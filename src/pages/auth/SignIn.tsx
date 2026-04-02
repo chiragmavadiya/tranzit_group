@@ -4,13 +4,33 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import { PasswordInput } from "@/components/ui/password-input";
-import { Link } from "react-router-dom";
+import { useNavigate, Link, Navigate } from "react-router-dom";
+import brandlogo from '../../assets/Tranzit_Logo.svg'
 
 export default function SignIn() {
+  const navigate = useNavigate();
+
+  const userAuthString = localStorage.getItem('userAuth');
+  if (userAuthString) {
+    try {
+      const userAuth = JSON.parse(userAuthString);
+      if (userAuth?.isAuthenticated) {
+        return <Navigate to="/orders" replace />;
+      }
+    } catch (e) { }
+  }
+
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const formData = new FormData(e.currentTarget);
     const payload = Object.fromEntries(formData.entries());
+
+    if (payload.email && payload.password) {
+      localStorage.setItem("userAuth", JSON.stringify({ email: payload.email, isAuthenticated: true }));
+    }
+
+    // redirect to dashboard route
+    navigate("/orders");
 
     try {
       const response = await fetch("/auth/signin", {
@@ -34,12 +54,12 @@ export default function SignIn() {
   return (
     <div className="grid min-h-screen grid-cols-1 lg:grid-cols-2">
       {/* Left Column (Brand/Info) */}
-      <div className="relative hidden flex-col justify-between bg-gradient-to-br from-blue-600 to-blue-800 p-10 text-white lg:flex lg:p-16">
+      <div className="relative hidden flex-col justify-between bg-[linear-gradient(165deg,_#1e3a5f_0%,_#2563eb_50%,_#0ea5e9_100%)] p-10 text-white lg:flex lg:p-16">
         <div className="flex-1">
-          <h1 className="mb-4 text-4xl font-extrabold tracking-tight sm:text-5xl">
+          <h1 className="mb-4 text-4xl font-extrabold tracking-tight sm:text-5xl drop-shadow-sm">
             Shipping automation that just works
           </h1>
-          <p className="mb-8 text-lg text-blue-100 max-w-lg">
+          <p className="mb-8 text-lg text-indigo-100 max-w-lg">
             Print labels, compare couriers, automate fulfilment and track deliveries - all from one platform. No per-label fees • Bring your own rates*
           </p>
 
@@ -52,20 +72,24 @@ export default function SignIn() {
                 "Local Support",
               ].map((feature, i) => (
                 <li key={i} className="flex items-center space-x-3 text-sm font-medium">
-                  <Check className="h-5 w-5 text-white" />
+                  <div className="flex h-6 w-6 items-center justify-center rounded-full bg-white/20 shadow-sm">
+                    <Check className="h-4 w-4 text-white" strokeWidth={3} />
+                  </div>
                   <span>{feature}</span>
                 </li>
               ))}
             </ul>
 
-            <ul className="space-y-3">
+            <ul className="space-y-3 pt-2">
               {[
                 "Save 6-10 hours per week on packing and logistics",
                 "See online orders reach customers faster",
                 "Save up to 50% on handling time",
               ].map((feature, i) => (
                 <li key={i} className="flex items-center space-x-3 text-sm font-medium">
-                  <Check className="h-5 w-5 text-white" />
+                  <div className="flex h-6 w-6 items-center justify-center rounded-full bg-white/20 shadow-sm">
+                    <Check className="h-4 w-4 text-white" strokeWidth={3} />
+                  </div>
                   <span>{feature}</span>
                 </li>
               ))}
@@ -73,8 +97,8 @@ export default function SignIn() {
           </div>
         </div>
 
-        <div className="mt-12">
-          <p className="text-sm font-medium text-blue-200">
+        <div className="mt-12 overflow-hidden rounded-xl border border-white/10 bg-white/10 p-5 backdrop-blur-md shadow-lg shadow-black/10">
+          <p className="text-sm font-medium text-indigo-50">
             Join retailers using Tranzit Group to save time on every order.
           </p>
         </div>
@@ -88,9 +112,11 @@ export default function SignIn() {
             <div className="flex items-center space-x-2 pb-4">
               {/* Fake Tranzit Group Logo */}
               <div className="flex italic text-3xl font-extrabold tracking-tight drop-shadow-sm">
-                <span className="text-slate-800 dark:text-slate-100">Trans</span>
+                {/* <span className="text-slate-800 dark:text-slate-100">Trans</span>
                 <span className="text-amber-500">zit</span>
-                <span className="text-slate-500 ml-1 text-base uppercase self-end mb-1">Group</span>
+                <span className="text-slate-500 ml-1 text-base uppercase self-end mb-1">Group</span> */}
+                {/* brand logo */}
+                <img src={brandlogo} alt="Logo" className="" />
               </div>
             </div>
 
@@ -145,7 +171,7 @@ export default function SignIn() {
               </a>
             </div>
 
-            <Button type="submit" className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-6 text-md rounded-md transition-all shadow-md hover:shadow-lg active:scale-[0.98]">
+            <Button type="submit" className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-6 text-md rounded-md transition-all shadow-md hover:shadow-lg">
               Login
             </Button>
 

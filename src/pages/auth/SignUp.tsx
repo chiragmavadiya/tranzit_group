@@ -7,6 +7,8 @@ import { PasswordInput } from "@/components/ui/password-input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Link } from "react-router-dom";
 import { useState } from "react";
+import brandlogo from '../../assets/Tranzit_Logo.svg'
+
 
 const COUNTRIES = [
   { code: "IN", name: "India", dialCode: "+91" },
@@ -47,7 +49,7 @@ export default function SignUp() {
   return (
     <div className="grid min-h-screen grid-cols-1 lg:grid-cols-2">
       {/* Left Column (Brand/Info) */}
-      <div className="relative hidden flex-col justify-between bg-gradient-to-br from-indigo-700 to-blue-900 p-10 text-white lg:flex lg:p-16">
+      <div className="relative flex-col justify-between bg-[linear-gradient(165deg,_#1e3a5f_0%,_#2563eb_50%,_#0ea5e9_100%)] p-10 text-white lg:flex lg:p-16">
         <div className="flex-1">
           <h1 className="mb-4 text-4xl font-extrabold tracking-tight sm:text-5xl drop-shadow-sm">
             Shipping automation that just works
@@ -104,10 +106,8 @@ export default function SignUp() {
           <div className="flex flex-col items-center text-center space-y-2">
             <div className="flex items-center space-x-2 pb-2">
               {/* Fake Tranzit Group Logo */}
-              <div className="flex italic text-3xl font-extrabold tracking-tight drop-shadow-sm hover:scale-105 transition-transform cursor-default">
-                <span className="text-slate-800 dark:text-slate-100">Trans</span>
-                <span className="text-amber-500">zit</span>
-                <span className="text-slate-500 ml-1 text-base uppercase self-end mb-1">Group</span>
+              <div className="flex italic text-3xl font-extrabold tracking-tight drop-shadow-sm">
+                <img src={brandlogo} alt="Logo" className="h-25" />
               </div>
             </div>
 
@@ -119,33 +119,34 @@ export default function SignUp() {
             </p>
           </div>
 
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-2">
+          <form onSubmit={handleSubmit} className="space-y-3">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
+              {/* <div className="grid grid-cols-2 gap-3 sm:gap-4"> */}
+              <div className="space-y-1">
                 <Label htmlFor="firstName" className="text-slate-700 dark:text-slate-300 font-semibold text-xs uppercase tracking-wider">
                   First name <span className="text-red-500">*</span>
                 </Label>
                 <Input
                   id="firstName"
                   name="firstName"
-                  placeholder="Enter your first name"
+                  placeholder="First name"
                   className="bg-white dark:bg-zinc-900 border-slate-200 dark:border-slate-800 transition-all focus-visible:ring-0 focus-visible:ring-offset-0 focus-visible:border-blue-500 h-10 shadow-sm"
                 />
               </div>
-              <div className="space-y-2">
+              <div className="space-y-1">
                 <Label htmlFor="lastName" className="text-slate-700 dark:text-slate-300 font-semibold text-xs uppercase tracking-wider">
                   Last name
                 </Label>
                 <Input
                   id="lastName"
                   name="lastName"
-                  placeholder="Enter your last name"
+                  placeholder="Last name"
                   className="bg-white dark:bg-zinc-900 border-slate-200 dark:border-slate-800 transition-all focus-visible:ring-0 focus-visible:ring-offset-0 focus-visible:border-blue-500 h-10 shadow-sm"
                 />
               </div>
             </div>
 
-            <div className="space-y-2">
+            <div className="space-y-1">
               <Label htmlFor="email" className="text-slate-700 dark:text-slate-300 font-semibold text-xs uppercase tracking-wider">
                 Email address <span className="text-red-500">*</span>
               </Label>
@@ -161,8 +162,8 @@ export default function SignUp() {
               />
             </div>
 
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-2">
+            <div className="grid grid-cols-2 gap-3 sm:gap-4">
+              <div className="space-y-1">
                 <Label htmlFor="country" className="text-slate-700 dark:text-slate-300 font-semibold text-xs uppercase tracking-wider">
                   Country
                 </Label>
@@ -180,7 +181,7 @@ export default function SignUp() {
                 </Select>
               </div>
 
-              <div className="space-y-2">
+              <div className="space-y-1">
                 <Label htmlFor="phone" className="text-slate-700 dark:text-slate-300 font-semibold text-xs uppercase tracking-wider">
                   Phone number
                 </Label>
@@ -200,7 +201,7 @@ export default function SignUp() {
               </div>
             </div>
 
-            <div className="space-y-2">
+            <div className="space-y-1">
               <Label htmlFor="password" className="text-slate-700 dark:text-slate-300 font-semibold text-xs uppercase tracking-wider">
                 Password <span className="text-red-500">*</span>
               </Label>
@@ -213,7 +214,7 @@ export default function SignUp() {
               />
             </div>
 
-            <div className="space-y-2">
+            <div className="space-y-1">
               <Label htmlFor="confirmPassword" className="text-slate-700 dark:text-slate-300 font-semibold text-xs uppercase tracking-wider">
                 Confirm your password <span className="text-red-500">*</span>
               </Label>
@@ -236,7 +237,7 @@ export default function SignUp() {
               </Label>
             </div>
 
-            <Button type="submit" className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold tracking-wide py-6 text-md rounded-md transition-all shadow-md hover:shadow-lg active:scale-[0.98] mt-6">
+            <Button type="submit" className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold tracking-wide py-6 text-md rounded-md transition-all shadow-md hover:shadow-lg mt-6">
               Continue
             </Button>
 

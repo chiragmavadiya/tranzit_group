@@ -7,7 +7,7 @@ export interface Order {
   country: string;
   state: string;
   type: 'Marketplace' | 'Manual' | 'Integration';
-  status: 'New' | 'Printed' | 'Shipped' | 'Archived';
+  status: 'New' | 'Printed' | 'Shipped' | 'Archived' | any;
   total: number;
   items_count: number;
   bin_location: string;
@@ -26,6 +26,17 @@ export interface Order {
   source: string;
   tags: string[];
   weight: string;
+}
+
+export interface MOCK_DATA_TYPE {
+  "customer": string;
+  "id_display": string;
+  "Suburb": string;
+  "Amount": string;
+  "status": "Courier Not Assigned" | "Payment Pending" | "Paid";
+  "Payment_Status": "Courier Not Assigned" | "Payment Pending" | "Paid";
+  "Courier": string;
+  "Order_Type": "Import" | "Manual" | "Integration" | "Shopify" | "Woocommerce";
 }
 
 export type TabType = 'New' | 'Printed' | 'Shipped' | 'Archived';

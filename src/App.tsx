@@ -1,6 +1,7 @@
 import { lazy, Suspense } from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import ProtectedRoute from './components/ProtectedRoute';
+import { ThemeProvider } from './components/theme-provider';
 import brandLogo from './assets/Tranzit_Logo.svg';
 import './App.css';
 
@@ -18,10 +19,10 @@ const PageLoader = () => (
   <div className="flex h-screen w-full items-center justify-center bg-white dark:bg-zinc-950">
     <div className="flex flex-col items-center gap-6">
       <div className="relative">
-        <img 
-          src={brandLogo} 
-          alt="Tranzit Group Logo" 
-          className="h-16 w-auto animate-pulse brightness-110 drop-shadow-md" 
+        <img
+          src={brandLogo}
+          alt="Tranzit Group Logo"
+          className="h-16 w-auto animate-pulse brightness-110 drop-shadow-md"
         />
         <div className="absolute -bottom-8 left-1/2 -translate-x-1/2">
           <div className="h-1.5 w-24 overflow-hidden rounded-full bg-slate-100 dark:bg-slate-800">
@@ -35,30 +36,32 @@ const PageLoader = () => (
 
 function App() {
   return (
-    <BrowserRouter>
-      <Suspense fallback={<PageLoader />}>
-        <Routes>
-          {/* Public Routes */}
-          <Route path="/signin" element={<SignIn />} />
-          <Route path="/signup" element={<SignUp />} />
+    <ThemeProvider defaultTheme="light" storageKey="tranzit-theme">
+      <BrowserRouter>
+        <Suspense fallback={<PageLoader />}>
+          <Routes>
+            {/* Public Routes */}
+            <Route path="/signin" element={<SignIn />} />
+            <Route path="/signup" element={<SignUp />} />
 
-          {/* Authenticated routes wrapped in ProtectedRoute -> Layout */}
-          <Route element={<ProtectedRoute />}>
-            <Route element={<Layout />}>
-              <Route path="/dashboard" element={<Dashboard />} />
-              <Route path="/orders" element={<Orders />} />
-              <Route path="/setup" element={<Setup />} />
-              <Route path="/search" element={<Search />} />
-              {/* Default authenticated route */}
-              <Route path="/" element={<Navigate to="/dashboard" replace />} />
+            {/* Authenticated routes wrapped in ProtectedRoute -> Layout */}
+            <Route element={<ProtectedRoute />}>
+              <Route element={<Layout />}>
+                <Route path="/dashboard" element={<Dashboard />} />
+                <Route path="/orders" element={<Orders />} />
+                <Route path="/setup" element={<Setup />} />
+                <Route path="/search" element={<Search />} />
+                {/* Default authenticated route */}
+                <Route path="/" element={<Navigate to="/dashboard" replace />} />
 
-              {/* Fallback route: inside the layout so it doesn't unmount the sidebar on unknown routes */}
-              <Route path="*" element={<Navigate to="/dashboard" replace />} />
+                {/* Fallback route: inside the layout so it doesn't unmount the sidebar on unknown routes */}
+                <Route path="*" element={<Navigate to="/dashboard" replace />} />
+              </Route>
             </Route>
-          </Route>
-        </Routes>
-      </Suspense>
-    </BrowserRouter>
+          </Routes>
+        </Suspense>
+      </BrowserRouter>
+    </ThemeProvider>
   );
 }
 

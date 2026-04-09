@@ -1,5 +1,5 @@
 import { Search, ChevronDown, LogOut, Sun, Moon, Monitor } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation, useSearchParams } from 'react-router-dom';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -8,10 +8,13 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { useTheme } from '@/components/theme-provider';
-import tranzit_logo from '@/assets/Tranzit_Logo.svg';
+import { OrdersTabs } from '../orders/components/OrdersTabs';
+import type { TabType } from '../orders/types';
 
 export default function TopBar({ isCollapsed }: { isCollapsed?: boolean }) {
   const navigate = useNavigate();
+  const location = useLocation();
+  const [searchParams, setSearchParams] = useSearchParams();
   const { theme, setTheme } = useTheme();
 
   const handleLogout = () => {
@@ -21,9 +24,15 @@ export default function TopBar({ isCollapsed }: { isCollapsed?: boolean }) {
 
   return (
     <header className={`h-16 bg-white dark:bg-zinc-950 border-b border-gray-200 dark:border-zinc-800 flex items-center justify-between px-6 fixed top-0 right-0 z-10 transition-[left] duration-300 ease-in-out ${isCollapsed ? 'left-[64px]' : 'left-[240px]'}`}>
-      <div className="flex items-center">
-        {/* brand logo */}
-        <img src={tranzit_logo} alt="Tranzit" className="h-10 dark:invert" />
+      <div className='flex justify-center flex-1'>
+        {location.pathname === '/orders' && (
+          <div className="h-16 ml-4">
+            <OrdersTabs
+              activeTab={(searchParams.get('tab') as TabType) || 'new'}
+              onTabChange={(tab) => setSearchParams({ tab })}
+            />
+          </div>
+        )}
       </div>
       <div className="flex items-center gap-3">
         <div className="relative flex items-center">
@@ -36,6 +45,8 @@ export default function TopBar({ isCollapsed }: { isCollapsed?: boolean }) {
             <Search className="h-4 w-4" strokeWidth={2.5} />
           </button>
         </div>
+
+
 
         {/* Theme Toggle Dropdown */}
         <DropdownMenu>

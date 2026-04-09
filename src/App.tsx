@@ -13,6 +13,7 @@ const Layout = lazy(() => import('./pages/layout'));
 const Orders = lazy(() => import('./pages/orders'));
 const Search = lazy(() => import('./pages/search'));
 const Setup = lazy(() => import('./pages/setup'));
+const OrderDetails = lazy(() => import('./pages/orders/OrderDetails/OrderDetailsPage'));
 
 // Simple loading fallback component
 const PageLoader = () => (
@@ -48,14 +49,17 @@ function App() {
             <Route element={<ProtectedRoute />}>
               <Route element={<Layout />}>
                 <Route path="/dashboard" element={<Dashboard />} />
-                <Route path="/orders" element={<Orders />} />
+                <Route path="/orders">
+                  <Route index element={<Orders />} />
+                  <Route path=":orderType/:orderID" element={<OrderDetails />} />
+                </Route>
                 <Route path="/setup" element={<Setup />} />
                 <Route path="/search" element={<Search />} />
                 {/* Default authenticated route */}
-                <Route path="/" element={<Navigate to="/dashboard" replace />} />
+                <Route path="/" element={<Navigate to="/orders" replace />} />
 
                 {/* Fallback route: inside the layout so it doesn't unmount the sidebar on unknown routes */}
-                <Route path="*" element={<Navigate to="/dashboard" replace />} />
+                <Route path="*" element={<Navigate to="/orders" replace />} />
               </Route>
             </Route>
           </Routes>

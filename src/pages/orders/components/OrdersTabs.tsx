@@ -1,36 +1,46 @@
 import { cn } from '@/lib/utils';
 import type { TabType } from '../types';
-import { TABS, MOCK_ORDERS, Order_status_styles } from '../constants';
+import { TABS } from '../constants';
 
 interface OrdersTabsProps {
   activeTab: TabType;
   onTabChange: (tab: TabType) => void;
+  className?: string;
 }
 
-export function OrdersTabs({ activeTab, onTabChange }: OrdersTabsProps) {
+export function OrdersTabs({ activeTab, onTabChange, className }: OrdersTabsProps) {
   return (
-    <div className="border-b border-gray-200 dark:border-zinc-800 transition-colors">
-      <nav className="flex space-x-8" aria-label="Tabs">
-        {TABS.map((tab) => (
+    <nav className={cn("flex items-center space-x-6 h-full", className)} aria-label="Tabs">
+      {TABS.map((tab) => {
+        const count = 61;
+        const isActive = activeTab === tab.toLowerCase();
+
+        return (
           <button
             key={tab}
-            onClick={() => onTabChange(tab)}
+            onClick={() => onTabChange(tab.toLowerCase() as TabType)}
             className={cn(
-              "py-4 px-1 border-b-2 font-medium text-sm transition-all duration-200 relative",
-              activeTab === tab
+              "h-full px-1 border-b-2 font-semibold text-[13px] transition-all duration-200 relative flex items-center gap-2 outline-none whitespace-nowrap",
+              isActive
                 ? "border-blue-600 text-blue-600 dark:text-blue-400 dark:border-blue-400"
                 : "border-transparent text-gray-500 dark:text-zinc-400 hover:text-gray-700 dark:hover:text-zinc-200 hover:border-gray-300 dark:hover:border-zinc-600"
             )}
           >
             {tab}
-            {activeTab === tab && (
-              <span className={cn("absolute -top-1 -right-4 px-2 py-0.5 text-[10px] rounded-full font-bold shadow-sm shadow-blue-200 animate-in zoom-in duration-300", Order_status_styles[tab])}>
-                {MOCK_ORDERS.filter(o => o.status === tab).length}
+            {count > 0 && (
+              <span className={cn(
+                "px-1.5 py-0.5 text-[10px] rounded-full font-bold transition-all duration-300",
+                isActive
+                  ? "bg-blue-100 dark:bg-blue-900/40 text-blue-600 dark:text-blue-400"
+                  : "bg-gray-100 dark:bg-zinc-800 text-gray-400 dark:text-zinc-500"
+              )}>
+                {count}
               </span>
             )}
           </button>
-        ))}
-      </nav>
-    </div>
+        );
+      })}
+    </nav>
   );
 }
+

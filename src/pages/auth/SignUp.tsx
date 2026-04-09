@@ -4,23 +4,11 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import { PasswordInput } from "@/components/ui/password-input";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Link } from "react-router-dom";
-import { useState } from "react";
 import brandlogo from '../../assets/Tranzit_Logo.svg'
 
-
-const COUNTRIES = [
-  { code: "IN", name: "India", dialCode: "+91" },
-  { code: "US", name: "United States", dialCode: "+1" },
-  { code: "GB", name: "United Kingdom", dialCode: "+44" },
-  { code: "AU", name: "Australia", dialCode: "+61" },
-  { code: "CA", name: "Canada", dialCode: "+1" },
-];
-
 export default function SignUp() {
-  const [selectedCountry, setSelectedCountry] = useState("IN");
-  const phonePrefix = COUNTRIES.find((c) => c.code === selectedCountry)?.dialCode || "+91";
+  const phonePrefix = "+61";
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -135,7 +123,7 @@ export default function SignUp() {
               </div>
               <div className="space-y-1">
                 <Label htmlFor="lastName" className="text-slate-700 dark:text-slate-300 font-semibold text-xs uppercase tracking-wider">
-                  Last name
+                  Last name <span className="text-red-500">*</span>
                 </Label>
                 <Input
                   id="lastName"
@@ -162,42 +150,22 @@ export default function SignUp() {
               />
             </div>
 
-            <div className="grid grid-cols-2 gap-3 sm:gap-4">
-              <div className="space-y-1">
-                <Label htmlFor="country" className="text-slate-700 dark:text-slate-300 font-semibold text-xs uppercase tracking-wider">
-                  Country
-                </Label>
-                <Select value={selectedCountry} onValueChange={(val) => val && setSelectedCountry(val)} name="country">
-                  <SelectTrigger className="w-full bg-white dark:bg-zinc-900 border-slate-200 dark:border-slate-800 transition-all focus-visible:ring-0 focus-visible:ring-offset-0 focus-visible:border-blue-500 h-10 shadow-sm data-[size=default]:h-10">
-                    <SelectValue placeholder="Select Country" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {COUNTRIES.map((c) => (
-                      <SelectItem key={c.code} value={c.code}>
-                        {c.name}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-
-              <div className="space-y-1">
-                <Label htmlFor="phone" className="text-slate-700 dark:text-slate-300 font-semibold text-xs uppercase tracking-wider">
-                  Phone number
-                </Label>
-                <div className="relative flex items-center">
-                  <span className="absolute left-3 text-slate-500 font-medium text-sm z-10 pointer-events-none">
-                    {phonePrefix}
-                  </span>
-                  <input type="hidden" name="phonePrefix" value={phonePrefix} />
-                  <Input
-                    id="phone"
-                    name="phone"
-                    type="tel"
-                    placeholder="Enter your phone number"
-                    className="bg-white dark:bg-zinc-900 border-slate-200 dark:border-slate-800 transition-all focus-visible:ring-0 focus-visible:ring-offset-0 focus-visible:border-blue-500 h-10 shadow-sm pl-10"
-                  />
-                </div>
+            <div className="space-y-1">
+              <Label htmlFor="phone" className="text-slate-700 dark:text-slate-300 font-semibold text-xs uppercase tracking-wider">
+                Phone number <span className="text-red-500">*</span>
+              </Label>
+              <div className="relative flex items-center">
+                <span className="absolute left-3 text-slate-500 font-medium text-sm z-10 pointer-events-none">
+                  {phonePrefix}
+                </span>
+                <input type="hidden" name="phonePrefix" value={phonePrefix} />
+                <Input
+                  id="phone"
+                  name="phone"
+                  type="tel"
+                  placeholder="Enter your phone number"
+                  className="bg-white dark:bg-zinc-900 border-slate-200 dark:border-slate-800 transition-all focus-visible:ring-0 focus-visible:ring-offset-0 focus-visible:border-blue-500 h-10 shadow-sm pl-10"
+                />
               </div>
             </div>
 

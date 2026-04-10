@@ -33,7 +33,7 @@ export const TableCard: React.FC<TableCardProps> = ({
   editable = false
 }) => {
   return (
-    <Card className="border-1 ring-0 shadow-md border-gray-200 dark:border-zinc-800 rounded-xl py-1 px-4 overflow-hidden group transition-colors duration-300">
+    <Card className="border ring-0 shadow-md border-gray-200 dark:border-zinc-800 rounded-xl py-1 px-4 overflow-hidden group transition-colors duration-300">
       <CardHeader className="flex flex-row items-center justify-between py-3 px-5 border-b border-gray-100 dark:border-zinc-800 bg-white dark:bg-zinc-900 group-hover:bg-gray-50/50 dark:group-hover:bg-zinc-800/50 transition-colors">
         <CardTitle className="text-sm font-bold text-gray-900 dark:text-zinc-100 tracking-wider">
           {title.toUpperCase()}

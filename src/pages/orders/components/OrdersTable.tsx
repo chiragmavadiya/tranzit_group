@@ -1,6 +1,6 @@
 import { useState, useMemo } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { MoreHorizontal, Settings2, Eye, Truck, CheckCircle2, ArrowUp, ArrowDown } from 'lucide-react';
+import { MoreHorizontal, Settings2, Eye, Truck, CheckCircle2, ArrowUp, ArrowDown, Trash } from 'lucide-react';
 import {
   Table, TableBody, TableCell,
   TableHead, TableHeader, TableRow
@@ -39,6 +39,10 @@ const OrderActionMenu = ({ order }: { order: Order }) => {
           <DropdownMenuItem className="flex items-center px-3 py-2 rounded-lg cursor-pointer transition-colors hover:bg-gray-50 dark:hover:bg-zinc-800 mt-0.5">
             <Truck className="w-4 h-4 mr-2.5 text-gray-400" />
             <span className="text-sm font-medium">Consign</span>
+          </DropdownMenuItem>
+          <DropdownMenuItem className="flex items-center px-3 py-2 rounded-lg cursor-pointer transition-colors hover:bg-gray-50 dark:hover:bg-zinc-800 mt-0.5">
+            <Trash className="w-4 h-4 mr-2.5 text-gray-400" />
+            <span className="text-sm font-medium ">Delete Order</span>
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenuPortal>
@@ -100,7 +104,7 @@ export function OrdersTable({ orders, sortConfig, onSort }: OrdersTableProps) {
   };
 
   return (
-    <div className="flex-1 overflow-auto relative custom-scrollbar border rounded-lg bg-white dark:bg-zinc-950 border-gray-200 dark:border-zinc-800">
+    <div className="flex-1 overflow-auto relative custom-scrollbar border rounded-lg bg-white dark:bg-zinc-950 border-gray-200 dark:border-zinc-800 z-0">
       <Table className={cn("min-w-max border-separate border-spacing-0", orders.length === 0 && "h-full")}>
         <TableHeader className="sticky top-0 bg-white dark:bg-zinc-900 border-b z-1">
           <TableRow className="hover:bg-transparent border-b-0">

@@ -25,7 +25,7 @@ interface OrdersFiltersProps {
   onReplaceFilter: (filterId: string, filter: FilterItem) => void;
   onClearAllFilters: () => void;
   onImportClick?: () => void;
-  onCreateOrderClick?: (type: 'order' | 'return') => void;
+  onCreateOrderClick?: (type: 'receiver' | 'return') => void;
 }
 
 export function OrdersFilters({
@@ -108,7 +108,7 @@ export function OrdersFilters({
                   />
                 </div>
               </PopoverTrigger>
-              <PopoverContent className="w-auto p-0 border-none shadow-none z-[100]" align="start" sideOffset={8}>
+              <PopoverContent className="w-auto p-0 border-none shadow-none z-99999" align="start" sideOffset={8}>
                 <AdvancedFilterPopover
                   orders={orders}
                   activeFilters={activeFilters}
@@ -140,7 +140,7 @@ export function OrdersFilters({
           variant="ghost"
           className="h-9 gap-2 text-[#0060FE] hover:text-blue-700 hover:bg-blue-50 dark:hover:bg-blue-900/10 font-bold text-[11px] uppercase tracking-wider transition-colors"
         >
-          <Send className="w-3.5 h-3.5 rotate-[-45deg] mt-[5px]" />
+          <Send className="w-3.5 h-3.5 -rotate-45 mt-[5px]" />
           <span>Manifest All</span>
         </Button>
 
@@ -178,7 +178,7 @@ export function OrdersFilters({
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end" className="w-56 p-1">
             <DropdownMenuItem
-              onClick={() => onCreateOrderClick?.('order')}
+              onClick={() => onCreateOrderClick?.('receiver')}
               className="cursor-pointer py-2.5 px-3 rounded-lg hover:bg-blue-50 dark:hover:bg-blue-900/20"
             >
               <div className="flex flex-col">

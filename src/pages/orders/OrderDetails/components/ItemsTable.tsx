@@ -25,7 +25,6 @@ interface ItemsTableProps {
   onUpdateItem?: (index: number, key: string, value: string | number) => void
   children?: React.ReactNode
   footer?: React.ReactNode
-  footerCells?: React.ReactNode[]
   isEmpty?: boolean
   addItem?: (data?: ItemData) => void
   removeItem?: (index: number | undefined) => void
@@ -40,7 +39,6 @@ export const ItemsTable: React.FC<ItemsTableProps> = ({
   onUpdateItem,
   children,
   footer,
-  footerCells,
   addItem,
   removeItem,
   onFullUpdateItem,
@@ -88,12 +86,12 @@ export const ItemsTable: React.FC<ItemsTableProps> = ({
   }, [addItem, onFullUpdateItem, editingItem]);
 
   return (
-    <Card className="border-1 ring-0 shadow-md border-gray-200 dark:border-zinc-800 rounded-xl py-1 px-4 overflow-hidden group transition-colors duration-300">
+    <Card className="border ring-0 shadow-md border-gray-200 dark:border-zinc-800 rounded-xl py-1 px-4 overflow-hidden group transition-colors duration-300">
       <CardHeader className="flex flex-row items-center justify-between py-3 px-5 border-b border-gray-100 dark:border-zinc-800 bg-white dark:bg-zinc-900 group-hover:bg-gray-50/50 dark:group-hover:bg-zinc-800/50 transition-colors">
         <CardTitle className="text-sm font-bold text-gray-900 dark:text-zinc-100 tracking-wider">
           ITEMS
         </CardTitle>
-        <ChevronDown onClick={handleEditClick} className={`h-5 w-5 text-[#0060FE] group-hover:bg-blue-50 dark:group-hover:bg-blue-900/20 rounded-full transition-colors transition-transform duration-300 ${isEditable ? 'rotate-180' : ''}`} />
+        <ChevronDown onClick={handleEditClick} className={`h-5 w-5 text-[#0060FE] group-hover:bg-blue-50 dark:group-hover:bg-blue-900/20 rounded-full transition-transform duration-300 ${isEditable ? 'rotate-180' : ''}`} />
       </CardHeader>
       <CardContent className="p-0 bg-white dark:bg-zinc-950">
         <div className='overflow-x-auto'>
@@ -146,6 +144,7 @@ export const ItemsTable: React.FC<ItemsTableProps> = ({
                                 onChange={(e) => onUpdateItem?.(idx, col.key, col.type === 'number' ? Number(e.target.value) || 0 : e.target.value)}
                                 className={`h-7 w-full min-w-[50px] ${col.key === 'ship' || col.key === 'qtyShipped' ? 'w-[60px]' : ''} text-xs border-transparent bg-transparent shadow-none group-hover/row:border-gray-200 dark:group-hover/row:border-zinc-800 focus:border-blue-600 focus:bg-white dark:focus:bg-zinc-950 focus-visible:ring-1 focus-visible:ring-blue-600 transition-all font-medium py-0 px-2`}
                                 type={col.type === 'number' ? 'number' : 'text'}
+                                placeholder={'0'}
                               />
                               {col.key === 'ship' || col.key === 'qtyShipped' && (
                                 <span className="text-xs text-gray-500 dark:text-zinc-400">of 1</span>

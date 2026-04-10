@@ -55,7 +55,7 @@ export const HistoryCard: React.FC = () => {
   }
 
   return (
-    <Card className="border-1 ring-0 shadow-md border-gray-200 dark:border-zinc-800 rounded-xl overflow-hidden transition-colors duration-300 gap-2">
+    <Card className="border py-0 ring-0 shadow-md border-gray-200 dark:border-zinc-800 rounded-xl overflow-hidden transition-colors duration-300 gap-2">
       <CardHeader
         className="flex flex-row items-center justify-between py-3 px-5 border-b border-gray-100 dark:border-zinc-800 bg-white dark:bg-zinc-900 cursor-pointer transition-colors"
         onClick={() => setIsCardExpanded(!isCardExpanded)}

@@ -43,7 +43,7 @@ export function OrdersPagination({
         </Button>
 
         <div className="flex items-center mx-2">
-          <span className="text-[13px] font-medium text-gray-900 dark:text-zinc-100 px-3 py-1 bg-blue-50 dark:bg-blue-900/20 rounded text-blue-600 dark:text-blue-400">
+          <span className="text-[13px] font-medium text-gray-900 dark:text-zinc-100 px-3 py-1 bg-blue-50 dark:bg-blue-900/20 rounded">
             {currentPage}
           </span>
         </div>

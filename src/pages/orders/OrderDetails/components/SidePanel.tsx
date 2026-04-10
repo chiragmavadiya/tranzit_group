@@ -104,7 +104,11 @@ export const SidePanel: React.FC<{ orderType: string | undefined }> = ({ orderTy
             {/* save button on right side */}
             {orderType !== 'new' && (
               <div className="flex justify-end">
-                <Button className="w-fit flex items-center gap-2 bg-[#0060FE] text-white hover:bg-blue-700 h-8 px-4 rounded-md font-bold text-xs uppercase">
+                <Button onClick={() => {
+                  const address = "B-710, Gopal palace, near zhanshi rani brts bus stnad, shivranjani Ahmedabad Gujarat India"
+                  const url = `https://www.google.com/maps?q=${encodeURIComponent(address)}`
+                  window.open(url, "_blank")
+                }} className="w-fit flex items-center gap-2 bg-[#0060FE] text-white hover:bg-blue-700 h-8 px-4 rounded-md font-bold text-xs uppercase">
                   <Save className="h-4 w-4" />
                   SAVE
                 </Button>
@@ -217,17 +221,27 @@ export const SidePanel: React.FC<{ orderType: string | undefined }> = ({ orderTy
 
         {/* ADDITIONAL DETAILS */}
         <AccordionItem value="details" className="border border-gray-200 dark:border-zinc-800 rounded-xl bg-white dark:bg-zinc-950 shadow-sm px-5 border-b overflow-hidden transition-colors duration-300">
-          <AccordionTrigger className="hover:no-underline py-3 px-0">
+          <AccordionTrigger className="hover:no-underline py-3 px-0 [&>svg]:text-[#0060FE] dark:[&>svg]:text-blue-500">
             <span className="text-sm font-bold text-gray-900 dark:text-zinc-100 tracking-wider">ADDITIONAL DETAILS</span>
           </AccordionTrigger>
-          <AccordionContent className="text-gray-500 dark:text-zinc-400 text-xs text-uppercase font-bold tracking-wider">
-            No additional details.
+          <AccordionContent className="flex flex-col gap-4 pb-4 mt-1">
+            <div className="flex justify-between items-center text-[13px]">
+              <span className="text-gray-700 dark:text-zinc-400">Order #</span>
+              <span className="text-gray-700 dark:text-zinc-200">5</span>
+            </div>
+            <div className="flex justify-between items-center text-[13px]">
+              <span className="text-gray-700 dark:text-zinc-400">Reference</span>
+            </div>
+            <div className="flex justify-between items-center text-[13px]">
+              <span className="text-gray-700 dark:text-zinc-400">Insurance Value</span>
+              <span className="text-gray-700 dark:text-zinc-200">0.00</span>
+            </div>
           </AccordionContent>
         </AccordionItem>
 
         {/* BREAKDOWN */}
         <AccordionItem value="breakdown" className="border border-gray-200 dark:border-zinc-800 rounded-xl bg-white dark:bg-zinc-950 shadow-sm px-5 border-b overflow-hidden transition-colors duration-300">
-          <AccordionTrigger className="hover:no-underline py-3 px-0">
+          <AccordionTrigger className="hover:no-underline py-3 px-0 [&>svg]:text-[#0060FE] dark:[&>svg]:text-blue-500">
             <span className="text-sm font-bold text-gray-900 dark:text-zinc-100 tracking-wider">BREAKDOWN</span>
           </AccordionTrigger>
           <AccordionContent className="text-gray-500 dark:text-zinc-400 text-xs text-uppercase font-bold tracking-tight">

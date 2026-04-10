@@ -15,7 +15,7 @@ export default function Orders() {
   const [searchQuery, setSearchQuery] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(25);
-  const [orderDialogMode, setOrderDialogMode] = useState<'order' | 'return' | null>(null);
+  const [orderDialogMode, setOrderDialogMode] = useState<'receiver' | 'return' | null>(null);
   const [sortConfig, setSortConfig] = useState<{
     key: string | null;
     direction: 'asc' | 'desc' | null;
@@ -103,7 +103,7 @@ export default function Orders() {
       const matchesSearch = !searchQuery ||
         fullName.includes(searchQuery.toLowerCase()) ||
         order.order_number.toLowerCase().includes(searchQuery.toLowerCase());
-
+      console.log(searchQuery, matchesSearch, 'matchesSearch', fullName);
       if (!matchesSearch) return false;
 
       // 3. Advanced Multi-Filters

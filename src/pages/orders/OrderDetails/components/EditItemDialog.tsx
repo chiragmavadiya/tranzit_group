@@ -144,7 +144,7 @@ export const EditItemDialog: React.FC<EditItemDialogProps> = ({
               </div>
 
               <div className="col-span-12 grid grid-cols-12 gap-4 items-end">
-                <div className="col-span-2">
+                <div className="col-span-4">
                   <FormInput
                     label="QTY ORDERED"
                     value={String(formData.qtyOrdered || 0)}
@@ -152,7 +152,7 @@ export const EditItemDialog: React.FC<EditItemDialogProps> = ({
                     type="number"
                   />
                 </div>
-                <div className="col-span-2">
+                <div className="col-span-4">
                   <FormInput
                     label="QTY TO SHIP"
                     value={String(formData.ship)}
@@ -160,20 +160,12 @@ export const EditItemDialog: React.FC<EditItemDialogProps> = ({
                     type="number"
                   />
                 </div>
-                <div className="col-span-2">
+                <div className="col-span-4">
                   <FormInput
                     label="QTY SHIPPED"
                     value={String(formData.qtyShipped)}
                     onChange={(val: string) => updateField('qtyShipped', Number(val))}
                     type="number"
-                  />
-                </div>
-                <div className="col-span-4">
-                  <FormInput
-                    label="BIN LOCATION"
-                    value={formData.binLocation || ''}
-                    onChange={(val: string) => updateField('binLocation', val)}
-                    placeholder="Enter the bin location"
                   />
                 </div>
               </div>
@@ -183,6 +175,14 @@ export const EditItemDialog: React.FC<EditItemDialogProps> = ({
                   value={formData.barcode || ''}
                   onChange={(val: string) => updateField('barcode', val)}
                   placeholder="Enter the barcode"
+                />
+              </div>
+              <div className="col-span-4">
+                <FormInput
+                  label="BIN LOCATION"
+                  value={formData.binLocation || ''}
+                  onChange={(val: string) => updateField('binLocation', val)}
+                  placeholder="Enter the bin location"
                 />
               </div>
             </div>
@@ -272,7 +272,7 @@ export const EditItemDialog: React.FC<EditItemDialogProps> = ({
           </Button>
           <Button
             onClick={handleSave}
-            className="bg-[#00a651] hover:bg-[#009247] text-white font-bold h-10 px-8 rounded-md flex items-center gap-2 shadow-md shadow-emerald-500/10"
+            className="bg-[#40a16f] hover:bg-[#009247] text-white font-bold h-10 px-8 rounded-md flex items-center gap-2 shadow-md shadow-emerald-500/10"
           >
             <Check className="w-4 h-4" strokeWidth={3} />
             UPDATE ORDER

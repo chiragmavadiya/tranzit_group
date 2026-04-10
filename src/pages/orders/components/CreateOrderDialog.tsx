@@ -44,7 +44,7 @@ export const initialData: OrderFormData = {
   packets: [],
 };
 
-export function CreateOrderDialog({ onOpenChange }: CreateOrderDialogProps) {
+export function CreateOrderDialog({ onOpenChange, type }: CreateOrderDialogProps) {
   const navigate = useNavigate();
   const [formData, setFormData] = useState<OrderFormData>(initialData);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -92,8 +92,8 @@ export function CreateOrderDialog({ onOpenChange }: CreateOrderDialogProps) {
               <Pencil className="w-5 h-5 text-blue-600 dark:text-blue-400" />
             </div>
             <div className="space-y-1">
-              <h2 className="text-xl font-bold tracking-tight text-slate-900 dark:text-zinc-100">
-                Receiver address
+              <h2 className="text-xl font-bold tracking-tight text-slate-900 dark:text-zinc-100 capitalize">
+                {type} address
               </h2>
               <p className="text-[12px] text-slate-500 dark:text-zinc-400 font-medium leading-tight">
                 Enter the receiver's address. You can lookup a customer's details saved in the address book to complete this section.

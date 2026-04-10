@@ -29,7 +29,7 @@ export function ColumnSettings({
     return columns.filter(col =>
       col.header.toLowerCase().includes(searchQuery.toLowerCase()) && !col.default
     );
-  }, [searchQuery]);
+  }, [searchQuery, columns]);
 
   const allSelected = useMemo(() => visibleColumns.length === columns.length, [visibleColumns, columns]);
 

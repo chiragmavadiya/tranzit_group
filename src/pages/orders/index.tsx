@@ -81,16 +81,10 @@ export default function Orders() {
     return stringValue === filterValue;
   };
 
-  const generateRandom = () => {
-    const random = Math.floor(Math.random() * 4) + 1;
-    return random;
-  };
-
   // Filtering Logic
   const filteredOrders = useMemo(() => {
     return MOCK_ORDERS_DATA.filter(order => {
       // 1. Tab filtering (Uncommented - New tab should filter by status 1)
-      order.status = generateRandom();
       const matchesTab = activeTab === 'New' ? order.status === 1 :
         activeTab === 'Printed' ? order.status === 2 :
           activeTab === 'Shipped' ? order.status === 3 :
@@ -125,18 +119,22 @@ export default function Orders() {
     });
   }, [activeTab, searchQuery, activeFilters]);
 
+  console.log(filteredOrders)
+
   // Sorting Logic
   const sortedOrders = useMemo(() => {
     if (!sortConfig.key || !sortConfig.direction) return filteredOrders;
 
     return [...filteredOrders].sort((a, b) => {
       const key = sortConfig.key as keyof Order;
-      let aValue: any = a[key] ?? '';
-      let bValue: any = b[key] ?? '';
+      const aRaw = a[key];
+      const bRaw = b[key];
+      let aValue: string | number = (typeof aRaw === 'string' || typeof aRaw === 'number') ? aRaw : '';
+      let bValue: string | number = (typeof bRaw === 'string' || typeof bRaw === 'number') ? bRaw : '';
 
       // Special handling for Amount (currency)
       if (key.toString().toLowerCase() === 'amount') {
-        const parseAmount = (val: any) => {
+        const parseAmount = (val: string | number | null | undefined) => {
           if (typeof val !== 'string') return 0;
           const cleaned = val.replace(/[$, ]/g, '');
           return cleaned === '-' ? 0 : parseFloat(cleaned) || 0;

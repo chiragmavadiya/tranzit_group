@@ -253,7 +253,7 @@ export interface ItemData {
   brandName?: string;
   makeOrModel?: string;
   usageOrPurpose?: string;
-  [key: string]: string | number | undefined;
+  [key: string]: string | number | undefined | null;
 }
 
 export interface ItemsColumn extends PackingColumn {

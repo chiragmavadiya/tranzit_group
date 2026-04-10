@@ -192,7 +192,7 @@ function SelectComponent({ data, defaultValue, placeholder, className, value, on
         <SelectValue placeholder={placeholder} className="placeholder:text-slate-300 dark:placeholder:text-zinc-700" />
       </SelectTrigger>
       <SelectContent alignItemWithTrigger={false} className="dark:bg-zinc-900 dark:border-zinc-800 p-1 rounded-md">
-        {data.map((item: any) => (
+        {data.map((item) => (
           <SelectItem key={item.key} value={item.key} className="h-7 text-xs font-medium data-highlighted:bg-blue-500/20 data-selected:bg-blue-500/90" >
             {item.key}
           </SelectItem>

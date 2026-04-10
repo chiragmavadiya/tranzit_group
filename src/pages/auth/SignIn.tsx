@@ -17,7 +17,9 @@ export default function SignIn() {
       if (userAuth?.isAuthenticated) {
         return <Navigate to="/orders" replace />;
       }
-    } catch (e) { }
+    } catch { 
+      // ignore
+    }
   }
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {

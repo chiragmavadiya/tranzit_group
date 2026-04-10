@@ -251,7 +251,7 @@ interface DropdownUIProps {
 }
 
 export function DropdownUI({ icon = 'ChevronDown', label, onClick, options }: DropdownUIProps) {
-  const IconComponent = LucideIcons[icon] as React.ComponentType<any>;
+  const IconComponent = LucideIcons[icon] as React.ComponentType<React.SVGProps<SVGSVGElement>>;
   return (
     <DropdownMenu>
       <DropdownMenuTrigger className="flex items-center gap-2 border border-gray-200 dark:border-zinc-800 text-gray-700 dark:text-zinc-300 h-10 px-4 rounded-md hover:bg-gray-50 dark:hover:bg-zinc-900 transition-colors cursor-pointer outline-none text-sm font-medium">

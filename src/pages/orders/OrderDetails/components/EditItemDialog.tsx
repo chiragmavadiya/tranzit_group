@@ -37,12 +37,13 @@ export const EditItemDialog: React.FC<EditItemDialogProps> = ({
   const [formData, setFormData] = useState<ItemData | null>(null);
 
   useEffect(() => {
-    if (item) {
+    if (open && item) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setFormData({ ...item });
     }
-  }, [item]);
+  }, [open, item]);
 
-  const updateField = useCallback((field: keyof ItemData, value: any) => {
+  const updateField = useCallback((field: keyof ItemData, value: string | number | null) => {
     setFormData((prev) => prev ? ({ ...prev, [field]: value }) : null);
   }, []);
 

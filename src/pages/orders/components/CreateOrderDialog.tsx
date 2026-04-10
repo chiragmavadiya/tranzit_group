@@ -27,7 +27,7 @@ const POSTCODES = [
   { value: "2000", key: "2000" },
 ];
 
-export const initialData: OrderFormData = {
+const initialData: OrderFormData = {
   receiverContactPerson: '',
   receiverEmail: '',
   receiverPhone: '',
@@ -51,7 +51,7 @@ export function CreateOrderDialog({ onOpenChange, type }: CreateOrderDialogProps
   // const [isSuccess, setIsSuccess] = useState(false);
   const [activeLookup, setActiveLookup] = useState<'contact' | 'address'>('address');
 
-  const updateField = (field: keyof OrderFormData, value: any) => {
+  const updateField = (field: keyof OrderFormData, value: string | boolean | number | string[]) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
   };
 

@@ -12,7 +12,7 @@ import Dropdown, {
   DropdownMenuTrigger,
   DropdownMenuItem
 } from '@/components/ui/dropdown-menu';
-import { cn } from '@/lib/utils';
+import { cn, getNestedValue } from '@/lib/utils';
 import type { Order } from '../types';
 import { COLUMN_CONFIG } from '../constants';
 import { ColumnSettings } from './ColumnSettings';
@@ -97,10 +97,6 @@ export function OrdersTable({ orders, sortConfig, onSort }: OrdersTableProps) {
     setVisibleColumns(prev =>
       prev.includes(key) ? prev.filter(k => k !== key) : [...prev, key]
     );
-  };
-
-  const getNestedValue = (obj: any, path: string) => {
-    return path.split('.').reduce((acc, part) => acc && acc[part], obj);
   };
 
   return (

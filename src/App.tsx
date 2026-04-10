@@ -3,11 +3,14 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import ProtectedRoute from './components/ProtectedRoute';
 import { ThemeProvider } from './components/theme-provider';
 import brandLogo from './assets/Tranzit_Logo.svg';
+// import { ErrorBoundary } from './components/ErrorBoundary';
 import './App.css';
 
 // Lazy load page components
 const SignIn = lazy(() => import('./pages/auth/SignIn'));
 const SignUp = lazy(() => import('./pages/auth/SignUp'));
+const ForgotPassword = lazy(() => import('./pages/auth/ForgotPassword'));
+const ResetPassword = lazy(() => import('./pages/auth/ResetPassword'));
 const Dashboard = lazy(() => import('./pages/Dashboard'));
 const Layout = lazy(() => import('./pages/layout'));
 const Orders = lazy(() => import('./pages/orders'));
@@ -37,6 +40,7 @@ const PageLoader = () => (
 
 function App() {
   return (
+    // <ErrorBoundary>
     <ThemeProvider defaultTheme="light" storageKey="tranzit-theme">
       <BrowserRouter>
         <Suspense fallback={<PageLoader />}>
@@ -44,6 +48,8 @@ function App() {
             {/* Public Routes */}
             <Route path="/signin" element={<SignIn />} />
             <Route path="/signup" element={<SignUp />} />
+            <Route path="/forgot-password" element={<ForgotPassword />} />
+            <Route path="/reset-password/:token" element={<ResetPassword />} />
 
             {/* Authenticated routes wrapped in ProtectedRoute -> Layout */}
             <Route element={<ProtectedRoute />}>
@@ -66,6 +72,7 @@ function App() {
         </Suspense>
       </BrowserRouter>
     </ThemeProvider>
+    // </ErrorBoundary>
   );
 }
 

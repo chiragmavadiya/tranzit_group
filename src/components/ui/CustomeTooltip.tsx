@@ -30,12 +30,11 @@ export const CustomTooltip: React.FC<CustomTooltipProps> = ({
   const vertical = false
 
   const handleVisibleChange = (_visible: boolean) => {
-    console.log("Tooltip visibility change:", _visible);
     if (onlyOnOverflow === undefined || onlyOnOverflow === false) {
       setVisible(_visible);
       return;
     }
-    
+
     if (container.current && ((!vertical && container.current.clientWidth < container.current.scrollWidth) || (vertical && container.current.clientHeight < container.current.scrollHeight))) {
       setVisible(_visible);
     } else if (container.current && !vertical && container.current.clientWidth === container.current.scrollWidth) {

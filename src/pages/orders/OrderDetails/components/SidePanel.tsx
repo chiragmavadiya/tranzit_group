@@ -87,7 +87,7 @@ export const SidePanel: React.FC<{ orderType: string | undefined }> = ({ orderTy
 
   return (
     <div className="flex flex-col gap-4">
-      <Accordion type="multiple" defaultValue={['notes', 'documents', 'tags', 'details', 'breakdown']} className="flex flex-col gap-3">
+      <Accordion multiple defaultValue={['notes', 'documents', 'tags', 'details', 'breakdown']} className="flex flex-col gap-3">
         {/* NOTES */}
         <AccordionItem value="notes" className="border border-gray-200 dark:border-zinc-800 rounded-xl bg-white dark:bg-zinc-950 shadow-sm px-5 border-b overflow-hidden transition-colors duration-300">
           <AccordionTrigger className="hover:no-underline py-3 px-0 [&>svg]:text-[#0060FE] dark:[&>svg]:text-blue-500">

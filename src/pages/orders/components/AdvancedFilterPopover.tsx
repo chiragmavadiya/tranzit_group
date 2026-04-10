@@ -103,8 +103,6 @@ export function AdvancedFilterPopover({
       f.value === value
     );
 
-    console.log(existingFilter, "existingFilter");
-
     if (existingFilter) {
       if (existingFilter.type === filterType) {
         // Same type: toggle off

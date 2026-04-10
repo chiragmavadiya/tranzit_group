@@ -61,7 +61,6 @@ export function CreateOrderDialog({ onOpenChange, type }: CreateOrderDialogProps
     await new Promise(resolve => setTimeout(resolve, 1500));
     setIsSubmitting(false);
     // setIsSuccess(true);
-    console.log(generateUniqueId(), 'uniq id....');
     // redirect to order view page
     navigate(`/orders/new/${generateUniqueId()}`);
   };
@@ -250,7 +249,7 @@ export function CreateOrderDialog({ onOpenChange, type }: CreateOrderDialogProps
 
             {/* Address Validation Accordion */}
             <div className="col-span-12">
-              <Accordion type="single" collapsible className="w-full border border-slate-200 dark:border-zinc-800 rounded-md bg-white dark:bg-zinc-950/50 shadow-sm overflow-hidden">
+              <Accordion className="w-full border border-slate-200 dark:border-zinc-800 rounded-md bg-white dark:bg-zinc-950/50 shadow-sm overflow-hidden">
                 <AccordionItem value="validation" className="border-none">
                   <AccordionTrigger className="px-5 py-3 hover:no-underline flex justify-between items-center group">
                     <span className="text-[11px] font-extrabold text-slate-800 dark:text-zinc-300 uppercase tracking-widest leading-none">

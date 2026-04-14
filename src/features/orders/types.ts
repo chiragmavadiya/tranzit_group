@@ -266,3 +266,9 @@ export interface ColumnConfig {
   className?: string;
   default?: boolean;
 }
+
+export interface OrdersResponse {
+  status: boolean;
+  message: string;
+  data: Order[];
+}

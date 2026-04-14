@@ -9,4 +9,6 @@ export const store = configureStore({
         getDefaultMiddleware({
             serializableCheck: false,
         }),
+
+    devTools: import.meta.env.MODE !== 'production',
 });

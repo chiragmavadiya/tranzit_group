@@ -5,10 +5,16 @@ export const API_ENDPOINTS = {
         RESEND_VERIFICATION: "/customer/auth/email/resend",
         VERIFICATION_STATUS: "/customer/auth/verification-status",
     },
-} as const;
+    ORDERS: {
+        LIST: "/customer/orders",
+    },
+};
 
 export const QUERY_KEYS = {
     AUTH: {
         VERIFICATION_STATUS: ["auth", "verification-status"],
     },
-} as const;
+    ORDERS: {
+        LIST: ["orders", "list"],
+    },
+};

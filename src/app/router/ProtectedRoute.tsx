@@ -1,13 +1,13 @@
 import { Navigate, Outlet } from 'react-router-dom';
 
 export default function ProtectedRoute() {
-  const userAuthString = localStorage.getItem('userAuth');
-  
+  const userAuthString = localStorage.getItem('auth_token');
+
   let isAuthenticated = false;
   if (userAuthString) {
     try {
       const userAuth = JSON.parse(userAuthString);
-      isAuthenticated = userAuth?.isAuthenticated;
+      isAuthenticated = userAuth?.accessToken;
     } catch (e) {
       console.error('Failed to parse userAuth from localStorage', e);
     }

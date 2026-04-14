@@ -1,3 +1,5 @@
+"use client";
+
 import { Search, ChevronDown, LogOut, Sun, Moon, Monitor } from 'lucide-react';
 import { useNavigate, useLocation, useSearchParams } from 'react-router-dom';
 import {

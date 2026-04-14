@@ -203,7 +203,7 @@ export const SidePanel: React.FC<{ orderType: string | undefined }> = ({ orderTy
             <div className="flex flex-wrap gap-2 mt-1">
               {tags.map((tag) => (
                 <div key={tag} className="inline-flex items-center gap-1.5 px-2 py-1.5 bg-gray-100 dark:bg-zinc-800 rounded text-[9px] font-bold text-gray-700 dark:text-zinc-300 transition-colors uppercase animate-in zoom-in-95 duration-200">
-                  {tag}
+                  <div>{tag}</div>
                   <button
                     onClick={() => handleRemoveTag(tag)}
                     className="hover:bg-red-50 dark:hover:bg-red-900/20 rounded p-0.5 transition-colors group"

@@ -1,40 +1,29 @@
+"use client";
+
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import { PasswordInput } from "@/components/common/password-input";
-import { Link, Navigate, useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import brandlogo from '@/assets/Tranzit_Logo.svg';
 import { AuthLayout } from "@/features/auth/components/AuthLayout";
 import { useLogin } from "@/features/auth/hooks/useAuth";
 import type { LoginRequest } from "@/features/auth/auth.types";
-import { Spinner } from "@/components/ui/spinner";
-// import { useAppDispatch } from "@/hooks/store.hooks";
-// import { setCredentials } from "@/features/auth/authSlice";
+// import { Spinner } from "@/components/ui/spinner";
+import { useAppDispatch } from "@/hooks/store.hooks";
+import { setCredentials } from "@/features/auth/authSlice";
 import { useState } from "react";
 
 export default function SignIn() {
   const navigate = useNavigate();
-  // const dispatch = useAppDispatch();
+  const dispatch = useAppDispatch();
   const loginMutation = useLogin();
   const [submited, setSubmited] = useState(false);
   const [data, setData] = useState<LoginRequest>({
     email: '',
     password: '',
   });
-  const [loading, setLoading] = useState(false);
-
-  const userAuthString = localStorage.getItem('userAuth');
-  if (userAuthString) {
-    try {
-      const userAuth = JSON.parse(userAuthString);
-      if (userAuth?.isAuthenticated) {
-        return <Navigate to="/orders" replace />;
-      }
-    } catch {
-      // ignore
-    }
-  }
 
   console.log(loginMutation.isPending, 'is pending...')
   const updateValue = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -48,22 +37,28 @@ export default function SignIn() {
     if (!data.email || !data.password) {
       return;
     }
-    setLoading(true);
-    await new Promise((resolve) => setTimeout(resolve, 700));
-    localStorage.setItem('userAuth', JSON.stringify({ isAuthenticated: true }))
-    navigate("/orders");
+    // setLoading(true);
+    // await new Promise((resolve) => setTimeout(resolve, 700));
+    // localStorage.setItem('userAuth', JSON.stringify({ isAuthenticated: true }))
 
 
-    // loginMutation.mutate(data, {
-    //   onSuccess: (response) => {
-    //     console.log(response, 'response')
-    //     if (response.status) {
-    //       // Sync with Redux store
-    //       dispatch(setCredentials({ user: response.data, token: response.data.accessToken }));
-    //       // Redirect to home/dashboard
-    //     }
-    //   }
-    // });
+    loginMutation.mutate(data, {
+      onSuccess: (response) => {
+        console.log(typeof response, 'response')
+        if (response?.status) {
+          console.log(response.status, "::::STATUS")
+          navigate("/orders");
+          // Sync with Redux store
+          if (response.data) {
+            dispatch(setCredentials({ user: response.data, token: response.data.accessToken }));
+          }
+          // Redirect to home/dashboard
+        }
+      },
+      onError: (error) => {
+        console.error('Login error:', error);
+      }
+    });
   };
 
   return (
@@ -97,8 +92,9 @@ export default function SignIn() {
               className="bg-white dark:bg-zinc-900 border-slate-300 dark:border-slate-800 transition-all focus-visible:ring-0 focus-visible:ring-offset-0 focus-visible:border-blue-500 h-10"
               value={data.email}
               onChange={updateValue}
+              error={submited && (!data.email)}
+              errormsg="Email is required"
             />
-            {submited && !data.email && <p className="text-red-500 text-sm text-end">Email is required</p>}
           </div>
 
           <div className="space-y-2">
@@ -111,8 +107,9 @@ export default function SignIn() {
               className="bg-white dark:bg-zinc-900 border-slate-300 dark:border-slate-800 transition-all focus-visible:ring-0 focus-visible:ring-offset-0 focus-visible:border-blue-500 h-10"
               value={data.password}
               onChange={updateValue}
+              error={submited && (!data.password)}
+              errormsg="Password is required"
             />
-            {submited && !data.password && <p className="text-red-500 text-sm text-end">Password is required</p>}
           </div>
         </div>
 
@@ -131,10 +128,12 @@ export default function SignIn() {
           </Link>
         </div>
 
-        <Button type="submit" className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-6 text-md rounded-md transition-all shadow-md hover:shadow-lg">
-          {loading && <Spinner data-icon="inline-start" />}
-          Login
+        <Button type="submit" disabled={loginMutation.isPending} className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-6 text-md rounded-md transition-all shadow-md hover:shadow-lg">
+          {/* {loginMutation.isPending && <Spinner data-icon="inline-start" />} */}
+          {loginMutation.isPending ? "Login..." : "Login"}
         </Button>
+        {/* invalid credential message */}
+        {loginMutation.isError && <p className="text-red-500 text-sm text-end">{loginMutation.error?.message}</p>}
 
         <p className="text-center text-sm text-slate-600 dark:text-slate-400">
           New on our platform?{" "}

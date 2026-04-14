@@ -22,7 +22,7 @@ const authSlice = createSlice({
             state.user = user;
             state.token = token;
             state.isAuthenticated = true;
-            localStorage.setItem("auth_token", token);
+            localStorage.setItem("auth_token", JSON.stringify(user));
         },
         logout: (state) => {
             state.user = null;
@@ -30,14 +30,8 @@ const authSlice = createSlice({
             state.isAuthenticated = false;
             localStorage.removeItem("auth_token");
         },
-        setLoading: (state, action: PayloadAction<boolean>) => {
-            state.isLoading = action.payload;
-        },
-        setError: (state, action: PayloadAction<string | null>) => {
-            state.error = action.payload;
-        },
     },
 });
 
-export const { setCredentials, logout, setLoading, setError } = authSlice.actions;
+export const { setCredentials, logout } = authSlice.actions;
 export default authSlice.reducer;

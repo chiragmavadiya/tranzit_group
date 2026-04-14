@@ -23,7 +23,7 @@ export const AddressCard: React.FC<AddressCardProps> = ({
   return (
     <Card className="w-full border ring-0 shadow-md border-gray-200 dark:border-zinc-800 py-1 dark:bg-zinc-950 transition-colors duration-300">
       <CardContent className="flex items-center justify-between p-4 py-0">
-        <div className="flex items-center gap-3 h-8">
+        <div className="flex items-center gap-3 min-h-8">
           {/* Section Label */}
           <span className="text-sm font-bold uppercase tracking-wider text-slate-800 dark:text-zinc-400">
             {title}
@@ -37,8 +37,8 @@ export const AddressCard: React.FC<AddressCardProps> = ({
             <div className="flex items-center space-x-1">
               <span className="font-medium text-slate-900 dark:text-zinc-100">{name},</span>
               <span>{address}</span>
-              <span className="px-1 text-slate-300 dark:text-zinc-700">|</span>
-              <span className="text-slate-600 dark:text-zinc-400">{email}</span>
+              {email && <span className="px-1 text-slate-300 dark:text-zinc-700">|</span>}
+              {email && <span className="text-slate-600 dark:text-zinc-400">{email}</span>}
             </div>
           </div>
         </div>

@@ -1,6 +1,7 @@
 import { lazy, Suspense } from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import ProtectedRoute from '@/app/router/ProtectedRoute';
+import PublicRoute from '@/app/router/PublicRoute';
 import Layout from '@/layout';
 import brandLogo from '@/assets/Tranzit_Logo.svg';
 
@@ -39,11 +40,13 @@ export const AppRouter = () => {
   return (
     <Suspense fallback={<PageLoader />}>
       <Routes>
-        {/* Public Routes */}
-        <Route path="/signin" element={<SignIn />} />
-        <Route path="/signup" element={<SignUp />} />
-        <Route path="/forgot-password" element={<ForgotPassword />} />
-        <Route path="/reset-password/:token" element={<ResetPassword />} />
+        {/* Public Auth Routes (Redirect to dashboard if already logged in) */}
+        <Route element={<PublicRoute />}>
+          <Route path="/signin" element={<SignIn />} />
+          <Route path="/signup" element={<SignUp />} />
+          <Route path="/forgot-password" element={<ForgotPassword />} />
+          <Route path="/reset-password/:token" element={<ResetPassword />} />
+        </Route>
 
         {/* Authenticated routes wrapped in ProtectedRoute -> Layout */}
         <Route element={<ProtectedRoute />}>

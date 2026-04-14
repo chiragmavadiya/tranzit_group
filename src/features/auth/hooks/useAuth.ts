@@ -14,11 +14,18 @@ export const useLogin = () => {
         mutationFn: useCallback((data: LoginRequest) => authService.login(data), []),
         onSuccess: (data) => {
             // Save token to localStorage
-            localStorage.setItem("auth_token", data.data.accessToken);
+            if (data?.data?.accessToken) {
+                console.log(data.data, ' data.data')
+                localStorage.setItem("auth_token", JSON.stringify(data.data));
+            }
             // redirect to order page
             // window.location.href = "/orders";
             // Invalidate verification status
             queryClient.invalidateQueries({ queryKey: QUERY_KEYS.AUTH.VERIFICATION_STATUS });
+            // 🔥 IMPORTANT: manually throw error
+            if (!data.status) {
+                throw new Error(data.message || "Login failed");
+            }
         },
     });
 };
@@ -34,7 +41,9 @@ export const useRegister = () => {
         mutationFn: useCallback((data: RegisterRequest) => authService.register(data), []),
         onSuccess: (data) => {
             // Save token to localStorage
-            localStorage.setItem("auth_token", data.data.accessToken);
+            if (data?.data?.accessToken) {
+                localStorage.setItem("auth_token", data.data.accessToken);
+            }
             // Invalidate verification status
             queryClient.invalidateQueries({ queryKey: QUERY_KEYS.AUTH.VERIFICATION_STATUS });
         },

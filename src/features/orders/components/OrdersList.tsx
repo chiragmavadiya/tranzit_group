@@ -1,15 +1,18 @@
 "use client";
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, Suspense, lazy } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { OrdersFilters } from '@/features/orders/components/OrdersFilters';
 import { OrdersTable } from '@/features/orders/components/OrdersTable';
 import { OrdersPagination } from '@/features/orders/components/OrdersPagination';
-import { CreateOrderDialog } from '@/features/orders/components/CreateOrderDialog';
+// import { CreateOrderDialog } from '@/features/orders/components/CreateOrderDialog';
 import { getNestedValue } from '@/lib/utils';
 import type { Order, TabType, FilterItem } from '@/features/orders/types';
-import { useOrders } from '@/features/orders/hooks/useOrders';
+// import { useOrders } from '@/features/orders/hooks/useOrders';
 import { Spinner } from '@/components/ui/spinner';
+import { MOCK_ORDERS_DATA } from '../constants';
+
+const CreateOrderDialog = lazy(() => import('@/features/orders/components/CreateOrderDialog'));
 
 export function OrdersList() {
   const [searchParams] = useSearchParams();
@@ -24,8 +27,11 @@ export function OrdersList() {
   }>({ key: null, direction: null });
   const [activeFilters, setActiveFilters] = useState<FilterItem[]>([]);
 
-  const { data: ordersData, isLoading, isError, error } = useOrders(activeTab, itemsPerPage, currentPage);
-  const orders = useMemo(() => ordersData?.data || [], [ordersData]);
+  // const { data: ordersData, isLoading, isError, error } = useOrders(activeTab, itemsPerPage, currentPage);
+  const isLoading = false;
+  const isError = false;
+  const error = {};
+  const orders = useMemo(() => MOCK_ORDERS_DATA || [], []);
 
   const checkFilterMatch = (order: Order, filter: FilterItem): boolean => {
     const categoryToKey: Record<string, string> = {
@@ -216,11 +222,13 @@ export function OrdersList() {
       </div>
 
       {orderDialogMode && (
-        <CreateOrderDialog
-          open={!!orderDialogMode}
-          onOpenChange={(open) => !open && setOrderDialogMode(null)}
-          type={orderDialogMode}
-        />
+        <Suspense>
+          <CreateOrderDialog
+            open={!!orderDialogMode}
+            onOpenChange={(open) => !open && setOrderDialogMode(null)}
+            type={orderDialogMode}
+          />
+        </Suspense>
       )}
     </div>
   );

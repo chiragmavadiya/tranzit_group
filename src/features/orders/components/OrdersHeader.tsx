@@ -7,7 +7,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { CreateOrderDialog } from './CreateOrderDialog';
+import CreateOrderDialog from './CreateOrderDialog';
 
 export function OrdersHeader() {
   const [orderDialogMode, setOrderDialogMode] = useState<'order' | 'return' | null>(null);
@@ -65,7 +65,7 @@ export function OrdersHeader() {
         {orderDialogMode && (
           <CreateOrderDialog
             open={!!orderDialogMode}
-            onOpenChange={(open) => !open && setOrderDialogMode(null)}
+            onOpenChange={(open: boolean) => !open && setOrderDialogMode(null)}
             type={orderDialogMode}
           />
         )}

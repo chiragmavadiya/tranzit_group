@@ -6,7 +6,7 @@ import { CarrierCard } from '@/features/orders/components/order-details/CarrierC
 import { HistoryCard } from '@/features/orders/components/order-details/HistoryCard'
 import { SidePanel } from '@/features/orders/components/order-details/SidePanel'
 import { StickyFooter } from '@/features/orders/components/order-details/StickyFooter'
-import { CreateOrderDialog } from '@/features/orders/components/CreateOrderDialog'
+import CreateOrderDialog from '@/features/orders/components/CreateOrderDialog'
 import { ItemsTable } from '@/features/orders/components/order-details/ItemsTable'
 import { PackagingTable } from '@/features/orders/components/order-details/PackagingTable'
 import { useOrderItems } from '@/features/orders/hooks/useOrderItems'

@@ -11,19 +11,21 @@ import { AuthLayout } from "@/features/auth/components/AuthLayout";
 import { useLogin } from "@/features/auth/hooks/useAuth";
 import type { LoginRequest } from "@/features/auth/auth.types";
 // import { Spinner } from "@/components/ui/spinner";
-import { useAppDispatch } from "@/hooks/store.hooks";
-import { setCredentials } from "@/features/auth/authSlice";
+// import { useAppDispatch } from "@/hooks/store.hooks";
+// import { setCredentials } from "@/features/auth/authSlice";
 import { useState } from "react";
+import AutoComplete from "@/components/common/AutoComplate";
 
 export default function SignIn() {
   const navigate = useNavigate();
-  const dispatch = useAppDispatch();
+  // const dispatch = useAppDispatch();
   const loginMutation = useLogin();
   const [submited, setSubmited] = useState(false);
   const [data, setData] = useState<LoginRequest>({
     email: '',
     password: '',
   });
+  const [loading, setLoading] = useState(false);
 
   console.log(loginMutation.isPending, 'is pending...')
   const updateValue = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -37,29 +39,44 @@ export default function SignIn() {
     if (!data.email || !data.password) {
       return;
     }
-    // setLoading(true);
-    // await new Promise((resolve) => setTimeout(resolve, 700));
-    // localStorage.setItem('userAuth', JSON.stringify({ isAuthenticated: true }))
+    setLoading(true);
+    await new Promise((resolve) => setTimeout(resolve, 700));
+    localStorage.setItem('auth_token', JSON.stringify({
+      "id": 1,
+      "username": "emilys",
+      "email": "emily.johnson@x.dummyjson.com",
+      "firstName": "Emily",
+      "lastName": "Johnson",
+      "gender": "female",
+      "image": "https://dummyjson.com/icon/emilys/128",
+      "accessToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+      "refreshToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+    }))
+    navigate("/orders");
 
-
-    loginMutation.mutate(data, {
-      onSuccess: (response) => {
-        console.log(typeof response, 'response')
-        if (response?.status) {
-          console.log(response.status, "::::STATUS")
-          navigate("/orders");
-          // Sync with Redux store
-          if (response.data) {
-            dispatch(setCredentials({ user: response.data, token: response.data.accessToken }));
-          }
-          // Redirect to home/dashboard
-        }
-      },
-      onError: (error) => {
-        console.error('Login error:', error);
-      }
-    });
+    // loginMutation.mutate(data, {
+    //   onSuccess: (response) => {
+    //     console.log(typeof response, 'response')
+    //     if (response?.status) {
+    //       console.log(response.status, "::::STATUS")
+    //       navigate("/orders");
+    //       // Sync with Redux store
+    //       if (response.data) {
+    //         dispatch(setCredentials({ user: response.data, token: response.data.accessToken }));
+    //       }
+    //       // Redirect to home/dashboard
+    //     }
+    //   },
+    //   onError: (error) => {
+    //     console.error('Login error:', error);
+    //   }
+    // });
   };
+  // const languages = [
+  //   { value: "next.js", label: "Next.js" },
+  //   { value: "sveltekit", label: "SvelteKit" },
+  //   { value: "nuxt.js", label: "Nuxt.js" },
+  // ];
 
   return (
     <AuthLayout>
@@ -76,6 +93,18 @@ export default function SignIn() {
           Get started with your account.
         </p>
       </div>
+
+      <AutoComplete 
+        options={[
+          { value: "next.js", label: "Next.js" },
+          { value: "sveltekit", label: "SvelteKit" },
+          { value: "nuxt.js", label: "Nuxt.js" },
+          { value: "remix", label: "Remix" },
+          { value: "astro", label: "Astro" },
+        ]}
+        placeholder="Search frameworks..."
+        className="mb-8"
+      />
 
       <form onSubmit={handleSubmit} className="space-y-6">
         <div className="space-y-4">
@@ -128,9 +157,9 @@ export default function SignIn() {
           </Link>
         </div>
 
-        <Button type="submit" disabled={loginMutation.isPending} className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-6 text-md rounded-md transition-all shadow-md hover:shadow-lg">
+        <Button type="submit" disabled={loginMutation.isPending || loading} className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-6 text-md rounded-md transition-all shadow-md hover:shadow-lg">
           {/* {loginMutation.isPending && <Spinner data-icon="inline-start" />} */}
-          {loginMutation.isPending ? "Login..." : "Login"}
+          {loginMutation.isPending || loading ? "Login..." : "Login"}
         </Button>
         {/* invalid credential message */}
         {loginMutation.isError && <p className="text-red-500 text-sm text-end">{loginMutation.error?.message}</p>}

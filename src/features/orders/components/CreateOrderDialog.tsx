@@ -44,7 +44,7 @@ const initialData: OrderFormData = {
   packets: [],
 };
 
-export function CreateOrderDialog({ onOpenChange, type }: CreateOrderDialogProps) {
+export default function CreateOrderDialog({ onOpenChange, type }: CreateOrderDialogProps) {
   const navigate = useNavigate();
   const [formData, setFormData] = useState<OrderFormData>(initialData);
   const [isSubmitting, setIsSubmitting] = useState(false);

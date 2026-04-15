@@ -1,20 +1,15 @@
 import { lazy, Suspense } from 'react';
-import { Routes, Route, Navigate } from 'react-router-dom';
-import ProtectedRoute from '@/app/router/ProtectedRoute';
-import PublicRoute from '@/app/router/PublicRoute';
-import Layout from '@/layout';
+import { Routes, Route } from 'react-router-dom';
+import PublicRoute from '@/router/PublicRoute';
 import brandLogo from '@/assets/Tranzit_Logo.svg';
+import AdminRoutes from '@/apps/admin/routes/AdminRoutes';
+import ClientRoutes from '@/apps/client/routes/ClientRoutes';
 
 // Lazy load page components
 const SignIn = lazy(() => import('@/features/auth/pages/SignIn'));
 const SignUp = lazy(() => import('@/features/auth/pages/SignUp'));
 const ForgotPassword = lazy(() => import('@/features/auth/pages/ForgotPassword'));
 const ResetPassword = lazy(() => import('@/features/auth/pages/ResetPassword'));
-const Dashboard = lazy(() => import('@/features/dashboard/pages/Dashboard'));
-const Orders = lazy(() => import('@/features/orders/pages/OrdersPage'));
-const OrderDetails = lazy(() => import('@/features/orders/pages/OrderDetails'));
-const Search = lazy(() => import('@/features/search/pages/SearchPage'));
-const Setup = lazy(() => import('@/features/setup/pages/SetupPage'));
 
 // Simple loading fallback component
 const PageLoader = () => (
@@ -49,7 +44,7 @@ export const AppRouter = () => {
         </Route>
 
         {/* Authenticated routes wrapped in ProtectedRoute -> Layout */}
-        <Route element={<ProtectedRoute />}>
+        {/* <Route element={<ProtectedRoute />}>
           <Route element={<Layout />}>
             <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/orders">
@@ -58,13 +53,16 @@ export const AppRouter = () => {
             </Route>
             <Route path="/setup" element={<Setup />} />
             <Route path="/search" element={<Search />} />
-            {/* Default authenticated route */}
-            <Route path="/" element={<Navigate to="/orders" replace />} />
+            <Route path="/" element={<Navigate to="/admin/orders" replace />} />
 
-            {/* Fallback route: inside the layout so it doesn't unmount the sidebar on unknown routes */}
-            <Route path="*" element={<Navigate to="/orders" replace />} />
+            <Route path="*" element={<Navigate to="/admin/orders" replace />} />
           </Route>
-        </Route>
+        </Route> */}
+        {/* Admin */}
+        <Route path="/admin/*" element={<AdminRoutes />} />
+
+        {/* Client */}
+        <Route path="/*" element={<ClientRoutes />} />
       </Routes>
     </Suspense>
   );

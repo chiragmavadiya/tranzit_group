@@ -119,7 +119,6 @@ export const AuthDemo = () => {
 
                     {registerMutation.isError && (
                         <p className="text-destructive text-sm font-medium">
-                            {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
                             Registration failed: {(registerMutation.error as any)?.response?.data?.message || "Unknown error"}
                         </p>
                     )}

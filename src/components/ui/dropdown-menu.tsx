@@ -247,7 +247,26 @@ function DropdownMenuShortcut({
   )
 }
 
-function Dropdown({ content, children, contentClassName }: { content: React.ReactNode, children: React.ReactNode, contentClassName?: string }) {
+const DropdownCustomMenu = ({ menus, children }: { menus: { label: string, onClick: () => void, className?: string, icon?: React.ComponentType<{ className?: string }> }[], children: React.ReactNode }) => {
+  return (
+    <DropdownMenu>
+      <DropdownMenuTrigger>
+        {children}
+      </DropdownMenuTrigger>
+      <DropdownMenuContent align="end" className="w-fit p-2">
+        {menus.map((menu) => (
+          <DropdownMenuItem onClick={menu.onClick} className={cn("cursor-pointer py-2 px-3 text-[13px]", menu.className)}>
+            {menu.icon && <menu.icon className="w-4 h-4 mr-2" />}
+            {menu.label}
+          </DropdownMenuItem>
+        ))}
+      </DropdownMenuContent>
+    </DropdownMenu>
+  )
+}
+
+
+function DropdownCustomContent({ content, children, contentClassName }: { content: React.ReactNode, children: React.ReactNode, contentClassName?: string }) {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger className="p-1 hover:bg-gray-100 dark:hover:bg-zinc-800 rounded transition-colors outline-none">
@@ -278,6 +297,7 @@ export {
   DropdownMenuSub,
   DropdownMenuSubTrigger,
   DropdownMenuSubContent,
+  DropdownCustomMenu
 }
 
-export default Dropdown;
+export default DropdownCustomContent;

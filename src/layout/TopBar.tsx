@@ -12,8 +12,11 @@ import {
 import { useTheme } from '@/app/providers/theme-provider';
 import { OrdersTabs } from '@/features/orders/components/OrdersTabs';
 import type { TabType } from '@/features/orders/types';
+import { useAppDispatch } from '@/hooks/store.hooks';
+import { logout } from '@/features/auth/authSlice';
 
 export default function TopBar({ isCollapsed }: { isCollapsed?: boolean }) {
+  const dispatch = useAppDispatch();
   const navigate = useNavigate();
   const location = useLocation();
   const [searchParams, setSearchParams] = useSearchParams();
@@ -21,6 +24,7 @@ export default function TopBar({ isCollapsed }: { isCollapsed?: boolean }) {
 
   const handleLogout = () => {
     localStorage.clear();
+    dispatch(logout());
     navigate('/signin');
   };
 

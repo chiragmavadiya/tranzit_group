@@ -1,12 +1,13 @@
 "use client";
 
 import { useState } from 'react';
-import { NavLink } from 'react-router-dom';
+import { NavLink, useLocation } from 'react-router-dom';
 import { Menu, ArrowLeft, ChevronDown } from 'lucide-react';
 import type { SidebarItem } from './types/Sidebar.types';
-import { sidebarItems } from '../app/router/Navigation';
+import { adminSidebarItems, clientSidebarItems } from '../router/Navigation';
 import tranzit_logo from '@/assets/Tranzit_Logo.svg';
 import { CustomTooltip } from '@/components/common/CustomTooltip';
+import { useAppSelector } from '@/hooks/store.hooks';
 
 interface SidebarProps {
   isCollapsed: boolean;
@@ -16,6 +17,10 @@ interface SidebarProps {
 export default function Sidebar({ isCollapsed, setIsCollapsed }: SidebarProps) {
   const [activeSubmenu, setActiveSubmenu] = useState<string | null>(null);
   const [expandedItems, setExpandedItems] = useState<string[]>([]);
+  const { role } = useAppSelector((state) => state.auth);
+  const location = useLocation();
+  
+  const sidebarItems = role === 'admin' ? adminSidebarItems : clientSidebarItems;
 
   const toggleExpand = (name: string) => {
     setExpandedItems(prev =>
@@ -108,15 +113,27 @@ export default function Sidebar({ isCollapsed, setIsCollapsed }: SidebarProps) {
                       handleItemClick(item);
                     }
                   }}
-                  className={({ isActive }) =>
-                    `flex items-center justify-between overflow-hidden py-[10px] px-3 border-l-4 rounded-r-md text-[13.5px] font-medium transition-colors ${isActive && !item.hasDropdown ? 'text-blue-600 dark:text-blue-400 bg-blue-100 dark:bg-blue-900/10 border-blue-600 dark:border-blue-400' : 'text-gray-600 dark:text-zinc-400 hover:text-gray-900 dark:hover:text-zinc-100 hover:bg-gray-100 dark:hover:bg-zinc-900 border-transparent'
+                  className={({ isActive }) => {
+                    // Fix double active highlight for base orders menu vs create order
+                    let finalActive = isActive;
+                    if ((item.name === 'Orders' || item.name === 'Order Management') && location.pathname.includes('/orders/create')) {
+                      finalActive = false;
+                    }
+                    
+                    return `flex items-center justify-between overflow-hidden py-[10px] px-3 border-l-4 rounded-r-md text-[13.5px] font-medium transition-colors ${finalActive && !item.hasDropdown ? 'text-blue-600 dark:text-blue-400 bg-blue-100 dark:bg-blue-900/10 border-blue-600 dark:border-blue-400' : 'text-gray-600 dark:text-zinc-400 hover:text-gray-900 dark:hover:text-zinc-100 hover:bg-gray-100 dark:hover:bg-zinc-900 border-transparent'
                     }`
-                  }
+                  }}
                 >
-                  {({ isActive }) => (
+                  {({ isActive }) => {
+                    let finalActive = isActive;
+                    if ((item.name === 'Orders' || item.name === 'Order Management') && location.pathname.includes('/orders/create')) {
+                      finalActive = false;
+                    }
+
+                    return (
                     <>
                       <div className="flex items-center gap-3 w-full min-w-0">
-                        <item.icon className={`w-[18px] h-[18px] shrink-0 transition-colors ${isActive && !item.hasDropdown ? 'text-blue-500' : 'text-gray-400 dark:text-zinc-500'}`} strokeWidth={2} />
+                        <item.icon className={`w-[18px] h-[18px] shrink-0 transition-colors ${finalActive && !item.hasDropdown ? 'text-blue-500' : 'text-gray-400 dark:text-zinc-500'}`} strokeWidth={2} />
                         <div className={`flex items-center min-w-0 flex-1 transition-opacity duration-3000 ${isCollapsed ? 'opacity-100' : 'opacity-100'}`}>
                           <CustomTooltip title={item.name} placement="bottom" onlyOnOverflow={true} className="flex-1">
                             <span>{item.name}</span>
@@ -130,7 +147,8 @@ export default function Sidebar({ isCollapsed, setIsCollapsed }: SidebarProps) {
                         <ChevronDown className={`w-4 h-4 shrink-0 ml-2 transition-all duration-300 text-gray-400 dark:text-zinc-500 ${isCollapsed ? 'opacity-0' : 'opacity-100'} ${expandedItems.includes(item.name) ? 'rotate-180' : ''}`} />
                       )}
                     </>
-                  )}
+                    );
+                  }}
                 </NavLink>
                 {/* Sub-items for Analytics (and others) */}
                 {!isCollapsed && expandedItems.includes(item.name) && item.subItems && (

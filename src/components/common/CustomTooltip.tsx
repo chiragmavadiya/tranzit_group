@@ -63,3 +63,5 @@ export const CustomTooltip: React.FC<CustomTooltipProps> = ({
     </Tooltip>
   );
 };
+
+export default CustomTooltip;

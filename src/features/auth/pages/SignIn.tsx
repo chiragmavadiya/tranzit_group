@@ -14,7 +14,6 @@ import type { LoginRequest } from "@/features/auth/auth.types";
 import { useAppDispatch } from "@/hooks/store.hooks";
 import { setCredentials } from "@/features/auth/authSlice";
 import { useState } from "react";
-import AutoComplete from "@/components/common/AutoComplate";
 
 export default function SignIn() {
   const navigate = useNavigate();
@@ -95,18 +94,6 @@ export default function SignIn() {
           Get started with your account.
         </p>
       </div>
-
-      <AutoComplete
-        options={[
-          { value: "next.js", label: "Next.js" },
-          { value: "sveltekit", label: "SvelteKit" },
-          { value: "nuxt.js", label: "Nuxt.js" },
-          { value: "remix", label: "Remix" },
-          { value: "astro", label: "Astro" },
-        ]}
-        placeholder="Search frameworks..."
-        className="mb-8"
-      />
 
       <form onSubmit={handleSubmit} className="space-y-6">
         <div className="space-y-4">

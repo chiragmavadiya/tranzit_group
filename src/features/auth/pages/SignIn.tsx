@@ -51,8 +51,10 @@ export default function SignIn() {
       "accessToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
       "refreshToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
     }
+    const role = data.email === 'admin@gmail.com' ? 'admin' : 'client'
     localStorage.setItem('auth_token', JSON.stringify(fakeUser))
-    dispatch(setCredentials({ user: fakeUser, token: fakeUser.accessToken, role: 'admin' }));
+    localStorage.setItem('user_role', role)
+    dispatch(setCredentials({ user: fakeUser, token: fakeUser.accessToken, role: role }));
     navigate("/orders");
 
     // loginMutation.mutate(data, {

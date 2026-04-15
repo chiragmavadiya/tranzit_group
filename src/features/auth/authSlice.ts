@@ -8,7 +8,7 @@ const initialState: AuthState = {
     isAuthenticated: !!localStorage.getItem("auth_token"),
     isLoading: false,
     error: null,
-    role: 'client',
+    role: localStorage.getItem("user_role") as 'admin' | 'client' || 'client',
 };
 
 const authSlice = createSlice({

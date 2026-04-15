@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Check } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
-import { PasswordInput } from "@/components/common/password-input";
+import { PasswordInput } from "@/components/common";
 import { Link, useParams } from "react-router-dom";
 import brandlogo from '@/assets/Tranzit_Logo.svg';
 import { AuthLayout } from "@/features/auth/components/AuthLayout";

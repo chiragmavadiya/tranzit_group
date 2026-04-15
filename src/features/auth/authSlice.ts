@@ -8,6 +8,7 @@ const initialState: AuthState = {
     isAuthenticated: !!localStorage.getItem("auth_token"),
     isLoading: false,
     error: null,
+    role: 'client',
 };
 
 const authSlice = createSlice({
@@ -16,10 +17,11 @@ const authSlice = createSlice({
     reducers: {
         setCredentials: (
             state,
-            action: PayloadAction<{ user: User; token: string }>
+            action: PayloadAction<{ user: User; token: string, role: 'admin' | 'client' }>
         ) => {
-            const { user, token } = action.payload;
+            const { user, token, role } = action.payload;
             state.user = user;
+            state.role = role;
             state.token = token;
             state.isAuthenticated = true;
             localStorage.setItem("auth_token", JSON.stringify(user));

@@ -4,11 +4,15 @@ import { useState, useEffect } from 'react';
 import { Outlet, useLocation } from 'react-router-dom';
 import Sidebar from './Sidebar';
 import TopBar from './TopBar';
-import { sidebarItems } from '../app/router/Navigation';
+import { adminSidebarItems, clientSidebarItems } from '../router/Navigation';
+import { useAppSelector } from '@/hooks/store.hooks';
 
 export default function Layout() {
   const [isCollapsed, setIsCollapsed] = useState(window.innerWidth < 1280);
   const location = useLocation();
+  const { role } = useAppSelector((state) => state.auth);
+
+  const sidebarItems = role === 'admin' ? adminSidebarItems : clientSidebarItems;
 
   useEffect(() => {
     const handleResize = () => {
@@ -50,7 +54,7 @@ export default function Layout() {
 
     const activeName = findActiveName();
     document.title = activeName ? `${activeName} | Tranzit` : 'Tranzit';
-  }, [location.pathname]);
+  }, [location.pathname, sidebarItems]);
 
   return (
     <div className="min-h-screen bg-white dark:bg-zinc-950 transition-colors duration-300">

@@ -31,7 +31,6 @@ api.interceptors.response.use(
         return response;
     },
     (error: AxiosError) => {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const message = (error.response?.data as any)?.message || error.message || "An error occurred";
 
         // Handle global errors (e.g. 401 Unauthorized)

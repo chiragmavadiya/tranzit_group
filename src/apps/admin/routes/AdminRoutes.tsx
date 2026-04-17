@@ -12,6 +12,7 @@ const Setup = lazy(() => import('@/features/setup/pages/SetupPage'));
 const Invoices = lazy(() => import('@/features/invoices/pages/InvoicesPage'));
 const InvoiceDetails = lazy(() => import('@/features/invoices/pages/InvoiceDocumentView'));
 const ParcelReport = lazy(() => import('@/features/reports/pages/ParcelReportPage'));
+const CustomerManagement = lazy(() => import('@/features/customers/pages/CustomerPage'));
 
 
 
@@ -31,6 +32,7 @@ export default function AdminRoutes() {
                     </Route>
                     <Route path="setup" element={<Setup />} />
                     <Route path="customer-parcel-report" element={<ParcelReport />} />
+                    <Route path="customers" element={<CustomerManagement />} />
                     <Route path="search" element={<Search />} />
                     {/* Default authenticated route */}
                     <Route path="/" element={<Navigate to="/admin/dashboard" replace />} />

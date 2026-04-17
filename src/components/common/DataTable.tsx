@@ -198,7 +198,7 @@ export function DataTable<T extends Record<string, any>>({
                   data={DEFAULT_PAGE_SIZES}
                   value={paginationPageSize.toString()}
                   placeholder="Select Page Size"
-                  className="w-[60px] h-8 text-xs font-bold"
+                  className="w-[70px] h-8 text-xs font-bold"
                   onValueChange={(value: string | null) => value && setPaginationPageSize(Number(value))}
                 />
               )}

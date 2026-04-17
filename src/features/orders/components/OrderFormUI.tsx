@@ -96,7 +96,6 @@ export function FormInput({
             "h-8 rounded-md border-slate-200 dark:border-zinc-800 bg-white dark:bg-zinc-950 font-medium focus-visible:ring-0 focus-visible:ring-blue-600 focus-visible:border-blue-600 transition-all placeholder:text-slate-300 dark:placeholder:text-zinc-700 text-sm",
             Icon ? "pl-9" : "px-3",
             error ? "border-red-500 focus-visible:border-red-500" : ""
-
           )}
           disabled={disabled}
         />
@@ -115,7 +114,9 @@ export function FormTextarea({
   isFullWidth = false,
   rows = 4,
   layout = 'vertical',
-  required = false
+  required = false,
+  error,
+  errormsg
 }: FormTextareaProps) {
   const isHorizontal = useMemo(() => layout === 'horizontal', [layout]);
 
@@ -125,12 +126,12 @@ export function FormTextarea({
 
   return (
     <div className={cn(
-      isHorizontal ? "grid grid-cols-[110px_1fr] items-start gap-4" : "space-y-1",
+      isHorizontal ? "grid grid-cols-[110px_1fr] items-start gap-4" : "space-y-2",
       isFullWidth ? "col-span-12" : "col-span-12 md:col-span-6"
     )}>
       <Label className={cn(
-        "text-[11px] font-extrabold text-slate-700 dark:text-zinc-400 uppercase tracking-wider leading-none",
-        isHorizontal ? "pt-2.5" : "ml-0.5"
+        "text-[11px] font-extrabold text-slate-700 dark:text-zinc-400 uppercase tracking-wider leading-none ",
+        isHorizontal ? "h-fit leading-none" : "ml-0.5"
       )}>
         {label}
         {required && <Required />}
@@ -140,8 +141,12 @@ export function FormTextarea({
         value={value}
         onChange={handleChange}
         rows={rows}
-        className="rounded-md border-slate-200 dark:border-zinc-800 bg-white dark:bg-zinc-950 font-medium focus-visible:ring-1 focus-visible:ring-blue-600 focus-visible:border-blue-600 transition-all placeholder:text-slate-300 text-sm resize-none px-3 py-2"
+        className={cn(
+          "rounded-md border-slate-200 dark:border-zinc-800 bg-white dark:bg-zinc-950 font-medium focus-visible:ring-0 focus-visible:ring-blue-600 focus-visible:border-blue-600 transition-all placeholder:text-slate-300 text-sm resize-none px-3 py-2",
+          error ? "border-red-500 focus-visible:border-red-500" : ""
+        )}
       />
+      {error ? <div className="text-red-500 text-[11px] w-full text-right">{errormsg}</div> : null}
     </div>
   );
 }

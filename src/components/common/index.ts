@@ -26,3 +26,4 @@ export { default as AutoComplete } from './AutoComplate';
 export { default as CustomTooltip } from './CustomTooltip';
 export { default as ErrorBoundary } from './ErrorBoundary';
 export { default as PasswordInput } from './password-input';
+export { StatCard } from './StatCard';

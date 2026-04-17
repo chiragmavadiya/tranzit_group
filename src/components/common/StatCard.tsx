@@ -2,10 +2,10 @@ import { Card, CardContent } from "@/components/ui/card";
 import type { StatItem } from "./types/statCard.types";
 import { cn } from "@/lib/utils";
 
-export function StatCard({ label, value, icon: Icon, subValue, color, className, iconBg, iconColor }: StatItem) {
+export function StatCard({ label, value, icon: Icon, subValue, color, className, contentClassName, iconBg, iconColor }: StatItem) {
   return (
     <Card className={cn("border ring-0 shadow-md border-gray-200 dark:border-zinc-800 rounded-xl bg-white dark:bg-zinc-950 transition-colors duration-300 hover:-translate-y- hover:border-blue-300", className)}>
-      <CardContent className="p-5 flex items-center justify-between gap-4">
+      <CardContent className={cn("p-5 flex items-center justify-between gap-4", contentClassName)}>
         <div className="flex flex-col min-w-0">
           <span className="text-[11px] font-bold text-slate-500 dark:text-zinc-500 uppercase tracking-widest leading-tight">
             {label}

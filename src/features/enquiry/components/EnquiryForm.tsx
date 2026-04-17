@@ -1,36 +1,37 @@
 import { useState, useCallback } from 'react';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
 import { FileUpload } from './FileUpload';
-import { ISSUE_CATEGORIES, PARCEL_ENQUIRY_TYPE } from '../constants';
+import { COUNTRY, ISSUE_CATEGORIES, PARCEL_ENQUIRY_TYPE, SENDER_RECEIVER } from '../constants';
 import type { EnquiryFormData, IssueCategory } from '../types';
 import { Send, CheckCircle2 } from 'lucide-react';
 import { toast } from 'sonner';
-import { FormInput, FormSelect } from '@/features/orders/components/OrderFormUI';
+import { FormInput, FormSelect, FormTextarea } from '@/features/orders/components/OrderFormUI';
 
 export function EnquiryForm() {
   const [formData, setFormData] = useState<EnquiryFormData>({
-    category: 'parcel_enquiry',
+    category: '',
     email: '',
-    subject: '',
     message: '',
     attachments: [],
   });
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isSubmited, setIsSubmited] = useState(false);
+  const [loading, setLoading] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!formData.subject || !formData.message) {
-      toast.error('Please fill in all required fields');
+    if (!(formData.message && formData.email !== '' && formData.category !== '')) {
+      setIsSubmited(true);
+      console.log("Return from blank....")
       return;
     }
 
-    setIsSubmitting(true);
+    setLoading(true);
+    console.log("Passed....")
     // Simulate API call
     await new Promise(resolve => setTimeout(resolve, 1500));
-    setIsSubmitting(false);
+    setLoading(false);
     setIsSuccess(true);
     toast.success('Your enquiry has been submitted successfully');
   };
@@ -70,10 +71,12 @@ export function EnquiryForm() {
             label='Issue Category'
             placeholder='Select enquiry'
             value={formData?.category || ''}
-            onValueChange={(value) => setFormData(prev => ({ ...prev, category: (value || 'parcel_enquiry') as IssueCategory }))}
+            onValueChange={(value) => setFormData(prev => ({ ...prev, category: (value || '') as IssueCategory }))}
             className="h-10 border-gray-200 dark:border-zinc-800"
             required
             options={ISSUE_CATEGORIES}
+            error={isSubmited && formData.category === ''}
+            errormsg='Please select an enquiry category'
           />
         </div>
 
@@ -86,61 +89,81 @@ export function EnquiryForm() {
             onChange={(value) => setFormData(prev => ({ ...prev, email: value }))}
             className="h-10 border-gray-200 dark:border-zinc-800"
             required
+            error={isSubmited && formData.email === ''}
+            errormsg='Please enter your email'
           />
         </div>
 
         {formData.category === 'sender_and_account_enquiry' && (
-          <div className="space-y-2">
-            <FormSelect
-              label="I'm the sender/receiver"
-              placeholder='Select your role'
-              value={formData?.sender_receiver || ''}
-              onValueChange={(value) => setFormData(prev => ({ ...prev, sender_receiver: value || '' }))}
-              className="h-10 border-gray-200 dark:border-zinc-800"
-              required
-              options={PARCEL_ENQUIRY_TYPE}
-            />
-          </div>
-        )}
-        {formData.category === 'parcel_enquiry' && (
           <>
             <div className="space-y-2">
               <FormSelect
-                label='Nature of Issue'
-                placeholder='Select nature of issue'
-                value={formData?.nature_of_issue || ''}
-                onValueChange={(value) => setFormData(prev => ({ ...prev, nature_of_issue: value || '' }))}
+                label="I'm the sender/receiver"
+                placeholder='Select your role'
+                value={formData?.sender_receiver || ''}
+                onValueChange={(value) => setFormData(prev => ({ ...prev, sender_receiver: value || '' }))}
                 className="h-10 border-gray-200 dark:border-zinc-800"
                 required
-                options={PARCEL_ENQUIRY_TYPE}
+                options={SENDER_RECEIVER}
+                error={isSubmited && formData.category === 'sender_and_account_enquiry' && !formData.sender_receiver}
+                errormsg='Please select your role'
               />
             </div>
             <div className="space-y-2">
               <FormSelect
-                label='Nature of Issue'
-                placeholder='Select nature of issue'
-                value={formData?.nature_of_issue || ''}
-                onValueChange={(value) => setFormData(prev => ({ ...prev, nature_of_issue: value || '' }))}
+                label="Local Country"
+                placeholder='Select local country'
+                value={formData?.local_country || ''}
+                onValueChange={(value) => setFormData(prev => ({ ...prev, local_country: value || '' }))}
                 className="h-10 border-gray-200 dark:border-zinc-800"
                 required
-                options={PARCEL_ENQUIRY_TYPE}
+                options={COUNTRY}
+                error={isSubmited && formData.category === 'sender_and_account_enquiry' && !formData.local_country}
+                errormsg='Please select local country'
+              />
+            </div>
+            <div className="space-y-2">
+              <FormInput
+                label="Contact Number"
+                placeholder='Enter your contact number'
+                value={formData?.phone_number || ''}
+                onChange={(value) => setFormData(prev => ({ ...prev, phone_number: value }))}
+                className="h-10 border-gray-200 dark:border-zinc-800"
+                required
+                error={isSubmited && formData.category === 'sender_and_account_enquiry' && (!formData.phone_number || formData.phone_number === '')}
+                errormsg='Please enter contact number'
               />
             </div>
           </>
         )}
+        {formData.category === 'parcel_enquiry' && (
+          <div className="space-y-2">
+            <FormSelect
+              label='Nature of Issue'
+              placeholder='Select nature of issue'
+              value={formData?.nature_of_issue || ''}
+              onValueChange={(value) => setFormData(prev => ({ ...prev, nature_of_issue: value || '' }))}
+              className="h-10 border-gray-200 dark:border-zinc-800"
+              required
+              options={PARCEL_ENQUIRY_TYPE}
+              error={isSubmited && formData.category === 'parcel_enquiry' && !formData.nature_of_issue}
+              errormsg='Please select nature of issue'
+            />
+          </div>
+        )}
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor="message" className="text-gray-700 dark:text-zinc-300">
-          How can we help? <span className="text-red-500">*</span>
-        </Label>
-        <Textarea
-          id="message"
-          placeholder="Please describe your issue in detail..."
-          // className="min-h-[150px] border-gray-200 dark:border-zinc-800 resize-none px-4 py-3"
+        <FormTextarea
+          label='How can we help?'
+          placeholder='Please describe your issue in detail...'
           value={formData.message}
-          onChange={(e) => setFormData(prev => ({ ...prev, message: e.target.value }))}
+          onChange={(value) => setFormData(prev => ({ ...prev, message: value }))}
+          rows={3}
+          isFullWidth
           required
+          error={isSubmited && formData.message === ''}
+          errormsg='Please enter your message'
         />
         <p className="text-[11px] text-gray-400 dark:text-zinc-500">
           A member of support staff will respond as soon as possible.
@@ -155,10 +178,10 @@ export function EnquiryForm() {
       <div className="pt-4">
         <Button
           type="submit"
-          disabled={isSubmitting}
+          disabled={loading}
           className="w-full h-11 text-sm font-semibold rounded-lg bg-[#0060FE] hover:bg-blue-700 text-white shadow-lg shadow-blue-500/10 transition-all flex items-center justify-center gap-2"
         >
-          {isSubmitting ? (
+          {loading ? (
             <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
           ) : (
             <>

@@ -1,0 +1,58 @@
+export type OrderItem = {
+    id: number
+    type: string
+    description: string | null
+    display_name: string
+    quantity: number
+    weight: number
+    length: number
+    width: number
+    height: number
+}
+
+export type ShippingActivity = {
+    title: string
+    description: string
+    date_time: string
+}
+
+export type OrderDetailData = {
+    order_number: string
+    order_type: string
+    created_at: string
+    created_human: string
+    order_details: {
+        subtotal: number
+        tax: number
+        total: number
+        paid: number
+        balance_due: number
+        items: OrderItem[]
+    }
+    courier_details: {
+        courier: string
+        tracking_number: string
+        customer_reference: string
+    }
+    sender_details: {
+        name: string
+        customer_id: number
+        email: string
+        mobile: string
+        address: string
+    }
+    receiver_details: {
+        name: string
+        email: string
+        mobile: string
+        address: string
+    }
+    limited_liability_cover: {
+        covered: boolean
+        message: string
+    }
+    delivery_instructions: string
+    payment_status: string
+    status: string
+    shipping_activity: ShippingActivity[]
+}

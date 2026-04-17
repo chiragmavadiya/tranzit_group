@@ -1,17 +1,17 @@
 export type IssueCategory =
   | 'parcel_enquiry'
   | 'sender_and_account_enquiry'
-  | 'feedback';
+  | 'feedback'
+  | '';
 
 export interface EnquiryFormData {
   category: IssueCategory;
   email: string;
-  subject: string;
   message: string;
   attachments: File[];
   nature_of_issue?: string;
   sender_receiver?: string;
-  country?: string;
+  local_country?: string;
   phone_number?: string;
 }
 
@@ -23,4 +23,13 @@ export interface CategoryOption {
 export interface ParcelEnquiryOption {
   value: string,
   label: string,
+}
+
+export interface SenderReceiverOption {
+  value: string;
+  label: string;
+}
+export interface CountryOption {
+  value: string;
+  label: string;
 }

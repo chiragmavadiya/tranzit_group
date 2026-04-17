@@ -7,6 +7,7 @@ export interface StatItem {
     subValue?: string;
     color?: string;
     className?: string;
+    contentClassName?: string;
     iconBg?: string;
     iconColor?: string;
 }

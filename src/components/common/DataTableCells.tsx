@@ -9,6 +9,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { MoreHorizontal, Eye, Edit, Trash, ExternalLink } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { useNavigate } from 'react-router-dom';
 
 // Status Badge Cell Renderer
 interface StatusCellProps {
@@ -50,6 +51,7 @@ interface LinkCellProps {
   onClick?: () => void;
   external?: boolean;
   className?: string;
+  path?: string;
 }
 
 export const LinkCell: React.FC<LinkCellProps> = ({
@@ -57,12 +59,15 @@ export const LinkCell: React.FC<LinkCellProps> = ({
   href,
   onClick,
   external = false,
-  className
+  className,
+  path
 }) => {
+  const navigate = useNavigate();
   const handleClick = (e: React.MouseEvent) => {
-    if (onClick) {
+    if (path) {
       e.preventDefault();
-      onClick();
+      onClick?.();
+      navigate(path, { replace: true });
     }
   };
 

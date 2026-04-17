@@ -63,6 +63,8 @@ export interface DataTableProps<T> {
   // Custom components
   customHeader?: ReactNode | (() => ReactNode);
   headerClass?: string;
+  headerTitle?: string;
+  headerDescription?: string;
   customFooter?: ReactNode | (() => ReactNode);
 }
 

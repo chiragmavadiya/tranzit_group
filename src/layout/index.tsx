@@ -60,7 +60,7 @@ export default function Layout() {
     <div className="min-h-screen bg-white dark:bg-zinc-950 transition-colors duration-300">
       <Sidebar isCollapsed={isCollapsed} setIsCollapsed={setIsCollapsed} />
       <TopBar isCollapsed={isCollapsed} />
-      <main className={`h-screen flex flex-col transition-[margin] duration-300 ease-in-out pt-16 ${isCollapsed ? 'ml-[64px]' : 'ml-[240px]'}`}>
+      <main className={`h-screen flex flex-col transition-[margin] duration-300 ease-in-out pt-16 z-0 relative ${isCollapsed ? 'ml-[64px]' : 'ml-[240px]'}`}>
         <div className="mx-auto w-full flex-1 flex flex-col bg-slate-50/30 dark:bg-zinc-900/10 overflow-hidden min-h-0">
           <Outlet />
         </div>

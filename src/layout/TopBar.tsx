@@ -14,6 +14,8 @@ import { OrdersTabs } from '@/features/orders/components/OrdersTabs';
 import type { TabType } from '@/features/orders/types';
 import { useAppDispatch } from '@/hooks/store.hooks';
 import { logout } from '@/features/auth/authSlice';
+import { ReportsTabs } from '@/features/reports/components/ReportsTabs';
+import type { ReportType } from '@/features/reports/types';
 
 export default function TopBar({ isCollapsed }: { isCollapsed?: boolean }) {
   const dispatch = useAppDispatch();
@@ -36,6 +38,15 @@ export default function TopBar({ isCollapsed }: { isCollapsed?: boolean }) {
             <OrdersTabs
               activeTab={(searchParams.get('tab') as TabType) || 'new'}
               onTabChange={(tab) => setSearchParams({ tab })}
+            />
+          </div>
+        )}
+        {location.pathname === '/reports' && (
+          <div className="h-16 ml-4">
+            <ReportsTabs
+              activeTab={(searchParams.get('tab') as ReportType) || 'shipment'}
+              onTabChange={(tab) => setSearchParams({ tab })}
+              className="h-full"
             />
           </div>
         )}

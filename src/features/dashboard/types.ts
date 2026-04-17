@@ -1,13 +1,3 @@
-import type { LucideIcon } from 'lucide-react';
-
-export interface StatItem {
-  label: string;
-  value: string | number;
-  icon: LucideIcon;
-  subValue?: string;
-  color?: string;
-}
-
 export interface Transaction {
   id: string;
   type: 'debit' | 'credit';

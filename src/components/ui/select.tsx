@@ -2,7 +2,7 @@ import * as React from "react"
 import { Select as SelectPrimitive } from "@base-ui/react/select"
 
 import { cn } from "@/lib/utils"
-import { ChevronDownIcon, CheckIcon, ChevronUpIcon } from "lucide-react"
+import { ChevronDownIcon, CheckIcon, ChevronUpIcon, X } from "lucide-react"
 
 const Select = SelectPrimitive.Root
 
@@ -39,7 +39,7 @@ function SelectTrigger({
       data-slot="select-trigger"
       data-size={size}
       className={cn(
-        "flex w-fit items-center justify-between gap-1.5 rounded-lg border border-input bg-transparent py-2 pr-2 pl-2.5 text-sm whitespace-nowrap transition-colors outline-none select-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 disabled:cursor-not-allowed disabled:opacity-50 aria-invalid:border-destructive aria-invalid:ring-3 aria-invalid:ring-destructive/20 data-placeholder:text-muted-foreground dark:data-placeholder:text-zinc-700 data-[size=default]:h-8 data-[size=sm]:h-7 data-[size=sm]:rounded-[min(var(--radius-md),10px)] *:data-[slot=select-value]:line-clamp-1 *:data-[slot=select-value]:flex *:data-[slot=select-value]:items-center *:data-[slot=select-value]:gap-1.5 dark:bg-input/30 dark:hover:bg-input/50 dark:aria-invalid:border-destructive/50 dark:aria-invalid:ring-destructive/40 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
+        "relative flex w-fit items-center justify-between gap-1.5 rounded-lg border border-input bg-transparent py-2 pr-2 pl-2.5 text-sm whitespace-nowrap transition-colors outline-none select-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 disabled:cursor-not-allowed disabled:opacity-50 aria-invalid:border-destructive aria-invalid:ring-3 aria-invalid:ring-destructive/20 data-placeholder:text-muted-foreground dark:data-placeholder:text-zinc-700 data-[size=default]:h-8 data-[size=sm]:h-7 data-[size=sm]:rounded-[min(var(--radius-md),10px)] *:data-[slot=select-value]:line-clamp-1 *:data-[slot=select-value]:flex *:data-[slot=select-value]:items-center *:data-[slot=select-value]:gap-1.5 dark:bg-input/30 dark:hover:bg-input/50 dark:aria-invalid:border-destructive/50 dark:aria-invalid:ring-destructive/40 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
         className
       )}
       {...props}
@@ -185,19 +185,25 @@ function SelectScrollDownButton({
   )
 }
 
-function SelectComponent({ data, defaultValue, placeholder, className, value, onValueChange }: { data: { key: string, value: string | number }[], defaultValue?: string, placeholder: string, className?: string, value?: string, onValueChange?: (value: string | null) => void }) {
+function SelectComponent({ data, defaultValue, placeholder, className, value, onValueChange, allowClear = false }: { data: { label: string, value: string | number }[], defaultValue?: string, placeholder: string, className?: string, value?: string, onValueChange?: (value: string | null) => void, allowClear?: boolean }) {
   return (
-    <Select defaultValue={defaultValue} value={value} onValueChange={onValueChange}>
+    <Select defaultValue={defaultValue} value={value} onValueChange={onValueChange} items={data}>
+      {/* <div className="relative"> */}
       <SelectTrigger className={cn("w-full text-xs h-10 rounded-md border-gray-200 dark:border-zinc-800 dark:bg-zinc-900 transition-colors placeholder:text-slate-300 dark:placeholder:text-zinc-700", className)}>
         <SelectValue placeholder={placeholder} className="placeholder:text-slate-300 dark:placeholder:text-zinc-700" />
       </SelectTrigger>
+      {allowClear && value && <X className="absolute right-[9px] top-[50%] origin-center translate-y-[-50%] size-4 text-muted-foreground bg-white dark:bg-zinc-900 cursor-pointer" onClick={(e) => { console.log('cliecnk....'); e.preventDefault(); onValueChange?.('') }} />}
       <SelectContent alignItemWithTrigger={false} align="start" className="min-w-min dark:bg-zinc-900 dark:border-zinc-800 p-1 rounded-md">
-        {data.map((item) => (
-          <SelectItem key={item.key} value={item.key} className="h-7 text-xs font-medium data-highlighted:bg-blue-500/20 data-selected:bg-blue-500/90" >
-            {item.key}
-          </SelectItem>
-        ))}
+        <SelectGroup>
+          {console.log(data)}
+          {data.map((item) => (
+            <SelectItem key={item.value} value={item.value} className="h-7 text-xs font-medium data-highlighted:bg-blue-500/20 data-selected:bg-blue-500/90" >
+              {item.label}
+            </SelectItem>
+          ))}
+        </SelectGroup>
       </SelectContent>
+      {/* </div> */}
     </Select>
   )
 }

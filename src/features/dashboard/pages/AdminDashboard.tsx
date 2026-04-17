@@ -1,5 +1,5 @@
 import { WelcomeBanner } from "../components/WelcomeBanner";
-import { StatCard } from "../components/StatCard";
+import { StatCard } from "../../../components/common/StatCard";
 import { TransactionList } from "../components/TransactionList";
 import { DashboardTable } from "../components/DashboardTable";
 import {

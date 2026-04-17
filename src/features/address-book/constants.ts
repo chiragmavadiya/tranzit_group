@@ -3,38 +3,67 @@ import type { Address } from './types';
 export const DEFAULT_PAGE_SIZE = 25;
 export const PAGE_SIZE_OPTIONS = [10, 25, 50, 100];
 
+export const AUSTRALIAN_STATES = [
+  { key: 'New South Wales', value: 'NSW' },
+  { key: 'Victoria', value: 'VIC' },
+  { key: 'Queensland', value: 'QLD' },
+  { key: 'Western Australia', value: 'WA' },
+  { key: 'South Australia', value: 'SA' },
+  { key: 'Tasmania', value: 'TAS' },
+  { key: 'Australian Capital Territory', value: 'ACT' },
+  { key: 'Northern Territory', value: 'NT' },
+];
+
+export const STREET_TYPES = [
+  { key: 'Alley', value: 'ALLEY' },
+  { key: 'Arcade', value: 'ARCADE' },
+  { key: 'Avenue', value: 'AVE' },
+  { key: 'Boulevard', value: 'BLVD' },
+  { key: 'Circuit', value: 'CCT' },
+  { key: 'Close', value: 'CL' },
+  { key: 'Court', value: 'CT' },
+  { key: 'Crescent', value: 'CRES' },
+  { key: 'Drive', value: 'DR' },
+  { key: 'Esplanade', value: 'ESP' },
+  { key: 'Grove', value: 'GR' },
+  { key: 'Highway', value: 'HWY' },
+  { key: 'Lane', value: 'LANE' },
+  { key: 'Mews', value: 'MEWS' },
+  { key: 'Parade', value: 'PDE' },
+  { key: 'Place', value: 'PL' },
+  { key: 'Plaza', value: 'PLZA' },
+  { key: 'Quay', value: 'QY' },
+  { key: 'Ridge', value: 'RDGE' },
+  { key: 'Road', value: 'RD' },
+  { key: 'Square', value: 'SQ' },
+  { key: 'Street', value: 'ST' },
+  { key: 'Terrace', value: 'TCE' },
+  { key: 'Way', value: 'WAY' },
+];
+
 export const MOCK_ADDRESSES: Address[] = [
   {
-    id: 1,
-    code: 'ADDR001',
-    contact_person: 'John Doe',
-    business_name: 'Tech Corp',
-    email_id: 'john@techcorp.com',
-    mobile: '+1 234 567 8900',
-    address: '123 Tech Lane, Silicon Valley, CA',
-    is_active: 1,
-    DT_RowIndex: 1
+    "id": 1,
+    "code": "101",
+    "customer_id": 2,
+    "contact_person": "Test",
+    "business_name": "Test",
+    "phone": "0477445588",
+    "email": "shikharchksh3@gmail.com",
+    "created_at": "2025-12-30T09:37:43.000000Z",
+    "address": "120 Collins Street, Melbourne VIC, Australia",
+    "DT_RowIndex": 1
   },
   {
-    id: 2,
-    code: 'ADDR002',
-    contact_person: 'Jane Smith',
-    business_name: 'Design Studio',
-    email_id: 'jane@designstudio.com',
-    mobile: '+1 987 654 3210',
-    address: '456 Creative Ave, New York, NY',
-    is_active: 1,
-    DT_RowIndex: 2
-  },
-  {
-    id: 3,
-    code: 'ADDR003',
-    contact_person: 'Mike Johnson',
-    business_name: 'Logistics Plus',
-    email_id: 'mike@logisticsplus.com',
-    mobile: '+1 555 123 4567',
-    address: '789 Warehouse Way, Chicago, IL',
-    is_active: 1,
-    DT_RowIndex: 3
+    "id": 4,
+    "code": "",
+    "customer_id": 2,
+    "contact_person": "test 123",
+    "business_name": "Business123",
+    "phone": "0416735272",
+    "email": "darshilchksh@gmail.com",
+    "created_at": "2026-01-16T23:24:24.000000Z",
+    "address": "12 Seuss Drive, Officer VIC, Australia",
+    "DT_RowIndex": 2
   }
 ];

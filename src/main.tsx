@@ -6,6 +6,7 @@ import { Provider } from 'react-redux'
 import { store } from '@/app/store'
 import { queryClient } from '@/lib/query-client'
 import '@/styles/index.css'
+import "@fontsource-variable/geist/index.css";
 import App from './App.tsx'
 import { TooltipProvider } from "@/components/ui/tooltip"
 

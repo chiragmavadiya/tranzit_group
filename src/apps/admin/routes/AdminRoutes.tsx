@@ -11,6 +11,8 @@ const Search = lazy(() => import('@/features/search/pages/SearchPage'));
 const Setup = lazy(() => import('@/features/setup/pages/SetupPage'));
 const Invoices = lazy(() => import('@/features/invoices/pages/InvoicesPage'));
 const InvoiceDetails = lazy(() => import('@/features/invoices/pages/InvoiceDocumentView'));
+const ParcelReport = lazy(() => import('@/features/reports/pages/ParcelReportPage'));
+
 
 
 export default function AdminRoutes() {
@@ -28,12 +30,13 @@ export default function AdminRoutes() {
                         <Route path=":invoiceID" element={<InvoiceDetails />} />
                     </Route>
                     <Route path="setup" element={<Setup />} />
+                    <Route path="customer-parcel-report" element={<ParcelReport />} />
                     <Route path="search" element={<Search />} />
                     {/* Default authenticated route */}
-                    <Route path="/" element={<Navigate to="/admin/orders" replace />} />
+                    <Route path="/" element={<Navigate to="/admin/dashboard" replace />} />
 
                     {/* Fallback route: inside the layout so it doesn't unmount the sidebar on unknown routes */}
-                    <Route path="*" element={<Navigate to="/admin/orders" replace />} />
+                    <Route path="*" element={<Navigate to="/admin/dashboard" replace />} />
                 </Route>
             </Route>
         </Routes>

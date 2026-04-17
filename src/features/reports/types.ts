@@ -1,5 +1,5 @@
 
-export type ReportType = 'shipment' | 'transaction' | 'invoice';
+export type ReportType = 'shipment' | 'transaction' | 'invoice' | 'parcel';
 
 export interface ShipmentReport {
   id: string;
@@ -32,6 +32,18 @@ export interface InvoiceReport {
   amount: number;
   due_date: string;
   status: string;
+}
+
+export interface ParcelReport {
+  id: string;
+  receiver_name: string;
+  receiver_address: string;
+  order_number: string;
+  tracking_number: string;
+  status: string;
+  courier: string;
+  total: string;
+  created_at: string;
 }
 
 export interface ReportTab {

@@ -7,7 +7,9 @@ import {
   MOCK_INVOICES,
   SHIPMENT_COLUMNS,
   TRANSACTION_COLUMNS,
-  INVOICE_COLUMNS
+  INVOICE_COLUMNS,
+  PARCEL_COLUMNS,
+  MOCK_PARCEL_REPORTS
 } from '../constants';
 import { DataTable } from '@/components/common';
 import type { ReportType } from '../types';
@@ -46,6 +48,9 @@ export default function ReportsPage() {
       case 'invoice':
         rawData = MOCK_INVOICES;
         break;
+      case 'parcel':
+        rawData = MOCK_PARCEL_REPORTS;
+        break;
       default:
         rawData = [];
     }
@@ -53,7 +58,7 @@ export default function ReportsPage() {
     if (!search) return rawData;
 
     return rawData.filter(item => {
-      return Object.values(item).some(val => 
+      return Object.values(item).some(val =>
         String(val).toLowerCase().includes(search.toLowerCase())
       );
     });
@@ -67,14 +72,16 @@ export default function ReportsPage() {
         return TRANSACTION_COLUMNS;
       case 'invoice':
         return INVOICE_COLUMNS;
+      case 'parcel':
+        return PARCEL_COLUMNS;
       default:
         return [];
     }
   }, [activeTab]);
 
   return (
-    <div className="flex flex-col flex-1 gap-2 p-page-padding min-h-0 animate-in fade-in slide-in-from-bottom-2 duration-500 bg-slate-50/30 dark:bg-zinc-950/30">
-      <div className='rounded-xl shadow-sm flex-1 flex flex-col min-h-0 border border-gray-100 dark:border-zinc-800 bg-white dark:bg-zinc-950 overflow-hidden'>
+    <div className="flex flex-col flex-1 gap-2 p-page-padding min-h-0 overflow-auto animate-in fade-in slide-in-from-bottom-2 duration-500 bg-slate-50/30 dark:bg-zinc-950/30">
+      <div className='rounded-xl  shadow-sm flex-1 flex flex-col min-h-0 border border-gray-100 dark:border-zinc-800 bg-white dark:bg-zinc-950 overflow-hidden'>
         <ReportsHeader
           startDate={startDate}
           endDate={endDate}

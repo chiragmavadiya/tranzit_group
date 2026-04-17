@@ -94,7 +94,7 @@ export default function TopBar({ isCollapsed }: { isCollapsed?: boolean }) {
             <span>zack@yopmail.com</span>
             <ChevronDown className="w-3.5 h-3.5 text-blue-500 -ml-1 stroke-[2.5]" />
           </DropdownMenuTrigger>
-          <DropdownMenuContent align="end" className="w-[180px]">
+          <DropdownMenuContent align="end" className="rounded-sm">
             <DropdownMenuItem className="cursor-pointer">
               Profile
             </DropdownMenuItem>

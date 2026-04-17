@@ -6,12 +6,14 @@ import Layout from "@/layout";
 // Lazy load page components
 const Dashboard = lazy(() => import('@/features/dashboard/pages/Dashboard'));
 const Orders = lazy(() => import('@/features/orders/pages/OrdersPage'));
-const OrderDetails = lazy(() => import('@/features/orders/pages/OrderDetails'));
+const OrderDetails = lazy(() => import('@/features/orders/pages/OrderDetail2'));
 const Search = lazy(() => import('@/features/search/pages/SearchPage'));
 const Setup = lazy(() => import('@/features/setup/pages/SetupPage'));
 const GetQuote = lazy(() => import('@/features/quote/pages/GetQuotePage'));
 const MyItems = lazy(() => import('@/features/items'));
 const AddressBook = lazy(() => import('@/features/address-book'));
+const HelpCenter = lazy(() => import('@/features/help-center/pages/HelpCenterPage'));
+const HelpCenterArticle = lazy(() => import('@/features/help-center/pages/HelpCenterArticlePage'));
 
 
 
@@ -34,6 +36,8 @@ export default function ClientRoutes() {
                     <Route path="search" element={<Search />} />
                     <Route path="items" element={<MyItems />} />
                     <Route path="address-book" element={<AddressBook />} />
+                    <Route path="help-center" element={<HelpCenter />} />
+                    <Route path="help-center/:slug" element={<HelpCenterArticle />} />
                     {/* Default authenticated route */}
                     <Route path="/" element={<Navigate to="/orders" replace />} />
 

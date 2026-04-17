@@ -32,6 +32,11 @@ export default function Layout() {
         // Direct match
         if (item.path === location.pathname) return item.name;
 
+        // Nested route match for modules like Help Center articles
+        if (item.path !== '/' && location.pathname.startsWith(`${item.path}/`)) {
+          return item.name;
+        }
+
         // Check subItems (if any)
         if (item.subItems) {
           const subMatch = item.subItems.find(sub => sub.path === location.pathname);

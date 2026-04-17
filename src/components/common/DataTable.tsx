@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import type { ReactNode } from 'react'
-import { ArrowUp, ArrowDown, Search } from 'lucide-react';
+import { ArrowUp, ArrowDown, Search, Download, ClipboardCopy, FileText, Upload, File } from 'lucide-react';
 import {
   Table,
   TableBody,
@@ -17,6 +17,8 @@ import { usePagination } from './hooks/usePagination';
 import { Pagination } from './Pagination';
 import { DEFAULT_PAGE_SIZES } from '@/constants/global.constants';
 import type { Column, DataTableProps, SortConfig } from './types/DataTable.types';
+import { Button } from '../ui/button';
+import { DropdownCustomMenu } from '../ui/dropdown-menu';
 
 export function DataTable<T extends Record<string, any>>({
   data,
@@ -57,9 +59,12 @@ export function DataTable<T extends Record<string, any>>({
   onRowClick,
   // Custom components
   customHeader,
+  headerTitle,
+  headerDescription,
   headerClass,
   customFooter
 }: DataTableProps<T>) {
+  console.log(data, columns);
   // Internal state for uncontrolled components
   const [internalSearch, setInternalSearch] = useState('');
   const [internalSortConfig, setInternalSortConfig] = useState<SortConfig>({ key: null, direction: null });
@@ -164,39 +169,86 @@ export function DataTable<T extends Record<string, any>>({
 
   return (
     <div className={cn("flex flex-col group flex-1 min-h-0", className)}>
-      {/* Header with search and controls */}
-      {(searchable || customHeader) && (
-        <div className={cn("flex items-center justify-between gap-4 p-4 border-b bg-gray-50/50 dark:bg-transparent relative", headerClass)}>
-          <div className="flex items-center gap-2 ml-auto">
-            {searchable && (
-              <div className="relative">
-                <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
-                <Input
-                  placeholder={searchPlaceholder}
-                  value={currentSearch}
-                  onChange={(e) => handleSearch(e.target.value)}
-                  className="pl-8 w-54 h-8"
-                />
-              </div>
-            )}
-            {pagination && !pageSizeInFooter && (
-              <SelectComponent
-                data={DEFAULT_PAGE_SIZES}
-                value={paginationPageSize.toString()}
-                placeholder="Select Page Size"
-                className="w-[60px] h-8 text-xs font-bold"
-                onValueChange={(value: string | null) => value && setPaginationPageSize(Number(value))}
-              />
-            )}
-            {typeof customHeader === 'function' ? (customHeader as () => ReactNode)() : customHeader}
-          </div>
+      <div className={cn("flex w-full border-b justify-between gap-4 p-4", headerClass)}>
+        <div>
+          <h1 className={`text-lg font-bold text-gray-800 dark:text-zinc-200`}>
+            {headerTitle}
+          </h1>
+          <p className="text-sm text-gray-500 dark:text-zinc-400">
+            {headerDescription}
+          </p>
         </div>
-      )}
+        {/* Header with search and controls */}
+        {(searchable || customHeader) && (
+          <div className="flex items-center justify-between gap-4 bg-gray-50/50 dark:bg-transparent relative">
+            <div className="flex items-center gap-2 ml-auto">
+              {searchable && (
+                <div className="relative">
+                  <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                  <Input
+                    placeholder={searchPlaceholder}
+                    value={currentSearch}
+                    onChange={(e) => handleSearch(e.target.value)}
+                    className="pl-8 w-54 h-8"
+                  />
+                </div>
+              )}
+              {pagination && !pageSizeInFooter && (
+                <SelectComponent
+                  data={DEFAULT_PAGE_SIZES}
+                  value={paginationPageSize.toString()}
+                  placeholder="Select Page Size"
+                  className="w-[60px] h-8 text-xs font-bold"
+                  onValueChange={(value: string | null) => value && setPaginationPageSize(Number(value))}
+                />
+              )}
+              <DropdownCustomMenu
+                menus={[
+                  {
+                    label: "Print",
+                    onClick: () => { },
+                    icon: Download,
+                  },
+                  {
+                    label: "CSV",
+                    onClick: () => { },
+                    icon: File,
+                  },
+                  {
+                    label: "Excel",
+                    onClick: () => { },
+                    icon: Upload,
+                  },
+                  {
+                    label: "PDF",
+                    onClick: () => { },
+                    icon: FileText,
+                  },
+                  {
+                    label: "Copy",
+                    onClick: () => { },
+                    icon: ClipboardCopy,
+                  },
+                ]}
+              >
+                <Button
+                  variant="outline"
+                  className="gap-2 border-gray-200 dark:border-zinc-800 hover:bg-gray-50 dark:hover:bg-zinc-800 font-medium text-slate-700 dark:text-zinc-300 transition-colors"
+                >
+                  <Download className="w-4 h-4" />
+                  <span>Export</span>
+                </Button>
+              </DropdownCustomMenu>
+              {typeof customHeader === 'function' ? (customHeader as () => ReactNode)() : customHeader}
+            </div>
+          </div>
+        )}
+      </div>
 
       {/* Table */}
       <div className="flex-1 overflow-auto min-h-0">
         <Table className={cn("min-w-full", tableClassName)}>
-          <TableHeader className={cn("bg-white dark:bg-zinc-950 sticky top-0 z-10", headerClassName)}>
+          <TableHeader className={cn("bg-white dark:bg-zinc-950 sticky top-0 z-10 shadow-sm", headerClassName)}>
             <TableRow className="hover:bg-transparent border-b border-gray-100 dark:border-zinc-800">
               {selectable && (
                 <TableHead className="h-12 text-[14px] font-bold text-gray-900 dark:text-zinc-100 uppercase tracking-wider px-5">

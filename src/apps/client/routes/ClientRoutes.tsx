@@ -12,6 +12,10 @@ const Setup = lazy(() => import('@/features/setup/pages/SetupPage'));
 const GetQuote = lazy(() => import('@/features/quote/pages/GetQuotePage'));
 const MyItems = lazy(() => import('@/features/items'));
 const AddressBook = lazy(() => import('@/features/address-book'));
+const Invoices = lazy(() => import('@/features/invoices/pages/InvoicesPage'));
+const InvoiceDetails = lazy(() => import('@/features/invoices/pages/InvoiceDocumentView'));
+const Reports = lazy(() => import('@/features/reports'));
+const Enquiry = lazy(() => import('@/features/enquiry'));
 
 
 
@@ -34,6 +38,12 @@ export default function ClientRoutes() {
                     <Route path="search" element={<Search />} />
                     <Route path="items" element={<MyItems />} />
                     <Route path="address-book" element={<AddressBook />} />
+                    <Route path="invoices">
+                        <Route index element={<Invoices />} />
+                        <Route path=":invoiceID" element={<InvoiceDetails />} />
+                    </Route>
+                    <Route path="reports" element={<Reports />} />
+                    <Route path="enquiry" element={<Enquiry />} />
                     {/* Default authenticated route */}
                     <Route path="/" element={<Navigate to="/orders" replace />} />
 

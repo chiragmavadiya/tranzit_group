@@ -9,7 +9,7 @@ export interface HeaderIconProps {
 }
 
 export interface FormInputProps extends Omit<InputHTMLAttributes<HTMLInputElement>, 'onChange' | 'value'> {
-  label: ReactNode;
+  label?: ReactNode;
   value: string | number;
   onChange: (val: string) => void;
   placeholder?: string;
@@ -34,13 +34,15 @@ export interface FormSelectProps {
   label: string;
   value: string;
   onValueChange: (val: string | null) => void;
-  options: readonly { key: string; value: string }[];
+  options: readonly { label: string; value: string | number }[];
   placeholder?: string;
   className?: string;
   isHalf?: boolean;
   isCompact?: boolean;
   layout?: 'vertical' | 'horizontal';
   required?: boolean;
+  error?: boolean;
+  errormsg?: string;
 }
 
 export interface SummaryCardProps {

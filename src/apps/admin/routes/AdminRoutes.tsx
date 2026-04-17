@@ -9,6 +9,8 @@ const Orders = lazy(() => import('@/features/orders/pages/OrdersPage'));
 const OrderDetails = lazy(() => import('@/features/orders/pages/OrderDetails'));
 const Search = lazy(() => import('@/features/search/pages/SearchPage'));
 const Setup = lazy(() => import('@/features/setup/pages/SetupPage'));
+const Invoices = lazy(() => import('@/features/invoices/pages/InvoicesPage'));
+const InvoiceDetails = lazy(() => import('@/features/invoices/pages/InvoiceDocumentView'));
 
 
 export default function AdminRoutes() {
@@ -20,6 +22,10 @@ export default function AdminRoutes() {
                     <Route path="orders">
                         <Route index element={<Orders />} />
                         <Route path=":orderType/:orderID" element={<OrderDetails />} />
+                    </Route>
+                    <Route path="invoices">
+                        <Route index element={<Invoices />} />
+                        <Route path=":invoiceID" element={<InvoiceDetails />} />
                     </Route>
                     <Route path="setup" element={<Setup />} />
                     <Route path="search" element={<Search />} />

@@ -37,7 +37,7 @@ export function HeaderIcon({ icon: Icon, title, color }: HeaderIconProps) {
   );
 }
 
-const Required = () => {
+export const Required = () => {
   return (
     <span className="text-destructive ml-[2px] mt-[-4px]">*</span>
   )
@@ -94,7 +94,9 @@ export function FormInput({
           onChange={handleChange}
           className={cn(
             "h-8 rounded-md border-slate-200 dark:border-zinc-800 bg-white dark:bg-zinc-950 font-medium focus-visible:ring-0 focus-visible:ring-blue-600 focus-visible:border-blue-600 transition-all placeholder:text-slate-300 dark:placeholder:text-zinc-700 text-sm",
-            Icon ? "pl-9" : "px-3"
+            Icon ? "pl-9" : "px-3",
+            error ? "border-red-500 focus-visible:border-red-500" : ""
+
           )}
           disabled={disabled}
         />
@@ -165,7 +167,9 @@ export function FormSelect({
   isHalf = false,
   isCompact = false,
   layout = 'vertical',
-  required = false
+  required = false,
+  error,
+  errormsg
 }: FormSelectProps) {
   const isHorizontal = useMemo(() => layout === 'horizontal', [layout]);
   const memoizedData = useMemo(() => [...options], [options]);
@@ -177,20 +181,21 @@ export function FormSelect({
       className
     )}>
       <Label className={cn(
-        "text-[11px] font-extrabold text-slate-700 dark:text-zinc-400 uppercase tracking-wider leading-none gap-0",
+        "text-[11px] font-extrabold text-slate-700 dark:text-zinc-400 uppercase tracking-wider gap-0 mb-1",
         !isHorizontal && "ml-0.5"
       )}>
         {label}
         {required && <Required />}
       </Label>
       <SelectComponent
-        className='w-full h-8 text-[13px] data-[size=default]:h-8 border-slate-200 rounded-md dark:border-zinc-800 font-medium bg-white dark:bg-zinc-950 text-slate-900 dark:text-zinc-100 focus:ring-blue-600 transition-all text-sm px-3 '
+        className={cn("w-full h-8 text-[13px] data-[size=default]:h-8 border-slate-200 rounded-md dark:border-zinc-800 font-medium bg-white dark:bg-zinc-950 text-slate-900 dark:text-zinc-100 focus:ring-blue-600 transition-all text-sm px-3 ", error ? "border-red-500 focus:border-red-500" : "")}
         data={memoizedData}
         // defaultValue="default"
         onValueChange={onValueChange}
         value={value}
         placeholder={placeholder}
       />
+      {error ? <div className="text-red-500 text-[11px] w-full text-right">{errormsg}</div> : null}
     </div>
   );
 }

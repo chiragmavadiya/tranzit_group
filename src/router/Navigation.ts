@@ -57,24 +57,24 @@ export const clientSidebarItems: SidebarItem[] = [
   { name: 'Orders', icon: Package, path: '/orders' },
   { name: 'Create Order', icon: PlusCircle, path: '/orders/create' },
   { name: 'Get Quote', icon: Calculator, path: '/quote' },
-  { 
-    name: 'My Wallet', 
-    icon: Wallet, 
+  {
+    name: 'My Wallet',
+    icon: Wallet,
     path: '/wallet',
     hasDropdown: true,
     subItems: [
-        { name: 'Transactions', path: '/wallet/transactions' },
+      { name: 'Transactions', path: '/wallet/transactions' },
     ]
   },
   { name: 'My Items', icon: Box, path: '/items' },
   { name: 'My Address Book', icon: BookOpen, path: '/address-book' },
-  { 
-    name: 'Report', 
-    icon: FileBarChart, 
+  {
+    name: 'Report',
+    icon: FileBarChart,
     path: '/reports',
     hasDropdown: true,
     subItems: [
-        { name: 'General Report', path: '/reports/general' },
+      { name: 'All Report', path: '/reports' },
     ]
   },
   { name: 'Invoices', icon: FileText, path: '/invoices' },

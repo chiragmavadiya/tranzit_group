@@ -154,9 +154,9 @@ export function QuoteForm({ items, setItems, setLocations, onGetRate, isValid }:
                         value={item.type}
                         onValueChange={(val: string | null) => val && updateItem(item.id, 'type', val)}
                         data={[
-                          { key: 'Parcel', value: 'Parcel' },
-                          { key: 'Document', value: 'Document' },
-                          { key: 'Pallet', value: 'Pallet' },
+                          { label: 'Parcel', value: 'Parcel' },
+                          { label: 'Document', value: 'Document' },
+                          { label: 'Pallet', value: 'Pallet' },
                         ]}
                         placeholder="Select type"
                         className="h-7 data-[size=default]:h-7 min-w-28 text-[11px] group-hover/row:border-gray-200 dark:group-hover/row:border-zinc-800 focus:border-blue-600 focus:bg-white dark:focus:bg-zinc-950 focus-visible:ring-1 focus-visible:ring-blue-600 transition-all font-medium py-0 px-2 outline-none"

@@ -31,14 +31,25 @@ export default function AddressBookPage() {
   }, []);
 
   const handleEditAddress = useCallback((addr: Address) => {
+    console.log(addr)
     setEditingAddress({
-      id: addr.id,
-      code: addr.code,
-      contact_person: addr.contact_person,
-      business_name: addr.business_name,
-      email_id: addr.email_id,
-      mobile: addr.mobile,
-      address: addr.address,
+      "code": "HOME",
+      "address": "120 Collins Street",
+      "unit_number": "10",
+      "street_number": "120",
+      "street_name": "Collins",
+      "street_type": "Street",
+      "suburb": "Melbourne",
+      "state": "VIC",
+      "postcode": "3000",
+      "latitude": -37.8136,
+      "longitude": 144.9631,
+      "contact_person": "John Doe",
+      "business_name": "Acme Pty Ltd",
+      "email": "john@example.com",
+      "phone": "0412345678",
+      "additional_details": "Leave at reception",
+      "special_instructions": "Ring the bell"
     });
     setIsDialogOpen(true);
   }, []);
@@ -56,7 +67,7 @@ export default function AddressBookPage() {
         id: Math.floor(Math.random() * 1000000),
         ...data,
         is_active: 1,
-      } as Address;
+      } as unknown as Address;
       setAddresses((prev) => [newAddress, ...prev]);
       toast.success('Address created successfully');
     }
@@ -94,15 +105,15 @@ export default function AddressBookPage() {
       searchable: true,
     },
     {
-      key: "email_id",
-      accessor: "email_id",
+      key: "email",
+      accessor: "email",
       header: "EMAIL ID",
       sortable: true,
       searchable: true,
     },
     {
-      key: "mobile",
-      accessor: "mobile",
+      key: "phone",
+      accessor: "phone",
       header: "MOBILE",
       sortable: true,
     },
@@ -131,40 +142,45 @@ export default function AddressBookPage() {
 
   return (
     <div className="flex flex-col flex-1 gap-2 p-page-padding min-h-0 animate-in fade-in slide-in-from-bottom-2 duration-500">
-      <DataTable
-        columns={columns}
-        data={addresses}
-        searchPlaceholder="Search addresses..."
-        onSearchChange={handleSearch}
-        searchValue={search}
-        pageSize={pageSize}
-        onPageSizeChange={handlePageSizeChange}
-        pageSizeInFooter
-        customHeader={<AddressBookHeader onAddAddress={handleAddAddress} />}
-        headerClass="h-20"
-      />
-      
-      <CreateAddressDialog
-        key={isDialogOpen ? (editingAddress?.id || 'new') : 'closed'}
-        open={isDialogOpen}
-        onOpenChange={setIsDialogOpen}
-        onSubmit={handleFormSubmit}
-        editAddress={editingAddress}
-      />
+      <div className='rounded-lg shadow-sm flex-1 flex flex-col min-h-0 border border-gray-100 dark:border-zinc-800 bg-white dark:bg-zinc-950 '>
+        <DataTable
+          columns={columns}
+          data={addresses}
+          searchPlaceholder="Search addresses..."
+          onSearchChange={handleSearch}
+          searchValue={search}
+          pageSize={pageSize}
+          onPageSizeChange={handlePageSizeChange}
+          pageSizeInFooter
+          customHeader={<AddressBookHeader onAddAddress={handleAddAddress} />}
+          headerTitle='My Address Book'
+          headerDescription="Manage your saved addresses, contact persons, and business details."
+          headerClass="h-20"
+          className='pb-3'
+        />
 
-      <ConformationModal
-        open={isDeleteDialogOpen}
-        onOpenChange={setIsDeleteDialogOpen}
-        title="Delete Address"
-        description="Are you sure you want to delete this address?"
-        onConfirm={onSubmitDelete}
-        onCancel={onCancelDelete}
-        confirmText="Delete"
-        cancelText="Cancel"
-        confirmVariant="destructive"
-        loading={false}
-        className="w-full"
-      />
+        <CreateAddressDialog
+          key={isDialogOpen ? (editingAddress?.id || 'new') : 'closed'}
+          open={isDialogOpen}
+          onOpenChange={setIsDialogOpen}
+          onSubmit={handleFormSubmit}
+          editAddress={editingAddress}
+        />
+
+        <ConformationModal
+          open={isDeleteDialogOpen}
+          onOpenChange={setIsDeleteDialogOpen}
+          title="Delete Address"
+          description="Are you sure you want to delete this address?"
+          onConfirm={onSubmitDelete}
+          onCancel={onCancelDelete}
+          confirmText="Delete"
+          cancelText="Cancel"
+          confirmVariant="destructive"
+          loading={false}
+          className="w-full"
+        />
+      </div>
     </div>
   );
 }

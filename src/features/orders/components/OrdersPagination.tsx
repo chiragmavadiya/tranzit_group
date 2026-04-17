@@ -1,6 +1,7 @@
 import { ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import SelectComponent from '@/components/ui/select';
+import { PAGE_SIZES } from '@/constants';
 
 interface OrdersPaginationProps {
   currentPage: number;
@@ -74,14 +75,9 @@ export function OrdersPagination({
         <SelectComponent
           className='h-8 w-16'
           value={itemsPerPage.toString()}
-          onValueChange={(val) => val && onItemsPerPageChange(parseInt(val))}
-          data={[
-            { key: "25", value: "25" },
-            { key: "50", value: "50" },
-            { key: "75", value: "75" },
-            { key: "100", value: "100" },
-          ]}
-          placeholder="Select view"
+          onValueChange={(val) => onItemsPerPageChange(Number(val))}
+          data={PAGE_SIZES}
+          placeholder=''
         />
       </div>
 

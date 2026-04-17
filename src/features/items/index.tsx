@@ -136,43 +136,45 @@ export default function MyItemsPage() {
 
   return (
     <div className="flex flex-col flex-1 gap-2 p-page-padding min-h-0 animate-in fade-in slide-in-from-bottom-2 duration-500">
-      {/* <ItemsHeader onAddItem={handleAddItem} /> */}
+      <div className='rounded-lg shadow-sm flex-1 flex flex-col min-h-0 border border-gray-100 dark:border-zinc-800 bg-white dark:bg-zinc-950 '>
+        <DataTable
+          columns={columns}
+          data={items}
+          searchPlaceholder="Search items..."
+          onSearchChange={handleSearch}
+          searchValue={search}
+          pageSize={pageSize}
+          onPageSizeChange={handlePageSizeChange}
+          pageSizeInFooter
+          customHeader={<ItemsHeader onAddItem={handleAddItem} />}
+          headerTitle='My Items'
+          headerDescription='Manage your shipping items, dimensions, and cubic measurements.'
+          headerClass="h-20"
+          className='pb-3'
+        />
 
-      <DataTable
-        columns={columns}
-        data={items}
-        searchPlaceholder="Search items..."
-        onSearchChange={handleSearch}
-        searchValue={search}
-        pageSize={pageSize}
-        onPageSizeChange={handlePageSizeChange}
-        pageSizeInFooter
-        customHeader={<ItemsHeader onAddItem={handleAddItem} />}
-        headerClass="h-20"
-      />
-      {/* Modals */}
-      {/* create */}
-      <CreateItemDialog
-        key={isDialogOpen ? (editingItem?.id || 'new') : 'closed'}
-        open={isDialogOpen}
-        onOpenChange={setIsDialogOpen}
-        onSubmit={handleFormSubmit}
-        editItem={editingItem}
-      />
-      {/* conformation */}
-      <ConformationModal
-        open={isDeleteDialogOpen}
-        onOpenChange={setIsDeleteDialogOpen}
-        title="Delete Item"
-        description="Are you sure you want to delete this item?"
-        onConfirm={onSubmitDelete}
-        onCancel={onCancelDelete}
-        confirmText="Delete"
-        cancelText="Cancel"
-        confirmVariant="destructive"
-        loading={false}
-        className="w-full"
-      />
+        <CreateItemDialog
+          key={isDialogOpen ? (editingItem?.id || 'new') : 'closed'}
+          open={isDialogOpen}
+          onOpenChange={setIsDialogOpen}
+          onSubmit={handleFormSubmit}
+          editItem={editingItem}
+        />
+
+        <ConformationModal
+          open={isDeleteDialogOpen}
+          onOpenChange={setIsDeleteDialogOpen}
+          title="Delete Item"
+          description="Are you sure you want to delete this item?"
+          onConfirm={onSubmitDelete}
+          onCancel={onCancelDelete}
+          confirmText="Delete"
+          cancelText="Cancel"
+          confirmVariant="destructive"
+          loading={false}
+          className="w-full"
+        />
+      </div>
     </div>
   );
 }

@@ -217,10 +217,10 @@ export const ItemsTable: React.FC<ItemsTableProps> = ({
               <span className="text-xs font-medium text-gray-500 dark:text-zinc-400 capitalize">Currency</span>
               <SelectComponent
                 data={[
-                  { key: 'AUD', value: 'aud' },
-                  { key: 'USD', value: 'usd' },
-                  { key: 'EUR', value: 'eur' },
-                  { key: 'GBP', value: 'gbp' }
+                  { label: 'AUD', value: 'aud' },
+                  { label: 'USD', value: 'usd' },
+                  { label: 'EUR', value: 'eur' },
+                  { label: 'GBP', value: 'gbp' }
                 ]}
                 value={currency}
                 onValueChange={(val) => val && setCurrency(val)}

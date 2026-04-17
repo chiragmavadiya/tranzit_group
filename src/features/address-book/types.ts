@@ -1,12 +1,13 @@
 export interface Address {
   id: number;
   code: string;
+  customer_id: number;
   contact_person: string;
   business_name: string;
-  email_id: string;
-  mobile: string;
+  email: string;
+  phone: string;
   address: string;
-  is_active: number;
+  created_at?: string;
   DT_RowIndex?: number;
 }
 
@@ -15,9 +16,20 @@ export interface AddressFormData {
   code: string;
   contact_person: string;
   business_name: string;
-  email_id: string;
-  mobile: string;
+  email: string;
+  phone?: string;
   address: string;
+  unit_number?: string;
+  street_number: string;
+  street_name: string;
+  street_type: string;
+  suburb: string;
+  state: string;
+  postcode: string;
+  additional_details?: string;
+  special_instructions?: string;
+  latitude?: number;
+  longitude?: number;
 }
 
 export interface AddressFilters {

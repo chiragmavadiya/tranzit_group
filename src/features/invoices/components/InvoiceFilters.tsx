@@ -20,15 +20,15 @@ export function InvoiceFilters({
       <SelectComponent
         data={[
           {
-            key: 'Chirag Test (chirag@gmail.com)',
+            label: 'Chirag Test (chirag@gmail.com)',
             value: 'chiragTest'
           },
           {
-            key: 'Ahish Test (ahish@gmail.com)',
+            label: 'Ahish Test (ahish@gmail.com)',
             value: 'ahishTest'
           },
           {
-            key: 'Sagar Test (sagar@gmail.com)',
+            label: 'Sagar Test (sagar@gmail.com)',
             value: 'sagarTest'
           },
         ]}

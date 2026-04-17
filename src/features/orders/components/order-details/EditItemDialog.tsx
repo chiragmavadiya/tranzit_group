@@ -20,11 +20,11 @@ interface EditItemDialogProps {
 }
 
 const COUNTRIES = [
-  { key: 'Australia', value: 'Australia' },
-  { key: 'China', value: 'China' },
-  { key: 'USA', value: 'USA' },
-  { key: 'UK', value: 'UK' },
-  { key: 'India', value: 'India' },
+  { label: 'Australia', value: 'Australia' },
+  { label: 'China', value: 'China' },
+  { label: 'USA', value: 'USA' },
+  { label: 'UK', value: 'UK' },
+  { label: 'India', value: 'India' },
 ];
 
 export const EditItemDialog: React.FC<EditItemDialogProps> = ({

@@ -35,16 +35,16 @@ export const ITEMS_COLUMNS: ItemsColumn[] = [
 ];
 
 export const DOCUMENT_TYPES = [
-  { key: "Customs Invoice", value: "customs_invoice" },
-  { key: "Proof of Purchase", value: "proof_of_purchase" },
-  { key: "Licence/Permit", value: "licence_permit" },
-  { key: "Order Document", value: "order_document" },
-  { key: "Invoice", value: "invoice" },
-  { key: "Proforma", value: "proforma" },
-  { key: "Certificate of Origin", value: "certificate_of_origin" },
-  { key: "Nafta Certificate of Origin", value: "nafta_certificate_of_origin" },
-  { key: "Commercial Invoice", value: "commercial_invoice" },
-  { key: "Custom Declaration", value: "custom_declaration" },
+  { label: "Customs Invoice", value: "customs_invoice" },
+  { label: "Proof of Purchase", value: "proof_of_purchase" },
+  { label: "Licence/Permit", value: "licence_permit" },
+  { label: "Order Document", value: "order_document" },
+  { label: "Invoice", value: "invoice" },
+  { label: "Proforma", value: "proforma" },
+  { label: "Certificate of Origin", value: "certificate_of_origin" },
+  { label: "Nafta Certificate of Origin", value: "nafta_certificate_of_origin" },
+  { label: "Commercial Invoice", value: "commercial_invoice" },
+  { label: "Custom Declaration", value: "custom_declaration" },
 ];
 
 

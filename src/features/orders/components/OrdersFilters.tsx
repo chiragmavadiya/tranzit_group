@@ -49,9 +49,9 @@ export function OrdersFilters({
         <SelectComponent
           className='w-[160px] h-9 text-[13px] data-[size=default]:h-9'
           data={[
-            { key: "default", value: "Select view" },
-            { key: "recent", value: "Recent Orders" },
-            { key: "flagged", value: "Flagged" },
+            { label: "Select view", value: "default" },
+            { label: "Recent Orders", value: "recent" },
+            { label: "Flagged", value: "flagged" },
           ]}
           // defaultValue="default"
           placeholder="Select view"

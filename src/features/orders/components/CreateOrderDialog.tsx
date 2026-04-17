@@ -16,15 +16,15 @@ import { FormInput, FormSelect, FormTextarea, ValidAddressBadge } from '@/featur
 import type { CreateOrderDialogProps, OrderFormData } from '@/features/orders/types';
 
 const SUBURBS = [
-  { value: "Truganina", key: "Truganina" },
-  { value: "Melbourne", key: "Melbourne" },
-  { value: "Sydney", key: "Sydney" },
+  { value: "Truganina", label: "Truganina" },
+  { value: "Melbourne", label: "Melbourne" },
+  { value: "Sydney", label: "Sydney" },
 ];
 
 const POSTCODES = [
-  { value: "3029", key: "3029" },
-  { value: "3000", key: "3000" },
-  { value: "2000", key: "2000" },
+  { value: "3029", label: "3029" },
+  { value: "3000", label: "3000" },
+  { value: "2000", label: "2000" },
 ];
 
 const initialData: OrderFormData = {

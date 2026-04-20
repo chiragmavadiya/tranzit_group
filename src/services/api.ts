@@ -14,8 +14,15 @@ export const api = axios.create({
 // Request Interceptor
 api.interceptors.request.use(
     (config: InternalAxiosRequestConfig) => {
-        const token = localStorage.getItem("auth_token");
-        if (token && config.headers) {
+        const tokenData = localStorage.getItem("auth_token");
+        if (tokenData && config.headers) {
+            let token = tokenData;
+            try {
+                const parsed = JSON.parse(tokenData);
+                token = parsed.accessToken || tokenData;
+            } catch (e) {
+                // Not JSON, use as is
+            }
             config.headers.Authorization = `Bearer ${token}`;
         }
         return config;
@@ -32,6 +39,9 @@ api.interceptors.response.use(
     },
     (error: AxiosError) => {
         const message = (error.response?.data as any)?.message || error.message || "An error occurred";
+
+        // Update error message to use the server-side message if it exists
+        error.message = message;
 
         // Handle global errors (e.g. 401 Unauthorized)
         if (error.response?.status === 401) {

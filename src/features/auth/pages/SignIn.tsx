@@ -37,41 +37,43 @@ export default function SignIn() {
     if (!data.email || !data.password) {
       return;
     }
-    setLoading(true);
-    await new Promise((resolve) => setTimeout(resolve, 700));
-    const fakeUser = {
-      "id": 1,
-      "username": "emilys",
-      "email": "emily.johnson@x.dummyjson.com",
-      "firstName": "Emily",
-      "lastName": "Johnson",
-      "gender": "female",
-      "image": "https://dummyjson.com/icon/emilys/128",
-      "accessToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
-      "refreshToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
-    }
-    const role = data.email === 'admin@gmail.com' ? 'admin' : 'client'
-    localStorage.setItem('auth_token', JSON.stringify(fakeUser))
-    localStorage.setItem('user_role', role)
-    dispatch(setCredentials({ user: fakeUser, token: fakeUser.accessToken, role: role }));
-    navigate("/orders");
+    // setLoading(true);
+    // await new Promise((resolve) => setTimeout(resolve, 700));
+    // const fakeUser = {
+    //   "id": 1,
+    //   "username": "emilys",
+    //   "email": "emily.johnson@x.dummyjson.com",
+    //   "firstName": "Emily",
+    //   "lastName": "Johnson",
+    //   "gender": "female",
+    //   "image": "https://dummyjson.com/icon/emilys/128",
+    //   "accessToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+    //   "refreshToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+    // }
+    // const role = data.email === 'admin@gmail.com' ? 'admin' : 'client'
+    // localStorage.setItem('auth_token', JSON.stringify(fakeUser))
+    // localStorage.setItem('user_role', role)
+    // dispatch(setCredentials({ user: fakeUser, token: fakeUser.accessToken, role: role }));
+    // navigate("/orders");
 
-    // loginMutation.mutate(data, {
-    //   onSuccess: (response) => {
-    //     console.log(typeof response, 'response')
-    //     if (response?.status) {
-    //       console.log(response.status, "::::STATUS")
-    //       navigate("/orders");
-    //       // Sync with Redux store
-    //       if (response.data) {
-    //       }
-    //       // Redirect to home/dashboard
-    //     }
-    //   },
-    //   onError: (error) => {
-    //     console.error('Login error:', error);
-    //   }
-    // });
+    loginMutation.mutate(data, {
+      onSuccess: (response) => {
+        console.log(typeof response, 'response')
+        if (response?.status) {
+          console.log(response.status, "::::STATUS")
+          navigate("/orders");
+          // Sync with Redux store
+          if (response.data) {
+            // navigate("/orders");
+
+          }
+          // Redirect to home/dashboard
+        }
+      },
+      onError: (error) => {
+        console.error('Login error:', error);
+      }
+    });
   };
   // const languages = [
   //   { value: "next.js", label: "Next.js" },
@@ -150,7 +152,6 @@ export default function SignIn() {
           {/* {loginMutation.isPending && <Spinner data-icon="inline-start" />} */}
           {loginMutation.isPending || loading ? "Login..." : "Login"}
         </Button>
-        {/* invalid credential message */}
         {loginMutation.isError && <p className="text-red-500 text-sm text-end">{loginMutation.error?.message}</p>}
 
         <p className="text-center text-sm text-slate-600 dark:text-slate-400">

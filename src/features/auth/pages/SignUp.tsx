@@ -93,6 +93,7 @@ export default function SignUp() {
       email: data.email,
       password: data.password,
       password_confirmation: data.confirmPassword,
+      phone_number: data.phone,
       terms: data.terms === 'true',
     };
 

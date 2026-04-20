@@ -13,6 +13,7 @@ export const useLogin = () => {
     return useMutation({
         mutationFn: useCallback((data: LoginRequest) => authService.login(data), []),
         onSuccess: (data) => {
+            console.log('on Success')
             // Save token to localStorage
             if (data?.data?.accessToken) {
                 console.log(data.data, ' data.data')
@@ -23,9 +24,9 @@ export const useLogin = () => {
             // Invalidate verification status
             queryClient.invalidateQueries({ queryKey: QUERY_KEYS.AUTH.VERIFICATION_STATUS });
             // 🔥 IMPORTANT: manually throw error
-            if (!data.status) {
-                throw new Error(data.message || "Login failed");
-            }
+            // if (!data.status) {
+            //     throw new Error(data.message || "Login failed");
+            // }
         },
     });
 };

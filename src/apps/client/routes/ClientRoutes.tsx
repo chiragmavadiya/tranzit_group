@@ -8,7 +8,6 @@ const Dashboard = lazy(() => import('@/features/dashboard/pages/Dashboard'));
 const Orders = lazy(() => import('@/features/orders/pages/OrdersPage'));
 const OrderDetails = lazy(() => import('@/features/orders/pages/OrderDetails2'));
 const Search = lazy(() => import('@/features/search/pages/SearchPage'));
-const Setup = lazy(() => import('@/features/setup/pages/SetupPage'));
 const GetQuote = lazy(() => import('@/features/quote/pages/GetQuotePage'));
 const MyItems = lazy(() => import('@/features/items'));
 const AddressBook = lazy(() => import('@/features/address-book'));
@@ -26,7 +25,7 @@ const Transactions = lazy(() => import('@/features/wallet/pages/TransactionsPage
 export default function ClientRoutes() {
   return (
     <Routes>
-      <Route element={<ProtectedRoute role="client" />}>
+      <Route element={<ProtectedRoute role="customer" />}>
         <Route element={<Layout />}>
           <Route path="dashboard" element={<Dashboard />} />
           <Route path="orders">
@@ -37,7 +36,6 @@ export default function ClientRoutes() {
 
           <Route path="orders/create" element={<div>order create page</div>} />
           <Route path="quote" element={<GetQuote />} />
-          <Route path="setup" element={<Setup />} />
 
           <Route path="search" element={<Search />} />
           <Route path="items" element={<MyItems />} />

@@ -6,15 +6,21 @@ import type {
     VerificationStatusResponse,
     GenericResponse,
     LoginRequest,
-    LoginResponse
+    LoginResponse,
+    ForgotPasswordRequest,
+    OnboardingRequest
 } from "@/features/auth/auth.types";
+// role can be admin or customer 
 
 export const authService = {
     /**
      * Login a customer
      */
-    login: async (data: LoginRequest): Promise<LoginResponse> => {
-        const response = await api.post<LoginResponse>(API_ENDPOINTS.AUTH.LOGIN, data);
+    login: async (data: LoginRequest, role: string): Promise<LoginResponse> => {
+        const endpoint = role === 'admin'
+            ? API_ENDPOINTS.AUTH.ADMIN_LOGIN
+            : API_ENDPOINTS.AUTH.CUSTOMER_LOGIN;
+        const response = await api.post<LoginResponse>(endpoint, data);
         return response.data;
     },
     /**
@@ -24,6 +30,13 @@ export const authService = {
         const response = await api.post<RegisterResponse>(API_ENDPOINTS.AUTH.REGISTER, data);
         return response.data;
     },
+
+    // forgot password services
+    forgotPassword: async (data: ForgotPasswordRequest): Promise<GenericResponse> => {
+        const response = await api.post<GenericResponse>(API_ENDPOINTS.AUTH.FORGOT_PASSWORD, data);
+        return response.data;
+    },
+
 
     /**
      * Resend verification email
@@ -38,6 +51,36 @@ export const authService = {
      */
     getVerificationStatus: async (): Promise<VerificationStatusResponse> => {
         const response = await api.get<VerificationStatusResponse>(API_ENDPOINTS.AUTH.VERIFICATION_STATUS);
+        return response.data;
+    },
+
+    /**
+     * Verify email with token
+     */
+    verifyEmail: async (token: string): Promise<GenericResponse> => {
+        const response = await api.post<GenericResponse>(API_ENDPOINTS.AUTH.VERIFY_EMAIL, { token });
+        return response.data;
+    },
+
+    /**
+     * Submit onboarding data
+     */
+    submitOnboarding: async (data: OnboardingRequest): Promise<GenericResponse> => {
+        const response = await api.put<GenericResponse>(API_ENDPOINTS.AUTH.ONBOARDING, data);
+        return response.data;
+    },
+
+    /**
+     * Logout a customer
+     */
+    logout: async (): Promise<GenericResponse> => {
+        const response = await api.post<GenericResponse>(API_ENDPOINTS.AUTH.LOGOUT);
+        return response.data;
+    },
+
+    // get user details api
+    getUserDetails: async (): Promise<LoginResponse> => {
+        const response = await api.get<LoginResponse>(API_ENDPOINTS.AUTH.USER_DETAILS);
         return response.data;
     },
 };

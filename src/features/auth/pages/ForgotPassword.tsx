@@ -1,24 +1,20 @@
-import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Link } from "react-router-dom";
 import brandlogo from '@/assets/Tranzit_Logo.svg';
 import { AuthLayout } from "@/features/auth/components/AuthLayout";
+import { useForgotPassword } from "../hooks/useAuth";
 
 export default function ForgotPassword() {
-  const [isSubmitted, setIsSubmitted] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
+
+  const { mutate: forgotPassword, isPending, isError, error, isSuccess, data } = useForgotPassword();
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    setIsLoading(true);
-
-    // Simulate API call
-    setTimeout(() => {
-      setIsLoading(false);
-      setIsSubmitted(true);
-    }, 1000);
+    const formData = new FormData(e.currentTarget);
+    const email = formData.get("email") as string;
+    forgotPassword({ email });
   };
 
   return (
@@ -33,7 +29,7 @@ export default function ForgotPassword() {
         </h2>
       </div>
 
-      {!isSubmitted ? (
+      {!isSuccess ? (
         <form onSubmit={handleSubmit} className="space-y-6">
           <p className="text-sm text-slate-500 dark:text-slate-400 text-center px-4">
             Enter your email and we'll send you instructions to reset your password.
@@ -54,13 +50,18 @@ export default function ForgotPassword() {
               />
             </div>
           </div>
+          {isError && (
+            <p className="text-center text-sm font-medium text-red-600">
+              {error?.message}
+            </p>
+          )}
 
           <Button
             type="submit"
-            disabled={isLoading}
+            disabled={isPending}
             className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-6 text-md rounded-md transition-all shadow-md hover:shadow-lg"
           >
-            {isLoading ? "Sending..." : "Send reset link"}
+            {isPending ? "Sending..." : "Send reset link"}
           </Button>
 
           <p className="text-center text-sm font-medium">
@@ -73,7 +74,7 @@ export default function ForgotPassword() {
         <div className="space-y-6 text-center w-full">
           <div className="rounded-md bg-green-50 p-4 border border-green-200">
             <p className="text-sm font-medium text-green-800">
-              Reset link sent to your email.
+              {data?.message}
             </p>
           </div>
           <p className="text-center text-sm font-medium">

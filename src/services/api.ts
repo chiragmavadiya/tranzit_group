@@ -16,15 +16,15 @@ api.interceptors.request.use(
     (config: InternalAxiosRequestConfig) => {
         const tokenData = localStorage.getItem("auth_token");
         if (tokenData && config.headers) {
-            let token = tokenData;
-            try {
-                const parsed = JSON.parse(tokenData);
-                token = parsed.accessToken || tokenData;
-            } catch (e) {
-                // Not JSON, use as is
-            }
-            config.headers.Authorization = `Bearer ${token}`;
+            config.headers.Authorization = `Bearer ${tokenData}`;
         }
+        const role = localStorage.getItem("user_role") || "customer";
+
+        // Only prefix if the URL doesn't already have one
+        if (config.url && !config.url.startsWith('/admin') && !config.url.startsWith('/customer')) {
+            config.url = `/${role}${config.url}`;
+        }
+
         return config;
     },
     (error) => {

@@ -11,27 +11,79 @@ import {
   BarChart3,
   CreditCard
 } from "lucide-react";
-import type { Transaction, DashboardInvoice } from "../types";
+import { useDashboardMetrics } from "../hooks/useDashboard";
+import type { Transaction, DashboardInvoice, AdminMetrics } from "../types";
 import { NavLink } from "react-router-dom";
 
 export default function AdminDashboard() {
-  // Mock Data
+  const { data: metricsData, isLoading } = useDashboardMetrics();
+  const metrics = metricsData?.data as AdminMetrics;
+
+  // Real Data from API
   const topStats = [
-    { label: "Orders", value: 1, icon: LayoutDashboard },
-    { label: "Customers", value: 1, icon: Users, color: "bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400" },
-    { label: "Invoice Pending", value: 0, icon: FileText, color: "bg-orange-50 dark:bg-orange-900/20 text-orange-600 dark:text-orange-400" },
-    { label: "Labels Undelivered", value: 1, icon: Tag, color: "bg-green-50 dark:bg-green-900/20 text-green-600 dark:text-green-400" },
+    { 
+      label: "Orders", 
+      value: isLoading ? "..." : metrics?.totalOrder ?? 0, 
+      icon: LayoutDashboard 
+    },
+    { 
+      label: "Customers", 
+      value: isLoading ? "..." : metrics?.totalCustomers ?? 0, 
+      icon: Users, 
+      color: "bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400" 
+    },
+    { 
+      label: "Invoice Pending", 
+      value: isLoading ? "..." : metrics?.pendingInvoiceCount ?? 0, 
+      icon: FileText, 
+      color: "bg-orange-50 dark:bg-orange-900/20 text-orange-600 dark:text-orange-400" 
+    },
+    { 
+      label: "Labels Undelivered", 
+      value: isLoading ? "..." : metrics?.undeliveredOrder ?? 0, 
+      icon: Tag, 
+      color: "bg-green-50 dark:bg-green-900/20 text-green-600 dark:text-green-400" 
+    },
   ];
 
   const secondaryStats = [
-    { label: "Margin", value: "$0.00", subValue: "Total Margin Amount", icon: TrendingDown },
-    { label: "Orders", value: "$22.10", subValue: "Total Order Amount", icon: BarChart3, color: "bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400" },
-    { label: "Paid Invoices", value: "$0.00", subValue: "Total Paid Invoices Amount", icon: FileText, color: "bg-green-50 dark:bg-green-900/20 text-green-600 dark:text-green-400" },
+    { 
+      label: "Margin", 
+      value: isLoading ? "..." : (metrics?.totalMarginAmount || "$0.00"), 
+      subValue: "Total Margin Amount", 
+      icon: TrendingDown 
+    },
+    { 
+      label: "Orders", 
+      value: isLoading ? "..." : (metrics?.totalOrderAmount || "$0.00"), 
+      subValue: "Total Order Amount", 
+      icon: BarChart3, 
+      color: "bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400" 
+    },
+    { 
+      label: "Paid Invoices", 
+      value: isLoading ? "..." : (metrics?.totalPaidInvoiceAmount || "$0.00"), 
+      subValue: "Total Paid Invoices Amount", 
+      icon: FileText, 
+      color: "bg-green-50 dark:bg-green-900/20 text-green-600 dark:text-green-400" 
+    },
   ];
 
   const tertiaryStats = [
-    { label: "Unpaid Invoices", value: "$0.00", subValue: "Total Unpaid Invoices Amount", icon: FileText, color: "bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400" },
-    { label: "Invoices", value: "$0.00", subValue: "Total Invoice Amount", icon: CreditCard, color: "bg-orange-50 dark:bg-orange-900/20 text-orange-600 dark:text-orange-400" },
+    { 
+      label: "Unpaid Invoices", 
+      value: isLoading ? "..." : (metrics?.totalUnpaidInvoiceAmount || "$0.00"), 
+      subValue: "Total Unpaid Invoices Amount", 
+      icon: FileText, 
+      color: "bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400" 
+    },
+    { 
+      label: "Invoices", 
+      value: isLoading ? "..." : (metrics?.totalInvoiceAmount || "$0.00"), 
+      subValue: "Total Invoice Amount", 
+      icon: CreditCard, 
+      color: "bg-orange-50 dark:bg-orange-900/20 text-orange-600 dark:text-orange-400" 
+    },
   ];
 
   const transactions: Transaction[] = [

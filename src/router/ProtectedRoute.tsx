@@ -2,7 +2,7 @@ import { Navigate, Outlet } from 'react-router-dom';
 import { useAppSelector } from '@/hooks/store.hooks';
 
 export default function ProtectedRoute({ role: requiredRole }: { role: string }) {
-  const { isAuthenticated, role: userRole } = useAppSelector((state) => state.auth);
+  const { isAuthenticated, role: userRole, next_step } = useAppSelector((state) => state.auth);
 
   // If the user isn't authenticated, redirect to the signin page
   if (!isAuthenticated) {
@@ -10,7 +10,7 @@ export default function ProtectedRoute({ role: requiredRole }: { role: string })
   }
 
   // If the component requires a specific role and the user doesn't have it
-  if (requiredRole && userRole !== requiredRole) {
+  if (requiredRole && userRole !== requiredRole && next_step !== 'onboarding') {
     // Redirect based on their actual role
     if (userRole === 'admin') {
       return <Navigate to="/admin/dashboard" replace />;

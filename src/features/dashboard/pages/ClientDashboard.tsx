@@ -7,17 +7,37 @@ import {
   FileText,
   LayoutDashboard
 } from "lucide-react";
-import type { Transaction, DashboardOrder } from "../types";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 import { NavLink } from "react-router-dom";
 
+import { useDashboardMetrics } from "../hooks/useDashboard";
+import type { Transaction, DashboardOrder, CustomerMetrics } from "../types";
+
 export default function ClientDashboard() {
-  // Mock Data
+  const { data: metricsData, isLoading } = useDashboardMetrics();
+  
+  // Real Data from API
+  const metrics = metricsData?.data as CustomerMetrics;
+
   const stats = [
-    { label: "Total Orders", value: 39, icon: LayoutDashboard },
-    { label: "Total Spend", value: "$152.35", icon: DollarSign, color: "bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400" },
-    { label: "Invoice Pending", value: 1, icon: FileText, color: "bg-orange-50 dark:bg-orange-900/20 text-orange-600 dark:text-orange-400" },
+    { 
+      label: "Total Orders", 
+      value: isLoading ? "..." : metrics?.totalOrder ?? 0, 
+      icon: LayoutDashboard 
+    },
+    { 
+      label: "Total Spend", 
+      value: isLoading ? "..." : (typeof metrics?.totalSpend === 'number' ? `$${metrics.totalSpend.toFixed(2)}` : (metrics?.totalSpend || "$0.00")), 
+      icon: DollarSign, 
+      color: "bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400" 
+    },
+    { 
+      label: "Invoice Pending", 
+      value: isLoading ? "..." : metrics?.pendingInvoiceCount ?? 0, 
+      icon: FileText, 
+      color: "bg-orange-50 dark:bg-orange-900/20 text-orange-600 dark:text-orange-400" 
+    },
   ];
 
   const transactions: Transaction[] = [

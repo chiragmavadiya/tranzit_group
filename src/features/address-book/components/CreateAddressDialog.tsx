@@ -19,6 +19,7 @@ interface CreateAddressDialogProps {
   onOpenChange: (open: boolean) => void;
   onSubmit: (data: AddressFormData) => void;
   editAddress?: AddressFormData | null;
+  isLoading?: boolean;
 }
 
 export function CreateAddressDialog({
@@ -26,6 +27,7 @@ export function CreateAddressDialog({
   onOpenChange,
   onSubmit,
   editAddress,
+  isLoading = false,
 }: CreateAddressDialogProps) {
   const initialData = useMemo(() => ({
     code: editAddress?.code || '',
@@ -331,9 +333,10 @@ export function CreateAddressDialog({
             </Button>
             <Button
               type="submit"
+              disabled={isLoading}
               className="px-8 bg-[#0060FE] hover:bg-[#0052db] text-white font-semibold transition-all shadow-md shadow-blue-100 dark:shadow-none active:scale-[0.98]"
             >
-              {editAddress ? 'Save Changes' : 'Create Address'}
+              {isLoading ? (editAddress ? 'Saving...' : 'Creating...') : (editAddress ? 'Save Changes' : 'Create Address')}
             </Button>
           </DialogFooter>
         </form>

@@ -20,6 +20,11 @@ export const API_ENDPOINTS = {
     ITEMS: {
         BASE: "/items",
         EXPORT: "/items/export",
+    },
+    ADDRESS_BOOK: {
+        BASE: "/customer/address-book",
+        EXPORT: "/customer/address-book/export",
+        SEARCH: "/customer/address-book/search",
     }
 };
 
@@ -38,4 +43,8 @@ export const QUERY_KEYS = {
         LIST: ["items", "list"],
         DETAILS: (id: number | string) => ["items", "details", id],
     },
+    ADDRESS_BOOK: {
+        LIST: ["address-book", "list"],
+        DETAILS: (id: number | string) => ["address-book", "details", id],
+    }
 };

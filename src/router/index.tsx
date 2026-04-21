@@ -1,15 +1,21 @@
-import { lazy, Suspense } from 'react';
-import { Routes, Route } from 'react-router-dom';
+import { lazy, Suspense, useEffect } from 'react';
+import { Routes, Route, useNavigate, useLocation } from 'react-router-dom';
 import PublicRoute from '@/router/PublicRoute';
 import brandLogo from '@/assets/Tranzit_Logo.svg';
 import AdminRoutes from '@/apps/admin/routes/AdminRoutes';
 import ClientRoutes from '@/apps/client/routes/ClientRoutes';
+import { useAppDispatch, useAppSelector } from '@/hooks/store.hooks';
+import { useGetUserDetails } from '@/features/auth/hooks/useAuth';
+import { setUser } from '@/features/auth/authSlice';
 
 // Lazy load page components
 const SignIn = lazy(() => import('@/features/auth/pages/SignIn'));
 const SignUp = lazy(() => import('@/features/auth/pages/SignUp'));
 const ForgotPassword = lazy(() => import('@/features/auth/pages/ForgotPassword'));
 const ResetPassword = lazy(() => import('@/features/auth/pages/ResetPassword'));
+const VerifyEmail = lazy(() => import('@/features/auth/pages/VerifyEmail'));
+const OnboardingPage = lazy(() => import('@/features/setup/pages/OnboardingPage'));
+
 
 // Simple loading fallback component
 const PageLoader = () => (
@@ -32,36 +38,44 @@ const PageLoader = () => (
 );
 
 export const AppRouter = () => {
+  const { isAuthenticated } = useAppSelector((state) => state.auth);
+  const dispatch = useAppDispatch();
+  const navigate = useNavigate();
+  const location = useLocation();
+
+  // Fetch user details if authenticated
+  const { data: userData, isLoading } = useGetUserDetails(isAuthenticated);
+
+  useEffect(() => {
+    if (userData?.user) {
+      dispatch(setUser({
+        user: userData.user,
+        next_step: userData.next_step
+      }));
+
+      // Redirect to onboarding if required
+      if (userData.next_step === 'onboarding' && location.pathname !== '/on-board') {
+        navigate('/on-board');
+      }
+    }
+  }, [userData, dispatch, navigate, location.pathname]);
+
+  if (isLoading) return <PageLoader />;
+
   return (
     <Suspense fallback={<PageLoader />}>
       <Routes>
         {/* Public Auth Routes (Redirect to dashboard if already logged in) */}
         <Route element={<PublicRoute />}>
-          <Route path="/signin" element={<SignIn />} />
+          <Route path="/admin/signin" element={<SignIn role="admin" />} />
+          <Route path="/signin" element={<SignIn role="customer" />} />
           <Route path="/signup" element={<SignUp />} />
           <Route path="/forgot-password" element={<ForgotPassword />} />
           <Route path="/reset-password/:token" element={<ResetPassword />} />
+          <Route path="/verify-email" element={<VerifyEmail />} />
+          <Route path="/on-board" element={<OnboardingPage />} />
         </Route>
-
-        {/* Authenticated routes wrapped in ProtectedRoute -> Layout */}
-        {/* <Route element={<ProtectedRoute />}>
-          <Route element={<Layout />}>
-            <Route path="/dashboard" element={<Dashboard />} />
-            <Route path="/orders">
-              <Route index element={<Orders />} />
-              <Route path=":orderType/:orderID" element={<OrderDetails />} />
-            </Route>
-            <Route path="/setup" element={<Setup />} />
-            <Route path="/search" element={<Search />} />
-            <Route path="/" element={<Navigate to="/admin/orders" replace />} />
-
-            <Route path="*" element={<Navigate to="/admin/orders" replace />} />
-          </Route>
-        </Route> */}
-        {/* Admin */}
         <Route path="/admin/*" element={<AdminRoutes />} />
-
-        {/* Client */}
         <Route path="/*" element={<ClientRoutes />} />
       </Routes>
     </Suspense>

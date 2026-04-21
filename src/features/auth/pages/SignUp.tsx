@@ -93,13 +93,14 @@ export default function SignUp() {
       email: data.email,
       password: data.password,
       password_confirmation: data.confirmPassword,
+      phone_number: data.phone,
       terms: data.terms === 'true',
     };
 
     registerMutation.mutate(payload, {
       onSuccess: () => {
         toast.success("Account created successfully!");
-        navigate("/signin");
+        navigate("/verify-email", { state: { email: data.email } });
       },
       onError: (error) => {
         console.error("Sign up failed", error);
@@ -313,7 +314,7 @@ export default function SignUp() {
               {submitted && errors.terms && <p className="text-red-500 text-[11px] mt-1">{errors.terms}</p>}
             </div>
 
-            <Button type="submit" disabled={registerMutation.isPending} className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold tracking-wide py-6 text-md rounded-md transition-all shadow-md hover:shadow-lg mt-6">
+            <Button type="submit" disabled={registerMutation.isPending} className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold tracking-wide h-10 text-sm rounded-md transition-all shadow-md hover:shadow-lg mt-6">
               {registerMutation.isPending ? "Continue..." : "Continue"}
             </Button>
 

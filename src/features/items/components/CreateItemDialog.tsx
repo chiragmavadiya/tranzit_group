@@ -17,6 +17,7 @@ interface CreateItemDialogProps {
   onOpenChange: (open: boolean) => void;
   onSubmit: (data: ItemFormData) => void;
   editItem?: ItemFormData | null;
+  isLoading?: boolean;
 }
 
 export function CreateItemDialog({
@@ -24,31 +25,22 @@ export function CreateItemDialog({
   onOpenChange,
   onSubmit,
   editItem,
+  isLoading,
 }: CreateItemDialogProps) {
-  const [formData, setFormData] = useState<ItemFormData>(() => {
-    if (editItem) {
-      return {
-        item_name: editItem.item_name,
-        item_code: editItem.item_code,
-        item_weight: editItem.item_weight,
-        item_length: editItem.item_length,
-        item_width: editItem.item_width,
-        item_height: editItem.item_height,
-        item_cubic: editItem.item_cubic,
-        is_default: editItem.is_default,
-      };
-    }
-    return {
-      item_code: '',
-      item_name: '',
-      item_weight: 0,
-      item_length: 0,
-      item_width: 0,
-      item_height: 0,
-      item_cubic: 0,
-      is_default: true,
-    };
+  // Initialize state directly from props. 
+  // Because the parent uses a 'key', this component will remount (and thus re-initialize)
+  // whenever the selected item changes or the dialog is closed/opened.
+  const [formData, setFormData] = useState<ItemFormData>({
+    item_code: editItem?.item_code || '',
+    item_name: editItem?.item_name || '',
+    item_weight: Number(editItem?.item_weight) || 0,
+    item_length: Number(editItem?.item_length) || 0,
+    item_width: Number(editItem?.item_width) || 0,
+    item_height: Number(editItem?.item_height) || 0,
+    item_cubic: Number(editItem?.item_cubic) || 0,
+    is_default: !!editItem?.is_default,
   });
+
   const [submited, setSubmited] = useState(false);
 
   const handleChange = useCallback((field: keyof ItemFormData, value: any) => {
@@ -58,12 +50,19 @@ export function CreateItemDialog({
   const handleSubmit = useCallback((e: React.FormEvent) => {
     e.preventDefault();
     setSubmited(true);
-    if (formData.item_code.length === 0 || formData.item_name.length === 0 || formData.item_weight === 0 || formData.item_length === 0 || formData.item_width === 0 || formData.item_height === 0 || formData.item_cubic === 0) {
+
+    if (!formData.item_code || !formData.item_name || !formData.item_weight) {
       return;
     }
-    onSubmit(formData);
-    onOpenChange(false);
-  }, [formData, onSubmit, onOpenChange]);
+
+    // Convert boolean to "on"/"off" as expected by the API
+    const submissionData = {
+      ...formData,
+      is_default: formData.is_default ? "on" : "off"
+    } as ItemFormData;
+
+    onSubmit(submissionData);
+  }, [formData, onSubmit]);
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -80,9 +79,9 @@ export function CreateItemDialog({
                 label="Item Code"
                 value={formData.item_code}
                 onChange={(val) => handleChange('item_code', val)}
-                placeholder="Enter item code (e.g. SHIP_2014)"
+                placeholder="Enter item code (e.g. ITM-123)"
                 required
-                error={submited && formData.item_code.length < 1}
+                error={submited && !formData.item_code}
                 errormsg="Item code is required"
               />
             </div>
@@ -93,7 +92,7 @@ export function CreateItemDialog({
                 onChange={(val) => handleChange('item_name', val)}
                 placeholder="Enter item name"
                 required
-                error={submited && formData.item_name.length < 1}
+                error={submited && !formData.item_name}
                 errormsg="Item name is required"
               />
             </div>
@@ -105,20 +104,20 @@ export function CreateItemDialog({
                 value={formData.item_cubic}
                 onChange={(val) => handleChange('item_cubic', Number(val))}
                 placeholder="0.0000"
-                error={submited && formData.item_cubic < 1}
-                errormsg="Item cubic is required"
+                error={submited && formData.item_cubic < 0}
+                errormsg="Item cubic cannot be negative"
               />
             </div>
             <div className="grid gap-2">
               <FormInput
                 type="number"
-                label="Dead Weight"
+                label="Dead Weight (kg)"
                 value={formData.item_weight}
                 onChange={(val) => handleChange('item_weight', Number(val))}
                 placeholder="0.00"
                 required
-                error={submited && formData.item_weight < 1}
-                errormsg="Item weight is required"
+                error={submited && formData.item_weight <= 0}
+                errormsg="Weight must be greater than 0"
               />
             </div>
             <div className="grid gap-2">
@@ -127,10 +126,8 @@ export function CreateItemDialog({
                 label="Length (cm)"
                 value={formData.item_length}
                 onChange={(val) => handleChange('item_length', Number(val))}
-                placeholder="0.00"
+                placeholder="0"
                 required
-                error={submited && formData.item_length < 1}
-                errormsg="Item length is required"
               />
             </div>
             <div className="grid gap-2">
@@ -139,10 +136,8 @@ export function CreateItemDialog({
                 label="Width (cm)"
                 value={formData.item_width}
                 onChange={(val) => handleChange('item_width', Number(val))}
-                placeholder="0.00"
+                placeholder="0"
                 required
-                error={submited && formData.item_width < 1}
-                errormsg="Item width is required"
               />
             </div>
             <div className="grid gap-2">
@@ -151,16 +146,14 @@ export function CreateItemDialog({
                 label="Height (cm)"
                 value={formData.item_height}
                 onChange={(val) => handleChange('item_height', Number(val))}
-                placeholder="0.00"
+                placeholder="0"
                 required
-                error={submited && formData.item_height < 1}
-                errormsg="Item height is required"
               />
             </div>
             <div className="flex items-center gap-3 p-1">
               <Switch
                 id="isDefault"
-                checked={formData.is_default}
+                checked={!!formData.is_default}
                 onCheckedChange={(checked) => handleChange('is_default', checked)}
                 className="data-[state=checked]:bg-blue-600"
               />
@@ -174,15 +167,17 @@ export function CreateItemDialog({
               type="button"
               variant="outline"
               onClick={() => onOpenChange(false)}
+              disabled={isLoading}
               className="px-6 border-gray-200 dark:border-zinc-800 font-medium"
             >
               Cancel
             </Button>
             <Button
               type="submit"
+              disabled={isLoading}
               className="px-8 bg-[#0060FE] hover:bg-[#0052db] text-white font-semibold transition-all shadow-md shadow-blue-100 dark:shadow-none"
             >
-              {editItem ? 'Save Changes' : 'Create Item'}
+              {isLoading ? 'Processing...' : (editItem ? 'Save Changes' : 'Create Item')}
             </Button>
           </DialogFooter>
         </form>

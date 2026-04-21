@@ -66,6 +66,8 @@ export interface DataTableProps<T> {
   headerTitle?: string;
   headerDescription?: string;
   customFooter?: ReactNode | (() => ReactNode);
+  onExport?: (type: "pdf" | "excel" | "print" | "csv") => void;
+  isExporting?: boolean;
 }
 
 // Common cell renderer types

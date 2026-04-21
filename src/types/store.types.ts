@@ -6,9 +6,11 @@ export type AppDispatch = typeof store.dispatch;
 
 export interface AuthState {
     user: User | null;
+    userID: number | null;
     token: string | null;
     isAuthenticated: boolean;
     isLoading: boolean;
     error: string | null;
-    role: 'admin' | 'client';
+    role: string;
+    next_step: string | null;
 }

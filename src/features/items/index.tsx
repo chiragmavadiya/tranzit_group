@@ -1,84 +1,110 @@
 import { useState, useCallback, useMemo } from 'react';
 import { ItemsHeader } from './components/ItemsHeader';
 import { CreateItemDialog } from './components/CreateItemDialog';
-import { MOCK_ITEMS } from './constants';
 import type { Item, ItemFormData } from './types';
-import { toast } from 'sonner';
 import { DataTable, type Column } from '@/components/common';
-import { Switch } from '@/components/ui/switch';
 import { Button } from '@/components/ui/button';
-import { Pencil, Trash } from 'lucide-react';
+import { Loader2, Pencil, Trash } from 'lucide-react';
 import { ConformationModal } from '@/components/common/ConformationModal';
 
+import {
+  useItems,
+  useCreateItem,
+  useUpdateItem,
+  useDeleteItem,
+  useExportItems,
+  useItemDetails
+} from './hooks/useItems';
+import { Badge } from '@/components/ui/badge';
+import { cn } from '@/lib/utils';
+
+import { useDebounce } from '@/hooks/useDebounce';
+
 export default function MyItemsPage() {
-  const [items, setItems] = useState<Item[]>(MOCK_ITEMS);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
-  const [editingItem, setEditingItem] = useState<ItemFormData | null>(null);
+  const [itemToDelete, setItemToDelete] = useState<number | null>(null);
+  const [editingItemId, setEditingItemId] = useState<number | null>(null);
   const [search, setSearch] = useState('');
+  const debouncedSearch = useDebounce(search, 500); // 500ms delay
   const [pageSize, setPageSize] = useState(50);
+  const [page, setPage] = useState(1);
+
+  const { data: itemsData, isLoading } = useItems({
+    search: debouncedSearch,
+    pageSize,
+    page
+  });
+  const { data: editingItemData, isLoading: isItemLoading } = useItemDetails(editingItemId || undefined);
+
+  const createItemMutation = useCreateItem();
+  const updateItemMutation = useUpdateItem();
+  const deleteItemMutation = useDeleteItem();
+  const exportItemsMutation = useExportItems();
 
   const handleSearch = useCallback((search: string) => {
     setSearch(search);
+    setPage(1);
   }, []);
 
   const handlePageSizeChange = useCallback((pageSize: number) => {
     setPageSize(pageSize);
-  }, []);
-
-  const handleToggleStatus = useCallback((id: number, status: boolean) => {
-    setItems((prev) =>
-      prev.map((item) => (item.id === id ? { ...item, is_active: status ? 1 : 0 } : item))
-    );
-    toast.success('Status updated successfully');
+    setPage(1);
   }, []);
 
   const handleAddItem = useCallback(() => {
-    setEditingItem(null);
+    setEditingItemId(null);
     setIsDialogOpen(true);
   }, []);
 
-  const handleEditItem = useCallback((item: unknown) => {
-    console.log(item);
-    setEditingItem({
-      "id": 8,
-      "item_code": "5465",
-      "item_name": "sdf",
-      "item_weight": 4234.00,
-      "item_length": 234.00,
-      "item_height": 234.00,
-      "item_width": 234.00,
-      "item_cubic": 32.0000,
-      "is_default": true,
-    });
+  const handleEditItem = useCallback((item: Item) => {
+    setEditingItemId(item.id);
     setIsDialogOpen(true);
+  }, []);
+
+  const handleDeleteClick = useCallback((id: number) => {
+    setItemToDelete(id);
+    setIsDeleteDialogOpen(true);
   }, []);
 
   const handleFormSubmit = useCallback((data: ItemFormData) => {
-    if (editingItem) {
-      setItems((prev) =>
-        prev.map((item) =>
-          item.id === editingItem.id ? { ...item, ...data } : item
-        )
-      );
-      toast.success('Item updated successfully');
+    if (editingItemId) {
+      updateItemMutation.mutate({ id: editingItemId, data }, {
+        onSuccess: () => setIsDialogOpen(false)
+      });
     } else {
-      const newItem: Item = {
-        id: Math.floor(Math.random() * 1000000), // Simple numeric ID
-        ...data,
-      } as unknown as Item;
-      setItems((prev) => [newItem, ...prev]);
-      toast.success('Item created successfully');
+      createItemMutation.mutate(data, {
+        onSuccess: () => setIsDialogOpen(false)
+      });
     }
-  }, [editingItem]);
+  }, [editingItemId, createItemMutation, updateItemMutation]);
 
   const onSubmitDelete = useCallback(() => {
-    setIsDeleteDialogOpen(false);
-  }, []);
+    if (itemToDelete) {
+      deleteItemMutation.mutate(itemToDelete, {
+        onSuccess: () => {
+          setIsDeleteDialogOpen(false);
+          setItemToDelete(null);
+        }
+      });
+    }
+  }, [itemToDelete, deleteItemMutation]);
 
   const onCancelDelete = useCallback(() => {
     setIsDeleteDialogOpen(false);
+    setItemToDelete(null);
   }, []);
+
+  const handleExport = useCallback((format: 'pdf' | 'excel' | 'print' | 'csv') => {
+    exportItemsMutation.mutate({ format, search });
+  }, [exportItemsMutation, search]);
+
+  // useEffect(() => {
+  //   if (isSuccess && editingItemId) {
+  //     setIsDialogOpen(true);
+  //   }
+  // }, [isSuccess, editingItemId])
+
 
   // const handleExport = useCallback(() => {
   //   toast.info('Exporting items to CSV...');
@@ -105,16 +131,19 @@ export default function MyItemsPage() {
       accessor: "item_cubic",
       header: "Item Cubic",
       sortable: true,
+      cell: (val) => typeof val === 'number' ? val.toFixed(4) : val
     },
     {
-      key: "is_active",
-      accessor: "is_active",
+      key: "status",
+      accessor: "status",
       header: "Status",
-      cell: (_, row) => (
-        <Switch
-          checked={!!row.is_active}
-          onCheckedChange={(checked: boolean) => handleToggleStatus(row.id, checked)}
-        />
+      cell: (val) => (
+        <Badge variant="secondary" className={cn(
+          "px-2 py-0 h-5 text-[10px] font-bold border-none",
+          val === 'Active' ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-600'
+        )}>
+          {val as string}
+        </Badge>
       )
     },
     {
@@ -124,22 +153,24 @@ export default function MyItemsPage() {
       cell: (_, row) => (
         <div className="flex items-center gap-4">
           <Button variant="ghost" size="sm" className="p-0 hover:text-blue-600 bg-transparent dark:hover:bg-transparent" onClick={() => handleEditItem(row)}>
-            <Pencil className='h-4 w-4' />
+            {isItemLoading ? <Loader2 className='h-4 w-4 animate-spin' /> : <Pencil className='h-4 w-4' />}
           </Button>
-          <Button variant="ghost" size="sm" className="p-0 hover:text-red-600 bg-transparent dark:hover:bg-transparent" onClick={() => setIsDeleteDialogOpen(true)}>
+          <Button variant="ghost" size="sm" className="p-0 hover:text-red-600 bg-transparent dark:hover:bg-transparent" onClick={() => handleDeleteClick(row.id)}>
+            <Pencil className='h-4 w-4 hidden' /> {/* Hidden pencil to maintain spacing if needed */}
             <Trash className='h-4 w-4' />
           </Button>
         </div>
       )
     }
-  ], [handleToggleStatus, handleEditItem]);
+  ], [handleEditItem, handleDeleteClick, isItemLoading]);
 
   return (
     <div className="flex flex-col flex-1 gap-2 p-page-padding min-h-0 animate-in fade-in slide-in-from-bottom-2 duration-500">
       <div className='rounded-lg shadow-sm flex-1 flex flex-col min-h-0 border border-gray-100 dark:border-zinc-800 bg-white dark:bg-zinc-950 '>
         <DataTable
           columns={columns}
-          data={items}
+          data={itemsData?.data || []}
+          loading={isLoading}
           searchPlaceholder="Search items..."
           onSearchChange={handleSearch}
           searchValue={search}
@@ -151,14 +182,17 @@ export default function MyItemsPage() {
           headerDescription='Manage your shipping items, dimensions, and cubic measurements.'
           headerClass="h-20"
           className='pb-3'
+          onExport={(type) => handleExport(type)}
+          isExporting={exportItemsMutation.isPending}
         />
 
         <CreateItemDialog
-          key={isDialogOpen ? (editingItem?.id || 'new') : 'closed'}
+          key={isDialogOpen ? `item-${editingItemId || 'new'}-${!!editingItemData}` : 'closed'}
           open={isDialogOpen}
           onOpenChange={setIsDialogOpen}
           onSubmit={handleFormSubmit}
-          editItem={editingItem}
+          editItem={editingItemData?.data}
+          isLoading={createItemMutation.isPending || updateItemMutation.isPending}
         />
 
         <ConformationModal
@@ -171,7 +205,7 @@ export default function MyItemsPage() {
           confirmText="Delete"
           cancelText="Cancel"
           confirmVariant="destructive"
-          loading={false}
+          loading={deleteItemMutation.isPending}
           className="w-full"
         />
       </div>

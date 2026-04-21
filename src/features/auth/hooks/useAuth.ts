@@ -2,30 +2,29 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useCallback } from "react";
 import { authService } from "@/features/auth/services/auth.service";
 import { QUERY_KEYS } from "@/constants/api.constants";
-import type { LoginRequest, RegisterRequest } from "@/features/auth/auth.types";
+import type { ForgotPasswordRequest, LoginRequest, RegisterRequest, OnboardingRequest } from "@/features/auth/auth.types";
 
 /**
  * Hook for customer login
  */
-export const useLogin = () => {
+export const useLogin = (role: string) => {
     const queryClient = useQueryClient();
 
     return useMutation({
-        mutationFn: useCallback((data: LoginRequest) => authService.login(data), []),
+        mutationFn: useCallback((data: LoginRequest) => authService.login(data, role), [role]),
         onSuccess: (data) => {
             // Save token to localStorage
-            if (data?.data?.accessToken) {
-                console.log(data.data, ' data.data')
-                localStorage.setItem("auth_token", JSON.stringify(data.data));
+            if (data?.token) {
+                localStorage.setItem("auth_token", JSON.stringify(data.token));
             }
             // redirect to order page
             // window.location.href = "/orders";
             // Invalidate verification status
             queryClient.invalidateQueries({ queryKey: QUERY_KEYS.AUTH.VERIFICATION_STATUS });
             // 🔥 IMPORTANT: manually throw error
-            if (!data.status) {
-                throw new Error(data.message || "Login failed");
-            }
+            // if (!data.status) {
+            //     throw new Error(data.message || "Login failed");
+            // }
         },
     });
 };
@@ -51,6 +50,30 @@ export const useRegister = () => {
 };
 
 /**
+ * Hook to submit onboarding data
+ */
+export const useOnboarding = () => {
+    const queryClient = useQueryClient();
+
+    return useMutation({
+        mutationFn: useCallback((data: OnboardingRequest) => authService.submitOnboarding(data), []),
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: QUERY_KEYS.AUTH.VERIFICATION_STATUS });
+            queryClient.invalidateQueries({ queryKey: QUERY_KEYS.AUTH.USER_DETAILS });
+        },
+    });
+};
+
+/**
+ * Hook to verify email with token
+ */
+export const useVerifyEmail = () => {
+    return useMutation({
+        mutationFn: useCallback((token: string) => authService.verifyEmail(token), []),
+    });
+};
+
+/**
  * Hook to resend verification email
  */
 export const useResendVerification = () => {
@@ -66,5 +89,40 @@ export const useVerificationStatus = () => {
     return useQuery({
         queryKey: QUERY_KEYS.AUTH.VERIFICATION_STATUS,
         queryFn: useCallback(() => authService.getVerificationStatus(), []),
+    });
+};
+
+// logout api 
+export const useLogout = () => {
+
+    return useMutation({
+        mutationFn: useCallback(() => authService.logout(), []),
+        onSuccess: () => {
+            // Remove token from localStorage
+            localStorage.clear();
+        },
+    });
+};
+
+// forgot password api 
+export const useForgotPassword = () => {
+    const queryClient = useQueryClient();
+
+    return useMutation({
+        mutationFn: useCallback((data: ForgotPasswordRequest) => authService.forgotPassword(data), []),
+        onSuccess: () => {
+            // Invalidate verification status
+            queryClient.invalidateQueries({ queryKey: QUERY_KEYS.AUTH.VERIFICATION_STATUS });
+        },
+    });
+};
+
+// get user details api 
+export const useGetUserDetails = (enabled: boolean) => {
+    return useQuery({
+        queryKey: QUERY_KEYS.AUTH.USER_DETAILS,
+        queryFn: () => authService.getUserDetails(),
+        enabled,
+        staleTime: Infinity,
     });
 };

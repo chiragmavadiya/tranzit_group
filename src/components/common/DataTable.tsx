@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import type { ReactNode } from 'react'
-import { ArrowUp, ArrowDown, Search, Download, ClipboardCopy, FileText, Upload, File } from 'lucide-react';
+import { ArrowUp, ArrowDown, Search, Download, ClipboardCopy, FileText, Upload, File, Loader2 } from 'lucide-react';
 import {
   Table,
   TableBody,
@@ -62,7 +62,9 @@ export function DataTable<T extends Record<string, any>>({
   headerTitle,
   headerDescription,
   headerClass,
-  customFooter
+  customFooter,
+  onExport,
+  isExporting
 }: DataTableProps<T>) {
   console.log(data, columns);
   // Internal state for uncontrolled components
@@ -206,22 +208,22 @@ export function DataTable<T extends Record<string, any>>({
                 menus={[
                   {
                     label: "Print",
-                    onClick: () => { },
+                    onClick: onExport ? () => onExport('print') : () => { },
                     icon: Download,
                   },
                   {
                     label: "CSV",
-                    onClick: () => { },
+                    onClick: onExport ? () => onExport('csv') : () => { },
                     icon: File,
                   },
                   {
                     label: "Excel",
-                    onClick: () => { },
+                    onClick: onExport ? () => onExport('excel') : () => { },
                     icon: Upload,
                   },
                   {
                     label: "PDF",
-                    onClick: () => { },
+                    onClick: onExport ? () => onExport('pdf') : () => { },
                     icon: FileText,
                   },
                   {
@@ -235,7 +237,8 @@ export function DataTable<T extends Record<string, any>>({
                   variant="outline"
                   className="gap-2 border-gray-200 dark:border-zinc-800 hover:bg-gray-50 dark:hover:bg-zinc-800 font-medium text-slate-700 dark:text-zinc-300 transition-colors"
                 >
-                  <Download className="w-4 h-4" />
+                  {isExporting && <Loader2 className="w-4 h-4 animate-spin" />}
+                  {!isExporting && <Download className="w-4 h-4" />}
                   <span>Export</span>
                 </Button>
               </DropdownCustomMenu>

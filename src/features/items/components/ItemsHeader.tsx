@@ -9,7 +9,6 @@ export function ItemsHeader({ onAddItem }: ItemsHeaderProps) {
   return (
     <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
       <div className="flex items-center gap-3">
-
         <Button
           onClick={onAddItem}
           className="gap-2 bg-[#0060FE] hover:bg-[#0052db] text-white shadow-lg shadow-blue-100 dark:shadow-none transition-all active:scale-[0.98] font-semibold border-none px-4"

@@ -1,28 +1,47 @@
 import { useState, useCallback, useMemo } from 'react';
 import { AddressBookHeader } from './components/AddressBookHeader';
 import { CreateAddressDialog } from './components/CreateAddressDialog';
-import { MOCK_ADDRESSES } from './constants';
 import type { Address, AddressFormData } from './types';
-import { toast } from 'sonner';
 import { DataTable, type Column } from '@/components/common';
 import { Button } from '@/components/ui/button';
 import { Pencil, Trash } from 'lucide-react';
 import { ConformationModal } from '@/components/common/ConformationModal';
+import {
+  useAddressBookList,
+  useCreateAddress,
+  useUpdateAddress,
+  useDeleteAddress,
+  useExportAddressBook
+} from './hooks/useAddressBook';
 
 export default function AddressBookPage() {
-  const [addresses, setAddresses] = useState<Address[]>(MOCK_ADDRESSES);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [editingAddress, setEditingAddress] = useState<AddressFormData | null>(null);
+  const [deletingId, setDeletingId] = useState<number | string | null>(null);
   const [search, setSearch] = useState('');
   const [pageSize, setPageSize] = useState(50);
+  const [currentPage, setCurrentPage] = useState(1);
+
+  // API Hooks
+  const { data, isLoading } = useAddressBookList({
+    search,
+    page: currentPage,
+    per_page: pageSize
+  });
+  const createMutation = useCreateAddress();
+  const updateMutation = useUpdateAddress(editingAddress?.id || '');
+  const deleteMutation = useDeleteAddress();
+  const exportMutation = useExportAddressBook();
 
   const handleSearch = useCallback((search: string) => {
     setSearch(search);
+    setCurrentPage(1);
   }, []);
 
   const handlePageSizeChange = useCallback((pageSize: number) => {
     setPageSize(pageSize);
+    setCurrentPage(1);
   }, []);
 
   const handleAddAddress = useCallback(() => {
@@ -31,56 +50,66 @@ export default function AddressBookPage() {
   }, []);
 
   const handleEditAddress = useCallback((addr: Address) => {
-    console.log(addr)
+    // Mapping Address to AddressFormData
     setEditingAddress({
-      "code": "HOME",
-      "address": "120 Collins Street",
-      "unit_number": "10",
-      "street_number": "120",
-      "street_name": "Collins",
-      "street_type": "Street",
-      "suburb": "Melbourne",
-      "state": "VIC",
-      "postcode": "3000",
-      "latitude": -37.8136,
-      "longitude": 144.9631,
-      "contact_person": "John Doe",
-      "business_name": "Acme Pty Ltd",
-      "email": "john@example.com",
-      "phone": "0412345678",
-      "additional_details": "Leave at reception",
-      "special_instructions": "Ring the bell"
+      id: addr.id,
+      code: addr.code,
+      contact_person: addr.contact_person,
+      business_name: addr.business_name,
+      email: addr.email,
+      phone: addr.phone,
+      unit_number: addr.unit_number,
+      street_number: addr.street_number,
+      street_name: addr.street_name,
+      street_type: addr.street_type,
+      suburb: addr.suburb,
+      state: addr.state,
+      postcode: addr.postcode,
+      latitude: Number(addr.latitude),
+      longitude: Number(addr.longitude),
+      additional_details: addr.additional_details,
+      special_instructions: addr.special_instructions,
+      address: addr.address,
     });
     setIsDialogOpen(true);
   }, []);
 
-  const handleFormSubmit = useCallback((data: AddressFormData) => {
-    if (editingAddress) {
-      setAddresses((prev) =>
-        prev.map((addr) =>
-          addr.id === editingAddress.id ? { ...addr, ...data } : addr
-        )
-      );
-      toast.success('Address updated successfully');
+  const handleConfirmDelete = useCallback((id: number | string) => {
+    setDeletingId(id);
+    setIsDeleteDialogOpen(true);
+  }, []);
+
+  const handleFormSubmit = useCallback((formData: AddressFormData) => {
+    if (editingAddress?.id) {
+      updateMutation.mutate(formData, {
+        onSuccess: () => setIsDialogOpen(false)
+      });
     } else {
-      const newAddress: Address = {
-        id: Math.floor(Math.random() * 1000000),
-        ...data,
-        is_active: 1,
-      } as unknown as Address;
-      setAddresses((prev) => [newAddress, ...prev]);
-      toast.success('Address created successfully');
+      createMutation.mutate(formData, {
+        onSuccess: () => setIsDialogOpen(false)
+      });
     }
-  }, [editingAddress]);
+  }, [editingAddress, updateMutation, createMutation]);
 
   const onSubmitDelete = useCallback(() => {
-    setIsDeleteDialogOpen(false);
-    toast.success('Address deleted successfully');
-  }, []);
+    if (deletingId) {
+      deleteMutation.mutate(deletingId, {
+        onSuccess: () => {
+          setIsDeleteDialogOpen(false);
+          setDeletingId(null);
+        }
+      });
+    }
+  }, [deletingId, deleteMutation]);
 
   const onCancelDelete = useCallback(() => {
     setIsDeleteDialogOpen(false);
+    setDeletingId(null);
   }, []);
+
+  const onExport = useCallback((format: string) => {
+    exportMutation.mutate({ format, search });
+  }, [exportMutation, search]);
 
   const columns = useMemo<Column<Address>[]>(() => [
     {
@@ -132,20 +161,21 @@ export default function AddressBookPage() {
           <Button variant="ghost" size="sm" className="p-0 hover:text-blue-600 bg-transparent dark:hover:bg-transparent" onClick={() => handleEditAddress(row)}>
             <Pencil className='h-4 w-4' />
           </Button>
-          <Button variant="ghost" size="sm" className="p-0 hover:text-red-600 bg-transparent dark:hover:bg-transparent" onClick={() => setIsDeleteDialogOpen(true)}>
+          <Button variant="ghost" size="sm" className="p-0 hover:text-red-600 bg-transparent dark:hover:bg-transparent" onClick={() => handleConfirmDelete(row.id)}>
             <Trash className='h-4 w-4' />
           </Button>
         </div>
       )
     }
-  ], [handleEditAddress]);
+  ], [handleEditAddress, handleConfirmDelete]);
 
   return (
     <div className="flex flex-col flex-1 gap-2 p-page-padding min-h-0 animate-in fade-in slide-in-from-bottom-2 duration-500">
       <div className='rounded-lg shadow-sm flex-1 flex flex-col min-h-0 border border-gray-100 dark:border-zinc-800 bg-white dark:bg-zinc-950 '>
         <DataTable
           columns={columns}
-          data={addresses}
+          data={data?.data || []}
+          loading={isLoading}
           searchPlaceholder="Search addresses..."
           onSearchChange={handleSearch}
           searchValue={search}
@@ -157,6 +187,11 @@ export default function AddressBookPage() {
           headerDescription="Manage your saved addresses, contact persons, and business details."
           headerClass="h-20"
           className='pb-3'
+          totalItems={data?.meta?.total}
+          currentPage={currentPage}
+          onPageChange={setCurrentPage}
+          onExport={onExport}
+          isExporting={exportMutation.isPending}
         />
 
         <CreateAddressDialog
@@ -165,6 +200,7 @@ export default function AddressBookPage() {
           onOpenChange={setIsDialogOpen}
           onSubmit={handleFormSubmit}
           editAddress={editingAddress}
+          isLoading={createMutation.isPending || updateMutation.isPending}
         />
 
         <ConformationModal
@@ -177,7 +213,7 @@ export default function AddressBookPage() {
           confirmText="Delete"
           cancelText="Cancel"
           confirmVariant="destructive"
-          loading={false}
+          loading={deleteMutation.isPending}
           className="w-full"
         />
       </div>

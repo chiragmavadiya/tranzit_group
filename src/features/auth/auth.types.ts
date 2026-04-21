@@ -1,13 +1,19 @@
 export interface User {
     id: number;
-    username: string;
+    name: string;
     email: string;
-    firstName: string;
-    lastName: string;
+    first_name: string;
+    last_name: string;
     gender: string;
     image: string;
     accessToken: string;
     refreshToken: string;
+    roles: Roles[];
+}
+
+export interface Roles {
+    id: number;
+    name: string;
 }
 
 export interface LoginRequest {
@@ -17,14 +23,17 @@ export interface LoginRequest {
 
 export interface LoginResponse {
     status: boolean;
-    data: User
+    user: User
     message: string;
+    token: string;
+    next_step: string;
 }
 
 export interface RegisterRequest {
     first_name: string;
     last_name: string;
     email: string;
+    phone_number: string;
     password: string;
     password_confirmation: string;
     terms: boolean;
@@ -33,6 +42,16 @@ export interface RegisterRequest {
 export interface RegisterResponse {
     status: boolean;
     data: User
+}
+
+export interface ForgotPasswordRequest {
+    email: string;
+}
+
+export interface ForgotPasswordResponse {
+    status: boolean;
+    message: string;
+    token: string;
 }
 
 export interface VerificationStatusResponse {
@@ -44,6 +63,36 @@ export interface VerificationStatusResponse {
         is_onboarded: boolean;
         next_step: string;
     };
+}
+
+export interface OnboardingRequest {
+    first_name: string;
+    last_name: string;
+    mobile: string;
+    business_name: string;
+    gst_number: string;
+    order_prefix: string;
+    address: string;
+    latitude?: number;
+    longitude?: number;
+    unit_number: string;
+    street_number: string;
+    street_name: string;
+    street_type: string;
+    suburb: string;
+    state: string;
+    postcode: string;
+    hasBillingAddress: boolean;
+    billing_address?: string;
+    billing_latitude?: number;
+    billing_longitude?: number;
+    billing_unit_number?: string;
+    billing_street_number?: string;
+    billing_street_name?: string;
+    billing_street_type?: string;
+    billing_suburb?: string;
+    billing_state?: string;
+    billing_postcode?: string;
 }
 
 export interface GenericResponse {

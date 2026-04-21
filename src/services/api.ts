@@ -14,10 +14,17 @@ export const api = axios.create({
 // Request Interceptor
 api.interceptors.request.use(
     (config: InternalAxiosRequestConfig) => {
-        const token = localStorage.getItem("auth_token");
-        if (token && config.headers) {
-            config.headers.Authorization = `Bearer ${token}`;
+        const tokenData = localStorage.getItem("auth_token");
+        if (tokenData && config.headers) {
+            config.headers.Authorization = `Bearer ${tokenData}`;
         }
+        const role = localStorage.getItem("user_role") || "customer";
+
+        // Only prefix if the URL doesn't already have one
+        if (config.url && !config.url.startsWith('/admin') && !config.url.startsWith('/customer')) {
+            config.url = `/${role}${config.url}`;
+        }
+
         return config;
     },
     (error) => {
@@ -32,6 +39,9 @@ api.interceptors.response.use(
     },
     (error: AxiosError) => {
         const message = (error.response?.data as any)?.message || error.message || "An error occurred";
+
+        // Update error message to use the server-side message if it exists
+        error.message = message;
 
         // Handle global errors (e.g. 401 Unauthorized)
         if (error.response?.status === 401) {

@@ -12,22 +12,31 @@ import {
 import { useTheme } from '@/app/providers/theme-provider';
 import { OrdersTabs } from '@/features/orders/components/OrdersTabs';
 import type { TabType } from '@/features/orders/types';
-import { useAppDispatch } from '@/hooks/store.hooks';
+import { useAppSelector, useAppDispatch } from '@/hooks/store.hooks';
 import { logout } from '@/features/auth/authSlice';
 import { ReportsTabs } from '@/features/reports/components/ReportsTabs';
 import type { ReportType } from '@/features/reports/types';
+import { useLogout } from '@/features/auth/hooks/useAuth';
 
 export default function TopBar({ isCollapsed }: { isCollapsed?: boolean }) {
+  const { user } = useAppSelector((state) => state.auth);
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
   const location = useLocation();
   const [searchParams, setSearchParams] = useSearchParams();
   const { theme, setTheme } = useTheme();
 
+  const logoutMutation = useLogout();
+
   const handleLogout = () => {
-    localStorage.clear();
-    dispatch(logout());
-    navigate('/signin');
+    // on success return to /signin
+    logoutMutation.mutate(undefined, {
+      onSuccess: () => {
+        localStorage.clear();
+        dispatch(logout());
+        navigate('/signin');
+      }
+    });
   };
 
   return (
@@ -100,9 +109,9 @@ export default function TopBar({ isCollapsed }: { isCollapsed?: boolean }) {
         <DropdownMenu>
           <DropdownMenuTrigger className="flex items-center gap-2 cursor-pointer px-[10px] py-[5px] hover:bg-gray-50 dark:hover:bg-zinc-800 rounded border border-gray-200 dark:border-zinc-800 text-[13px] font-medium text-gray-700 dark:text-zinc-300 transition-colors outline-none">
             <div className="w-[22px] h-[22px] rounded-full bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center text-[#0060FE] dark:text-blue-400 text-xs font-semibold shadow-sm">
-              z
+              {user?.first_name?.charAt(0).toUpperCase()}
             </div>
-            <span>zack@yopmail.com</span>
+            <span>{user?.email}</span>
             <ChevronDown className="w-3.5 h-3.5 text-blue-500 -ml-1 stroke-[2.5]" />
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end" className="rounded-sm">

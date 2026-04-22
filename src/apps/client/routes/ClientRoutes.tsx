@@ -19,6 +19,8 @@ const Enquiry = lazy(() => import('@/features/enquiry'));
 const HelpCenter = lazy(() => import('@/features/help-center/pages/HelpCenterPage'));
 const HelpCenterArticle = lazy(() => import('@/features/help-center/pages/HelpCenterArticlePage'));
 const Transactions = lazy(() => import('@/features/wallet/pages/TransactionsPage'));
+const TopUp = lazy(() => import('@/features/wallet/pages/TopUpPage'));
+
 
 
 
@@ -42,7 +44,9 @@ export default function ClientRoutes() {
           <Route path="address-book" element={<AddressBook />} />
           <Route path="wallet">
             <Route path="transactions" element={<Transactions />} />
+            <Route path="top-up" element={<TopUp />} />
           </Route>
+
           <Route path="invoices">
             <Route index element={<Invoices />} />
             <Route path=":invoiceID" element={<InvoiceDetails />} />

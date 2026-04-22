@@ -12,16 +12,16 @@ export interface PaginationResult<T> {
   pageSize: number;
   totalPages: number;
   totalItems: number;
-  
+
   // Pagination info
   startIndex: number;
   endIndex: number;
   hasNextPage: boolean;
   hasPreviousPage: boolean;
-  
+
   // Paginated data
   paginatedData: T[];
-  
+
   // Actions
   goToPage: (page: number) => void;
   goToNextPage: () => void;
@@ -29,7 +29,7 @@ export interface PaginationResult<T> {
   goToFirstPage: () => void;
   goToLastPage: () => void;
   setPageSize: (size: number) => void;
-  
+
   // Pagination metadata
   getPageInfo: () => {
     from: number;
@@ -46,6 +46,7 @@ export interface UsePaginationOptions {
   pageSize?: number;
   onPageChange?: (page: number) => void;
   onPageSizeChange?: (pageSize: number) => void;
+  totalItems?: number;
 }
 
 export function usePagination<T>(
@@ -70,13 +71,15 @@ export function usePagination<T>(
   const currentPageSize = controlledPageSize !== undefined ? controlledPageSize : internalPageSize;
 
   // Calculate pagination values
-  const totalItems = data.length;
-  const totalPages = Math.ceil(totalItems / currentPageSize);
+  const actualTotalItems = options.totalItems !== undefined ? options.totalItems : data.length;
+  const totalPages = Math.ceil(actualTotalItems / currentPageSize);
   const startIndex = (currentPage - 1) * currentPageSize;
-  const endIndex = Math.min(startIndex + currentPageSize, totalItems);
-  
+  const endIndex = Math.min(startIndex + currentPageSize, actualTotalItems);
+
   // Paginated data
   const paginatedData = useMemo(() => {
+    // If totalItems is provided, assume data is already paginated server-side
+    // or just return data directly (this logic is handled in DataTable anyway)
     return data.slice(startIndex, endIndex);
   }, [data, startIndex, endIndex]);
 
@@ -87,7 +90,7 @@ export function usePagination<T>(
   // Action handlers
   const goToPage = (page: number) => {
     const clampedPage = Math.max(1, Math.min(page, totalPages));
-    
+
     if (onPageChange) {
       onPageChange(clampedPage);
     } else {
@@ -121,15 +124,15 @@ export function usePagination<T>(
     } else {
       setInternalPageSize(size);
     }
-    
+
     // Reset to first page when changing page size
     goToPage(1);
   };
 
   const getPageInfo = () => ({
-    from: totalItems === 0 ? 0 : startIndex + 1,
+    from: actualTotalItems === 0 ? 0 : startIndex + 1,
     to: endIndex,
-    total: totalItems,
+    total: actualTotalItems,
   });
 
   return {
@@ -137,17 +140,17 @@ export function usePagination<T>(
     currentPage,
     pageSize: currentPageSize,
     totalPages,
-    totalItems,
-    
+    totalItems: actualTotalItems,
+
     // Pagination info
     startIndex,
     endIndex,
     hasNextPage,
     hasPreviousPage,
-    
+
     // Paginated data
     paginatedData,
-    
+
     // Actions
     goToPage,
     goToNextPage,
@@ -155,7 +158,7 @@ export function usePagination<T>(
     goToFirstPage,
     goToLastPage,
     setPageSize: handleSetPageSize,
-    
+
     // Pagination metadata
     getPageInfo,
   };
@@ -176,7 +179,7 @@ export function useServerPagination(options: UseServerPaginationOptions) {
   const totalPages = Math.ceil(total / pageSize);
   const startIndex = (page - 1) * pageSize;
   const endIndex = Math.min(startIndex + pageSize, total);
-  
+
   const hasNextPage = page < totalPages;
   const hasPreviousPage = page > 1;
 
@@ -223,13 +226,13 @@ export function useServerPagination(options: UseServerPaginationOptions) {
     pageSize,
     totalPages,
     totalItems: total,
-    
+
     // Pagination info
     startIndex,
     endIndex,
     hasNextPage,
     hasPreviousPage,
-    
+
     // Actions
     goToPage,
     goToNextPage,
@@ -237,7 +240,7 @@ export function useServerPagination(options: UseServerPaginationOptions) {
     goToFirstPage,
     goToLastPage,
     setPageSize: handleSetPageSize,
-    
+
     // Pagination metadata
     getPageInfo,
   };

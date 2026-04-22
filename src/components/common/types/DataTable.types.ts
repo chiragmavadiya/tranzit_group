@@ -36,7 +36,7 @@ export interface DataTableProps<T> {
   pageSizeInFooter?: boolean;
   pageSize?: number;
   currentPage?: number;
-  totalItems?: number;
+  totalItems: number;
   onPageChange?: (page: number) => void;
   onPageSizeChange?: (pageSize: number) => void;
   // Search

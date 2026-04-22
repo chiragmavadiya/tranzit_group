@@ -40,7 +40,7 @@ export default function TopBar({ isCollapsed }: { isCollapsed?: boolean }) {
   };
 
   return (
-    <header className={`h-16 bg-white dark:bg-zinc-950 border-b border-gray-200 dark:border-zinc-800 flex items-center justify-between px-6 fixed top-0 right-0 z-10 transition-[left] duration-300 ease-in-out ${isCollapsed ? 'left-[64px]' : 'left-[240px]'}`}>
+    <header className={`print:hidden h-16 bg-white dark:bg-zinc-950 border-b border-gray-200 dark:border-zinc-800 flex items-center justify-between px-6 fixed top-0 right-0 z-10 transition-[left] duration-300 ease-in-out ${isCollapsed ? 'left-[64px]' : 'left-[240px]'}`}>
       <div className='flex justify-center flex-1'>
         {location.pathname === '/orders' && (
           <div className="h-16 ml-4">

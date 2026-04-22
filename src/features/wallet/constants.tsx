@@ -47,3 +47,27 @@ export const TRANSACTION_TYPES = [
   { value: 'credit', label: 'Credit' },
   { value: 'debit', label: 'Debit' },
 ];
+export const TOP_UP_COLUMNS: Column<any>[] = [
+  { key: 'transaction_id', header: 'TRANSACTION ID', sortable: true },
+  { key: 'amount', header: 'AMOUNT', sortable: true },
+  { key: 'date', header: 'PAYMENT DATE', sortable: true },
+  {
+    key: 'status',
+    header: 'PAYMENT STATUS',
+    sortable: true,
+    cell: (value: any) => (
+      <div className={`px-2 py-1 rounded-full text-xs font-medium inline-block ${
+        value === 'Success' ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/20 dark:text-emerald-400' : 
+        'bg-amber-100 text-amber-700 dark:bg-amber-900/20 dark:text-amber-400'
+      }`}>
+        {value}
+      </div>
+    )
+  },
+];
+
+export const MOCK_TOP_UP_RECORDS = [
+  { id: '1', transaction_id: 'TRX-123456', amount: '$100.00', date: '21 Jan 2026, 10:35 AM', status: 'Success' },
+  { id: '2', transaction_id: 'TRX-789012', amount: '$50.00', date: '20 Jan 2026, 11:25 AM', status: 'Success' },
+  { id: '3', transaction_id: 'TRX-345678', amount: '$200.00', date: '19 Jan 2026, 1:40 PM', status: 'Pending' },
+];

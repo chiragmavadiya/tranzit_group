@@ -17,4 +17,5 @@ export interface SidebarItem {
   hasDropdown?: boolean;
   subItems?: SidebarSubItem[];
   subGroups?: SidebarSubGroup[];
+  isExternal?: boolean;
 }

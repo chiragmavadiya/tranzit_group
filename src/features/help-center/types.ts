@@ -1,19 +1,14 @@
-export interface HelpCenterQA {
-    question: string
-    answer: string[]
-}
-
 export interface HelpCenterArticle {
-    slug: string
+    id?: number
     title: string
-    subtitle: string
+    slug: string
     category: string
-    categorySlug: string
-    qas: HelpCenterQA[]
+    updated: string
+    short_description?: string
+    content?: string
 }
 
 export interface HelpCenterCategory {
-    slug: string
-    name: string
+    category: string
     articles: HelpCenterArticle[]
 }

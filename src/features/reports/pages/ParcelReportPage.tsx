@@ -6,48 +6,57 @@ import { Calendar } from '@/components/ui/calendar';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { cn } from '@/lib/utils';
 import { DataTable, StatCard } from '@/components/common';
-import { MOCK_PARCEL_REPORTS, PARCEL_COLUMNS } from '../constants';
+import { PARCEL_COLUMNS } from '../constants';
+import { useParcelReport } from '../hooks/useReports';
 
 export default function ParcelReportPage() {
-  const [startDate, setStartDate] = useState<Date | undefined>(new Date('2026-04-01'));
-  const [endDate, setEndDate] = useState<Date | undefined>(new Date('2026-04-17'));
+  const [startDate, setStartDate] = useState<Date | undefined>();
+  const [endDate, setEndDate] = useState<Date | undefined>();
   const [search, setSearch] = useState('');
   const [pageSize, setPageSize] = useState(25);
+  const [page, setPage] = useState(1);
 
+  const formatDate = (date?: Date) => date ? format(date, 'dd/MM/yyyy') : undefined;
+
+  const filters = useMemo(() => ({
+    start_date: formatDate(startDate),
+    end_date: formatDate(endDate),
+    search: search || undefined,
+    per_page: pageSize,
+    page: page,
+  }), [startDate, endDate, search, pageSize, page]);
+
+  const { data, isLoading } = useParcelReport(filters);
+
+  // You can still compute dynamic stats from the paginated API response, 
+  // or use meta fields if your API provides global statistics.
   const stats = useMemo(() => [
     {
       label: 'Total Order',
-      value: '3',
+      value: data?.meta?.total?.toString() || '0',
       icon: ClipboardList,
       iconColor: 'text-rose-600',
       iconBg: 'bg-rose-50 dark:bg-rose-500/10',
     },
     {
       label: 'Total Amount Paid',
-      value: '$1357.12',
+      value: '-', // Needs to come from API or be calculated if available globally
       icon: DollarSign,
       iconColor: 'text-emerald-600',
       iconBg: 'bg-emerald-50 dark:bg-emerald-500/10',
     },
-  ], []);
+  ], [data?.meta?.total]);
 
   const handleApplyFilters = useCallback(() => {
-    console.log('Applying filters:', { startDate, endDate });
-  }, [startDate, endDate]);
+    setPage(1);
+  }, []);
 
   const handleReset = useCallback(() => {
     setStartDate(undefined);
     setEndDate(undefined);
+    setSearch('');
+    setPage(1);
   }, []);
-
-  const filteredData = useMemo(() => {
-    if (!search) return MOCK_PARCEL_REPORTS;
-    return MOCK_PARCEL_REPORTS.filter(item =>
-      Object.values(item).some(val =>
-        String(val).toLowerCase().includes(search.toLowerCase())
-      )
-    );
-  }, [search]);
 
   return (
     <div className="flex flex-col flex-1 gap-4 p-page-padding min-h-0 animate-in fade-in slide-in-from-bottom-2 duration-500 bg-slate-50/30 dark:bg-zinc-950/30">
@@ -119,22 +128,17 @@ export default function ParcelReportPage() {
             variant="default"
             size="sm"
             className="h-8 p-3"
-          // className="w-full h-10 bg-[#001F3F] hover:bg-[#001F3F]/90 text-white font-semibold transition-colors"
           >
             Filter
           </Button>
           <Button
             onClick={handleReset}
             variant="outline"
-            // className="w-full h-10 bg-[#7F8C8D] hover:bg-[#7F8C8D]/90 text-white border-none font-semibold transition-colors"
             className="h-8 p-3"
             size="sm"
           >
             Reset
           </Button>
-        </div>
-
-        <div className="">
         </div>
       </div>
 
@@ -142,14 +146,18 @@ export default function ParcelReportPage() {
       <div className='rounded-xl min-h-[300px] shadow-md flex-1 flex flex-col min-h-0 border border-gray-100 dark:border-zinc-800 bg-white dark:bg-zinc-950 overflow-hidden'>
         <DataTable
           columns={PARCEL_COLUMNS as any}
-          data={filteredData}
+          data={data?.data || []}
           headerTitle="Customer Parcel Report"
           searchable
           searchValue={search}
-          onSearchChange={setSearch}
+          onSearchChange={(val) => { setSearch(val); setPage(1); }}
           pageSize={pageSize}
-          onPageSizeChange={(val) => setPageSize(Number(val))}
+          onPageSizeChange={(val) => { setPageSize(Number(val)); setPage(1); }}
           className="pb-3"
+          totalItems={data?.meta?.total || 0}
+          currentPage={page}
+          onPageChange={setPage}
+          loading={isLoading}
         />
       </div>
     </div>

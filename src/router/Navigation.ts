@@ -64,7 +64,9 @@ export const clientSidebarItems: SidebarItem[] = [
     hasDropdown: true,
     subItems: [
       { name: 'Transactions', path: '/wallet/transactions' },
+      { name: 'Top Up', path: '/wallet/top-up' },
     ]
+
   },
   { name: 'My Items', icon: Box, path: '/items' },
   { name: 'My Address Book', icon: BookOpen, path: '/address-book' },
@@ -81,7 +83,7 @@ export const clientSidebarItems: SidebarItem[] = [
   { name: 'Enquiry', icon: MessageSquare, path: '/enquiry' },
   { name: 'Help Center', icon: HelpCircle, path: '/help-center' },
   { name: 'Parcel Report', icon: FileArchive, path: '/parcel-report' },
-  { name: 'Help', icon: LifeBuoy, path: '/help' },
+  { name: 'Help', icon: LifeBuoy, path: 'mailto:info@tranzitgroup.com.au?subject=Support Request from Portal&body=Hi Team', isExternal: true },
 ];
 
 // Fallback for existing references until fully migrated to split apps

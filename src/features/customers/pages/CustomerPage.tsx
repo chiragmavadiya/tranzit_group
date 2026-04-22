@@ -118,9 +118,9 @@ export default function CustomerPage() {
                     onPageSizeChange={(val) => setPageSize(Number(val))}
                     className="pb-3"
                     customHeader={(
-                        <Button 
-                            size="sm" 
-                            variant="default" 
+                        <Button
+                            size="sm"
+                            variant="default"
                             className="h-8 rounded-lg"
                             onClick={() => setIsAddDialogOpen(true)}
                         >
@@ -128,12 +128,13 @@ export default function CustomerPage() {
                             Add Customer
                         </Button>
                     )}
+                    totalItems={MOCK_CUSTOMERS.length}
                 />
             </div>
 
-            <AddCustomerDialog 
-                open={isAddDialogOpen} 
-                onOpenChange={setIsAddDialogOpen} 
+            <AddCustomerDialog
+                open={isAddDialogOpen}
+                onOpenChange={setIsAddDialogOpen}
             />
         </div>
     );

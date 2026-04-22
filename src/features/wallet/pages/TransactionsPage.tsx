@@ -2,12 +2,18 @@ import { useState, useMemo } from 'react';
 import { TrendingDown, TrendingUp, Wallet } from 'lucide-react';
 import { DataTable, StatCard } from '@/components/common';
 import SelectComponent from '@/components/ui/select';
+import { Button } from '@/components/ui/button';
+import { Plus } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+
 import { MOCK_TRANSACTIONS, WALLET_COLUMNS, TRANSACTION_TYPES } from '../constants';
 
 export default function TransactionsPage() {
   const [transactionType, setTransactionType] = useState('all');
   const [search, setSearch] = useState('');
   const [pageSize, setPageSize] = useState(7);
+  const navigate = useNavigate();
+
 
   const stats = useMemo(() => [
     {
@@ -56,12 +62,23 @@ export default function TransactionsPage() {
 
       {/* Summary Section */}
       <div className="space-y-3">
+        <div className="flex justify-between items-center">
+          <h2 className="text-lg font-bold text-slate-800 dark:text-zinc-200">Wallet Summary</h2>
+          <Button
+            onClick={() => navigate('/wallet/top-up')}
+            className="h-8 gap-1 bg-[#0060FE] hover:bg-[#0052db]"
+          >
+            <Plus className="h-4 w-4" />
+            Top Up Wallet
+          </Button>
+        </div>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {stats.map((stat, idx) => (
             <StatCard key={idx} {...stat} className="shadow-sm border-gray-100 dark:border-zinc-800" contentClassName="py-4" />
           ))}
         </div>
       </div>
+
 
       {/* Filter Section */}
       <div className="space-y-3">
@@ -90,6 +107,7 @@ export default function TransactionsPage() {
           pageSize={pageSize}
           onPageSizeChange={(val) => setPageSize(Number(val))}
           className="pb-3"
+          totalItems={filteredData.length}
         />
       </div>
     </div>

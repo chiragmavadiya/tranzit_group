@@ -4,7 +4,7 @@ import { CreateItemDialog } from './components/CreateItemDialog';
 import type { Item, ItemFormData } from './types';
 import { DataTable, type Column } from '@/components/common';
 import { Button } from '@/components/ui/button';
-import { Loader2, Pencil, Trash } from 'lucide-react';
+import { Pencil, Trash } from 'lucide-react';
 import { ConformationModal } from '@/components/common/ConformationModal';
 
 import {
@@ -13,7 +13,6 @@ import {
   useUpdateItem,
   useDeleteItem,
   useExportItems,
-  useItemDetails
 } from './hooks/useItems';
 import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
@@ -27,15 +26,15 @@ export default function MyItemsPage() {
   const [editingItemId, setEditingItemId] = useState<number | null>(null);
   const [search, setSearch] = useState('');
   const debouncedSearch = useDebounce(search, 500); // 500ms delay
-  const [pageSize, setPageSize] = useState(50);
-  const [page, setPage] = useState(1);
+  const [pageSize, setPageSize] = useState(10);
+  const [currentPage, setCurrentPage] = useState(1);
 
   const { data: itemsData, isLoading } = useItems({
     search: debouncedSearch,
-    pageSize,
-    page
+    per_page: pageSize,
+    page: currentPage
   });
-  const { data: editingItemData, isLoading: isItemLoading } = useItemDetails(editingItemId || undefined);
+  // const { data: editingItemData, isLoading: isItemLoading } = useItemDetails(editingItemId || undefined);
 
   const createItemMutation = useCreateItem();
   const updateItemMutation = useUpdateItem();
@@ -44,12 +43,12 @@ export default function MyItemsPage() {
 
   const handleSearch = useCallback((search: string) => {
     setSearch(search);
-    setPage(1);
+    setCurrentPage(1);
   }, []);
 
   const handlePageSizeChange = useCallback((pageSize: number) => {
     setPageSize(pageSize);
-    setPage(1);
+    setCurrentPage(1);
   }, []);
 
   const handleAddItem = useCallback(() => {
@@ -148,12 +147,12 @@ export default function MyItemsPage() {
     },
     {
       key: "actions",
-      header: "Actions",
-      className: "w-20 px-0 pr-3",
+      header: "ACTIONS",
+      className: "w-20 px-0 pr-3 print:hidden",
       cell: (_, row) => (
         <div className="flex items-center gap-4">
           <Button variant="ghost" size="sm" className="p-0 hover:text-blue-600 bg-transparent dark:hover:bg-transparent" onClick={() => handleEditItem(row)}>
-            {isItemLoading ? <Loader2 className='h-4 w-4 animate-spin' /> : <Pencil className='h-4 w-4' />}
+            <Pencil className='h-4 w-4' />
           </Button>
           <Button variant="ghost" size="sm" className="p-0 hover:text-red-600 bg-transparent dark:hover:bg-transparent" onClick={() => handleDeleteClick(row.id)}>
             <Pencil className='h-4 w-4 hidden' /> {/* Hidden pencil to maintain spacing if needed */}
@@ -162,7 +161,7 @@ export default function MyItemsPage() {
         </div>
       )
     }
-  ], [handleEditItem, handleDeleteClick, isItemLoading]);
+  ], [handleEditItem, handleDeleteClick]);
 
   return (
     <div className="flex flex-col flex-1 gap-2 p-page-padding min-h-0 animate-in fade-in slide-in-from-bottom-2 duration-500">
@@ -182,16 +181,19 @@ export default function MyItemsPage() {
           headerDescription='Manage your shipping items, dimensions, and cubic measurements.'
           headerClass="h-20"
           className='pb-3'
+          totalItems={itemsData?.meta?.total || 0}
+          currentPage={currentPage}
+          onPageChange={setCurrentPage}
           onExport={(type) => handleExport(type)}
           isExporting={exportItemsMutation.isPending}
         />
 
         <CreateItemDialog
-          key={isDialogOpen ? `item-${editingItemId || 'new'}-${!!editingItemData}` : 'closed'}
+          key={isDialogOpen ? `item-${editingItemId || 'new'}` : 'closed'}
           open={isDialogOpen}
           onOpenChange={setIsDialogOpen}
           onSubmit={handleFormSubmit}
-          editItem={editingItemData?.data}
+          editingItemId={editingItemId?.toString()}
           isLoading={createItemMutation.isPending || updateItemMutation.isPending}
         />
 

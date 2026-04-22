@@ -29,38 +29,20 @@ export const Pagination: React.FC<PaginationProps> = ({
   pageSize,
   totalItems,
   onPageChange,
-  // onPageSizeChange,
-  // pageSizeOptions = DEFAULT_PAGE_SIZES,
-  // showPageSizeSelector = true,
-  // showPageInfo = true,
+  onPageSizeChange,
   className,
   pageSizeInFooter = false,
-  // size = 'md',
 }) => {
   const startIndex = (currentPage - 1) * pageSize;
   const endIndex = Math.min(startIndex + pageSize, totalItems);
 
-  // const sizeClasses = {
-  //   sm: {
-  //     button: 'h-6 w-6 text-xs',
-  //     text: 'text-xs',
-  //     gap: 'gap-1',
-  //   },
-  //   md: {
-  //     button: 'h-8 w-8 text-sm',
-  //     text: 'text-sm',
-  //     gap: 'gap-1.5',
-  //   },
-  //   lg: {
-  //     button: 'h-10 w-10 text-base',
-  //     text: 'text-base',
-  //     gap: 'gap-2',
-  //   },
-  // };
+  console.log({ currentPage, totalPages, pageSize, totalItems, startIndex, endIndex })
 
-  // const classes = sizeClasses[size];
-
-  const onItemsPerPageChange = (val: number) => { console.log(val) }
+  const onItemsPerPageChange = (val: number) => {
+    if (onPageSizeChange) {
+      onPageSizeChange(val);
+    }
+  }
   return (
     <div className={cn("px-4 pt-4 flex flex-col md:flex-row items-center justify-between gap-4 border-t border-slate-50 dark:border-zinc-900 bg-white/50 dark:bg-transparent", className)}>
 
@@ -73,7 +55,7 @@ export const Pagination: React.FC<PaginationProps> = ({
           <span className="text-[13px] text-gray-500 dark:text-zinc-400">Page size:</span>
           <SelectComponent
             className='h-8 w-16'
-            value={'25'}
+            value={pageSize.toString()}
             onValueChange={(val) => val && onItemsPerPageChange(parseInt(val))}
             data={DEFAULT_PAGE_SIZES}
             placeholder="Select view"

@@ -76,7 +76,7 @@ export function DataTable<T extends Record<string, any>>({
   const currentSearch = searchValue !== undefined ? searchValue : internalSearch;
   const currentSortConfig = sortConfig !== undefined ? sortConfig : internalSortConfig;
   const currentSelectedRows = selectedRows !== undefined ? selectedRows : internalSelectedRows;
-
+  console.log(totalItems, 'totalItems')
   // Get row identifier
   const getRowId = (row: T): string => {
     if (typeof rowKey === 'function') {
@@ -93,6 +93,7 @@ export function DataTable<T extends Record<string, any>>({
     pageSize: pageSize,
     onPageChange,
     onPageSizeChange,
+    totalItems,
   });
 
   const {
@@ -105,7 +106,10 @@ export function DataTable<T extends Record<string, any>>({
     setPageSize: setPaginationPageSize,
   } = paginationResult;
   // Use paginated data or all data based on pagination setting
-  const displayData = pagination ? paginatedData : data;
+  // If totalItems is provided, we assume server-side pagination so we don't slice the data again
+  const displayData = pagination 
+    ? (totalItems !== undefined ? data : paginatedData) 
+    : data;
   const actualTotalItems = totalItems || paginationTotalItems;
 
   // Handlers
@@ -171,7 +175,7 @@ export function DataTable<T extends Record<string, any>>({
 
   return (
     <div className={cn("flex flex-col group flex-1 min-h-0", className)}>
-      <div className={cn("flex w-full border-b justify-between gap-4 p-4", headerClass)}>
+      <div className={cn("flex w-full border-b justify-between gap-4 p-4 print:hidden", headerClass)}>
         <div>
           <h1 className={`text-lg font-bold text-gray-800 dark:text-zinc-200`}>
             {headerTitle}
@@ -208,7 +212,7 @@ export function DataTable<T extends Record<string, any>>({
                 menus={[
                   {
                     label: "Print",
-                    onClick: onExport ? () => onExport('print') : () => { },
+                    onClick: () => window.print(),
                     icon: Download,
                   },
                   {
@@ -364,7 +368,7 @@ export function DataTable<T extends Record<string, any>>({
           totalItems={actualTotalItems}
           onPageChange={goToPage}
           onPageSizeChange={setPaginationPageSize}
-          className="border-t"
+          className="border-t print:hidden"
           pageSizeInFooter={pageSizeInFooter}
         />
       )}

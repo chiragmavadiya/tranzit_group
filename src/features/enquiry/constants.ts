@@ -1,13 +1,13 @@
-import type { CategoryOption, CountryOption, ParcelEnquiryOption, SenderReceiverOption } from './types';
+import type { CategoryOption, CountryOption, FeedbackOption, ParcelEnquiryOption, SenderReceiverOption } from './types';
 
 export const ISSUE_CATEGORIES: CategoryOption[] = [
   {
     label: 'Parcel enquiries',
-    value: 'parcel_enquiry',
+    value: 'parcel',
   },
   {
     label: 'Sender and account enquiries',
-    value: 'sender_and_account_enquiry',
+    value: 'sender',
   },
   {
     label: 'Feedback',
@@ -17,9 +17,9 @@ export const ISSUE_CATEGORIES: CategoryOption[] = [
 ];
 
 export const PARCEL_ENQUIRY_TYPE: ParcelEnquiryOption[] = [
-  { value: 'parcel_status_tracking', label: 'Parcel Status/Tracking' },
-  { value: 'damaged_parcel', label: 'Damaged Parcel' },
-  { value: 'missing_parcel', label: 'Missing Parcel' },
+  { value: 'status', label: 'Parcel Status/Tracking' },
+  { value: 'damage', label: 'Damaged Parcel' },
+  { value: 'missing', label: 'Missing Parcel' },
   { value: 'other', label: 'Other' },
 ]
 export const COUNTRY: CountryOption[] = [
@@ -31,5 +31,11 @@ export const COUNTRY: CountryOption[] = [
 export const SENDER_RECEIVER: SenderReceiverOption[] = [
   { value: 'sender', label: 'Sender' },
   { value: 'receiver', label: 'Receiver' },
+]
+
+export const FEEDBACK_CATEGORIES: FeedbackOption[] = [
+  { value: 'Website/Portal', label: 'Website/Portal' },
+  { value: 'Service Quality', label: 'Service Quality' },
+  { value: 'Driver/Courier', label: 'Driver/Courier' },
 ]
 

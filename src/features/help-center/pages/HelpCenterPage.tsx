@@ -26,7 +26,7 @@ const HelpCenterPage: React.FC = () => {
                                 How can we help?
                             </h1>
                             <p className="mt-3 text-[15px] text-slate-500">
-                                Search for articles or browse by category.
+                                Search for articles or browse by category
                             </p>
                             <div className="mx-auto mt-6 max-w-xl">
                                 <div className="relative">

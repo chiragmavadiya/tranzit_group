@@ -4,6 +4,7 @@ import { cn } from '@/lib/utils';
 import type { Customer } from './types';
 import type { Column } from '@/components/common/types/DataTable.types';
 import { Button } from '@/components/ui/button';
+import { NavLink } from 'react-router-dom';
 
 export const CUSTOMER_COLUMNS: Column<Customer>[] = [
 
@@ -80,14 +81,16 @@ export const CUSTOMER_COLUMNS: Column<Customer>[] = [
         key: 'actions',
         header: 'ACTIONS',
         sticky: "right",
-        cell: () => (
+        cell: (_, customer) => (
             <div className="flex items-center gap-2">
                 <Button variant="ghost" size="sm" className="p-0 hover:text-blue-500 bg-transparent hover:bg-transparent dark:hover:bg-transparent">
                     <Pencil className="w-4 h-4" />
                 </Button>
-                <Button variant="ghost" size="sm" className="p-0 hover:text-blue-500 bg-transparent hover:bg-transparent dark:hover:bg-transparent">
-                    <Eye className="w-4 h-4" />
-                </Button>
+                <NavLink to={`/admin/customers/${customer.id}`}>
+                    <Button variant="ghost" size="sm" className="p-0 hover:text-blue-500 bg-transparent hover:bg-transparent dark:hover:bg-transparent">
+                        <Eye className="w-4 h-4" />
+                    </Button>
+                </NavLink>
             </div>
         ),
     },

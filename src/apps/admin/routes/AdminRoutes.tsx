@@ -13,6 +13,9 @@ const Invoices = lazy(() => import('@/features/invoices/pages/InvoicesPage'));
 const InvoiceDetails = lazy(() => import('@/features/invoices/pages/InvoiceDocumentView'));
 const ParcelReport = lazy(() => import('@/features/reports/pages/ParcelReportPage'));
 const CustomerManagement = lazy(() => import('@/features/customers/pages/CustomerPage'));
+const CustomerDetailPage = lazy(() => import('@/features/customers/pages/CustomerDetailPage'));
+const CancelOrderPage = lazy(() => import('@/features/cancel-order/pages/CancelOrderPage'));
+const BookPickupPage = lazy(() => import('@/features/book-pickup/pages/BookPickupPage'));
 
 
 
@@ -32,7 +35,13 @@ export default function AdminRoutes() {
                     </Route>
                     <Route path="setup" element={<Setup />} />
                     <Route path="customer-parcel-report" element={<ParcelReport />} />
-                    <Route path="customers" element={<CustomerManagement />} />
+                    <Route path="customers">
+                        <Route index element={<CustomerManagement />} />
+                        <Route path=":id" element={<CustomerDetailPage />} />
+                    </Route>
+                    <Route path="cancel-order" element={<CancelOrderPage />} />
+                    <Route path="book-pickup" element={<BookPickupPage />} />
+                    {/* <Route path="book-pickup" element={<BookPickupPage />} /> */}
                     <Route path="search" element={<Search />} />
                     {/* Default authenticated route */}
                     <Route path="/" element={<Navigate to="/admin/dashboard" replace />} />

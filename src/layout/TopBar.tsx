@@ -15,6 +15,10 @@ import type { TabType } from '@/features/orders/types';
 import { useAppSelector, useAppDispatch } from '@/hooks/store.hooks';
 import { logout } from '@/features/auth/authSlice';
 import { ReportsTabs } from '@/features/reports/components/ReportsTabs';
+import { CancelOrderTabs } from '@/features/cancel-order/components/CancelOrderTabs';
+import type { CancelOrderTabType } from '@/features/cancel-order/constants/cancelOrder.constants';
+import { BookPickupTabs } from '@/features/book-pickup/components/BookPickupTabs';
+import type { BookPickupTabType } from '@/features/book-pickup/constants/book-pickup.constants';
 import type { ReportType } from '@/features/reports/types';
 import { useLogout } from '@/features/auth/hooks/useAuth';
 
@@ -54,6 +58,24 @@ export default function TopBar({ isCollapsed }: { isCollapsed?: boolean }) {
           <div className="h-16 ml-4">
             <ReportsTabs
               activeTab={(searchParams.get('tab') as ReportType) || 'shipment'}
+              onTabChange={(tab) => setSearchParams({ tab })}
+              className="h-full"
+            />
+          </div>
+        )}
+        {location.pathname === '/admin/cancel-order' && (
+          <div className="h-16 ml-4">
+            <CancelOrderTabs
+              activeTab={(searchParams.get('tab') as CancelOrderTabType) || 'request'}
+              onTabChange={(tab) => setSearchParams({ tab })}
+              className="h-full"
+            />
+          </div>
+        )}
+        {location.pathname === '/admin/book-pickup' && (
+          <div className="h-16 ml-4">
+            <BookPickupTabs
+              activeTab={(searchParams.get('tab') as BookPickupTabType) || 'new'}
               onTabChange={(tab) => setSearchParams({ tab })}
               className="h-full"
             />

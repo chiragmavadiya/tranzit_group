@@ -52,32 +52,26 @@ const STREET_TYPES = [
 export default function AddCustomerDialog({ open, onOpenChange }: AddCustomerDialogProps) {
   const [currentStep, setCurrentStep] = useState(0)
   const [formData, setFormData] = useState({
-    // Personal
     first_name: "",
     last_name: "",
     email: "",
     mobile: "",
-    // Business
     business_name: "",
     gst_number: "",
-    order_prefix: "",
-    // Billing Address
     billing_address: "",
-    billing_street_number: "",
     billing_street_name: "",
+    billing_street_number: "",
     billing_street_type: "",
     billing_suburb: "",
     billing_state: "",
     billing_postcode: "",
-    // Shipping Address
     address: "",
-    street_number: "",
     street_name: "",
+    street_number: "",
     street_type: "",
     suburb: "",
     state: "",
     postcode: "",
-    // Shipping Settings
     direct_freight_active: 0,
     direct_freight_markup_charge: 0,
     direct_freight_pickup_charge: 0,
@@ -88,25 +82,87 @@ export default function AddCustomerDialog({ open, onOpenChange }: AddCustomerDia
     pallet_markup_charge: 0,
     pallet_pickup_charge: 0,
     topup_enable: false,
+    order_prefix: ""
   })
+  // const [formData, setFormData] = useState({
+  //   // Personal
+  //   first_name: "",
+  //   last_name: "",
+  //   email: "",
+  //   mobile: "",
+  //   office_number: "",
+  //   // Business
+  //   business_name: "",
+  //   gst_number: "",
+  //   order_prefix: "",
+  //   // Billing Address
+  //   billing_address: "",
+  //   billing_street_number: "",
+  //   billing_street_name: "",
+  //   billing_street_type: "",
+  //   billing_suburb: "",
+  //   billing_state: "",
+  //   billing_postcode: "",
+  //   // Shipping Address
+  //   address: "",
+  //   street_number: "",
+  //   street_name: "",
+  //   street_type: "",
+  //   suburb: "",
+  //   state: "",
+  //   postcode: "",
+  //   // Shipping Settings
+  //   direct_freight_express_active: 0,
+  //   direct_freight_express_markup_charge: 0,
+  //   direct_freight_express_pickup_charge: 0,
+  //   auspost_active: 0,
+  //   auspost_markup_charge: 0,
+  //   auspost_pickup_charge: 0,
+  //   pallet_active: 0,
+  //   pallet_markup_charge: 0,
+  //   pallet_pickup_charge: 0,
+  //   topup_enable: false,
+  // })
+  const [submited, setSubmited] = useState(false)
+
+  const [errors, setErrors] = useState<Record<string, string>>({})
+
 
   const handleChange = (field: string, value: any) => {
     setFormData((prev) => ({ ...prev, [field]: value }))
+    if (errors[field]) {
+      setErrors((prev) => {
+        const next = { ...prev }
+        delete next[field]
+        return next
+      })
+    }
   }
 
-  const nextStep = () => setCurrentStep((prev) => Math.min(prev + 1, STEPS.length - 1))
-  const prevStep = () => setCurrentStep((prev) => Math.max(prev - 1, 0))
+  const nextStep = () => {
+    const { first_name, last_name, email, mobile, business_name, order_prefix } = formData
+    if (currentStep === 0 && !(first_name && last_name && email && mobile && business_name && order_prefix)) {
+      setSubmited(true)
+      return;
+    }
+    setCurrentStep((prev) => Math.min(prev + 1, STEPS.length - 1))
+  }
+  const prevStep = () => {
+    setCurrentStep((prev) => Math.max(prev - 1, 0))
+    setErrors({}) // Clear errors when going back
+  }
 
   const handleSubmit = () => {
     console.log("Submitting Customer Data:", formData)
     toast.success("Customer added successfully!")
     onOpenChange(false)
     setCurrentStep(0)
+    setErrors({})
   }
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-2xl p-0 gap-0 overflow-hidden bg-white dark:bg-zinc-950 border-none shadow-2xl">
+      <DialogContent className="sm:max-w-2xl gap-0 overflow-hidden bg-white dark:bg-zinc-950 border-none shadow-2xl">
         <DialogHeader className="px-6 pt-6 pb-2">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-2xl bg-blue-50 dark:bg-blue-500/10 flex items-center justify-center text-blue-600 dark:text-blue-400">
@@ -121,43 +177,65 @@ export default function AddCustomerDialog({ open, onOpenChange }: AddCustomerDia
 
         <Stepper steps={STEPS} currentStep={currentStep} className="my-2" />
 
-        <div className="px-8 py-6 max-h-[60vh] overflow-y-auto custom-scrollbar">
+        <div className="px-8 py-6 max-h-[60vh] overflow-y-auto no-scrollbar">
           {currentStep === 0 && (
             <div className="grid grid-cols-12 gap-x-5 gap-y-4 animate-in fade-in slide-in-from-right-4 duration-300">
               <FormInput
                 label="First Name"
                 icon={User}
+                required
                 placeholder="Enter first name"
                 value={formData.first_name}
                 onChange={(val) => handleChange("first_name", val)}
+                error={submited && !formData.first_name.trim()}
+                errormsg="First name is required"
               />
               <FormInput
                 label="Last Name"
+                required
                 placeholder="Enter last name"
                 value={formData.last_name}
                 onChange={(val) => handleChange("last_name", val)}
+                error={submited && !formData.last_name.trim()}
+                errormsg="Last name is required"
               />
               <FormInput
                 label="Email Address"
                 icon={Mail}
                 type="email"
+                required
                 placeholder="name@company.com"
                 value={formData.email}
                 onChange={(val) => handleChange("email", val)}
+                error={submited && !formData.email.trim()}
+                errormsg="Email is required"
               />
               <FormInput
                 label="Mobile Number"
                 icon={Phone}
+                required
                 placeholder="0412 345 678"
                 value={formData.mobile}
                 onChange={(val) => handleChange("mobile", val)}
+                error={submited && !formData.mobile.trim()}
+                errormsg="Mobile number is required"
               />
+              {/* <FormInput
+                label="Office Number"
+                icon={Phone}
+                placeholder="0412 345 678"
+                value={formData.office_number}
+                onChange={(val) => handleChange("office_number", val)}
+              /> */}
               <FormInput
                 label="Business Name"
                 icon={Building2}
+                required
                 placeholder="Legal business name"
                 value={formData.business_name}
                 onChange={(val) => handleChange("business_name", val)}
+                error={submited && !formData.business_name.trim()}
+                errormsg="Business name is required"
               />
               <FormInput
                 label="GST Number"
@@ -170,8 +248,11 @@ export default function AddCustomerDialog({ open, onOpenChange }: AddCustomerDia
                 label="Order Prefix"
                 placeholder="e.g. TRZ-"
                 isFullWidth
+                required
                 value={formData.order_prefix}
                 onChange={(val) => handleChange("order_prefix", val)}
+                error={!!errors.order_prefix}
+                errormsg={errors.order_prefix}
               />
             </div>
           )}
@@ -193,19 +274,20 @@ export default function AddCustomerDialog({ open, onOpenChange }: AddCustomerDia
                     onChange={(val) => handleChange("billing_address", val)}
                   />
                   <FormInput
-                    label="Street #"
-                    isCompact
-                    placeholder="123"
-                    value={formData.billing_street_number}
-                    onChange={(val) => handleChange("billing_street_number", val)}
-                  />
-                  <FormInput
                     label="Street Name"
                     isHalf
                     placeholder="Main St"
                     value={formData.billing_street_name}
                     onChange={(val) => handleChange("billing_street_name", val)}
                   />
+                  <FormInput
+                    label="Street Number"
+                    isCompact
+                    placeholder="123"
+                    value={formData.billing_street_number}
+                    onChange={(val) => handleChange("billing_street_number", val)}
+                  />
+
                   <FormSelect
                     label="Type"
                     isCompact
@@ -308,7 +390,7 @@ export default function AddCustomerDialog({ open, onOpenChange }: AddCustomerDia
                       <div className="w-8 h-8 rounded-lg bg-blue-100 dark:bg-blue-500/20 flex items-center justify-center text-blue-600 dark:text-blue-400">
                         <Truck className="w-4 h-4" />
                       </div>
-                      <span className="text-sm font-bold">Direct Freight</span>
+                      <span className="text-sm font-bold">Direct Freight Express</span>
                     </div>
                     <Switch
                       checked={formData.direct_freight_active === 1}
@@ -342,7 +424,7 @@ export default function AddCustomerDialog({ open, onOpenChange }: AddCustomerDia
                       <div className="w-8 h-8 rounded-lg bg-rose-100 dark:bg-rose-500/20 flex items-center justify-center text-rose-600 dark:text-rose-400">
                         <Mail className="w-4 h-4" />
                       </div>
-                      <span className="text-sm font-bold">AusPost</span>
+                      <span className="text-sm font-bold">Auspost Tranzit Group</span>
                     </div>
                     <Switch
                       checked={formData.auspost_active === 1}
@@ -376,7 +458,7 @@ export default function AddCustomerDialog({ open, onOpenChange }: AddCustomerDia
                       <div className="w-8 h-8 rounded-lg bg-amber-100 dark:bg-amber-500/20 flex items-center justify-center text-amber-600 dark:text-amber-400">
                         <Box className="w-4 h-4" />
                       </div>
-                      <span className="text-sm font-bold">Pallet Service</span>
+                      <span className="text-sm font-bold">Pallet Tranzit Group</span>
                     </div>
                     <Switch
                       checked={formData.pallet_active === 1}
@@ -436,13 +518,6 @@ export default function AddCustomerDialog({ open, onOpenChange }: AddCustomerDia
           </Button>
 
           <div className="flex items-center gap-3">
-            <Button
-              variant="outline"
-              onClick={() => onOpenChange(false)}
-              className="rounded-lg h-8 px-4 text-xs font-bold uppercase tracking-wider border-slate-200 dark:border-zinc-800"
-            >
-              Cancel
-            </Button>
             {currentStep === STEPS.length - 1 ? (
               <Button
                 onClick={handleSubmit}

@@ -59,6 +59,7 @@ export function DataTable<T extends Record<string, any>>({
   onRowClick,
   // Custom components
   customHeader,
+  headerPosition = 'right',
   headerTitle,
   headerDescription,
   headerClass,
@@ -107,8 +108,8 @@ export function DataTable<T extends Record<string, any>>({
   } = paginationResult;
   // Use paginated data or all data based on pagination setting
   // If totalItems is provided, we assume server-side pagination so we don't slice the data again
-  const displayData = pagination 
-    ? (totalItems !== undefined ? data : paginatedData) 
+  const displayData = pagination
+    ? (totalItems !== undefined ? data : paginatedData)
     : data;
   const actualTotalItems = totalItems || paginationTotalItems;
 
@@ -188,6 +189,7 @@ export function DataTable<T extends Record<string, any>>({
         {(searchable || customHeader) && (
           <div className="flex items-center justify-between gap-4 bg-gray-50/50 dark:bg-transparent relative">
             <div className="flex items-center gap-2 ml-auto">
+              {headerPosition == 'left' && customHeader && (typeof customHeader === 'function' ? (customHeader as () => ReactNode)() : customHeader)}
               {searchable && (
                 <div className="relative">
                   <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
@@ -246,7 +248,7 @@ export function DataTable<T extends Record<string, any>>({
                   <span>Export</span>
                 </Button>
               </DropdownCustomMenu>
-              {typeof customHeader === 'function' ? (customHeader as () => ReactNode)() : customHeader}
+              {headerPosition == 'right' && customHeader && (typeof customHeader === 'function' ? (customHeader as () => ReactNode)() : customHeader)}
             </div>
           </div>
         )}

@@ -1,14 +1,30 @@
 "use client";
 
-import { useState, useMemo, useCallback } from 'react';
+import { useState, useMemo, useCallback, Fragment } from 'react';
 import { QuoteForm } from '../components/QuoteForm';
 import { QuoteSummary } from '../components/QuoteSummary';
+import { SendQuoteDialog } from '../../customer-quote/components/SendQuoteDialog';
+import { useAppSelector } from '@/hooks/store.hooks';
 import type { QuoteItem, QuoteLocation, QuoteCalculations, ServiceRate } from '../types';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Calculator, RefreshCw, Box, Truck } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { FormRadio, FormCheckbox } from '@/features/orders/components/OrderFormUI';
+import { cn } from '@/lib/utils';
+
+const SURCHARGES = [
+  { id: 'airport', name: 'Airport Delivery Surcharge', description: 'Additional charge for airport deliveries.', price: 25.00 },
+  { id: 'exhibition', name: 'Exhibition Centre Surcharge', description: 'Per consignment note (per Delivery / Pickup).', price: 200.00 },
+  { id: 'palletising', name: 'Palletising', description: 'Charge for palletising loose freight.', price: 25.00 },
+  { id: 'tailgate', name: 'Tailgate Pickup / Delivery', description: 'Tailgate service required at pickup or delivery.', price: 45.00 },
+];
 
 export default function GetQuotePage() {
+  const { role } = useAppSelector((state) => state.auth);
+  const isAdmin = role === 'admin';
+  const [margin, setMargin] = useState<string>('0');
+  const [isSendDialogOpen, setIsSendDialogOpen] = useState(false);
+
   const [items, setItems] = useState<QuoteItem[]>([
     { id: crypto.randomUUID(), type: 'Parcel', qty: 1, weight: 0, length: 0, width: 0, height: 0 }
   ]);
@@ -17,6 +33,8 @@ export default function GetQuotePage() {
     receiver: null
   });
   const [rates, setRates] = useState<ServiceRate[] | null>(null);
+  const [selectedRateId, setSelectedRateId] = useState<string | null>(null);
+  const [selectedSurcharges, setSelectedSurcharges] = useState<string[]>([]);
   const [loading, setLoading] = useState(false);
 
   const calculations = useMemo<QuoteCalculations>(() => {
@@ -30,9 +48,18 @@ export default function GetQuotePage() {
       volumetricWeight += ((item.length * item.width * item.height) / 5000) * item.qty;
     });
 
-    const serviceCost = rates ? rates[0]?.price || 0 : 0;
+    const selectedRate = rates?.find(r => r.id === selectedRateId) || (rates?.[0] || null);
+    const serviceCost = selectedRate ? selectedRate.price : 0;
     const gst = serviceCost * 0.1;
-    const surcharges = 0;
+
+    const surcharges = selectedSurcharges.reduce((acc, id) => {
+      const surcharge = SURCHARGES.find(s => s.id === id);
+      return acc + (surcharge?.price || 0);
+    }, 0);
+
+    const baseTotal = serviceCost + gst + surcharges;
+    const marginPercentage = parseFloat(margin) || 0;
+    const marginAmount = baseTotal * (marginPercentage / 100);
 
     return {
       totalItems,
@@ -41,9 +68,10 @@ export default function GetQuotePage() {
       serviceCost,
       gst,
       surcharges,
-      total: serviceCost + gst + surcharges
+      margin: marginAmount,
+      total: baseTotal + marginAmount
     };
-  }, [items, rates]);
+  }, [items, rates, selectedRateId, selectedSurcharges, margin]);
 
   const isValid = useMemo(() => {
     return (
@@ -62,8 +90,11 @@ export default function GetQuotePage() {
       { id: '1', provider: 'StarTrack', name: 'Premium', price: 45.50, estimatedDays: '1-2 Days' },
       { id: '2', provider: 'TNT', name: 'Express', price: 52.00, estimatedDays: 'Next Day' }
     ]);
+    setSelectedRateId('1'); // Default select the first one
     setLoading(false);
   }, []);
+
+  console.log(isValid, 'isValid', items, locations);
 
   return (
     <div className="p-page-padding animate-in fade-in duration-700 overflow-auto">
@@ -72,9 +103,9 @@ export default function GetQuotePage() {
           <h1 className="text-2xl font-bold tracking-tight text-[#111827] dark:text-white">Get Quote</h1>
         </div> */}
 
-        <div className="grid grid-cols-1 xl:grid-cols-12 gap-6 items-start">
+        <div className="grid grid-cols-1 xl:grid-cols-12 gap-4 items-start">
           {/* Main Form Area */}
-          <div className="xl:col-span-8 space-y-6">
+          <div className="xl:col-span-8 space-y-4">
             <QuoteForm
               items={items}
               setItems={setItems}
@@ -85,8 +116,8 @@ export default function GetQuotePage() {
             />
 
             {/* Services Section */}
-            <Card className="shadow-sm border-slate-200 dark:border-zinc-800 bg-white dark:bg-zinc-950 min-h-[250px] gap-0">
-              <CardHeader className="flex flex-row items-center justify-between border-b border-slate-50 dark:border-zinc-900 pb-3 h-14">
+            <Card className="shadow-sm border-slate-200 dark:border-zinc-800 bg-white dark:bg-zinc-950 min-h-[250px] gap-0 p-0">
+              <CardHeader className="flex flex-row items-center justify-between border-b border-slate-50 dark:border-zinc-900 py-3 [.border-b]:pb-3">
                 <CardTitle className="inline-flex items-center gap-2 text-[15px] font-semibold text-slate-800 dark:text-zinc-100">
                   <Truck className="w-4 h-4 text-blue-500" />
                   Available Services
@@ -121,32 +152,69 @@ export default function GetQuotePage() {
                 ) : (
                   <div className="divide-y divide-slate-100 dark:divide-zinc-900 border border-slate-100 dark:border-zinc-800 overflow-hidden">
                     {rates && rates.map(rate => (
-                      <div key={rate.id} className="p-5 md:px-6 flex flex-col md:flex-row md:items-center justify-between hover:bg-slate-50/50 dark:hover:bg-zinc-900/30 transition-all group">
-                        <div className="flex items-center gap-4 mb-4 md:mb-0">
-                          <div className="w-12 h-12 bg-white dark:bg-zinc-800 border border-slate-100 dark:border-zinc-800 rounded-xl flex items-center justify-center overflow-hidden shadow-sm group-hover:shadow-md transition-shadow">
-                            <Box className="w-6 h-6 text-blue-600/20 dark:text-blue-400/20" />
+                      <Fragment key={rate.id}>
+                        <div
+                          onClick={() => setSelectedRateId(rate.id)}
+                          className={cn(
+                            "p-5 md:px-6 flex flex-col md:flex-row md:items-center justify-between hover:bg-slate-50/50 dark:hover:bg-zinc-900/30 transition-all duration-300 group cursor-pointer",
+                            selectedRateId === rate.id ? "bg-blue-50/40 dark:bg-blue-900/20" : ""
+                          )}
+                        >
+                          <div className="flex items-center gap-4 mb-4 md:mb-0">
+                            <FormRadio
+                              checked={selectedRateId === rate.id}
+                              onChange={() => setSelectedRateId(rate.id)}
+                            />
+                            <div className="w-12 h-12 bg-white dark:bg-zinc-800 border border-slate-100 dark:border-zinc-800 rounded-xl flex items-center justify-center overflow-hidden shadow-sm group-hover:shadow-md transition-shadow">
+                              <Box className="w-6 h-6 text-blue-600/20 dark:text-blue-400/20" />
+                            </div>
+                            <div>
+                              <h4 className="text-[15px] font-bold text-[#111827] dark:text-white leading-tight">{rate.provider}</h4>
+                              <div className="flex items-center gap-2 mt-0.5">
+                                <span className="text-[12px] font-medium text-slate-500 dark:text-zinc-400 whitespace-nowrap">{rate.name}</span>
+                                <span className="w-1 h-1 rounded-full bg-slate-300 dark:bg-zinc-700"></span>
+                                <span className="text-[12px] font-semibold text-blue-600 dark:text-blue-400 whitespace-nowrap">{rate.estimatedDays}</span>
+                              </div>
+                            </div>
                           </div>
-                          <div>
-                            <h4 className="text-[15px] font-bold text-[#111827] dark:text-white leading-tight">{rate.provider}</h4>
-                            <div className="flex items-center gap-2 mt-0.5">
-                              <span className="text-[12px] font-medium text-slate-500 dark:text-zinc-400 whitespace-nowrap">{rate.name}</span>
-                              <span className="w-1 h-1 rounded-full bg-slate-300 dark:bg-zinc-700"></span>
-                              <span className="text-[12px] font-semibold text-blue-600 dark:text-blue-400 whitespace-nowrap">{rate.estimatedDays}</span>
+                          <div className="flex items-center justify-between md:justify-end gap-6 md:gap-8">
+                            <div className="text-right">
+                              <p className="text-[20px] font-extrabold text-[#111827] dark:text-white tracking-tight">${rate.price.toFixed(2)}</p>
+                              <div className="inline-flex items-center px-2 py-0.5 rounded-full bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 text-[10px] font-bold uppercase tracking-wider mt-0.5">
+                                Best Value
+                              </div>
                             </div>
                           </div>
                         </div>
-                        <div className="flex items-center justify-between md:justify-end gap-6 md:gap-8">
-                          <div className="text-right">
-                            <p className="text-[20px] font-extrabold text-[#111827] dark:text-white tracking-tight">${rate.price.toFixed(2)}</p>
-                            <div className="inline-flex items-center px-2 py-0.5 rounded-full bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 text-[10px] font-bold uppercase tracking-wider mt-0.5">
-                              Best Value
+
+                        {/* Surcharges Section - Appears below selected service */}
+                        {selectedRateId === rate.id && (
+                          <div className="bg-blue-50/10 dark:bg-blue-900/5 animate-in fade-in slide-in-from-top-4 duration-500 ease-out border-t border-slate-100 dark:border-zinc-800">
+                            <div className="px-6 py-3 border-b border-slate-100 dark:border-zinc-800 flex items-center justify-between">
+                              <h5 className="text-[11px] font-bold text-slate-400 dark:text-zinc-500 uppercase tracking-widest">Extra Surcharges</h5>
+                            </div>
+                            <div className="divide-y divide-slate-100 dark:divide-zinc-800">
+                              {SURCHARGES.map((surcharge) => (
+                                <FormCheckbox
+                                  key={surcharge.id}
+                                  label={surcharge.name}
+                                  description={surcharge.description}
+                                  price={surcharge.price}
+                                  checked={selectedSurcharges.includes(surcharge.id)}
+                                  onCheckedChange={(checked) => {
+                                    if (checked) {
+                                      setSelectedSurcharges(prev => [...prev, surcharge.id]);
+                                    } else {
+                                      setSelectedSurcharges(prev => prev.filter(id => id !== surcharge.id));
+                                    }
+                                  }}
+                                  className="hover:bg-white/50 dark:hover:bg-zinc-800/50 py-3 px-6"
+                                />
+                              ))}
                             </div>
                           </div>
-                          <Button className="bg-[#111827] hover:bg-black dark:bg-blue-600 dark:hover:bg-blue-700 h-9 px-6 text-[13px] font-bold shadow-sm active:scale-95 transition-all rounded-lg">
-                            Select
-                          </Button>
-                        </div>
-                      </div>
+                        )}
+                      </Fragment>
                     ))}
                   </div>
                 )}
@@ -156,10 +224,27 @@ export default function GetQuotePage() {
 
           {/* Right Sidebar */}
           <div className="xl:col-span-4 sticky top-0">
-            <QuoteSummary calculations={calculations} />
+            <QuoteSummary
+              calculations={calculations}
+              isAdmin={isAdmin}
+              margin={margin}
+              setMargin={setMargin}
+              onSendQuote={() => setIsSendDialogOpen(true)}
+              isValid={isValid}
+            />
           </div>
         </div>
       </div>
+
+      {/* Admin Features */}
+      {isAdmin && (
+        <SendQuoteDialog
+          open={isSendDialogOpen}
+          onOpenChange={setIsSendDialogOpen}
+          calculations={calculations}
+          selectedRate={rates?.find(r => r.id === selectedRateId) || (rates?.[0] || null)}
+        />
+      )}
     </div>
   );
 }

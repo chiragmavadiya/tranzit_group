@@ -24,6 +24,7 @@ export interface FormInputProps extends Omit<InputHTMLAttributes<HTMLInputElemen
   disabled?: boolean;
   error?: boolean;
   errormsg?: string;
+  rightElement?: ReactNode;
 }
 
 export interface FormTextareaProps extends Omit<FormInputProps, 'type'> {
@@ -63,4 +64,21 @@ export interface DropdownUIProps {
   label: string;
   onClick: (value: string) => void;
   options: ReadonlyArray<{ value: string; label: string }> | Array<{ value: string; label: string }>;
+}
+
+export interface FormRadioProps {
+  checked: boolean;
+  onChange: () => void;
+  label?: string;
+  className?: string;
+  activeColor?: string;
+}
+
+export interface FormCheckboxProps {
+  checked: boolean;
+  onCheckedChange: (checked: boolean) => void;
+  label?: string;
+  description?: string;
+  price?: number;
+  className?: string;
 }

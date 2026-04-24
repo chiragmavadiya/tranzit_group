@@ -23,6 +23,7 @@ export interface QuoteCalculations {
   serviceCost: number;
   gst: number;
   surcharges: number;
+  margin: number;
   total: number;
 }
 

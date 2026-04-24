@@ -62,8 +62,8 @@ const HelpCenterArticlePage: React.FC = () => {
                                 </div>
 
                                 <div className="mt-5 border-t border-slate-200 pt-5">
-                                    <div 
-                                        className="prose prose-slate max-w-none dark:prose-invert"
+                                    <div
+                                        className="prose prose-slate max-w-none dark:prose-invert rich-text-content"
                                         dangerouslySetInnerHTML={{ __html: article.content || '' }}
                                     />
                                 </div>

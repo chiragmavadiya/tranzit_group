@@ -1,3 +1,4 @@
+
 export const AUSTRALIAN_STATES = [
   { label: 'New South Wales', value: 'NSW' },
   { label: 'Victoria', value: 'VIC' },
@@ -35,3 +36,4 @@ export const STREET_TYPES = [
   { label: 'Terrace', value: 'TCE' },
   { label: 'Way', value: 'WAY' },
 ];
+

@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useState } from 'react';
+import { useCallback, useMemo } from 'react';
 import { Pencil, Trash2, Eye, Bell, Plus } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -7,28 +7,35 @@ import { INVOICE_STATUS_COLORS } from '../constants';
 import { cn } from '@/lib/utils';
 import { CustomTooltip, DataTable, type Column } from '@/components/common';
 import { NavLink } from 'react-router-dom';
+import { useAppSelector } from '@/hooks/store.hooks';
 
 interface InvoiceTableProps {
   invoices: Invoice[];
+  loading?: boolean;
   isAdmin?: boolean;
   onEdit?: (id: number) => void;
   onDelete?: (id: number) => void;
   onView?: (invoiceNumber: string) => void;
   onSend?: (id: number) => void;
+  totalItems?: number;
+  currentPage?: number;
+  pageSize?: number;
+  search?: string;
+  onPageChange?: (page: number) => void;
+  onPageSizeChange?: (size: number) => void;
+  onSearchChange?: (search: string) => void;
+  onExport?: (format: string) => void;
+  isExporting?: boolean;
 }
 
-export function InvoiceTable({ invoices, isAdmin, onEdit, onDelete, onView, onSend, }: InvoiceTableProps) {
+export function InvoiceTable({
+  invoices, loading, isAdmin, onEdit, onDelete, onView, onSend,
+  totalItems = 0, currentPage = 1, pageSize = 10, search = '',
+  onPageChange, onPageSizeChange, onSearchChange, onExport, isExporting
+}: InvoiceTableProps) {
+  const { role } = useAppSelector((state) => state.auth);
 
-  const [search, setSearch] = useState<string>('')
-  const [pageSize, setPageSize] = useState<number>(10)
 
-  const handleSearch = (value: string) => {
-    setSearch(value)
-  }
-
-  const handlePageSizeChange = (size: number) => {
-    setPageSize(size)
-  }
 
 
   const formatCurrency = useCallback((amount: number) => {
@@ -40,7 +47,7 @@ export function InvoiceTable({ invoices, isAdmin, onEdit, onDelete, onView, onSe
 
   const renderStatus = useCallback((status: Invoice['status']) => {
     return (
-      <Badge className={cn("px-3 py-0.5 rounded-md font-medium border-none shadow-none", INVOICE_STATUS_COLORS[status])}>
+      <Badge className={cn("px-3 py-0.5 rounded-md font-medium border-none shadow-none", INVOICE_STATUS_COLORS[status as keyof typeof INVOICE_STATUS_COLORS])}>
         {status}
       </Badge>
     );
@@ -82,8 +89,8 @@ export function InvoiceTable({ invoices, isAdmin, onEdit, onDelete, onView, onSe
       header: 'Customer',
       cell: (_, row) => (
         <div className="flex flex-col">
-          <span className="font-semibold text-gray-800 dark:text-zinc-200">{row.user.name}</span>
-          <span className="text-xs text-gray-500 dark:text-zinc-400">{row.user.email}</span>
+          <span className="font-semibold text-gray-800 dark:text-zinc-200">{row.customer_full_name || row.user?.name}</span>
+          <span className="text-xs text-gray-500 dark:text-zinc-400">{row.customer_email || row.user?.email}</span>
         </div>
       )
     },
@@ -91,9 +98,9 @@ export function InvoiceTable({ invoices, isAdmin, onEdit, onDelete, onView, onSe
       accessor: 'amount',
       key: 'amount',
       header: 'Total',
-      cell: (value) => (
+      cell: (_, row) => (
         <div className="text-right font-medium text-gray-700 dark:text-zinc-300">
-          {formatCurrency(Number(value))}
+          {formatCurrency(Number(row.total ?? row.amount ?? 0))}
         </div>
       )
     },
@@ -101,9 +108,9 @@ export function InvoiceTable({ invoices, isAdmin, onEdit, onDelete, onView, onSe
       accessor: 'invoice_date',
       key: 'invoice_date',
       header: 'Issued Date',
-      cell: (value) => (
+      cell: (_, row) => (
         <div className="text-gray-500 dark:text-zinc-400 whitespace-nowrap">
-          {value}
+          {row.issue_date || row.invoice_date}
         </div>
       )
     },
@@ -111,53 +118,102 @@ export function InvoiceTable({ invoices, isAdmin, onEdit, onDelete, onView, onSe
       accessor: 'amount_paid',
       key: 'amount_paid',
       header: 'Till Date Paid',
-      cell: (value) => (
-        <div className={cn("text-right font-medium", Number(value) > 0 ? "text-emerald-600 dark:text-emerald-400" : "text-gray-400")}>
-          {formatCurrency(Number(value))}
-        </div>
-      )
+      cell: (_, row) => {
+        const val = Number(row.till_date_paid ?? row.amount_paid ?? 0);
+        return (
+          <div className={cn("text-right font-medium", val > 0 ? "text-emerald-600 dark:text-emerald-400" : "text-gray-400")}>
+            {formatCurrency(val)}
+          </div>
+        );
+      }
     },
     {
       accessor: 'balance',
       key: 'balance',
       header: 'Remaining Balance',
-      cell: (value) => (
-        <div className={cn("text-right font-medium", Number(value) > 0 ? "text-rose-600 dark:text-rose-400" : "text-gray-400")}>
-          {formatCurrency(Number(value))}
-        </div>
-      )
+      cell: (_, row) => {
+        const val = Number(row.remaining_balance ?? row.balance ?? 0);
+        return (
+          <div className={cn("text-right font-medium", val > 0 ? "text-rose-600 dark:text-rose-400" : "text-gray-400")}>
+            {formatCurrency(val)}
+          </div>
+        );
+      }
     },
     {
       accessor: 'actions',
       key: 'actions',
       header: 'Action',
       sticky: 'right',
-      cell: (_, row) => (
-        <div className="flex items-center justify-center gap-2">
-          <CustomTooltip title="Edit invoice" placement="bottom">
-            <Button variant="ghost" size="sm" className="p-0 hover:text-blue-500 bg-transparent hover:bg-transparent dark:hover:bg-transparent" onClick={() => onEdit?.(row.id)}>
-              <Pencil className="w-4 h-4" />
-            </Button>
-          </CustomTooltip>
-          <CustomTooltip title="Delete invoice" placement="bottom">
-            <Button variant="ghost" size="sm" className="p-0 hover:text-rose-600 bg-transparent hover:bg-transparent dark:hover:bg-transparent" onClick={() => onDelete?.(row.id)}>
-              <Trash2 className="w-4 h-4" />
-            </Button>
-          </CustomTooltip>
-          <CustomTooltip title="View invoice" placement="bottom">
-            <Button variant="ghost" size="sm" className="p-0 hover:text-blue-500 bg-transparent hover:bg-transparent dark:hover:bg-transparent" onClick={() => onView?.(row.invoice_number)}>
-              <Eye className="w-4 h-4" />
-            </Button>
-          </CustomTooltip>
-          <CustomTooltip title="Send invoice before reminding" placement="bottom">
-            <Button variant="ghost" size="sm" className="p-0 hover:text-blue-500 bg-transparent hover:bg-transparent dark:hover:bg-transparent" onClick={() => onSend?.(row.id)}>
-              <Bell className="w-4 h-4" />
-            </Button>
-          </CustomTooltip>
-        </div>
-      )
+      cell: (_, row) => {
+        const rowStatus = row.status.toUpperCase();
+        const isCustomer = role === 'customer';
+
+        if (isCustomer) {
+          return (
+            <div className="flex items-center gap-2">
+              <CustomTooltip title="View invoice" placement="bottom">
+                <Button variant="ghost" size="sm" className="p-0 hover:text-blue-500 bg-transparent hover:bg-transparent dark:hover:bg-transparent" onClick={() => onView?.(row.invoice_number)}>
+                  <Eye className="w-4 h-4" />
+                </Button>
+              </CustomTooltip>
+            </div>
+          );
+        }
+
+        // Admin rules
+        const showPreview = rowStatus === 'PAID';
+        const showEdit = ['SEND', 'DRAFT', 'OVERDUE', 'PARTIAL', 'UNPAID'].includes(rowStatus);
+        const showReminder = ['SEND', 'OVERDUE'].includes(rowStatus);
+        const disableReminder = ['DRAFT', 'PARTIAL', 'UNPAID'].includes(rowStatus);
+        const showDelete = ['DRAFT', 'OVERDUE', 'PARTIAL', 'UNPAID'].includes(rowStatus);
+
+        return (
+          <div className="flex items-center gap-2">
+            {showPreview && (
+              <CustomTooltip title="View invoice" placement="bottom">
+                <Button variant="ghost" size="sm" className="p-0 hover:text-blue-500 bg-transparent hover:bg-transparent dark:hover:bg-transparent" onClick={() => onView?.(row.invoice_number)}>
+                  <Eye className="w-4 h-4" />
+                </Button>
+              </CustomTooltip>
+            )}
+
+            {showEdit && (
+              <CustomTooltip title="Edit invoice" placement="bottom">
+                <Button variant="ghost" size="sm" className="p-0 hover:text-blue-500 bg-transparent hover:bg-transparent dark:hover:bg-transparent" onClick={() => onEdit?.(row.id)}>
+                  <Pencil className="w-4 h-4" />
+                </Button>
+              </CustomTooltip>
+            )}
+
+            {(showReminder || disableReminder) && (
+              <CustomTooltip title={disableReminder ? "Cannot send reminder" : "Send reminder"} placement="bottom">
+                <span>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    disabled={disableReminder}
+                    className={`p-0 bg-transparent hover:bg-transparent dark:hover:bg-transparent ${disableReminder ? 'text-gray-400 opacity-50 cursor-not-allowed' : 'hover:text-blue-500'}`}
+                    onClick={() => !disableReminder && onSend?.(row.id)}
+                  >
+                    <Bell className="w-4 h-4" />
+                  </Button>
+                </span>
+              </CustomTooltip>
+            )}
+
+            {showDelete && (
+              <CustomTooltip title="Delete invoice" placement="bottom">
+                <Button variant="ghost" size="sm" className="p-0 hover:text-rose-600 bg-transparent hover:bg-transparent dark:hover:bg-transparent" onClick={() => onDelete?.(row.id)}>
+                  <Trash2 className="w-4 h-4" />
+                </Button>
+              </CustomTooltip>
+            )}
+          </div>
+        );
+      }
     },
-  ], [onEdit, onDelete, onView, onSend, formatCurrency, renderStatus, isAdmin]);
+  ], [onEdit, onDelete, onView, onSend, formatCurrency, renderStatus, isAdmin, role]);
 
   const customHeader = () => {
     return (
@@ -181,13 +237,19 @@ export function InvoiceTable({ invoices, isAdmin, onEdit, onDelete, onView, onSe
           columns={columns}
           data={invoices}
           searchPlaceholder="Search invoices..."
-          onSearchChange={handleSearch}
+          onSearchChange={onSearchChange}
           searchValue={search}
           pageSize={pageSize}
-          onPageSizeChange={handlePageSizeChange}
+          onPageSizeChange={onPageSizeChange}
           headerTitle="Customer Invoice Management"
           className='pb-3'
           customHeader={isAdmin ? customHeader : undefined}
+          totalItems={totalItems}
+          currentPage={currentPage}
+          onPageChange={onPageChange}
+          loading={loading}
+          onExport={onExport}
+          isExporting={isExporting}
         />
       </div>
     </div>

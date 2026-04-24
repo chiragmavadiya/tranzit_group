@@ -2,38 +2,89 @@ import { useState, useCallback } from 'react';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { FileUpload } from './FileUpload';
-import { COUNTRY, ISSUE_CATEGORIES, PARCEL_ENQUIRY_TYPE, SENDER_RECEIVER } from '../constants';
+import { COUNTRY, FEEDBACK_CATEGORIES, ISSUE_CATEGORIES, PARCEL_ENQUIRY_TYPE, SENDER_RECEIVER } from '../constants';
 import type { EnquiryFormData, IssueCategory } from '../types';
 import { Send, CheckCircle2 } from 'lucide-react';
-import { toast } from 'sonner';
 import { FormInput, FormSelect, FormTextarea } from '@/features/orders/components/OrderFormUI';
+import { useCreateEnquiry } from '../hooks/useEnquiries';
 
 export function EnquiryForm() {
   const [formData, setFormData] = useState<EnquiryFormData>({
-    category: '',
-    email: '',
+    issue_type: '',
+    reply_email: '',
     message: '',
     attachments: [],
+    nature_of_issue: '',
+    sender_role: '',
+    local_country: '',
+    contact_number: '',
+    feedback_category: '',
   });
-  const [isSubmited, setIsSubmited] = useState(false);
-  const [loading, setLoading] = useState(false);
-  const [isSuccess, setIsSuccess] = useState(false);
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const [isSubmited, setIsSubmited] = useState(false);
+  const { mutate, isPending, isSuccess, reset } = useCreateEnquiry();
+
+  const validateForm = () => {
+    // General required fields
+    if (!formData.issue_type || !formData.reply_email || !formData.message) {
+      return false;
+    }
+
+    // Email format validation
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(formData.reply_email)) {
+      return false;
+    }
+
+    // Conditional requirements
+    if (formData.issue_type === 'parcel') {
+      if (!formData.nature_of_issue) return false;
+    }
+
+    if (formData.issue_type === 'sender') {
+      if (!formData.sender_role || !formData.local_country || !formData.contact_number) return false;
+    }
+
+    if (formData.issue_type === 'feedback') {
+      if (!formData.feedback_category) return false;
+    }
+
+    return true;
+  };
+
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!(formData.message && formData.email !== '' && formData.category !== '')) {
-      setIsSubmited(true);
-      console.log("Return from blank....")
+    setIsSubmited(true);
+
+    if (!validateForm()) {
       return;
     }
 
-    setLoading(true);
-    console.log("Passed....")
-    // Simulate API call
-    await new Promise(resolve => setTimeout(resolve, 1500));
-    setLoading(false);
-    setIsSuccess(true);
-    toast.success('Your enquiry has been submitted successfully');
+    const payload = new FormData();
+    payload.append('issue_type', formData.issue_type);
+    payload.append('reply_email', formData.reply_email);
+    payload.append('message', formData.message);
+
+    if (formData.issue_type === 'parcel' && formData.nature_of_issue) {
+      payload.append('nature_of_issue', formData.nature_of_issue);
+    }
+
+    if (formData.issue_type === 'sender') {
+      if (formData.sender_role) payload.append('sender_role', formData.sender_role);
+      if (formData.local_country) payload.append('local_country', formData.local_country);
+      if (formData.contact_number) payload.append('contact_number', formData.contact_number);
+    }
+
+    if (formData.issue_type === 'feedback' && formData.feedback_category) {
+      payload.append('feedback_category', formData.feedback_category);
+    }
+
+    // Append attachments
+    formData.attachments.forEach((file) => {
+      payload.append('attachments[]', file);
+    });
+
+    mutate(payload);
   };
 
   const updateFiles = useCallback((files: File[]) => {
@@ -50,11 +101,25 @@ export function EnquiryForm() {
           Thank you for reaching out!
         </h2>
         <p className="text-gray-500 dark:text-zinc-400 max-w-sm mb-8">
-          Your enquiry has been received. Our support team will get back to you at <strong>{formData.email}</strong> as soon as possible.
+          Your enquiry has been received. Our support team will get back to you at <strong>{formData.reply_email}</strong> as soon as possible.
         </p>
         <Button
           variant="outline"
-          onClick={() => setIsSuccess(false)}
+          onClick={() => {
+            reset();
+            setIsSubmited(false);
+            setFormData({
+              issue_type: '',
+              reply_email: '',
+              message: '',
+              attachments: [],
+              nature_of_issue: '',
+              sender_role: '',
+              local_country: '',
+              contact_number: '',
+              feedback_category: '',
+            });
+          }}
           className="rounded-full px-8"
         >
           Send another enquiry
@@ -62,7 +127,7 @@ export function EnquiryForm() {
       </div>
     );
   }
-  console.log(formData)
+
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -70,12 +135,12 @@ export function EnquiryForm() {
           <FormSelect
             label='Issue Category'
             placeholder='Select enquiry'
-            value={formData?.category || ''}
-            onValueChange={(value) => setFormData(prev => ({ ...prev, category: (value || '') as IssueCategory }))}
+            value={formData?.issue_type || ''}
+            onValueChange={(value) => setFormData(prev => ({ ...prev, issue_type: (value || '') as IssueCategory }))}
             className="h-10 border-gray-200 dark:border-zinc-800"
             required
             options={ISSUE_CATEGORIES}
-            error={isSubmited && formData.category === ''}
+            error={isSubmited && formData.issue_type === ''}
             errormsg='Please select an enquiry category'
           />
         </div>
@@ -85,27 +150,27 @@ export function EnquiryForm() {
             label='Reply Email'
             type='email'
             placeholder='Enter your email'
-            value={formData.email}
-            onChange={(value) => setFormData(prev => ({ ...prev, email: value }))}
+            value={formData.reply_email}
+            onChange={(value) => setFormData(prev => ({ ...prev, reply_email: value }))}
             className="h-10 border-gray-200 dark:border-zinc-800"
             required
-            error={isSubmited && formData.email === ''}
-            errormsg='Please enter your email'
+            error={isSubmited && (!formData.reply_email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.reply_email))}
+            errormsg='Please enter a valid email address'
           />
         </div>
 
-        {formData.category === 'sender_and_account_enquiry' && (
+        {formData.issue_type === 'sender' && (
           <>
             <div className="space-y-2">
               <FormSelect
                 label="I'm the sender/receiver"
                 placeholder='Select your role'
-                value={formData?.sender_receiver || ''}
-                onValueChange={(value) => setFormData(prev => ({ ...prev, sender_receiver: value || '' }))}
+                value={formData?.sender_role || ''}
+                onValueChange={(value) => setFormData(prev => ({ ...prev, sender_role: value || '' }))}
                 className="h-10 border-gray-200 dark:border-zinc-800"
                 required
                 options={SENDER_RECEIVER}
-                error={isSubmited && formData.category === 'sender_and_account_enquiry' && !formData.sender_receiver}
+                error={isSubmited && formData.issue_type === 'sender' && !formData.sender_role}
                 errormsg='Please select your role'
               />
             </div>
@@ -118,7 +183,7 @@ export function EnquiryForm() {
                 className="h-10 border-gray-200 dark:border-zinc-800"
                 required
                 options={COUNTRY}
-                error={isSubmited && formData.category === 'sender_and_account_enquiry' && !formData.local_country}
+                error={isSubmited && formData.issue_type === 'sender' && !formData.local_country}
                 errormsg='Please select local country'
               />
             </div>
@@ -126,17 +191,18 @@ export function EnquiryForm() {
               <FormInput
                 label="Contact Number"
                 placeholder='Enter your contact number'
-                value={formData?.phone_number || ''}
-                onChange={(value) => setFormData(prev => ({ ...prev, phone_number: value }))}
+                value={formData?.contact_number || ''}
+                onChange={(value) => setFormData(prev => ({ ...prev, contact_number: value }))}
                 className="h-10 border-gray-200 dark:border-zinc-800"
                 required
-                error={isSubmited && formData.category === 'sender_and_account_enquiry' && (!formData.phone_number || formData.phone_number === '')}
+                error={isSubmited && formData.issue_type === 'sender' && !formData.contact_number}
                 errormsg='Please enter contact number'
               />
             </div>
           </>
         )}
-        {formData.category === 'parcel_enquiry' && (
+
+        {formData.issue_type === 'parcel' && (
           <div className="space-y-2">
             <FormSelect
               label='Nature of Issue'
@@ -146,8 +212,23 @@ export function EnquiryForm() {
               className="h-10 border-gray-200 dark:border-zinc-800"
               required
               options={PARCEL_ENQUIRY_TYPE}
-              error={isSubmited && formData.category === 'parcel_enquiry' && !formData.nature_of_issue}
+              error={isSubmited && formData.issue_type === 'parcel' && !formData.nature_of_issue}
               errormsg='Please select nature of issue'
+            />
+          </div>
+        )}
+        {formData.issue_type === 'feedback' && (
+          <div className="space-y-2">
+            <FormSelect
+              label='Feedback Category'
+              placeholder='Select feedback category'
+              value={formData?.feedback_category || ''}
+              onValueChange={(value) => setFormData(prev => ({ ...prev, feedback_category: value || '' }))}
+              className="h-10 border-gray-200 dark:border-zinc-800"
+              required
+              options={FEEDBACK_CATEGORIES}
+              error={isSubmited && formData.issue_type === 'feedback' && !formData.feedback_category}
+              errormsg='Please select feedback category'
             />
           </div>
         )}
@@ -178,10 +259,10 @@ export function EnquiryForm() {
       <div className="pt-4">
         <Button
           type="submit"
-          disabled={loading}
+          disabled={isPending}
           className="w-full h-11 text-sm font-semibold rounded-lg bg-[#0060FE] hover:bg-blue-700 text-white shadow-lg shadow-blue-500/10 transition-all flex items-center justify-center gap-2"
         >
-          {loading ? (
+          {isPending ? (
             <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
           ) : (
             <>

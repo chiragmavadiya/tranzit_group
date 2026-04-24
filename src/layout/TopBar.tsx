@@ -15,6 +15,10 @@ import type { TabType } from '@/features/orders/types';
 import { useAppSelector, useAppDispatch } from '@/hooks/store.hooks';
 import { logout } from '@/features/auth/authSlice';
 import { ReportsTabs } from '@/features/reports/components/ReportsTabs';
+import { CancelOrderTabs } from '@/features/cancel-order/components/CancelOrderTabs';
+import type { CancelOrderTabType } from '@/features/cancel-order/constants/cancelOrder.constants';
+import { BookPickupTabs } from '@/features/book-pickup/components/BookPickupTabs';
+import type { BookPickupTabType } from '@/features/book-pickup/constants/book-pickup.constants';
 import type { ReportType } from '@/features/reports/types';
 import { useLogout } from '@/features/auth/hooks/useAuth';
 
@@ -40,7 +44,7 @@ export default function TopBar({ isCollapsed }: { isCollapsed?: boolean }) {
   };
 
   return (
-    <header className={`h-16 bg-white dark:bg-zinc-950 border-b border-gray-200 dark:border-zinc-800 flex items-center justify-between px-6 fixed top-0 right-0 z-10 transition-[left] duration-300 ease-in-out ${isCollapsed ? 'left-[64px]' : 'left-[240px]'}`}>
+    <header className={`print:hidden h-16 bg-white dark:bg-zinc-950 border-b border-gray-200 dark:border-zinc-800 flex items-center justify-between px-6 fixed top-0 right-0 z-10 transition-[left] duration-300 ease-in-out ${isCollapsed ? 'left-[64px]' : 'left-[240px]'}`}>
       <div className='flex justify-center flex-1'>
         {location.pathname === '/orders' && (
           <div className="h-16 ml-4">
@@ -54,6 +58,24 @@ export default function TopBar({ isCollapsed }: { isCollapsed?: boolean }) {
           <div className="h-16 ml-4">
             <ReportsTabs
               activeTab={(searchParams.get('tab') as ReportType) || 'shipment'}
+              onTabChange={(tab) => setSearchParams({ tab })}
+              className="h-full"
+            />
+          </div>
+        )}
+        {location.pathname === '/admin/cancel-order' && (
+          <div className="h-16 ml-4">
+            <CancelOrderTabs
+              activeTab={(searchParams.get('tab') as CancelOrderTabType) || 'request'}
+              onTabChange={(tab) => setSearchParams({ tab })}
+              className="h-full"
+            />
+          </div>
+        )}
+        {location.pathname === '/admin/book-pickup' && (
+          <div className="h-16 ml-4">
+            <BookPickupTabs
+              activeTab={(searchParams.get('tab') as BookPickupTabType) || 'new'}
               onTabChange={(tab) => setSearchParams({ tab })}
               className="h-full"
             />

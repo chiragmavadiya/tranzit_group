@@ -6,6 +6,8 @@ export const INVOICE_STATUS_COLORS: Record<InvoiceStatus, string> = {
   Draft: 'bg-slate-100 text-slate-700 dark:bg-slate-500/10 dark:text-slate-400',
   Pending: 'bg-red-100 text-red-700 dark:bg-red-500/10 dark:text-red-400',
   Unpaid: 'bg-red-100 text-red-700 dark:bg-red-500/10 dark:text-red-400',
+  Send: 'bg-slate-100 text-slate-700 dark:bg-slate-500/10 dark:text-slate-400',
+  Overdue: 'bg-red-100 text-red-700 dark:bg-red-500/10 dark:text-red-400',
 };
 
 export const MOCK_INVOICES: Invoice[] = [

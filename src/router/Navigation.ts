@@ -42,11 +42,11 @@ export const adminSidebarItems: SidebarItem[] = [
   { name: 'Topup Management', icon: Wallet, path: '/admin/topup' },
   { name: 'Courier Surcharge', icon: Percent, path: '/admin/courier-surcharge' },
   { name: 'Courier base Postcode', icon: MapPin, path: '/admin/courier-postcode' },
-  { name: 'Inquiry Management', icon: MessageSquare, path: '/admin/inquiries' },
+  { name: 'Enquiry Management', icon: MessageSquare, path: '/admin/enquiry' },
   { name: 'Help Center Management', icon: HelpCircle, path: '/admin/help-center' },
   { name: 'System Settings', icon: Settings, path: '/admin/settings' },
   { name: 'Admin Activity Log', icon: Activity, path: '/admin/activity-log' },
-  { name: 'Order Summary For Aus...', icon: ClipboardList, path: '/admin/order-summary' },
+  { name: 'Order Summary For Auspost', icon: ClipboardList, path: '/admin/order-summary' },
   { name: 'Undelivered Parcel', icon: PackageX, path: '/admin/undelivered' },
   { name: 'Customer Quote', icon: FileQuestion, path: '/admin/customer-quote' },
   { name: 'Profile', icon: User, path: '/admin/profile' },
@@ -64,7 +64,9 @@ export const clientSidebarItems: SidebarItem[] = [
     hasDropdown: true,
     subItems: [
       { name: 'Transactions', path: '/wallet/transactions' },
+      { name: 'Top Up', path: '/wallet/top-up' },
     ]
+
   },
   { name: 'My Items', icon: Box, path: '/items' },
   { name: 'My Address Book', icon: BookOpen, path: '/address-book' },
@@ -81,7 +83,7 @@ export const clientSidebarItems: SidebarItem[] = [
   { name: 'Enquiry', icon: MessageSquare, path: '/enquiry' },
   { name: 'Help Center', icon: HelpCircle, path: '/help-center' },
   { name: 'Parcel Report', icon: FileArchive, path: '/parcel-report' },
-  { name: 'Help', icon: LifeBuoy, path: '/help' },
+  { name: 'Help', icon: LifeBuoy, path: 'mailto:info@tranzitgroup.com.au?subject=Support Request from Portal&body=Hi Team', isExternal: true },
 ];
 
 // Fallback for existing references until fully migrated to split apps

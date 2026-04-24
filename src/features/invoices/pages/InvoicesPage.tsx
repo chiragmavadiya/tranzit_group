@@ -1,62 +1,62 @@
 import { useState, useMemo, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-// import { Plus } from 'lucide-react';
-// import { Button } from '@/components/ui/button';
 import { useAppSelector } from '@/hooks/store.hooks';
 import { InvoiceStats } from '../components/InvoiceStats';
 import { InvoiceFilters } from '../components/InvoiceFilters';
 import { InvoiceTable } from '../components/InvoiceTable';
 import { CreateInvoiceDialog } from '../components/CreateInvoiceDialog';
-import { MOCK_INVOICES } from '../constants';
-import type { InvoiceStats as InvoiceStatsType } from '../types';
+import { useCustomerInvoices, useExportCustomerInvoices } from '../hooks/useInvoices';
 
 export default function InvoicesPage() {
   const [searchTerm, setSearchTerm] = useState('');
-  const [pageSize, setPageSize] = useState('25');
+  const [pageSize, setPageSize] = useState(25);
+  const [page, setPage] = useState(1);
   const [selectedCustomer, setSelectedCustomer] = useState('');
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+
   const { role } = useAppSelector((state) => state.auth);
   const isAdmin = useMemo(() => role === 'admin', [role]);
-  const [isDialogOpen, setIsDialogOpen] = useState(false);
   const navigate = useNavigate();
 
-  const stats: InvoiceStatsType = useMemo(() => ({
-    total_invoices: 8,
-    invoice_pending: 3,
-    invoice_partial: 4,
-    invoice_paid: 1,
-    amount_pending: 2387.46,
-    amount_paid: 1561.00,
-  }), []);
+  // Connect to API hooks
+  const { data, isLoading } = useCustomerInvoices({
+    search: searchTerm || undefined,
+    page: page,
+    per_page: pageSize,
+  });
 
-  const filteredInvoices = useMemo(() => {
-    return MOCK_INVOICES.filter(invoice => {
-      const matchesSearch =
-        invoice.invoice_number.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        invoice.user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        invoice.user.email.toLowerCase().includes(searchTerm.toLowerCase());
+  const exportMutation = useExportCustomerInvoices();
 
-      const matchesCustomer = selectedCustomer === 'all' ||
-        invoice.user.name.toLowerCase().includes(selectedCustomer.toLowerCase());
+  const handleExport = useCallback((format: string) => {
+    exportMutation.mutate({ format, search: searchTerm || undefined });
+  }, [exportMutation, searchTerm]);
 
-      return matchesSearch && matchesCustomer;
-    });
-  }, [searchTerm, selectedCustomer]);
+  // Transform the API summary object to match InvoiceStats expected props
+  // const stats = data?.summary ? {
+  //   total_invoices: data.summary.total_invoice,
+  //   invoice_pending: data.summary.invoice_pending,
+  //   invoice_partial: data.summary.invoice_partial,
+  //   invoice_paid: data.summary.invoice_paid,
+  //   amount_pending: data.summary.amount_pending,
+  //   amount_paid: data.summary.amount_paid,
+  // } : undefined;
 
   const handleSearchChange = useCallback((value: string) => {
     setSearchTerm(value);
+    setPage(1); // Reset to first page on search
   }, []);
 
-  const handlePageSizeChange = useCallback((value: string | null) => {
-    if (value) setPageSize(value);
+  const handlePageSizeChange = useCallback((value: string | number | null) => {
+    if (value) {
+      setPageSize(Number(value));
+      setPage(1); // Reset to first page on page size change
+    }
   }, []);
 
   const handleCustomerChange = useCallback((value: string | null) => {
     setSelectedCustomer(value || '');
+    setPage(1);
   }, []);
-
-  // const handleAddInvoice = useCallback(() => {
-  //   setIsDialogOpen(true);
-  // }, []);
 
   const handleInvoiceCreate = useCallback((data: any) => {
     console.log('Invoice Created:', data);
@@ -68,19 +68,18 @@ export default function InvoicesPage() {
     navigate(path);
   }, [isAdmin, navigate]);
 
-
   return (
-    <div className="flex flex-col flex-1 gap-2 p-page-padding min-h-0 bg-slate-50/30 dark:bg-zinc-950/30">
+    <div className="flex flex-col flex-1 gap-4 p-page-padding min-h-0 bg-slate-50/30 dark:bg-zinc-950/30">
 
       {/* Stats Cards */}
-      <InvoiceStats stats={stats} />
+      <InvoiceStats stats={data?.summary} />
 
       {/* Main Content Area */}
       <div className="flex-1 flex flex-col min-h-0 bg-white dark:bg-zinc-900 rounded-xl shadow-sm p-0">
         {isAdmin && <InvoiceFilters
           searchTerm={searchTerm}
           onSearchChange={handleSearchChange}
-          pageSize={pageSize}
+          pageSize={pageSize.toString()}
           onPageSizeChange={handlePageSizeChange}
           isAdmin={isAdmin}
           selectedCustomer={selectedCustomer}
@@ -88,7 +87,17 @@ export default function InvoicesPage() {
         />}
 
         <InvoiceTable
-          invoices={filteredInvoices}
+          invoices={data?.data || []}
+          loading={isLoading}
+          totalItems={data?.meta?.total || 0}
+          currentPage={page}
+          pageSize={pageSize}
+          search={searchTerm}
+          onPageChange={setPage}
+          onPageSizeChange={(size) => handlePageSizeChange(size)}
+          onSearchChange={handleSearchChange}
+          onExport={handleExport}
+          isExporting={exportMutation.isPending}
           onEdit={(id) => console.log('Edit', id)}
           onDelete={(id) => console.log('Delete', id)}
           onView={handleView}

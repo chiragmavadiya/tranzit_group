@@ -59,12 +59,14 @@ export function DataTable<T extends Record<string, any>>({
   onRowClick,
   // Custom components
   customHeader,
+  headerPosition = 'right',
   headerTitle,
   headerDescription,
   headerClass,
   customFooter,
   onExport,
-  isExporting
+  isExporting,
+  exportable = true
 }: DataTableProps<T>) {
   console.log(data, columns);
   // Internal state for uncontrolled components
@@ -76,7 +78,7 @@ export function DataTable<T extends Record<string, any>>({
   const currentSearch = searchValue !== undefined ? searchValue : internalSearch;
   const currentSortConfig = sortConfig !== undefined ? sortConfig : internalSortConfig;
   const currentSelectedRows = selectedRows !== undefined ? selectedRows : internalSelectedRows;
-
+  console.log(totalItems, 'totalItems')
   // Get row identifier
   const getRowId = (row: T): string => {
     if (typeof rowKey === 'function') {
@@ -93,6 +95,7 @@ export function DataTable<T extends Record<string, any>>({
     pageSize: pageSize,
     onPageChange,
     onPageSizeChange,
+    totalItems,
   });
 
   const {
@@ -105,7 +108,10 @@ export function DataTable<T extends Record<string, any>>({
     setPageSize: setPaginationPageSize,
   } = paginationResult;
   // Use paginated data or all data based on pagination setting
-  const displayData = pagination ? paginatedData : data;
+  // If totalItems is provided, we assume server-side pagination so we don't slice the data again
+  const displayData = pagination
+    ? (totalItems !== undefined ? data : paginatedData)
+    : data;
   const actualTotalItems = totalItems || paginationTotalItems;
 
   // Handlers
@@ -171,7 +177,7 @@ export function DataTable<T extends Record<string, any>>({
 
   return (
     <div className={cn("flex flex-col group flex-1 min-h-0", className)}>
-      <div className={cn("flex w-full border-b justify-between gap-4 p-4", headerClass)}>
+      <div className={cn("flex w-full border-b justify-between gap-4 p-4 print:hidden", headerClass)}>
         <div>
           <h1 className={`text-lg font-bold text-gray-800 dark:text-zinc-200`}>
             {headerTitle}
@@ -184,6 +190,7 @@ export function DataTable<T extends Record<string, any>>({
         {(searchable || customHeader) && (
           <div className="flex items-center justify-between gap-4 bg-gray-50/50 dark:bg-transparent relative">
             <div className="flex items-center gap-2 ml-auto">
+              {headerPosition == 'left' && customHeader && (typeof customHeader === 'function' ? (customHeader as () => ReactNode)() : customHeader)}
               {searchable && (
                 <div className="relative">
                   <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
@@ -204,45 +211,47 @@ export function DataTable<T extends Record<string, any>>({
                   onValueChange={(value: string | null) => value && setPaginationPageSize(Number(value))}
                 />
               )}
-              <DropdownCustomMenu
-                menus={[
-                  {
-                    label: "Print",
-                    onClick: onExport ? () => onExport('print') : () => { },
-                    icon: Download,
-                  },
-                  {
-                    label: "CSV",
-                    onClick: onExport ? () => onExport('csv') : () => { },
-                    icon: File,
-                  },
-                  {
-                    label: "Excel",
-                    onClick: onExport ? () => onExport('excel') : () => { },
-                    icon: Upload,
-                  },
-                  {
-                    label: "PDF",
-                    onClick: onExport ? () => onExport('pdf') : () => { },
-                    icon: FileText,
-                  },
-                  {
-                    label: "Copy",
-                    onClick: () => { },
-                    icon: ClipboardCopy,
-                  },
-                ]}
-              >
-                <Button
-                  variant="outline"
-                  className="gap-2 border-gray-200 dark:border-zinc-800 hover:bg-gray-50 dark:hover:bg-zinc-800 font-medium text-slate-700 dark:text-zinc-300 transition-colors"
+              {exportable && (
+                <DropdownCustomMenu
+                  menus={[
+                    {
+                      label: "Print",
+                      onClick: () => window.print(),
+                      icon: Download,
+                    },
+                    {
+                      label: "CSV",
+                      onClick: onExport ? () => onExport('csv') : () => { },
+                      icon: File,
+                    },
+                    {
+                      label: "Excel",
+                      onClick: onExport ? () => onExport('excel') : () => { },
+                      icon: Upload,
+                    },
+                    {
+                      label: "PDF",
+                      onClick: onExport ? () => onExport('pdf') : () => { },
+                      icon: FileText,
+                    },
+                    {
+                      label: "Copy",
+                      onClick: () => { },
+                      icon: ClipboardCopy,
+                    },
+                  ]}
                 >
-                  {isExporting && <Loader2 className="w-4 h-4 animate-spin" />}
-                  {!isExporting && <Download className="w-4 h-4" />}
-                  <span>Export</span>
-                </Button>
-              </DropdownCustomMenu>
-              {typeof customHeader === 'function' ? (customHeader as () => ReactNode)() : customHeader}
+                  <Button
+                    variant="outline"
+                    className="gap-2 border-gray-200 dark:border-zinc-800 hover:bg-gray-50 dark:hover:bg-zinc-800 font-medium text-slate-700 dark:text-zinc-300 transition-colors"
+                  >
+                    {isExporting && <Loader2 className="w-4 h-4 animate-spin" />}
+                    {!isExporting && <Download className="w-4 h-4" />}
+                    <span>Export</span>
+                  </Button>
+                </DropdownCustomMenu>
+              )}
+              {headerPosition == 'right' && customHeader && (typeof customHeader === 'function' ? (customHeader as () => ReactNode)() : customHeader)}
             </div>
           </div>
         )}
@@ -270,7 +279,8 @@ export function DataTable<T extends Record<string, any>>({
                     column.sortable !== false && sortable && "cursor-pointer hover:bg-muted/50",
                     column.sticky === 'left' && "sticky left-0 bg-background z-20",
                     column.sticky === 'right' && "sticky right-0 bg-background z-20",
-                    column.className
+                    column.className,
+                    column.noPrint && 'print:hidden'
                   )}
                   style={{ width: column.width }}
                   onClick={() => column.sortable !== false && handleSort(column.key)}
@@ -341,7 +351,8 @@ export function DataTable<T extends Record<string, any>>({
                           column.sticky === 'left' && "sticky left-0 bg-background",
                           column.sticky === 'right' && "sticky right-0 bg-background",
                           column.className,
-                          cellClassName
+                          cellClassName,
+                          column.noPrint && 'print:hidden'
                         )}
                       >
                         {renderCell(column, row, index)}
@@ -364,7 +375,7 @@ export function DataTable<T extends Record<string, any>>({
           totalItems={actualTotalItems}
           onPageChange={goToPage}
           onPageSizeChange={setPaginationPageSize}
-          className="border-t"
+          className="border-t print:hidden"
           pageSizeInFooter={pageSizeInFooter}
         />
       )}

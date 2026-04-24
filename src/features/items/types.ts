@@ -46,6 +46,6 @@ export interface ItemDetailsResponse {
 
 export interface ItemsFilters {
   search?: string;
-  pageSize?: number;
+  per_page?: number;
   page?: number;
 }

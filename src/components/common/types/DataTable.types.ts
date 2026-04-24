@@ -11,6 +11,7 @@ export interface Column<T> {
   className?: string;
   sticky?: 'left' | 'right';
   hidden?: boolean;
+  noPrint?: boolean;
 }
 
 export interface SortConfig {
@@ -36,7 +37,7 @@ export interface DataTableProps<T> {
   pageSizeInFooter?: boolean;
   pageSize?: number;
   currentPage?: number;
-  totalItems?: number;
+  totalItems: number;
   onPageChange?: (page: number) => void;
   onPageSizeChange?: (pageSize: number) => void;
   // Search
@@ -62,12 +63,14 @@ export interface DataTableProps<T> {
   onRowClick?: (row: T, index: number) => void;
   // Custom components
   customHeader?: ReactNode | (() => ReactNode);
+  headerPosition?: 'left' | 'right';
   headerClass?: string;
   headerTitle?: string;
   headerDescription?: string;
   customFooter?: ReactNode | (() => ReactNode);
   onExport?: (type: "pdf" | "excel" | "print" | "csv") => void;
   isExporting?: boolean;
+  exportable?: boolean;
 }
 
 // Common cell renderer types

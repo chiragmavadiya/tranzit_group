@@ -1,35 +1,31 @@
 export type IssueCategory =
-  | 'parcel_enquiry'
-  | 'sender_and_account_enquiry'
+  | 'parcel'
+  | 'sender'
   | 'feedback'
   | '';
 
 export interface EnquiryFormData {
-  category: IssueCategory;
-  email: string;
+  issue_type: IssueCategory;
+  reply_email: string;
   message: string;
   attachments: File[];
   nature_of_issue?: string;
-  sender_receiver?: string;
+  sender_role?: string;
   local_country?: string;
-  phone_number?: string;
+  contact_number?: string;
+  feedback_category?: string;
 }
 
-export interface CategoryOption {
+export interface GenericOption {
+  value: string;
+  label: string;
+}
+
+export type CategoryOption = Omit<GenericOption, 'value'> & {
   value: IssueCategory;
-  label: string;
 }
 
-export interface ParcelEnquiryOption {
-  value: string,
-  label: string,
-}
-
-export interface SenderReceiverOption {
-  value: string;
-  label: string;
-}
-export interface CountryOption {
-  value: string;
-  label: string;
-}
+export type ParcelEnquiryOption = GenericOption
+export type SenderReceiverOption = GenericOption
+export type CountryOption = GenericOption
+export type FeedbackOption = GenericOption

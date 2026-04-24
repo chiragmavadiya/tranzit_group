@@ -25,7 +25,7 @@ export const CustomTooltip: React.FC<CustomTooltipProps> = ({
   onlyOnOverflow = undefined,
   className = "",
 }) => {
-  const container = React.useRef<HTMLSpanElement>(null);
+  const container = React.useRef<HTMLDivElement>(null);
   const [visible, setVisible] = useState(false);
   const vertical = false
 
@@ -43,21 +43,21 @@ export const CustomTooltip: React.FC<CustomTooltipProps> = ({
   };
 
   const content = (
-    <span
+    <div
       ref={container}
       className={`block min-w-0 max-w-full truncate ${className}`.trim()}
     >
       {children}
-    </span>
+    </div>
   );
 
   return (
     <Tooltip onOpenChange={handleVisibleChange} open={visible} defaultOpen={visible}>
       <TooltipTrigger
-        render={<span />}
+        render={<div />}
         className="block min-w-0 max-w-full cursor-pointer"
       >
-        {content}
+        {onlyOnOverflow ? content : children}
       </TooltipTrigger>
       <TooltipContent side={placement}>{title}</TooltipContent>
     </Tooltip>

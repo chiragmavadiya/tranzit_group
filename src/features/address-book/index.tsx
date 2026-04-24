@@ -20,7 +20,7 @@ export default function AddressBookPage() {
   const [editingAddress, setEditingAddress] = useState<AddressFormData | null>(null);
   const [deletingId, setDeletingId] = useState<number | string | null>(null);
   const [search, setSearch] = useState('');
-  const [pageSize, setPageSize] = useState(50);
+  const [pageSize, setPageSize] = useState(10);
   const [currentPage, setCurrentPage] = useState(1);
 
   // API Hooks
@@ -40,6 +40,7 @@ export default function AddressBookPage() {
   }, []);
 
   const handlePageSizeChange = useCallback((pageSize: number) => {
+    console.log(pageSize, "PAGE SIZE");
     setPageSize(pageSize);
     setCurrentPage(1);
   }, []);
@@ -155,7 +156,7 @@ export default function AddressBookPage() {
     {
       key: "actions",
       header: "ACTIONS",
-      className: "w-20 px-0 pr-3",
+      className: "w-20 px-0 pr-3 print:hidden",
       cell: (_, row) => (
         <div className="flex items-center gap-4">
           <Button variant="ghost" size="sm" className="p-0 hover:text-blue-600 bg-transparent dark:hover:bg-transparent" onClick={() => handleEditAddress(row)}>
@@ -187,7 +188,7 @@ export default function AddressBookPage() {
           headerDescription="Manage your saved addresses, contact persons, and business details."
           headerClass="h-20"
           className='pb-3'
-          totalItems={data?.meta?.total}
+          totalItems={data?.meta?.total || 0}
           currentPage={currentPage}
           onPageChange={setCurrentPage}
           onExport={onExport}

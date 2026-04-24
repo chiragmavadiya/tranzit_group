@@ -13,6 +13,16 @@ const Invoices = lazy(() => import('@/features/invoices/pages/InvoicesPage'));
 const InvoiceDetails = lazy(() => import('@/features/invoices/pages/InvoiceDocumentView'));
 const ParcelReport = lazy(() => import('@/features/reports/pages/ParcelReportPage'));
 const CustomerManagement = lazy(() => import('@/features/customers/pages/CustomerPage'));
+const CustomerDetailPage = lazy(() => import('@/features/customers/pages/CustomerDetailPage'));
+const CancelOrderPage = lazy(() => import('@/features/cancel-order/pages/CancelOrderPage'));
+const BookPickupPage = lazy(() => import('@/features/book-pickup/pages/BookPickupPage'));
+const StaffManagementPage = lazy(() => import('@/features/staff/pages/StaffManagementPage'));
+const ZohoIntegrationPage = lazy(() => import('@/features/zoho/pages/ZohoIntegrationPage'));
+const AdminTopUpPage = lazy(() => import('@/features/wallet/pages/AdminTopUpPage'));
+const CourierSurchargePage = lazy(() => import('@/features/courier-surcharge/pages/CourierSurchargePage'));
+const CourierPostcodePage = lazy(() => import('@/features/courier-postcode/pages/CourierPostcodePage'));
+const EnquiryPage = lazy(() => import('@/features/enquiries/pages/EnquiryPage'));
+const AuspostOrderSummaryPage = lazy(() => import('@/features/auspost-order-summary/pages/AuspostOrderSummaryPage'));
 
 
 
@@ -32,7 +42,19 @@ export default function AdminRoutes() {
                     </Route>
                     <Route path="setup" element={<Setup />} />
                     <Route path="customer-parcel-report" element={<ParcelReport />} />
-                    <Route path="customers" element={<CustomerManagement />} />
+                    <Route path="customers">
+                        <Route index element={<CustomerManagement />} />
+                        <Route path=":id" element={<CustomerDetailPage />} />
+                    </Route>
+                    <Route path="cancel-order" element={<CancelOrderPage />} />
+                    <Route path="book-pickup" element={<BookPickupPage />} />
+                    <Route path="staff" element={<StaffManagementPage />} />
+                    <Route path="zoho-integration" element={<ZohoIntegrationPage />} />
+                    <Route path="topup" element={<AdminTopUpPage />} />
+                    <Route path="courier-surcharge" element={<CourierSurchargePage />} />
+                    <Route path="courier-postcode" element={<CourierPostcodePage />} />
+                    <Route path="enquiry" element={<EnquiryPage />} />
+                    <Route path="order-summary" element={<AuspostOrderSummaryPage />} />
                     <Route path="search" element={<Search />} />
                     {/* Default authenticated route */}
                     <Route path="/" element={<Navigate to="/admin/dashboard" replace />} />

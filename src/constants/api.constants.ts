@@ -25,6 +25,26 @@ export const API_ENDPOINTS = {
         BASE: "/customer/address-book",
         EXPORT: "/customer/address-book/export",
         SEARCH: "/customer/address-book/search",
+    },
+    REPORTS: {
+        SHIPMENT: "/customer/report/shipment",
+        SHIPMENT_EXPORT: "/customer/report/shipment/export",
+        TRANSACTION: "/customer/report/transection",
+        TRANSACTION_EXPORT: "/customer/report/transection/export",
+        INVOICE: "/customer/report/invoice",
+        PARCELS: "/customer/report/parcels",
+        PARCELS_EXPORT: "/customer/report/parcels/Export",
+    },
+    INVOICES: {
+        BASE: "/customer/invoices",
+        EXPORT: "/customer/invoices/export",
+    },
+    ENQUIRIES: {
+        BASE: "/customer/enquiries",
+    },
+    HELP_CENTER: {
+        LIST: "/customer/help-center",
+        DETAILS: (slug: string) => `/customer/help-center/${slug}`,
     }
 };
 
@@ -46,5 +66,19 @@ export const QUERY_KEYS = {
     ADDRESS_BOOK: {
         LIST: ["address-book", "list"],
         DETAILS: (id: number | string) => ["address-book", "details", id],
+    },
+    REPORTS: {
+        SHIPMENT: ["reports", "shipment"],
+        TRANSACTION: ["reports", "transaction"],
+        INVOICE: ["reports", "invoice"],
+        PARCELS: ["reports", "parcels"],
+    },
+    INVOICES: {
+        LIST: ["invoices", "list"],
+        DETAILS: (id: number | string) => ["invoices", "details", id],
+    },
+    HELP_CENTER: {
+        LIST: ["help-center", "list"],
+        DETAILS: (slug: string) => ["help-center", "details", slug],
     }
 };

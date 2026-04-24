@@ -19,7 +19,7 @@ export default function Sidebar({ isCollapsed, setIsCollapsed }: SidebarProps) {
   const [expandedItems, setExpandedItems] = useState<string[]>([]);
   const { role } = useAppSelector((state) => state.auth);
   const location = useLocation();
-  
+
   const sidebarItems = role === 'admin' ? adminSidebarItems : clientSidebarItems;
 
   const toggleExpand = (name: string) => {
@@ -40,8 +40,8 @@ export default function Sidebar({ isCollapsed, setIsCollapsed }: SidebarProps) {
   const currentSubmenuData = sidebarItems.find(i => i.name === activeSubmenu);
 
   return (
-    <aside className={`h-screen bg-white dark:bg-zinc-950 border-r border-gray-200 dark:border-zinc-800 flex flex-col justify-between fixed top-0 left-0 z-20 transition-[width] duration-500 ease-in-out ${isCollapsed ? 'w-[64px]' : 'w-[240px]'}`}>
-      <div className="flex-1 overflow-y-auto overflow-x-hidden w-full custom-scrollbar">
+    <aside className={`print:hidden h-screen bg-white dark:bg-zinc-950 border-r border-gray-200 dark:border-zinc-800 flex flex-col justify-between fixed top-0 left-0 z-20 transition-[width] duration-500 ease-in-out ${isCollapsed ? 'w-[64px]' : 'w-[240px]'}`}>
+      <div className="flex-1 overflow-y-auto overflow-x-hidden w-full no-scrollbar">
         {/* Main Menu Header */}
         {!activeSubmenu && (
           <div className={`flex items-center justify-between h-16 ${isCollapsed ? 'px-4' : 'px-4'}`}>
@@ -106,8 +106,13 @@ export default function Sidebar({ isCollapsed, setIsCollapsed }: SidebarProps) {
             sidebarItems.map((item) => (
               <div key={item.name}>
                 <NavLink
-                  to={item.path}
+                  to={item.isExternal ? '#' : item.path}
                   onClick={(e) => {
+                    if (item.isExternal) {
+                      e.preventDefault();
+                      window.location.href = item.path;
+                      return;
+                    }
                     if (item.hasDropdown) {
                       e.preventDefault();
                       handleItemClick(item);
@@ -116,37 +121,41 @@ export default function Sidebar({ isCollapsed, setIsCollapsed }: SidebarProps) {
                   className={({ isActive }) => {
                     // Fix double active highlight for base orders menu vs create order
                     let finalActive = isActive;
+                    if (item.isExternal) finalActive = false;
                     if ((item.name === 'Orders' || item.name === 'Order Management') && location.pathname.includes('/orders/create')) {
                       finalActive = false;
                     }
-                    
+
                     return `flex items-center justify-between overflow-hidden py-[10px] px-3 border-l-4 rounded-r-md text-[13.5px] font-medium transition-colors ${finalActive && !item.hasDropdown ? 'text-blue-600 dark:text-blue-400 bg-blue-100 dark:bg-blue-900/10 border-blue-600 dark:border-blue-400' : 'text-gray-600 dark:text-zinc-400 hover:text-gray-900 dark:hover:text-zinc-100 hover:bg-gray-100 dark:hover:bg-zinc-900 border-transparent'
-                    }`
+                      }`
                   }}
                 >
                   {({ isActive }) => {
                     let finalActive = isActive;
+                    if (item.isExternal) finalActive = false;
                     if ((item.name === 'Orders' || item.name === 'Order Management') && location.pathname.includes('/orders/create')) {
                       finalActive = false;
                     }
 
                     return (
-                    <>
-                      <div className="flex items-center gap-3 w-full min-w-0">
-                        <item.icon className={`w-[18px] h-[18px] shrink-0 transition-colors ${finalActive && !item.hasDropdown ? 'text-blue-500' : 'text-gray-400 dark:text-zinc-500'}`} strokeWidth={2} />
-                        <div className={`flex items-center min-w-0 flex-1 transition-opacity duration-3000 ${isCollapsed ? 'opacity-100' : 'opacity-100'}`}>
-                          <CustomTooltip title={item.name} placement="bottom" onlyOnOverflow={true} className="flex-1">
-                            <span>{item.name}</span>
+                      <>
+                        <div className={`flex items-center gap-${!isCollapsed ? 3 : 3} w-full min-w-0 transition-all duration-300`}>
+                          <CustomTooltip title={item.name} placement="bottom" className="flex-1">
+                            <item.icon className={`w-[18px] h-[18px] shrink-0 transition-colors ${finalActive && !item.hasDropdown ? 'text-blue-500' : 'text-gray-400 dark:text-zinc-500'}`} strokeWidth={2} />
                           </CustomTooltip>
-                          {item.name === 'Getting Setup' && (
-                            <span className="ml-[6px] px-[5px] py-[2px] rounded text-[10px] bg-[#111827] dark:bg-zinc-800 text-white font-semibold leading-none shadow-sm shrink-0">Menu</span>
-                          )}
+                          <div className={`flex items-center min-w-0 flex-1 transition-opacity duration-3000 ${isCollapsed ? 'opacity-100' : 'opacity-100'}`}>
+                            <CustomTooltip title={item.name} placement="bottom" onlyOnOverflow={true} className="flex-1">
+                              <span>{item.name}</span>
+                            </CustomTooltip>
+                            {item.name === 'Getting Setup' && (
+                              <span className="ml-[6px] px-[5px] py-[2px] rounded text-[10px] bg-[#111827] dark:bg-zinc-800 text-white font-semibold leading-none shadow-sm shrink-0">Menu</span>
+                            )}
+                          </div>
                         </div>
-                      </div>
-                      {item.hasDropdown && (
-                        <ChevronDown className={`w-4 h-4 shrink-0 ml-2 transition-all duration-300 text-gray-400 dark:text-zinc-500 ${isCollapsed ? 'opacity-0' : 'opacity-100'} ${expandedItems.includes(item.name) ? 'rotate-180' : ''}`} />
-                      )}
-                    </>
+                        {item.hasDropdown && (
+                          <ChevronDown className={`w-4 h-4 shrink-0 ml-2 transition-all duration-300 text-gray-400 dark:text-zinc-500 ${isCollapsed ? 'opacity-0' : 'opacity-100'} ${expandedItems.includes(item.name) ? 'rotate-180' : ''}`} />
+                        )}
+                      </>
                     );
                   }}
                 </NavLink>

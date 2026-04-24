@@ -1,13 +1,6 @@
-import { useState, useCallback, useMemo } from 'react';
+import { useState, useCallback, useMemo, useRef, forwardRef } from 'react';
 import { Loader2 } from 'lucide-react';
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogFooter,
-} from '@/components/ui/dialog';
-import { Button } from '@/components/ui/button';
+import { CustomModel, } from '@/components/ui/dialog';
 import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
 import type { ItemFormData } from '../types';
@@ -62,65 +55,62 @@ export function CreateItemDialog({
 
   const formKey = editingItemId ? `edit-${editingItemId}-${detailsData?.data ? 'loaded' : 'loading'}` : 'new';
 
+  const formRef = useRef<HTMLFormElement>(null);
+
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[425px] bg-white dark:bg-zinc-900 border-gray-200 dark:border-zinc-800 rounded-2xl shadow-2xl p-0 overflow-hidden">
-        <ItemForm
-          key={formKey}
-          initialValues={formDataToLoad}
-          isFetching={isFetchingDetails}
-          onSubmit={onSubmit}
-          onCancel={() => onOpenChange(false)}
-          isLoading={!!isLoading}
-          isEdit={!!editingItemId}
-        />
-      </DialogContent>
-    </Dialog>
-  );
+    <CustomModel
+      title={editingItemId ? 'Edit Item' : 'Add New Item'}
+      open={open}
+      onOpenChange={onOpenChange}
+      onSubmit={() => formRef.current?.requestSubmit()}
+      onCancel={() => onOpenChange(false)}
+      isLoading={!!isLoading}
+      submitText={editingItemId ? 'Update' : 'Submit'}
+    >
+      <ItemForm
+        key={formKey}
+        ref={formRef}
+        initialValues={formDataToLoad}
+        isFetching={isFetchingDetails}
+        onSubmit={onSubmit}
+      />
+    </CustomModel>
+  )
 }
 
 interface ItemFormProps {
   initialValues: ItemFormData;
   isFetching: boolean;
   onSubmit: (data: ItemFormData) => void;
-  onCancel: () => void;
-  isLoading: boolean;
-  isEdit: boolean;
 }
 
-function ItemForm({ initialValues, isFetching, onSubmit, onCancel, isLoading, isEdit }: ItemFormProps) {
-  const [formData, setFormData] = useState<ItemFormData>(initialValues);
-  const [submited, setSubmited] = useState(false);
+const ItemForm = forwardRef<HTMLFormElement, ItemFormProps>(
+  ({ initialValues, isFetching, onSubmit }, ref) => {
+    const [formData, setFormData] = useState<ItemFormData>(initialValues);
+    const [submited, setSubmited] = useState(false);
 
-  const handleChange = useCallback((field: keyof ItemFormData, value: any) => {
-    setFormData((prev) => ({ ...prev, [field]: value }));
-  }, []);
+    const handleChange = useCallback((field: keyof ItemFormData, value: any) => {
+      setFormData((prev) => ({ ...prev, [field]: value }));
+    }, []);
 
-  const handleSubmit = useCallback((e: React.FormEvent) => {
-    e.preventDefault();
-    setSubmited(true);
+    const handleSubmit = useCallback((e?: React.FormEvent) => {
+      if (e) e.preventDefault();
+      setSubmited(true);
 
-    if (!formData.item_code || !formData.item_name || !formData.item_weight) {
-      return;
-    }
+      if (!formData.item_code || !formData.item_name || !formData.item_weight) {
+        return;
+      }
 
-    const submissionData = {
-      ...formData,
-      is_default: formData.is_default ? "on" : "off"
-    } as ItemFormData;
+      const submissionData = {
+        ...formData,
+        is_default: formData.is_default ? "on" : "off"
+      } as ItemFormData;
 
-    onSubmit(submissionData);
-  }, [formData, onSubmit]);
+      onSubmit(submissionData);
+    }, [formData, onSubmit]);
 
-  return (
-    <form onSubmit={handleSubmit} className="flex flex-col max-h-[90vh]">
-      <DialogHeader className="p-6 border-b border-gray-100 dark:border-zinc-800 bg-gray-50/50 dark:bg-zinc-900/50">
-        <DialogTitle className="text-xl font-bold text-slate-900 dark:text-zinc-100 italic!">
-          {isEdit ? 'Edit Item' : 'Add New Item'}
-        </DialogTitle>
-      </DialogHeader>
-
-      <div className="flex-1 overflow-y-auto p-6 scrollbar-thin relative">
+    return (
+      <form ref={ref} onSubmit={handleSubmit} className="flex flex-col max-h-[90vh]">
         {isFetching && (
           <div className="absolute inset-0 z-50 flex items-center justify-center bg-white/60 dark:bg-zinc-900/60 backdrop-blur-[1px]">
             <div className="flex flex-col items-center gap-2">
@@ -160,7 +150,8 @@ function ItemForm({ initialValues, isFetching, onSubmit, onCancel, isLoading, is
               value={formData.item_cubic}
               onChange={(val) => handleChange('item_cubic', Number(val))}
               placeholder="0.0000"
-              error={submited && Number(formData.item_cubic) < 0}
+              required
+              error={submited && Number(formData.item_cubic) <= 0}
               errormsg="Item cubic cannot be negative"
             />
           </div>
@@ -184,6 +175,8 @@ function ItemForm({ initialValues, isFetching, onSubmit, onCancel, isLoading, is
               onChange={(val) => handleChange('item_length', Number(val))}
               placeholder="0"
               required
+              error={submited && Number(formData.item_length) <= 0}
+              errormsg="Length must be greater than 0"
             />
           </div>
           <div className="grid gap-2">
@@ -194,6 +187,8 @@ function ItemForm({ initialValues, isFetching, onSubmit, onCancel, isLoading, is
               onChange={(val) => handleChange('item_width', Number(val))}
               placeholder="0"
               required
+              error={submited && Number(formData.item_width) <= 0}
+              errormsg="Width must be greater than 0"
             />
           </div>
           <div className="grid gap-2">
@@ -204,6 +199,8 @@ function ItemForm({ initialValues, isFetching, onSubmit, onCancel, isLoading, is
               onChange={(val) => handleChange('item_height', Number(val))}
               placeholder="0"
               required
+              error={submited && Number(formData.item_height) <= 0}
+              errormsg="Height must be greater than 0"
             />
           </div>
           <div className="flex items-center gap-3 p-1">
@@ -218,26 +215,9 @@ function ItemForm({ initialValues, isFetching, onSubmit, onCancel, isLoading, is
             </Label>
           </div>
         </div>
-      </div>
-      <DialogFooter className="gap-3 p-6 border-t border-gray-100 dark:border-zinc-800 bg-gray-50/50 dark:bg-zinc-900/50">
-        <Button
-          type="button"
-          variant="outline"
-          onClick={onCancel}
-          disabled={isLoading}
-          className="px-6 border-gray-200 dark:border-zinc-800 font-medium hover:bg-gray-100 dark:hover:bg-zinc-800 h-8"
-        >
-          Cancel
-        </Button>
-        <Button
-          type="submit"
-          disabled={isLoading}
-          className="px-8 bg-[#0060FE] hover:bg-[#0052db] text-white font-semibold transition-all shadow-md shadow-blue-100 dark:shadow-none active:scale-[0.98] h-8"
-        >
-          {isLoading ? 'Processing...' : (isEdit ? 'Save Changes' : 'Create Item')}
-        </Button>
-      </DialogFooter>
-    </form>
-  );
-}
+      </form>
+    );
+  }
+);
+
 

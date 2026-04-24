@@ -37,12 +37,17 @@ export interface InvoiceReport {
 }
 
 export interface ParcelReport {
+  sender_name?: string;
   receiver_name: string;
   receiver_full_address: string;
   tranzit_group_order_number: string;
   actual_parcel_tracking_number: string;
+  actual_australia_post_mailing_statement_no?: string;
   parcel_status: string | null;
   courier: string;
+  pickup_charge?: number;
+  extra_surcharge?: number;
+  tranzit_group_markup?: number;
   total: number;
   create_date: string;
 }
@@ -59,6 +64,8 @@ export interface ReportFilters {
   search?: string;
   per_page?: number;
   page?: number;
+  customer_id?: string;
+  invoice_type?: string;
 }
 
 export interface PaginatedResponse<T> {

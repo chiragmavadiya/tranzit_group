@@ -138,3 +138,52 @@ export const PARCEL_COLUMNS: Column<ParcelReport>[] = [
   { key: 'total', header: 'TOTAL', sortable: true },
   { key: 'create_date', header: 'CREATE DATE', sortable: true },
 ];
+
+export const ADMIN_PARCEL_COLUMNS: Column<ParcelReport>[] = [
+  {
+    key: 'sender_name',
+    header: 'CUSTOMER NAME (SENDER NAME)',
+    sortable: true,
+    searchable: true,
+    cell: (val) => <span className="font-medium text-slate-700 dark:text-zinc-300">{val || '-'}</span>
+  },
+  { key: 'receiver_name', header: 'RECEIVER NAME', sortable: true, searchable: true },
+  {
+    key: 'receiver_full_address',
+    header: 'RECEIVER FULL ADDRESS',
+    sortable: true,
+    searchable: true,
+    cell: (val) => <span className="text-xs text-slate-500 max-w-[200px] inline-block">{val}</span>
+  },
+  {
+    key: 'tranzit_group_order_number',
+    header: 'TRANZIT GROUP ORDER NUMBER',
+    sortable: true,
+    searchable: true,
+    cell: (value) => (
+      <LinkCell value={value} className="font-bold text-blue-600" path={`/admin/orders/all/${value?.replace('#', '')}`} />
+    )
+  },
+  { key: 'actual_parcel_tracking_number', header: 'ACTUAL PARCEL TRACKING NUMBER', sortable: true, searchable: true },
+  { key: 'actual_australia_post_mailing_statement_no', header: 'ACTUAL AUSTRALIA POST MAILING STATEMENT NO', sortable: true },
+  { key: 'parcel_status', header: 'PARCEL STATUS', sortable: true },
+  { key: 'courier', header: 'COURIER', sortable: true },
+  {
+    key: 'pickup_charge',
+    header: 'PICKUP CHARGE',
+    sortable: true,
+    cell: (val) => val ? `$${Number(val).toFixed(2)}` : '-'
+  },
+  {
+    key: 'extra_surcharge',
+    header: 'EXTRA SURCHARGE',
+    sortable: true,
+    cell: (val) => val ? `$${Number(val).toFixed(2)}` : '$0.00'
+  },
+  {
+    key: 'tranzit_group_markup',
+    header: 'TRANZIT GROUP MARKUP',
+    sortable: true,
+    cell: (val) => val ? `$${Number(val).toFixed(2)}` : '$0.00'
+  },
+];

@@ -65,7 +65,8 @@ export function DataTable<T extends Record<string, any>>({
   headerClass,
   customFooter,
   onExport,
-  isExporting
+  isExporting,
+  exportable = true
 }: DataTableProps<T>) {
   console.log(data, columns);
   // Internal state for uncontrolled components
@@ -210,44 +211,46 @@ export function DataTable<T extends Record<string, any>>({
                   onValueChange={(value: string | null) => value && setPaginationPageSize(Number(value))}
                 />
               )}
-              <DropdownCustomMenu
-                menus={[
-                  {
-                    label: "Print",
-                    onClick: () => window.print(),
-                    icon: Download,
-                  },
-                  {
-                    label: "CSV",
-                    onClick: onExport ? () => onExport('csv') : () => { },
-                    icon: File,
-                  },
-                  {
-                    label: "Excel",
-                    onClick: onExport ? () => onExport('excel') : () => { },
-                    icon: Upload,
-                  },
-                  {
-                    label: "PDF",
-                    onClick: onExport ? () => onExport('pdf') : () => { },
-                    icon: FileText,
-                  },
-                  {
-                    label: "Copy",
-                    onClick: () => { },
-                    icon: ClipboardCopy,
-                  },
-                ]}
-              >
-                <Button
-                  variant="outline"
-                  className="gap-2 border-gray-200 dark:border-zinc-800 hover:bg-gray-50 dark:hover:bg-zinc-800 font-medium text-slate-700 dark:text-zinc-300 transition-colors"
+              {exportable && (
+                <DropdownCustomMenu
+                  menus={[
+                    {
+                      label: "Print",
+                      onClick: () => window.print(),
+                      icon: Download,
+                    },
+                    {
+                      label: "CSV",
+                      onClick: onExport ? () => onExport('csv') : () => { },
+                      icon: File,
+                    },
+                    {
+                      label: "Excel",
+                      onClick: onExport ? () => onExport('excel') : () => { },
+                      icon: Upload,
+                    },
+                    {
+                      label: "PDF",
+                      onClick: onExport ? () => onExport('pdf') : () => { },
+                      icon: FileText,
+                    },
+                    {
+                      label: "Copy",
+                      onClick: () => { },
+                      icon: ClipboardCopy,
+                    },
+                  ]}
                 >
-                  {isExporting && <Loader2 className="w-4 h-4 animate-spin" />}
-                  {!isExporting && <Download className="w-4 h-4" />}
-                  <span>Export</span>
-                </Button>
-              </DropdownCustomMenu>
+                  <Button
+                    variant="outline"
+                    className="gap-2 border-gray-200 dark:border-zinc-800 hover:bg-gray-50 dark:hover:bg-zinc-800 font-medium text-slate-700 dark:text-zinc-300 transition-colors"
+                  >
+                    {isExporting && <Loader2 className="w-4 h-4 animate-spin" />}
+                    {!isExporting && <Download className="w-4 h-4" />}
+                    <span>Export</span>
+                  </Button>
+                </DropdownCustomMenu>
+              )}
               {headerPosition == 'right' && customHeader && (typeof customHeader === 'function' ? (customHeader as () => ReactNode)() : customHeader)}
             </div>
           </div>
@@ -276,7 +279,8 @@ export function DataTable<T extends Record<string, any>>({
                     column.sortable !== false && sortable && "cursor-pointer hover:bg-muted/50",
                     column.sticky === 'left' && "sticky left-0 bg-background z-20",
                     column.sticky === 'right' && "sticky right-0 bg-background z-20",
-                    column.className
+                    column.className,
+                    column.noPrint && 'print:hidden'
                   )}
                   style={{ width: column.width }}
                   onClick={() => column.sortable !== false && handleSort(column.key)}
@@ -347,7 +351,8 @@ export function DataTable<T extends Record<string, any>>({
                           column.sticky === 'left' && "sticky left-0 bg-background",
                           column.sticky === 'right' && "sticky right-0 bg-background",
                           column.className,
-                          cellClassName
+                          cellClassName,
+                          column.noPrint && 'print:hidden'
                         )}
                       >
                         {renderCell(column, row, index)}

@@ -11,6 +11,7 @@ export interface Column<T> {
   className?: string;
   sticky?: 'left' | 'right';
   hidden?: boolean;
+  noPrint?: boolean;
 }
 
 export interface SortConfig {
@@ -69,6 +70,7 @@ export interface DataTableProps<T> {
   customFooter?: ReactNode | (() => ReactNode);
   onExport?: (type: "pdf" | "excel" | "print" | "csv") => void;
   isExporting?: boolean;
+  exportable?: boolean;
 }
 
 // Common cell renderer types

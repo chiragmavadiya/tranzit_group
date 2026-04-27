@@ -1,4 +1,4 @@
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import {
   User,
   MapPin,
@@ -12,7 +12,9 @@ import {
   Mail,
   Receipt,
   Wallet,
-  Box
+  Box,
+  Pencil,
+  Loader2
 } from "lucide-react"
 import {
   Dialog,
@@ -27,10 +29,12 @@ import { Stepper, type Step } from "@/components/ui/stepper"
 import { FormInput, FormSelect } from "@/features/orders/components/OrderFormUI"
 import { toast } from "sonner"
 import { STATES } from "../constants"
+import { useCreateCustomer, useUpdateCustomer, useCustomerEditDetails } from "../hooks/useCustomers"
 
-interface AddCustomerDialogProps {
+interface CustomerDialogProps {
   open: boolean
   onOpenChange: (open: boolean) => void
+  customerId?: string | number // If provided, we are in Edit mode
 }
 
 const STEPS: Step[] = [
@@ -49,84 +53,65 @@ const STREET_TYPES = [
   { label: "Highway", value: "Hwy" },
 ];
 
-export default function AddCustomerDialog({ open, onOpenChange }: AddCustomerDialogProps) {
-  const [currentStep, setCurrentStep] = useState(0)
-  const [formData, setFormData] = useState({
-    first_name: "",
-    last_name: "",
-    email: "",
-    mobile: "",
-    business_name: "",
-    gst_number: "",
-    billing_address: "",
-    billing_street_name: "",
-    billing_street_number: "",
-    billing_street_type: "",
-    billing_suburb: "",
-    billing_state: "",
-    billing_postcode: "",
-    address: "",
-    street_name: "",
-    street_number: "",
-    street_type: "",
-    suburb: "",
-    state: "",
-    postcode: "",
-    direct_freight_active: 0,
-    direct_freight_markup_charge: 0,
-    direct_freight_pickup_charge: 0,
-    auspost_active: 0,
-    auspost_markup_charge: 0,
-    auspost_pickup_charge: 0,
-    pallet_active: 0,
-    pallet_markup_charge: 0,
-    pallet_pickup_charge: 0,
-    topup_enable: false,
-    order_prefix: ""
-  })
-  // const [formData, setFormData] = useState({
-  //   // Personal
-  //   first_name: "",
-  //   last_name: "",
-  //   email: "",
-  //   mobile: "",
-  //   office_number: "",
-  //   // Business
-  //   business_name: "",
-  //   gst_number: "",
-  //   order_prefix: "",
-  //   // Billing Address
-  //   billing_address: "",
-  //   billing_street_number: "",
-  //   billing_street_name: "",
-  //   billing_street_type: "",
-  //   billing_suburb: "",
-  //   billing_state: "",
-  //   billing_postcode: "",
-  //   // Shipping Address
-  //   address: "",
-  //   street_number: "",
-  //   street_name: "",
-  //   street_type: "",
-  //   suburb: "",
-  //   state: "",
-  //   postcode: "",
-  //   // Shipping Settings
-  //   direct_freight_express_active: 0,
-  //   direct_freight_express_markup_charge: 0,
-  //   direct_freight_express_pickup_charge: 0,
-  //   auspost_active: 0,
-  //   auspost_markup_charge: 0,
-  //   auspost_pickup_charge: 0,
-  //   pallet_active: 0,
-  //   pallet_markup_charge: 0,
-  //   pallet_pickup_charge: 0,
-  //   topup_enable: false,
-  // })
-  const [submited, setSubmited] = useState(false)
+const INITIAL_FORM_DATA = {
+  first_name: "",
+  last_name: "",
+  email: "",
+  mobile: "",
+  business_name: "",
+  gst_number: "",
+  billing_address: "",
+  billing_street_name: "",
+  billing_street_number: "",
+  billing_street_type: "",
+  billing_suburb: "",
+  billing_state: "",
+  billing_postcode: "",
+  address: "",
+  street_name: "",
+  street_number: "",
+  street_type: "",
+  suburb: "",
+  state: "",
+  postcode: "",
+  direct_freight_active: 0,
+  direct_freight_markup_charge: 0,
+  direct_freight_pickup_charge: 0,
+  auspost_active: 0,
+  auspost_markup_charge: 0,
+  auspost_pickup_charge: 0,
+  pallet_active: 0,
+  pallet_markup_charge: 0,
+  pallet_pickup_charge: 0,
+  topup_enable: false,
+  order_prefix: ""
+};
 
+export default function CustomerDialog({ open, onOpenChange, customerId }: CustomerDialogProps) {
+  const isEdit = !!customerId
+  const [currentStep, setCurrentStep] = useState(0)
+  const [formData, setFormData] = useState(INITIAL_FORM_DATA)
+  const [submited, setSubmited] = useState(false)
   const [errors, setErrors] = useState<Record<string, string>>({})
 
+  const { mutate: createCustomer, isPending: isCreating } = useCreateCustomer();
+  const { mutate: updateCustomer, isPending: isUpdating } = useUpdateCustomer();
+  const { data: editData, isLoading: isLoadingDetails } = useCustomerEditDetails(customerId || "");
+
+  useEffect(() => {
+    if (isEdit && editData?.data) {
+      queueMicrotask(() => {
+        setFormData(editData.data);
+      });
+    } else if (!isEdit && open) {
+      queueMicrotask(() => {
+        setFormData(INITIAL_FORM_DATA);
+        setCurrentStep(0);
+        setErrors({});
+        setSubmited(false);
+      })
+    }
+  }, [isEdit, editData, open]);
 
   const handleChange = (field: string, value: any) => {
     setFormData((prev) => ({ ...prev, [field]: value }))
@@ -153,12 +138,32 @@ export default function AddCustomerDialog({ open, onOpenChange }: AddCustomerDia
   }
 
   const handleSubmit = () => {
-    console.log("Submitting Customer Data:", formData)
-    toast.success("Customer added successfully!")
-    onOpenChange(false)
-    setCurrentStep(0)
-    setErrors({})
+    const mutation = isEdit ? updateCustomer : createCustomer;
+    const variables = isEdit ? { id: customerId!, data: formData as any } : (formData as any);
+
+    mutation(variables, {
+      onSuccess: () => {
+        toast.success(isEdit ? "Customer updated successfully!" : "Customer added successfully!")
+        onOpenChange(false)
+      },
+      onError: (error: any) => {
+        toast.error(`Failed to ${isEdit ? 'update' : 'add'} customer. Please check the form.`);
+        if (error?.response?.data?.errors) {
+          const beErrors = error.response.data.errors;
+          const formattedErrors: Record<string, string> = {};
+          Object.keys(beErrors).forEach(key => {
+            formattedErrors[key] = beErrors[key][0];
+          });
+          setErrors(formattedErrors);
+          if (formattedErrors.email || formattedErrors.order_prefix) {
+            setCurrentStep(0);
+          }
+        }
+      }
+    });
   }
+
+  const isPending = isCreating || isUpdating;
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -166,11 +171,13 @@ export default function AddCustomerDialog({ open, onOpenChange }: AddCustomerDia
         <DialogHeader className="px-6 pt-6 pb-2">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-2xl bg-blue-50 dark:bg-blue-500/10 flex items-center justify-center text-blue-600 dark:text-blue-400">
-              <Plus className="w-5 h-5" />
+              {isEdit ? <Pencil className="w-5 h-5" /> : <Plus className="w-5 h-5" />}
             </div>
             <div>
-              <DialogTitle className="text-xl font-bold">Add New Customer</DialogTitle>
-              <p className="text-xs text-muted-foreground mt-1">Fill in the details to onboard a new customer.</p>
+              <DialogTitle className="text-xl font-bold">{isEdit ? "Update Customer" : "Add New Customer"}</DialogTitle>
+              <p className="text-xs text-muted-foreground mt-1">
+                {isEdit ? "Update the customer profile details." : "Fill in the details to onboard a new customer."}
+              </p>
             </div>
           </div>
         </DialogHeader>
@@ -178,6 +185,14 @@ export default function AddCustomerDialog({ open, onOpenChange }: AddCustomerDia
         <Stepper steps={STEPS} currentStep={currentStep} className="my-2" />
 
         <div className="px-8 py-6 max-h-[60vh] overflow-y-auto no-scrollbar">
+          {isLoadingDetails && (
+            <div className="absolute inset-0 z-50 flex items-center justify-center bg-white/60 dark:bg-zinc-900/60 backdrop-blur-[1px]">
+              <div className="flex flex-col items-center gap-2">
+                <Loader2 className="h-8 w-8 text-blue-600 animate-spin" />
+                <p className="text-xs font-bold text-slate-500 uppercase tracking-widest">Loading customer details...</p>
+              </div>
+            </div>
+          )}
           {currentStep === 0 && (
             <div className="grid grid-cols-12 gap-x-5 gap-y-4 animate-in fade-in slide-in-from-right-4 duration-300">
               <FormInput
@@ -207,8 +222,8 @@ export default function AddCustomerDialog({ open, onOpenChange }: AddCustomerDia
                 placeholder="name@company.com"
                 value={formData.email}
                 onChange={(val) => handleChange("email", val)}
-                error={submited && !formData.email.trim()}
-                errormsg="Email is required"
+                error={(submited && !formData.email?.trim()) || !!errors.email}
+                errormsg={errors.email || "Email is required"}
               />
               <FormInput
                 label="Mobile Number"
@@ -217,16 +232,9 @@ export default function AddCustomerDialog({ open, onOpenChange }: AddCustomerDia
                 placeholder="0412 345 678"
                 value={formData.mobile}
                 onChange={(val) => handleChange("mobile", val)}
-                error={submited && !formData.mobile.trim()}
+                error={submited && !formData.mobile?.trim()}
                 errormsg="Mobile number is required"
               />
-              {/* <FormInput
-                label="Office Number"
-                icon={Phone}
-                placeholder="0412 345 678"
-                value={formData.office_number}
-                onChange={(val) => handleChange("office_number", val)}
-              /> */}
               <FormInput
                 label="Business Name"
                 icon={Building2}
@@ -234,7 +242,7 @@ export default function AddCustomerDialog({ open, onOpenChange }: AddCustomerDia
                 placeholder="Legal business name"
                 value={formData.business_name}
                 onChange={(val) => handleChange("business_name", val)}
-                error={submited && !formData.business_name.trim()}
+                error={submited && !formData.business_name?.trim()}
                 errormsg="Business name is required"
               />
               <FormInput
@@ -251,8 +259,8 @@ export default function AddCustomerDialog({ open, onOpenChange }: AddCustomerDia
                 required
                 value={formData.order_prefix}
                 onChange={(val) => handleChange("order_prefix", val)}
-                error={!!errors.order_prefix}
-                errormsg={errors.order_prefix}
+                error={submited && !formData.order_prefix?.trim()}
+                errormsg="Order prefix is required"
               />
             </div>
           )}
@@ -403,14 +411,14 @@ export default function AddCustomerDialog({ open, onOpenChange }: AddCustomerDia
                         label="Markup Charge ($)"
                         isHalf
                         type="number"
-                        value={formData.direct_freight_markup_charge.toString()}
+                        value={formData.direct_freight_markup_charge?.toString()}
                         onChange={(val) => handleChange("direct_freight_markup_charge", parseInt(val) || 0)}
                       />
                       <FormInput
                         label="Pickup Charge ($)"
                         isHalf
                         type="number"
-                        value={formData.direct_freight_pickup_charge.toString()}
+                        value={formData.direct_freight_pickup_charge?.toString()}
                         onChange={(val) => handleChange("direct_freight_pickup_charge", parseInt(val) || 0)}
                       />
                     </div>
@@ -437,14 +445,14 @@ export default function AddCustomerDialog({ open, onOpenChange }: AddCustomerDia
                         label="Markup Charge ($)"
                         isHalf
                         type="number"
-                        value={formData.auspost_markup_charge.toString()}
+                        value={formData.auspost_markup_charge?.toString()}
                         onChange={(val) => handleChange("auspost_markup_charge", parseInt(val) || 0)}
                       />
                       <FormInput
                         label="Pickup Charge ($)"
                         isHalf
                         type="number"
-                        value={formData.auspost_pickup_charge.toString()}
+                        value={formData.auspost_pickup_charge?.toString()}
                         onChange={(val) => handleChange("auspost_pickup_charge", parseInt(val) || 0)}
                       />
                     </div>
@@ -471,14 +479,14 @@ export default function AddCustomerDialog({ open, onOpenChange }: AddCustomerDia
                         label="Markup Charge ($)"
                         isHalf
                         type="number"
-                        value={formData.pallet_markup_charge.toString()}
+                        value={formData.pallet_markup_charge?.toString()}
                         onChange={(val) => handleChange("pallet_markup_charge", parseInt(val) || 0)}
                       />
                       <FormInput
                         label="Pickup Charge ($)"
                         isHalf
                         type="number"
-                        value={formData.pallet_pickup_charge.toString()}
+                        value={formData.pallet_pickup_charge?.toString()}
                         onChange={(val) => handleChange("pallet_pickup_charge", parseInt(val) || 0)}
                       />
                     </div>
@@ -521,10 +529,15 @@ export default function AddCustomerDialog({ open, onOpenChange }: AddCustomerDia
             {currentStep === STEPS.length - 1 ? (
               <Button
                 onClick={handleSubmit}
+                disabled={isPending}
                 className="rounded-lg h-8 px-6 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold uppercase tracking-wider shadow-lg shadow-blue-500/20"
               >
-                <Check className="mr-2 h-3.5 w-3.5" />
-                Complete
+                {isPending ? (
+                  <span className="w-3.5 h-3.5 border-2 border-white/30 border-t-white rounded-full animate-spin mr-2" />
+                ) : (
+                  <Check className="mr-2 h-3.5 w-3.5" />
+                )}
+                {isEdit ? "Update" : "Complete"}
               </Button>
             ) : (
               <Button
@@ -541,3 +554,4 @@ export default function AddCustomerDialog({ open, onOpenChange }: AddCustomerDia
     </Dialog>
   )
 }
+

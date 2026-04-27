@@ -160,7 +160,7 @@ export function QuoteForm({ items, setItems, setLocations, onGetRate, isValid }:
                       </Select> */}
                       <SelectComponent
                         value={item.type}
-                        onValueChange={(val: string | null) => val && updateItem(item.id, 'type', val)}
+                        onValueChange={(val: string | null) => val && updateItem(item.id || '', 'type', val)}
                         data={[
                           { label: 'Parcel', value: 'Parcel' },
                           { label: 'Document', value: 'Document' },
@@ -174,7 +174,7 @@ export function QuoteForm({ items, setItems, setLocations, onGetRate, isValid }:
                       <Input
                         type="number"
                         value={item.qty}
-                        onChange={(e) => updateItem(item.id, 'qty', Math.max(1, parseInt(e.target.value) || 0))}
+                        onChange={(e) => updateItem(item.id || '', 'qty', Math.max(1, parseInt(e.target.value) || 0))}
                         // className="h-7 w-full text-center text-xs group-hover/row:border-gray-200 dark:group-hover/row:border-zinc-800 focus:border-blue-600 focus:bg-white dark:focus:bg-zinc-950 focus-visible:ring-1 focus-visible:ring-blue-600 transition-all font-medium py-0 px-2"
                         className="h-7 min-w-15"
                         min={1}
@@ -185,7 +185,7 @@ export function QuoteForm({ items, setItems, setLocations, onGetRate, isValid }:
                         type="number"
                         placeholder="kg"
                         value={item.weight || ''}
-                        onChange={(e) => updateItem(item.id, 'weight', Math.max(0, parseFloat(e.target.value) || 0))}
+                        onChange={(e) => updateItem(item.id || '', 'weight', Math.max(0, parseFloat(e.target.value) || 0))}
                         // className="h-7 w-full text-xs group-hover/row:border-gray-200 dark:group-hover/row:border-zinc-800 dark:focus:bg-zinc-950 focus-visible:ring-1 focus-visible:ring-blue-600 transition-all font-medium py-0 px-2"
                         className="h-7"
                         min={0}
@@ -196,7 +196,7 @@ export function QuoteForm({ items, setItems, setLocations, onGetRate, isValid }:
                         type="number"
                         placeholder="cm"
                         value={item.length || ''}
-                        onChange={(e) => updateItem(item.id, 'length', Math.max(0, parseFloat(e.target.value) || 0))}
+                        onChange={(e) => updateItem(item.id || '', 'length', Math.max(0, parseFloat(e.target.value) || 0))}
                         // className="h-7 w-full text-xs group-hover/row:border-gray-200 dark:group-hover/row:border-zinc-800 focus:border-blue-600 focus:bg-white dark:focus:bg-zinc-950 focus-visible:ring-1 focus-visible:ring-blue-600 transition-all font-medium py-0 px-2"
                         className="h-7"
                         min={0}
@@ -207,7 +207,7 @@ export function QuoteForm({ items, setItems, setLocations, onGetRate, isValid }:
                         type="number"
                         placeholder="cm"
                         value={item.width || ''}
-                        onChange={(e) => updateItem(item.id, 'width', Math.max(0, parseFloat(e.target.value) || 0))}
+                        onChange={(e) => updateItem(item.id || '', 'width', Math.max(0, parseFloat(e.target.value) || 0))}
                         // className="h-7 w-full text-xs group-hover/row:border-gray-200 dark:group-hover/row:border-zinc-800 focus:border-blue-600 focus:bg-white dark:focus:bg-zinc-950 focus-visible:ring-1 focus-visible:ring-blue-600 transition-all font-medium py-0 px-2"
                         className="h-7"
                         min={0}
@@ -218,7 +218,7 @@ export function QuoteForm({ items, setItems, setLocations, onGetRate, isValid }:
                         type="number"
                         placeholder="cm"
                         value={item.height || ''}
-                        onChange={(e) => updateItem(item.id, 'height', Math.max(0, parseFloat(e.target.value) || 0))}
+                        onChange={(e) => updateItem(item.id || '', 'height', Math.max(0, parseFloat(e.target.value) || 0))}
                         // className="h-7 w-full text-xs group-hover/row:border-gray-200 dark:group-hover/row:border-zinc-800 focus:border-blue-600 focus:bg-white dark:focus:bg-zinc-950 focus-visible:ring-1 focus-visible:ring-blue-600 transition-all font-medium py-0 px-2"
                         className="h-7"
                         min={0}
@@ -228,7 +228,7 @@ export function QuoteForm({ items, setItems, setLocations, onGetRate, isValid }:
                       <Button
                         variant="ghost"
                         size="icon"
-                        onClick={() => removeItem(item.id)}
+                        onClick={() => removeItem(item.id || '')}
                         disabled={items.length === 1}
                         className="h-8 w-8 text-slate-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-950/20 rounded-md transition-colors"
                       >

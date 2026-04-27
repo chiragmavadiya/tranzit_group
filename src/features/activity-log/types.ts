@@ -1,26 +1,27 @@
 export interface ActivityLog {
-    id: string;
-    index: number;
-    dateTime: string;
-    adminName: string;
-    adminRole: string;
+    date: string;
+    admin: string;
     email: string;
-    action: 'Created' | 'Updated' | 'Deleted' | 'Logged In' | 'Logged Out';
-    model: string;
+    action: string; // created, updated, deleted, status_changed, verified, settings_updated
     description: string;
-    details: {
-        modelId?: string;
-        route: string;
-        ip: string;
+    model_type: string;
+    model_id: number;
+    route: string | null;
+    ip_address: string;
+    changes?: {
+        old_status?: string;
+        new_status?: string;
+        [key: string]: any;
     };
 }
 
 export interface ActivityLogFilters {
     role?: string;
     action?: string;
-    startDate?: string;
-    endDate?: string;
+    from_date?: string;
+    to_date?: string;
     search?: string;
     page: number;
-    perPage: number;
+    per_page: number;
 }
+

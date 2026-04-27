@@ -2,7 +2,6 @@
 
 import * as React from "react";
 import { Popover } from "@base-ui/react/popover";
-import { Input } from "@/components/ui/input";
 import {
     Command,
     CommandGroup,
@@ -10,6 +9,8 @@ import {
     CommandList,
 } from "@/components/ui/command";
 import { cn } from "@/lib/utils";
+import { FormInput } from "@/features/orders/components/OrderFormUI";
+import { Search } from "lucide-react";
 
 export interface AutoCompleteOption {
     value: string;
@@ -73,8 +74,8 @@ const AutoComplete = React.forwardRef<HTMLInputElement, AutoCompleteProps>(
         );
 
         const handleInputChange = React.useCallback(
-            (e: React.ChangeEvent<HTMLInputElement>) => {
-                const newValue = e.target.value;
+            (value: string) => {
+                const newValue = value;
                 setInputValue(newValue);
                 onChange?.(newValue);
                 onSearch?.(newValue);
@@ -91,7 +92,7 @@ const AutoComplete = React.forwardRef<HTMLInputElement, AutoCompleteProps>(
         }, []);
 
         return (
-            <div className={cn("relative w-full", className)}>
+            <div className={cn("relative w-full")}>
                 <Popover.Root
                     open={open}
                     onOpenChange={setOpen}
@@ -100,14 +101,16 @@ const AutoComplete = React.forwardRef<HTMLInputElement, AutoCompleteProps>(
                     <Popover.Trigger
                         render={(props) => (
                             <div {...props}>
-                                <Input
+                                {/* <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" /> */}
+                                <FormInput
                                     ref={ref}
+                                    icon={Search}
                                     value={controlledValue}
                                     onChange={handleInputChange}
                                     onFocus={handleFocus}
                                     placeholder={placeholder}
                                     disabled={disabled}
-                                    className="w-full"
+                                    className={cn("w-full", className)}
                                 />
                             </div>
                         )}

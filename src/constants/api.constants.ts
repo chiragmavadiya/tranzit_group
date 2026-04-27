@@ -45,6 +45,36 @@ export const API_ENDPOINTS = {
     HELP_CENTER: {
         LIST: "/customer/help-center",
         DETAILS: (slug: string) => `/customer/help-center/${slug}`,
+    },
+    ADMIN_CUSTOMERS: {
+        BASE: "/admin/customers",
+        DETAILS: (id: string | number) => `/admin/customers/${id}`,
+        EDIT: (id: string | number) => `/admin/customers/${id}/edit`,
+        PROFILE: (id: string | number) => `/admin/customers/${id}/profile`,
+        ORDERS: (id: string | number) => `/admin/customers/${id}/orders`,
+        TRANSACTION: (id: string | number) => `/admin/customers/${id}/transaction`,
+        INVOICE: (id: string | number) => `/admin/customers/${id}/invoice`,
+        VERIFY: (id: string | number) => `/admin/customers/${id}/verify`,
+        TOGGLE_STATUS: (id: string | number) => `/admin/customers/${id}/toggle-status`,
+        ZOHO_SYNC: (id: string | number) => `/admin/customers/${id}/zoho-sync`,
+        EXPORT: "/admin/customers/export",
+        ORDERS_EXPORT: (id: string | number) => `/admin/customers/${id}/orders/export`,
+        TRANSACTION_EXPORT: (id: string | number) => `/admin/customers/${id}/transaction/export`,
+        INVOICE_EXPORT: (id: string | number) => `/admin/customers/${id}/invoice/export`,
+    },
+    ADMIN_ACTIVITIES: {
+        BASE: "/admin/activities",
+    },
+    ADMIN_COURIER_POSTCODES: {
+        BASE: "/admin/courier-postcodes",
+        DETAILS: (id: string | number) => `/admin/courier-postcodes/${id}`,
+        EXPORT: "/admin/courier-postcodes/export",
+    },
+    ADMIN_QUOTES: {
+        BASE: "/admin/quotes",
+        DETAILS: (id: string | number) => `/admin/quotes/${id}`,
+        SERVICES: "/admin/quotes/services",
+        EXPORT: "/admin/quotes/export",
     }
 };
 
@@ -80,5 +110,24 @@ export const QUERY_KEYS = {
     HELP_CENTER: {
         LIST: ["help-center", "list"],
         DETAILS: (slug: string) => ["help-center", "details", slug],
+    },
+    ADMIN_CUSTOMERS: {
+        LIST: ["admin", "customers", "list"],
+        DETAILS: (id: string | number) => ["admin", "customers", "details", id],
+        PROFILE: (id: string | number) => ["admin", "customers", "profile", id],
+        ORDERS: (id: string | number) => ["admin", "customers", "orders", id],
+        TRANSACTION: (id: string | number) => ["admin", "customers", "transaction", id],
+        INVOICE: (id: string | number) => ["admin", "customers", "invoice", id],
+    },
+    ADMIN_ACTIVITIES: {
+        LIST: ["admin", "activities", "list"],
+    },
+    ADMIN_COURIER_POSTCODES: {
+        LIST: ["admin", "courier-postcodes", "list"],
+        DETAILS: (id: string | number) => ["admin", "courier-postcodes", "details", id],
+    },
+    ADMIN_QUOTES: {
+        LIST: ["admin", "quotes", "list"],
+        DETAILS: (id: string | number) => ["admin", "quotes", "details", id],
     }
 };

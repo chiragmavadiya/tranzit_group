@@ -2,7 +2,7 @@ import { FileText } from 'lucide-react';
 import type { ActivityItem } from './types';
 
 export const SectionHeader = ({ title, icon: Icon }: { title: string, icon: any }) => (
-    <div className="flex items-center gap-2 mb-6">
+    <div className="flex items-center gap-2">
         <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-blue-50 dark:bg-blue-500/10 text-blue-600 dark:text-blue-400">
             <Icon className="h-4 w-4" />
         </div>
@@ -12,7 +12,7 @@ export const SectionHeader = ({ title, icon: Icon }: { title: string, icon: any 
 
 export const DetailItem = ({ label, value, icon: Icon }: { label: string, value: string, icon: any }) => (
     <div className="flex items-start gap-3 py-1.5">
-        <Icon className="h-4 w-4 text-slate-400 shrink-0 mt-0.5" />
+        <Icon className="h-4 w-4 text-slate-400 shrink-0 -mt-[4px]" />
         <div className="flex flex-col">
             <span className="text-[10px] font-bold text-slate-400 dark:text-zinc-500 uppercase tracking-wider leading-none mb-1">{label}</span>
             <span className="text-sm font-semibold text-slate-700 dark:text-zinc-300">{value}</span>

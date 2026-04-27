@@ -47,7 +47,7 @@ export const Required = () => {
 }
 
 
-export function FormInput({
+export const FormInput = React.forwardRef<HTMLInputElement, FormInputProps>(({
   label,
   value,
   onChange,
@@ -62,12 +62,13 @@ export function FormInput({
   className, disabled = false,
   error,
   errormsg,
-  rightElement
-}: FormInputProps) {
+  // rightElement
+}, ref) => {
+  const [showPassword, setShowPassword] = React.useState(false);
   const isHorizontal = useMemo(() => layout === 'horizontal', [layout]);
 
   const handleChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-    onChange(e.target.value);
+    onChange(e.target.value, e.target.name || '');
   }, [onChange]);
 
   return (
@@ -87,33 +88,42 @@ export function FormInput({
       )}
       <div className="relative group">
         {Icon && (
-          <div className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-blue-600 transition-colors">
+          <div className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-blue-600 transition-colors">
             <Icon className="w-4 h-4" />
           </div>
         )}
         <Input
-          type={type}
+          ref={ref}
+          type={showPassword ? 'text' : type}
           placeholder={placeholder}
           value={value}
           onChange={handleChange}
           className={cn(
-            "h-8 rounded-md border-slate-200 dark:border-zinc-800 bg-white dark:bg-zinc-950 font-medium focus-visible:ring-0 focus-visible:ring-blue-600 focus-visible:border-blue-600 transition-all placeholder:text-slate-300 dark:placeholder:text-zinc-700 text-sm",
+            "h-8 rounded-md border-slate-200 dark:border-zinc-800 bg-white dark:bg-zinc-950 font-medium focus-visible:ring-0 focus-visible:ring-blue-600 focus-visible:border-blue-600 transition-all placeholder:text-muted-foreground placeholder:font-normal dark:placeholder:text-zinc-700 text-sm",
             Icon ? "pl-9" : "px-3",
-            rightElement ? "pr-10" : "",
+            type === 'password' ? "pr-10" : "",
             error ? "border-red-500 focus-visible:border-red-500" : ""
           )}
           disabled={disabled}
         />
-        {rightElement && (
-          <div className="absolute right-0 top-1/2 -translate-y-1/2 flex items-center h-full">
-            {rightElement}
-          </div>
+        {type === 'password' && (
+          <button
+            type="button"
+            onClick={() => setShowPassword(!showPassword)}
+            className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 transition-colors"
+          >
+            {showPassword ? (
+              <LucideIcons.Eye className="h-4 w-4" />
+            ) : (
+              <LucideIcons.EyeOff className="h-4 w-4" />
+            )}
+          </button>
         )}
       </div>
       {error ? <div className="text-red-500 text-[11px] w-full text-right">{errormsg}</div> : null}
     </div>
   );
-}
+});
 
 
 export function FormTextarea({
@@ -131,7 +141,7 @@ export function FormTextarea({
   const isHorizontal = useMemo(() => layout === 'horizontal', [layout]);
 
   const handleChange = useCallback((e: React.ChangeEvent<HTMLTextAreaElement>) => {
-    onChange(e.target.value);
+    onChange(e.target.value, e.target.name || '');
   }, [onChange]);
 
   return (

@@ -11,7 +11,7 @@ export interface HeaderIconProps {
 export interface FormInputProps extends Omit<InputHTMLAttributes<HTMLInputElement>, 'onChange' | 'value'> {
   label?: ReactNode;
   value: string | number;
-  onChange: (val: string) => void;
+  onChange: (val: string, name: string) => void;
   placeholder?: string;
   type?: string;
   isHalf?: boolean;
@@ -24,7 +24,6 @@ export interface FormInputProps extends Omit<InputHTMLAttributes<HTMLInputElemen
   disabled?: boolean;
   error?: boolean;
   errormsg?: string;
-  rightElement?: ReactNode;
 }
 
 export interface FormTextareaProps extends Omit<FormInputProps, 'type'> {

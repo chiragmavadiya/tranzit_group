@@ -7,7 +7,9 @@ import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover
 import { cn } from '@/lib/utils';
 import { DataTable } from '@/components/common';
 import { FormSelect } from '@/features/orders/components/OrderFormUI';
-import { ACTIVITY_COLUMNS, MOCK_ACTIVITIES } from '../constants';
+import { ACTIVITY_COLUMNS } from '../constants';
+import { useActivityLog } from '../hooks/useActivityLog';
+import { useDebounce } from '@/hooks/useDebounce';
 
 export default function ActivityLogPage() {
     const [startDate, setStartDate] = useState<Date | undefined>();
@@ -27,21 +29,22 @@ export default function ActivityLogPage() {
         setPage(1);
     }, []);
 
-    // Filter logic for mock data
-    const filteredData = useMemo(() => {
-        return MOCK_ACTIVITIES.filter(item => {
-            if (role !== 'all' && item.adminRole !== role) return false;
-            if (action !== 'all' && item.action !== action) return false;
-            if (search && !item.description.toLowerCase().includes(search.toLowerCase()) && !item.email.toLowerCase().includes(search.toLowerCase())) return false;
-            if (startDate && new Date(item.dateTime) < startDate) return false;
-            if (endDate) {
-                const endOfDay = new Date(endDate);
-                endOfDay.setHours(23, 59, 59, 999);
-                if (new Date(item.dateTime) > endOfDay) return false;
-            }
-            return true;
-        });
-    }, [role, action, search, startDate, endDate]);
+    const queryParams = useMemo(() => {
+        const params: any = {
+            page,
+            per_page: pageSize,
+        };
+        if (role !== 'all') params.role = role.toLowerCase();
+        if (action !== 'all') params.action = action;
+        if (startDate) params.from_date = format(startDate, 'dd/MM/yyyy');
+        if (endDate) params.to_date = format(endDate, 'dd/MM/yyyy');
+        return params;
+    }, [page, pageSize, role, action, startDate, endDate]);
+
+    const { data: activityData, isLoading } = useActivityLog({ ...queryParams, search: useDebounce(search, 500) });
+
+    const activities = activityData?.data || [];
+    const totalItems = activityData?.meta?.total || 0;
 
     return (
         <div className="flex flex-col flex-1 gap-6 p-page-padding min-h-0 animate-in fade-in slide-in-from-bottom-2 duration-500 bg-slate-50/30 dark:bg-zinc-950/30 overflow-y-auto">
@@ -70,11 +73,11 @@ export default function ActivityLogPage() {
                         <FormSelect
                             label="Role"
                             value={role}
-                            onValueChange={(val) => setRole(val || 'all')}
+                            onValueChange={(val) => { setRole(val || 'all'); setPage(1); }}
                             options={[
                                 { label: 'All Roles', value: 'all' },
-                                { label: 'Admin', value: 'Admin' },
-                                { label: 'Sub Admin', value: 'Sub Admin' },
+                                { label: 'Admin', value: 'admin' },
+                                { label: 'Staff', value: 'staff' },
                             ]}
                             placeholder="All Roles"
                             className="w-full space-y-1.5"
@@ -85,13 +88,15 @@ export default function ActivityLogPage() {
                         <FormSelect
                             label="Action"
                             value={action}
-                            onValueChange={(val) => setAction(val || 'all')}
+                            onValueChange={(val) => { setAction(val || 'all'); setPage(1); }}
                             options={[
                                 { label: 'All Actions', value: 'all' },
-                                { label: 'Created', value: 'Created' },
-                                { label: 'Updated', value: 'Updated' },
-                                { label: 'Deleted', value: 'Deleted' },
-                                { label: 'Logged In', value: 'Logged In' },
+                                { label: 'Created', value: 'created' },
+                                { label: 'Updated', value: 'updated' },
+                                { label: 'Deleted', value: 'deleted' },
+                                { label: 'Status Changed', value: 'status_changed' },
+                                { label: 'Verified', value: 'verified' },
+                                { label: 'Settings Updated', value: 'settings_updated' },
                             ]}
                             placeholder="All Actions"
                             className="w-full space-y-1.5"
@@ -105,7 +110,7 @@ export default function ActivityLogPage() {
                                 <Button
                                     variant="outline"
                                     className={cn(
-                                        "w-full h-8 justify-between text-left text-[12px] border-slate-200 dark:border-zinc-800 rounded-md px-3 bg-white dark:bg-zinc-950",
+                                        "w-full h-8 justify-between text-left text-[12px] border-slate-200 dark:border-zinc-800 rounded-md px-3 bg-white dark:bg-zinc-950 font-medium",
                                         !startDate && "text-slate-400"
                                     )}
                                 >
@@ -117,7 +122,7 @@ export default function ActivityLogPage() {
                                 <Calendar
                                     mode="single"
                                     selected={startDate}
-                                    onSelect={setStartDate}
+                                    onSelect={(date) => { setStartDate(date); setPage(1); }}
                                     initialFocus
                                 />
                             </PopoverContent>
@@ -143,7 +148,7 @@ export default function ActivityLogPage() {
                                 <Calendar
                                     mode="single"
                                     selected={endDate}
-                                    onSelect={setEndDate}
+                                    onSelect={(date) => { setEndDate(date); setPage(1); }}
                                     initialFocus
                                 />
                             </PopoverContent>
@@ -152,31 +157,34 @@ export default function ActivityLogPage() {
 
                     <div className="lg:col-span-2 content-end mb-1">
                         <Button
-                            className="w-full h-8 bg-blue-600 hover:bg-blue-700 dark:bg-blue-600 dark:hover:bg-blue-500 text-white font-bold uppercase tracking-widest text-[11px] rounded-md shadow-sm shadow-blue-500/20 transition-all hover:-translate-y-0.5 active:translate-y-0"
+                            className="w-full h-8 bg-blue-600 hover:bg-blue-700 dark:bg-blue-600 dark:hover:bg-blue-500 text-white rounded-md shadow-sm shadow-blue-500/20 transition-all"
                             onClick={() => setPage(1)}
                         >
-                            Apply Filters
+                            Refresh Log
                         </Button>
                     </div>
                 </div>
             </div>
 
             {/* Table Section */}
-            <div className='rounded-2xl min-h-[500px] shadow-[0_8px_30px_rgb(0,0,0,0.04)] flex-1 flex flex-col border border-slate-100 dark:border-zinc-800 bg-white dark:bg-zinc-950 overflow-hidden'>
+            <div className='rounded-2xl min-h-[500px] shadow-[0_8px_30px_rgba(0,0,0,0.04)] flex-1 flex flex-col border border-slate-100 dark:border-zinc-800 bg-white dark:bg-zinc-950 overflow-hidden'>
                 <DataTable
                     columns={ACTIVITY_COLUMNS as any}
-                    data={filteredData}
+                    data={activities}
                     searchable
                     searchValue={search}
                     onSearchChange={(val) => { setSearch(val); setPage(1); }}
                     pageSize={pageSize}
                     onPageSizeChange={(val) => { setPageSize(Number(val)); setPage(1); }}
                     className="pb-3 text-xs"
-                    totalItems={filteredData.length}
+                    totalItems={totalItems}
                     currentPage={page}
                     onPageChange={setPage}
+                    loading={isLoading}
+                    exportable={false}
                 />
             </div>
         </div>
     );
 }
+

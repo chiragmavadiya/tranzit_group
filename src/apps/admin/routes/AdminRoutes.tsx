@@ -25,7 +25,9 @@ const EnquiryPage = lazy(() => import('@/features/enquiries/pages/EnquiryPage'))
 const AuspostOrderSummaryPage = lazy(() => import('@/features/auspost-order-summary/pages/AuspostOrderSummaryPage'));
 const UndeliveredParcelPage = lazy(() => import('@/features/undelivered-parcel/pages/UndeliveredParcelPage'));
 const GetQuote = lazy(() => import('@/features/quote/pages/GetQuotePage'));
+const QuoteList = lazy(() => import('@/features/customer-quote/pages/QuoteListPage'));
 const ProfilePage = lazy(() => import('@/features/profile/pages/ProfilePage'));
+
 const HelpCenterAdminPage = lazy(() => import('@/features/help-center-admin/pages/HelpCenterAdminPage'));
 const ActivityLogPage = lazy(() => import('@/features/activity-log/pages/ActivityLogPage'));
 
@@ -60,8 +62,12 @@ export default function AdminRoutes() {
                     <Route path="enquiry" element={<EnquiryPage />} />
                     <Route path="order-summary" element={<AuspostOrderSummaryPage />} />
                     <Route path="undelivered" element={<UndeliveredParcelPage />} />
-                    <Route path="customer-quote" element={<GetQuote />} />
+                    <Route path="quotes">
+                        <Route index element={<QuoteList />} />
+                        <Route path="create" element={<GetQuote />} />
+                    </Route>
                     <Route path="profile" element={<ProfilePage />} />
+
                     <Route path="help-center" element={<HelpCenterAdminPage />} />
                     <Route path="activity-log" element={<ActivityLogPage />} />
                     <Route path="search" element={<Search />} />

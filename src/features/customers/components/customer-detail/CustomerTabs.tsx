@@ -8,7 +8,7 @@ interface CustomerTabsProps {
 
 export const CustomerTabs = ({ activeTab, onTabChange }: CustomerTabsProps) => {
     return (
-        <div className="flex items-center gap-2 p-1 bg-white/50 dark:bg-zinc-900/50 backdrop-blur-sm rounded-2xl w-fit border border-white dark:border-zinc-800 shadow-sm">
+        <div className="flex items-center gap-2 p-1 bg-white/50 dark:bg-zinc-900/50 backdrop-blur-sm rounded-2xl w-fit border border-white dark:border-zinc-800 shadow-sm sticky top-0 z-10">
             {CUSTOMER_TABS.map((tab) => (
                 <button
                     key={tab}

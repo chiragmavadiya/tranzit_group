@@ -48,7 +48,8 @@ export const adminSidebarItems: SidebarItem[] = [
   { name: 'Admin Activity Log', icon: Activity, path: '/admin/activity-log' },
   { name: 'Order Summary For Auspost', icon: ClipboardList, path: '/admin/order-summary' },
   { name: 'Undelivered Parcel', icon: PackageX, path: '/admin/undelivered' },
-  { name: 'Customer Quote', icon: FileQuestion, path: '/admin/customer-quote' },
+  { name: 'Customer Quote', icon: FileQuestion, path: '/admin/quotes' },
+
   { name: 'Profile', icon: User, path: '/admin/profile' },
 ];
 

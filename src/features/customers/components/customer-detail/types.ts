@@ -1,6 +1,6 @@
 export interface ActivityItem {
     id: string;
-    type: 'login' | 'payment' | 'logout';
+    type: string;
     title: string;
     description: string;
     timestamp: string;

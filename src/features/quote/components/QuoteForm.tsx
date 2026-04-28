@@ -60,17 +60,17 @@ export function QuoteForm({ items, setItems, setLocations, onGetRate, isValid }:
   ], []);
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4">
       {/* Addresses Section */}
       <Card className="shadow-md border-gray-200 dark:border-zinc-800 bg-white dark:bg-zinc-950">
-        <CardHeader className="pb-3">
+        <CardHeader className="pb-0">
           <CardTitle className="inline-flex items-center gap-2 text-[15px] font-semibold text-slate-800 dark:text-zinc-100">
             <MapPin className="w-4 h-4 text-blue-500" />
             Addresses
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-0.5">
               <Label className="text-[13px] font-medium text-slate-600 dark:text-zinc-400">Sender Location</Label>
               <AutoComplete
@@ -102,17 +102,25 @@ export function QuoteForm({ items, setItems, setLocations, onGetRate, isValid }:
       </Card>
 
       {/* Items Section */}
-      <Card className="shadow-md border-gray-200 dark:border-zinc-800 py-1 px-4 bg-white dark:bg-zinc-950">
-        <CardHeader className="flex flex-row items-center justify-between py-3 px-5 border-b border-gray-100 dark:border-zinc-800 bg-white dark:bg-zinc-900 group-hover:bg-gray-50/50 dark:group-hover:bg-zinc-800/50 transition-colors">
+      <Card className="shadow-md gap-0 border-gray-200 dark:border-zinc-800 py-1 px-4 bg-white dark:bg-zinc-950">
+        <CardHeader className="flex flex-row items-center justify-between py-2 [.border-b]:pb-3 px-5 border-b border-gray-100 dark:border-zinc-800 bg-white dark:bg-zinc-900 group-hover:bg-gray-50/50 dark:group-hover:bg-zinc-800/50 transition-colors">
           <CardTitle className="text-sm font-bold text-gray-900 dark:text-zinc-100 tracking-wider">
             ITEMS
           </CardTitle>
           <div className="flex items-center gap-3">
             <Button
+              onClick={onGetRate}
+              disabled={!isValid}
+              className="bg-[#0060FE] hover:bg-blue-700 text-white gap-2 pt-px h-8 text-[13px] font-bold transition-all shadow-md active:scale-[0.98]"
+            >
+              <Calculator className="w-4 h-4" />
+              Get Live Rate
+            </Button>
+            <Button
               variant="outline"
               size="sm"
               onClick={addItem}
-              className="h-8 gap-1.5 text-[12px] border-slate-200 dark:border-zinc-800 hover:bg-slate-50 dark:hover:bg-zinc-900 font-medium"
+              className="h-8 gap-1.5 text-[12px] border-slate-200 pt-px dark:border-zinc-800 hover:bg-slate-50 dark:hover:bg-zinc-900 font-medium"
             >
               <Plus className="w-3.5 h-3.5" />
               Add item
@@ -124,13 +132,13 @@ export function QuoteForm({ items, setItems, setLocations, onGetRate, isValid }:
             <Table>
               <TableHeader>
                 <TableRow className="bg-white dark:bg-zinc-950 hover:bg-white dark:hover:bg-zinc-950 border-b border-gray-100 dark:border-zinc-800 transition-colors">
-                  <TableHead className="h-12 text-[10px] font-bold text-gray-900 dark:text-zinc-100 uppercase tracking-wider px-5 w-[180px]">Type</TableHead>
-                  <TableHead className="h-12 text-[10px] font-bold text-gray-900 dark:text-zinc-100 uppercase tracking-wider px-5 w-[80px]">Qty</TableHead>
-                  <TableHead className="h-12 text-[10px] font-bold text-gray-900 dark:text-zinc-100 uppercase tracking-wider px-5 w-[120px]">Weight (KG)</TableHead>
-                  <TableHead className="h-12 text-[10px] font-bold text-gray-900 dark:text-zinc-100 uppercase tracking-wider px-5 w-[100px]">Length (CM)</TableHead>
-                  <TableHead className="h-12 text-[10px] font-bold text-gray-900 dark:text-zinc-100 uppercase tracking-wider px-5 w-[100px]">Width (CM)</TableHead>
-                  <TableHead className="h-12 text-[10px] font-bold text-gray-900 dark:text-zinc-100 uppercase tracking-wider px-5 w-[100px]">Height (CM)</TableHead>
-                  <TableHead className="h-12 w-10 px-5"></TableHead>
+                  <TableHead className="h-10 text-[10px] font-bold text-gray-900 dark:text-zinc-100 uppercase tracking-wider px-5 w-[180px]">Type</TableHead>
+                  <TableHead className="h-10 text-[10px] font-bold text-gray-900 dark:text-zinc-100 uppercase tracking-wider px-5 w-[80px]">Qty</TableHead>
+                  <TableHead className="h-10 text-[10px] font-bold text-gray-900 dark:text-zinc-100 uppercase tracking-wider px-5 w-[120px]">Weight (KG)</TableHead>
+                  <TableHead className="h-10 text-[10px] font-bold text-gray-900 dark:text-zinc-100 uppercase tracking-wider px-5 w-[100px]">Length (CM)</TableHead>
+                  <TableHead className="h-10 text-[10px] font-bold text-gray-900 dark:text-zinc-100 uppercase tracking-wider px-5 w-[100px]">Width (CM)</TableHead>
+                  <TableHead className="h-10 text-[10px] font-bold text-gray-900 dark:text-zinc-100 uppercase tracking-wider px-5 w-[100px]">Height (CM)</TableHead>
+                  <TableHead className="h-10 w-5 px-5 sticky right-0 bg-background z-20"></TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -152,7 +160,7 @@ export function QuoteForm({ items, setItems, setLocations, onGetRate, isValid }:
                       </Select> */}
                       <SelectComponent
                         value={item.type}
-                        onValueChange={(val: string | null) => val && updateItem(item.id, 'type', val)}
+                        onValueChange={(val: string | null) => val && updateItem(item.id || '', 'type', val)}
                         data={[
                           { label: 'Parcel', value: 'Parcel' },
                           { label: 'Document', value: 'Document' },
@@ -166,7 +174,7 @@ export function QuoteForm({ items, setItems, setLocations, onGetRate, isValid }:
                       <Input
                         type="number"
                         value={item.qty}
-                        onChange={(e) => updateItem(item.id, 'qty', Math.max(1, parseInt(e.target.value) || 0))}
+                        onChange={(e) => updateItem(item.id || '', 'qty', Math.max(1, parseInt(e.target.value) || 0))}
                         // className="h-7 w-full text-center text-xs group-hover/row:border-gray-200 dark:group-hover/row:border-zinc-800 focus:border-blue-600 focus:bg-white dark:focus:bg-zinc-950 focus-visible:ring-1 focus-visible:ring-blue-600 transition-all font-medium py-0 px-2"
                         className="h-7 min-w-15"
                         min={1}
@@ -177,7 +185,7 @@ export function QuoteForm({ items, setItems, setLocations, onGetRate, isValid }:
                         type="number"
                         placeholder="kg"
                         value={item.weight || ''}
-                        onChange={(e) => updateItem(item.id, 'weight', Math.max(0, parseFloat(e.target.value) || 0))}
+                        onChange={(e) => updateItem(item.id || '', 'weight', Math.max(0, parseFloat(e.target.value) || 0))}
                         // className="h-7 w-full text-xs group-hover/row:border-gray-200 dark:group-hover/row:border-zinc-800 dark:focus:bg-zinc-950 focus-visible:ring-1 focus-visible:ring-blue-600 transition-all font-medium py-0 px-2"
                         className="h-7"
                         min={0}
@@ -188,7 +196,7 @@ export function QuoteForm({ items, setItems, setLocations, onGetRate, isValid }:
                         type="number"
                         placeholder="cm"
                         value={item.length || ''}
-                        onChange={(e) => updateItem(item.id, 'length', Math.max(0, parseFloat(e.target.value) || 0))}
+                        onChange={(e) => updateItem(item.id || '', 'length', Math.max(0, parseFloat(e.target.value) || 0))}
                         // className="h-7 w-full text-xs group-hover/row:border-gray-200 dark:group-hover/row:border-zinc-800 focus:border-blue-600 focus:bg-white dark:focus:bg-zinc-950 focus-visible:ring-1 focus-visible:ring-blue-600 transition-all font-medium py-0 px-2"
                         className="h-7"
                         min={0}
@@ -199,7 +207,7 @@ export function QuoteForm({ items, setItems, setLocations, onGetRate, isValid }:
                         type="number"
                         placeholder="cm"
                         value={item.width || ''}
-                        onChange={(e) => updateItem(item.id, 'width', Math.max(0, parseFloat(e.target.value) || 0))}
+                        onChange={(e) => updateItem(item.id || '', 'width', Math.max(0, parseFloat(e.target.value) || 0))}
                         // className="h-7 w-full text-xs group-hover/row:border-gray-200 dark:group-hover/row:border-zinc-800 focus:border-blue-600 focus:bg-white dark:focus:bg-zinc-950 focus-visible:ring-1 focus-visible:ring-blue-600 transition-all font-medium py-0 px-2"
                         className="h-7"
                         min={0}
@@ -210,17 +218,17 @@ export function QuoteForm({ items, setItems, setLocations, onGetRate, isValid }:
                         type="number"
                         placeholder="cm"
                         value={item.height || ''}
-                        onChange={(e) => updateItem(item.id, 'height', Math.max(0, parseFloat(e.target.value) || 0))}
+                        onChange={(e) => updateItem(item.id || '', 'height', Math.max(0, parseFloat(e.target.value) || 0))}
                         // className="h-7 w-full text-xs group-hover/row:border-gray-200 dark:group-hover/row:border-zinc-800 focus:border-blue-600 focus:bg-white dark:focus:bg-zinc-950 focus-visible:ring-1 focus-visible:ring-blue-600 transition-all font-medium py-0 px-2"
                         className="h-7"
                         min={0}
                       />
                     </TableCell>
-                    <TableCell className="px-5 py-4 text-center">
+                    <TableCell className="px-2 py-4 text-center sticky right-0 z-20 bg-background">
                       <Button
                         variant="ghost"
                         size="icon"
-                        onClick={() => removeItem(item.id)}
+                        onClick={() => removeItem(item.id || '')}
                         disabled={items.length === 1}
                         className="h-8 w-8 text-slate-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-950/20 rounded-md transition-colors"
                       >
@@ -234,14 +242,7 @@ export function QuoteForm({ items, setItems, setLocations, onGetRate, isValid }:
           </div>
           <div className="flex items-center justify-between px-5 py-4 border-t border-gray-100 dark:border-zinc-800 bg-white dark:bg-zinc-950">
             <div />
-            <Button
-              onClick={onGetRate}
-              disabled={!isValid}
-              className="bg-[#0060FE] hover:bg-blue-700 text-white gap-2 px-8 h-10 text-[13px] font-bold transition-all shadow-md active:scale-[0.98]"
-            >
-              <Calculator className="w-4 h-4" />
-              Get Live Rate
-            </Button>
+
           </div>
         </CardContent>
       </Card>

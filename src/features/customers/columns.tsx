@@ -1,39 +1,66 @@
-import { Eye, Pencil } from 'lucide-react';
+import { Eye, Pencil, Loader2, Trash2 } from 'lucide-react';
 import { Switch } from '@/components/ui/switch';
-import { cn } from '@/lib/utils';
 import type { Customer } from './types';
 import type { Column } from '@/components/common/types/DataTable.types';
 import { Button } from '@/components/ui/button';
 import { NavLink } from 'react-router-dom';
+import { useToggleCustomerStatus } from './hooks/useCustomers';
+import { toast } from 'sonner';
 
-export const CUSTOMER_COLUMNS: Column<Customer>[] = [
+// eslint-disable-next-line react-refresh/only-export-components
+const StatusSwitch = ({ customer }: { customer: Customer }) => {
+    const { mutate: toggleStatus, isPending } = useToggleCustomerStatus();
 
+    const handleToggle = () => {
+        toggleStatus(customer.id, {
+            onSuccess: (res) => {
+                toast.success(res.message || `Customer status updated to ${customer.status === 'active' ? 'inactive' : 'active'}`);
+            },
+            onError: (err: any) => {
+                toast.error(err?.response?.data?.message || 'Failed to update status');
+            }
+        });
+    };
+
+    return (
+        <div className="flex items-center gap-2">
+            <Switch
+                checked={customer.status === 'active'}
+                disabled={isPending}
+                onCheckedChange={handleToggle}
+                className="data-[state=checked]:bg-slate-950"
+            />
+            {isPending && <Loader2 className="w-3 h-3 animate-spin text-slate-400" />}
+        </div>
+    );
+};
+
+export const getCustomerColumns = (onEdit: (id: string | number) => void, handleDelete: (id: string | number) => void): Column<Customer>[] => [
     {
         key: 'name',
         header: 'NAME',
         sticky: "left",
         cell: (_, customer) => {
-            const initials = customer.name.split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase();
+            const fullName = `${customer.first_name} ${customer.last_name}`;
             return (
-                <div className="flex items-center gap-3">
-                    <div className={cn(
-                        "flex h-8 w-8 items-center justify-center rounded-full text-[10px] font-bold text-white shadow-sm",
-                        customer.avatar_color || 'bg-gray-400'
-                    )}>
-                        {initials}
+                <NavLink to={`/admin/customers/${customer.id}`}>
+                    <div className="flex items-center gap-3">
+                        <div className='w-[35px] h-[35px]'>
+                            <img className='w-[35px] h-[35px] object-cover rounded-full' src={`https://ui-avatars.com/api/?format=svg&name=${fullName}&background=random&rounded=true`} alt={fullName} />
+                        </div>
+                        <div className="flex flex-col">
+                            <span className="text-sm font-semibold text-slate-900">{fullName}</span>
+                            <span className="text-xs text-muted-foreground">{customer.email}</span>
+                        </div>
                     </div>
-                    <div className="flex flex-col">
-                        <span className="text-sm font-semibold text-slate-900">{customer.name}</span>
-                        <span className="text-xs text-muted-foreground">{customer.email}</span>
-                    </div>
-                </div>
+                </NavLink>
             );
         },
     },
     {
         key: 'mobile',
         header: 'MOBILE',
-        cell: (_, customer) => <span className="text-sm text-slate-600">{customer.mobile}</span>,
+        cell: (_, customer) => <span className="text-sm text-slate-600">{customer.personal_mobile || customer.office_number || '-'}</span>,
     },
     {
         key: 'business_name',
@@ -43,7 +70,7 @@ export const CUSTOMER_COLUMNS: Column<Customer>[] = [
     {
         key: 'customer_id',
         header: 'CUSTOMER ID',
-        cell: (_, customer) => <span className="text-sm font-mono text-slate-600">{customer.customer_id}</span>,
+        cell: (_, customer) => <span className="text-sm font-mono text-slate-600">{customer.id}</span>,
     },
     {
         key: 'suburb',
@@ -58,14 +85,7 @@ export const CUSTOMER_COLUMNS: Column<Customer>[] = [
     {
         key: 'status',
         header: 'STATUS',
-        cell: (_, customer) => (
-            <div className="flex items-center">
-                <Switch
-                    checked={customer.status === 'active'}
-                    className="data-[state=checked]:bg-slate-950"
-                />
-            </div>
-        ),
+        cell: (_, customer) => <StatusSwitch customer={customer} />,
     },
     {
         key: 'created_at',
@@ -73,17 +93,21 @@ export const CUSTOMER_COLUMNS: Column<Customer>[] = [
         cell: (_, customer) => <span className="text-sm text-slate-600">{customer.created_at}</span>,
     },
     {
-        key: 'last_login_at',
-        header: 'LAST LOGIN AT',
-        cell: (_, customer) => <span className="text-sm text-slate-600">{customer.last_login_at || '-'}</span>,
-    },
-    {
         key: 'actions',
         header: 'ACTIONS',
         sticky: "right",
         cell: (_, customer) => (
             <div className="flex items-center gap-2">
-                <Button variant="ghost" size="sm" className="p-0 hover:text-blue-500 bg-transparent hover:bg-transparent dark:hover:bg-transparent">
+                <Button
+                    variant="ghost"
+                    size="sm"
+                    className="p-0 hover:text-blue-500 bg-transparent hover:bg-transparent dark:hover:bg-transparent"
+                    onClick={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        onEdit(customer.id);
+                    }}
+                >
                     <Pencil className="w-4 h-4" />
                 </Button>
                 <NavLink to={`/admin/customers/${customer.id}`}>
@@ -91,7 +115,22 @@ export const CUSTOMER_COLUMNS: Column<Customer>[] = [
                         <Eye className="w-4 h-4" />
                     </Button>
                 </NavLink>
+                {/* delete button */}
+                <Button
+                    variant="ghost"
+                    size="sm"
+                    className="p-0 hover:text-red-500 bg-transparent hover:bg-transparent dark:hover:bg-transparent"
+                    onClick={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        handleDelete(customer.id);
+                    }}
+                >
+                    <Trash2 className="w-4 h-4" />
+                </Button>
             </div>
         ),
     },
 ];
+
+

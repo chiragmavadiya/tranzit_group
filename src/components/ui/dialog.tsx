@@ -150,15 +150,16 @@ interface CustomModelProps {
   description?: string;
   onOpenChange: (open: boolean) => void;
   children: React.ReactNode;
-  onSubmit: () => void;
+  onSubmit?: () => void;
   onCancel?: () => void;
   isLoading?: boolean;
   cancelText?: string;
   submitText?: string;
   contentClass?: string;
+  showFooter?: boolean;
 }
 
-const CustomModel = ({ open, title, description, onOpenChange, children, onSubmit, onCancel, cancelText = 'Cancel', submitText = 'Submit', isLoading = false, contentClass = "" }: CustomModelProps) => {
+const CustomModel = ({ open, title, description, onOpenChange, children, onSubmit, onCancel, cancelText = 'Cancel', submitText = 'Submit', isLoading = false, contentClass = "", showFooter = true }: CustomModelProps) => {
   const handleCancel = () => {
     if (onCancel) {
       onCancel()
@@ -179,27 +180,30 @@ const CustomModel = ({ open, title, description, onOpenChange, children, onSubmi
         <div className="-mx-4 no-scrollbar max-h-[65vh] overflow-y-auto px-4">
           {children}
         </div>
-        <DialogFooter className="gap-3 p-6 border-t border-gray-100 dark:border-zinc-800 bg-gray-50/50 dark:bg-zinc-900/50">
-          <Button
-            type="button"
-            variant="outline"
-            onClick={handleCancel}
-            disabled={isLoading}
-            className="px-4 border-gray-200 dark:border-zinc-800 font-medium hover:bg-gray-100 dark:hover:bg-zinc-800 h-8"
-          >
-            {cancelText}
-          </Button>
-          <Button
-            type="submit"
-            disabled={isLoading}
-            className="px-4 bg-[#0060FE] hover:bg-[#0052db] text-white font-semibold transition-all shadow-md shadow-blue-100 dark:shadow-none active:scale-[0.98] h-8"
-            onClick={onSubmit}
-          >
-            {isLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : null}
-            {submitText}
-            {/* {isLoading ? 'Processing...' : (isEdit ? 'Save Changes' : 'Create Item')} */}
-          </Button>
-        </DialogFooter>
+        {
+          showFooter && (
+            <DialogFooter className="gap-3 p-6 border-t border-gray-100 dark:border-zinc-800 bg-gray-50/50 dark:bg-zinc-900/50">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={handleCancel}
+                disabled={isLoading}
+                className="px-4 border-gray-200 dark:border-zinc-800 font-medium hover:bg-gray-100 dark:hover:bg-zinc-800 h-8"
+              >
+                {cancelText}
+              </Button>
+              <Button
+                type="submit"
+                disabled={isLoading}
+                className="px-4 bg-[#0060FE] hover:bg-[#0052db] text-white font-semibold transition-all shadow-md shadow-blue-100 dark:shadow-none active:scale-[0.98] h-8"
+                onClick={onSubmit}
+              >
+                {isLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : null}
+                {submitText}
+                {/* {isLoading ? 'Processing...' : (isEdit ? 'Save Changes' : 'Create Item')} */}
+              </Button>
+            </DialogFooter>
+          )}
       </DialogContent>
     </Dialog>
   )

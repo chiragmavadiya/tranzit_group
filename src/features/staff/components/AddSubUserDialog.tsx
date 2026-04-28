@@ -1,6 +1,7 @@
 import { useState, useMemo, useRef, forwardRef, useCallback } from 'react';
 import { CustomModel } from '@/components/ui/dialog';
 import { FormInput, FormSelect } from '@/features/orders/components/OrderFormUI';
+import PermissionTreeView from '@/components/common/treeview';
 
 interface AddSubUserDialogProps {
   open: boolean;
@@ -46,7 +47,7 @@ export function AddSubUserDialog({ open, onOpenChange, onSubmit, initialData }: 
       submitText={initialData ? "Update" : "Submit"}
       contentClass="sm:max-w-[700px]"
     >
-      <SubUserForm 
+      <SubUserForm
         key={formKey}
         ref={formRef}
         initialValues={formDataToLoad}
@@ -178,6 +179,11 @@ const SubUserForm = forwardRef<HTMLFormElement, SubUserFormProps>(
               { label: 'Inactive', value: 'Inactive' },
             ]}
           />
+        </div>
+
+        <div className="col-span-12 my-4 border-t" />
+        <div className="col-span-12">
+          <PermissionTreeView title="Role Management" />
         </div>
       </form>
     );

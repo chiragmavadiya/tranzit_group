@@ -9,7 +9,6 @@ import {
   TableHeader,
   TableRow
 } from '@/components/ui/table';
-import { Input } from '@/components/ui/input';
 import { Checkbox } from '@/components/ui/checkbox';
 import { cn, getNestedValue } from '@/lib/utils';
 import SelectComponent from '../ui/select';
@@ -19,6 +18,7 @@ import { DEFAULT_PAGE_SIZES } from '@/constants/global.constants';
 import type { Column, DataTableProps, SortConfig } from './types/DataTable.types';
 import { Button } from '../ui/button';
 import { DropdownCustomMenu } from '../ui/dropdown-menu';
+import { FormInput } from '@/features/orders/components/OrderFormUI';
 
 export function DataTable<T extends Record<string, any>>({
   data,
@@ -192,15 +192,13 @@ export function DataTable<T extends Record<string, any>>({
             <div className="flex items-center gap-2 ml-auto">
               {headerPosition == 'left' && customHeader && (typeof customHeader === 'function' ? (customHeader as () => ReactNode)() : customHeader)}
               {searchable && (
-                <div className="relative">
-                  <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
-                  <Input
-                    placeholder={searchPlaceholder}
-                    value={currentSearch}
-                    onChange={(e) => handleSearch(e.target.value)}
-                    className="pl-8 w-54 h-8"
-                  />
-                </div>
+                <FormInput
+                  placeholder={searchPlaceholder}
+                  value={currentSearch}
+                  onChange={handleSearch}
+                  icon={Search}
+                  className="pl-8 w-62 h-8"
+                />
               )}
               {pagination && !pageSizeInFooter && (
                 <SelectComponent

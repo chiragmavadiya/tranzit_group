@@ -220,3 +220,55 @@
 .align-items-center {
   align-items: center;
 }
+
+/* Rich Text Content Styling */
+.rich-text-content table {
+  border-collapse: collapse;
+  table-layout: fixed;
+  width: 100%;
+  margin: 1.5rem 0;
+  overflow: hidden;
+}
+
+.rich-text-content table td,
+.rich-text-content table th {
+  min-width: 1em;
+  border: 1px solid #e2e8f0;
+  padding: 8px 12px;
+  vertical-align: top;
+  box-sizing: border-box;
+  position: relative;
+}
+
+.rich-text-content table th {
+  font-weight: bold;
+  text-align: left;
+  background-color: #f8fafc;
+}
+
+.dark .rich-text-content table td,
+.dark .rich-text-content table th {
+  border-color: #334155;
+}
+
+.dark .rich-text-content table th {
+  background-color: #1e293b;
+}
+
+.rich-text-content img {
+  max-width: 100%;
+  height: auto;
+  display: block;
+  margin: 1.5rem 0;
+  border-radius: 0.75rem;
+}
+
+.rich-text-content a {
+  color: #2563eb;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.dark .rich-text-content a {
+  color: #60a5fa;
+}

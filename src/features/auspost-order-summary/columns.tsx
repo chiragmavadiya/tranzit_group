@@ -30,6 +30,7 @@ export const AUSPOST_COLUMNS: Column<AuspostOrder>[] = [
     key: 'orderDate',
     header: 'ORDER DATE',
     sortable: true,
+    noPrint: true,
     cell: (val) => <span className="text-slate-500 font-medium text-[12px]">{val}</span>
   }
 ];

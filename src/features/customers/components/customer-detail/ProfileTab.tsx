@@ -3,56 +3,71 @@ import { Card, CardHeader, CardContent } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 import { SectionHeader, DetailItem } from './Common';
 import { ActivityTimeline } from './ActivityTimeline';
-import type { CustomerDetail } from './types';
+import { useCustomerProfile } from '../../hooks/useCustomers';
 
 interface ProfileTabProps {
-    customer: CustomerDetail;
+    customerId: string;
 }
 
-export const ProfileTab = ({ customer }: ProfileTabProps) => {
+export const ProfileTab = ({ customerId }: ProfileTabProps) => {
+    const { data: response, isLoading } = useCustomerProfile(customerId);
+
+    if (isLoading) {
+        return <div className="p-8 flex justify-center"><span className="w-8 h-8 border-4 border-blue-600/30 border-t-blue-600 rounded-full animate-spin" /></div>;
+    }
+
+    const customer = response?.data;
+    if (!customer) return null;
+
+    const markups = [
+        customer.charges_markups.aus_post,
+        customer.charges_markups.direct_freight,
+        customer.charges_markups.pallet
+    ].filter(Boolean);
+
     return (
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 animate-in fade-in slide-in-from-left-4 duration-500">
             {/* Left Column: Details */}
             <div className="lg:col-span-4 flex flex-col gap-6">
-                <Card className="bg-white dark:bg-zinc-900 shadow-lg border-none rounded-3xl overflow-hidden">
+                <Card className="bg-white dark:bg-zinc-900 gap-1 shadow-lg border-none rounded-3xl overflow-hidden">
                     <CardHeader className="pb-4">
                         <SectionHeader title="About" icon={Users} />
                     </CardHeader>
-                    <CardContent className="flex flex-col gap-4">
-                        <DetailItem label="Full Name" value={customer.fullName} icon={Users} />
-                        <DetailItem label="Status" value={customer.status} icon={CheckCircle2} />
-                        <DetailItem label="Role" value={customer.role} icon={Settings} />
-                        <DetailItem label="GST" value={customer.gst} icon={FileText} />
-                        <DetailItem label="Business Name" value={customer.businessName} icon={Building2} />
+                    <CardContent className="flex flex-col gap-2">
+                        <DetailItem label="Full Name" value={customer.about.full_name} icon={Users} />
+                        <DetailItem label="Status" value={customer.about.status} icon={CheckCircle2} />
+                        <DetailItem label="Role" value={customer.about.role} icon={Settings} />
+                        <DetailItem label="GST" value={customer.about.gst?.toString() || 'N/A'} icon={FileText} />
+                        <DetailItem label="Business Name" value={customer.about.business_name} icon={Building2} />
 
                         <Separator className="my-2 bg-slate-50 dark:bg-zinc-800" />
 
                         <SectionHeader title="Contacts" icon={Mail} />
-                        <DetailItem label="Contact" value={customer.contact} icon={Phone} />
-                        <DetailItem label="Email" value={customer.email} icon={Mail} />
+                        <DetailItem label="Contact" value={customer.contacts.contact} icon={Phone} />
+                        <DetailItem label="Email" value={customer.contacts.email} icon={Mail} />
 
                         <Separator className="my-2 bg-slate-50 dark:bg-zinc-800" />
 
                         <SectionHeader title="Pickup Address" icon={MapPin} />
-                        <DetailItem label="Address" value={customer.address} icon={MapPin} />
-                        <DetailItem label="Postcode" value={customer.postcode} icon={MapPin} />
+                        <DetailItem label="Address" value={customer.pickup_address.address} icon={MapPin} />
+                        <DetailItem label="Postcode" value={customer.pickup_address.post_code} icon={MapPin} />
 
                         <Separator className="my-2 bg-slate-50 dark:bg-zinc-800" />
 
                         <SectionHeader title="Charges & Markups" icon={TrendingUp} />
                         <div className="space-y-4">
-                            {customer.markup.map((m, i) => (
+                            {markups.map((m, i) => (
                                 <div key={i} className="flex flex-col gap-2 p-3 rounded-2xl bg-slate-50 dark:bg-zinc-950/50 border border-slate-100 dark:border-zinc-800">
                                     <div className="flex items-center justify-between">
-                                        <span className="text-xs font-bold text-slate-900 dark:text-zinc-100">{m.courier}</span>
+                                        <span className="text-xs font-bold text-slate-900 dark:text-zinc-100">{m.title}</span>
                                         <div className="flex items-center gap-1.5">
                                             <div className="h-1.5 w-1.5 rounded-full bg-blue-500" />
-                                            <span className="text-[10px] font-black text-blue-600 dark:text-blue-400 uppercase tracking-widest">{m.markup}</span>
+                                            <span className="text-[10px] font-black text-blue-600 dark:text-blue-400 uppercase tracking-widest">${m.markup}</span>
                                         </div>
                                     </div>
                                     <div className="flex items-center justify-between">
                                         <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Pickup</span>
-                                        <span className="text-xs font-bold text-slate-600 dark:text-zinc-400">{m.pickup}</span>
+                                        <span className="text-xs font-bold text-slate-600 dark:text-zinc-400">${m.pickup}</span>
                                     </div>
                                 </div>
                             ))}
@@ -63,7 +78,7 @@ export const ProfileTab = ({ customer }: ProfileTabProps) => {
 
             {/* Right Column: Timeline */}
             <div className="lg:col-span-8">
-                <ActivityTimeline />
+                <ActivityTimeline activities={customer.activity_timeline} />
             </div>
         </div>
     );

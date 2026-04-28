@@ -2,12 +2,13 @@ import { useState, useMemo, useRef, forwardRef, useCallback } from 'react';
 import { CustomModel } from '@/components/ui/dialog';
 import { FormInput, FormSelect } from '@/features/orders/components/OrderFormUI';
 import { COURIER_OPTIONS } from '../constants';
-import type { CourierPostcode } from '../types';
+import type { CourierPostcode, CourierPostcodeFormData } from '../types';
 
 interface AddPostcodeDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  onSubmit: (data: Partial<CourierPostcode>) => void;
+  onSubmit: (data: CourierPostcodeFormData) => void;
+
   initialData?: CourierPostcode | null;
   isLoading?: boolean;
 }
@@ -20,17 +21,17 @@ export function AddPostcodeDialog({
   isLoading
 }: AddPostcodeDialogProps) {
   const initialValues = useMemo(() => ({
-    courierName: '',
-    postCode: '',
+    global_courier_id: '',
+    single_post_code: '',
     price: ''
   }), []);
 
   const formDataToLoad = useMemo(() => {
     if (initialData) {
       return {
-        courierName: initialData.courierName,
-        postCode: initialData.postCode,
-        price: initialData.price
+        global_courier_id: initialData.global_courier_id?.toString(),
+        single_post_code: initialData.single_post_code,
+        price: initialData.price?.toString()
       };
     }
     return initialValues;
@@ -47,7 +48,7 @@ export function AddPostcodeDialog({
       onSubmit={() => formRef.current?.requestSubmit()}
       onCancel={() => onOpenChange(false)}
       submitText={initialData ? "Update" : "Submit"}
-      cancelText="Cencel"
+      cancelText="Cancel"
       isLoading={isLoading}
       contentClass="sm:max-w-[400px]"
     >
@@ -55,7 +56,13 @@ export function AddPostcodeDialog({
         key={formKey}
         ref={formRef}
         initialValues={formDataToLoad}
-        onSubmit={onSubmit}
+        onSubmit={(data) => {
+          onSubmit({
+            global_courier_id: Number(data.global_courier_id),
+            single_post_code: Number(data.single_post_code),
+            price: Number(data.price)
+          });
+        }}
       />
     </CustomModel>
   );
@@ -79,7 +86,7 @@ const PostcodeForm = forwardRef<HTMLFormElement, PostcodeFormProps>(
       e.preventDefault();
       setSubmited(true);
 
-      if (!formData.courierName || !formData.postCode || !formData.price) {
+      if (!formData.global_courier_id || !formData.single_post_code || !formData.price) {
         return;
       }
 
@@ -90,22 +97,22 @@ const PostcodeForm = forwardRef<HTMLFormElement, PostcodeFormProps>(
       <form ref={ref} onSubmit={handleSubmit} className="flex flex-col gap-5 p-1">
         <FormSelect
           label="Courier Name"
-          value={formData.courierName}
-          onValueChange={(val) => handleChange('courierName', val || '')}
+          value={formData.global_courier_id}
+          onValueChange={(val) => handleChange('global_courier_id', val || '')}
           options={COURIER_OPTIONS}
           placeholder="Select Courier"
           required
-          error={submited && !formData.courierName}
-          errormsg="Courier Name is required"
+          error={submited && !formData.global_courier_id}
+          errormsg="Courier is required"
         />
 
         <FormInput
           label="Post Code"
-          value={formData.postCode}
-          onChange={(val) => handleChange('postCode', val)}
+          value={formData.single_post_code}
+          onChange={(val) => handleChange('single_post_code', val)}
           placeholder="Enter PostCode"
           required
-          error={submited && !formData.postCode}
+          error={submited && !formData.single_post_code}
           errormsg="Post Code is required"
         />
 
@@ -122,3 +129,4 @@ const PostcodeForm = forwardRef<HTMLFormElement, PostcodeFormProps>(
     );
   }
 );
+

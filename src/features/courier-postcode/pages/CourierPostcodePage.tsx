@@ -4,41 +4,89 @@ import { DataTable } from '@/components/common';
 import { ConformationModal } from '@/components/common/ConformationModal';
 import { Button } from '@/components/ui/button';
 import { POSTCODE_COLUMNS } from '../columns';
-import { MOCK_POSTCODES } from '../constants';
 import { AddPostcodeDialog } from '../components/AddPostcodeDialog';
-import type { CourierPostcode } from '../types';
+import type { CourierPostcode, CourierPostcodeFormData } from '../types';
+import { 
+  useCourierPostcodes, 
+  useCreateCourierPostcode, 
+  useUpdateCourierPostcode, 
+  useDeleteCourierPostcode,
+  useExportCourierPostcodes 
+} from '../hooks/useCourierPostcode';
+import { useDebounce } from '@/hooks/useDebounce';
+import { toast } from 'sonner';
+import { downloadFile } from '@/lib/utils';
 
 export default function CourierPostcodePage() {
-  const [data, setData] = useState<CourierPostcode[]>(MOCK_POSTCODES);
   const [search, setSearch] = useState('');
   const [isAddOpen, setIsAddOpen] = useState(false);
   const [editingRow, setEditingRow] = useState<CourierPostcode | null>(null);
   const [deletingRow, setDeletingRow] = useState<CourierPostcode | null>(null);
+  const [page, setPage] = useState(1);
+  const [pageSize, setPageSize] = useState(25);
 
-  const handleAddPostcode = (formData: Partial<CourierPostcode>) => {
+  const debouncedSearch = useDebounce(search, 500);
+
+  const { data: postcodeData, isLoading } = useCourierPostcodes({
+    search: debouncedSearch,
+    page,
+    per_page: pageSize
+  });
+
+  const { mutate: createPostcode, isPending: isCreating } = useCreateCourierPostcode();
+  const { mutate: updatePostcode, isPending: isUpdating } = useUpdateCourierPostcode();
+  const { mutate: deletePostcode, isPending: isDeleting } = useDeleteCourierPostcode();
+  const { mutate: exportPostcodes, isPending: isExporting } = useExportCourierPostcodes();
+
+  const handleAddPostcode = (formData: CourierPostcodeFormData) => {
     if (editingRow) {
-      setData(prev => prev.map(item => item.id === editingRow.id ? { ...item, ...formData } as CourierPostcode : item));
+      updatePostcode({ id: editingRow.id, data: formData }, {
+        onSuccess: () => {
+          toast.success('Postcode updated successfully');
+          setIsAddOpen(false);
+          setEditingRow(null);
+        },
+        onError: (err: any) => {
+          toast.error(err?.response?.data?.message || 'Failed to update postcode');
+        }
+      });
     } else {
-      const newPostcode: CourierPostcode = {
-        ...formData,
-        id: Math.random().toString(36).substr(2, 9),
-      } as CourierPostcode;
-      setData(prev => [newPostcode, ...prev]);
+      createPostcode(formData, {
+        onSuccess: () => {
+          toast.success('Postcode created successfully');
+          setIsAddOpen(false);
+        },
+        onError: (err: any) => {
+          toast.error(err?.response?.data?.message || 'Failed to create postcode');
+        }
+      });
     }
-    setIsAddOpen(false);
-    setEditingRow(null);
   };
 
   const handleDelete = () => {
     if (deletingRow) {
-      setData(prev => prev.filter(item => item.id !== deletingRow.id));
-      setDeletingRow(null);
+      deletePostcode(deletingRow.id, {
+        onSuccess: () => {
+          toast.success('Postcode deleted successfully');
+          setDeletingRow(null);
+        },
+        onError: (err: any) => {
+          toast.error(err?.response?.data?.message || 'Failed to delete postcode');
+        }
+      });
     }
   };
 
-  const onAddPostcode = () => {
-    setEditingRow(null);
-    setIsAddOpen(true);
+  const handleExport = (format: string) => {
+    exportPostcodes({ format, search: debouncedSearch }, {
+      onSuccess: (blob) => {
+        downloadFile(blob, `courier-postcodes-${new Date().getTime()}.${format === 'excel' ? 'xlsx' : format}`);
+        toast.success('Exported successfully');
+      },
+      onError: (err: any) => {
+        toast.error(err?.response?.data?.message || 'Failed to export');
+      }
+    });
   };
 
   const columns = useMemo(() => POSTCODE_COLUMNS(
@@ -46,37 +94,38 @@ export default function CourierPostcodePage() {
       setEditingRow(row);
       setIsAddOpen(true);
     },
-    (row) => {
-      setDeletingRow(row);
-    }
+    (row) => setDeletingRow(row)
   ), []);
 
-  const filteredData = useMemo(() => {
-    return data.filter(item =>
-      item.courierName.toLowerCase().includes(search.toLowerCase()) ||
-      item.postCode.toLowerCase().includes(search.toLowerCase())
-    );
-  }, [data, search]);
-
   return (
-    <div className="flex flex-col flex-1 gap-6 p-page-padding min-h-0 animate-in fade-in slide-in-from-bottom-2 duration-500 bg-slate-50/30 dark:bg-zinc-950/30 overflow-y-auto">
-      <div className="rounded-2xl shadow-sm border border-slate-100 dark:border-zinc-800 bg-white dark:bg-zinc-950 overflow-hidden flex-1 flex flex-col min-h-[500px]">
+    <div className="flex flex-col flex-1 gap-4 p-page-padding min-h-0 animate-in fade-in slide-in-from-bottom-2 duration-500 bg-slate-50/30 dark:bg-zinc-950/30 overflow-y-auto">
+      <div className='rounded-2xl min-h-[500px] shadow-[0_8px_30px_rgba(0,0,0,0.04)] flex-1 flex flex-col border border-slate-100 dark:border-zinc-800 bg-white dark:bg-zinc-950 overflow-hidden'>
         <DataTable
-          headerTitle="Courier Based PostCode"
-          columns={columns}
-          data={filteredData}
+          columns={columns as any}
+          data={postcodeData?.data || []}
           searchable
           searchValue={search}
-          onSearchChange={setSearch}
-          totalItems={filteredData.length}
-          className="text-xs pb-3"
+          onSearchChange={(val) => { setSearch(val); setPage(1); }}
+          pageSize={pageSize}
+          onPageSizeChange={(val) => { setPageSize(Number(val)); setPage(1); }}
+          className="pb-3 text-xs"
+          totalItems={postcodeData?.meta?.total || 0}
+          currentPage={page}
+          onPageChange={setPage}
+          loading={isLoading}
+          exportable
+          isExporting={isExporting}
+          onExport={handleExport}
           customHeader={
-            <Button
-              onClick={onAddPostcode}
-              className="gap-2 bg-[#0060FE] hover:bg-[#0052db] text-white shadow-lg shadow-blue-100 dark:shadow-none transition-all active:scale-[0.98] font-semibold border-none px-4"
+            <Button 
+              onClick={() => {
+                setEditingRow(null);
+                setIsAddOpen(true);
+              }}
+              className="gap-2 bg-[#0060FE] hover:bg-[#0052db] text-white shadow-lg shadow-blue-100 dark:shadow-none transition-all active:scale-[0.98] font-semibold border-none px-4 h-8"
             >
               <Plus className="w-4 h-4" />
-              <span>Add Postcode</span>
+              <span className="text-xs uppercase tracking-wider font-bold">Add Postcode</span>
             </Button>
           }
         />
@@ -87,16 +136,18 @@ export default function CourierPostcodePage() {
         onOpenChange={setIsAddOpen}
         onSubmit={handleAddPostcode}
         initialData={editingRow}
+        isLoading={isCreating || isUpdating}
       />
 
       <ConformationModal
         open={!!deletingRow}
         onOpenChange={(open) => !open && setDeletingRow(null)}
-        onConfirm={handleDelete}
         title="Delete Postcode"
-        description={`Are you sure you want to delete the postcode mapping for "${deletingRow?.courierName}"? This action cannot be undone.`}
+        description="Are you sure you want to delete this courier postcode? This action cannot be undone."
+        onConfirm={handleDelete}
         confirmText="Delete"
         confirmVariant="destructive"
+        loading={isDeleting}
       />
     </div>
   );

@@ -11,7 +11,7 @@ export interface HeaderIconProps {
 export interface FormInputProps extends Omit<InputHTMLAttributes<HTMLInputElement>, 'onChange' | 'value'> {
   label?: ReactNode;
   value: string | number;
-  onChange: (val: string) => void;
+  onChange: (val: string, name: string) => void;
   placeholder?: string;
   type?: string;
   isHalf?: boolean;
@@ -63,4 +63,21 @@ export interface DropdownUIProps {
   label: string;
   onClick: (value: string) => void;
   options: ReadonlyArray<{ value: string; label: string }> | Array<{ value: string; label: string }>;
+}
+
+export interface FormRadioProps {
+  checked: boolean;
+  onChange: () => void;
+  label?: string;
+  className?: string;
+  activeColor?: string;
+}
+
+export interface FormCheckboxProps {
+  checked: boolean;
+  onCheckedChange: (checked: boolean) => void;
+  label?: string;
+  description?: string;
+  price?: number;
+  className?: string;
 }

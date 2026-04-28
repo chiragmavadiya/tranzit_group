@@ -1,12 +1,11 @@
 import { useState, useCallback, useMemo, useRef, forwardRef } from 'react';
-import { Search, Loader2 } from 'lucide-react';
+import { Loader2 } from 'lucide-react';
 import { CustomModel, } from '@/components/ui/dialog';
 import type { AddressFormData } from '../types';
-import { FormInput, FormTextarea, FormSelect, Required } from '@/features/orders/components/OrderFormUI';
+import { FormInput, FormTextarea, FormSelect } from '@/features/orders/components/OrderFormUI';
 import { AUSTRALIAN_STATES, STREET_TYPES } from '../constants';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
 import { useAddressBookDetails } from '../hooks/useAddressBook';
+import { AutoComplete } from '@/components/common';
 
 interface CreateAddressDialogProps {
   open: boolean;
@@ -161,221 +160,225 @@ const AddressForm = forwardRef<HTMLFormElement, AddressFormProps>(
               </div>
             </div>
           )}
-          <div className="space-y-8">
-            {/* Basic Information Section */}
-            <section>
-              <div className="flex items-center gap-2 mb-4">
-                <div className="h-6 w-1 bg-blue-600 rounded-full" />
-                <h3 className="text-sm font-bold text-slate-700 dark:text-zinc-300 uppercase tracking-wider">Basic Information</h3>
+          <div className="space-y-6">
+            <div className="flex dark:border-zinc-800 rounded-md overflow-hidden bg-white dark:bg-zinc-950">
+              {/* <button type="button" className="px-6 py-2 text-[12px] font-bold text-blue-600 bg-white dark:bg-zinc-900 border-r border-gray-200 dark:border-zinc-800 uppercase tracking-wider hover:bg-slate-50 transition-colors">
+                LOOK UP CONTACT
+              </button>
+              <button type="button" className="px-6 py-2 text-[12px] font-bold text-white bg-blue-600 uppercase tracking-wider">
+                LOOK UP ADDRESS
+              </button> */}
+              <div className="flex-1 relative flex items-center">
+                {/* <Input
+                  value={formData.address}
+                  onChange={(e) => handleChange('address', e.target.value)}
+                  placeholder="Enter an address to search"
+                  className="w-full h-8 border-0 rounded-none focus-visible:ring-0 bg-transparent px-9 font-medium text-sm"
+                /> */}
+                <AutoComplete
+                  placeholder="Start typing suburb or postcode..."
+                  options={[
+                    { value: 'SYD-2000', label: 'Sydney, NSW 2000', suburb: 'Sydney', state: 'NSW', postcode: '2000', country: 'Australia' },
+                    { value: 'MEL-3000', label: 'Melbourne, VIC 3000', suburb: 'Melbourne', state: 'VIC', postcode: '3000', country: 'Australia' },
+                    { value: 'BNE-4000', label: 'Brisbane, QLD 4000', suburb: 'Brisbane', state: 'QLD', postcode: '4000', country: 'Australia' },
+                    { value: 'PER-6000', label: 'Perth, WA 6000', suburb: 'Perth', state: 'WA', postcode: '6000', country: 'Australia' },
+                  ]}
+                  onSelect={() => {
+                    // const opt = locationOptions.find(o => o.value === val);
+                    // if (opt) setLocations(prev => ({ ...prev, sender: opt }));
+                  }}
+                // className="w-full h-8 border-0 rounded-none focus-visible:ring-0  px-9 font-medium text-sm"
+                />
               </div>
-              <div className='space-y-4'>
-                <div className="grid grid-cols-12 gap-4">
-                  <div className="col-span-4">
-                    <FormInput
-                      label="Code"
-                      value={formData.code}
-                      onChange={(val) => handleChange('code', val)}
-                      placeholder="Enter code"
-                      required
-                      error={submited && formData.code.length < 1}
-                      errormsg="Required Code"
-                    />
-                  </div>
-                  <div className="col-span-4">
-                    <FormInput
-                      label="Contact Person"
-                      value={formData.contact_person}
-                      onChange={(val) => handleChange('contact_person', val)}
-                      placeholder="Full name"
-                      required
-                      error={submited && formData.contact_person.length < 1}
-                      errormsg="Required Contact Person"
-                    />
-                  </div>
-                  <div className="col-span-4">
-                    <FormInput
-                      label="Business Name"
-                      value={formData.business_name}
-                      onChange={(val) => handleChange('business_name', val)}
-                      placeholder="Company name"
-                    />
-                  </div>
-                </div>
-                <div className="grid grid-cols-12 gap-4">
-                  <div className="col-span-6">
-                    <FormInput
-                      label="Email ID"
-                      value={formData.email}
-                      onChange={(val) => handleChange('email', val)}
-                      placeholder="example@mail.com"
-                      required
-                      error={submited && formData.email.length < 1}
-                      errormsg="Required Email"
-                    />
-                  </div>
-                  <div className="col-span-6">
-                    <FormInput
-                      label="Mobile"
-                      value={formData.phone || ''}
-                      onChange={(val) => handleChange('phone', val)}
-                      placeholder="Phone number"
-                    />
-                  </div>
-                </div>
-              </div>
-            </section>
+            </div>
 
-            {/* Address Information Section */}
-            <section>
-              <div className="flex items-center gap-2 mb-4">
-                <div className="h-6 w-1 bg-blue-600 rounded-full" />
-                <h3 className="text-sm font-bold text-slate-700 dark:text-zinc-300 uppercase tracking-wider">Address Information</h3>
-              </div>
+            {submited && formData.address.length < 1 && (
+              <p className="text-red-500 text-[11px] mt-1">Required Address</p>
+            )}
 
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-4">
+              {/* Left Column */}
               <div className="space-y-4">
-                <div className="relative group">
-                  <Label className="text-[11px] ml-0.5 font-extrabold text-slate-700 dark:text-zinc-400 uppercase tracking-wider gap-0 mb-1">
-                    Address
-                    <Required />
-                  </Label>
-                  <Search className="absolute left-2.5 top-9 -translate-y-1/2 w-4 h-4 text-gray-400 group-focus-within:text-blue-500 transition-colors" />
-                  <Input
-                    value={formData.address}
-                    onChange={(e) => handleChange('address', e.target.value)}
-                    placeholder="Search for an address..."
-                    className="pl-8 h-8 rounded-md border-slate-200 dark:border-zinc-800 bg-white dark:bg-zinc-950 font-medium focus-visible:ring-0 focus-visible:ring-blue-600 focus-visible:border-blue-600 transition-all placeholder:text-slate-300 dark:placeholder:text-zinc-700 text-sm"
-                    error={submited && formData.address.length < 1}
-                  />
-                </div>
+                <FormInput
+                  layout="horizontal"
+                  label="Code"
+                  value={formData.code}
+                  onChange={(val) => handleChange('code', val)}
+                  placeholder="Enter code"
+                  required
+                  error={submited && formData.code.length < 1}
+                  errormsg="Required Code"
+                  isFullWidth
+                />
+                <FormInput
+                  layout="horizontal"
+                  label="Contact Person"
+                  value={formData.contact_person}
+                  onChange={(val) => handleChange('contact_person', val)}
+                  placeholder="Full name"
+                  required
+                  error={submited && formData.contact_person.length < 1}
+                  errormsg="Required Contact Person"
+                  isFullWidth
+                />
+                <FormInput
+                  layout="horizontal"
+                  label="Business Name"
+                  value={formData.business_name}
+                  onChange={(val) => handleChange('business_name', val)}
+                  placeholder="Company name"
+                  isFullWidth
+                />
+                <FormInput
+                  layout="horizontal"
+                  label="Email ID"
+                  value={formData.email}
+                  onChange={(val) => handleChange('email', val)}
+                  placeholder="example@mail.com"
+                  required
+                  error={submited && formData.email.length < 1}
+                  errormsg="Required Email"
+                  isFullWidth
+                />
+                <FormInput
+                  layout="horizontal"
+                  label="Mobile"
+                  value={formData.phone || ''}
+                  onChange={(val) => handleChange('phone', val)}
+                  placeholder="Phone number"
+                  isFullWidth
+                />
+                <FormTextarea
+                  layout="horizontal"
+                  label="Special Instructions"
+                  value={formData.special_instructions || ''}
+                  onChange={(val) => handleChange('special_instructions', val)}
+                  placeholder="Delivery instructions..."
+                  rows={3}
+                  isFullWidth
+                />
+                <FormTextarea
+                  layout="horizontal"
+                  label="Additional Details"
+                  value={formData.additional_details || ''}
+                  onChange={(val) => handleChange('additional_details', val)}
+                  placeholder="Internal notes..."
+                  rows={3}
+                  isFullWidth
+                />
+              </div>
 
-                <div className="grid grid-cols-12 gap-4">
-                  <div className="col-span-4">
-                    <FormInput
-                      label="Unit Number"
-                      value={formData.unit_number || ''}
-                      onChange={(val) => handleChange('unit_number', val)}
-                      placeholder="e.g. 1A"
-                    />
-                  </div>
-                  <div className="col-span-4">
-                    <FormInput
-                      label="Street Name"
-                      value={formData.street_name || ''}
-                      onChange={(val) => handleChange('street_name', val)}
-                      placeholder="e.g. George"
-                      required
-                      error={submited && formData.street_name.length < 1}
-                      errormsg="Required Street Name"
-                    />
-                  </div>
-                  <div className="col-span-4">
-                    <FormInput
-                      label="Street Number"
-                      value={formData.street_number || ''}
-                      onChange={(val) => handleChange('street_number', val)}
-                      placeholder="e.g. 123"
-                      required
-                      error={submited && formData.street_number.length < 1}
-                      errormsg="Required Street Number"
-                    />
-                  </div>
-                </div>
-                <div className="grid grid-cols-12 gap-4">
-                  <div className="col-span-4">
-                    <FormSelect
-                      label="Street Type"
-                      value={formData.street_type || ''}
-                      onValueChange={(val) => handleChange('street_type', val)}
-                      options={STREET_TYPES}
-                      placeholder="Select type"
-                      required
-                      error={submited && formData.street_type.length < 1}
-                      errormsg="Required Street Type"
-                    />
-                  </div>
-                  <div className="col-span-4">
-                    <FormInput
-                      label="Suburb"
-                      value={formData.suburb || ''}
-                      onChange={(val) => handleChange('suburb', val)}
-                      placeholder="e.g. Sydney"
-                      required
-                      error={submited && formData.suburb.length < 1}
-                      errormsg="Required Suburb"
-                    />
-                  </div>
-                  <div className="col-span-4">
-                    <FormSelect
-                      label="State"
-                      value={formData.state || ''}
-                      onValueChange={(val) => handleChange('state', val)}
-                      options={AUSTRALIAN_STATES}
-                      placeholder="Select state"
-                      required
-                      error={submited && formData.state.length < 1}
-                      errormsg="Required State"
-                    />
-                  </div>
-                  <div className="col-span-4">
-                    <FormInput
-                      label="Post Code"
-                      value={formData.postcode || ''}
-                      onChange={(val) => handleChange('postcode', val)}
-                      placeholder="e.g. 2000"
-                      required
-                      error={submited && formData.postcode.length < 1}
-                      errormsg="Required Post code"
-                    />
-                  </div>
-                  <div className="col-span-4">
-                    <FormInput
-                      label="Latitude"
-                      value={formData.latitude || ''}
-                      onChange={(val) => handleChange('latitude', val)}
-                      placeholder="e.g. 2000"
-                    />
-                  </div>
-                  <div className="col-span-4">
-                    <FormInput
-                      label="Longitude"
-                      value={formData.longitude || ''}
-                      onChange={(val) => handleChange('longitude', val)}
-                      placeholder="e.g. 2000"
-                    />
-                  </div>
-                </div>
-              </div>
-            </section>
+              {/* Right Column */}
+              <div className="space-y-4">
+                <FormInput
+                  layout="horizontal"
+                  label="Unit Number"
+                  value={formData.unit_number || ''}
+                  onChange={(val) => handleChange('unit_number', val)}
+                  placeholder="e.g. 1A"
+                  isFullWidth
+                />
+                <FormInput
+                  layout="horizontal"
+                  label="Street Name"
+                  value={formData.street_name || ''}
+                  onChange={(val) => handleChange('street_name', val)}
+                  placeholder="e.g. George"
+                  required
+                  error={submited && formData.street_name.length < 1}
+                  errormsg="Required Street Name"
+                  isFullWidth
+                />
+                <FormInput
+                  layout="horizontal"
+                  label="Street Number"
+                  value={formData.street_number || ''}
+                  onChange={(val) => handleChange('street_number', val)}
+                  placeholder="e.g. 123"
+                  required
+                  error={submited && formData.street_number.length < 1}
+                  errormsg="Required Street Number"
+                  isFullWidth
+                />
+                <FormSelect
+                  layout="horizontal"
+                  label="Street Type"
+                  value={formData.street_type || ''}
+                  onValueChange={(val) => handleChange('street_type', val)}
+                  options={STREET_TYPES}
+                  placeholder="Select type"
+                  required
+                  error={submited && formData.street_type.length < 1}
+                  errormsg="Required Street Type"
+                // isFullWidth
+                />
+                <FormInput
+                  layout="horizontal"
+                  label="Suburb"
+                  value={formData.suburb || ''}
+                  onChange={(val) => handleChange('suburb', val)}
+                  placeholder="e.g. Sydney"
+                  required
+                  error={submited && formData.suburb.length < 1}
+                  errormsg="Required Suburb"
+                  isFullWidth
+                />
+                <FormSelect
+                  layout="horizontal"
+                  label="State"
+                  value={formData.state || ''}
+                  onValueChange={(val) => handleChange('state', val)}
+                  options={AUSTRALIAN_STATES}
+                  placeholder="Select state"
+                  required
+                  error={submited && formData.state.length < 1}
+                  errormsg="Required State"
+                // isFullWidth
+                />
+                <FormInput
+                  layout="horizontal"
+                  label="Post Code"
+                  value={formData.postcode || ''}
+                  onChange={(val) => handleChange('postcode', val)}
+                  placeholder="e.g. 2000"
+                  required
+                  error={submited && formData.postcode.length < 1}
+                  errormsg="Required Post code"
+                  isFullWidth
+                />
+                <FormInput
+                  layout="horizontal"
+                  label="Latitude"
+                  value={formData.latitude || ''}
+                  onChange={(val) => handleChange('latitude', val)}
+                  placeholder="e.g. -33.8688"
+                  isFullWidth
+                />
+                <FormInput
+                  layout="horizontal"
+                  label="Longitude"
+                  value={formData.longitude || ''}
+                  onChange={(val) => handleChange('longitude', val)}
+                  placeholder="e.g. 151.2093"
+                  isFullWidth
+                />
 
-            {/* Additional Information Section */}
-            <section>
-              <div className="flex items-center gap-2 mb-4">
-                <div className="h-6 w-1 bg-blue-600 rounded-full" />
-                <h3 className="text-sm font-bold text-slate-700 dark:text-zinc-300 uppercase tracking-wider">Additional Details</h3>
+                {/* <div className="pl-[126px] pt-2">
+                  <div className="flex items-center gap-2 px-3 py-1.5 bg-white dark:bg-zinc-900 border border-emerald-600 rounded-md text-[11px] font-bold text-emerald-600 uppercase tracking-wider w-fit shadow-sm cursor-default">
+                    <CheckCircle2 className="w-4 h-4" />
+                    VALID ADDRESS
+                    <RefreshCw className="w-3.5 h-3.5 ml-1 cursor-pointer hover:rotate-180 transition-transform duration-500" />
+                  </div>
+                </div> */}
               </div>
-              <div className="grid grid-cols-12 gap-4">
-                <div className="col-span-6">
-                  <FormTextarea
-                    label="Special Instructions"
-                    value={formData.special_instructions || ''}
-                    onChange={(val) => handleChange('special_instructions', val)}
-                    placeholder="Delivery instructions..."
-                    rows={3}
-                    isFullWidth
-                  />
-                </div>
-                <div className="col-span-6">
-                  <FormTextarea
-                    label="Additional Details"
-                    value={formData.additional_details || ''}
-                    onChange={(val) => handleChange('additional_details', val)}
-                    placeholder="Internal notes..."
-                    rows={3}
-                    isFullWidth
-                  />
-                </div>
-              </div>
-            </section>
+            </div>
+
+            {/* <div className="mt-8 border border-gray-200 dark:border-zinc-800 rounded-md">
+              <button type="button" className="flex items-center justify-between w-full px-4 py-3 bg-white dark:bg-zinc-950 rounded-md hover:bg-slate-50 transition-colors">
+                <span className="text-[12px] font-extrabold text-slate-700 dark:text-zinc-300 uppercase tracking-wider">ADDRESS VALIDATION</span>
+                <ChevronDown className="w-4 h-4 text-slate-400" />
+              </button>
+            </div> */}
           </div>
         </div>
 

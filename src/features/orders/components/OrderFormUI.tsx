@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import SelectComponent from "@/components/ui/select"
+import { Checkbox } from "@/components/ui/checkbox"
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -19,7 +20,9 @@ import type {
   FormSelectProps,
   SummaryCardProps,
   SummaryMetricProps,
-  DropdownUIProps
+  DropdownUIProps,
+  FormRadioProps,
+  FormCheckboxProps
 } from "./types/OrderFormUI.types";
 
 
@@ -44,7 +47,7 @@ export const Required = () => {
 }
 
 
-export function FormInput({
+export const FormInput = React.forwardRef<HTMLInputElement, FormInputProps>(({
   label,
   value,
   onChange,
@@ -58,12 +61,14 @@ export function FormInput({
   required = false,
   className, disabled = false,
   error,
-  errormsg
-}: FormInputProps) {
+  errormsg,
+  // rightElement
+}, ref) => {
+  const [showPassword, setShowPassword] = React.useState(false);
   const isHorizontal = useMemo(() => layout === 'horizontal', [layout]);
 
   const handleChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-    onChange(e.target.value);
+    onChange(e.target.value, e.target.name || '');
   }, [onChange]);
 
   return (
@@ -83,27 +88,42 @@ export function FormInput({
       )}
       <div className="relative group">
         {Icon && (
-          <div className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-blue-600 transition-colors">
+          <div className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-blue-600 transition-colors">
             <Icon className="w-4 h-4" />
           </div>
         )}
         <Input
-          type={type}
+          ref={ref}
+          type={showPassword ? 'text' : type}
           placeholder={placeholder}
           value={value}
           onChange={handleChange}
           className={cn(
-            "h-8 rounded-md border-slate-200 dark:border-zinc-800 bg-white dark:bg-zinc-950 font-medium focus-visible:ring-0 focus-visible:ring-blue-600 focus-visible:border-blue-600 transition-all placeholder:text-slate-300 dark:placeholder:text-zinc-700 text-sm",
+            "h-8 rounded-md border-slate-200 dark:border-zinc-800 bg-white dark:bg-zinc-950 font-medium focus-visible:ring-0 focus-visible:ring-blue-600 focus-visible:border-blue-600 transition-all placeholder:text-muted-foreground placeholder:font-normal dark:placeholder:text-zinc-700 text-sm",
             Icon ? "pl-9" : "px-3",
+            type === 'password' ? "pr-10" : "",
             error ? "border-red-500 focus-visible:border-red-500" : ""
           )}
           disabled={disabled}
         />
+        {type === 'password' && (
+          <button
+            type="button"
+            onClick={() => setShowPassword(!showPassword)}
+            className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 transition-colors"
+          >
+            {showPassword ? (
+              <LucideIcons.Eye className="h-4 w-4" />
+            ) : (
+              <LucideIcons.EyeOff className="h-4 w-4" />
+            )}
+          </button>
+        )}
       </div>
       {error ? <div className="text-red-500 text-[11px] w-full text-right">{errormsg}</div> : null}
     </div>
   );
-}
+});
 
 
 export function FormTextarea({
@@ -121,7 +141,7 @@ export function FormTextarea({
   const isHorizontal = useMemo(() => layout === 'horizontal', [layout]);
 
   const handleChange = useCallback((e: React.ChangeEvent<HTMLTextAreaElement>) => {
-    onChange(e.target.value);
+    onChange(e.target.value, e.target.name || '');
   }, [onChange]);
 
   return (
@@ -245,4 +265,68 @@ export function DropdownUI({ icon = 'ChevronDown', label, onClick, options }: Dr
       </DropdownMenuContent>
     </DropdownMenu>
   )
+}
+export function FormRadio({
+  checked,
+  onChange,
+  label,
+  className,
+  activeColor = "bg-[#0060FE]"
+}: FormRadioProps) {
+  return (
+    <label className={cn("flex items-center gap-2.5 cursor-pointer group", className)}>
+      <div className="relative flex items-center justify-center">
+        <input
+          type="radio"
+          className={cn(
+            "peer appearance-none w-4 h-4 rounded-full border-2 border-gray-300 dark:border-zinc-700 transition-all",
+            checked && (activeColor === "bg-[#0060FE]" ? "border-[#0060FE]" : `border-${activeColor.replace('bg-[', '').replace(']', '')}`)
+          )}
+          checked={checked}
+          onChange={onChange}
+        />
+        <div className={cn(
+          "absolute w-2 h-2 rounded-full opacity-0 peer-checked:opacity-100 transition-all scale-0 peer-checked:scale-100",
+          activeColor
+        )} />
+      </div>
+      {label && <span className="text-[13px] font-medium text-gray-700 dark:text-zinc-300 group-hover:text-gray-900 dark:group-hover:text-zinc-100">{label}</span>}
+    </label>
+  );
+}
+
+export function FormCheckbox({
+  checked,
+  onCheckedChange,
+  label,
+  description,
+  price,
+  className
+}: FormCheckboxProps) {
+  return (
+    <div className={cn("flex items-start gap-4 p-4 transition-all", className)}>
+      <Checkbox
+        checked={checked}
+        onCheckedChange={onCheckedChange}
+        className="mt-1"
+      />
+      <div className="flex-1 space-y-1">
+        <div className="flex items-center justify-between">
+          <Label className="text-[14px] font-bold text-slate-800 dark:text-zinc-100 leading-none">
+            {label}
+          </Label>
+          {price !== undefined && (
+            <span className="text-[14px] font-bold text-slate-800 dark:text-zinc-100">
+              ${price.toFixed(2)}
+            </span>
+          )}
+        </div>
+        {description && (
+          <p className="text-[12px] text-slate-500 dark:text-zinc-400 font-medium">
+            {description}
+          </p>
+        )}
+      </div>
+    </div>
+  );
 }

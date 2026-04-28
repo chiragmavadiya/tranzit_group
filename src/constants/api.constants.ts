@@ -75,7 +75,24 @@ export const API_ENDPOINTS = {
         DETAILS: (id: string | number) => `/admin/quotes/${id}`,
         SERVICES: "/admin/quotes/services",
         EXPORT: "/admin/quotes/export",
-    }
+    },
+    ADMIN_COURIER_SURCHARGES: {
+        BASE: "/admin/courier-surcharges",
+        DETAILS: (id: string | number) => `/admin/courier-surcharges/${id}`,
+        GLOBAL_COURIERS: "/admin/courier-surcharges/global-couriers",
+        EXPORT: "/admin/courier-surcharges/export",
+    },
+    ADMIN_REPORTS: {
+        PARCELS: "/admin/reports/customer-parcels",
+        PARCELS_EXPORT: "/admin/reports/customer-parcels/export",
+        AUSPOST_ORDER_SUMMARY: "/admin/reports/auspost-order-summary",
+        UNDELIVERED_PARCELS: "/admin/reports/undelivered-parcels",
+        UNDELIVERED_PARCELS_EXPORT: "/admin/reports/undelivered-parcels/export",
+    },
+    ADMIN_HELP_CENTER: {
+        BASE: "/admin/help-center/articles",
+        DETAILS: (id: string | number) => `/admin/help-center/articles/${id}`,
+    },
 };
 
 export const QUERY_KEYS = {
@@ -102,6 +119,12 @@ export const QUERY_KEYS = {
         TRANSACTION: ["reports", "transaction"],
         INVOICE: ["reports", "invoice"],
         PARCELS: ["reports", "parcels"],
+        AUSPOST_SUMMARY: ["reports", "auspost-summary"],
+        UNDELIVERED_PARCELS: ["reports", "undelivered-parcels"],
+    },
+    ADMIN_HELP_CENTER: {
+        LIST: ["admin", "help-center", "list"],
+        DETAILS: (id: string | number) => ["admin", "help-center", "details", id],
     },
     INVOICES: {
         LIST: ["invoices", "list"],
@@ -129,5 +152,8 @@ export const QUERY_KEYS = {
     ADMIN_QUOTES: {
         LIST: ["admin", "quotes", "list"],
         DETAILS: (id: string | number) => ["admin", "quotes", "details", id],
+    },
+    ADMIN_COURIER_SURCHARGES: {
+        GLOBAL_COURIERS: ["admin", "courier-surcharges", "global-couriers"],
     }
 };

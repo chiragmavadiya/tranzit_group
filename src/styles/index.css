@@ -3,6 +3,7 @@
 @import "shadcn/tailwind.css";
 
 
+
 @custom-variant dark (&:is(.dark *));
 
 @theme inline {
@@ -131,6 +132,22 @@
   html {
     @apply font-sans;
   }
+
+  h1 {
+    @apply text-3xl font-bold mb-4 mt-6;
+  }
+
+  h2 {
+    @apply text-2xl font-bold mb-3 mt-5;
+  }
+
+  h3 {
+    @apply text-xl font-bold mb-2 mt-4;
+  }
+
+  p {
+    @apply mb-4 leading-relaxed;
+  }
 }
 
 @layer utilities {
@@ -167,7 +184,17 @@
   }
 }
 
+/* @layer components {
+  .global-btn {
+    @apply gap-2 bg-[#0060FE] hover:bg-[#0052db] text-white shadow-lg shadow-blue-100 dark:shadow-none transition-all active:scale-[0.98] font-semibold border-none px-4 h-8;
+  }
+} */
+
 @layer components {
+  .global-btn {
+    @apply gap-2 pt-[0px] bg-[#0060FE] hover:bg-[#0052db] text-white shadow-lg shadow-blue-100 dark:shadow-none transition-all active:scale-[0.98] font-semibold border-none px-4 h-8;
+  }
+
 
   /* Firefox support */
   * {
@@ -222,6 +249,34 @@
 }
 
 /* Rich Text Content Styling */
+.rich-text-content h1 {
+  @apply text-3xl font-bold mb-4 mt-6;
+}
+
+.rich-text-content h2 {
+  @apply text-2xl font-bold mb-3 mt-5;
+}
+
+.rich-text-content h3 {
+  @apply text-xl font-bold mb-2 mt-4;
+}
+
+.rich-text-content p {
+  @apply mb-4 leading-relaxed;
+}
+
+.rich-text-content ul {
+  @apply list-disc pl-6 mb-4;
+}
+
+.rich-text-content ol {
+  @apply list-decimal pl-6 mb-4;
+}
+
+.rich-text-content blockquote {
+  @apply border-l-4 border-slate-200 dark:border-zinc-800 pl-4 italic text-slate-600 dark:text-zinc-400 my-6;
+}
+
 .rich-text-content table {
   border-collapse: collapse;
   table-layout: fixed;

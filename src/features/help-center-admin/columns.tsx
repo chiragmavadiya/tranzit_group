@@ -48,12 +48,12 @@ export const ARTICLE_COLUMNS = (
       },
     },
     {
-      key: 'updatedAt',
+      key: 'updated',
       header: 'UPDATED',
       sortable: true,
       cell: (val) => (
         <span className="text-slate-500 dark:text-zinc-500 font-medium">
-          {format(new Date(val as string), "dd MMM yyyy, hh:mm a")}
+          {val ? format(new Date(val as string), "dd MMM yyyy, hh:mm a") : 'N/A'}
         </span>
       ),
     },

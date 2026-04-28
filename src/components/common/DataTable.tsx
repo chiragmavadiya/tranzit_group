@@ -68,7 +68,6 @@ export function DataTable<T extends Record<string, any>>({
   isExporting,
   exportable = true
 }: DataTableProps<T>) {
-  console.log(data, columns);
   // Internal state for uncontrolled components
   const [internalSearch, setInternalSearch] = useState('');
   const [internalSortConfig, setInternalSortConfig] = useState<SortConfig>({ key: null, direction: null });
@@ -78,7 +77,6 @@ export function DataTable<T extends Record<string, any>>({
   const currentSearch = searchValue !== undefined ? searchValue : internalSearch;
   const currentSortConfig = sortConfig !== undefined ? sortConfig : internalSortConfig;
   const currentSelectedRows = selectedRows !== undefined ? selectedRows : internalSelectedRows;
-  console.log(totalItems, 'totalItems')
   // Get row identifier
   const getRowId = (row: T): string => {
     if (typeof rowKey === 'function') {

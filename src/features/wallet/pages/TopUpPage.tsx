@@ -9,7 +9,7 @@ import { TOP_UP_COLUMNS, MOCK_TOP_UP_RECORDS } from '../constants';
 export default function TopUpPage() {
   const [amount, setAmount] = useState('100');
   const [search, setSearch] = useState('');
-  const [pageSize, setPageSize] = useState(10);
+  const [pageSize, setPageSize] = useState(25);
 
   const walletBalance = "1,379.03";
   const gatewayCharge = "2.05";

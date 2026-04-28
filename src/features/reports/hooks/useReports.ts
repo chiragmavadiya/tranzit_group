@@ -70,18 +70,18 @@ export const useInvoiceReport = (filters: ReportFilters) => {
 
 // Assuming export for invoice is not available based on prompt endpoints, skipping useExportInvoiceReport
 
-export const useParcelReport = (filters: ReportFilters) => {
+export const useParcelReport = (filters: ReportFilters, isAdmin: boolean = false) => {
   return useQuery({
-    queryKey: [...QUERY_KEYS.REPORTS.PARCELS, filters],
-    queryFn: () => reportsService.getParcelReport(filters),
+    queryKey: [...QUERY_KEYS.REPORTS.PARCELS, filters, isAdmin],
+    queryFn: () => reportsService.getParcelReport(filters, isAdmin),
     placeholderData: keepPreviousData,
   });
 };
 
-export const useExportParcelReport = () => {
+export const useExportParcelReport = (isAdmin: boolean = false) => {
   return useMutation({
     mutationFn: (filters: ReportFilters & { format: string }) =>
-      reportsService.exportParcelReport(filters),
+      reportsService.exportParcelReport(filters, isAdmin),
     onSuccess: ({ blob, filename }) => {
       const url = window.URL.createObjectURL(blob);
       const link = document.createElement("a");

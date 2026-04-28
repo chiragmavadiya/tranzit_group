@@ -80,6 +80,10 @@ export function menuBarStateSelector(ctx: EditorStateSnapshot<Editor | null>) {
         // Table
         isInTable: editor.isActive('table') ?? false,
 
+        // Font
+        currentFontFamily: editor.getAttributes('textStyle').fontFamily || 'Inter',
+        currentFontSize: editor.getAttributes('textStyle').fontSize || '16px',
+
         // History
         canUndo: editor.can().chain().undo().run() ?? false,
         canRedo: editor.can().chain().redo().run() ?? false,

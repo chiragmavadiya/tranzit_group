@@ -51,7 +51,6 @@ export default function SignIn({ role = "customer" }: { role?: string }) {
             navigate("/on-board");
             return;
           }
-          console.log('Redirecting to dashboard');
           if (role === 'admin') {
             navigate("/admin/dashboard");
           } else {

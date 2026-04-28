@@ -26,7 +26,7 @@ export default function MyItemsPage() {
   const [editingItemId, setEditingItemId] = useState<number | null>(null);
   const [search, setSearch] = useState('');
   const debouncedSearch = useDebounce(search, 500); // 500ms delay
-  const [pageSize, setPageSize] = useState(10);
+  const [pageSize, setPageSize] = useState(25);
   const [currentPage, setCurrentPage] = useState(1);
 
   const { data: itemsData, isLoading } = useItems({
@@ -66,17 +66,23 @@ export default function MyItemsPage() {
     setIsDeleteDialogOpen(true);
   }, []);
 
+
+  const handleCloseModal = useCallback(() => {
+    setIsDialogOpen(false);
+    setEditingItemId(null);
+  }, []);
+
   const handleFormSubmit = useCallback((data: ItemFormData) => {
     if (editingItemId) {
       updateItemMutation.mutate({ id: editingItemId, data }, {
-        onSuccess: () => setIsDialogOpen(false)
+        onSuccess: () => handleCloseModal()
       });
     } else {
       createItemMutation.mutate(data, {
-        onSuccess: () => setIsDialogOpen(false)
+        onSuccess: () => handleCloseModal()
       });
     }
-  }, [editingItemId, createItemMutation, updateItemMutation]);
+  }, [editingItemId, createItemMutation, updateItemMutation, handleCloseModal]);
 
   const onSubmitDelete = useCallback(() => {
     if (itemToDelete) {
@@ -97,6 +103,7 @@ export default function MyItemsPage() {
   const handleExport = useCallback((format: 'pdf' | 'excel' | 'print' | 'csv') => {
     exportItemsMutation.mutate({ format, search });
   }, [exportItemsMutation, search]);
+
 
   // useEffect(() => {
   //   if (isSuccess && editingItemId) {
@@ -187,15 +194,16 @@ export default function MyItemsPage() {
           onExport={(type) => handleExport(type)}
           isExporting={exportItemsMutation.isPending}
         />
-
-        <CreateItemDialog
-          key={isDialogOpen ? `item-${editingItemId || 'new'}` : 'closed'}
-          open={isDialogOpen}
-          onOpenChange={setIsDialogOpen}
-          onSubmit={handleFormSubmit}
-          editingItemId={editingItemId?.toString()}
-          isLoading={createItemMutation.isPending || updateItemMutation.isPending}
-        />
+        {isDialogOpen && (
+          <CreateItemDialog
+            key={isDialogOpen ? `item-${editingItemId || 'new'}` : 'closed'}
+            open={isDialogOpen}
+            onClose={handleCloseModal}
+            onSubmit={handleFormSubmit}
+            editingItemId={editingItemId}
+            isLoading={createItemMutation.isPending || updateItemMutation.isPending}
+          />
+        )}
 
         <ConformationModal
           open={isDeleteDialogOpen}

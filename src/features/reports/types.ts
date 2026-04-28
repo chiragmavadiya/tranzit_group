@@ -72,6 +72,15 @@ export interface PaginatedResponse<T> {
   status: boolean;
   message: string;
   data: T[];
+  summary?: {
+    total_customers?: number;
+    total_orders: number;
+    total_amount: number;
+    total_markup: number;
+    total_pickup: number;
+    total_surcharge: number;
+
+  }
   meta: {
     current_page: number;
     per_page: number;

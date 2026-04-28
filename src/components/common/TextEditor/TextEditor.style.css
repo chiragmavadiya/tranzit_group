@@ -1,4 +1,4 @@
-.tiptap {
+/* .tiptap {
   outline: none;
 }
 
@@ -91,7 +91,6 @@
   pointer-events: none;
 }
 
-/* Table Styles */
 .tiptap table {
   border-collapse: collapse;
   table-layout: fixed;
@@ -150,7 +149,6 @@
   cursor: col-resize;
 }
 
-/* Image Styles */
 .tiptap img {
   max-width: 100%;
   height: auto;
@@ -161,4 +159,4 @@
 
 .tiptap img.ProseMirror-selectednode {
   outline: 3px solid #60a5fa;
-}
+} */

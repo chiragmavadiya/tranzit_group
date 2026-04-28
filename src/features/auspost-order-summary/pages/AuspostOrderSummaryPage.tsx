@@ -1,20 +1,21 @@
-import { useState, useMemo } from 'react';
+import { useState } from 'react';
 import { DataTable } from '@/components/common';
 import { AUSPOST_COLUMNS } from '../columns';
-import { MOCK_AUSPOST_ORDERS } from '../constants';
-import type { AuspostOrder } from '../types';
+import { useAuspostOrderSummary } from '../hooks/useAuspostOrderSummary';
+import { useDebounce } from '@/hooks/useDebounce';
 
 export default function AuspostOrderSummaryPage() {
-  const [data] = useState<AuspostOrder[]>(MOCK_AUSPOST_ORDERS);
   const [search, setSearch] = useState('');
+  const [page, setPage] = useState(1);
+  const [pageSize, setPageSize] = useState(25);
 
-  const filteredData = useMemo(() => {
-    return data.filter(item => 
-      item.orderNumber.toLowerCase().includes(search.toLowerCase()) ||
-      item.customerName.toLowerCase().includes(search.toLowerCase()) ||
-      item.suburb.toLowerCase().includes(search.toLowerCase())
-    );
-  }, [data, search]);
+  const debouncedSearch = useDebounce(search, 500);
+
+  const { data: response, isLoading } = useAuspostOrderSummary({
+    search: debouncedSearch,
+    page,
+    per_page: pageSize
+  });
 
   return (
     <div className="flex flex-col flex-1 gap-6 p-page-padding min-h-0 animate-in fade-in slide-in-from-bottom-2 duration-500 bg-slate-50/30 dark:bg-zinc-950/30 overflow-y-auto">
@@ -22,11 +23,16 @@ export default function AuspostOrderSummaryPage() {
         <DataTable
           headerTitle="Auspost Order Summary"
           columns={AUSPOST_COLUMNS}
-          data={filteredData}
+          data={response?.data || []}
+          loading={isLoading}
           searchable
           searchValue={search}
           onSearchChange={setSearch}
-          totalItems={filteredData.length}
+          totalItems={response?.meta?.total || 0}
+          currentPage={page}
+          onPageChange={setPage}
+          pageSize={pageSize}
+          onPageSizeChange={setPageSize}
           className="text-xs pb-3"
           onExport={(type) => console.log(`Exporting as ${type}`)}
         />

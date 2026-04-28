@@ -50,16 +50,17 @@ export const useCreateAddress = () => {
 /**
  * Hook to update an address book entry
  */
-export const useUpdateAddress = (id: number | string) => {
+export const useUpdateAddress = () => {
     const queryClient = useQueryClient();
 
     return useMutation({
-        mutationFn: (data: AddressFormData) => addressBookService.update(id, data),
-        onSuccess: (response) => {
+        mutationFn: ({ id, data }: { id: number | string; data: AddressFormData }) =>
+            addressBookService.update(id, data),
+        onSuccess: (response, variables) => {
             if (response.status) {
                 toast.success(response.message || "Address updated successfully");
                 queryClient.invalidateQueries({ queryKey: QUERY_KEYS.ADDRESS_BOOK.LIST });
-                queryClient.invalidateQueries({ queryKey: QUERY_KEYS.ADDRESS_BOOK.DETAILS(id) });
+                queryClient.removeQueries({ queryKey: QUERY_KEYS.ADDRESS_BOOK.DETAILS(variables.id as any) });
             } else {
                 toast.error(response.message || "Failed to update address");
             }

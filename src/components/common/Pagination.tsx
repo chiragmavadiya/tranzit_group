@@ -36,8 +36,6 @@ export const Pagination: React.FC<PaginationProps> = ({
   const startIndex = (currentPage - 1) * pageSize;
   const endIndex = Math.min(startIndex + pageSize, totalItems);
 
-  console.log({ currentPage, totalPages, pageSize, totalItems, startIndex, endIndex })
-
   const onItemsPerPageChange = (val: number) => {
     if (onPageSizeChange) {
       onPageSizeChange(val);

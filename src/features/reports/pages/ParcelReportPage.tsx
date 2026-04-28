@@ -7,7 +7,7 @@ import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover
 import { cn } from '@/lib/utils';
 import { DataTable, StatCard } from '@/components/common';
 import { PARCEL_COLUMNS, ADMIN_PARCEL_COLUMNS } from '../constants';
-import { useParcelReport } from '../hooks/useReports';
+import { useParcelReport, useExportParcelReport } from '../hooks/useReports';
 import { FormSelect } from '@/features/orders/components/OrderFormUI';
 import { Input } from '@/components/ui/input';
 import { useLocation } from 'react-router-dom';
@@ -39,22 +39,21 @@ export default function ParcelReportPage() {
     invoice_type: isAdmin ? invoiceType : undefined,
   }), [startDate, endDate, search, pageSize, page, isAdmin, selectedCustomer, invoiceType]);
 
-  const { data, isLoading } = useParcelReport(filters);
+  const { data, isLoading } = useParcelReport(filters, isAdmin);
+  const exportMutation = useExportParcelReport(isAdmin);
 
-  // You can still compute dynamic stats from the paginated API response, 
-  // or use meta fields if your API provides global statistics.
   const stats = useMemo(() => {
     const baseStats = [
       {
         label: 'Total Order',
-        value: data?.meta?.total?.toString() || '12',
+        value: data?.summary?.total_orders?.toString() || '0',
         icon: ClipboardList,
         iconColor: 'text-rose-500',
         iconBg: 'bg-rose-50 dark:bg-rose-500/10',
       },
       {
         label: 'Total Amount Paid',
-        value: '$1882.05',
+        value: '$' + (data?.summary?.total_amount?.toString() || '0'),
         icon: DollarSign,
         iconColor: 'text-emerald-500',
         iconBg: 'bg-emerald-50 dark:bg-emerald-500/10',
@@ -65,7 +64,7 @@ export default function ParcelReportPage() {
       return [
         {
           label: 'Total Customer',
-          value: '3',
+          value: data?.summary?.total_customers?.toString() || '0',
           icon: Users,
           iconColor: 'text-blue-500',
           iconBg: 'bg-blue-50 dark:bg-blue-500/10',
@@ -73,14 +72,14 @@ export default function ParcelReportPage() {
         ...baseStats,
         {
           label: 'Total Margin',
-          value: '$6.49',
+          value: '$' + (data?.summary?.total_markup?.toString() || '0'),
           icon: TrendingUp,
           iconColor: 'text-orange-500',
           iconBg: 'bg-orange-50 dark:bg-orange-500/10',
         },
         {
           label: 'Total Pickup Charges',
-          value: '$15.00',
+          value: '$' + (data?.summary?.total_pickup?.toString() || '0'),
           icon: Truck,
           iconColor: 'text-amber-500',
           iconBg: 'bg-amber-50 dark:bg-amber-500/10',
@@ -88,7 +87,7 @@ export default function ParcelReportPage() {
       ];
     }
     return baseStats;
-  }, [data?.meta?.total, isAdmin]);
+  }, [data?.summary, isAdmin]);
 
   const handleApplyFilters = useCallback(() => {
     setPage(1);
@@ -138,7 +137,7 @@ export default function ParcelReportPage() {
                     !startDate && "text-slate-400"
                   )}
                 >
-                  {startDate ? format(startDate, "dd/MM/yyyy") : <span>01/04/2026</span>}
+                  {startDate ? format(startDate, "dd/MM/yyyy") : <span>DD/MM/YYYY</span>}
                   <CalendarIcon className="h-3.5 w-3.5 opacity-50" />
                 </Button>
               </PopoverTrigger>
@@ -164,7 +163,7 @@ export default function ParcelReportPage() {
                     !endDate && "text-slate-400"
                   )}
                 >
-                  {endDate ? format(endDate, "dd/MM/yyyy") : <span>23/04/2026</span>}
+                  {endDate ? format(endDate, "dd/MM/yyyy") : <span>DD/MM/YYYY</span>}
                   <CalendarIcon className="h-3.5 w-3.5 opacity-50" />
                 </Button>
               </PopoverTrigger>
@@ -199,9 +198,10 @@ export default function ParcelReportPage() {
           <div className={cn("flex gap-3", isAdmin ? "md:col-span-3" : "md:col-span-6")}>
             <Button
               onClick={handleApplyFilters}
-              variant="default"
-              size="sm"
-              className="h-8 flex-1 bg-slate-900 hover:bg-slate-800 dark:bg-zinc-100 dark:hover:bg-zinc-200 dark:text-zinc-950 font-bold uppercase tracking-widest text-[10px] shadow-sm"
+              // variant="default"
+              // size="sm"
+              // className="h-8 flex-1 bg-slate-900 hover:bg-slate-800 dark:bg-zinc-100 dark:hover:bg-zinc-200 dark:text-zinc-950 font-bold uppercase tracking-widest text-[10px] shadow-sm"
+              className='global-btn flex-1'
             >
               Filter
             </Button>
@@ -283,6 +283,8 @@ export default function ParcelReportPage() {
           currentPage={page}
           onPageChange={setPage}
           loading={isLoading}
+          onExport={(format) => exportMutation.mutate({ ...filters, format })}
+          isExporting={exportMutation.isPending}
         />
       </div>
     </div>

@@ -161,7 +161,7 @@ export function AdvancedFilterPopover({
         </div>
       </div>
 
-      <div className="p-5 space-y-6 max-h-[600px] overflow-y-auto custom-scrollbar">
+      <div className="p-5 space-y-4 max-h-[600px] overflow-y-auto custom-scrollbar">
         {/* Filter Criteria */}
         <section className="space-y-3">
           <h3 className="text-[11px] font-bold uppercase tracking-widest text-gray-400 dark:text-zinc-500">Filter Criteria</h3>

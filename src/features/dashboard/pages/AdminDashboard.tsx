@@ -21,68 +21,68 @@ export default function AdminDashboard() {
 
   // Real Data from API
   const topStats = [
-    { 
-      label: "Orders", 
-      value: isLoading ? "..." : metrics?.totalOrder ?? 0, 
-      icon: LayoutDashboard 
+    {
+      label: "Orders",
+      value: isLoading ? "..." : metrics?.totalOrder ?? 0,
+      icon: LayoutDashboard
     },
-    { 
-      label: "Customers", 
-      value: isLoading ? "..." : metrics?.totalCustomers ?? 0, 
-      icon: Users, 
-      color: "bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400" 
+    {
+      label: "Customers",
+      value: isLoading ? "..." : metrics?.totalCustomers ?? 0,
+      icon: Users,
+      color: "bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400"
     },
-    { 
-      label: "Invoice Pending", 
-      value: isLoading ? "..." : metrics?.pendingInvoiceCount ?? 0, 
-      icon: FileText, 
-      color: "bg-orange-50 dark:bg-orange-900/20 text-orange-600 dark:text-orange-400" 
+    {
+      label: "Invoice Pending",
+      value: isLoading ? "..." : metrics?.pendingInvoiceCount ?? 0,
+      icon: FileText,
+      color: "bg-orange-50 dark:bg-orange-900/20 text-orange-600 dark:text-orange-400"
     },
-    { 
-      label: "Labels Undelivered", 
-      value: isLoading ? "..." : metrics?.undeliveredOrder ?? 0, 
-      icon: Tag, 
-      color: "bg-green-50 dark:bg-green-900/20 text-green-600 dark:text-green-400" 
+    {
+      label: "Labels Undelivered",
+      value: isLoading ? "..." : metrics?.undeliveredOrder ?? 0,
+      icon: Tag,
+      color: "bg-green-50 dark:bg-green-900/20 text-green-600 dark:text-green-400"
     },
   ];
 
   const secondaryStats = [
-    { 
-      label: "Margin", 
-      value: isLoading ? "..." : (metrics?.totalMarginAmount || "$0.00"), 
-      subValue: "Total Margin Amount", 
-      icon: TrendingDown 
+    {
+      label: "Margin",
+      value: isLoading ? "..." : (metrics?.totalMarginAmount || "$0.00"),
+      subValue: "Total Margin Amount",
+      icon: TrendingDown
     },
-    { 
-      label: "Orders", 
-      value: isLoading ? "..." : (metrics?.totalOrderAmount || "$0.00"), 
-      subValue: "Total Order Amount", 
-      icon: BarChart3, 
-      color: "bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400" 
+    {
+      label: "Orders",
+      value: isLoading ? "..." : (metrics?.totalOrderAmount || "$0.00"),
+      subValue: "Total Order Amount",
+      icon: BarChart3,
+      color: "bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400"
     },
-    { 
-      label: "Paid Invoices", 
-      value: isLoading ? "..." : (metrics?.totalPaidInvoiceAmount || "$0.00"), 
-      subValue: "Total Paid Invoices Amount", 
-      icon: FileText, 
-      color: "bg-green-50 dark:bg-green-900/20 text-green-600 dark:text-green-400" 
+    {
+      label: "Paid Invoices",
+      value: isLoading ? "..." : (metrics?.totalPaidInvoiceAmount || "$0.00"),
+      subValue: "Total Paid Invoices Amount",
+      icon: FileText,
+      color: "bg-green-50 dark:bg-green-900/20 text-green-600 dark:text-green-400"
     },
   ];
 
   const tertiaryStats = [
-    { 
-      label: "Unpaid Invoices", 
-      value: isLoading ? "..." : (metrics?.totalUnpaidInvoiceAmount || "$0.00"), 
-      subValue: "Total Unpaid Invoices Amount", 
-      icon: FileText, 
-      color: "bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400" 
+    {
+      label: "Unpaid Invoices",
+      value: isLoading ? "..." : (metrics?.totalUnpaidInvoiceAmount || "$0.00"),
+      subValue: "Total Unpaid Invoices Amount",
+      icon: FileText,
+      color: "bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400"
     },
-    { 
-      label: "Invoices", 
-      value: isLoading ? "..." : (metrics?.totalInvoiceAmount || "$0.00"), 
-      subValue: "Total Invoice Amount", 
-      icon: CreditCard, 
-      color: "bg-orange-50 dark:bg-orange-900/20 text-orange-600 dark:text-orange-400" 
+    {
+      label: "Invoices",
+      value: isLoading ? "..." : (metrics?.totalInvoiceAmount || "$0.00"),
+      subValue: "Total Invoice Amount",
+      icon: CreditCard,
+      color: "bg-orange-50 dark:bg-orange-900/20 text-orange-600 dark:text-orange-400"
     },
   ];
 
@@ -213,8 +213,8 @@ export default function AdminDashboard() {
   ];
 
   return (
-    <div className="p-page-padding space-y-6 overflow-y-auto animate-in fade-in duration-700">
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+    <div className="p-page-padding space-y-4 overflow-y-auto animate-in fade-in duration-700">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 items-start">
         <div className="lg:col-span-4">
           <WelcomeBanner
             variant="purple"
@@ -254,7 +254,7 @@ export default function AdminDashboard() {
         ))}
       </div>
 
-      <div className="grid grid-cols-1 xl:grid-cols-12 gap-6 items-start">
+      <div className="grid grid-cols-1 xl:grid-cols-12 gap-4 items-start">
         <div className="xl:col-span-4 h-[500px]">
           <TransactionList transactions={transactions} />
         </div>

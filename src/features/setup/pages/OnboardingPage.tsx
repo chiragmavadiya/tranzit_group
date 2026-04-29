@@ -1,6 +1,7 @@
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 import { logout, setNextStep } from '@/features/auth/authSlice';
 // import { setCredentials } from '@/features/auth/authSlice';
 import { useOnboarding } from '@/features/auth/hooks/useAuth';
@@ -36,6 +37,7 @@ export default function OnboardingPage() {
   const dispatch = useAppDispatch();
   const { user } = useAppSelector(state => state.auth);
   const onboardingMutation = useOnboarding();
+  const [isSubmitted, setIsSubmitted] = useState(false);
 
   const [formData, setFormData] = useState({
     // Account
@@ -76,11 +78,51 @@ export default function OnboardingPage() {
     setFormData(prev => ({ ...prev, [field]: value }));
   };
 
+  const validateForm = () => {
+    // Basic required fields
+    const requiredFields = [
+      'first_name', 'last_name', 'mobile',
+      'business_name', 'gst_number', 'order_prefix',
+      'street_number', 'street_name', 'street_type', 'suburb', 'state', 'postcode'
+    ];
+
+    for (const field of requiredFields) {
+      if (!formData[field as keyof typeof formData]) return false;
+    }
+
+    // Mobile validation (10 digits)
+    if (!/^\d{10}$/.test(formData.mobile.replace(/\s/g, ''))) return false;
+
+    // Postcode validation (4 digits)
+    if (!/^\d{4}$/.test(formData.postcode)) return false;
+
+    // Billing fields validation if enabled
+    if (formData.hasBillingAddress) {
+      const billingRequired = [
+        'billing_street_number', 'billing_street_name', 'billing_street_type',
+        'billing_suburb', 'billing_state', 'billing_postcode'
+      ];
+      for (const field of billingRequired) {
+        if (!formData[field as keyof typeof formData] || formData[field as keyof typeof formData] === "") return false;
+      }
+      if (!/^\d{4}$/.test(formData.billing_postcode)) return false;
+    }
+
+    if (!formData.agree_privacy || !formData.accept_terms) return false;
+
+    return true;
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setIsSubmitted(true);
 
-    if (!formData.agree_privacy || !formData.accept_terms) {
-      toast.error("Please accept the Privacy Policy and Terms & Conditions");
+    if (!validateForm()) {
+      if (!formData.agree_privacy || !formData.accept_terms) {
+        toast.error("Please accept the Privacy Policy and Terms & Conditions");
+      } else {
+        toast.error("Please fill in all required fields correctly");
+      }
       return;
     }
 
@@ -101,7 +143,7 @@ export default function OnboardingPage() {
   };
 
   return (
-    <div className="flex flex-col flex-1 p-6 space-y-6 overflow-y-auto max-w-7xl mx-auto w-full animate-in fade-in duration-500">
+    <div className="flex flex-col flex-1 p-6 space-y-4 overflow-y-auto max-w-7xl mx-auto w-full animate-in fade-in duration-500">
       {/* Banner */}
       <div className="bg-red-50 dark:bg-red-950/20 border border-red-100 dark:border-red-900/30 p-3 rounded-md flex items-center gap-3">
         <AlertCircle className="w-4 h-4 text-red-600 dark:text-red-400" />
@@ -127,6 +169,8 @@ export default function OnboardingPage() {
                 value={formData.first_name}
                 onChange={(val) => handleChange('first_name', val)}
                 placeholder="Your legal first name"
+                error={isSubmitted && !formData.first_name}
+                errormsg="First name is required"
               />
               <FormInput
                 label="Mobile Number"
@@ -134,7 +178,8 @@ export default function OnboardingPage() {
                 value={formData.mobile}
                 onChange={(val) => handleChange('mobile', val)}
                 placeholder="e.g. 0412 345 678"
-                errormsg="Australian format only."
+                error={isSubmitted && !/^\d{10}$/.test(formData.mobile.replace(/\s/g, ''))}
+                errormsg="Valid 10-digit mobile number required"
               />
             </div>
             <div className="space-y-4">
@@ -143,6 +188,8 @@ export default function OnboardingPage() {
                 required
                 value={formData.last_name}
                 onChange={(val) => handleChange('last_name', val)}
+                error={isSubmitted && !formData.last_name}
+                errormsg="Last name is required"
               />
               <FormInput
                 label="Login Email Address"
@@ -165,6 +212,8 @@ export default function OnboardingPage() {
               value={formData.business_name}
               onChange={(val) => handleChange('business_name', val)}
               placeholder="e.g. Digisite Pty Ltd"
+              error={isSubmitted && !formData.business_name}
+              errormsg="Business name is required"
             />
             <FormInput
               label="GST Number"
@@ -172,6 +221,8 @@ export default function OnboardingPage() {
               value={formData.gst_number}
               onChange={(val) => handleChange('gst_number', val)}
               placeholder="ABN / GST"
+              error={isSubmitted && !formData.gst_number}
+              errormsg="GST number is required"
             />
             <FormInput
               label="Order Prefix"
@@ -179,6 +230,8 @@ export default function OnboardingPage() {
               value={formData.order_prefix}
               onChange={(val) => handleChange('order_prefix', val)}
               placeholder="e.g. TRZ"
+              error={isSubmitted && !formData.order_prefix}
+              errormsg="Order prefix is required"
             />
           </div>
         </div>
@@ -213,6 +266,8 @@ export default function OnboardingPage() {
                 value={formData.street_number}
                 onChange={(val) => handleChange('street_number', val)}
                 placeholder="Street Number"
+                error={isSubmitted && !formData.street_number}
+                errormsg="Required"
               />
               <FormInput
                 label="Street Name"
@@ -220,6 +275,8 @@ export default function OnboardingPage() {
                 value={formData.street_name}
                 onChange={(val) => handleChange('street_name', val)}
                 placeholder="Street Name"
+                error={isSubmitted && !formData.street_name}
+                errormsg="Required"
               />
             </div>
 
@@ -231,6 +288,8 @@ export default function OnboardingPage() {
                 onValueChange={(val) => handleChange('street_type', val)}
                 options={STREET_TYPES}
                 placeholder="Select Type"
+                error={isSubmitted && !formData.street_type}
+                errormsg="Required"
               />
               <FormInput
                 label="Suburb"
@@ -238,6 +297,8 @@ export default function OnboardingPage() {
                 value={formData.suburb}
                 onChange={(val) => handleChange('suburb', val)}
                 placeholder="Suburb"
+                error={!formData.suburb}
+                errormsg="Required"
               />
               <FormSelect
                 label="State"
@@ -246,6 +307,8 @@ export default function OnboardingPage() {
                 onValueChange={(val) => handleChange('state', val)}
                 options={STATES}
                 placeholder="Select State"
+                error={isSubmitted && !formData.state}
+                errormsg="Required"
               />
             </div>
 
@@ -256,6 +319,8 @@ export default function OnboardingPage() {
                 value={formData.postcode}
                 onChange={(val) => handleChange('postcode', val)}
                 placeholder="Post Code"
+                error={isSubmitted && !/^\d{4}$/.test(formData.postcode)}
+                errormsg="Valid 4-digit postcode required"
               />
             </div>
 
@@ -298,41 +363,59 @@ export default function OnboardingPage() {
                 />
                 <FormInput
                   label="Street Number"
+                  required
                   value={formData.billing_street_number}
                   onChange={(val) => handleChange('billing_street_number', val)}
+                  error={isSubmitted && formData.hasBillingAddress && !formData.billing_street_number}
+                  errormsg="Required"
                 />
                 <FormInput
                   label="Street Name"
+                  required
                   value={formData.billing_street_name}
                   onChange={(val) => handleChange('billing_street_name', val)}
+                  error={isSubmitted && formData.hasBillingAddress && !formData.billing_street_name}
+                  errormsg="Required"
                 />
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 <FormSelect
                   label="Street Type"
+                  required
                   value={formData.billing_street_type}
                   onValueChange={(val) => handleChange('billing_street_type', val)}
                   options={STREET_TYPES}
+                  error={isSubmitted && formData.hasBillingAddress && !formData.billing_street_type}
+                  errormsg="Required"
                 />
                 <FormInput
                   label="Suburb"
+                  required
                   value={formData.billing_suburb}
                   onChange={(val) => handleChange('billing_suburb', val)}
+                  error={isSubmitted && formData.hasBillingAddress && !formData.billing_suburb}
+                  errormsg="Required"
                 />
                 <FormSelect
                   label="State"
+                  required
                   value={formData.billing_state}
                   onValueChange={(val) => handleChange('billing_state', val)}
                   options={STATES}
+                  error={isSubmitted && formData.hasBillingAddress && !formData.billing_state}
+                  errormsg="Required"
                 />
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 <FormInput
                   label="Post Code"
+                  required
                   value={formData.billing_postcode}
                   onChange={(val) => handleChange('billing_postcode', val)}
+                  error={isSubmitted && formData.hasBillingAddress && !/^\d{4}$/.test(formData.billing_postcode)}
+                  errormsg="Valid 4-digit postcode required"
                 />
               </div>
             </div>
@@ -404,7 +487,4 @@ export default function OnboardingPage() {
   );
 }
 
-// Add Label component since it's used
-function Label({ children, className }: { children: React.ReactNode, className?: string }) {
-  return <label className={className}>{children}</label>;
-}
+// Label component is now imported from @/components/ui/label

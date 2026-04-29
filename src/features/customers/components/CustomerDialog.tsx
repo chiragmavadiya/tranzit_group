@@ -389,7 +389,7 @@ export default function CustomerDialog({ open, onOpenChange, customerId }: Custo
           )}
 
           {currentStep === 2 && (
-            <div className="space-y-6 animate-in fade-in slide-in-from-right-4 duration-300 pb-4">
+            <div className="space-y-4 animate-in fade-in slide-in-from-right-4 duration-300 pb-4">
               <div className="grid grid-cols-1 gap-4">
                 {/* Direct Freight */}
                 <div className="p-4 rounded-2xl border border-slate-100 dark:border-zinc-800 bg-slate-50/50 dark:bg-zinc-900/50 space-y-4">

@@ -13,6 +13,7 @@ import type { LoginRequest } from "@/features/auth/auth.types";
 import { useAppDispatch } from "@/hooks/store.hooks";
 import { setCredentials } from "@/features/auth/authSlice";
 import { useState } from "react";
+import { Spinner } from "@/components/ui/spinner";
 
 export default function SignIn({ role = "customer" }: { role?: string }) {
   const navigate = useNavigate();
@@ -137,8 +138,8 @@ export default function SignIn({ role = "customer" }: { role?: string }) {
         </div>
 
         <Button type="submit" disabled={loginMutation.isPending} className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold h-10 text-sm rounded-md transition-all shadow-md hover:shadow-lg">
-          {/* {loginMutation.isPending && <Spinner data-icon="inline-start" />} */}
-          {loginMutation.isPending ? "Login..." : "Login"}
+          {loginMutation.isPending && <Spinner data-icon="inline-start" />}
+          Login
         </Button>
         {loginMutation.isError && <p className="text-red-500 text-sm text-end">{loginMutation.error?.message}</p>}
 

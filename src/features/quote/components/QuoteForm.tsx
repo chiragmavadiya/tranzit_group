@@ -14,7 +14,7 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
-import { MapPin, Plus, Trash2, Calculator } from "lucide-react";
+import { MapPin, Plus, Trash2, Calculator, Package } from "lucide-react";
 import AutoComplete from "@/components/common/AutoComplate";
 import type { QuoteItem, QuoteLocation } from "../types";
 
@@ -103,8 +103,9 @@ export function QuoteForm({ items, setItems, setLocations, onGetRate, isValid }:
 
       {/* Items Section */}
       <Card className="shadow-md gap-0 border-gray-200 dark:border-zinc-800 py-1 px-4 bg-white dark:bg-zinc-950">
-        <CardHeader className="flex flex-row items-center justify-between py-2 [.border-b]:pb-3 px-5 border-b border-gray-100 dark:border-zinc-800 bg-white dark:bg-zinc-900 group-hover:bg-gray-50/50 dark:group-hover:bg-zinc-800/50 transition-colors">
-          <CardTitle className="text-sm font-bold text-gray-900 dark:text-zinc-100 tracking-wider">
+        <CardHeader className="flex flex-row items-center justify-between py-3 px-6 border-b border-slate-100 dark:border-zinc-800">
+          <CardTitle className="text-sm font-bold text-slate-800 dark:text-zinc-100 tracking-wider flex items-center gap-2">
+            <Package className="w-4 h-4 text-orange-500" strokeWidth={2.5} />
             ITEMS
           </CardTitle>
           <div className="flex items-center gap-3">

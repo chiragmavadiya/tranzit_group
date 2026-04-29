@@ -8,7 +8,8 @@ import type {
     LoginRequest,
     LoginResponse,
     ForgotPasswordRequest,
-    OnboardingRequest
+    OnboardingRequest,
+    ResetPasswordRequest
 } from "@/features/auth/auth.types";
 // role can be admin or customer 
 
@@ -81,6 +82,14 @@ export const authService = {
     // get user details api
     getUserDetails: async (): Promise<LoginResponse> => {
         const response = await api.get<LoginResponse>(API_ENDPOINTS.AUTH.USER_DETAILS);
+        return response.data;
+    },
+
+    /**
+     * Reset password
+     */
+    resetPassword: async (data: ResetPasswordRequest): Promise<GenericResponse> => {
+        const response = await api.post<GenericResponse>(API_ENDPOINTS.AUTH.RESET_PASSWORD, data);
         return response.data;
     },
 };

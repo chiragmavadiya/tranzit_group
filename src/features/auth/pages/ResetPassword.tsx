@@ -3,14 +3,22 @@ import { Check } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { PasswordInput } from "@/components/common";
-import { Link, useParams } from "react-router-dom";
+import { Link, useParams, useSearchParams } from "react-router-dom";
+import { useResetPassword } from "@/features/auth/hooks/useAuth";
+import { toast } from "sonner";
 import brandlogo from '@/assets/Tranzit_Logo.svg';
 import { AuthLayout } from "@/features/auth/components/AuthLayout";
 
 export default function ResetPassword() {
   const { token } = useParams<{ token: string }>();
+  const [searchParams] = useSearchParams();
+  const email = searchParams.get("email");
+
+  console.log("email", email);
+  console.log("token", token);
+
   const [password, setPassword] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
+  const { mutate: resetPassword, isPending } = useResetPassword();
   const [error, setError] = useState<string | null>(null);
   const [isSuccess, setIsSuccess] = useState(false);
 
@@ -41,15 +49,32 @@ export default function ResetPassword() {
       return;
     }
 
-    setIsLoading(true);
+    if (!token || !email) {
+      setError("Invalid reset link. Token or email is missing.");
+      return;
+    }
 
-    // Simulate API call using token
-    console.log("Resetting password with token:", token);
-
-    setTimeout(() => {
-      setIsLoading(false);
-      setIsSuccess(true);
-    }, 1000);
+    resetPassword({
+      email,
+      token,
+      password,
+      password_confirmation: confirmPassword
+    }, {
+      onSuccess: (response) => {
+        if (response.status) {
+          setIsSuccess(true);
+          toast.success("Password reset successfully");
+        } else {
+          setError(response.message || "Failed to reset password");
+          toast.error(response.message || "Failed to reset password");
+        }
+      },
+      onError: (err: any) => {
+        const errMsg = err.message || "An error occurred while resetting your password";
+        setError(errMsg);
+        toast.error(errMsg);
+      }
+    });
   };
 
   return (
@@ -125,10 +150,10 @@ export default function ResetPassword() {
 
           <Button
             type="submit"
-            disabled={isLoading}
+            disabled={isPending}
             className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-6 text-md rounded-md transition-all shadow-md hover:shadow-lg"
           >
-            {isLoading ? "Setting password..." : "Set new password"}
+            {isPending ? "Setting password..." : "Set new password"}
           </Button>
 
           <p className="text-center text-sm font-medium">

@@ -20,8 +20,8 @@ export const useItems = (filters: ItemsFilters) => {
  */
 export const useItemDetails = (id: number | string | undefined) => {
   return useQuery({
-    queryKey: QUERY_KEYS.ITEMS.DETAILS(id!),
-    queryFn: () => itemsService.getDetails(id!),
+    queryKey: QUERY_KEYS.ITEMS.DETAILS(id as any),
+    queryFn: () => itemsService.getDetails(id as any),
     enabled: !!id,
   });
 };
@@ -57,10 +57,13 @@ export const useUpdateItem = () => {
   return useMutation({
     mutationFn: ({ id, data }: { id: number | string; data: ItemFormData }) =>
       itemsService.update(id, data),
-    onSuccess: (response) => {
+    onSuccess: (response, variables) => {
       if (response.status) {
         toast.success(response.message || "Item updated successfully");
         queryClient.invalidateQueries({ queryKey: QUERY_KEYS.ITEMS.LIST });
+        queryClient.removeQueries({
+          queryKey: QUERY_KEYS.ITEMS.DETAILS(variables.id as any),
+        });
       } else {
         toast.error(response.message || "Failed to update item");
       }

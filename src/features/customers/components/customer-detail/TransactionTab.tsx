@@ -14,7 +14,7 @@ interface TransactionTabProps {
 
 export const TransactionTab = ({ customerId }: TransactionTabProps) => {
     const [page, setPage] = useState(1);
-    const [pageSize, setPageSize] = useState(10);
+    const [pageSize, setPageSize] = useState(25);
     const [search, setSearch] = useState('');
 
     const { data: response, isLoading } = useCustomerTransactions(customerId, { page, per_page: pageSize, search });

@@ -11,7 +11,7 @@ import { MOCK_TRANSACTIONS, WALLET_COLUMNS, TRANSACTION_TYPES } from '../constan
 export default function TransactionsPage() {
   const [transactionType, setTransactionType] = useState('all');
   const [search, setSearch] = useState('');
-  const [pageSize, setPageSize] = useState(7);
+  const [pageSize, setPageSize] = useState(25);
   const navigate = useNavigate();
 
 

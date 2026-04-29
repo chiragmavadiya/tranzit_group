@@ -4,31 +4,61 @@ import { FormInput, FormSelect, FormTextarea } from '@/features/orders/component
 import { RichTextEditorComponent } from './RichTextEditor';
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
+import { Loader2 } from 'lucide-react';
 import { ARTICLE_CATEGORIES } from '../constants';
-import type { HelpArticle } from '../types';
+import { useHelpArticleMutations, useHelpArticleDetails } from '../hooks/useHelpCenterAdmin';
+import type { HelpArticle, HelpArticleFormData } from '../types';
+import React from 'react';
 
 interface AddArticleDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  onSubmit: (data: Partial<HelpArticle>) => void;
   initialData?: HelpArticle | null;
 }
 
-export function AddArticleDialog({ open, onOpenChange, onSubmit, initialData }: AddArticleDialogProps) {
+export function AddArticleDialog({ open, onOpenChange, initialData }: AddArticleDialogProps) {
+  const { createArticle, isCreating, updateArticle, isUpdating } = useHelpArticleMutations();
+
+  const { data: detailsResponse, isLoading: isFetching } = useHelpArticleDetails(initialData?.id || null);
+
+  const surchargeDetails = detailsResponse?.data;
+  const isLoading = isCreating || isUpdating;
+
   const initialValues = useMemo(() => ({
     title: '',
-    slug: '',
     category: ARTICLE_CATEGORIES[0].value,
-    status: 'Published',
-    content: ''
+    excerpt: '',
+    content: '',
+    is_published: true
   }), []);
 
   const formDataToLoad = useMemo(() => {
-    if (initialData) return initialData;
+    const data = surchargeDetails || initialData;
+    if (data) {
+      return {
+        title: data.title,
+        category: data.category,
+        excerpt: data.excerpt || '',
+        content: data.content || '',
+        is_published: data.is_published ?? (data.status === 'Published')
+      };
+    }
     return initialValues;
-  }, [initialData, initialValues]);
+  }, [surchargeDetails, initialData, initialValues]);
 
   const formRef = useRef<HTMLFormElement>(null);
+
+  const handleSubmit = (data: HelpArticleFormData) => {
+    if (initialData) {
+      updateArticle({ id: initialData.id, data }, {
+        onSuccess: () => onOpenChange(false)
+      });
+    } else {
+      createArticle(data, {
+        onSuccess: () => onOpenChange(false)
+      });
+    }
+  };
 
   return (
     <CustomModel
@@ -37,59 +67,55 @@ export function AddArticleDialog({ open, onOpenChange, onSubmit, initialData }: 
       title={initialData ? "Edit Article" : "Create Article"}
       onSubmit={() => formRef.current?.requestSubmit()}
       onCancel={() => onOpenChange(false)}
-      submitText="Save Article"
+      submitText={initialData ? "Update Article" : "Save Article"}
       cancelText="Cancel"
       contentClass="sm:max-w-[850px]"
+      isLoading={isLoading}
     >
-      <ArticleForm
-        key={initialData ? `edit-${initialData.id}` : 'new'}
-        ref={formRef}
-        initialValues={formDataToLoad}
-        onSubmit={onSubmit}
-      />
+      {isFetching && (
+        <div className="absolute inset-0 z-50 flex items-center justify-center bg-white/60 dark:bg-zinc-900/60 backdrop-blur-[1px]">
+          <div className="flex flex-col items-center gap-2">
+            <Loader2 className="h-8 w-8 text-blue-600 animate-spin" />
+            <p className="text-xs font-bold text-slate-500 uppercase tracking-widest">Loading article details...</p>
+          </div>
+        </div>
+      )}
+      {open && (
+        <ArticleForm
+          key={initialData?.id || 'new'}
+          ref={formRef}
+          initialValues={formDataToLoad}
+          onSubmit={handleSubmit}
+        />
+      )}
     </CustomModel>
   );
 }
 
 interface ArticleFormProps {
-  initialValues: any;
-  onSubmit: (data: any) => void;
+  initialValues: HelpArticleFormData;
+  onSubmit: (data: HelpArticleFormData) => void;
 }
 
 const ArticleForm = ({ initialValues, onSubmit, ref }: ArticleFormProps & { ref: any }) => {
-  const [formData, setFormData] = useState({
-    ...initialValues,
-    isPublished: initialValues.status === 'Published'
+  const [formData, setFormData] = useState<HelpArticleFormData>({
+    ...initialValues
   });
   const [submited, setSubmited] = useState(false);
 
-  const handleInputChange = useCallback((field: string, value: any) => {
-    setFormData((prev: any) => ({ ...prev, [field]: value }));
-    if (field === 'title') {
-      const slug = value.toLowerCase().trim()
-        .replace(/[^\w\s-]/g, '')
-        .replace(/[\s_-]+/g, '-')
-        .replace(/^-+|-+$/g, '');
-      setFormData((prev: any) => ({ ...prev, slug: `/${slug}` }));
-    }
+  const handleInputChange = useCallback((field: keyof HelpArticleFormData, value: any) => {
+    setFormData((prev) => ({ ...prev, [field]: value }));
   }, []);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     setSubmited(true);
 
-    const requiredFields = ['title', 'slug', 'category', 'content'];
-    const hasErrors = requiredFields.some(field => !formData[field]);
-    if (hasErrors) return;
+    if (!formData.title || !formData.category || !formData.content) {
+      return;
+    }
 
-    const { isPublished, ...rest } = formData;
-    const finalData = {
-      ...rest,
-      status: isPublished ? 'Published' : 'Draft'
-    };
-    console.log(finalData, 'finalData');
-
-    onSubmit(finalData);
+    onSubmit(formData);
   };
 
   return (
@@ -117,10 +143,10 @@ const ArticleForm = ({ initialValues, onSubmit, ref }: ArticleFormProps & { ref:
       </div>
       <div className="col-span-12">
         <FormTextarea
-          label="Short Description"
+          label="Short Description (Excerpt)"
           placeholder="Account Registration Process"
-          value={formData.shortDescription || ''}
-          onChange={(val) => handleInputChange('shortDescription', val)}
+          value={formData.excerpt || ''}
+          onChange={(val) => handleInputChange('excerpt', val)}
           rows={2}
         />
       </div>
@@ -139,8 +165,8 @@ const ArticleForm = ({ initialValues, onSubmit, ref }: ArticleFormProps & { ref:
       <div className="col-span-12 flex items-center gap-3 pt-2">
         <Switch
           id="published-status"
-          checked={formData.isPublished}
-          onCheckedChange={(val) => handleInputChange('isPublished', val)}
+          checked={formData.is_published}
+          onCheckedChange={(val) => handleInputChange('is_published', val)}
         />
         <Label htmlFor="published-status" className="text-sm font-bold text-slate-700 dark:text-zinc-300 cursor-pointer">
           Published (visible in customer portal)

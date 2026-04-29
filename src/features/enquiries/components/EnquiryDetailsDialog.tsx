@@ -17,7 +17,6 @@ export function EnquiryDetailsDialog({ enquiry, onClose, onUpdateStatus }: Enqui
 
   useEffect(() => {
     if (enquiry) {
-      // eslint-disable-next-line react-hooks/set-state-in-effect
       setCurrentStatus(enquiry.status);
     }
   }, [enquiry]);

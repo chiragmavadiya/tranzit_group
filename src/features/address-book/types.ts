@@ -15,8 +15,8 @@ export interface Address {
     suburb: string;
     state: string;
     postcode: string;
-    latitude: string | number;
-    longitude: string | number;
+    latitude: string;
+    longitude: string;
     created_at?: string;
     updated_at?: string;
     is_active?: number;
@@ -32,8 +32,8 @@ export interface AddressFormData {
     suburb: string;
     state: string;
     postcode: string;
-    latitude: number;
-    longitude: number;
+    latitude: string;
+    longitude: string;
     code: string;
     contact_person: string;
     business_name: string;

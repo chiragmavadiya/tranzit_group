@@ -1,4 +1,4 @@
-import { useState, useCallback, useMemo, useRef, forwardRef } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { Loader2 } from 'lucide-react';
 import { CustomModel, } from '@/components/ui/dialog';
 import { Label } from '@/components/ui/label';
@@ -9,22 +9,21 @@ import { useItemDetails } from '../hooks/useItems';
 
 interface CreateItemDialogProps {
   open: boolean;
-  onOpenChange: (open: boolean) => void;
+  onClose: (open: boolean) => void;
   onSubmit: (data: ItemFormData) => void;
-  editingItemId?: string | number;
+  editingItemId?: string | number | null;
   isLoading?: boolean;
 }
 
 export function CreateItemDialog({
   open,
-  onOpenChange,
+  onClose,
   onSubmit,
   editingItemId,
   isLoading,
 }: CreateItemDialogProps) {
-  const { data: detailsData, isLoading: isFetchingDetails } = useItemDetails(editingItemId);
 
-  const initialData = useMemo(() => ({
+  const [formData, setFormData] = useState<ItemFormData>({
     item_code: '',
     item_name: '',
     item_weight: 0,
@@ -33,85 +32,56 @@ export function CreateItemDialog({
     item_height: 0,
     item_cubic: 0,
     is_default: false,
-  }), []);
+  });
+  const [submited, setSubmited] = useState(false);
+  const { data: detailsData, isLoading: isFetchingDetails } = useItemDetails(editingItemId || undefined);
 
-  const formDataToLoad = useMemo(() => {
-    if (editingItemId && detailsData?.data) {
-      const item = detailsData.data;
-      return {
-        id: item.id,
-        item_code: item.item_code || '',
-        item_name: item.item_name || '',
-        item_weight: Number(item.item_weight) || 0,
-        item_length: Number(item.item_length) || 0,
-        item_width: Number(item.item_width) || 0,
-        item_height: Number(item.item_height) || 0,
-        item_cubic: Number(item.item_cubic) || 0,
-        is_default: Boolean(item.is_default),
-      };
+  const handleChange = useCallback((field: keyof ItemFormData, value: any) => {
+    setFormData((prev) => ({ ...prev, [field]: value }));
+  }, []);
+
+  const handleSubmit = useCallback((e?: React.FormEvent) => {
+    if (e) e.preventDefault();
+    setSubmited(true);
+
+    if (!formData.item_code || !formData.item_name || !formData.item_weight) {
+      return;
     }
-    return initialData;
-  }, [editingItemId, detailsData, initialData]);
 
-  const formKey = editingItemId ? `edit-${editingItemId}-${detailsData?.data ? 'loaded' : 'loading'}` : 'new';
+    const submissionData = {
+      ...formData,
+      is_default: formData.is_default ? "on" : "off"
+    } as ItemFormData;
 
-  const formRef = useRef<HTMLFormElement>(null);
+    onSubmit(submissionData);
+  }, [formData, onSubmit]);
+
+  useEffect(() => {
+    if (!open || !detailsData?.data) return;
+    const data = detailsData.data;
+    setFormData({
+      ...data,
+      item_cubic: Number(data.item_cubic),
+      item_weight: Number(data.item_weight),
+      item_length: Number(data.item_length),
+      item_width: Number(data.item_width),
+      item_height: Number(data.item_height),
+      is_default: Boolean(data.is_default),
+    })
+  }, [open, detailsData])
 
   return (
     <CustomModel
       title={editingItemId ? 'Edit Item' : 'Add New Item'}
       open={open}
-      onOpenChange={onOpenChange}
-      onSubmit={() => formRef.current?.requestSubmit()}
-      onCancel={() => onOpenChange(false)}
+      onOpenChange={onClose}
+      onSubmit={() => handleSubmit()}
+      onCancel={() => onClose(false)}
       isLoading={!!isLoading}
       submitText={editingItemId ? 'Update' : 'Submit'}
     >
-      <ItemForm
-        key={formKey}
-        ref={formRef}
-        initialValues={formDataToLoad}
-        isFetching={isFetchingDetails}
-        onSubmit={onSubmit}
-      />
-    </CustomModel>
-  )
-}
-
-interface ItemFormProps {
-  initialValues: ItemFormData;
-  isFetching: boolean;
-  onSubmit: (data: ItemFormData) => void;
-}
-
-const ItemForm = forwardRef<HTMLFormElement, ItemFormProps>(
-  ({ initialValues, isFetching, onSubmit }, ref) => {
-    const [formData, setFormData] = useState<ItemFormData>(initialValues);
-    const [submited, setSubmited] = useState(false);
-
-    const handleChange = useCallback((field: keyof ItemFormData, value: any) => {
-      setFormData((prev) => ({ ...prev, [field]: value }));
-    }, []);
-
-    const handleSubmit = useCallback((e?: React.FormEvent) => {
-      if (e) e.preventDefault();
-      setSubmited(true);
-
-      if (!formData.item_code || !formData.item_name || !formData.item_weight) {
-        return;
-      }
-
-      const submissionData = {
-        ...formData,
-        is_default: formData.is_default ? "on" : "off"
-      } as ItemFormData;
-
-      onSubmit(submissionData);
-    }, [formData, onSubmit]);
-
-    return (
-      <form ref={ref} onSubmit={handleSubmit} className="flex flex-col max-h-[90vh]">
-        {isFetching && (
+      <form onSubmit={handleSubmit} className="flex flex-col max-h-[90vh]">
+        {isFetchingDetails && (
           <div className="absolute inset-0 z-50 flex items-center justify-center bg-white/60 dark:bg-zinc-900/60 backdrop-blur-[1px]">
             <div className="flex flex-col items-center gap-2">
               <Loader2 className="h-8 w-8 text-blue-600 animate-spin" />
@@ -216,8 +186,7 @@ const ItemForm = forwardRef<HTMLFormElement, ItemFormProps>(
           </div>
         </div>
       </form>
-    );
-  }
-);
-
+    </CustomModel>
+  )
+}
 

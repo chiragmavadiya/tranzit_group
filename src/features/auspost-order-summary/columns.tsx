@@ -3,13 +3,13 @@ import type { AuspostOrder } from './types';
 
 export const AUSPOST_COLUMNS: Column<AuspostOrder>[] = [
   {
-    key: 'orderNumber',
+    key: 'order_number',
     header: 'ORDER NUMBER',
     sortable: true,
     cell: (val) => <span className="font-bold text-slate-900 dark:text-zinc-100 text-[12px] tracking-tight">{val}</span>
   },
   {
-    key: 'customerName',
+    key: 'customer_name',
     header: 'CUSTOMER NAME',
     sortable: true,
     cell: (val) => <span className="text-slate-600 font-medium text-[12px]">{val}</span>
@@ -27,7 +27,7 @@ export const AUSPOST_COLUMNS: Column<AuspostOrder>[] = [
     cell: (val) => <span className="text-slate-500 font-medium text-[12px]">{val}</span>
   },
   {
-    key: 'orderDate',
+    key: 'order_date',
     header: 'ORDER DATE',
     sortable: true,
     noPrint: true,

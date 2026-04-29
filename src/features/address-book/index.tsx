@@ -17,10 +17,10 @@ import {
 export default function AddressBookPage() {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
-  const [editingAddress, setEditingAddress] = useState<AddressFormData | null>(null);
+  const [editingAddressId, setEditingAddressId] = useState<number | null>(null);
   const [deletingId, setDeletingId] = useState<number | string | null>(null);
   const [search, setSearch] = useState('');
-  const [pageSize, setPageSize] = useState(10);
+  const [pageSize, setPageSize] = useState(25);
   const [currentPage, setCurrentPage] = useState(1);
 
   // API Hooks
@@ -30,7 +30,7 @@ export default function AddressBookPage() {
     per_page: pageSize
   });
   const createMutation = useCreateAddress();
-  const updateMutation = useUpdateAddress(editingAddress?.id || '');
+  const updateMutation = useUpdateAddress();
   const deleteMutation = useDeleteAddress();
   const exportMutation = useExportAddressBook();
 
@@ -40,38 +40,17 @@ export default function AddressBookPage() {
   }, []);
 
   const handlePageSizeChange = useCallback((pageSize: number) => {
-    console.log(pageSize, "PAGE SIZE");
     setPageSize(pageSize);
     setCurrentPage(1);
   }, []);
 
   const handleAddAddress = useCallback(() => {
-    setEditingAddress(null);
+    setEditingAddressId(null);
     setIsDialogOpen(true);
   }, []);
 
   const handleEditAddress = useCallback((addr: Address) => {
-    // Mapping Address to AddressFormData
-    setEditingAddress({
-      id: addr.id,
-      code: addr.code,
-      contact_person: addr.contact_person,
-      business_name: addr.business_name,
-      email: addr.email,
-      phone: addr.phone,
-      unit_number: addr.unit_number,
-      street_number: addr.street_number,
-      street_name: addr.street_name,
-      street_type: addr.street_type,
-      suburb: addr.suburb,
-      state: addr.state,
-      postcode: addr.postcode,
-      latitude: Number(addr.latitude),
-      longitude: Number(addr.longitude),
-      additional_details: addr.additional_details,
-      special_instructions: addr.special_instructions,
-      address: addr.address,
-    });
+    setEditingAddressId(addr.id);
     setIsDialogOpen(true);
   }, []);
 
@@ -80,17 +59,22 @@ export default function AddressBookPage() {
     setIsDeleteDialogOpen(true);
   }, []);
 
+  const handleCloseDialog = useCallback(() => {
+    setEditingAddressId(null);
+    setIsDialogOpen(false);
+  }, []);
+
   const handleFormSubmit = useCallback((formData: AddressFormData) => {
-    if (editingAddress?.id) {
-      updateMutation.mutate(formData, {
-        onSuccess: () => setIsDialogOpen(false)
+    if (editingAddressId) {
+      updateMutation.mutate({ id: editingAddressId, data: formData }, {
+        onSuccess: handleCloseDialog
       });
     } else {
       createMutation.mutate(formData, {
-        onSuccess: () => setIsDialogOpen(false)
+        onSuccess: handleCloseDialog
       });
     }
-  }, [editingAddress, updateMutation, createMutation]);
+  }, [editingAddressId, updateMutation, createMutation, handleCloseDialog]);
 
   const onSubmitDelete = useCallback(() => {
     if (deletingId) {
@@ -195,14 +179,17 @@ export default function AddressBookPage() {
           isExporting={exportMutation.isPending}
         />
 
-        <CreateAddressDialog
-          key={isDialogOpen ? (editingAddress?.id || 'new') : 'closed'}
-          open={isDialogOpen}
-          onOpenChange={setIsDialogOpen}
-          onSubmit={handleFormSubmit}
-          editAddress={editingAddress}
-          isLoading={createMutation.isPending || updateMutation.isPending}
-        />
+        {isDialogOpen && (
+
+          <CreateAddressDialog
+            key={isDialogOpen ? (editingAddressId || 'new') : 'closed'}
+            open={isDialogOpen}
+            onOpenChange={setIsDialogOpen}
+            onSubmit={handleFormSubmit}
+            editingAddressId={editingAddressId}
+            isLoading={createMutation.isPending || updateMutation.isPending}
+          />
+        )}
 
         <ConformationModal
           open={isDeleteDialogOpen}

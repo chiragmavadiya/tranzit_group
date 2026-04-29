@@ -12,7 +12,7 @@ interface OrdersTabProps {
 
 export const OrdersTab = ({ customerId }: OrdersTabProps) => {
     const [page, setPage] = useState(1);
-    const [pageSize, setPageSize] = useState(10);
+    const [pageSize, setPageSize] = useState(25);
 
     const { data: response, isLoading } = useCustomerOrders(customerId, { page, per_page: pageSize });
     const orders = response?.data || [];

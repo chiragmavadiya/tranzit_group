@@ -1,7 +1,7 @@
 import { useState, useMemo, useRef, forwardRef, useCallback } from 'react';
 import { CustomModel } from '@/components/ui/dialog';
-import { FormInput, FormSelect } from '@/features/orders/components/OrderFormUI';
-import { COURIER_OPTIONS } from '../constants';
+import { FormInput } from '@/features/orders/components/OrderFormUI';
+import { GlobalCourierSelect } from '@/features/courier-surcharge/components/GlobalCourierSelect';
 import type { CourierPostcode, CourierPostcodeFormData } from '../types';
 
 interface AddPostcodeDialogProps {
@@ -95,12 +95,9 @@ const PostcodeForm = forwardRef<HTMLFormElement, PostcodeFormProps>(
 
     return (
       <form ref={ref} onSubmit={handleSubmit} className="flex flex-col gap-5 p-1">
-        <FormSelect
-          label="Courier Name"
+        <GlobalCourierSelect
           value={formData.global_courier_id}
           onValueChange={(val) => handleChange('global_courier_id', val || '')}
-          options={COURIER_OPTIONS}
-          placeholder="Select Courier"
           required
           error={submited && !formData.global_courier_id}
           errormsg="Courier is required"

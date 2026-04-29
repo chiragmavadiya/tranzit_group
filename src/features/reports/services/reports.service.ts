@@ -1,12 +1,12 @@
 import { api } from "@/services/api";
 import { API_ENDPOINTS } from "@/constants/api.constants";
-import type { 
-    ReportFilters, 
-    ShipmentReport, 
-    TransactionReport, 
-    InvoiceReport, 
-    ParcelReport, 
-    PaginatedResponse 
+import type {
+    ReportFilters,
+    ShipmentReport,
+    TransactionReport,
+    InvoiceReport,
+    ParcelReport,
+    PaginatedResponse
 } from "../types";
 
 export const reportsService = {
@@ -20,7 +20,7 @@ export const reportsService = {
             params: filters,
             responseType: 'blob',
         });
-        
+
         const filename = `Shipment_Report_${new Date().getTime()}.${filters.format}`;
         return { blob: response.data, filename };
     },
@@ -35,7 +35,7 @@ export const reportsService = {
             params: filters,
             responseType: 'blob',
         });
-        
+
         const filename = `Transaction_Report_${new Date().getTime()}.${filters.format}`;
         return { blob: response.data, filename };
     },
@@ -45,17 +45,19 @@ export const reportsService = {
         return response.data;
     },
 
-    getParcelReport: async (filters: ReportFilters): Promise<PaginatedResponse<ParcelReport>> => {
-        const response = await api.get(API_ENDPOINTS.REPORTS.PARCELS, { params: filters });
+    getParcelReport: async (filters: ReportFilters, isAdmin: boolean = false): Promise<PaginatedResponse<ParcelReport>> => {
+        const endpoint = isAdmin ? API_ENDPOINTS.ADMIN_REPORTS.PARCELS : API_ENDPOINTS.REPORTS.PARCELS;
+        const response = await api.get(endpoint, { params: filters });
         return response.data;
     },
 
-    exportParcelReport: async (filters: ReportFilters & { format: string }): Promise<{ blob: Blob; filename: string }> => {
-        const response = await api.get(API_ENDPOINTS.REPORTS.PARCELS_EXPORT, {
+    exportParcelReport: async (filters: ReportFilters & { format: string }, isAdmin: boolean = false): Promise<{ blob: Blob; filename: string }> => {
+        const endpoint = isAdmin ? API_ENDPOINTS.ADMIN_REPORTS.PARCELS_EXPORT : API_ENDPOINTS.REPORTS.PARCELS_EXPORT;
+        const response = await api.get(endpoint, {
             params: filters,
             responseType: 'blob',
         });
-        
+
         const filename = `Parcel_Report_${new Date().getTime()}.${filters.format}`;
         return { blob: response.data, filename };
     }

@@ -38,7 +38,6 @@ export const EditItemDialog: React.FC<EditItemDialogProps> = ({
 
   useEffect(() => {
     if (open && item) {
-      // eslint-disable-next-line react-hooks/set-state-in-effect
       setFormData({ ...item });
     }
   }, [open, item]);

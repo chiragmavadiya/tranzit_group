@@ -1,4 +1,4 @@
-import type { Column } from '@/components/common';
+import { CustomTooltip, type Column } from '@/components/common';
 import type { CourierSurcharge } from './types';
 import { Button } from '@/components/ui/button';
 import { Pencil, Trash2, CheckCircle2, XCircle } from 'lucide-react';
@@ -6,7 +6,7 @@ import { cn } from '@/lib/utils';
 
 export const SURCHARGE_COLUMNS = (onEdit: (row: any) => void, onDelete: (row: any) => void): Column<CourierSurcharge>[] => [
   {
-    key: 'courierName',
+    key: 'courier_name',
     header: 'COURIER NAME',
     sortable: true,
     cell: (val) => <span className="font-bold text-slate-900 dark:text-zinc-100 text-[13px]">{val}</span>
@@ -36,7 +36,7 @@ export const SURCHARGE_COLUMNS = (onEdit: (row: any) => void, onDelete: (row: an
     cell: (val) => <span className="font-bold text-slate-900 dark:text-zinc-100 text-[13px] tracking-tight">${Number(val).toFixed(2)}</span>
   },
   {
-    key: 'customerSelectable',
+    key: 'customer_selectable',
     header: 'CUSTOMER SELECTABLE',
     cell: (val) => (
       <div className={cn(
@@ -51,7 +51,7 @@ export const SURCHARGE_COLUMNS = (onEdit: (row: any) => void, onDelete: (row: an
     )
   },
   {
-    key: 'autoApply',
+    key: 'auto_apply',
     header: 'AUTO APPLY',
     cell: (val) => (
       <div className={cn(
@@ -73,22 +73,27 @@ export const SURCHARGE_COLUMNS = (onEdit: (row: any) => void, onDelete: (row: an
     noPrint: true,
     cell: (_, row) => (
       <div className="flex items-center justify-end gap-2 pr-2">
-        <Button
-          variant="ghost"
-          size="icon"
-          className="h-8 w-8 text-slate-400 hover:text-blue-500 hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-all active:scale-90"
-          onClick={() => onEdit(row)}
-        >
-          <Pencil className="w-4 h-4" />
-        </Button>
-        <Button
-          variant="ghost"
-          size="icon"
-          className="h-8 w-8 text-slate-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 transition-all active:scale-90"
-          onClick={() => onDelete(row)}
-        >
-          <Trash2 className="w-4 h-4" />
-        </Button>
+        <CustomTooltip title="Edit">
+          <Button
+            variant="ghost"
+            size="icon"
+            className="h-8 w-8 text-slate-400 hover:text-blue-500 hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-all active:scale-90"
+            onClick={() => onEdit(row)}
+          >
+            <Pencil className="w-4 h-4" />
+          </Button>
+        </CustomTooltip>
+        <CustomTooltip title="Delete">
+          <Button
+            variant="ghost"
+            size="icon"
+            className="h-8 w-8 text-slate-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 transition-all active:scale-90"
+            onClick={() => onDelete(row)}
+          >
+            <Trash2 className="w-4 h-4" />
+          </Button>
+        </CustomTooltip>
+
       </div>
     )
   }

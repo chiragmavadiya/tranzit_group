@@ -16,7 +16,7 @@ export default function CustomerPage() {
     const [suburb, setSuburb] = useState('all');
     const [state, setState] = useState('all');
     const [search, setSearch] = useState('');
-    const [pageSize, setPageSize] = useState(7);
+    const [pageSize, setPageSize] = useState(25);
     const [currentPage, setCurrentPage] = useState(1);
     const [isDialogOpen, setIsDialogOpen] = useState(false);
     const [editCustomerId, setEditCustomerId] = useState<string | number | undefined>(undefined);

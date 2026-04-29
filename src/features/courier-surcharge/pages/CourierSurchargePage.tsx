@@ -4,35 +4,38 @@ import { DataTable } from '@/components/common';
 import { ConformationModal } from '@/components/common/ConformationModal';
 import { Button } from '@/components/ui/button';
 import { SURCHARGE_COLUMNS } from '../columns';
-import { MOCK_SURCHARGES } from '../constants';
 import { AddSurchargeDialog } from '../components/AddSurchargeDialog';
+import {
+  useCourierSurcharges,
+  useCourierSurchargeMutations,
+  useExportCourierSurcharge
+} from '../hooks/useCourierSurcharge';
 import type { CourierSurcharge } from '../types';
+import { useDebounce } from '@/hooks/useDebounce';
 
 export default function CourierSurchargePage() {
-  const [data, setData] = useState<CourierSurcharge[]>(MOCK_SURCHARGES);
   const [search, setSearch] = useState('');
+  const [page, setPage] = useState(1);
+  const [pageSize, setPageSize] = useState(25);
+
+  const { data: listResponse, isLoading } = useCourierSurcharges({
+    search: useDebounce(search, 500),
+    page,
+    per_page: pageSize
+  });
+
+  const { deleteSurcharge, isDeleting } = useCourierSurchargeMutations();
+  const exportMutation = useExportCourierSurcharge();
+
   const [isAddOpen, setIsAddOpen] = useState(false);
   const [editingRow, setEditingRow] = useState<CourierSurcharge | null>(null);
   const [deletingRow, setDeletingRow] = useState<CourierSurcharge | null>(null);
 
-  const handleAddSurcharge = (formData: Partial<CourierSurcharge>) => {
-    if (editingRow) {
-      setData(prev => prev.map(item => item.id === editingRow.id ? { ...item, ...formData } as CourierSurcharge : item));
-    } else {
-      const newSurcharge: CourierSurcharge = {
-        ...formData,
-        id: Math.random().toString(36).substr(2, 9),
-      } as CourierSurcharge;
-      setData(prev => [newSurcharge, ...prev]);
-    }
-    setIsAddOpen(false);
-    setEditingRow(null);
-  };
-
   const handleDelete = () => {
     if (deletingRow) {
-      setData(prev => prev.filter(item => item.id !== deletingRow.id));
-      setDeletingRow(null);
+      deleteSurcharge(deletingRow.id, {
+        onSuccess: () => setDeletingRow(null)
+      });
     }
   };
 
@@ -49,30 +52,29 @@ export default function CourierSurchargePage() {
     (row) => setDeletingRow(row)
   ), []);
 
-  const filteredData = useMemo(() => {
-    return data.filter(item =>
-      item.name.toLowerCase().includes(search.toLowerCase()) ||
-      item.courierName.toLowerCase().includes(search.toLowerCase()) ||
-      item.code.toLowerCase().includes(search.toLowerCase())
-    );
-  }, [data, search]);
-
   return (
     <div className="flex flex-col flex-1 gap-6 p-page-padding min-h-0 animate-in fade-in slide-in-from-bottom-2 duration-500 bg-slate-50/30 dark:bg-zinc-950/30 overflow-y-auto">
       <div className="rounded-2xl shadow-sm border border-slate-100 dark:border-zinc-800 bg-white dark:bg-zinc-950 overflow-hidden flex-1 flex flex-col min-h-[500px]">
         <DataTable
           headerTitle="Surcharge List"
           columns={columns}
-          data={filteredData}
+          data={listResponse?.data || []}
+          loading={isLoading}
           searchable
           searchValue={search}
           onSearchChange={setSearch}
-          totalItems={filteredData.length}
+          totalItems={listResponse?.meta?.total || 0}
+          currentPage={page}
+          onPageChange={setPage}
+          pageSize={pageSize}
+          onPageSizeChange={setPageSize}
+          onExport={(format) => exportMutation.mutate({ format, search })}
+          isExporting={exportMutation.isPending}
           className="text-xs pb-3"
           customHeader={
             <Button
               onClick={onAddSurcharge}
-              className="gap-2 bg-[#0060FE] hover:bg-[#0052db] text-white shadow-lg shadow-blue-100 dark:shadow-none transition-all active:scale-[0.98] font-semibold border-none px-4"
+              className="global-btn"
             >
               <Plus className="w-4 h-4" />
               <span>Add Surcharge</span>
@@ -85,7 +87,6 @@ export default function CourierSurchargePage() {
       <AddSurchargeDialog
         open={isAddOpen}
         onOpenChange={setIsAddOpen}
-        onSubmit={handleAddSurcharge}
         initialData={editingRow}
       />
 
@@ -97,6 +98,7 @@ export default function CourierSurchargePage() {
         description={`Are you sure you want to delete the surcharge "${deletingRow?.name}"? This action cannot be undone.`}
         confirmText="Delete"
         confirmVariant="destructive"
+        loading={isDeleting}
       />
     </div>
   );

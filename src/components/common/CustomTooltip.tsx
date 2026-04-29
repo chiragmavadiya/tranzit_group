@@ -21,7 +21,7 @@ interface CustomTooltipProps {
 export const CustomTooltip: React.FC<CustomTooltipProps> = ({
   children,
   title,
-  placement = "top",
+  placement = "bottom",
   onlyOnOverflow = undefined,
   className = "",
 }) => {

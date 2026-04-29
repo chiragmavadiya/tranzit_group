@@ -52,10 +52,10 @@ export function AuthLayout({ children }: AuthLayoutProps) {
           </div>
         </div>
 
-        <div className="mt-12 overflow-hidden rounded-xl border border-white/10 bg-white/10 p-5 backdrop-blur-md shadow-lg shadow-black/10">
-          <p className="text-sm font-medium text-indigo-50">
+        <div className="mt-8 overflow-hidden rounded-xl border border-white/10 bg-white/10 p-5 backdrop-blur-md shadow-lg shadow-black/10">
+          <span className="text-sm font-medium text-indigo-50">
             Join retailers using Tranzit Group to save time on every order.
-          </p>
+          </span>
         </div>
       </div>
 

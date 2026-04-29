@@ -54,6 +54,18 @@ export interface ForgotPasswordResponse {
     token: string;
 }
 
+export interface ResetPasswordRequest {
+    email: string;
+    token: string;
+    password: string;
+    password_confirmation: string;
+}
+
+export interface ResetPasswordResponse {
+    status: boolean;
+    message: string;
+}
+
 export interface VerificationStatusResponse {
     status: boolean;
     message: string;

@@ -13,30 +13,32 @@ import { NavLink } from "react-router-dom";
 
 import { useDashboardMetrics } from "../hooks/useDashboard";
 import type { Transaction, DashboardOrder, CustomerMetrics } from "../types";
+import { useNavigate } from "react-router";
 
 export default function ClientDashboard() {
+  const navigate = useNavigate();
   const { data: metricsData, isLoading } = useDashboardMetrics();
-  
+
   // Real Data from API
   const metrics = metricsData?.data as CustomerMetrics;
 
   const stats = [
-    { 
-      label: "Total Orders", 
-      value: isLoading ? "..." : metrics?.totalOrder ?? 0, 
-      icon: LayoutDashboard 
+    {
+      label: "Total Orders",
+      value: isLoading ? 0 : metrics?.totalOrder ?? 0,
+      icon: LayoutDashboard
     },
-    { 
-      label: "Total Spend", 
-      value: isLoading ? "..." : (typeof metrics?.totalSpend === 'number' ? `$${metrics.totalSpend.toFixed(2)}` : (metrics?.totalSpend || "$0.00")), 
-      icon: DollarSign, 
-      color: "bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400" 
+    {
+      label: "Total Spend",
+      value: isLoading ? '$0' : (typeof metrics?.totalSpend === 'number' ? `$${metrics.totalSpend.toFixed(2)}` : (metrics?.totalSpend || "$0.00")),
+      icon: DollarSign,
+      color: "bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400"
     },
-    { 
-      label: "Invoice Pending", 
-      value: isLoading ? "..." : metrics?.pendingInvoiceCount ?? 0, 
-      icon: FileText, 
-      color: "bg-orange-50 dark:bg-orange-900/20 text-orange-600 dark:text-orange-400" 
+    {
+      label: "Invoice Pending",
+      value: isLoading ? 0 : metrics?.pendingInvoiceCount ?? 0,
+      icon: FileText,
+      color: "bg-orange-50 dark:bg-orange-900/20 text-orange-600 dark:text-orange-400"
     },
   ];
 
@@ -100,24 +102,24 @@ export default function ClientDashboard() {
 
 
   return (
-    <div className="p-page-padding space-y-6 overflow-y-auto animate-in fade-in duration-700">
+    <div className="p-page-padding space-y-4 overflow-y-auto animate-in fade-in duration-700">
       <WelcomeBanner
         variant="blue"
         userName="Welcome to Tranzit Group, Customer1 User"
         description="Manage pickups, create shipments, and track every parcel in real time, all from one dashboard built to keep your delivery costs low."
         buttons={[
-          { label: "Send Parcel", variant: "default", onClick: () => console.log("Send Parcel clicked") },
-          { label: "View Orders", variant: "outline", onClick: () => console.log("View Orders clicked") },
+          { label: "Send Parcel", variant: "default", onClick: () => navigate("/orders/create") },
+          { label: "View Orders", variant: "outline", onClick: () => navigate("/orders") },
         ]}
       />
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         {stats.map((stat, idx) => (
           <StatCard key={idx} {...stat} />
         ))}
       </div>
 
-      <div className="grid grid-cols-1 xl:grid-cols-12 gap-6 items-start">
+      <div className="grid grid-cols-1 xl:grid-cols-12 gap-4 items-start">
         <div className="xl:col-span-8">
           <DashboardTable
             title="Recent Orders"

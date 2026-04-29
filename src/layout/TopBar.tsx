@@ -1,6 +1,6 @@
 "use client";
 
-import { Search, ChevronDown, LogOut, Sun, Moon, Monitor } from 'lucide-react';
+import { Search, ChevronDown, LogOut, Sun, Moon, Monitor, Loader2, User, HelpCircle } from 'lucide-react';
 import { useNavigate, useLocation, useSearchParams } from 'react-router-dom';
 import {
   DropdownMenu,
@@ -42,6 +42,11 @@ export default function TopBar({ isCollapsed }: { isCollapsed?: boolean }) {
       }
     });
   };
+
+  const handleFaq = () => {
+    // open new window
+    window.open('https://tranzitgroup.com.au/faq', '_blank');
+  }
 
   return (
     <header className={`print:hidden h-16 bg-white dark:bg-zinc-950 border-b border-gray-200 dark:border-zinc-800 flex items-center justify-between px-6 fixed top-0 right-0 z-10 transition-[left] duration-300 ease-in-out ${isCollapsed ? 'left-[64px]' : 'left-[240px]'}`}>
@@ -130,26 +135,37 @@ export default function TopBar({ isCollapsed }: { isCollapsed?: boolean }) {
 
         <DropdownMenu>
           <DropdownMenuTrigger className="flex items-center gap-2 cursor-pointer px-[10px] py-[5px] hover:bg-gray-50 dark:hover:bg-zinc-800 rounded border border-gray-200 dark:border-zinc-800 text-[13px] font-medium text-gray-700 dark:text-zinc-300 transition-colors outline-none">
-            <div className="w-[22px] h-[22px] rounded-full bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center text-[#0060FE] dark:text-blue-400 text-xs font-semibold shadow-sm">
-              {user?.first_name?.charAt(0).toUpperCase()}
+            <div className="w-[22px] h-[22px] rounded-full pt-[2px] bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center text-[#0060FE] dark:text-blue-400 text-xs font-semibold shadow-sm">
+              {logoutMutation.isPending ? (
+                <Loader2 className="w-4 h-4 animate-spin" />
+              ) : user?.first_name?.charAt(0).toUpperCase()
+              }
             </div>
             <span>{user?.email}</span>
             <ChevronDown className="w-3.5 h-3.5 text-blue-500 -ml-1 stroke-[2.5]" />
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end" className="rounded-sm">
             <DropdownMenuItem className="cursor-pointer">
+              <User />
               Profile
             </DropdownMenuItem>
-            <DropdownMenuItem className="cursor-pointer">
-              Settings
+            <DropdownMenuItem onClick={handleFaq} className="cursor-pointer">
+              <HelpCircle />
+              FAQ
             </DropdownMenuItem>
             <DropdownMenuSeparator className="dark:bg-zinc-800" />
             <DropdownMenuItem
-              className="cursor-pointer text-red-600 focus:text-red-700 focus:bg-red-50 dark:focus:bg-red-950/30"
+              variant="destructive"
+              className="cursor-pointer"
               onClick={handleLogout}
+              disabled={logoutMutation.isPending}
             >
-              <LogOut className="w-4 h-4 mr-2" />
-              Logout
+              {logoutMutation.isPending ? (
+                <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+              ) : (
+                <LogOut className="mr-2" />
+              )}
+              {logoutMutation.isPending ? "Logging out..." : "Logout"}
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>

@@ -2,7 +2,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useCallback } from "react";
 import { authService } from "@/features/auth/services/auth.service";
 import { QUERY_KEYS } from "@/constants/api.constants";
-import type { ForgotPasswordRequest, LoginRequest, RegisterRequest, OnboardingRequest } from "@/features/auth/auth.types";
+import type { ForgotPasswordRequest, LoginRequest, RegisterRequest, OnboardingRequest, ResetPasswordRequest } from "@/features/auth/auth.types";
 
 /**
  * Hook for customer login
@@ -124,5 +124,14 @@ export const useGetUserDetails = (enabled: boolean) => {
         queryFn: () => authService.getUserDetails(),
         enabled,
         staleTime: Infinity,
+    });
+};
+
+/**
+ * Hook for reset password
+ */
+export const useResetPassword = () => {
+    return useMutation({
+        mutationFn: useCallback((data: ResetPasswordRequest) => authService.resetPassword(data), []),
     });
 };

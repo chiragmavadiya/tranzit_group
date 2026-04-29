@@ -31,7 +31,7 @@ export function ZohoConnectionCard({
         </div>
       </div>
 
-      <div className="space-y-6 flex-1">
+      <div className="space-y-4 flex-1">
         <div className="grid grid-cols-1 gap-4">
           <div className="p-3 rounded-lg bg-slate-50 dark:bg-zinc-900/50 border border-slate-100 dark:border-zinc-800">
             <div className="flex justify-between items-center mb-1">

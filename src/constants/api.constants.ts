@@ -10,6 +10,7 @@ export const API_ENDPOINTS = {
         ONBOARDING: "/customer/onboarding",
         LOGOUT: "/auth/logout",
         USER_DETAILS: "/auth/me",
+        RESET_PASSWORD: "/customer/auth/reset-password",
     },
     ORDERS: {
         LIST: "/customer/orders",

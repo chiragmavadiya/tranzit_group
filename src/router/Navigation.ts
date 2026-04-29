@@ -84,6 +84,7 @@ export const clientSidebarItems: SidebarItem[] = [
   { name: 'Enquiry', icon: MessageSquare, path: '/enquiry' },
   { name: 'Help Center', icon: HelpCircle, path: '/help-center' },
   { name: 'Parcel Report', icon: FileArchive, path: '/parcel-report' },
+  { name: 'Integrations', icon: Link, path: '/integrations' },
   { name: 'Help', icon: LifeBuoy, path: 'mailto:info@tranzitgroup.com.au?subject=Support Request from Portal&body=Hi Team', isExternal: true },
 ];
 

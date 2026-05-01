@@ -170,19 +170,21 @@ const CustomModel = ({ open, title, description, onOpenChange, children, onSubmi
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className={contentClass || ""}>
         <DialogHeader className="border-b border-gray-100 dark:border-zinc-800 bg-gray-50/50 dark:bg-zinc-900/50">
-          <DialogTitle className="text-xl font-bold text-slate-900 dark:text-zinc-100 italic!">
+          <DialogTitle className="mt-0 text-xl font-bold text-slate-900 dark:text-zinc-100 italic!">
             {title}
           </DialogTitle>
-          <DialogDescription>
-            {description}
-          </DialogDescription>
+          {description && (
+            <DialogDescription>
+              {description}
+            </DialogDescription>
+          )}
         </DialogHeader>
         <div className="-mx-4 no-scrollbar max-h-[65vh] overflow-y-auto px-4">
           {children}
         </div>
         {
           showFooter && (
-            <DialogFooter className="gap-3 p-6 border-t border-gray-100 dark:border-zinc-800 bg-gray-50/50 dark:bg-zinc-900/50">
+            <DialogFooter className="gap-3 p-4 border-t border-gray-100 dark:border-zinc-800 bg-gray-50/50 dark:bg-zinc-900/50">
               <Button
                 type="button"
                 variant="outline"

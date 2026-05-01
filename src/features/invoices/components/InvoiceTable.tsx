@@ -58,12 +58,12 @@ export function InvoiceTable({
 
   const columns = useMemo<Column<Invoice>[]>(() => [
     {
-      accessor: 'invoice_number',
-      key: 'invoice_number',
+      accessor: 'id',
+      key: 'id',
       header: 'Invoice #',
       sticky: 'left',
       cell: (value, row) => (
-        <NavLink to={`${isAdmin ? '/admin' : ''}/invoices/${row.invoice_number}`} className="font-bold text-blue-600 dark:text-blue-400 hover:underline">
+        <NavLink to={`${isAdmin ? '/admin' : ''}/invoices/${row.id}`} className="font-bold text-blue-600 dark:text-blue-400 hover:underline">
           {value}
         </NavLink>
       )

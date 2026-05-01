@@ -58,6 +58,7 @@ export function DataTable<T extends Record<string, any>>({
   // Row actions
   onRowClick,
   // Custom components
+  header = true,
   customHeader,
   headerPosition = 'right',
   headerTitle,
@@ -175,18 +176,20 @@ export function DataTable<T extends Record<string, any>>({
 
   return (
     <div className={cn("flex flex-col group flex-1 min-h-0", className)}>
-      <div className={cn("flex w-full border-b justify-between gap-4 p-4 print:hidden", headerClass)}>
-        <div>
-          <h1 className={`text-lg font-bold text-gray-800 dark:text-zinc-200`}>
+      {header && (<div className={cn("flex w-full border-b bg-gray-50/50 dark:bg-transparent justify-between gap-4 p-4 print:hidden", headerClass)}>
+        <div className="flex flex-col justify-center">
+          <h1 className={`text-lg font-bold text-gray-800 dark:text-zinc-200 my-0`}>
             {headerTitle}
           </h1>
-          <p className="text-sm text-gray-500 dark:text-zinc-400">
-            {headerDescription}
-          </p>
+          {headerDescription && (
+            <p className="text-sm text-gray-500 dark:text-zinc-400 mb-0">
+              {headerDescription}
+            </p>
+          )}
         </div>
         {/* Header with search and controls */}
         {(searchable || customHeader) && (
-          <div className="flex items-center justify-between gap-4 bg-gray-50/50 dark:bg-transparent relative">
+          <div className="flex items-center justify-between gap-4 relative">
             <div className="flex items-center gap-2 ml-auto">
               {headerPosition == 'left' && customHeader && (typeof customHeader === 'function' ? (customHeader as () => ReactNode)() : customHeader)}
               {searchable && (
@@ -242,7 +245,7 @@ export function DataTable<T extends Record<string, any>>({
                     className="gap-2 border-gray-200 dark:border-zinc-800 hover:bg-gray-50 dark:hover:bg-zinc-800 font-medium text-slate-700 dark:text-zinc-300 transition-colors"
                   >
                     {isExporting && <Loader2 className="w-4 h-4 animate-spin" />}
-                    {!isExporting && <Download className="w-4 h-4" />}
+                    {!isExporting && <Upload className="w-4 h-4" />}
                     <span>Export</span>
                   </Button>
                 </DropdownCustomMenu>
@@ -251,7 +254,7 @@ export function DataTable<T extends Record<string, any>>({
             </div>
           </div>
         )}
-      </div>
+      </div>)}
 
       {/* Table */}
       <div className={`flex-1 min-h-[200px] ${!loading ? 'overflow-auto' : ''}`}>

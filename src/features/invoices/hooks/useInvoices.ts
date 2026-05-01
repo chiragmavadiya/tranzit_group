@@ -83,9 +83,12 @@ export const useUpdateAdminInvoice = () => {
     onSuccess: (response, variables) => {
       if (response.status) {
         toast.success(response.message || "Invoice updated successfully");
-        queryClient.invalidateQueries({ queryKey: ['admin', 'invoices'] });
+        // queryClient.invalidateQueries({ queryKey: ['admin', 'invoices'] });
         queryClient.invalidateQueries({ queryKey: ['admin', 'invoices', 'details', variables.id] });
       }
+    },
+    onError: (error: any) => {
+      toast.error(error?.response?.data?.message || "Failed to update invoice");
     },
   });
 };
@@ -140,6 +143,9 @@ export const useRemindAdminInvoice = () => {
         toast.success(response.message || "Reminder sent successfully");
       }
     },
+    onError: (error: any) => {
+      toast.error(error?.response?.data?.message || "Failed to send reminder");
+    },
   });
 };
 
@@ -150,6 +156,9 @@ export const useZohoSyncAdminInvoice = () => {
       if (response.status) {
         toast.success(response.message || "Synced to Zoho successfully");
       }
+    },
+    onError: (error: any) => {
+      toast.error(error?.response?.data?.message || "Failed to sync to Zoho");
     },
   });
 };

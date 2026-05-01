@@ -30,7 +30,6 @@ export const OrdersTab = ({ customerId }: OrdersTabProps) => {
         exportOrders({ id: customerId, format, params: { page, per_page: pageSize } }, {
             onSuccess: ({ blob, filename }) => {
                 downloadFile(blob, filename);
-                toast.success('Export started successfully');
             },
             onError: () => {
                 toast.error('Failed to export orders');

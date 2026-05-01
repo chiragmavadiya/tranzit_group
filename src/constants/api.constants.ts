@@ -40,6 +40,17 @@ export const API_ENDPOINTS = {
         BASE: "/customer/invoices",
         EXPORT: "/customer/invoices/export",
     },
+    ADMIN_INVOICES: {
+        BASE: "/admin/customer-invoice-management",
+        DETAILS: (id: string | number) => `/admin/customer-invoice-management/${id}`,
+        SEND: (id: string | number) => `/admin/customer-invoice-management/${id}/send`,
+        DOWNLOAD: (id: string | number) => `/admin/customer-invoice-management/${id}/download`,
+        REMIND: (id: string | number) => `/admin/customer-invoice-management/${id}/remind`,
+        PAYMENTS: (id: string | number) => `/admin/customer-invoice-management/${id}/payments`,
+        PAYMENT_DETAILS: (invoiceId: string | number, paymentId: string | number) => `/admin/customer-invoice-management/${invoiceId}/payments/${paymentId}`,
+        ZOHO_SYNC: (id: string | number) => `/admin/customer-invoice-management/${id}/zoho-sync`,
+        EXPORT: "/admin/customer-invoice-management/export",
+    },
     ENQUIRIES: {
         BASE: "/customer/enquiries",
     },

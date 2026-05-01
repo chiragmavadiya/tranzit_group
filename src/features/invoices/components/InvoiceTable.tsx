@@ -6,7 +6,7 @@ import type { Invoice } from '../types';
 import { INVOICE_STATUS_COLORS } from '../constants';
 import { cn } from '@/lib/utils';
 import { CustomTooltip, DataTable, type Column } from '@/components/common';
-import { NavLink } from 'react-router-dom';
+import { NavLink, useNavigate } from 'react-router-dom';
 import { useAppSelector } from '@/hooks/store.hooks';
 
 interface InvoiceTableProps {
@@ -34,9 +34,7 @@ export function InvoiceTable({
   onPageChange, onPageSizeChange, onSearchChange, onExport, isExporting
 }: InvoiceTableProps) {
   const { role } = useAppSelector((state) => state.auth);
-
-
-
+  const navigate = useNavigate();
 
   const formatCurrency = useCallback((amount: number) => {
     return new Intl.NumberFormat('en-US', {
@@ -44,6 +42,11 @@ export function InvoiceTable({
       currency: 'USD',
     }).format(amount);
   }, []);
+
+  const onAddInvoice = () => {
+    // redirect to /createpage
+    navigate('/admin/invoices/create');
+  }
 
   const renderStatus = useCallback((status: Invoice['status']) => {
     return (
@@ -219,11 +222,11 @@ export function InvoiceTable({
     return (
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <Button
-          // onClick={onAddAddress}
+          onClick={onAddInvoice}
           className="gap-2 bg-[#0060FE] hover:bg-[#0052db] text-white shadow-lg shadow-blue-100 dark:shadow-none transition-all active:scale-[0.98] font-semibold border-none px-4"
         >
           <Plus className="w-4 h-4" />
-          <span>Add Address</span>
+          <span>Add Invoice</span>
         </Button>
       </div>
     )

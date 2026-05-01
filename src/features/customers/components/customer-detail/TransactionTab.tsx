@@ -33,7 +33,6 @@ export const TransactionTab = ({ customerId }: TransactionTabProps) => {
         exportTransactions({ id: customerId, format, params: { page, per_page: pageSize, search } }, {
             onSuccess: ({ blob, filename }) => {
                 downloadFile(blob, filename);
-                toast.success('Export started successfully');
             },
             onError: () => {
                 toast.error('Failed to export transactions');

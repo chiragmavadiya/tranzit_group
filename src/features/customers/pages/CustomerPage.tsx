@@ -51,7 +51,6 @@ export default function CustomerPage() {
         exportCustomers({ format, params: queryParams }, {
             onSuccess: ({ blob, filename }) => {
                 downloadFile(blob, filename);
-                toast.success('Export started successfully');
             },
             onError: () => {
                 toast.error('Failed to export customers');

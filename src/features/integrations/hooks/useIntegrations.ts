@@ -29,7 +29,7 @@ export const useConnectIntegration = () => {
         onSuccess: (_, variables) => {
             queryClient.invalidateQueries({ queryKey: ["integrations"] });
             queryClient.invalidateQueries({ queryKey: ["integration-status", variables.provider] });
-            toast.success("Connected successfully");
+            toast.success("Integration settings updated successfully!");
         },
         onError: (error: any) => {
             toast.error(error.message || "Failed to connect");

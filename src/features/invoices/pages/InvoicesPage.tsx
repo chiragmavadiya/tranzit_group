@@ -5,7 +5,7 @@ import { InvoiceStats } from '../components/InvoiceStats';
 import { InvoiceFilters } from '../components/InvoiceFilters';
 import { InvoiceTable } from '../components/InvoiceTable';
 import { CreateInvoiceDialog } from '../components/CreateInvoiceDialog';
-import { useCustomerInvoices, useExportCustomerInvoices } from '../hooks/useInvoices';
+import { useAdminInvoices, useExportCustomerInvoices } from '../hooks/useInvoices';
 
 export default function InvoicesPage() {
   const [searchTerm, setSearchTerm] = useState('');
@@ -19,7 +19,12 @@ export default function InvoicesPage() {
   const navigate = useNavigate();
 
   // Connect to API hooks
-  const { data, isLoading } = useCustomerInvoices({
+  // const { data, isLoading } = useCustomerInvoices({
+  //   search: searchTerm || undefined,
+  //   page: page,
+  //   per_page: pageSize,
+  // });
+  const { data, isLoading } = useAdminInvoices({
     search: searchTerm || undefined,
     page: page,
     per_page: pageSize,

@@ -12,6 +12,7 @@ interface DashboardTableProps<T> {
   className?: string;
   searchValue?: string;
   columns: Column<T>[];
+  loading?: boolean;
 }
 
 export function DashboardTable<T extends { id: number }>({
@@ -19,7 +20,8 @@ export function DashboardTable<T extends { id: number }>({
   subtitle,
   data,
   className,
-  columns
+  columns,
+  loading = false
 }: DashboardTableProps<T>) {
   const [search, setSearch] = useState<string>("");
   const [page, setPage] = useState<number>(1);
@@ -54,6 +56,7 @@ export function DashboardTable<T extends { id: number }>({
             headerTitle={title}
             headerDescription={subtitle}
             className='pb-3'
+            loading={loading}
           />
         </div>
       </CardContent>

@@ -12,6 +12,7 @@ import { FormInput } from "@/features/orders/components/OrderFormUI";
 import { useIntegrationStatus, useConnectIntegration, useSyncIntegration } from "../hooks/useIntegrations";
 import { Loader2, RefreshCw } from 'lucide-react'
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { toast } from "sonner";
 
 interface IntegrationDialogProps {
     provider: { id: string; name: string; type: string };
@@ -25,25 +26,67 @@ export function IntegrationDialog({ provider, isOpen, onOpenChange }: Integratio
     const syncMutation = useSyncIntegration();
 
     const [formData, setFormData] = useState<any>({});
+    const [submitted, setSubmitted] = useState(false);
+    const [errors, setErrors] = useState<Record<string, string>>({});
 
     useEffect(() => {
         if (statusResponse?.data) {
             setFormData(statusResponse.data);
         } else if (!isOpen) {
             setFormData({});
+            setSubmitted(false);
+            setErrors({});
         }
     }, [statusResponse, isOpen]);
 
     const handleInputChange = (value: any, name: any) => {
-        console.log({ name, value }, "name, value")
-        // const { name, value } = e.target;
         setFormData((prev: any) => ({ ...prev, [name]: value }));
+        if (errors[name]) {
+            setErrors(prev => {
+                const newErrors = { ...prev };
+                delete newErrors[name];
+                return newErrors;
+            });
+        }
+    };
+
+    const validateForm = () => {
+        const newErrors: Record<string, string> = {};
+        const requiredFields: Record<string, string[]> = {
+            auspost: ['api_key', 'api_password', 'base_url', 'account_number', 'account_label'],
+            aramex: ['client_id', 'client_secret', 'account_name', 'account_label'],
+            mypostbusiness: ['merchant_token', 'base_url', 'account_label'],
+            directfreight: ['token', 'account', 'site_id', 'base_url', 'consignment_token', 'account_label'],
+            shopify: ['shop'],
+            woocommerce: ['store_url', 'consumer_key', 'consumer_secret']
+        };
+
+        const fieldsToValidate = requiredFields[provider.id] || [];
+        fieldsToValidate.forEach(field => {
+            if (!formData[field] || (typeof formData[field] === 'string' && !formData[field].trim())) {
+                const label = field.split('_').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
+                newErrors[field] = `${label} is required`;
+            }
+        });
+
+        setErrors(newErrors);
+        return Object.keys(newErrors).length === 0;
     };
 
     const onSubmit = (e: React.FormEvent) => {
         e.preventDefault();
+        setSubmitted(true);
+
+        if (!validateForm()) {
+            toast.error("Please fill in all required fields.");
+            return;
+        }
+
         connectMutation.mutate({ provider: provider.id, data: formData }, {
-            onSuccess: () => onOpenChange(false)
+            onSuccess: () => {
+                
+                onOpenChange(false);
+            },
         });
     };
 
@@ -52,7 +95,9 @@ export function IntegrationDialog({ provider, isOpen, onOpenChange }: Integratio
             name,
             value: formData[name] || "",
             onChange: (val: any) => handleInputChange(val, name),
-            required: true
+            required: true,
+            error: submitted && !!errors[name],
+            errormsg: errors[name]
         });
 
         switch (provider.id) {

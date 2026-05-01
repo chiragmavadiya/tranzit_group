@@ -23,7 +23,6 @@ export default function IntegrationsPage() {
     const disconnectMutation = useDisconnectIntegration();
     const [selectedProvider, setSelectedProvider] = useState<any>(null);
     const [isDialogOpen, setIsDialogOpen] = useState(false);
-    console.log(listResponse, "listResponse")
 
     const data = listResponse?.data;
     const connectedProviders = data ? [

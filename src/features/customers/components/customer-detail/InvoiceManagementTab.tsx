@@ -30,7 +30,6 @@ export const InvoiceManagementTab = ({ customerId }: InvoiceManagementTabProps) 
         exportInvoices({ id: customerId, format }, {
             onSuccess: ({ blob, filename }) => {
                 downloadFile(blob, filename);
-                toast.success('Export started successfully');
             },
             onError: () => {
                 toast.error('Failed to export invoices');

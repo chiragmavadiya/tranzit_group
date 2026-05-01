@@ -14,6 +14,7 @@ import { cn, getNestedValue } from '@/lib/utils';
 import SelectComponent from '../ui/select';
 import { usePagination } from './hooks/usePagination';
 import { Pagination } from './Pagination';
+import { TableSkeleton } from './TableSkeleton';
 import { DEFAULT_PAGE_SIZES } from '@/constants/global.constants';
 import type { Column, DataTableProps, SortConfig } from './types/DataTable.types';
 import { Button } from '../ui/button';
@@ -54,7 +55,6 @@ export function DataTable<T extends Record<string, any>>({
   // Loading and empty states
   loading = false,
   emptyMessage = 'No data found',
-  loadingMessage = 'Loading...',
   // Row actions
   onRowClick,
   // Custom components
@@ -254,7 +254,7 @@ export function DataTable<T extends Record<string, any>>({
       </div>
 
       {/* Table */}
-      <div className="flex-1 overflow-auto min-h-[200px]">
+      <div className={`flex-1 min-h-[200px] ${!loading ? 'overflow-auto' : ''}`}>
         <Table className={cn("min-w-full", tableClassName)}>
           <TableHeader className={cn("bg-white dark:bg-zinc-950 sticky top-0 z-10 shadow-sm", headerClassName)}>
             <TableRow className="hover:bg-transparent border-b border-gray-100 dark:border-zinc-800">
@@ -296,14 +296,7 @@ export function DataTable<T extends Record<string, any>>({
 
           <TableBody>
             {loading ? (
-              <TableRow>
-                <TableCell
-                  colSpan={columns.length + (selectable ? 1 : 0)}
-                  className="h-32 text-center"
-                >
-                  {loadingMessage}
-                </TableCell>
-              </TableRow>
+              <TableSkeleton columns={columns.length} selectable={selectable} rows={pageSize} />
             ) : displayData.length === 0 ? (
               <TableRow>
                 <TableCell

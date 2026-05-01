@@ -3,11 +3,12 @@ import { customerService } from "../services/customer.service";
 import { QUERY_KEYS } from "@/constants/api.constants";
 import type { CustomerFormData } from "../types";
 
-export const useCustomers = (params?: Record<string, any>) => {
+export const useCustomers = (params?: Record<string, any>, enabled: boolean = true) => {
     return useQuery({
         queryKey: [...QUERY_KEYS.ADMIN_CUSTOMERS.LIST, params],
         queryFn: () => customerService.getList(params),
-        placeholderData: keepPreviousData
+        placeholderData: keepPreviousData,
+        enabled: enabled
     });
 };
 

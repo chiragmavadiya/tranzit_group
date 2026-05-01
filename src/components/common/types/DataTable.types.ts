@@ -58,7 +58,6 @@ export interface DataTableProps<T> {
   // Loading and empty states
   loading?: boolean;
   emptyMessage?: string;
-  loadingMessage?: string;
   // Row actions
   onRowClick?: (row: T, index: number) => void;
   // Custom components

@@ -59,6 +59,24 @@ export interface InvoiceFormData {
   till_date_paid: number;
 }
 
+export interface InvoiceItem {
+  type: 'custom' | 'order' | 'credit';
+  description: string;
+  total: number;
+  order_number?: string;
+  item_date?: string;
+  from?: string;
+  destination?: string;
+  to?: string;
+  receiver?: string;
+}
+
+export interface CreateInvoiceRequest {
+  customer_id: number;
+  invoice_date: string;
+  items: InvoiceItem[];
+}
+
 export interface PaginatedInvoicesResponse {
   status: boolean;
   message: string;

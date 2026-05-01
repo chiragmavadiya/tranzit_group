@@ -249,3 +249,25 @@ export const INVOICE_COLUMN_CONFIG = [
   { key: 'remaining_balance', header: 'REMAINING BALANCE' },
   { key: 'action', header: 'ACTION' },
 ];
+
+export const TERMS_CONDITIONS = [
+  "Payment is due within 7 days of the invoice date.",
+  "Late payments may incur a 1.5% interest fee per month.",
+  "Ownership of deliverables transfers upon receipt of full payment.",
+  "Any disputes should be reported within 7 business days of receiving the invoice.",
+  "Either party may terminate with 7 days' notice."
+];
+
+export const BANKING_DETAILS = {
+  bank_name: "Commonwealth Bank",
+  account_name: "Tranzit Group Pty Ltd",
+  bsb: "063 138",
+  account_number: "1112 4733"
+};
+
+export const COMPANY_DETAILS = {
+  name: "Tranzit Group Pty Ltd",
+  abn: "12 690 967 198",
+  address: "12B Bass Ct, Keysborough VIC 3173",
+  email: "accounts@tranzitgroup.com.au"
+};

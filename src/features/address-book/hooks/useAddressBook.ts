@@ -109,7 +109,6 @@ export const useExportAddressBook = () => {
             link.click();
             link.remove();
             window.URL.revokeObjectURL(url);
-            toast.success("Export started successfully");
         },
         onError: () => {
             toast.error("Failed to export address book");

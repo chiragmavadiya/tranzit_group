@@ -1,6 +1,7 @@
 // DataTable exports
 export { DataTable } from './DataTable';
 export { Pagination, SimplePagination } from './Pagination';
+export { TableSkeleton } from './TableSkeleton';
 export { usePagination, useServerPagination } from './hooks/usePagination';
 export { 
   StatusCell, 

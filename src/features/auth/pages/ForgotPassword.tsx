@@ -19,18 +19,18 @@ export default function ForgotPassword() {
 
   return (
     <AuthLayout>
-      <div className="flex flex-col items-center text-center space-y-2">
+      <div className="flex flex-col items-center text-center space-y-2 max-w-sm m-auto">
         <div className="flex items-center space-x-2 pb-4">
-          <img src={brandlogo} alt="Logo" className="" />
+          <img src={brandlogo} alt="Logo" className="h-25" />
         </div>
 
-        <h2 className="text-2xl font-bold tracking-tight text-slate-900 dark:text-white">
+        <h2 className=" my-0 text-2xl font-bold tracking-tight text-slate-900 dark:text-white">
           Forgot your password?
         </h2>
       </div>
 
       {!isSuccess ? (
-        <form onSubmit={handleSubmit} className="space-y-6">
+        <form onSubmit={handleSubmit} className="space-y-6 w-sm m-auto">
           <p className="text-sm text-slate-500 dark:text-slate-400 text-center px-4">
             Enter your email and we'll send you instructions to reset your password.
           </p>
@@ -59,7 +59,7 @@ export default function ForgotPassword() {
           <Button
             type="submit"
             disabled={isPending}
-            className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-6 text-md rounded-md transition-all shadow-md hover:shadow-lg"
+            className="w-full bg-blue-600 hover:bg-blue-700 h-10 text-white font-semibold  text-md rounded-md transition-all shadow-md hover:shadow-lg"
           >
             {isPending ? "Sending..." : "Send reset link"}
           </Button>
@@ -71,9 +71,9 @@ export default function ForgotPassword() {
           </p>
         </form>
       ) : (
-        <div className="space-y-6 text-center w-full">
+        <div className="space-y-4 text-center w-full mt-4">
           <div className="rounded-md bg-green-50 p-4 border border-green-200">
-            <p className="text-sm font-medium text-green-800">
+            <p className="text-sm font-medium text-green-800 my-0">
               {data?.message}
             </p>
           </div>

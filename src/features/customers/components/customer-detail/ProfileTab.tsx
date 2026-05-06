@@ -30,7 +30,7 @@ export const ProfileTab = ({ customerId }: ProfileTabProps) => {
             {/* Left Column: Details */}
             <div className="lg:col-span-4 flex flex-col gap-6">
                 <Card className="bg-white dark:bg-zinc-900 gap-1 shadow-lg border-none rounded-3xl overflow-hidden">
-                    <CardHeader className="pb-4">
+                    <CardHeader className="">
                         <SectionHeader title="About" icon={Users} />
                     </CardHeader>
                     <CardContent className="flex flex-col gap-2">

@@ -22,7 +22,7 @@ function Input({ className, type, error, errormsg, ...props }: InputProps) {
         )}
         {...props}
       />
-      {error ? <span className="text-red-500 text-[11px] text-right">{errormsg}</span> : null}
+      {error ? <span className="text-red-500 text-[11px]">{errormsg}</span> : null}
     </div>
   )
 }

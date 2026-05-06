@@ -14,10 +14,10 @@ const SURCHARGES = [
 ];
 
 import { useGetQuoteServices } from '@/features/quote/hooks/useQuote';
-import { toast } from 'sonner';
 import { OrderSummary } from './components/OrderSummary';
 import type { CustomerAddress, OrderCalculations } from './types';
 import { OrderAddressForm } from './components/OrderAddressForm';
+import { showToast } from '@/components/ui/custom-toast';
 
 const initialAddress: CustomerAddress = {
   contact_name: '',
@@ -118,10 +118,10 @@ export default function CreateOrderPage() {
         if (data.services.length > 0) {
           setSelectedRateId(data.services[0].product_id);
         }
-        toast.success(`Found ${data.services.length} available services`);
+        showToast(`Found ${data.services.length} available services`, 'success');
       },
       onError: (err: any) => {
-        toast.error(err?.response?.data?.message || 'Failed to fetch rates');
+        showToast(err?.response?.data?.message || 'Failed to fetch rates', 'error');
       }
     });
   }, [locations, items, getServices]);

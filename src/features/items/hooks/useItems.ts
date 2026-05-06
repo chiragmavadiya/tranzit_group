@@ -2,7 +2,7 @@ import { useMutation, useQuery, useQueryClient, keepPreviousData } from "@tansta
 import { itemsService } from "../services/items.service";
 import { QUERY_KEYS } from "@/constants/api.constants";
 import type { ItemsFilters, ItemFormData } from "../types";
-import { toast } from "sonner";
+import { showToast } from "@/components/ui/custom-toast";
 
 /**
  * Hook to fetch items list
@@ -36,14 +36,14 @@ export const useCreateItem = () => {
     mutationFn: (data: ItemFormData) => itemsService.create(data),
     onSuccess: (response) => {
       if (response.status) {
-        toast.success(response.message || "Item created successfully");
+        showToast(response.message || "Item created successfully", "success");
         queryClient.invalidateQueries({ queryKey: QUERY_KEYS.ITEMS.LIST });
       } else {
-        toast.error(response.message || "Failed to create item");
+        showToast(response.message || "Failed to create item", "error");
       }
     },
     onError: (error: any) => {
-      toast.error(error.message || "An error occurred");
+      showToast(error.message || "An error occurred", "error");
     },
   });
 };
@@ -59,17 +59,17 @@ export const useUpdateItem = () => {
       itemsService.update(id, data),
     onSuccess: (response, variables) => {
       if (response.status) {
-        toast.success(response.message || "Item updated successfully");
+        showToast(response.message || "Item updated successfully", "success");
         queryClient.invalidateQueries({ queryKey: QUERY_KEYS.ITEMS.LIST });
         queryClient.removeQueries({
           queryKey: QUERY_KEYS.ITEMS.DETAILS(variables.id as any),
         });
       } else {
-        toast.error(response.message || "Failed to update item");
+        showToast(response.message || "Failed to update item", "error");
       }
     },
     onError: (error: any) => {
-      toast.error(error.message || "An error occurred");
+      showToast(error.message || "An error occurred", "error");
     },
   });
 };
@@ -83,11 +83,11 @@ export const useDeleteItem = () => {
   return useMutation({
     mutationFn: (id: number | string) => itemsService.delete(id),
     onSuccess: () => {
-      toast.success("Item deleted successfully");
+      showToast("Item deleted successfully", "success");
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.ITEMS.LIST });
     },
     onError: (error: any) => {
-      toast.error(error.message || "Failed to delete item");
+      showToast(error.message || "Failed to delete item", "error");
     },
   });
 };
@@ -109,7 +109,7 @@ export const useExportItems = () => {
       link.remove();
     },
     onError: (error: any) => {
-      toast.error(error.message || "Failed to export items");
+      showToast(error.message || "Failed to export items", "error");
     },
   });
 };

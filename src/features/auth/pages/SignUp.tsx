@@ -4,17 +4,16 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
-import { PasswordInput } from "@/components/common";
+import PasswordInput from "@/components/common/password-input";
 import { Link, useNavigate } from "react-router-dom";
 import brandlogo from '@/assets/Tranzit_Logo.svg'
 import { useRegister } from "@/features/auth/hooks/useAuth";
 import type { RegisterRequest } from "../auth.types";
 import { useState, useMemo } from "react";
-import { toast } from "sonner";
 import { AuthLayout } from "../components/AuthLayout";
+import { showToast } from "@/components/ui/custom-toast";
 
 export default function SignUp() {
-  const phonePrefix = "+61";
   const navigate = useNavigate();
 
   const registerMutation = useRegister();
@@ -24,7 +23,6 @@ export default function SignUp() {
     firstName: '',
     lastName: '',
     email: '',
-    phone: '',
     password: '',
     confirmPassword: '',
     terms: '',
@@ -35,35 +33,29 @@ export default function SignUp() {
   const errors = useMemo(() => {
     const newErrors: Record<string, string> = {};
 
-    if (!data.firstName.trim()) newErrors.firstName = "First name is required";
-    if (!data.lastName.trim()) newErrors.lastName = "Last name is required";
+    if (!data.firstName.trim()) newErrors.firstName = "Please enter your first name";
+    if (!data.lastName.trim()) newErrors.lastName = "Please enter your last name";
 
     if (!data.email.trim()) {
-      newErrors.email = "Email is required";
+      newErrors.email = "Please enter your email address";
     } else if (!/^\S+@\S+\.\S+$/.test(data.email)) {
-      newErrors.email = "Invalid email format";
-    }
-
-    if (!data.phone.trim()) {
-      newErrors.phone = "Phone number is required";
-    } else if (!/^\d{9,10}$/.test(data.phone)) {
-      newErrors.phone = "Phone must be 9-10 digits";
+      newErrors.email = "Please enter a valid email address (e.g., name@example.com)";
     }
 
     if (!data.password) {
-      newErrors.password = "Password is required";
+      newErrors.password = "Please enter your password";
     } else if (data.password.length < 8) {
-      newErrors.password = "Minimum 8 characters required";
+      newErrors.password = "Password must be at least 8 characters";
     }
 
     if (!data.confirmPassword) {
-      newErrors.confirmPassword = "Please confirm your password";
+      newErrors.confirmPassword = "Please re-enter your password";
     } else if (data.confirmPassword !== data.password) {
       newErrors.confirmPassword = "Passwords do not match";
     }
 
     if (!data.terms) {
-      newErrors.terms = "You must agree to the terms";
+      newErrors.terms = "Please accept the Privacy Policy and Terms to continue";
     }
 
     return newErrors;
@@ -93,18 +85,16 @@ export default function SignUp() {
       email: data.email,
       password: data.password,
       password_confirmation: data.confirmPassword,
-      phone_number: data.phone,
       terms: data.terms === 'true',
     };
 
     registerMutation.mutate(payload, {
       onSuccess: () => {
-        toast.success("Account created successfully!");
+        showToast("Account created successfully!", 'success');
         navigate("/verify-email", { state: { email: data.email } });
       },
       onError: (error) => {
-        console.error("Sign up failed", error);
-        toast.error(error.message || "Registration failed");
+        showToast(error.message || "Registration failed", 'error');
       }
     });
   };
@@ -183,7 +173,7 @@ export default function SignUp() {
           />
         </div>
 
-        <div className="space-y-1">
+        {/* <div className="space-y-1">
           <Label htmlFor="phone" className="text-slate-700 dark:text-slate-300 font-semibold text-xs uppercase tracking-wider">
             Phone number <span className="text-red-500">*</span>
           </Label>
@@ -191,7 +181,6 @@ export default function SignUp() {
             <span className="absolute top-[10px] left-3 text-slate-500 font-medium text-sm z-10 pointer-events-none">
               {phonePrefix}
             </span>
-            {/* <input type="hidden" name="phonePrefix" value={phonePrefix} /> */}
             <Input
               id="phone"
               name="phone"
@@ -204,7 +193,7 @@ export default function SignUp() {
               errormsg={errors.phone}
             />
           </div>
-        </div>
+        </div> */}
 
         <div className="space-y-1">
           <Label htmlFor="password" className="text-slate-700 dark:text-slate-300 font-semibold text-xs uppercase tracking-wider">
@@ -240,7 +229,7 @@ export default function SignUp() {
           />
         </div>
 
-        <div className="flex flex-col pt-3">
+        <div className="flex flex-col">
           <div className="flex items-start space-x-3">
             <Checkbox
               id="terms"
@@ -257,10 +246,10 @@ export default function SignUp() {
               I agree to the <a href="#" className="font-semibold text-blue-600 hover:text-blue-500 hover:underline transition-colors">Privacy Policy</a> and <a href="#" className="font-semibold text-blue-600 hover:text-blue-500 hover:underline transition-colors">Terms</a>
             </Label>
           </div>
-          {submitted && errors.terms && <p className="text-red-500 text-[11px] mt-1">{errors.terms}</p>}
+          {/* {submitted && errors.terms && <p className="text-red-500 text-[11px] mt-1 mb-0">{errors.terms}</p>} */}
         </div>
 
-        <Button type="submit" disabled={registerMutation.isPending} className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold tracking-wide h-10 text-sm rounded-md transition-all shadow-md hover:shadow-lg mt-6">
+        <Button type="submit" disabled={registerMutation.isPending} className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold tracking-wide h-10 text-sm rounded-md transition-all shadow-md hover:shadow-lg">
           {registerMutation.isPending ? "Continue..." : "Continue"}
         </Button>
 

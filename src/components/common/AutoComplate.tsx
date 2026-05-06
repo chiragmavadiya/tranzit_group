@@ -30,6 +30,11 @@ export interface AutoCompleteProps {
     className?: string;
     renderOption?: (option: AutoCompleteOption) => React.ReactNode;
     emptyText?: string;
+    shouldFilter?: boolean;
+    label?: string;
+    error?: boolean;
+    errormsg?: string;
+    required?: boolean;
 }
 
 const AutoComplete = React.forwardRef<HTMLInputElement, AutoCompleteProps>(
@@ -45,19 +50,25 @@ const AutoComplete = React.forwardRef<HTMLInputElement, AutoCompleteProps>(
             disabled,
             className,
             renderOption,
+            shouldFilter = true,
+            label,
+            error,
+            errormsg,
+            required,
         },
         ref
     ) => {
         const [open, setOpen] = React.useState(false);
         const [inputValue, setInputValue] = React.useState(defaultValue);
+
         const controlledValue = value !== undefined ? value : inputValue;
 
         const filteredOptions = React.useMemo(() => {
-            if (!controlledValue) return options;
+            if (!shouldFilter || !controlledValue) return options;
             return options.filter((option) =>
                 option.label.toLowerCase().includes(controlledValue.toLowerCase())
             );
-        }, [options, controlledValue]);
+        }, [options, controlledValue, shouldFilter]);
 
         const handleSelect = React.useCallback(
             (optionValue: string) => {
@@ -110,7 +121,11 @@ const AutoComplete = React.forwardRef<HTMLInputElement, AutoCompleteProps>(
                                     onFocus={handleFocus}
                                     placeholder={placeholder}
                                     disabled={disabled}
-                                    className={cn("w-full", className)}
+                                    label={label}
+                                    error={error}
+                                    errormsg={errormsg}
+                                    required={required}
+                                    className={cn("w-full h-full", className)}
                                 />
                             </div>
                         )}
@@ -132,7 +147,7 @@ const AutoComplete = React.forwardRef<HTMLInputElement, AutoCompleteProps>(
                                         "p-0"
                                     )}
                                 >
-                                    <Command className="border-none shadow-none p-0">
+                                    <Command className="border-none shadow-none p-0" shouldFilter={false}>
                                         <CommandList className="max-h-[300px] w-full overflow-y-auto p-0">
                                             <CommandGroup className="">
                                                 {filteredOptions.map((option) => (

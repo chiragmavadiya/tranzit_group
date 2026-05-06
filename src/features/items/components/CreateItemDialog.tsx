@@ -1,7 +1,6 @@
-import { useState, useCallback, useEffect } from 'react';
+import { useState, useCallback, useEffect, useMemo } from 'react';
 import { Loader2 } from 'lucide-react';
 import { CustomModel, } from '@/components/ui/dialog';
-import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
 import type { ItemFormData } from '../types';
 import { FormInput } from '@/features/orders/components/OrderFormUI';
@@ -26,11 +25,11 @@ export function CreateItemDialog({
   const [formData, setFormData] = useState<ItemFormData>({
     item_code: '',
     item_name: '',
-    item_weight: 0,
-    item_length: 0,
-    item_width: 0,
-    item_height: 0,
-    item_cubic: 0,
+    item_weight: undefined,
+    item_length: undefined,
+    item_width: undefined,
+    item_height: undefined,
+    item_cubic: undefined,
     is_default: false,
   });
   const [submited, setSubmited] = useState(false);
@@ -40,6 +39,15 @@ export function CreateItemDialog({
     setFormData((prev) => ({ ...prev, [field]: value }));
   }, []);
 
+  const calculatedVolume = useMemo(() => {
+    const l = Number(formData.item_length)
+    const w = Number(formData.item_width)
+    const h = Number(formData.item_height)
+    if (!l || !w || !h) return ""
+    console.log((l * w * h / 1000000).toFixed(3))
+    return (l * w * h / 1000000).toFixed(3) // cm³ → m³
+  }, [formData.item_length, formData.item_width, formData.item_height])
+
   const handleSubmit = useCallback((e?: React.FormEvent) => {
     if (e) e.preventDefault();
     setSubmited(true);
@@ -47,29 +55,33 @@ export function CreateItemDialog({
     if (!formData.item_code || !formData.item_name || !formData.item_weight) {
       return;
     }
-
     const submissionData = {
       ...formData,
+      item_cubic: Number(calculatedVolume),
       is_default: formData.is_default ? "on" : "off"
     } as ItemFormData;
 
     onSubmit(submissionData);
-  }, [formData, onSubmit]);
+  }, [formData, onSubmit, calculatedVolume]);
+
+
 
   useEffect(() => {
     if (!open || !detailsData?.data) return;
     const data = detailsData.data;
+    console.log(data, 'API RESPONSE')
     setFormData({
       ...data,
-      item_cubic: Number(data.item_cubic),
-      item_weight: Number(data.item_weight),
-      item_length: Number(data.item_length),
-      item_width: Number(data.item_width),
-      item_height: Number(data.item_height),
+      item_cubic: data.item_cubic,
+      item_weight: data.item_weight,
+      item_length: data.item_length,
+      item_width: data.item_width,
+      item_height: data.item_height,
       is_default: Boolean(data.is_default),
     })
   }, [open, detailsData])
 
+  console.log(formData, 'Form data....');
   return (
     <CustomModel
       title={editingItemId ? 'Edit Item' : 'Add New Item'}
@@ -89,101 +101,135 @@ export function CreateItemDialog({
             </div>
           </div>
         )}
-        <div className="grid gap-3">
-          <div className="grid gap-2">
-            <FormInput
-              label="Item Code"
-              value={formData.item_code}
-              onChange={(val) => handleChange('item_code', val)}
-              placeholder="Enter item code (e.g. ITM-123)"
-              required
-              error={submited && !formData.item_code}
-              errormsg="Item code is required"
-            />
+        <div className="space-y-6">
+
+          {/* 🔹 Basic Info */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <FormInput
+                label="Item Code"
+                value={formData.item_code}
+                onChange={(val) => handleChange('item_code', val)}
+                placeholder="Enter item code (e.g. ITM-123)"
+                required
+                error={submited && !formData.item_code}
+                errormsg="Please enter an item code"
+              />
+            </div>
+
+            <div>
+              <FormInput
+                label="Item Name"
+                value={formData.item_name}
+                onChange={(val) => handleChange('item_name', val)}
+                placeholder="Enter item name"
+                required
+                error={submited && !formData.item_name}
+                errormsg="Please enter an item name"
+              />
+            </div>
           </div>
-          <div className="grid gap-2">
-            <FormInput
-              label="Item Name"
-              value={formData.item_name}
-              onChange={(val) => handleChange('item_name', val)}
-              placeholder="Enter item name"
-              required
-              error={submited && !formData.item_name}
-              errormsg="Item name is required"
-            />
+
+          {/* 🔹 Dimensions */}
+          <div>
+            <p className="text-sm font-medium text-muted-foreground mb-2">
+              Dimensions (cm)
+            </p>
+            <div className="grid grid-cols-3 gap-4">
+              <div>
+                <FormInput
+                  type="number"
+                  label="Length (cm)"
+                  value={formData.item_length || ''}
+                  onChange={(val) => handleChange('item_length', Number(val))}
+                  placeholder="0"
+                  required
+                  error={submited && !formData.item_length}
+                  errormsg="Please enter the item length"
+                />
+              </div>
+
+              <div>
+                <FormInput
+                  type="number"
+                  label="Width (cm)"
+                  value={formData.item_width || ''}
+                  onChange={(val) => handleChange('item_width', Number(val))}
+                  placeholder="0"
+                  required
+                  error={submited && !formData.item_width}
+                  errormsg="Please enter the item width"
+                />
+              </div>
+
+              <div>
+                <FormInput
+                  type="number"
+                  label="Height (cm)"
+                  value={formData.item_height || ''}
+                  onChange={(val) => handleChange('item_height', Number(val))}
+                  placeholder="0"
+                  required
+                  error={submited && !formData.item_height}
+                  errormsg="Please enter the item height"
+                />
+              </div>
+            </div>
           </div>
-          <div className="grid gap-2">
-            <FormInput
-              type="number"
-              step="0.0001"
-              label="Item Cubic (Volume)"
-              value={formData.item_cubic}
-              onChange={(val) => handleChange('item_cubic', Number(val))}
-              placeholder="0.0000"
-              required
-              error={submited && Number(formData.item_cubic) <= 0}
-              errormsg="Item cubic cannot be negative"
-            />
+
+          {/* 🔹 Weight & Volume */}
+          <div>
+            <p className="text-sm font-medium text-muted-foreground mb-2">
+              Weight & Volume
+            </p>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <FormInput
+                  type="number"
+                  label="Dead Weight (kg)"
+                  value={formData.item_weight || ''}
+                  onChange={(val) => handleChange('item_weight', Number(val))}
+                  placeholder="0.00"
+                  required
+                  error={submited && !formData.item_weight}
+                  errormsg="Please enter the item weight"
+                />
+              </div>
+
+              <div>
+                <FormInput
+                  type="number"
+                  step="0.0001"
+                  label="Item Cubic (Volume m³)"
+                  value={calculatedVolume}
+                  readOnly
+                  disabled
+                  onChange={(val) => handleChange('item_cubic', Number(val))}
+                  placeholder="0.0000"
+                // required
+                // error={submited && !formData.item_cubic}
+                // errormsg="Please enter the item cubic"
+                />
+              </div>
+            </div>
           </div>
-          <div className="grid gap-2">
-            <FormInput
-              type="number"
-              label="Dead Weight (kg)"
-              value={formData.item_weight}
-              onChange={(val) => handleChange('item_weight', Number(val))}
-              placeholder="0.00"
-              required
-              error={submited && Number(formData.item_weight) <= 0}
-              errormsg="Weight must be greater than 0"
-            />
-          </div>
-          <div className="grid gap-2">
-            <FormInput
-              type="number"
-              label="Length (cm)"
-              value={formData.item_length}
-              onChange={(val) => handleChange('item_length', Number(val))}
-              placeholder="0"
-              required
-              error={submited && Number(formData.item_length) <= 0}
-              errormsg="Length must be greater than 0"
-            />
-          </div>
-          <div className="grid gap-2">
-            <FormInput
-              type="number"
-              label="Width (cm)"
-              value={formData.item_width}
-              onChange={(val) => handleChange('item_width', Number(val))}
-              placeholder="0"
-              required
-              error={submited && Number(formData.item_width) <= 0}
-              errormsg="Width must be greater than 0"
-            />
-          </div>
-          <div className="grid gap-2">
-            <FormInput
-              type="number"
-              label="Height (cm)"
-              value={formData.item_height}
-              onChange={(val) => handleChange('item_height', Number(val))}
-              placeholder="0"
-              required
-              error={submited && Number(formData.item_height) <= 0}
-              errormsg="Height must be greater than 0"
-            />
-          </div>
-          <div className="flex items-center gap-3 p-1">
+
+          {/* 🔹 Default Toggle */}
+          <div className="flex items-center justify-between border rounded-lg p-3">
+            <div>
+              <p className="text-sm font-medium mb-0">Set as Default Item</p>
+              <p className="text-xs text-muted-foreground mb-0">
+                This item will be selected by default
+              </p>
+            </div>
             <Switch
               id="isDefault"
               checked={!!formData.is_default}
               onCheckedChange={(checked) => handleChange('is_default', checked)}
               className="data-[state=checked]:bg-blue-600"
             />
-            <Label htmlFor="isDefault" className="text-sm font-medium text-slate-700 dark:text-zinc-300 cursor-pointer">
-              Is Default Item
-            </Label>
           </div>
+
         </div>
       </form>
     </CustomModel>

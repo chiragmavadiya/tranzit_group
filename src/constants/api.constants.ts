@@ -13,7 +13,19 @@ export const API_ENDPOINTS = {
         RESET_PASSWORD: "/customer/auth/reset-password",
     },
     ORDERS: {
-        LIST: "/customer/orders",
+        LIST: "/orders",
+        CREATE: "/customer/orders",
+        DETAILS: (id: string | number) => `/orders/${id}`,
+        CANCEL: (id: string | number) => `/customer/orders/${id}/cancel`,
+        CONSIGN: (id: string | number) => `/customer/orders/${id}/consign`,
+        LABEL_DOWNLOAD: (id: string | number) => `/customer/orders/${id}/label/download`,
+        PAYMENT_INFO: (id: string | number) => `/customer/orders/${id}/payment`,
+        PAY_WITH_WALLET: (id: string | number) => `/customer/orders/${id}/pay-with-wallet`,
+        WALLET_CHECK: "/customer/orders/wallet-check",
+        IMPORT: "/customer/orders/import",
+        EXPORT: "/orders/export",
+        CREATE_OWN_COURIER: "/customer/orders/create-own-courier",
+        GET_QUOTE_SERVICES: "/customer/get-quote/services",
     },
     DASHBOARD: {
         METRICS: "/dashboard/metrics",
@@ -85,8 +97,11 @@ export const API_ENDPOINTS = {
     ADMIN_QUOTES: {
         BASE: "/admin/quotes",
         DETAILS: (id: string | number) => `/admin/quotes/${id}`,
-        SERVICES: "/admin/quotes/services",
+        SERVICES: "/quotes/services",
         EXPORT: "/admin/quotes/export",
+    },
+    CUSTOMER_QUOTES: {
+        SERVICES: "/customer/get-quote/services",
     },
     ADMIN_COURIER_SURCHARGES: {
         BASE: "/admin/courier-surcharges",
@@ -105,6 +120,13 @@ export const API_ENDPOINTS = {
         BASE: "/admin/help-center/articles",
         DETAILS: (id: string | number) => `/admin/help-center/articles/${id}`,
     },
+    ADMIN_SETTINGS: {
+        BASE: "/admin/settings",
+        DETAILS: (id: string | number) => `/admin/settings/${id}`,
+    },
+    SEARCH: {
+        GLOBAL: "/globalsearch",
+    },
 };
 
 export const QUERY_KEYS = {
@@ -114,6 +136,8 @@ export const QUERY_KEYS = {
     },
     ORDERS: {
         LIST: ["orders", "list"],
+        DETAILS: (id: string | number) => ["orders", "details", id],
+        PAYMENT_INFO: (id: string | number) => ["orders", "payment", id],
     },
     DASHBOARD: {
         METRICS: ["dashboard", "metrics"],
@@ -167,5 +191,12 @@ export const QUERY_KEYS = {
     },
     ADMIN_COURIER_SURCHARGES: {
         GLOBAL_COURIERS: ["admin", "courier-surcharges", "global-couriers"],
+    },
+    ADMIN_SETTINGS: {
+        LIST: ["admin", "settings", "list"],
+        DETAILS: (slug: string) => ["admin", "settings", "details", slug],
+    },
+    SEARCH: {
+        GLOBAL: (q: string) => ["search", "global", q],
     }
 };

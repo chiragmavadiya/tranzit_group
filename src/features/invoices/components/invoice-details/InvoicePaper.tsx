@@ -35,7 +35,6 @@ import { BANKING_DETAILS, COMPANY_DETAILS, TERMS_CONDITIONS } from '../../consta
 interface InvoicePaperProps {
   invoice: any;
   isAdmin?: boolean;
-  onUpdateStatus?: (status: string) => void;
   onUpdateDate?: (date: string) => void;
   setInvoiceData: React.Dispatch<React.SetStateAction<any>>;
   invoiceId: string;
@@ -44,7 +43,6 @@ interface InvoicePaperProps {
 export const InvoicePaper: React.FC<InvoicePaperProps> = ({
   invoice,
   isAdmin = false,
-  onUpdateStatus,
   onUpdateDate,
   setInvoiceData,
   invoiceId
@@ -93,6 +91,10 @@ export const InvoicePaper: React.FC<InvoicePaperProps> = ({
     setInvoiceData?.((prev: any) => ({ ...prev, items: prev?.items?.filter((i: any) => i.id !== itemId) }))
   }, [setInvoiceData])
 
+  const updateStatus = useCallback((status: string) => {
+    setInvoiceData?.((prev: any) => ({ ...prev, invoice: { ...prev?.invoice, status } }))
+  }, [setInvoiceData])
+
   // Auto-edit newly added item
   React.useEffect(() => {
     if (shouldAutoEdit && invoice.line_items?.length > 0) {
@@ -118,24 +120,24 @@ export const InvoicePaper: React.FC<InvoicePaperProps> = ({
       <div className="flex justify-between items-start mb-0">
         <div className="space-y-6">
           <div className="flex items-center gap-4">
-            <div className="w-12 h-12 bg-slate-900 dark:bg-zinc-800 rounded-lg flex items-center justify-center">
-              <img src={TranzitLogo} alt="TG" className="w-8 h-8 invert" />
+            <div className="w-16 h-16 bg-slate-900/10 dark:bg-zinc-800 rounded-lg flex items-center justify-center">
+              <img src={TranzitLogo} alt="TG" className="w-14 h-14" />
             </div>
             <div>
-              <h1 className="text-xl font-bold tracking-tight">{COMPANY_DETAILS.name || 'Tranzit Group Pty Ltd'}</h1>
-              <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">ABN: {COMPANY_DETAILS.abn || '12 690 967 198'}</p>
+              <h1 className="text-xl font-bold tracking-tight mt-0">{COMPANY_DETAILS.name || 'Tranzit Group Pty Ltd'}</h1>
+              <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-0">ABN: {COMPANY_DETAILS.abn || '12 690 967 198'}</p>
             </div>
           </div>
 
-          <div className="text-xs space-y-1 text-slate-500 dark:text-zinc-400 font-medium max-w-[280px]">
+          <div className="text-xs space-y-1 text-slate-500 dark:text-zinc-400 font-medium max-w-[380px]">
             <p className='font-bold text-xl text-slate-800 dark:text-white'>{invoice.customer?.business_name || ''}</p>
-            <p>{invoice.customer?.address?.address1 || '150 Collins Street, Melbourne VIC 3000, Australia'}</p>
-            <p>{invoice.customer?.address?.suburb || 'Melbourne VIC 3000'}</p>
+            <p>{invoice.customer?.address_line || ''}</p>
+            <p>{invoice.customer?.address?.suburb || ''}</p>
           </div>
         </div>
 
         <div className="text-right flex flex-col items-end">
-          <h2 className="text-4xl font-black text-slate-200 dark:text-zinc-800 uppercase tracking-tighter mb-4">TAX INVOICE</h2>
+          <h2 className="text-4xl font-black text-slate-200 dark:text-zinc-800 uppercase tracking-tighter mb-4 mt-0">TAX INVOICE</h2>
           <div className="mt-4 text-[10px] text-slate-400 text-right leading-tight font-medium">
             <p className='my-1'>{COMPANY_DETAILS.address || '12B Bass Ct, Keysborough VIC 3173'}</p>
             <p className='my-1'>{COMPANY_DETAILS.email || 'accounts@tranzitgroup.com.au'}</p>
@@ -178,12 +180,12 @@ export const InvoicePaper: React.FC<InvoicePaperProps> = ({
 
         {/* Invoice Date Box */}
         <div className="p-4 border-r border-slate-100 dark:border-zinc-800">
-          <p className="text-[9px] font-black text-slate-400 uppercase tracking-[0.15em] mb-2">Invoice Date</p>
+          <p className="text-[11px] font-extrabold text-slate-700 dark:text-zinc-400 uppercase tracking-wider mb-2">Invoice Date</p>
           {isAdmin ? (
             <Popover>
               <PopoverTrigger>
                 <button className="flex items-center justify-between w-full group cursor-pointer outline-none">
-                  <span className="text-[12px] font-bold mt-[2px]">{invoice?.invoice?.invoice_date}</span>
+                  <span className="text-[14px] font-bold mt-[2px]">{invoice?.invoice?.invoice_date}</span>
                   <CalendarIcon className="w-4 h-4 ml-2 text-slate-300 group-hover:text-slate-400 transition-colors" />
                 </button>
               </PopoverTrigger>
@@ -203,7 +205,7 @@ export const InvoicePaper: React.FC<InvoicePaperProps> = ({
             </Popover>
           ) : (
             <div className="flex items-center justify-between">
-              <span className="text-sm font-bold">{invoice.invoice?.invoice_date}</span>
+              <span className="text-[14px] font-bold">{invoice.invoice?.invoice_date}</span>
               <CalendarIcon className="w-4 h-4 text-slate-300" />
             </div>
           )}
@@ -217,22 +219,22 @@ export const InvoicePaper: React.FC<InvoicePaperProps> = ({
                 <FormSelect
                   label="Status"
                   value={invoice.invoice?.status}
-                  onValueChange={(val) => onUpdateStatus?.(val || '')}
+                  onValueChange={(val) => updateStatus(val || '')}
                   options={[
-                    { value: 'Draft', label: 'Draft' },
-                    { value: 'Pending', label: 'Pending' },
-                    { value: 'Partial', label: 'Partial' },
-                    { value: 'Paid', label: 'Paid' },
-                    { value: 'Unpaid', label: 'Unpaid' },
-                    { value: 'Overdue', label: 'Overdue' },
+                    { value: 'draft', label: 'Draft' },
+                    { value: 'pending', label: 'Pending' },
+                    { value: 'partial', label: 'Partial' },
+                    { value: 'paid', label: 'Paid' },
+                    { value: 'unpaid', label: 'Unpaid' },
+                    { value: 'overdue', label: 'Overdue' },
                   ]}
                 />
               ) : (
                 <>
-                  <p className="text-[9px] font-black text-slate-400 uppercase tracking-[0.15em] mb-2">Status</p>
+                  <p className="text-[11px] font-extrabold text-slate-700 dark:text-zinc-400 uppercase tracking-wider mb-2">Status</p>
                   <div className="flex items-center justify-between">
                     <span className={cn(
-                      "text-sm font-bold",
+                      "text-[14px] font-bold",
                       invoice.invoice?.status === 'Paid' ? "text-emerald-600" :
                         invoice.invoice?.status === 'Overdue' ? "text-rose-600" : "text-amber-600"
                     )}>{invoice.invoice?.status}</span>
@@ -241,12 +243,12 @@ export const InvoicePaper: React.FC<InvoicePaperProps> = ({
               )}
             </div>
             <div className="p-4 border-r border-slate-100 dark:border-zinc-800 bg-slate-50/30 dark:bg-zinc-800/20">
-              <p className="text-[9px] font-black text-slate-400 uppercase tracking-[0.15em] mb-2">Amount Paid</p>
-              <span className="text-sm font-bold text-emerald-600">{formatCurrency(invoice.invoice?.amount_paid)}</span>
+              <p className="text-[11px] font-extrabold text-slate-700 dark:text-zinc-400 uppercase tracking-wider mb-2">Amount Paid</p>
+              <span className="text-[18px] font-bold text-emerald-600">{formatCurrency(invoice.invoice?.amount_paid)}</span>
             </div>
             <div className="p-4 bg-slate-50/30 dark:bg-zinc-800/20">
-              <p className="text-[9px] font-black text-slate-400 uppercase tracking-[0.15em] mb-2 text-rose-500">Balance Due</p>
-              <span className="text-sm font-bold text-slate-900 dark:text-white">{formatCurrency(invoice.invoice?.balance_due)}</span>
+              <p className="text-[11px] font-extrabold text-slate-700 dark:text-zinc-400 uppercase tracking-wider mb-2">Balance Due</p>
+              <span className="text-[18px] font-bold text-slate-900 dark:text-white">{formatCurrency(invoice.invoice?.balance_due)}</span>
             </div>
           </>
         )}

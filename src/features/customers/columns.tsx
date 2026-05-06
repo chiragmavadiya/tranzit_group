@@ -5,7 +5,7 @@ import type { Column } from '@/components/common/types/DataTable.types';
 import { Button } from '@/components/ui/button';
 import { NavLink } from 'react-router-dom';
 import { useToggleCustomerStatus } from './hooks/useCustomers';
-import { toast } from 'sonner';
+import { showToast } from '@/components/ui/custom-toast';
 
 // eslint-disable-next-line react-refresh/only-export-components
 const StatusSwitch = ({ customer }: { customer: Customer }) => {
@@ -14,10 +14,10 @@ const StatusSwitch = ({ customer }: { customer: Customer }) => {
     const handleToggle = () => {
         toggleStatus(customer.id, {
             onSuccess: (res) => {
-                toast.success(res.message || `Customer status updated to ${customer.status === 'active' ? 'inactive' : 'active'}`);
+                showToast(res.message || `Customer status updated to ${customer.status === 'active' ? 'inactive' : 'active'}`)
             },
             onError: (err: any) => {
-                toast.error(err?.response?.data?.message || 'Failed to update status');
+                showToast(err?.response?.data?.message || 'Failed to update status', "error");
             }
         });
     };

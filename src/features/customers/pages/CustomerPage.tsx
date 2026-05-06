@@ -8,9 +8,9 @@ import { getCustomerColumns } from '../columns';
 import CustomerDialog from '../components/CustomerDialog';
 import { useCustomers, useExportCustomers, useDeleteCustomer } from '../hooks/useCustomers';
 import { downloadFile } from '@/lib/utils';
-import { toast } from 'sonner';
 import { useDebounce } from '@/hooks/useDebounce';
 import { ConformationModal } from '@/components/common/ConformationModal';
+import { showToast } from '@/components/ui/custom-toast';
 
 export default function CustomerPage() {
     const [suburb, setSuburb] = useState('all');
@@ -53,7 +53,7 @@ export default function CustomerPage() {
                 downloadFile(blob, filename);
             },
             onError: () => {
-                toast.error('Failed to export customers');
+                showToast('Failed to export customers', 'error');
             }
         });
     };
@@ -112,12 +112,12 @@ export default function CustomerPage() {
         if (!deleteId) return;
         deleteCustomer(deleteId, {
             onSuccess: () => {
-                toast.success('Customer deleted successfully');
+                showToast('Customer deleted successfully', "success");
                 setIsDeleteDialogOpen(false);
                 setDeleteId(null);
             },
             onError: (err: any) => {
-                toast.error(err?.response?.data?.message || 'Failed to delete customer');
+                showToast(err?.response?.data?.message || 'Failed to delete customer', "error");
             }
         });
     };

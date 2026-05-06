@@ -94,12 +94,13 @@ export const useVerificationStatus = () => {
 
 // logout api 
 export const useLogout = () => {
-
+    const queryClient = useQueryClient();
     return useMutation({
         mutationFn: useCallback(() => authService.logout(), []),
         onSuccess: () => {
-            // Remove token from localStorage
+            // Clear all sensitive data and query cache on logout
             localStorage.clear();
+            queryClient.clear();
         },
     });
 };
@@ -119,10 +120,11 @@ export const useForgotPassword = () => {
 
 // get user details api 
 export const useGetUserDetails = (enabled: boolean) => {
+    const token = localStorage.getItem("auth_token");
     return useQuery({
         queryKey: QUERY_KEYS.AUTH.USER_DETAILS,
         queryFn: () => authService.getUserDetails(),
-        enabled,
+        enabled: !!(enabled && token),
         staleTime: Infinity,
     });
 };

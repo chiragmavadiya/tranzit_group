@@ -1,7 +1,7 @@
 import { useQuery, useMutation, useQueryClient, keepPreviousData } from '@tanstack/react-query';
 import { invoicesService } from '../services/invoices.service';
 import { QUERY_KEYS } from '@/constants/api.constants';
-import { toast } from 'sonner';
+import { showToast } from '@/components/ui/custom-toast';
 
 export const useCustomerInvoices = (params?: { search?: string; page?: number; per_page?: number; }, enabled: boolean = true) => {
   return useQuery({
@@ -35,7 +35,7 @@ export const useExportCustomerInvoices = () => {
       window.URL.revokeObjectURL(url);
     },
     onError: (error: any) => {
-      toast.error(error?.response?.data?.message || "Failed to export invoices");
+      showToast(error?.response?.data?.message || "Failed to export invoices", "error");
     },
   });
 };
@@ -47,14 +47,14 @@ export const useCreateCustomerInvoice = () => {
     mutationFn: (data: any) => invoicesService.createCustomerInvoice(data),
     onSuccess: (response) => {
       if (response.status) {
-        toast.success(response.message || "Invoice created successfully");
+        showToast(response.message || "Invoice created successfully", "success");
         queryClient.invalidateQueries({ queryKey: QUERY_KEYS.INVOICES.LIST });
       } else {
-        toast.error(response.message || "Failed to create invoice");
+        showToast(response.message || "Failed to create invoice", "error");
       }
     },
     onError: (error: any) => {
-      toast.error(error?.response?.data?.message || "Failed to create invoice");
+      showToast(error?.response?.data?.message || "Failed to create invoice", "error");
     },
   });
 };
@@ -82,10 +82,13 @@ export const useUpdateAdminInvoice = () => {
     mutationFn: ({ id, data }: { id: string | number; data: any }) => invoicesService.updateAdminInvoice(id, data),
     onSuccess: (response, variables) => {
       if (response.status) {
-        toast.success(response.message || "Invoice updated successfully");
-        queryClient.invalidateQueries({ queryKey: ['admin', 'invoices'] });
+        showToast(response.message || "Invoice updated successfully", "success");
+        // queryClient.invalidateQueries({ queryKey: ['admin', 'invoices'] });
         queryClient.invalidateQueries({ queryKey: ['admin', 'invoices', 'details', variables.id] });
       }
+    },
+    onError: (error: any) => {
+      showToast(error?.response?.data?.message || "Failed to update invoice", "error");
     },
   });
 };
@@ -96,7 +99,7 @@ export const useDeleteAdminInvoice = () => {
     mutationFn: (id: string | number) => invoicesService.deleteAdminInvoice(id),
     onSuccess: (response) => {
       if (response.status) {
-        toast.success(response.message || "Invoice deleted successfully");
+        showToast(response.message || "Invoice deleted successfully", "success");
         queryClient.invalidateQueries({ queryKey: ['admin', 'invoices'] });
       }
     },
@@ -109,7 +112,7 @@ export const useSendAdminInvoice = () => {
     mutationFn: (id: string | number) => invoicesService.sendAdminInvoice(id),
     onSuccess: (response, id) => {
       if (response.status) {
-        toast.success(response.message || "Invoice sent successfully");
+        showToast(response.message || "Invoice sent successfully", "success");
         queryClient.invalidateQueries({ queryKey: ['admin', 'invoices', 'details', id] });
       }
     },
@@ -137,8 +140,11 @@ export const useRemindAdminInvoice = () => {
     mutationFn: (id: string | number) => invoicesService.remindAdminInvoice(id),
     onSuccess: (response) => {
       if (response.status) {
-        toast.success(response.message || "Reminder sent successfully");
+        showToast(response.message || "Reminder sent successfully", "success");
       }
+    },
+    onError: (error: any) => {
+      showToast(error?.response?.data?.message || "Failed to send reminder", "error");
     },
   });
 };
@@ -148,8 +154,11 @@ export const useZohoSyncAdminInvoice = () => {
     mutationFn: (id: string | number) => invoicesService.zohoSyncAdminInvoice(id),
     onSuccess: (response) => {
       if (response.status) {
-        toast.success(response.message || "Synced to Zoho successfully");
+        showToast(response.message || "Synced to Zoho successfully", "success");
       }
+    },
+    onError: (error: any) => {
+      showToast(error?.response?.data?.message || "Failed to sync to Zoho", "error");
     },
   });
 };
@@ -161,7 +170,7 @@ export const useAdminInvoicePayment = () => {
       mutationFn: ({ id, data }: { id: string | number; data: any }) => invoicesService.addAdminInvoicePayment(id, data),
       onSuccess: (response, variables) => {
         if (response.status) {
-          toast.success("Payment added successfully");
+          showToast("Payment added successfully", "success");
           queryClient.invalidateQueries({ queryKey: ['admin', 'invoices', 'details', variables.id] });
         }
       },
@@ -170,7 +179,7 @@ export const useAdminInvoicePayment = () => {
       mutationFn: ({ invoiceId, paymentId, data }: { invoiceId: string | number; paymentId: string | number; data: any }) => invoicesService.updateAdminInvoicePayment(invoiceId, paymentId, data),
       onSuccess: (response, variables) => {
         if (response.status) {
-          toast.success("Payment updated successfully");
+          showToast("Payment updated successfully", "success");
           queryClient.invalidateQueries({ queryKey: ['admin', 'invoices', 'details', variables.invoiceId] });
         }
       },
@@ -179,7 +188,7 @@ export const useAdminInvoicePayment = () => {
       mutationFn: ({ invoiceId, paymentId }: { invoiceId: string | number; paymentId: string | number }) => invoicesService.deleteAdminInvoicePayment(invoiceId, paymentId),
       onSuccess: (response, variables) => {
         if (response.status) {
-          toast.success("Payment deleted successfully");
+          showToast("Payment deleted successfully", "success");
           queryClient.invalidateQueries({ queryKey: ['admin', 'invoices', 'details', variables.invoiceId] });
         }
       },

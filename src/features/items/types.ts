@@ -17,11 +17,11 @@ export interface ItemDetails extends Item {
 export interface ItemFormData {
   id?: number;
   item_name: string;
-  item_weight: number;
-  item_length: number;
-  item_width: number;
-  item_height: number;
-  item_cubic: number;
+  item_weight?: number | undefined;
+  item_length?: number | undefined;
+  item_width?: number | undefined;
+  item_height?: number | undefined;
+  item_cubic?: number | undefined;
   is_default: "on" | "off" | boolean;
   item_code: string;
 }

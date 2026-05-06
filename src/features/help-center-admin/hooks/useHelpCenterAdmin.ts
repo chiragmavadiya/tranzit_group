@@ -2,7 +2,7 @@ import { useQuery, useMutation, useQueryClient, keepPreviousData } from "@tansta
 import { helpCenterAdminService } from "../services/help-center-admin.service";
 import { QUERY_KEYS } from "@/constants/api.constants";
 import type { HelpArticleFilters, HelpArticleFormData } from "../types";
-import { toast } from "sonner";
+import { showToast } from "@/components/ui/custom-toast";
 
 export const useHelpArticles = (filters: HelpArticleFilters) => {
   return useQuery({
@@ -27,14 +27,14 @@ export const useHelpArticleMutations = () => {
     mutationFn: helpCenterAdminService.create,
     onSuccess: (response) => {
       if (response.status) {
-        toast.success("Article created successfully");
+        showToast("Article created successfully", "success");
         queryClient.invalidateQueries({ queryKey: QUERY_KEYS.ADMIN_HELP_CENTER.LIST });
       } else {
-        toast.error(response.message || "Failed to create article");
+        showToast(response.message || "Failed to create article", "error");
       }
     },
     onError: (error: any) => {
-      toast.error(error.response?.data?.message || "Failed to create article");
+      showToast(error.response?.data?.message || "Failed to create article", "error");
     },
   });
 
@@ -43,16 +43,16 @@ export const useHelpArticleMutations = () => {
       helpCenterAdminService.update(id, data),
     onSuccess: (response, variables) => {
       if (response.status) {
-        toast.success("Article updated successfully");
+        showToast("Article updated successfully", "success");
         // Update the detail cache with new data immediately
         queryClient.setQueryData(QUERY_KEYS.ADMIN_HELP_CENTER.DETAILS(variables.id), response);
         queryClient.invalidateQueries({ queryKey: QUERY_KEYS.ADMIN_HELP_CENTER.LIST });
       } else {
-        toast.error(response.message || "Failed to update article");
+        showToast(response.message || "Failed to update article", "error");
       }
     },
     onError: (error: any) => {
-      toast.error(error.response?.data?.message || "Failed to update article");
+      showToast(error.response?.data?.message || "Failed to update article", "error");
     },
   });
 
@@ -60,14 +60,14 @@ export const useHelpArticleMutations = () => {
     mutationFn: helpCenterAdminService.delete,
     onSuccess: (response) => {
       if (response.status) {
-        toast.success("Article deleted successfully");
+        showToast("Article deleted successfully", "success");
         queryClient.invalidateQueries({ queryKey: QUERY_KEYS.ADMIN_HELP_CENTER.LIST });
       } else {
-        toast.error(response.message || "Failed to delete article");
+        showToast(response.message || "Failed to delete article", "error");
       }
     },
     onError: (error: any) => {
-      toast.error(error.response?.data?.message || "Failed to delete article");
+      showToast(error.response?.data?.message || "Failed to delete article", "error");
     },
   });
 

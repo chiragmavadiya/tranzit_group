@@ -5,8 +5,8 @@ import { Button } from '@/components/ui/button';
 import { DataTable } from '@/components/common';
 import { useCustomerTransactions, useExportCustomerTransactions } from '../../hooks/useCustomers';
 import { downloadFile } from '@/lib/utils';
-import { toast } from 'sonner';
 import { Plus } from 'lucide-react';
+import { showToast } from '@/components/ui/custom-toast';
 
 interface TransactionTabProps {
     customerId: string;
@@ -35,7 +35,7 @@ export const TransactionTab = ({ customerId }: TransactionTabProps) => {
                 downloadFile(blob, filename);
             },
             onError: () => {
-                toast.error('Failed to export transactions');
+                showToast('Failed to export transactions', "error");
             }
         });
     };

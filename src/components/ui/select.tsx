@@ -193,7 +193,7 @@ function SelectComponent({ data, defaultValue, placeholder, className, value, on
         <SelectValue placeholder={placeholder} className="placeholder:text-slate-300 dark:placeholder:text-zinc-700" />
       </SelectTrigger>
       {allowClear && value && <X className="absolute right-[9px] top-[50%] origin-center translate-y-[-50%] size-4 text-muted-foreground bg-white dark:bg-zinc-900 cursor-pointer" onClick={(e) => { console.log('cliecnk....'); e.preventDefault(); onValueChange?.('') }} />}
-      <SelectContent alignItemWithTrigger={false} align="start" className="min-w-min dark:bg-zinc-900 dark:border-zinc-800 p-1 rounded-md">
+      <SelectContent alignItemWithTrigger={false} align="start" className="min-w-min dark:bg-zinc-900 dark:border-zinc-800 p-1 rounded-md max-h-[220px]">
         <SelectGroup>
           {data.map((item) => (
             <SelectItem key={item.value} value={item.value} className="h-7 text-xs font-medium data-highlighted:bg-blue-500/20 data-selected:bg-blue-500/90" >

@@ -2,7 +2,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { addressBookService } from "../services/address-book.service";
 import { QUERY_KEYS } from "@/constants/api.constants";
 import type { AddressFormData, AddressBookFilters } from "../types";
-import { toast } from "sonner";
+import { showToast } from "@/components/ui/custom-toast";
 
 /**
  * Hook to get the list of address book entries
@@ -35,14 +35,14 @@ export const useCreateAddress = () => {
         mutationFn: (data: AddressFormData) => addressBookService.create(data),
         onSuccess: (response) => {
             if (response.status) {
-                toast.success(response.message || "Address added successfully");
+                showToast(response.message || "Address added successfully", "success");
                 queryClient.invalidateQueries({ queryKey: QUERY_KEYS.ADDRESS_BOOK.LIST });
             } else {
-                toast.error(response.message || "Failed to add address");
+                showToast(response.message || "Failed to add address", "error");
             }
         },
         onError: (error: any) => {
-            toast.error(error.response?.data?.message || "An error occurred while adding address");
+            showToast(error.response?.data?.message || "An error occurred while adding address", "error");
         },
     });
 };
@@ -58,15 +58,15 @@ export const useUpdateAddress = () => {
             addressBookService.update(id, data),
         onSuccess: (response, variables) => {
             if (response.status) {
-                toast.success(response.message || "Address updated successfully");
+                showToast(response.message || "Address updated successfully", "success");
                 queryClient.invalidateQueries({ queryKey: QUERY_KEYS.ADDRESS_BOOK.LIST });
                 queryClient.removeQueries({ queryKey: QUERY_KEYS.ADDRESS_BOOK.DETAILS(variables.id as any) });
             } else {
-                toast.error(response.message || "Failed to update address");
+                showToast(response.message || "Failed to update address", "error");
             }
         },
         onError: (error: any) => {
-            toast.error(error.response?.data?.message || "An error occurred while updating address");
+            showToast(error.response?.data?.message || "An error occurred while updating address", "error");
         },
     });
 };
@@ -81,14 +81,14 @@ export const useDeleteAddress = () => {
         mutationFn: (id: number | string) => addressBookService.delete(id),
         onSuccess: (response) => {
             if (response.status) {
-                toast.success(response.message || "Address deleted successfully");
+                showToast(response.message || "Address deleted successfully", "success");
                 queryClient.invalidateQueries({ queryKey: QUERY_KEYS.ADDRESS_BOOK.LIST });
             } else {
-                toast.error(response.message || "Failed to delete address");
+                showToast(response.message || "Failed to delete address", "error");
             }
         },
         onError: (error: any) => {
-            toast.error(error.response?.data?.message || "An error occurred while deleting address");
+            showToast(error.response?.data?.message || "An error occurred while deleting address", "error");
         },
     });
 };
@@ -110,8 +110,8 @@ export const useExportAddressBook = () => {
             link.remove();
             window.URL.revokeObjectURL(url);
         },
-        onError: () => {
-            toast.error("Failed to export address book");
+        onError: (error: any) => {
+            showToast(error.response?.data?.message || "Failed to export address book", "error");
         },
     });
 };

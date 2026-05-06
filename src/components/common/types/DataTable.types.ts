@@ -61,6 +61,7 @@ export interface DataTableProps<T> {
   // Row actions
   onRowClick?: (row: T, index: number) => void;
   // Custom components
+  header?: boolean;
   customHeader?: ReactNode | (() => ReactNode);
   headerPosition?: 'left' | 'right';
   headerClass?: string;

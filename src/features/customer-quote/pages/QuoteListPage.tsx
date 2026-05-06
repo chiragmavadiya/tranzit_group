@@ -3,12 +3,12 @@ import { DataTable } from '@/components/common';
 import { Button } from '@/components/ui/button';
 import { useAdminQuotes, useExportQuotes } from '@/features/quote/hooks/useQuote';
 import { useDebounce } from '@/hooks/useDebounce';
-import { toast } from 'sonner';
 import { downloadFile } from '@/lib/utils';
 import { QuoteDetailsDialog } from '../components/QuoteDetailsDialog';
 import { Eye, Plus } from 'lucide-react';
 import { format } from 'date-fns';
 import { useNavigate } from 'react-router-dom';
+import { showToast } from '@/components/ui/custom-toast';
 
 export default function QuoteListPage() {
     const navigate = useNavigate();
@@ -32,10 +32,10 @@ export default function QuoteListPage() {
         exportQuotes({ format, search: debouncedSearch }, {
             onSuccess: (blob) => {
                 downloadFile(blob, `quotes-${new Date().getTime()}.${format === 'excel' ? 'xlsx' : format}`);
-                toast.success('Exported successfully');
+                showToast('Exported successfully', 'success');
             },
             onError: (err: any) => {
-                toast.error(err?.response?.data?.message || 'Failed to export quotes');
+                showToast(err?.response?.data?.message || 'Failed to export quotes', 'error');
             }
         });
     };
@@ -115,7 +115,7 @@ export default function QuoteListPage() {
                     isExporting={isExporting}
                     onExport={handleExport}
                     customHeader={
-                        <Button 
+                        <Button
                             onClick={() => navigate('/admin/quotes/create')}
                             className="gap-2 bg-[#0060FE] hover:bg-[#0052db] text-white shadow-lg shadow-blue-100 dark:shadow-none transition-all active:scale-[0.98] font-semibold border-none px-4 h-8"
                         >

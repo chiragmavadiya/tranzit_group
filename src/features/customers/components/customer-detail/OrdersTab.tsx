@@ -4,7 +4,7 @@ import { Badge } from '@/components/ui/badge';
 import { DataTable } from '@/components/common';
 import { useCustomerOrders, useExportCustomerOrders } from '../../hooks/useCustomers';
 import { downloadFile } from '@/lib/utils';
-import { toast } from 'sonner';
+import { showToast } from '@/components/ui/custom-toast';
 
 interface OrdersTabProps {
     customerId: string;
@@ -32,7 +32,7 @@ export const OrdersTab = ({ customerId }: OrdersTabProps) => {
                 downloadFile(blob, filename);
             },
             onError: () => {
-                toast.error('Failed to export orders');
+                showToast('Failed to export orders', 'error');
             }
         });
     };

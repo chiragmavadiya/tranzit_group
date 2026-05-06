@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { DataTable, StatCard } from '@/components/common';
 import { useCustomerInvoices, useExportCustomerInvoices } from '../../hooks/useCustomers';
 import { downloadFile } from '@/lib/utils';
-import { toast } from 'sonner';
+import { showToast } from '@/components/ui/custom-toast';
 
 interface InvoiceManagementTabProps {
     customerId: string;
@@ -13,7 +13,7 @@ interface InvoiceManagementTabProps {
 
 export const InvoiceManagementTab = ({ customerId }: InvoiceManagementTabProps) => {
     const { data: response, isLoading } = useCustomerInvoices(customerId);
-    
+
     const invoices = response?.data || [];
     const summary = response?.summary || { total_invoices: 0, total_paid: 0, total_unpaid: 0 };
     const meta = response?.meta;
@@ -32,7 +32,7 @@ export const InvoiceManagementTab = ({ customerId }: InvoiceManagementTabProps) 
                 downloadFile(blob, filename);
             },
             onError: () => {
-                toast.error('Failed to export invoices');
+                showToast('Failed to export invoices', 'error');
             }
         });
     };

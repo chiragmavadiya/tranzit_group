@@ -8,13 +8,53 @@ import { SidePanel } from '@/features/orders/components/order-details/SidePanel'
 import { StickyFooter } from '@/features/orders/components/order-details/StickyFooter'
 import CreateOrderDialog from '@/features/orders/components/CreateOrderDialog'
 import { ItemsTable } from '@/features/orders/components/order-details/ItemsTable'
-import { PackagingTable } from '@/features/orders/components/order-details/PackagingTable'
+// import { PackagingTable } from '@/features/orders/components/order-details/PackagingTable'
 import { useOrderItems } from '@/features/orders/hooks/useOrderItems'
-import { useOrderPackaging } from '@/features/orders/hooks/useOrderPackaging'
+import type { AddressData } from '../types'
+// import { useOrderPackaging } from '@/features/orders/hooks/useOrderPackaging'
 
 const OrderDetailsPage: React.FC = () => {
   const { orderType, orderID } = useParams<{ orderType: string, orderID: string }>()
-  const [orderDialogMode, setOrderDialogMode] = useState<"sender" | "receiver" | null>(null)
+
+  const [quoteData, setQuoteData] = useState<any>(null);
+
+  const [addressData, setAddressData] = useState<{ sender: AddressData, receiver: AddressData }>({
+    sender: {
+      email: "",
+      phone: "",
+      company: "",
+      address1: "150 Collins Street, Melbourne, VIC, 3000, Australia",
+      suburb: "Melbourne",
+      state: "VIC",
+      street_name: "Collins",
+      street_number: "150",
+      postcode: "3000",
+      country: "Australia",
+      name: "Zack",
+      saveToAddressBook: false,
+    },
+    receiver: {
+      email: "",
+      phone: "",
+      company: "",
+      address1: "",
+      suburb: "",
+      state: "",
+      street_name: "",
+      street_number: "",
+      postcode: "",
+      country: "",
+      name: "",
+      saveToAddressBook: false
+    }
+  })
+  const initialDialogMode = useMemo(() => {
+    if (addressData.receiver.address1 === '') {
+      return "receiver"
+    }
+    return null
+  }, [addressData])
+  const [orderDialogMode, setOrderDialogMode] = useState<"sender" | "receiver" | null>(initialDialogMode)
 
   const {
     itemsData,
@@ -24,45 +64,48 @@ const OrderDetailsPage: React.FC = () => {
     removeItem
   } = useOrderItems([
     {
-      item: 'Item',
-      sku: 'SKU',
-      ship: 1,
-      unitPrice: 0.00,
-      weight: 2,
-      size: '',
-      countryOfOrigin: 'China',
-      qtyShipped: 1
+      type: "box",
+      quantity: 0,
+      weight: 0,
+      length: 0,
+      width: 0,
+      height: 0
     }
   ])
 
-  const {
-    packagingData,
-    updatePackaging
-  } = useOrderPackaging({
-    package: 'Package',
-    qty: 1,
-    length: 10,
-    width: 5,
-    height: 1,
-    weight: 2,
-    cubic: 0.0001,
-    tracking: ''
-  })
+  // const {
+  //   packagingData,
+  //   updatePackaging
+  // } = useOrderPackaging({
+  //   package: 'Package',
+  //   qty: 1,
+  //   length: 10,
+  //   width: 5,
+  //   height: 1,
+  //   weight: 2,
+  //   cubic: 0.0001,
+  //   tracking: ''
+  // })
+
+  const handleAddressSubmit = useCallback((type: "sender" | "receiver", data: AddressData) => {
+    setAddressData(prev => ({ ...prev, [type]: data }))
+    setOrderDialogMode(null)
+  }, [])
 
   const onCreateOrderClick = useCallback((type: "sender" | "receiver") => {
     setOrderDialogMode(type)
   }, [])
 
-  const senderAddress = useMemo(() => ({
-    name: "Zack",
-    address: "150 Collins Street, Melbourne, VIC, 3000, Australia",
-    email: "zack@yopmail.com"
-  }), [])
+  // const senderAddress = useMemo(() => ({
+  //   name: "Zack",
+  //   address: "150 Collins Street, Melbourne, VIC, 3000, Australia",
+  //   email: "zack@yopmail.com"
+  // }), [])
 
-  const receiverAddress = useMemo(() => ({
-    name: "new order",
-    address: "150 Collins Street, Melbourne, VIC, 3000, Australia"
-  }), [])
+  // const receiverAddress = useMemo(() => ({
+  //   name: "new order",
+  //   address: "150 Collins Street, Melbourne, VIC, 3000, Australia"
+  // }), [])
 
   return (
     <>
@@ -78,18 +121,18 @@ const OrderDetailsPage: React.FC = () => {
             <div className="flex flex-col gap-3 overflow-hidden">
               <AddressCard
                 title="SENDER"
-                name={senderAddress.name}
-                address={senderAddress.address}
-                email={senderAddress.email}
-                editable={orderType === 'new'}
+                name={addressData.sender.name}
+                address={addressData.sender.address1}
+                email={addressData.sender.email}
+                editable={orderType === 'create'}
                 onEditClick={() => onCreateOrderClick('sender')}
               />
 
               <AddressCard
                 title="RECEIVER"
-                name={receiverAddress.name}
-                address={receiverAddress.address}
-                editable={orderType === 'new'}
+                name={addressData.receiver.name}
+                address={addressData.receiver.address1}
+                editable={orderType === 'create'}
                 onEditClick={() => onCreateOrderClick('receiver')}
               />
 
@@ -101,16 +144,16 @@ const OrderDetailsPage: React.FC = () => {
                 removeItem={removeItem}
               />
 
-              <PackagingTable
+              {/* <PackagingTable
                 data={packagingData}
                 onUpdate={updatePackaging}
-              />
+              /> */}
 
-              <CarrierCard />
+              <CarrierCard itemData={itemsData} addresses={addressData} onQuoteChange={setQuoteData} />
               <HistoryCard />
             </div>
 
-            <SidePanel orderType={orderType} />
+            <SidePanel itemsData={itemsData} quoteData={quoteData} />
           </div>
         </main>
         {orderDialogMode && (
@@ -118,6 +161,8 @@ const OrderDetailsPage: React.FC = () => {
             open={!!orderDialogMode}
             onOpenChange={() => setOrderDialogMode(null)}
             type={orderDialogMode}
+            onSubmit={handleAddressSubmit}
+            initialData={addressData[orderDialogMode]}
           />
         )}
       </div>

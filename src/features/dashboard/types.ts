@@ -32,15 +32,17 @@ export interface DashboardInvoice {
   DT_RowIndex: number;
 }
 
+export interface TransactionMetrics {
+  last28days: Transaction[];
+  lastmonth: Transaction[];
+  lastyear: Transaction[];
+}
+
 export interface CustomerMetrics {
   totalOrder: number;
   totalSpend: string | number;
   pendingInvoiceCount: number;
-  transactions: {
-    last28days: number;
-    lastmonth: number;
-    lastyear: number;
-  };
+  transactions: TransactionMetrics;
   order: {
     total: number;
     printed?: number;
@@ -59,6 +61,9 @@ export interface AdminMetrics {
   last28Days: any[];
   lastMonth: any[];
   lastYear: any[];
+  last28DaysCount?: number;
+  lastMonthCount?: number;
+  lastYearCount?: number;
   totalMarginAmount: string;
   totalOrderAmount: string;
   totalInvoiceAmount: string;

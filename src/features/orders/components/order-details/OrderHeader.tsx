@@ -1,9 +1,10 @@
-import React from 'react'
+import React, { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { ArrowLeft, Box, MapPin } from 'lucide-react'
+import { ArrowLeft, Box, MapPin, Download, Trash2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
-import { DropdownUI } from '@/features/orders/components/OrderFormUI'
+// import { DropdownUI } from '@/features/orders/components/OrderFormUI'
+import { ConformationModal } from '@/components/common/ConformationModal'
 
 
 interface OrderHeaderProps {
@@ -13,15 +14,40 @@ interface OrderHeaderProps {
 
 export const OrderHeader: React.FC<OrderHeaderProps> = ({ orderID = '4', orderType = 'new' }) => {
   const navigate = useNavigate()
+  const [showConfirm, setShowConfirm] = useState(false)
+
+  const handleBack = () => {
+    setShowConfirm(true)
+  }
+
+  const handleDiscard = () => {
+    setShowConfirm(false)
+    navigate(-1)
+  }
+
+  const handleSave = () => {
+    setShowConfirm(false)
+    // Trigger save action if implemented
+  }
 
   return (
     <div className="flex flex-col gap-3 bg-white dark:bg-zinc-950 border-b border-gray-100 dark:border-zinc-800 transition-colors duration-300 p-3 pt-0 lg:p-4 lg:pb-3 lg:pt-0">
+      <ConformationModal
+        open={showConfirm}
+        onOpenChange={setShowConfirm}
+        onConfirm={handleSave}
+        onCancel={handleDiscard}
+        title="Save changes?"
+        description="If you don't save, your recent changes will be discarded."
+        confirmText="SAVE"
+        cancelText="Discard"
+      />
       <div className="flex flex-wrap items-center justify-between gap-4">
         <div className="flex items-center gap-4 lg:gap-8">
           <Button
             // variant="ghost"
             size="sm"
-            onClick={() => navigate(-1)}
+            onClick={handleBack}
             className="flex items-center gap-2 bg-[#0060FE] text-white hover:bg-[#0052D9] px-4 rounded-md h-9"
           >
             <ArrowLeft className="h-4 w-4" />
@@ -44,7 +70,7 @@ export const OrderHeader: React.FC<OrderHeaderProps> = ({ orderID = '4', orderTy
         </div>
 
         <div className="flex items-center gap-2">
-          {orderType !== 'new' && (
+          {/* {orderType !== 'new' && (
             <DropdownUI
               label="Print"
               icon="ChevronDown"
@@ -67,7 +93,20 @@ export const OrderHeader: React.FC<OrderHeaderProps> = ({ orderID = '4', orderTy
               { value: 'archive_order', label: 'Archive order' },
               { value: 'delete_order', label: 'Delete order' },
             ]}
-          />
+          /> */}
+
+          {orderType !== 'create' && (
+            <>
+              <Button variant="outline" className="flex items-center gap-2 border-gray-200 dark:border-zinc-800 text-gray-700 dark:text-zinc-300 font-bold h-8 px-4 text-xs hover:bg-gray-50 dark:hover:bg-zinc-900 transition-colors">
+                <Download className="h-4 w-4" />
+                DOWNLOAD LABEL
+              </Button>
+              <Button variant="outline" className="flex items-center gap-2 border-red-200 dark:border-red-900/30 text-red-600 dark:text-red-400 font-bold h-8 px-4 text-xs hover:bg-red-50 dark:hover:bg-red-950/30 transition-colors">
+                <Trash2 className="h-4 w-4" />
+                DELETE ORDER
+              </Button>
+            </>
+          )}
 
           {/* <DropdownMenu>
             <DropdownMenuTrigger className="flex items-center gap-2 border border-gray-200 dark:border-zinc-800 text-gray-700 dark:text-zinc-300 h-10 px-4 rounded-md hover:bg-gray-50 dark:hover:bg-zinc-900 transition-colors cursor-pointer outline-none text-sm font-medium">
@@ -84,7 +123,7 @@ export const OrderHeader: React.FC<OrderHeaderProps> = ({ orderID = '4', orderTy
         </div>
       </div>
 
-      <div className="flex flex-wrap items-center gap-x-6 gap-y-2 text-xs text-gray-500 dark:text-zinc-400 font-medium">
+      {orderType !== 'create' && (<div className="flex flex-wrap items-center gap-x-6 gap-y-2 text-xs text-gray-500 dark:text-zinc-400 font-medium">
         <Badge variant="secondary" className="bg-gray-100 dark:bg-zinc-800 text-gray-500 dark:text-zinc-400 border-none rounded-sm px-2 py-0 h-5 font-bold">
           NEW
         </Badge>
@@ -97,7 +136,7 @@ export const OrderHeader: React.FC<OrderHeaderProps> = ({ orderID = '4', orderTy
         <div className="flex items-center gap-1">
           Reference #
         </div>
-      </div>
+      </div>)}
     </div>
   )
 }

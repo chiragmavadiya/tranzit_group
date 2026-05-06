@@ -9,7 +9,7 @@ import { Button } from '@/components/ui/button'
 import SelectComponent from '@/components/ui/select'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
-import { Upload, X, Save } from 'lucide-react'
+import { Upload, X } from 'lucide-react'
 import { DOCUMENT_TYPES } from '@/features/orders/constants'
 
 // Moved to constants.ts
@@ -21,8 +21,12 @@ interface UploadedDocument {
   size: string;
 }
 
+interface SidePanelProps {
+  itemsData?: any[];
+  quoteData?: any;
+}
 
-export const SidePanel: React.FC<{ orderType: string | undefined }> = ({ orderType }) => {
+export const SidePanel: React.FC<SidePanelProps> = ({ itemsData, quoteData }) => {
   const [tags, setTags] = useState<string[]>(['PRINTED BY: ZACK%40YOPMAIL.COM'])
   const [tagInput, setTagInput] = useState('')
   const [uploadedDocs, setUploadedDocs] = useState<UploadedDocument[]>([])
@@ -89,31 +93,15 @@ export const SidePanel: React.FC<{ orderType: string | undefined }> = ({ orderTy
     <div className="flex flex-col gap-4">
       <Accordion multiple defaultValue={['notes', 'documents', 'tags', 'details', 'breakdown']} className="flex flex-col gap-3">
         {/* NOTES */}
-        <AccordionItem value="notes" className="border border-gray-200 dark:border-zinc-800 rounded-xl bg-white dark:bg-zinc-950 shadow-sm px-5 border-b overflow-hidden transition-colors duration-300">
-          <AccordionTrigger className="hover:no-underline py-3 px-0 [&>svg]:text-[#0060FE] dark:[&>svg]:text-blue-500">
-            <span className="text-sm font-bold text-gray-900 dark:text-zinc-100 tracking-wider">NOTES</span>
+        <AccordionItem value="notes" className="border border-gray-200 dark:border-zinc-800 rounded-xl bg-white dark:bg-zinc-950 shadow-sm px-5 border-b overflow-hidden transition-colors duration-300 [&>h3]:my-0">
+          <AccordionTrigger className="hover:no-underline py-3 px-0 [&>svg]:text-[#0060FE] dark:[&>svg]:text-blue-500 items-center">
+            <span className="text-sm font-bold text-gray-900 dark:text-zinc-100 tracking-wider">Delivery Instructions(Printed on Label)</span>
           </AccordionTrigger>
           <AccordionContent className="flex flex-col gap-2 pb-4">
             <Textarea
               className="min-h-[100px] border-gray-200 dark:border-zinc-800 text-xs text-gray-700 dark:text-zinc-300 focus:border-[#0060FE] dark:focus:border-blue-500 focus:ring-0 focus-visible:ring-0 transition-all duration-200 shadow-none font-medium"
               placeholder="Add your notes here..."
             />
-            <p className="text-[10px] text-gray-400 dark:text-zinc-500 font-medium leading-4">
-              Notes are internal by default, but may be printed on the packing slip depending on your settings.
-            </p>
-            {/* save button on right side */}
-            {orderType !== 'new' && (
-              <div className="flex justify-end">
-                <Button onClick={() => {
-                  const address = "B-710, Gopal palace, near zhanshi rani brts bus stnad, shivranjani Ahmedabad Gujarat India"
-                  const url = `https://www.google.com/maps?q=${encodeURIComponent(address)}`
-                  window.open(url, "_blank")
-                }} className="w-fit flex items-center gap-2 bg-[#0060FE] text-white hover:bg-blue-700 h-8 px-4 rounded-md font-bold text-xs uppercase">
-                  <Save className="h-4 w-4" />
-                  SAVE
-                </Button>
-              </div>
-            )}
           </AccordionContent>
         </AccordionItem>
 
@@ -187,6 +175,68 @@ export const SidePanel: React.FC<{ orderType: string | undefined }> = ({ orderTy
           </AccordionContent>
         </AccordionItem>
 
+        {/* ORDER QUOTATION SUMMARY */}
+        <AccordionItem value="summary" className="border border-gray-200 dark:border-zinc-800 rounded-xl bg-white dark:bg-zinc-950 shadow-sm px-5 border-b overflow-hidden transition-colors duration-300">
+          <AccordionTrigger className="hover:no-underline py-3 px-0 [&>svg]:text-[#0060FE] dark:[&>svg]:text-blue-500">
+            <span className="text-sm font-bold text-gray-900 dark:text-zinc-100 tracking-wider">ORDER QUOTATION SUMMARY</span>
+          </AccordionTrigger>
+          <AccordionContent className="flex flex-col gap-2 pb-4 pt-1">
+            {(() => {
+              const totalItems = itemsData?.reduce((acc, item) => acc + (Number(item.quantity) || 1), 0) || 0;
+              const totalWeight = itemsData?.reduce((acc, item) => acc + (Number(item.weight) * (Number(item.quantity) || 1)), 0) || 0;
+              const volumetric = itemsData?.reduce((acc, item) => {
+                const w = Number(item.width) || 0;
+                const h = Number(item.height) || 0;
+                const l = Number(item.length) || 0;
+                const q = Number(item.quantity) || 1;
+                return acc + ((w * h * l) / 1000000) * q;
+              }, 0) || 0;
+
+              const servicePrice = quoteData?.courier?.price || 0;
+              const gst = quoteData?.courier?.gst || 0;
+              const totalSurcharges = quoteData?.totalSurcharges || 0;
+              const grandTotal = quoteData?.totalPrice || 0;
+
+              return (
+                <>
+                  <div className="flex justify-between items-center text-xs">
+                    <span className="text-gray-500 dark:text-zinc-400 font-medium">Total Items</span>
+                    <span className="font-bold text-gray-900 dark:text-zinc-100">{totalItems}</span>
+                  </div>
+                  <div className="flex justify-between items-center text-xs">
+                    <span className="text-gray-500 dark:text-zinc-400 font-medium">Total Weight</span>
+                    <span className="font-bold text-gray-900 dark:text-zinc-100">{totalWeight.toFixed(2)} kg</span>
+                  </div>
+                  <div className="flex justify-between items-center text-xs">
+                    <span className="text-gray-500 dark:text-zinc-400 font-medium">Volumetric</span>
+                    <span className="font-bold text-gray-900 dark:text-zinc-100">{volumetric.toFixed(3)} m³</span>
+                  </div>
+                  
+                  <div className="border-t border-gray-100 dark:border-zinc-800 my-1"></div>
+                  
+                  <div className="flex justify-between items-center text-xs">
+                    <span className="text-gray-500 dark:text-zinc-400 font-medium">Service (Inc. F.L)</span>
+                    <span className="font-bold text-gray-900 dark:text-zinc-100">${servicePrice.toFixed(2)}</span>
+                  </div>
+                  <div className="flex justify-between items-center text-xs">
+                    <span className="text-gray-500 dark:text-zinc-400 font-medium">Extra surcharges</span>
+                    <span className="font-bold text-gray-900 dark:text-zinc-100">${totalSurcharges.toFixed(2)}</span>
+                  </div>
+                  <div className="flex justify-between items-center text-xs">
+                    <span className="text-gray-500 dark:text-zinc-400 font-medium">GST</span>
+                    <span className="font-bold text-gray-900 dark:text-zinc-100">${gst.toFixed(2)}</span>
+                  </div>
+                  
+                  <div className="border-t border-gray-100 dark:border-zinc-800 my-1 pt-2 flex justify-between items-center">
+                    <span className="text-xs text-gray-900 dark:text-zinc-100 font-bold uppercase">Total inc GST & F.L</span>
+                    <span className="text-sm font-bold text-[#0060FE] dark:text-blue-500">${grandTotal.toFixed(2)}</span>
+                  </div>
+                </>
+              );
+            })()}
+          </AccordionContent>
+        </AccordionItem>
+
         {/* TAGS */}
         <AccordionItem value="tags" className="border border-gray-200 dark:border-zinc-800 rounded-xl bg-white dark:bg-zinc-950 shadow-sm px-5 border-b overflow-hidden transition-colors duration-300">
           <AccordionTrigger className="hover:no-underline py-3 px-0 [&>svg]:text-[#0060FE] dark:[&>svg]:text-blue-500">
@@ -236,16 +286,6 @@ export const SidePanel: React.FC<{ orderType: string | undefined }> = ({ orderTy
               <span className="text-gray-700 dark:text-zinc-400">Insurance Value</span>
               <span className="text-gray-700 dark:text-zinc-200">0.00</span>
             </div>
-          </AccordionContent>
-        </AccordionItem>
-
-        {/* BREAKDOWN */}
-        <AccordionItem value="breakdown" className="border border-gray-200 dark:border-zinc-800 rounded-xl bg-white dark:bg-zinc-950 shadow-sm px-5 border-b overflow-hidden transition-colors duration-300">
-          <AccordionTrigger className="hover:no-underline py-3 px-0 [&>svg]:text-[#0060FE] dark:[&>svg]:text-blue-500">
-            <span className="text-sm font-bold text-gray-900 dark:text-zinc-100 tracking-wider">BREAKDOWN</span>
-          </AccordionTrigger>
-          <AccordionContent className="text-gray-500 dark:text-zinc-400 text-xs text-uppercase font-bold tracking-tight">
-            No breakdown data.
           </AccordionContent>
         </AccordionItem>
       </Accordion>

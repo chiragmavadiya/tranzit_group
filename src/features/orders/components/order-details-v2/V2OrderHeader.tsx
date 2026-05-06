@@ -1,16 +1,19 @@
 
-import { Copy, Check, ExternalLink, ChevronRight, FileDown, Rocket } from 'lucide-react'
+import { Copy, Check, ExternalLink, ChevronRight, FileDown, Rocket, Loader2 } from 'lucide-react'
 import { useState } from 'react'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
 import type { OrderDetailData } from '../../types/order-details.types'
 import { STATUS_TONE_MAP, PAYMENT_TONE_MAP } from '../../constants/order-details.constants'
-import { toast } from 'sonner'
+import { useDownloadLabel } from '../../hooks/useOrders'
+import { showToast } from '@/components/ui/custom-toast'
 
 export const OrderHeader = ({ data }: { data: OrderDetailData }) => {
     const [copiedTracking, setCopiedTracking] = useState(false)
     const [copiedOrder, setCopiedOrder] = useState(false)
+
+    const downloadLabel = useDownloadLabel();
 
     const statusTone =
         STATUS_TONE_MAP[data.status.toLowerCase()] ??
@@ -24,11 +27,19 @@ export const OrderHeader = ({ data }: { data: OrderDetailData }) => {
         navigator.clipboard.writeText(text)
         if (type === 'order') setCopiedOrder(true)
         else setCopiedTracking(true)
-        toast.success(`${type === 'order' ? 'Order number' : 'Tracking number'} copied to clipboard`)
+        showToast(`${type === 'order' ? 'Order number' : 'Tracking number'} copied to clipboard`, "success");
         setTimeout(() => {
             if (type === 'order') setCopiedOrder(false)
             else setCopiedTracking(false)
         }, 2000)
+    }
+
+    const handleDownloadLabel = () => {
+        downloadLabel.mutate(data.order_number, {
+            onError: (error: any) => {
+                showToast(error?.response?.data?.message || 'Failed to download label', "error");
+            }
+        });
     }
 
     return (
@@ -127,9 +138,18 @@ export const OrderHeader = ({ data }: { data: OrderDetailData }) => {
                                 <Rocket className="mr-2 h-4 w-4" />
                                 Generate Consignment
                             </Button>
-                            <Button variant="outline" className="h-11 rounded-xl border-slate-200 px-6 font-medium shadow-sm transition-all hover:bg-slate-50 hover:border-slate-300">
-                                <FileDown className="mr-2 h-4 w-4 text-slate-500" />
-                                Download Label
+                            <Button
+                                variant="outline"
+                                className="h-11 rounded-xl border-slate-200 px-6 font-medium shadow-sm transition-all hover:bg-slate-50 hover:border-slate-300"
+                                onClick={handleDownloadLabel}
+                                disabled={downloadLabel.isPending}
+                            >
+                                {downloadLabel.isPending ? (
+                                    <Loader2 className="mr-2 h-4 w-4 animate-spin text-blue-600" />
+                                ) : (
+                                    <FileDown className="mr-2 h-4 w-4 text-slate-500" />
+                                )}
+                                {downloadLabel.isPending ? 'Downloading...' : 'Download Label'}
                             </Button>
                         </div>
                     </div>

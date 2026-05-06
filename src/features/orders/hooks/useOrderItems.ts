@@ -24,14 +24,12 @@ export const useOrderItems = (initialItems: ItemData[] = []) => {
     setItemsData((prev) => [
       ...prev,
       data || {
-        item: 'Item',
-        sku: 'SKU',
-        ship: 1,
-        unitPrice: 0.00,
-        weight: 2,
-        size: '1',
-        countryOfOrigin: 'China',
-        qtyShipped: 1
+        type: "box",
+        quantity: 0,
+        weight: 0,
+        length: 0,
+        width: 0,
+        height: 0
       }
     ]);
   }, []);

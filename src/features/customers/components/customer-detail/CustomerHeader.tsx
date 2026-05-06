@@ -3,8 +3,8 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import type { CustomerDetails } from '../../types';
 import { useVerifyCustomer, useZohoSyncCustomer, useToggleCustomerStatus } from '../../hooks/useCustomers';
-import { toast } from 'sonner';
 import { useNavigate } from 'react-router-dom';
+import { showToast } from '@/components/ui/custom-toast';
 
 interface CustomerHeaderProps {
     customer: CustomerDetails;
@@ -21,22 +21,22 @@ export const CustomerHeader = ({ customer, onEdit }: CustomerHeaderProps) => {
 
     const handleVerify = () => {
         verify(customer.id, {
-            onSuccess: (res) => toast.success(res.message || 'Customer verified successfully'),
-            onError: (err: any) => toast.error(err?.response?.data?.message || 'Failed to verify customer'),
+            onSuccess: (res) => showToast(res.message || 'Customer verified successfully', 'success'),
+            onError: (err: any) => showToast(err?.response?.data?.message || 'Failed to verify customer', "error"),
         });
     };
 
     const handleZohoSync = () => {
         zohoSync({ id: customer.id }, {
-            onSuccess: (res) => toast.success(res.message || 'Synced with Zoho successfully'),
-            onError: (err: any) => toast.error(err?.response?.data?.message || 'Failed to sync with Zoho'),
+            onSuccess: (res) => showToast(res.message || 'Synced with Zoho successfully', 'success'),
+            onError: (err: any) => showToast(err?.response?.data?.message || 'Failed to sync with Zoho', "error"),
         });
     };
 
     const handleToggleStatus = () => {
         toggleStatus(customer.id, {
-            onSuccess: (res) => toast.success(res.message || 'Status updated successfully'),
-            onError: (err: any) => toast.error(err?.response?.data?.message || 'Failed to update status'),
+            onSuccess: (res) => showToast(res.message || 'Status updated successfully', 'success'),
+            onError: (err: any) => showToast(err?.response?.data?.message || 'Failed to update status', "error"),
         });
     };
 

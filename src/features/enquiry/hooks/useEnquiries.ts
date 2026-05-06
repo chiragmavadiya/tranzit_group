@@ -1,15 +1,15 @@
 import { useMutation } from '@tanstack/react-query';
 import { enquiriesService } from '../services/enquiries.service';
-import { toast } from 'sonner';
+import { showToast } from '@/components/ui/custom-toast';
 
 export const useCreateEnquiry = () => {
   return useMutation({
     mutationFn: (formData: FormData) => enquiriesService.createEnquiry(formData),
     onSuccess: () => {
-      toast.success('Your enquiry has been submitted successfully');
+      showToast('Your enquiry has been submitted successfully', "success");
     },
     onError: (error: any) => {
-      toast.error(error?.response?.data?.message || 'Failed to submit enquiry');
+      showToast(error?.response?.data?.message || 'Failed to submit enquiry', "error");
     },
   });
 };

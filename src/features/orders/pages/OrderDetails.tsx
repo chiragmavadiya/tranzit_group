@@ -110,7 +110,7 @@ const OrderDetailsPage: React.FC = () => {
   return (
     <>
       <div
-        className="p-page-padding overflow-y-auto scrollbar-hide-buttons bg-white dark:bg-zinc-950 font-sans text-gray-900 dark:text-zinc-100 dark:border-zinc-800 transition-colors duration-300"
+        className="p-page-padding overflow-y-auto scrollbar-hide-buttons flex-1 bg-white dark:bg-zinc-950 font-sans text-gray-900 dark:text-zinc-100 dark:border-zinc-800 transition-colors duration-300"
         style={{
           '--webkit-scrollbar-button-display': 'none'
         } as React.CSSProperties}
@@ -150,7 +150,7 @@ const OrderDetailsPage: React.FC = () => {
               /> */}
 
               <CarrierCard itemData={itemsData} addresses={addressData} onQuoteChange={setQuoteData} />
-              <HistoryCard />
+              {orderType !== 'create' && <HistoryCard />}
             </div>
 
             <SidePanel itemsData={itemsData} quoteData={quoteData} />

@@ -1,25 +1,25 @@
-import { useState, useRef, useCallback } from 'react'
+// import { useState, useRef, useCallback } from 'react'
 import {
   Accordion,
   AccordionContent,
   AccordionItem,
   AccordionTrigger,
 } from '@/components/ui/accordion'
-import { Button } from '@/components/ui/button'
-import SelectComponent from '@/components/ui/select'
-import { Input } from '@/components/ui/input'
+// import { Button } from '@/components/ui/button'
+// import SelectComponent from '@/components/ui/select'
+// import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
-import { Upload, X } from 'lucide-react'
-import { DOCUMENT_TYPES } from '@/features/orders/constants'
+// import { Upload, X } from 'lucide-react'
+// import { DOCUMENT_TYPES } from '@/features/orders/constants'
 
 // Moved to constants.ts
 
-interface UploadedDocument {
-  id: string;
-  name: string;
-  category: string;
-  size: string;
-}
+// interface UploadedDocument {
+//   id: string;
+//   name: string;
+//   category: string;
+//   size: string;
+// }
 
 interface SidePanelProps {
   itemsData?: any[];
@@ -27,67 +27,67 @@ interface SidePanelProps {
 }
 
 export const SidePanel: React.FC<SidePanelProps> = ({ itemsData, quoteData }) => {
-  const [tags, setTags] = useState<string[]>(['PRINTED BY: ZACK%40YOPMAIL.COM'])
-  const [tagInput, setTagInput] = useState('')
-  const [uploadedDocs, setUploadedDocs] = useState<UploadedDocument[]>([])
-  const [uploadError, setUploadError] = useState<string | null>(null)
-  const [selectedDocType, setSelectedDocType] = useState<string>("")
-  const fileInputRef = useRef<HTMLInputElement>(null)
+  // const [tags, setTags] = useState<string[]>(['PRINTED BY: ZACK%40YOPMAIL.COM'])
+  // const [tagInput, setTagInput] = useState('')
+  // const [uploadedDocs, setUploadedDocs] = useState<UploadedDocument[]>([])
+  // const [uploadError, setUploadError] = useState<string | null>(null)
+  // const [selectedDocType, setSelectedDocType] = useState<string>("")
+  // const fileInputRef = useRef<HTMLInputElement>(null)
 
-  const handleAddTag = useCallback((e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === 'Enter' && tagInput.trim()) {
-      if (!tags.includes(tagInput.trim().toUpperCase())) {
-        setTags([...tags, tagInput.trim().toUpperCase()])
-      }
-      setTagInput('')
-    }
-  }, [tagInput, tags])
+  // const handleAddTag = useCallback((e: React.KeyboardEvent<HTMLInputElement>) => {
+  //   if (e.key === 'Enter' && tagInput.trim()) {
+  //     if (!tags.includes(tagInput.trim().toUpperCase())) {
+  //       setTags([...tags, tagInput.trim().toUpperCase()])
+  //     }
+  //     setTagInput('')
+  //   }
+  // }, [tagInput, tags])
 
-  const handleRemoveTag = useCallback((tagToRemove: string) => {
-    setTags(tags.filter(tag => tag !== tagToRemove))
-  }, [tags])
+  // const handleRemoveTag = useCallback((tagToRemove: string) => {
+  //   setTags(tags.filter(tag => tag !== tagToRemove))
+  // }, [tags])
 
-  const formatFileSize = (bytes: number) => {
-    if (bytes === 0) return '0 Bytes'
-    const k = 1024
-    const sizes = ['Bytes', 'KB', 'MB']
-    const i = Math.floor(Math.log(bytes) / Math.log(k))
-    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i]
-  }
+  // const formatFileSize = (bytes: number) => {
+  //   if (bytes === 0) return '0 Bytes'
+  //   const k = 1024
+  //   const sizes = ['Bytes', 'KB', 'MB']
+  //   const i = Math.floor(Math.log(bytes) / Math.log(k))
+  //   return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i]
+  // }
 
-  const handleFileUpload = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0]
-    setUploadError(null)
+  // const handleFileUpload = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+  //   const file = e.target.files?.[0]
+  //   setUploadError(null)
 
-    if (!file) return
+  //   if (!file) return
 
-    // Validation: Size (1MB = 1024 * 1024 bytes)
-    if (file.size > 1024 * 1024) {
-      setUploadError('File size exceeds 1MB limit.')
-      return
-    }
+  //   // Validation: Size (1MB = 1024 * 1024 bytes)
+  //   if (file.size > 1024 * 1024) {
+  //     setUploadError('File size exceeds 1MB limit.')
+  //     return
+  //   }
 
-    // Validation: Format
-    const allowedFormats = ['application/pdf', 'image/jpeg', 'image/png']
-    if (!allowedFormats.includes(file.type)) {
-      setUploadError('Only PDF, JPG, and PNG files are allowed.')
-      return
-    }
+  //   // Validation: Format
+  //   const allowedFormats = ['application/pdf', 'image/jpeg', 'image/png']
+  //   if (!allowedFormats.includes(file.type)) {
+  //     setUploadError('Only PDF, JPG, and PNG files are allowed.')
+  //     return
+  //   }
 
-    const newDoc: UploadedDocument = {
-      id: Math.random().toString(36).substr(2, 9),
-      name: file.name,
-      category: selectedDocType,
-      size: formatFileSize(file.size)
-    }
+  //   const newDoc: UploadedDocument = {
+  //     id: Math.random().toString(36).substr(2, 9),
+  //     name: file.name,
+  //     category: selectedDocType,
+  //     size: formatFileSize(file.size)
+  //   }
 
-    setUploadedDocs(prev => [...prev, newDoc])
-    if (fileInputRef.current) fileInputRef.current.value = ''
-  }, [selectedDocType])
+  //   setUploadedDocs(prev => [...prev, newDoc])
+  //   if (fileInputRef.current) fileInputRef.current.value = ''
+  // }, [selectedDocType])
 
-  const handleRemoveDoc = useCallback((id: string) => {
-    setUploadedDocs(prev => prev.filter(doc => doc.id !== id))
-  }, [])
+  // const handleRemoveDoc = useCallback((id: string) => {
+  //   setUploadedDocs(prev => prev.filter(doc => doc.id !== id))
+  // }, [])
 
   return (
     <div className="flex flex-col gap-4">
@@ -106,7 +106,7 @@ export const SidePanel: React.FC<SidePanelProps> = ({ itemsData, quoteData }) =>
         </AccordionItem>
 
         {/* DOCUMENTS */}
-        <AccordionItem value="documents" className="border border-gray-200 dark:border-zinc-800 rounded-xl bg-white dark:bg-zinc-950 shadow-sm px-5 border-b overflow-hidden transition-colors duration-300">
+        {/* <AccordionItem value="documents" className="border border-gray-200 dark:border-zinc-800 rounded-xl bg-white dark:bg-zinc-950 shadow-sm px-5 border-b overflow-hidden transition-colors duration-300">
           <AccordionTrigger className="hover:no-underline py-3 px-0 [&>svg]:text-[#0060FE] dark:[&>svg]:text-blue-500">
             <span className="text-sm font-bold text-gray-900 dark:text-zinc-100 tracking-wider">DOCUMENTS</span>
           </AccordionTrigger>
@@ -173,10 +173,10 @@ export const SidePanel: React.FC<SidePanelProps> = ({ itemsData, quoteData }) =>
 
             <p className="text-[10px] text-gray-400 dark:text-zinc-500 font-medium uppercase mt-1">PDF, JPG or PNG up to 1 MB.</p>
           </AccordionContent>
-        </AccordionItem>
+        </AccordionItem> */}
 
         {/* ORDER QUOTATION SUMMARY */}
-        <AccordionItem value="summary" className="border border-gray-200 dark:border-zinc-800 rounded-xl bg-white dark:bg-zinc-950 shadow-sm px-5 border-b overflow-hidden transition-colors duration-300">
+        <AccordionItem value="summary" className="border border-gray-200 dark:border-zinc-800 rounded-xl bg-white dark:bg-zinc-950 shadow-sm px-5 border-b overflow-hidden transition-colors duration-300 [&>h3]:my-0">
           <AccordionTrigger className="hover:no-underline py-3 px-0 [&>svg]:text-[#0060FE] dark:[&>svg]:text-blue-500">
             <span className="text-sm font-bold text-gray-900 dark:text-zinc-100 tracking-wider">ORDER QUOTATION SUMMARY</span>
           </AccordionTrigger>
@@ -211,9 +211,9 @@ export const SidePanel: React.FC<SidePanelProps> = ({ itemsData, quoteData }) =>
                     <span className="text-gray-500 dark:text-zinc-400 font-medium">Volumetric</span>
                     <span className="font-bold text-gray-900 dark:text-zinc-100">{volumetric.toFixed(3)} m³</span>
                   </div>
-                  
+
                   <div className="border-t border-gray-100 dark:border-zinc-800 my-1"></div>
-                  
+
                   <div className="flex justify-between items-center text-xs">
                     <span className="text-gray-500 dark:text-zinc-400 font-medium">Service (Inc. F.L)</span>
                     <span className="font-bold text-gray-900 dark:text-zinc-100">${servicePrice.toFixed(2)}</span>
@@ -226,7 +226,7 @@ export const SidePanel: React.FC<SidePanelProps> = ({ itemsData, quoteData }) =>
                     <span className="text-gray-500 dark:text-zinc-400 font-medium">GST</span>
                     <span className="font-bold text-gray-900 dark:text-zinc-100">${gst.toFixed(2)}</span>
                   </div>
-                  
+
                   <div className="border-t border-gray-100 dark:border-zinc-800 my-1 pt-2 flex justify-between items-center">
                     <span className="text-xs text-gray-900 dark:text-zinc-100 font-bold uppercase">Total inc GST & F.L</span>
                     <span className="text-sm font-bold text-[#0060FE] dark:text-blue-500">${grandTotal.toFixed(2)}</span>
@@ -238,7 +238,7 @@ export const SidePanel: React.FC<SidePanelProps> = ({ itemsData, quoteData }) =>
         </AccordionItem>
 
         {/* TAGS */}
-        <AccordionItem value="tags" className="border border-gray-200 dark:border-zinc-800 rounded-xl bg-white dark:bg-zinc-950 shadow-sm px-5 border-b overflow-hidden transition-colors duration-300">
+        {/* <AccordionItem value="tags" className="border border-gray-200 dark:border-zinc-800 rounded-xl bg-white dark:bg-zinc-950 shadow-sm px-5 border-b overflow-hidden transition-colors duration-300">
           <AccordionTrigger className="hover:no-underline py-3 px-0 [&>svg]:text-[#0060FE] dark:[&>svg]:text-blue-500">
             <span className="text-sm font-bold text-gray-900 dark:text-zinc-100 tracking-wider">TAGS</span>
           </AccordionTrigger>
@@ -267,10 +267,10 @@ export const SidePanel: React.FC<SidePanelProps> = ({ itemsData, quoteData }) =>
               )}
             </div>
           </AccordionContent>
-        </AccordionItem>
+        </AccordionItem> */}
 
         {/* ADDITIONAL DETAILS */}
-        <AccordionItem value="details" className="border border-gray-200 dark:border-zinc-800 rounded-xl bg-white dark:bg-zinc-950 shadow-sm px-5 border-b overflow-hidden transition-colors duration-300">
+        <AccordionItem value="details" className="border border-gray-200 dark:border-zinc-800 rounded-xl bg-white dark:bg-zinc-950 shadow-sm px-5 border-b overflow-hidden transition-colors duration-300 [&>h3]:my-0">
           <AccordionTrigger className="hover:no-underline py-3 px-0 [&>svg]:text-[#0060FE] dark:[&>svg]:text-blue-500">
             <span className="text-sm font-bold text-gray-900 dark:text-zinc-100 tracking-wider">ADDITIONAL DETAILS</span>
           </AccordionTrigger>

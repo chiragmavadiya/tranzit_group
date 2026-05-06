@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, Suspense, lazy, useMemo, useCallback, useEffect, useRef } from 'react';
+import { useState, useMemo, useCallback, useEffect, useRef } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import type { TabType } from '@/features/orders/types';
 import { useOrders, useExportOrders, useImportOrders } from '@/features/orders/hooks/useOrders';
@@ -11,14 +11,12 @@ import { Button } from '@/components/ui/button';
 import { Download, Plus, X, Loader2 } from 'lucide-react';
 import { useAppSelector } from '@/hooks/store.hooks';
 import { showToast } from '@/components/ui/custom-toast';
-const CreateOrderDialog = lazy(() => import('@/features/orders/components/CreateOrderDialog'));
 
 export default function OrdersPage() {
   const [searchParams] = useSearchParams();
   const activeTab = (searchParams.get('tab') as TabType) || 'new';
   const { role } = useAppSelector((state) => state.auth);
   const navigate = useNavigate();
-  const [orderDialogMode, setOrderDialogMode] = useState<'receiver' | 'return' | null>(null);
 
   // State for pagination and search
   const [page, setPage] = useState(1);
@@ -202,16 +200,6 @@ export default function OrdersPage() {
 
         />
       </div>
-
-      {orderDialogMode && (
-        <Suspense>
-          <CreateOrderDialog
-            open={!!orderDialogMode}
-            onOpenChange={(open) => !open && setOrderDialogMode(null)}
-            type={orderDialogMode as any}
-          />
-        </Suspense>
-      )}
     </div>
   );
 }

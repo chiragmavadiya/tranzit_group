@@ -6,16 +6,16 @@ import { Button } from '@/components/ui/button';
 import { POSTCODE_COLUMNS } from '../columns';
 import { AddPostcodeDialog } from '../components/AddPostcodeDialog';
 import type { CourierPostcode, CourierPostcodeFormData } from '../types';
-import { 
-  useCourierPostcodes, 
-  useCreateCourierPostcode, 
-  useUpdateCourierPostcode, 
+import {
+  useCourierPostcodes,
+  useCreateCourierPostcode,
+  useUpdateCourierPostcode,
   useDeleteCourierPostcode,
-  useExportCourierPostcodes 
+  useExportCourierPostcodes
 } from '../hooks/useCourierPostcode';
 import { useDebounce } from '@/hooks/useDebounce';
-import { toast } from 'sonner';
 import { downloadFile } from '@/lib/utils';
+import { showToast } from '@/components/ui/custom-toast';
 
 export default function CourierPostcodePage() {
   const [search, setSearch] = useState('');
@@ -42,22 +42,22 @@ export default function CourierPostcodePage() {
     if (editingRow) {
       updatePostcode({ id: editingRow.id, data: formData }, {
         onSuccess: () => {
-          toast.success('Postcode updated successfully');
+          showToast('Postcode updated successfully', "success");
           setIsAddOpen(false);
           setEditingRow(null);
         },
         onError: (err: any) => {
-          toast.error(err?.response?.data?.message || 'Failed to update postcode');
+          showToast(err?.response?.data?.message || 'Failed to update postcode', "error");
         }
       });
     } else {
       createPostcode(formData, {
         onSuccess: () => {
-          toast.success('Postcode created successfully');
+          showToast('Postcode created successfully', "success");
           setIsAddOpen(false);
         },
         onError: (err: any) => {
-          toast.error(err?.response?.data?.message || 'Failed to create postcode');
+          showToast(err?.response?.data?.message || 'Failed to create postcode', "error");
         }
       });
     }
@@ -67,11 +67,11 @@ export default function CourierPostcodePage() {
     if (deletingRow) {
       deletePostcode(deletingRow.id, {
         onSuccess: () => {
-          toast.success('Postcode deleted successfully');
+          showToast('Postcode deleted successfully', "success");
           setDeletingRow(null);
         },
         onError: (err: any) => {
-          toast.error(err?.response?.data?.message || 'Failed to delete postcode');
+          showToast(err?.response?.data?.message || 'Failed to delete postcode', "error");
         }
       });
     }
@@ -81,10 +81,10 @@ export default function CourierPostcodePage() {
     exportPostcodes({ format, search: debouncedSearch }, {
       onSuccess: (blob) => {
         downloadFile(blob, `courier-postcodes-${new Date().getTime()}.${format === 'excel' ? 'xlsx' : format}`);
-        toast.success('Exported successfully');
+        showToast('Exported successfully', "success");
       },
       onError: (err: any) => {
-        toast.error(err?.response?.data?.message || 'Failed to export');
+        showToast(err?.response?.data?.message || 'Failed to export', "error");
       }
     });
   };
@@ -117,7 +117,7 @@ export default function CourierPostcodePage() {
           isExporting={isExporting}
           onExport={handleExport}
           customHeader={
-            <Button 
+            <Button
               onClick={() => {
                 setEditingRow(null);
                 setIsAddOpen(true);

@@ -57,7 +57,7 @@ export function ConformationModal({
         <Dialog open={open} onOpenChange={onOpenChange}>
             <DialogContent
                 // className={cn("sm:max-w-[440px] bg-white dark:bg-zinc-950 border-gray-200 dark:border-zinc-800 rounded-2xl shadow-2xl p-0 overflow-hidden", className)}
-                className={className}
+                className={cn("gap-0", className)}
             >
                 {/* <div className="p-6"> */}
                 <DialogHeader className="space-y-1">
@@ -78,7 +78,7 @@ export function ConformationModal({
                         variant="ghost"
                         onClick={handleCancel}
                         disabled={loading}
-                        className="px-4 h-10 font-medium text-slate-600 dark:text-zinc-400 hover:text-slate-900 dark:hover:text-zinc-100 hover:bg-slate-100 dark:hover:bg-zinc-800 transition-colors"
+                        className="px-6 h-8 font-medium text-slate-600 dark:text-zinc-400 hover:text-slate-900 dark:hover:text-zinc-100 hover:bg-slate-200 dark:hover:bg-zinc-800 transition-colors"
                     >
                         {cancelText}
                     </Button>
@@ -88,7 +88,7 @@ export function ConformationModal({
                         onClick={handleConfirm}
                         disabled={loading}
                         className={cn(
-                            "px-4 h-10 font-semibold transition-all shadow-sm active:scale-95",
+                            "px-6 h-8 font-semibold transition-all shadow-sm active:scale-95",
                             confirmVariant === 'default' && "bg-blue-600 hover:bg-blue-700 text-white shadow-blue-200 dark:shadow-none"
                         )}
                     >

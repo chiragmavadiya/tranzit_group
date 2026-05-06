@@ -14,7 +14,7 @@ import { QuoteSummary } from "@/features/quote/components/QuoteSummary";
 import type { QuoteCalculations, QuoteItem, QuoteLocation, ServiceRate } from "@/features/quote/types";
 import { QuoteForm } from "@/features/quote/components/QuoteForm";
 import { useGetQuoteServices } from "@/features/quote/hooks/useQuote";
-import { toast } from "sonner";
+import { showToast } from "@/components/ui/custom-toast";
 
 const SURCHARGES = [
   { id: 'airport', name: 'Airport Delivery Surcharge', description: 'Additional charge for airport deliveries.', price: 25.00 },
@@ -107,10 +107,10 @@ export default function CreateOrderPage() {
         if (data.services.length > 0) {
           setSelectedRateId(data.services[0].product_id);
         }
-        toast.success(`Found ${data.services.length} available services`);
+        showToast(`Found ${data.services.length} available services`, "success");
       },
       onError: (err: any) => {
-        toast.error(err?.response?.data?.message || 'Failed to fetch rates');
+        showToast(err?.response?.data?.message || 'Failed to fetch rates', "error");
       }
     });
   }, [locations, items, getServices]);

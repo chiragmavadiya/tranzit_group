@@ -10,7 +10,7 @@ export interface HeaderIconProps {
 
 export interface FormInputProps extends Omit<InputHTMLAttributes<HTMLInputElement>, 'onChange' | 'value'> {
   label?: ReactNode;
-  value: string | number;
+  value: string | number | undefined;
   onChange: (val: string, name: string) => void;
   placeholder?: string;
   type?: string;

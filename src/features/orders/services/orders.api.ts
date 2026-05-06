@@ -1,10 +1,10 @@
 import api from "@/services/api";
 import { API_ENDPOINTS } from "@/constants/api.constants";
 import type { OrdersResponse } from "@/features/orders/types";
-import type { 
-    CreateOrderRequest, 
-    CreateOrderResponse, 
-    QuoteServicesRequest, 
+import type {
+    CreateOrderRequest,
+    CreateOrderResponse,
+    QuoteServicesRequest,
     QuoteServicesResponse,
     WalletCheckResponse,
     PaymentInfoResponse
@@ -122,12 +122,15 @@ export const ordersService = {
         start_date?: string;
         end_date?: string;
         search?: string;
-    }): Promise<Blob> => {
+    }): Promise<{ blob: Blob, filename: string }> => {
         const response = await api.get(API_ENDPOINTS.ORDERS.EXPORT, {
             params,
             responseType: "blob",
         });
-        return response.data;
+
+        const filename = `orders_${new Date().getTime()}.${params.format}`;
+
+        return { blob: response.data, filename };
     },
 
     /**

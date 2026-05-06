@@ -6,7 +6,7 @@ import Layout from "@/layout";
 // Lazy load page components
 const Dashboard = lazy(() => import('@/features/dashboard/pages/Dashboard'));
 const Orders = lazy(() => import('@/features/orders/pages/OrdersPage'));
-const OrderDetails = lazy(() => import('@/features/orders/pages/OrderDetails'));
+const OrderDetails = lazy(() => import('@/features/orders/pages/OrderDetails2'));
 const Search = lazy(() => import('@/features/search/pages/SearchPage'));
 const Setup = lazy(() => import('@/features/setup/pages/SetupPage'));
 const Invoices = lazy(() => import('@/features/invoices/pages/InvoicesPage'));
@@ -29,6 +29,7 @@ const QuoteList = lazy(() => import('@/features/customer-quote/pages/QuoteListPa
 const ProfilePage = lazy(() => import('@/features/profile/pages/ProfilePage'));
 
 const HelpCenterAdminPage = lazy(() => import('@/features/help-center-admin/pages/HelpCenterAdminPage'));
+const SettingsPage = lazy(() => import('@/features/settings/pages/SettingsPage'));
 const ActivityLogPage = lazy(() => import('@/features/activity-log/pages/ActivityLogPage'));
 
 
@@ -40,6 +41,7 @@ export default function AdminRoutes() {
                     <Route path="dashboard" element={<Dashboard />} />
                     <Route path="orders">
                         <Route index element={<Orders />} />
+                        <Route path=":orderID" element={<OrderDetails />} />
                         <Route path=":orderType/:orderID" element={<OrderDetails />} />
                     </Route>
                     <Route path="invoices">
@@ -69,6 +71,7 @@ export default function AdminRoutes() {
                     <Route path="profile" element={<ProfilePage />} />
 
                     <Route path="help-center" element={<HelpCenterAdminPage />} />
+                    <Route path="settings" element={<SettingsPage />} />
                     <Route path="activity-log" element={<ActivityLogPage />} />
                     <Route path="search" element={<Search />} />
                     {/* Default authenticated route */}

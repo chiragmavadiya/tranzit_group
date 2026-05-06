@@ -11,7 +11,7 @@ import { FormInput } from "@/features/orders/components/OrderFormUI";
 import { Mail, Send } from "lucide-react";
 import type { QuoteCalculations, ServiceRate, QuoteItem, QuoteLocation } from "../../quote/types";
 import { useCreateQuote } from '../../quote/hooks/useQuote';
-import { toast } from 'sonner';
+import { showToast } from '@/components/ui/custom-toast';
 
 interface SendQuoteDialogProps {
   open: boolean;
@@ -27,15 +27,15 @@ interface SendQuoteDialogProps {
   pickupCharge: number;
 }
 
-export function SendQuoteDialog({ 
-    open, 
-    onOpenChange, 
-    calculations, 
-    selectedRate,
-    locations,
-    items,
-    margin,
-    pickupCharge
+export function SendQuoteDialog({
+  open,
+  onOpenChange,
+  calculations,
+  selectedRate,
+  locations,
+  items,
+  margin,
+  pickupCharge
 }: SendQuoteDialogProps) {
   const [email, setEmail] = useState('');
   const { mutate: createQuote, isPending } = useCreateQuote();
@@ -44,38 +44,38 @@ export function SendQuoteDialog({
     if (!selectedRate || !locations.sender || !locations.receiver) return;
 
     const payload = {
-        sender: `${locations.sender.postcode}|${locations.sender.suburb}|${locations.sender.state}`,
-        receiver: `${locations.receiver.postcode}|${locations.receiver.suburb}|${locations.receiver.state}`,
-        parcels: items.map(item => ({
-            type: item.type,
-            quantity: item.qty || item.quantity || 1,
-            weight: item.weight,
-            length: item.length,
-            width: item.width,
-            height: item.height
-        })),
-        service: {
-            courier: selectedRate.carrier_id,
-            carrier_name: selectedRate.carrier,
-            product_id: selectedRate.product_id,
-            product_type: selectedRate.product_type
-        },
-        surcharges: [],
-        chosenTotal: calculations.total,
-        email: email,
-        margin: Number(margin),
-        pickup_charge: pickupCharge
+      sender: `${locations.sender.postcode}|${locations.sender.suburb}|${locations.sender.state}`,
+      receiver: `${locations.receiver.postcode}|${locations.receiver.suburb}|${locations.receiver.state}`,
+      parcels: items.map(item => ({
+        type: item.type,
+        quantity: item.qty || item.quantity || 1,
+        weight: item.weight,
+        length: item.length,
+        width: item.width,
+        height: item.height
+      })),
+      service: {
+        courier: selectedRate.carrier_id,
+        carrier_name: selectedRate.carrier,
+        product_id: selectedRate.product_id,
+        product_type: selectedRate.product_type
+      },
+      surcharges: [],
+      chosenTotal: calculations.total,
+      email: email,
+      margin: Number(margin),
+      pickup_charge: pickupCharge
     };
 
     createQuote(payload, {
-        onSuccess: () => {
-            toast.success('Quote sent to customer successfully');
-            onOpenChange(false);
-            setEmail('');
-        },
-        onError: (err: any) => {
-            toast.error(err?.response?.data?.message || 'Failed to send quote');
-        }
+      onSuccess: () => {
+        showToast('Quote sent to customer successfully', 'success');
+        onOpenChange(false);
+        setEmail('');
+      },
+      onError: (err: any) => {
+        showToast(err?.response?.data?.message || 'Failed to send quote', 'error');
+      }
     });
   };
 

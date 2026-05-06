@@ -31,6 +31,10 @@ export interface AutoCompleteProps {
     renderOption?: (option: AutoCompleteOption) => React.ReactNode;
     emptyText?: string;
     shouldFilter?: boolean;
+    label?: string;
+    error?: boolean;
+    errormsg?: string;
+    required?: boolean;
 }
 
 const AutoComplete = React.forwardRef<HTMLInputElement, AutoCompleteProps>(
@@ -47,11 +51,16 @@ const AutoComplete = React.forwardRef<HTMLInputElement, AutoCompleteProps>(
             className,
             renderOption,
             shouldFilter = true,
+            label,
+            error,
+            errormsg,
+            required,
         },
         ref
     ) => {
         const [open, setOpen] = React.useState(false);
         const [inputValue, setInputValue] = React.useState(defaultValue);
+
         const controlledValue = value !== undefined ? value : inputValue;
 
         const filteredOptions = React.useMemo(() => {
@@ -112,6 +121,10 @@ const AutoComplete = React.forwardRef<HTMLInputElement, AutoCompleteProps>(
                                     onFocus={handleFocus}
                                     placeholder={placeholder}
                                     disabled={disabled}
+                                    label={label}
+                                    error={error}
+                                    errormsg={errormsg}
+                                    required={required}
                                     className={cn("w-full h-full", className)}
                                 />
                             </div>

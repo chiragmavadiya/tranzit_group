@@ -44,10 +44,16 @@ export const StickyFooter: React.FC<{ orderType: string | undefined }> = ({ orde
           </div>
         </>
       )}
-      {orderType !== 'new' && (
-        <Button variant="outline" className="flex items-center gap-2 border-blue-600 dark:border-zinc-800 text-[#0060FE] font-bold h-8 px-6 uppercase text-xs hover:bg-gray-50 dark:hover:bg-zinc-900 transition-colors">
-          <Printer className="h-4 w-4" />
-          Reprint Lable
+      {orderType === 'create' && (
+        // <Button variant="outline" className="flex items-center gap-2 border-blue-600 dark:border-zinc-800 text-[#0060FE] font-bold h-8 px-6 uppercase text-xs hover:bg-gray-50 dark:hover:bg-zinc-900 transition-colors">
+        //   <Printer className="h-4 w-4" />
+        //   Reprint Lable
+        // </Button>
+        <Button variant="default"
+        // className="flex items-center gap-2 border-gray-200 dark:border-zinc-800 text-[#0060FE] font-bold h-8 px-6 uppercase text-xs hover:bg-gray-50 dark:hover:bg-zinc-900 transition-colors"
+        >
+          <Save className="h-4 w-4" />
+          SAVE
         </Button>
       )}
     </div>

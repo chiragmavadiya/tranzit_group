@@ -2,11 +2,11 @@ import { FileText } from 'lucide-react';
 import type { ActivityItem } from './types';
 
 export const SectionHeader = ({ title, icon: Icon }: { title: string, icon: any }) => (
-    <div className="flex items-center gap-2">
+    <div className="flex items-center gap-2 mb-2">
         <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-blue-50 dark:bg-blue-500/10 text-blue-600 dark:text-blue-400">
             <Icon className="h-4 w-4" />
         </div>
-        <h3 className="text-sm font-bold text-slate-900 dark:text-zinc-100 uppercase tracking-widest">{title}</h3>
+        <h3 className="text-sm font-bold text-slate-900 dark:text-zinc-100 uppercase tracking-widest my-0">{title}</h3>
     </div>
 );
 

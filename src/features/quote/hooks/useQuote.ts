@@ -19,9 +19,9 @@ export const useQuoteDetails = (id: number | string | undefined) => {
     });
 };
 
-export const useGetQuoteServices = () => {
+export const useGetQuoteServices = (role: string = 'customer') => {
     return useMutation({
-        mutationFn: (data: GetQuoteServicesPayload) => quoteService.getServices(data),
+        mutationFn: (data: GetQuoteServicesPayload) => quoteService.getServices(data, role),
     });
 };
 

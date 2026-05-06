@@ -6,8 +6,8 @@ import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
 import type { OrderDetailData } from '../../types/order-details.types'
 import { STATUS_TONE_MAP, PAYMENT_TONE_MAP } from '../../constants/order-details.constants'
-import { toast } from 'sonner'
 import { useDownloadLabel } from '../../hooks/useOrders'
+import { showToast } from '@/components/ui/custom-toast'
 
 export const OrderHeader = ({ data }: { data: OrderDetailData }) => {
     const [copiedTracking, setCopiedTracking] = useState(false)
@@ -27,7 +27,7 @@ export const OrderHeader = ({ data }: { data: OrderDetailData }) => {
         navigator.clipboard.writeText(text)
         if (type === 'order') setCopiedOrder(true)
         else setCopiedTracking(true)
-        toast.success(`${type === 'order' ? 'Order number' : 'Tracking number'} copied to clipboard`)
+        showToast(`${type === 'order' ? 'Order number' : 'Tracking number'} copied to clipboard`, "success");
         setTimeout(() => {
             if (type === 'order') setCopiedOrder(false)
             else setCopiedTracking(false)
@@ -37,7 +37,7 @@ export const OrderHeader = ({ data }: { data: OrderDetailData }) => {
     const handleDownloadLabel = () => {
         downloadLabel.mutate(data.order_number, {
             onError: (error: any) => {
-                toast.error(error?.response?.data?.message || 'Failed to download label');
+                showToast(error?.response?.data?.message || 'Failed to download label', "error");
             }
         });
     }

@@ -9,7 +9,7 @@ export function AuthLayout({ children }: AuthLayoutProps) {
   return (
     <div className="grid min-h-screen grid-cols-1 lg:grid-cols-2">
       {/* Left Column (Brand/Info) */}
-      <div className="relative hidden flex-col justify-between bg-[linear-gradient(165deg,#1e3a5f_0%,#2563eb_50%,#0ea5e9_100%)] p-10 text-white lg:flex lg:p-16">
+      <div className="relative flex-col justify-between bg-[linear-gradient(165deg,#1e3a5f_0%,#2563eb_50%,#0ea5e9_100%)] p-10 text-white lg:flex lg:p-16">
         <div className="flex-1">
           <h1 className="mb-4 text-4xl font-extrabold tracking-tight sm:text-5xl drop-shadow-sm">
             Shipping automation that just works
@@ -61,7 +61,7 @@ export function AuthLayout({ children }: AuthLayoutProps) {
 
       {/* Right Column (Form) */}
       <div className="flex flex-col items-center justify-center p-8 sm:p-12 lg:p-16 bg-white dark:bg-zinc-950">
-        <div className="mx-auto flex w-full flex-col justify-center space-y-8 max-w-sm">
+        <div className="mx-auto flex w-full flex-col justify-center space-y-8 max-w-2xl">
           {children}
         </div>
       </div>

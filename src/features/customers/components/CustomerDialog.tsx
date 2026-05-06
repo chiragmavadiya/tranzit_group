@@ -27,9 +27,9 @@ import { Button } from "@/components/ui/button"
 import { Switch } from "@/components/ui/switch"
 import { Stepper, type Step } from "@/components/ui/stepper"
 import { FormInput, FormSelect } from "@/features/orders/components/OrderFormUI"
-import { toast } from "sonner"
 import { STATES } from "../constants"
 import { useCreateCustomer, useUpdateCustomer, useCustomerEditDetails } from "../hooks/useCustomers"
+import { showToast } from "@/components/ui/custom-toast"
 
 interface CustomerDialogProps {
   open: boolean
@@ -143,11 +143,11 @@ export default function CustomerDialog({ open, onOpenChange, customerId }: Custo
 
     mutation(variables, {
       onSuccess: () => {
-        toast.success(isEdit ? "Customer updated successfully!" : "Customer added successfully!")
+        showToast(isEdit ? "Customer updated successfully!" : "Customer added successfully!")
         onOpenChange(false)
       },
       onError: (error: any) => {
-        toast.error(`Failed to ${isEdit ? 'update' : 'add'} customer. Please check the form.`);
+        showToast(`Failed to ${isEdit ? 'update' : 'add'} customer. Please check the form.`, "error");
         if (error?.response?.data?.errors) {
           const beErrors = error.response.data.errors;
           const formattedErrors: Record<string, string> = {};

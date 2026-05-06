@@ -61,7 +61,7 @@ export const itemsService = {
 
     // Extract filename from Content-Disposition header
     const disposition = response.headers['content-disposition'];
-    let filename = `items_export_${new Date().getTime()}.${format}`;
+    let filename = `items_${new Date().getTime()}.${format}`;
 
     if (disposition && disposition.indexOf('filename=') !== -1) {
       const filenameRegex = /filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/;

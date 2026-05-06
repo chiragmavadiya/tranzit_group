@@ -19,10 +19,11 @@ const SURCHARGES = [
   { id: 'tailgate', name: 'Tailgate Pickup / Delivery', description: 'Tailgate service required at pickup or delivery.', price: 45.00 },
 ];
 
-import { 
-  useGetQuoteServices 
+import {
+  useGetQuoteServices
 } from '../hooks/useQuote';
-import { toast } from 'sonner';
+import { useQuoteServices } from '@/features/orders/hooks/useOrders';
+import { showToast } from '@/components/ui/custom-toast';
 
 export default function GetQuotePage() {
   const { role } = useAppSelector((state) => state.auth);
@@ -40,8 +41,9 @@ export default function GetQuotePage() {
   const [rates, setRates] = useState<ServiceRate[] | null>(null);
   const [selectedRateId, setSelectedRateId] = useState<string | null>(null);
   const [selectedSurcharges, setSelectedSurcharges] = useState<string[]>([]);
-  
-  const { mutate: getServices, isPending: loading } = useGetQuoteServices();
+
+  const { mutate: getServices, isPending: loading } = useGetQuoteServices(role);
+  const { mutate: updateRate, isPending: updatingRate } = useQuoteServices();
 
   const calculations = useMemo<QuoteCalculations>(() => {
     let deadWeight = 0;
@@ -93,33 +95,47 @@ export default function GetQuotePage() {
     if (!locations.sender || !locations.receiver) return;
 
     const payload = {
-        sender_details: `${locations.sender.postcode}|${locations.sender.suburb}|${locations.sender.state}`,
-        receiver_details: `${locations.receiver.postcode}|${locations.receiver.suburb}|${locations.receiver.state}`,
-        receiver_address: locations.receiver.label, // Or more detailed if available
-        items: items.map(item => ({
-            type: item.type,
-            quantity: item.qty || 1,
-            weight: item.weight,
-            length: item.length,
-            width: item.width,
-            height: item.height
-        })),
-        is_order: "no" as const
+      sender_details: `${locations.sender.postcode}|${locations.sender.suburb}|${locations.sender.state}`,
+      receiver_details: `${locations.receiver.postcode}|${locations.receiver.suburb}|${locations.receiver.state}`,
+      receiver_address: locations.receiver.label, // Or more detailed if available
+      items: items.map(item => ({
+        type: item.type,
+        quantity: item.qty || 1,
+        weight: item.weight,
+        length: item.length,
+        width: item.width,
+        height: item.height
+      })),
+      is_order: "no" as const
     };
-
-    getServices(payload, {
+    if (role === "admin") {
+      getServices(payload, {
         onSuccess: (data) => {
-            setRates(data.services);
-            if (data.services.length > 0) {
-                setSelectedRateId(data.services[0].product_id);
-            }
-            toast.success(`Found ${data.services.length} available services`);
+          setRates(data.services);
+          if (data.services.length > 0) {
+            setSelectedRateId(data.services[0].product_id);
+          }
+          showToast(`Found ${data.services.length} available services`, "success");
         },
         onError: (err: any) => {
-            toast.error(err?.response?.data?.message || 'Failed to fetch rates');
+          showToast(err?.response?.data?.message || 'Failed to fetch rates', "error");
         }
-    });
-  }, [locations, items, getServices]);
+      });
+    } else {
+      updateRate(payload, {
+        onSuccess: (data) => {
+          setRates(data.services);
+          if (data.services.length > 0) {
+            setSelectedRateId(data.services[0].product_id);
+          }
+          showToast(`Found ${data.services.length} available services`, "success");
+        },
+        onError: (err: any) => {
+          showToast(err?.response?.data?.message || 'Failed to fetch rates', "error");
+        }
+      });
+    }
+  }, [locations, items, getServices, role, updateRate]);
 
 
   console.log(isValid, 'isValid', items, locations);
@@ -156,12 +172,12 @@ export default function GetQuotePage() {
                   className="h-8 gap-1.5 text-[12px] font-medium text-slate-500 hover:text-blue-600 transition-colors"
                   onClick={() => setRates(null)}
                 >
-                  <RefreshCw className={`w-3.5 h-3.5 ${loading ? 'animate-spin' : ''}`} />
+                  <RefreshCw className={`w-3.5 h-3.5 ${loading || updatingRate ? 'animate-spin' : ''}`} />
                   Refresh
                 </Button>
               </CardHeader>
               <CardContent className="p-0">
-                {!rates && !loading ? (
+                {!rates && !loading && !updatingRate ? (
                   <div className="flex flex-col items-center justify-center min-h-[250px] text-center p-6 bg-slate-50/50 dark:bg-zinc-900/10">
                     <div className="w-16 h-16 bg-white dark:bg-zinc-900 shadow-sm border border-slate-100 dark:border-zinc-800 rounded-2xl flex items-center justify-center mb-6">
                       <Calculator className="w-7 h-7 text-slate-300 dark:text-zinc-700" />
@@ -170,7 +186,7 @@ export default function GetQuotePage() {
                       Fill in addresses and items, then click <span className="text-blue-600 font-bold dark:text-blue-400">Get Live Rate</span> to see options.
                     </p>
                   </div>
-                ) : loading ? (
+                ) : loading || updatingRate ? (
                   <div className="flex items-center justify-center min-h-[250px]">
                     <div className="flex flex-col items-center gap-4">
                       <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-blue-600"></div>
@@ -194,11 +210,11 @@ export default function GetQuotePage() {
                               onChange={() => setSelectedRateId(rate.product_id)}
                             />
                             <div className="w-12 h-12 bg-white dark:bg-zinc-800 border border-slate-100 dark:border-zinc-800 rounded-xl flex items-center justify-center overflow-hidden shadow-sm group-hover:shadow-md transition-shadow">
-                                {rate.image ? (
-                                    <img src={rate.image} alt={rate.carrier} className="w-8 h-8 object-contain" />
-                                ) : (
-                                    <Box className="w-6 h-6 text-blue-600/20 dark:text-blue-400/20" />
-                                )}
+                              {rate.image ? (
+                                <img src={rate.image} alt={rate.carrier} className="w-8 h-8 object-contain" />
+                              ) : (
+                                <Box className="w-6 h-6 text-blue-600/20 dark:text-blue-400/20" />
+                              )}
                             </div>
                             <div>
                               <h4 className="text-[15px] font-bold text-[#111827] dark:text-white leading-tight">{rate.carrier}</h4>

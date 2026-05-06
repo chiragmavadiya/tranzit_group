@@ -12,7 +12,7 @@ import { FormInput } from "@/features/orders/components/OrderFormUI";
 import { useIntegrationStatus, useConnectIntegration, useSyncIntegration } from "../hooks/useIntegrations";
 import { Loader2, RefreshCw } from 'lucide-react'
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { toast } from "sonner";
+import { showToast } from "@/components/ui/custom-toast";
 
 interface IntegrationDialogProps {
     provider: { id: string; name: string; type: string };
@@ -78,13 +78,13 @@ export function IntegrationDialog({ provider, isOpen, onOpenChange }: Integratio
         setSubmitted(true);
 
         if (!validateForm()) {
-            toast.error("Please fill in all required fields.");
+            showToast("Please fill in all required fields.", "error");
             return;
         }
 
         connectMutation.mutate({ provider: provider.id, data: formData }, {
             onSuccess: () => {
-                
+
                 onOpenChange(false);
             },
         });

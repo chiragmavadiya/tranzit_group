@@ -12,26 +12,14 @@ export const PACKAGING_COLUMNS: PackingColumn[] = [
 ];
 
 export const ITEMS_COLUMNS: ItemsColumn[] = [
-  { key: 'item', label: 'ITEM', editable: true, type: 'text', default: true },
-  { key: 'sku', label: 'SKU', editable: true, type: 'text', default: true },
-  { key: 'ship', label: 'SHIP', editable: true, type: 'number', default: true, displayTotal: true },
-  { key: 'unitPrice', label: 'UNIT PRICE (AUD)', editable: true, type: 'number', default: true, displayTotal: true },
-  { key: 'weight', label: 'WGT (KG)', editable: true, type: 'number', default: true, displayTotal: true },
-  { key: 'size', label: 'SIZE', editable: true, type: 'text', default: true },
-  { key: 'countryOfOrigin', label: 'COUNTRY OF ORIGIN', editable: true, type: 'text' },
-  { key: 'qtyShipped', label: 'QTY SHIPPED', editable: true, type: 'number', displayTotal: true },
-  { key: "color", label: "Color", editable: true, type: 'text' },
-  { key: "hs_code", label: "HS code", editable: true, type: 'text' },
-  { key: "materials", label: "Materials", editable: true, type: 'text' },
-  { key: "country_of_origin", label: "Country of origin", editable: true, type: 'text' },
-  { key: "manufacturer_id", label: "Manufacturer ID", editable: true, type: 'text' },
-  { key: "brand_name", label: "Brand name", editable: true, type: 'text' },
-  { key: "make_or_model", label: "Make or model", editable: true, type: 'text' },
-  { key: "usage_or_purpose", label: "Usage or purpose", editable: true, type: 'text' },
-  { key: "qty_ordered", label: "QTY ordered", editable: true, type: 'number' },
-  { key: "bin_location", label: "Bin location", editable: true, type: 'text' },
-  { key: "barcode", label: "Barcode", editable: true, type: 'text' },
-  { key: "item_image", label: "Item image", editable: true, type: 'text' }
+  { key: 'type', label: 'TYPE', editable: true, type: 'text' },
+  { key: 'qty', label: 'QTY', editable: true, type: 'number' },
+  { key: 'length', label: 'L (CM)', editable: true, type: 'number' },
+  { key: 'width', label: 'W (CM)', editable: true, type: 'number' },
+  { key: 'height', label: 'H (CM)', editable: true, type: 'number' },
+  { key: 'weight', label: 'WGT (KG)', editable: true, type: 'number' },
+
+
 ];
 
 export const DOCUMENT_TYPES = [

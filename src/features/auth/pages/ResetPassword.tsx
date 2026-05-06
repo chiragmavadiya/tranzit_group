@@ -2,12 +2,12 @@ import { useState } from "react";
 import { Check } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
-import { PasswordInput } from "@/components/common";
+import PasswordInput from "@/components/common/password-input";
 import { Link, useParams, useSearchParams } from "react-router-dom";
 import { useResetPassword } from "@/features/auth/hooks/useAuth";
-import { toast } from "sonner";
 import brandlogo from '@/assets/Tranzit_Logo.svg';
 import { AuthLayout } from "@/features/auth/components/AuthLayout";
+import { showToast } from "@/components/ui/custom-toast";
 
 export default function ResetPassword() {
   const { token } = useParams<{ token: string }>();
@@ -16,7 +16,7 @@ export default function ResetPassword() {
 
   const [password, setPassword] = useState("");
   const { mutate: resetPassword, isPending } = useResetPassword();
-  const [error, setError] = useState<string | null>(null);
+  // const [error, setError] = useState<string | null>(null);
   const [isSuccess, setIsSuccess] = useState(false);
 
   const validations = [
@@ -31,23 +31,26 @@ export default function ResetPassword() {
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    setError(null);
+    // setError(null);
     const formData = new FormData(e.currentTarget);
     const password = formData.get("password") as string;
     const confirmPassword = formData.get("confirmPassword") as string;
 
     if (!isPasswordValid) {
-      setError("Please ensure your password .");
+      // setError("Please ensure your password .");
+      showToast("Please ensure your password is valid", "error");
       return;
     }
 
     if (password !== confirmPassword) {
-      setError("Passwords do not match.");
+      showToast("Passwords do not match", "error");
+      // setError("Passwords do not match.");
       return;
     }
 
     if (!token || !email) {
-      setError("Invalid reset link. Token or email is missing.");
+      showToast("Invalid reset link. Token or email is missing.", "error");
+      // setError("Invalid reset link. Token or email is missing.");
       return;
     }
 
@@ -60,25 +63,24 @@ export default function ResetPassword() {
       onSuccess: (response) => {
         if (response.status) {
           setIsSuccess(true);
-          toast.success("Password reset successfully");
+          showToast("Password reset successfully", "success");
         } else {
-          setError(response.message || "Failed to reset password");
-          toast.error(response.message || "Failed to reset password");
+          // setError(response.message || "Failed to reset password");
+          showToast(response.message || "Failed to reset password", "error");
         }
       },
       onError: (err: any) => {
         const errMsg = err.message || "An error occurred while resetting your password";
-        setError(errMsg);
-        toast.error(errMsg);
+        showToast(errMsg, "error");
       }
     });
   };
 
   return (
     <AuthLayout>
-      <div className="flex flex-col items-center text-center space-y-2">
+      <div className="flex flex-col items-center text-center space-y-2 max-w-sm m-auto">
         <div className="flex items-center space-x-2 pb-4">
-          <img src={brandlogo} alt="Logo" className="" />
+          <img src={brandlogo} alt="Logo" className="h-25" />
         </div>
 
         <h2 className="text-2xl font-bold tracking-tight text-slate-900 dark:text-white">
@@ -87,7 +89,7 @@ export default function ResetPassword() {
       </div>
 
       {!isSuccess ? (
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form onSubmit={handleSubmit} className="space-y-4 w-sm m-auto">
           <p className="text-sm text-slate-500 dark:text-slate-400 text-center px-4">
             Your new password must be different from previously used passwords.
           </p>
@@ -104,30 +106,31 @@ export default function ResetPassword() {
                 onChange={(e) => setPassword(e.target.value)}
                 className="bg-white dark:bg-zinc-900 border-slate-300 dark:border-slate-800 transition-all focus-visible:ring-0 focus-visible:ring-offset-0 focus-visible:border-blue-500 h-10"
               />
+              {/* Password Validation Rules */}
+              <div className="space-y-2 pb-3 px-1 text-left">
+                {validations.map((v, i) => (
+                  <div
+                    key={i}
+                    className={`flex items-center space-x-3 text-[13px] transition-all duration-300 ${v.isValid
+                      ? 'text-emerald-500 font-medium'
+                      : 'text-slate-500 dark:text-slate-400'
+                      }`}
+                  >
+                    <div className={`flex items-center justify-center w-4 h-4 rounded-full ${v.isValid ? 'bg-emerald-50 text-emerald-500 dark:bg-emerald-500/10' : ''
+                      }`}>
+                      {v.isValid ? (
+                        <Check className="w-3.5 h-3.5 stroke-[3]" />
+                      ) : (
+                        <div className="w-1.5 h-1.5 rounded-full bg-slate-300 dark:bg-slate-600" />
+                      )}
+                    </div>
+                    <span>{v.text}</span>
+                  </div>
+                ))}
+              </div>
             </div>
 
-            {/* Password Validation Rules */}
-            <div className="space-y-2 py-3 px-1 text-left">
-              {validations.map((v, i) => (
-                <div
-                  key={i}
-                  className={`flex items-center space-x-3 text-[13px] transition-all duration-300 ${v.isValid
-                    ? 'text-emerald-500 font-medium'
-                    : 'text-slate-500 dark:text-slate-400'
-                    }`}
-                >
-                  <div className={`flex items-center justify-center w-4 h-4 rounded-full ${v.isValid ? 'bg-emerald-50 text-emerald-500 dark:bg-emerald-500/10' : ''
-                    }`}>
-                    {v.isValid ? (
-                      <Check className="w-3.5 h-3.5 stroke-[3]" />
-                    ) : (
-                      <div className="w-1.5 h-1.5 rounded-full bg-slate-300 dark:bg-slate-600" />
-                    )}
-                  </div>
-                  <span>{v.text}</span>
-                </div>
-              ))}
-            </div>
+
 
             <div className="space-y-2 text-left">
               <Label htmlFor="confirmPassword" className="text-slate-600 dark:text-slate-400 font-medium">Confirm password</Label>
@@ -140,15 +143,15 @@ export default function ResetPassword() {
               />
             </div>
 
-            {error && (
+            {/* {error && (
               <p className="text-sm font-medium text-red-500 text-center">{error}</p>
-            )}
+            )} */}
           </div>
 
           <Button
             type="submit"
             disabled={isPending}
-            className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-6 text-md rounded-md transition-all shadow-md hover:shadow-lg"
+            className="w-full h-10 mt-2 bg-blue-600 hover:bg-blue-700 text-white font-semibold text-md rounded-md transition-all shadow-md hover:shadow-lg"
           >
             {isPending ? "Setting password..." : "Set new password"}
           </Button>

@@ -1,22 +1,23 @@
 "use client";
 
 import { useState, Suspense, lazy, useMemo, useCallback, useEffect, useRef } from 'react';
-import { useSearchParams } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import type { TabType } from '@/features/orders/types';
 import { useOrders, useExportOrders, useImportOrders } from '@/features/orders/hooks/useOrders';
 import { DataTable } from '@/components/common';
-import { COLUMN_CONFIG } from '../column';
+import { getOrdersColumns } from '../column';
 import DatePicker from '@/components/common/DatePicker';
 import { Button } from '@/components/ui/button';
 import { Download, Plus, X, Loader2 } from 'lucide-react';
-import { toast } from 'sonner';
-
+import { useAppSelector } from '@/hooks/store.hooks';
+import { showToast } from '@/components/ui/custom-toast';
 const CreateOrderDialog = lazy(() => import('@/features/orders/components/CreateOrderDialog'));
 
 export default function OrdersPage() {
   const [searchParams] = useSearchParams();
   const activeTab = (searchParams.get('tab') as TabType) || 'new';
-
+  const { role } = useAppSelector((state) => state.auth);
+  const navigate = useNavigate();
   const [orderDialogMode, setOrderDialogMode] = useState<'receiver' | 'return' | null>(null);
 
   // State for pagination and search
@@ -92,21 +93,24 @@ export default function OrdersPage() {
     if (!file) return;
 
     if (file.type !== 'text/csv' && !file.name.endsWith('.csv')) {
-      toast.error('Please select a valid CSV file');
+      showToast('Please select a valid CSV file', "error");
       return;
     }
 
     importOrders.mutate(file, {
       onSuccess: (response) => {
-        toast.success(response.message || 'Orders imported successfully');
+        showToast(response.message || 'Orders imported successfully', "success");
         if (fileInputRef.current) fileInputRef.current.value = '';
       },
       onError: (error: any) => {
-        toast.error(error?.response?.data?.message || 'Failed to import orders');
+        showToast(error?.response?.data?.message || 'Failed to import orders', "error");
         if (fileInputRef.current) fileInputRef.current.value = '';
       }
     });
   }, [importOrders]);
+
+  const columns = useMemo(() => getOrdersColumns(role), [role]);
+
 
   return (
     <div className="p-page-padding flex-1 flex flex-col space-y-4 animate-in fade-in duration-700 h-full overflow-hidden min-h-0 bg-white dark:bg-zinc-950">
@@ -155,7 +159,7 @@ export default function OrdersPage() {
           onChange={handleFileChange}
         />
         <DataTable
-          columns={COLUMN_CONFIG}
+          columns={columns}
           data={ordersData?.data || []}
           rowKey="order_number"
           loading={isLoading}
@@ -187,7 +191,7 @@ export default function OrdersPage() {
                 <span>{importOrders.isPending ? 'Importing...' : 'Import'}</span>
               </Button>
               <Button
-                onClick={() => setOrderDialogMode('receiver')}
+                onClick={() => navigate('/orders/create')}
                 className="gap-2 bg-[#0060FE] hover:bg-[#0052db] text-white shadow-lg shadow-blue-100 dark:shadow-none transition-all active:scale-[0.98] font-semibold border-none px-4"
               >
                 <Plus className="w-4 h-4" />

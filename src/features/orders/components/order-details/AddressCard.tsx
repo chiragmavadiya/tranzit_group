@@ -21,7 +21,7 @@ export const AddressCard: React.FC<AddressCardProps> = ({
   onEditClick,
 }) => {
   return (
-    <Card className="w-full border ring-0 shadow-md border-gray-200 dark:border-zinc-800 py-1 dark:bg-zinc-950 transition-colors duration-300">
+    <Card className="w-full border ring-0 shadow-md border-gray-200 dark:border-zinc-800 py-2 dark:bg-zinc-950 transition-colors duration-300">
       <CardContent className="flex items-center justify-between p-4 py-0">
         <div className="flex items-center gap-3 min-h-8">
           {/* Section Label */}

@@ -12,11 +12,12 @@ export const useOrders = (params?: {
   per_page?: number;
   page?: number;
   search?: string;
-}) => {
+}, enabled: boolean = true) => {
   return useQuery({
     queryKey: [...QUERY_KEYS.ORDERS.LIST, params],
     queryFn: () => ordersService.getOrders(params),
     refetchInterval: 30000, // Poll every 30 seconds for list updates
+    enabled
   });
 };
 
@@ -121,7 +122,7 @@ export const useWalletCheck = () => {
 export const useConsignOrder = () => {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: ({ orderId, data }: { orderId: string | number; data: any }) => 
+    mutationFn: ({ orderId, data }: { orderId: string | number; data: any }) =>
       ordersService.consignOrder(orderId, data),
     onSuccess: (_, { orderId }) => {
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.ORDERS.LIST });
@@ -149,12 +150,11 @@ export const useImportOrders = () => {
 export const useExportOrders = () => {
   return useMutation({
     mutationFn: ordersService.exportOrders,
-    onSuccess: (blob, params) => {
+    onSuccess: ({ blob, filename }) => {
       const url = window.URL.createObjectURL(blob);
       const link = document.createElement('a');
       link.href = url;
-      const extension = params.format === 'excel' ? 'xlsx' : params.format;
-      link.setAttribute('download', `orders-export.${extension}`);
+      link.setAttribute('download', filename);
       document.body.appendChild(link);
       link.click();
       link.remove();

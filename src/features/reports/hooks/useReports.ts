@@ -2,7 +2,7 @@ import { useMutation, useQuery, keepPreviousData } from "@tanstack/react-query";
 import { reportsService } from "../services/reports.service";
 import { QUERY_KEYS } from "@/constants/api.constants";
 import type { ReportFilters } from "../types";
-import { toast } from "sonner";
+import { showToast } from "@/components/ui/custom-toast";
 
 export const useShipmentReport = (filters: ReportFilters) => {
   return useQuery({
@@ -27,7 +27,7 @@ export const useExportShipmentReport = () => {
       window.URL.revokeObjectURL(url);
     },
     onError: (error: any) => {
-      toast.error(error?.response?.data?.message || "Failed to export shipment report");
+      showToast(error?.response?.data?.message || "Failed to export shipment report", "error");
     },
   });
 };
@@ -55,7 +55,7 @@ export const useExportTransactionReport = () => {
       window.URL.revokeObjectURL(url);
     },
     onError: (error: any) => {
-      toast.error(error?.response?.data?.message || "Failed to export transaction report");
+      showToast(error?.response?.data?.message || "Failed to export transaction report", "error");
     },
   });
 };
@@ -93,7 +93,7 @@ export const useExportParcelReport = (isAdmin: boolean = false) => {
       window.URL.revokeObjectURL(url);
     },
     onError: (error: any) => {
-      toast.error(error?.response?.data?.message || "Failed to export parcel report");
+      showToast(error?.response?.data?.message || "Failed to export parcel report", "error");
     },
   });
 };

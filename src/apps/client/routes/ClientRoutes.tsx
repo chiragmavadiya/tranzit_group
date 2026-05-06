@@ -6,8 +6,9 @@ import Layout from "@/layout";
 // Lazy load page components
 const Dashboard = lazy(() => import('@/features/dashboard/pages/Dashboard'));
 const Orders = lazy(() => import('@/features/orders/pages/OrdersPage'));
-const OrderDetails = lazy(() => import('@/features/orders/pages/OrderDetails2'));
-const CreateOrder = lazy(() => import('@/features/create-order/'));
+const OrderDetails = lazy(() => import('@/features/orders/pages/OrderDetails'));
+const OrderDetails2 = lazy(() => import('@/features/orders/pages/OrderDetails2'));
+// const CreateOrder = lazy(() => import('@/features/create-order/'));
 const Search = lazy(() => import('@/features/search/pages/SearchPage'));
 const GetQuote = lazy(() => import('@/features/quote/pages/GetQuotePage'));
 const MyItems = lazy(() => import('@/features/items'));
@@ -32,11 +33,12 @@ export default function ClientRoutes() {
           <Route path="dashboard" element={<Dashboard />} />
           <Route path="orders">
             <Route index element={<Orders />} />
-            <Route path=":orderID" element={<OrderDetails />} />
-            <Route path=":orderType/:orderID" element={<OrderDetails />} />
+            <Route path=":orderType" element={<OrderDetails />} />
+            <Route path=":orderID" element={<OrderDetails2 />} />
+            <Route path=":orderType/:orderID" element={<OrderDetails2 />} />
           </Route>
 
-          <Route path="orders/create" element={<CreateOrder />} />
+          {/* <Route path="orders/create" element={<CreateOrder />} /> */}
           <Route path="quote" element={<GetQuote />} />
 
           <Route path="search" element={<Search />} />

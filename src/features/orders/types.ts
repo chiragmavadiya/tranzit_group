@@ -125,6 +125,22 @@ export interface Packet {
   height: string;
 }
 
+export interface AddressData {
+  name: string;
+  company: string;
+  phone: string;
+  email: string;
+  address1: string;
+  suburb: string;
+  state: string;
+  postcode: string;
+  country: string;
+  street_name: string;
+  street_number: string;
+  street_type?: string;
+  saveToAddressBook: boolean;
+}
+
 export interface OrderFormData {
   receiverContactPerson: string;
   receiverEmail: string;
@@ -133,6 +149,9 @@ export interface OrderFormData {
   receiverBuilding: string;
   receiverInstructions: string;
   receiverStreetAddress: string;
+  receiverStreetNumber: string;
+  receiverStreetName: string;
+  receiverStreetType: string;
   receiverTownSuburb: string;
   receiverCity: string;
   receiverState: string;
@@ -145,7 +164,9 @@ export interface OrderFormData {
 export interface CreateOrderDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  type?: 'order' | 'return' | 'sender' | 'receiver';
+  type?: 'sender' | 'receiver';
+  initialData: AddressData;
+  onSubmit: (type: "sender" | "receiver", data: AddressData) => void;
 }
 
 export interface PackingColumn {
@@ -168,26 +189,14 @@ export interface PackagingData {
 }
 
 export interface ItemData {
-  item: string;
-  sku: string;
-  ship: number;
-  unitPrice: number;
+  type: string;
+  quantity: number;
   weight: number;
-  size: string;
-  countryOfOrigin: string;
-  qtyShipped: number;
-  color?: string;
-  currency?: string;
-  qtyOrdered?: number;
-  binLocation?: string;
-  barcode?: string;
-  hsCode?: string;
-  material?: string;
-  manufacturerId?: string;
-  brandName?: string;
-  makeOrModel?: string;
-  usageOrPurpose?: string;
-  [key: string]: string | number | undefined | null;
+  length: number;
+  width: number;
+  height: number;
+  item_id?: number | string;
+  item_name?: string;
 }
 
 export interface ItemsColumn extends PackingColumn {

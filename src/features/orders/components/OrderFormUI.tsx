@@ -66,7 +66,7 @@ export const FormInput = React.forwardRef<HTMLInputElement, FormInputProps>(({
 }, ref) => {
   const [showPassword, setShowPassword] = React.useState(false);
   const isHorizontal = useMemo(() => layout === 'horizontal', [layout]);
-
+  console.log(label, value, 'LABEL & VALUE')
   const handleChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     onChange(e.target.value, e.target.name || '');
   }, [onChange]);
@@ -74,7 +74,7 @@ export const FormInput = React.forwardRef<HTMLInputElement, FormInputProps>(({
   return (
     <div className={cn(
       isHorizontal ? "grid grid-cols-[110px_1fr] items-center gap-4" : "space-y-0",
-      isFullWidth ? "col-span-12" : isHalf ? "col-span-6" : isCompact ? "col-span-3" : "col-span-12 md:col-span-6",
+      isFullWidth ? "col-span-12" : isHalf ? "col-span-12 md:col-span-6" : isCompact ? "col-span-6 md:col-span-3" : "col-span-12 md:col-span-6",
       className
     )}>
       {label && (
@@ -88,7 +88,7 @@ export const FormInput = React.forwardRef<HTMLInputElement, FormInputProps>(({
       )}
       <div className="relative group">
         {Icon && (
-          <div className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-blue-600 transition-colors">
+          <div className={cn("absolute left-3", error ? 'top-2' : 'top-1/2 -translate-y-1/2', "text-gray-400 group-focus-within:text-blue-600 transition-colors")}>
             <Icon className="w-4 h-4" />
           </div>
         )}
@@ -98,6 +98,7 @@ export const FormInput = React.forwardRef<HTMLInputElement, FormInputProps>(({
           placeholder={placeholder}
           value={value}
           onChange={handleChange}
+          autoComplete="off"
           className={cn(
             "h-8 rounded-md border-slate-200 dark:border-zinc-800 bg-white dark:bg-zinc-950 font-medium focus-visible:ring-0 focus-visible:ring-blue-600 focus-visible:border-blue-600 transition-all placeholder:text-muted-foreground placeholder:font-normal dark:placeholder:text-zinc-700 text-sm",
             Icon ? "pl-9" : "px-3",
@@ -119,8 +120,8 @@ export const FormInput = React.forwardRef<HTMLInputElement, FormInputProps>(({
             )}
           </button>
         )}
+        {error ? <div className="text-red-500 text-[11px] w-full">{errormsg}</div> : null}
       </div>
-      {error ? <div className="text-red-500 text-[11px] w-full text-right">{errormsg}</div> : null}
     </div>
   );
 });
@@ -166,7 +167,7 @@ export function FormTextarea({
           error ? "border-red-500 focus-visible:border-red-500" : ""
         )}
       />
-      {error ? <div className="text-red-500 text-[11px] w-full text-right">{errormsg}</div> : null}
+      {error ? <div className="text-red-500 text-[11px] w-full">{errormsg}</div> : null}
     </div>
   );
 }
@@ -202,7 +203,7 @@ export function FormSelect({
   return (
     <div className={cn(
       isHorizontal ? "grid grid-cols-[110px_1fr] items-center gap-4" : "space-y-1",
-      isHalf ? "col-span-6" : isCompact ? "col-span-3" : "col-span-12 md:col-span-6",
+      isHalf ? "col-span-12 md:col-span-6" : isCompact ? "col-span-6 md:col-span-3" : "col-span-12 md:col-span-6",
       className
     )}>
       <Label className={cn(
@@ -212,15 +213,17 @@ export function FormSelect({
         {label}
         {required && <Required />}
       </Label>
-      <SelectComponent
-        className={cn("w-full h-8 text-[13px] data-[size=default]:h-8 border-slate-200 rounded-md dark:border-zinc-800 font-medium bg-white dark:bg-zinc-950 text-slate-900 dark:text-zinc-100 focus:ring-blue-600 transition-all text-sm px-3 ", error ? "border-red-500 focus:border-red-500" : "")}
-        data={memoizedData}
-        // defaultValue="default"
-        onValueChange={onValueChange}
-        value={value}
-        placeholder={placeholder}
-      />
-      {error ? <div className="text-red-500 text-[11px] w-full text-right">{errormsg}</div> : null}
+      <div>
+        <SelectComponent
+          className={cn("w-full h-8 text-[13px] data-[size=default]:h-8 border-slate-200 rounded-md dark:border-zinc-800 font-medium bg-white dark:bg-zinc-950 text-slate-900 dark:text-zinc-100 focus:ring-blue-600 transition-all text-sm px-3 ", error ? "border-red-500 focus:border-red-500" : "")}
+          data={memoizedData}
+          // defaultValue="default"
+          onValueChange={onValueChange}
+          value={value}
+          placeholder={placeholder}
+        />
+        {error ? <div className="text-red-500 text-[11px] w-full">{errormsg}</div> : null}
+      </div>
     </div>
   );
 }

@@ -1,8 +1,8 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { courierSurchargeService } from "../services/courier-surcharge.service";
 import { QUERY_KEYS } from "@/constants/api.constants";
-import { toast } from "sonner";
 import type { CourierSurchargeFilters, CourierSurchargeFormData } from "../types";
+import { showToast } from "@/components/ui/custom-toast";
 
 export function useCourierSurcharges(filters: CourierSurchargeFilters) {
     return useQuery({
@@ -26,30 +26,30 @@ export function useCourierSurchargeMutations() {
         mutationFn: (data: CourierSurchargeFormData) => courierSurchargeService.create(data),
         onSuccess: (res) => {
             if (res.status) {
-                toast.success(res.message || "Surcharge created successfully");
+                showToast(res.message || "Surcharge created successfully", "success");
                 queryClient.invalidateQueries({ queryKey: ["admin", "courier-surcharges"] });
             } else {
-                toast.error(res.message || "Failed to create surcharge");
+                showToast(res.message || "Failed to create surcharge", "error");
             }
         },
         onError: (error: any) => {
-            toast.error(error.message || "An error occurred");
+            showToast(error.message || "Failed to create surcharge", "error");
         }
     });
 
     const updateMutation = useMutation({
-        mutationFn: ({ id, data }: { id: number | string, data: CourierSurchargeFormData }) => 
+        mutationFn: ({ id, data }: { id: number | string, data: CourierSurchargeFormData }) =>
             courierSurchargeService.update(id, data),
         onSuccess: (res) => {
             if (res.status) {
-                toast.success(res.message || "Surcharge updated successfully");
+                showToast(res.message || "Surcharge updated successfully", "success");
                 queryClient.invalidateQueries({ queryKey: ["admin", "courier-surcharges"] });
             } else {
-                toast.error(res.message || "Failed to update surcharge");
+                showToast(res.message || "Failed to update surcharge", "error");
             }
         },
         onError: (error: any) => {
-            toast.error(error.message || "An error occurred");
+            showToast(error.message || "Failed to update surcharge", "error");
         }
     });
 
@@ -57,14 +57,14 @@ export function useCourierSurchargeMutations() {
         mutationFn: (id: number | string) => courierSurchargeService.delete(id),
         onSuccess: (res) => {
             if (res.status) {
-                toast.success(res.message || "Surcharge deleted successfully");
+                showToast(res.message || "Surcharge deleted successfully", "success");
                 queryClient.invalidateQueries({ queryKey: ["admin", "courier-surcharges"] });
             } else {
-                toast.error(res.message || "Failed to delete surcharge");
+                showToast(res.message || "Failed to delete surcharge", "error");
             }
         },
         onError: (error: any) => {
-            toast.error(error.message || "An error occurred");
+            showToast(error.message || "Failed to delete surcharge", "error");
         }
     });
 
@@ -80,7 +80,7 @@ export function useCourierSurchargeMutations() {
 
 export function useExportCourierSurcharge() {
     return useMutation({
-        mutationFn: (params: { format: string; search?: string }) => 
+        mutationFn: (params: { format: string; search?: string }) =>
             courierSurchargeService.export(params),
         onSuccess: (blob, params) => {
             const url = window.URL.createObjectURL(blob);
@@ -93,7 +93,7 @@ export function useExportCourierSurcharge() {
             window.URL.revokeObjectURL(url);
         },
         onError: (error: any) => {
-            toast.error(error.message || "Failed to export courier surcharges");
+            showToast(error.message || "Failed to export courier surcharges", "error");
         }
     });
 }

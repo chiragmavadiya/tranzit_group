@@ -137,9 +137,6 @@ export default function GetQuotePage() {
     }
   }, [locations, items, getServices, role, updateRate]);
 
-
-  console.log(isValid, 'isValid', items, locations);
-
   return (
     <div className="p-page-padding animate-in fade-in duration-700 overflow-auto">
       <div className="flex flex-col gap-8">

@@ -51,6 +51,6 @@ export const useOrderItems = (initialItems: ItemData[] = []) => {
     fullUpdateItem,
     addItem,
     removeItem,
-    itemsTotal
+    itemsTotal,
   };
 };

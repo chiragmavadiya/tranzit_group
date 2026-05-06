@@ -10,14 +10,19 @@ import { ConformationModal } from '@/components/common/ConformationModal'
 interface OrderHeaderProps {
   orderID?: string
   orderType?: string
+  onSave?: () => void
 }
 
-export const OrderHeader: React.FC<OrderHeaderProps> = ({ orderID = '4', orderType = 'new' }) => {
+export const OrderHeader: React.FC<OrderHeaderProps> = ({ orderID = '4', orderType = 'create', onSave }) => {
   const navigate = useNavigate()
   const [showConfirm, setShowConfirm] = useState(false)
 
   const handleBack = () => {
-    setShowConfirm(true)
+    if (orderType !== 'create') {
+      navigate('/orders')
+    } else {
+      setShowConfirm(true)
+    }
   }
 
   const handleDiscard = () => {
@@ -27,11 +32,11 @@ export const OrderHeader: React.FC<OrderHeaderProps> = ({ orderID = '4', orderTy
 
   const handleSave = () => {
     setShowConfirm(false)
-    // Trigger save action if implemented
+    onSave?.()
   }
 
   return (
-    <div className="flex flex-col gap-3 bg-white dark:bg-zinc-950 border-b border-gray-100 dark:border-zinc-800 transition-colors duration-300 p-3 pt-0 lg:p-4 lg:pb-3 lg:pt-0">
+    <div className="flex flex-col gap-3 bg-white dark:bg-zinc-950 border-b border-gray-100 dark:border-zinc-800 transition-colors duration-300 pb-3 pt-0 lg:pb-4">
       <ConformationModal
         open={showConfirm}
         onOpenChange={setShowConfirm}
@@ -57,11 +62,11 @@ export const OrderHeader: React.FC<OrderHeaderProps> = ({ orderID = '4', orderTy
           <div className="flex items-center gap-3">
             <div className="flex items-center gap-2 text-primary border-r border-gray-200 dark:border-zinc-800 pr-3">
               <Box className="h-5 w-5 text-[#0060FE]" />
-              <span className="text-xl font-bold text-gray-900 dark:text-zinc-100">{orderID}</span>
+              <span className="text-xl font-bold text-gray-900 dark:text-zinc-100">{orderType === 'create' ? 'NEW ORDER' : orderID}</span>
             </div>
-            <div className="flex items-center gap-2 px-0">
-              <span className="text-xl font-bold text-gray-900 dark:text-zinc-100 tracking-tight">NEW ORDER</span>
-            </div>
+            {/* <div className="flex items-center gap-2 px-0">
+              <span className="text-xl font-bold text-gray-900 dark:text-zinc-100 tracking-tight">{orderType === 'create' ? 'NEW ORDER' : 'EDIT ORDER'}</span>
+            </div> */}
             <div className="flex items-center gap-1 text-[#0060FE] font-medium">
               <MapPin className="h-4 w-4" />
               <span className="text-sm">AUSTRALIA</span>

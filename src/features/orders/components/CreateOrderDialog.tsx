@@ -13,6 +13,7 @@ import { CustomModel } from '@/components/ui/dialog';
 import { AutoComplete } from '@/components/common';
 import { LOCATION_OPTIONS, STATES } from '@/constants';
 import { showToast } from '@/components/ui/custom-toast';
+import { Checkbox } from '@/components/ui/checkbox';
 
 // const initialData: AddressData = {
 //   name: '',
@@ -29,10 +30,9 @@ import { showToast } from '@/components/ui/custom-toast';
 //   saveToAddressBook: false,
 // };
 
-export default function CreateOrderDialog({ onOpenChange, type, open, initialData, onSubmit }: CreateOrderDialogProps) {
+export default function CreateOrderDialog({ onOpenChange, type, open, initialData, onSubmit, isEdit }: CreateOrderDialogProps) {
   const navigate = useNavigate();
   const [formData, setFormData] = useState<AddressData>(initialData);
-  console.log(initialData, 'initialData')
   const [isSubmitting, setIsSubmitting] = useState(false);
   // const [isSuccess, setIsSuccess] = useState(false);
 
@@ -54,6 +54,10 @@ export default function CreateOrderDialog({ onOpenChange, type, open, initialDat
   };
 
   const handleCloseMenualy = (value: boolean) => {
+    if (!value && isEdit) {
+      onOpenChange(false)
+      return
+    }
     if (value) return
     navigate(`/orders`);
   }
@@ -145,26 +149,45 @@ export default function CreateOrderDialog({ onOpenChange, type, open, initialDat
                 layout="horizontal"
                 placeholder="Enter Phone"
               />
-              <FormInput
-                label="COMPANY"
-                value={formData.company}
-                onChange={val => updateField('company', val)}
-                layout="horizontal"
-                placeholder='Enter Company name'
-              />
-              {/* <FormInput
+              <div className="space-y-4">
+                <FormInput
+                  label="COMPANY"
+                  value={formData.company}
+                  onChange={val => updateField('company', val)}
+                  layout="horizontal"
+                  placeholder='Enter Company name'
+                />
+                {/* <FormInput
                 label="BUILDING"
                 value={formData.receiverBuilding}
                 onChange={val => updateField('receiverBuilding', val)}
                 layout="horizontal"
               /> */}
-              {/* <FormTextarea
+                {/* <FormTextarea
                 label="INSTRUCTIONS"
                 value={formData.receiverInstructions}
                 onChange={val => updateField('receiverInstructions', val)}
                 rows={5}
                 layout="horizontal"
               /> */}
+                <div className="flex justify-start">
+                  <ValidAddressBadge />
+                </div>
+                <div className="flex items-center gap-2 pt-2">
+                  <Checkbox
+                    id="saveToAddressBook"
+                    checked={formData.saveToAddressBook}
+                    onCheckedChange={(checked) => updateField('saveToAddressBook', checked as boolean)}
+                    className="data-[state=checked]:bg-[#0060FE] data-[state=checked]:border-[#0060FE] rounded-[4px]"
+                  />
+                  <label
+                    htmlFor="saveToAddressBook"
+                    className="text-[13px] font-semibold text-slate-700 dark:text-zinc-300 cursor-pointer select-none"
+                  >
+                    Save address to address book
+                  </label>
+                </div>
+              </div>
             </div>
 
             {/* Right Column */}
@@ -240,9 +263,6 @@ export default function CreateOrderDialog({ onOpenChange, type, open, initialDat
                   error={isSubmitting && formData.country?.trim() === ''}
                   errormsg="Please enter your country"
                 />
-                <div className="flex justify-start">
-                  <ValidAddressBadge />
-                </div>
               </div>
             </div>
           </div>
@@ -250,7 +270,7 @@ export default function CreateOrderDialog({ onOpenChange, type, open, initialDat
           {/* Address Validation Accordion */}
           <div className="col-span-12">
             <Accordion className="w-full border border-slate-200 dark:border-zinc-800 rounded-md bg-white dark:bg-zinc-950/50 shadow-sm overflow-hidden">
-              <AccordionItem value="validation" className="border-none">
+              <AccordionItem value="validation" className="border-none [&>h3]:my-0">
                 <AccordionTrigger className="px-5 py-3 hover:no-underline flex justify-between items-center group">
                   <span className="text-[11px] font-extrabold text-slate-800 dark:text-zinc-300 uppercase tracking-widest leading-none">
                     ADDRESS VALIDATION

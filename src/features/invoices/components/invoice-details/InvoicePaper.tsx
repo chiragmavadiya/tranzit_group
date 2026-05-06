@@ -48,7 +48,6 @@ export const InvoicePaper: React.FC<InvoicePaperProps> = ({
   invoiceId
 }) => {
   const { data: customersData } = useCustomers({ pageSize: 1000 }, invoiceId === 'create');
-  console.log(invoice, 'invoiceinvoice')
   const [editingRowId, setEditingRowId] = useState<number | string | null>(null);
   const [shouldAutoEdit, setShouldAutoEdit] = useState(false);
   const editingRowRef = useRef<HTMLTableRowElement>(null);
@@ -70,7 +69,7 @@ export const InvoicePaper: React.FC<InvoicePaperProps> = ({
       items: prev?.items?.map((i: any) => i.id === id ? { ...i, [type]: value } : i)
     }))
   }, [setInvoiceData])
-  console.log(invoice)
+
   const handleAddItem = (type: string) => {
     const defaultItem = {
       id: Date.now(),

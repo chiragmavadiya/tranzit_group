@@ -1,5 +1,5 @@
 import { Download } from 'lucide-react';
-import type { Column } from '@/components/common';
+import type { Column } from '@/components/common/types/DataTable.types';
 import { StatusCell } from '@/components/common/DataTableCells';
 import type { WalletTransaction } from './types';
 import { Button } from '@/components/ui/button';

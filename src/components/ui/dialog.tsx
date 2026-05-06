@@ -170,7 +170,7 @@ const CustomModel = ({ open, title, description, onOpenChange, children, onSubmi
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className={contentClass || "min-w-xl"}>
         <DialogHeader className="border-b border-gray-100 dark:border-zinc-800">
-          <DialogTitle className="my-0 text-xl font-bold text-slate-900 dark:text-zinc-100 italic!">
+          <DialogTitle className="my-0 mb-3 text-xl font-bold text-slate-900 dark:text-zinc-100 italic!">
             {title}
           </DialogTitle>
           {description && (

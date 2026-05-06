@@ -102,11 +102,9 @@ const InvoiceDocumentView: React.FC = () => {
   }, [invoiceID, updateMutation])
 
   useEffect(() => {
-    console.log("invoiceID", invoiceID)
     if (invoiceID !== 'create' && details?.status) {
       setInvoiceData(details?.data)
     } else if (invoiceID === 'create') {
-      console.log("set......")
       setInvoiceData({
         "invoice": {
           "invoice_number": "",

@@ -188,3 +188,7 @@ export const STATES = [
     { value: 'VIC', label: 'Victoria' },
     { value: 'WA', label: 'Western Australia' }
 ]
+
+export const TERMS_CONDITIONS_URL = "https://tranzit.digisite.net/terms-conditions"
+export const PRIVACY_POLICY_URL = "https://tranzit.digisite.net/privacy-policy"
+export const DANGEROUS_GOODS_URL = "https://tranzit.digisite.net/dangerous-goods"

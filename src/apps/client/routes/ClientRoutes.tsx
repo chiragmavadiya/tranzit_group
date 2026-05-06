@@ -35,7 +35,7 @@ export default function ClientRoutes() {
             <Route index element={<Orders />} />
             <Route path=":orderType" element={<OrderDetails />} />
             <Route path=":orderID" element={<OrderDetails2 />} />
-            <Route path=":orderType/:orderID" element={<OrderDetails2 />} />
+            <Route path=":orderType/:orderID" element={<OrderDetails />} />
           </Route>
 
           {/* <Route path="orders/create" element={<CreateOrder />} /> */}

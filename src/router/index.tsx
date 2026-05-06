@@ -44,7 +44,7 @@ export const AppRouter = () => {
   const location = useLocation();
 
   // Fetch user details if authenticated
-  const { data: userData, isLoading } = useGetUserDetails(isAuthenticated);
+  const { data: userData } = useGetUserDetails(isAuthenticated);
 
   useEffect(() => {
     if (userData?.user) {
@@ -60,7 +60,7 @@ export const AppRouter = () => {
     }
   }, [userData, dispatch, navigate, location.pathname]);
 
-  if (isLoading) return <PageLoader />;
+  // if (isLoading) return <PageLoader />;
 
   return (
     <Suspense fallback={<PageLoader />}>

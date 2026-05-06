@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react'
+import { useParams } from 'react-router-dom'
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card'
 import { Truck, AlertCircle, RefreshCw } from 'lucide-react'
 import { Badge } from '@/components/ui/badge'
@@ -12,17 +13,22 @@ interface CarrierCardProps {
   itemData: ItemData[];
   addresses: { sender: AddressData, receiver: AddressData };
   onQuoteChange?: (data: any) => void;
+  setCourierData: React.Dispatch<React.SetStateAction<any>>;
+  orderDetail?: any;
 }
 
-export const CarrierCard: React.FC<CarrierCardProps> = ({ itemData, addresses, onQuoteChange }) => {
+export const CarrierCard: React.FC<CarrierCardProps> = ({ itemData, addresses, onQuoteChange, setCourierData, orderDetail }) => {
+  const { orderType } = useParams<{ orderType?: string }>()
   const { role } = useAppSelector((state) => state.auth);
   const [selectedServiceId, setSelectedServiceId] = useState<string>('')
   const [couriers, setCouriers] = useState<any[]>([]);
   const [surchargesMap, setSurchargesMap] = useState<Record<string, any[]>>({});
+  const [bestDeal, setBestDeal] = useState<string>('');
 
   const { mutate: getServices, isPending: loading } = useGetQuoteServices(role);
 
   useEffect(() => {
+    if (orderType !== 'create') return;
     // Check if we have valid items with dimensions > 0
     const isValidItems = itemData && itemData.length > 0 && itemData.every(item =>
       Number(item.height) > 0 && Number(item.width) > 0 && Number(item.length) > 0 && Number(item.weight) > 0 && Number(item.quantity) > 0
@@ -52,7 +58,11 @@ export const CarrierCard: React.FC<CarrierCardProps> = ({ itemData, addresses, o
         setSurchargesMap(data.surcharges || {});
         if (data.services && data.services.length > 0) {
           const firstService = data.services[0];
-          setSelectedServiceId(firstService.product_id || firstService.courierCode || '0');
+          const minItem = data.services.reduce((min, curr) =>
+            curr.price < min.price ? curr : min
+          );
+          setBestDeal(minItem.product_id || minItem.code || '');
+          setSelectedServiceId(firstService.product_id || firstService.code || '0');
         }
         // showToast(`Found ${data.services.length} available services`, "success");
       },
@@ -60,7 +70,7 @@ export const CarrierCard: React.FC<CarrierCardProps> = ({ itemData, addresses, o
         showToast(err?.response?.data?.message || 'Failed to fetch rates', "error");
       }
     });
-  }, [itemData, addresses, getServices])
+  }, [itemData, addresses, getServices, orderType])
 
   useEffect(() => {
     if (couriers.length > 0 && selectedServiceId) {
@@ -69,33 +79,69 @@ export const CarrierCard: React.FC<CarrierCardProps> = ({ itemData, addresses, o
         const courierSurcharges = surchargesMap[selectedCourier.courierCode] || [];
         const totalSurcharges = courierSurcharges.reduce((acc: any, curr: any) => acc + curr.amount, 0);
         const totalPrice = selectedCourier.price + totalSurcharges;
-
         onQuoteChange?.({
           courier: selectedCourier,
           surcharges: courierSurcharges,
           totalSurcharges,
           totalPrice
         });
+        setCourierData({
+          courier: selectedCourier.carrier_id,
+          product_id: selectedCourier.product_id,
+          product_type: selectedCourier.product_type,
+          shipment_summary: selectedCourier.shipment_summary,
+        })
       }
     } else {
       onQuoteChange?.(null);
     }
-  }, [selectedServiceId, couriers, surchargesMap, onQuoteChange])
-
+  }, [selectedServiceId, couriers, surchargesMap, onQuoteChange, setCourierData])
 
   return (
-    <Card className="border shadow-md border-gray-200 dark:border-zinc-800 rounded-xl overflow-hidden transition-colors duration-300">
+    <Card className="border shadow-md pt-1 gap-0 border-gray-200 dark:border-zinc-800 rounded-xl overflow-hidden transition-colors duration-300">
       <CardHeader className="flex flex-row items-center justify-between py-3 px-5 border-b border-gray-100 dark:border-zinc-800 bg-white dark:bg-zinc-900 transition-colors">
-        <div className="flex items-center gap-2">
-          <Truck className="h-4 w-4 text-blue-600 dark:text-blue-500" />
-          <CardTitle className="text-sm font-bold text-gray-900 dark:text-zinc-100 tracking-wider">
-            SHIPMENT OPTIONS
-          </CardTitle>
+        <div className="flex justify-between w-full items-center gap-2">
+          <div className='flex items-center gap-2'>
+            <Truck className="h-4 w-4 text-blue-600 dark:text-blue-500" />
+            <CardTitle className="text-sm font-bold text-gray-900 dark:text-zinc-100 tracking-wider">
+              SHIPMENT OPTIONS
+            </CardTitle>
+          </div>
+          {loading && <RefreshCw className="h-4 w-4 animate-spin" />}
         </div>
       </CardHeader>
 
       <CardContent className="p-4 bg-gray-50/50 dark:bg-zinc-950">
-        {loading && couriers.length === 0 ? (
+        {orderType !== 'create' && orderDetail ? (
+          <div className="flex flex-col gap-3">
+            <div className="relative flex flex-col p-4 rounded-xl border border-blue-600 bg-blue-50/50 dark:border-blue-500 dark:bg-blue-900/10 shadow-sm">
+              <div className="flex items-center justify-between gap-4">
+                <div className="flex items-center gap-4">
+                  <div className="w-12 h-12 rounded-lg bg-white dark:bg-zinc-800 border border-gray-100 dark:border-zinc-700 flex items-center justify-center p-2 shadow-sm">
+                    <Truck className="w-6 h-6 text-blue-600 dark:text-blue-400" />
+                  </div>
+                  <div>
+                    <h4 className="text-sm font-bold text-gray-900 dark:text-zinc-100 uppercase tracking-tight">
+                      {orderDetail.courier_details?.courier || 'Standard Delivery'}
+                    </h4>
+                    <div className="flex items-center gap-2 mt-1">
+                      <span className="text-[10px] font-bold text-gray-500 dark:text-zinc-400 uppercase">Tracking:</span>
+                      <span className="text-[10px] font-bold text-blue-600 dark:text-blue-400">{orderDetail.courier_details?.tracking_number || 'N/A'}</span>
+                    </div>
+                  </div>
+                </div>
+                <div className="text-right">
+                  <div className="text-lg font-black text-gray-900 dark:text-zinc-100 tracking-tighter">
+                    ${orderDetail.order_details?.total?.toFixed(2) || '0.00'}
+                  </div>
+                  <div className="text-[10px] font-bold text-gray-500 dark:text-zinc-400 uppercase tracking-widest mt-0.5">
+                    Total Inc. GST
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        ) : loading && couriers.length === 0 ? (
           <div className="py-8 flex items-center justify-center text-sm text-gray-500 font-medium gap-2">
             <RefreshCw className="h-4 w-4 animate-spin text-[#0060FE]" />
             Fetching available carriers...
@@ -128,7 +174,7 @@ export const CarrierCard: React.FC<CarrierCardProps> = ({ itemData, addresses, o
                     }`}
                 >
                   {/* Recommended Badge (Example logic: lowest price) */}
-                  {idx === 0 && (
+                  {serviceId === bestDeal && (
                     <div className="absolute -top-2.5 right-4">
                       <Badge className="bg-[#00A650] hover:bg-[#00A650] text-white text-[10px] uppercase font-bold px-2 py-0.5 shadow-sm">
                         Best Value

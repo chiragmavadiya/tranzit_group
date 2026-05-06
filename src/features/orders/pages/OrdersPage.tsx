@@ -166,7 +166,7 @@ export default function OrdersPage() {
           searchValue={search}
           pageSize={pageSize}
           onPageSizeChange={handlePageSizeChange}
-          pageSizeInFooter
+          // pageSizeInFooter
           headerTitle='Orders'
           headerDescription='Manage and track your customer orders across all channels.'
           headerClass="h-20"

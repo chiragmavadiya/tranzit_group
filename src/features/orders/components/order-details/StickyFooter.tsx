@@ -4,7 +4,8 @@ import {
   Save,
   Download,
   Printer,
-  ChevronUp
+  ChevronUp,
+  Loader2
 } from 'lucide-react'
 import {
   DropdownMenu,
@@ -13,7 +14,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
 
-export const StickyFooter: React.FC<{ orderType: string | undefined }> = ({ orderType }) => {
+export const StickyFooter: React.FC<{ orderType: string | undefined, onSave?: () => void, saveLoading: boolean }> = ({ orderType, onSave, saveLoading }) => {
   return (
     <div className="sticky bottom-0 -left-5 right-20 bg-white dark:bg-zinc-950 border-t border-gray-200 dark:border-zinc-800 p-3 flex justify-center items-center gap-3 z-50 shadow-[0_-4px_10px_rgba(0,0,0,0.05)] dark:shadow-[0_-4px_10px_rgba(0,0,0,0.2)] transition-colors duration-300">
       {orderType === 'new' && (
@@ -45,15 +46,14 @@ export const StickyFooter: React.FC<{ orderType: string | undefined }> = ({ orde
         </>
       )}
       {orderType === 'create' && (
-        // <Button variant="outline" className="flex items-center gap-2 border-blue-600 dark:border-zinc-800 text-[#0060FE] font-bold h-8 px-6 uppercase text-xs hover:bg-gray-50 dark:hover:bg-zinc-900 transition-colors">
-        //   <Printer className="h-4 w-4" />
-        //   Reprint Lable
-        // </Button>
-        <Button variant="default"
-        // className="flex items-center gap-2 border-gray-200 dark:border-zinc-800 text-[#0060FE] font-bold h-8 px-6 uppercase text-xs hover:bg-gray-50 dark:hover:bg-zinc-900 transition-colors"
+        <Button
+          onClick={onSave}
+          variant="default"
+          disabled={saveLoading}
+          className={`flex items-center gap-2 h-8 px-6 uppercase text-xs font-bold transition-all bg-[#0060FE] hover:bg-blue-700 text-white shadow-sm`}
         >
-          <Save className="h-4 w-4" />
-          SAVE
+          {saveLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
+          Save
         </Button>
       )}
     </div>

@@ -192,15 +192,6 @@ export function DataTable<T extends Record<string, any>>({
           <div className="flex items-center justify-between gap-4 relative">
             <div className="flex items-center gap-2 ml-auto">
               {headerPosition == 'left' && customHeader && (typeof customHeader === 'function' ? (customHeader as () => ReactNode)() : customHeader)}
-              {searchable && (
-                <FormInput
-                  placeholder={searchPlaceholder}
-                  value={currentSearch}
-                  onChange={handleSearch}
-                  icon={Search}
-                  className="pl-8 w-62 h-8"
-                />
-              )}
               {pagination && !pageSizeInFooter && (
                 <SelectComponent
                   data={DEFAULT_PAGE_SIZES}
@@ -208,6 +199,15 @@ export function DataTable<T extends Record<string, any>>({
                   placeholder="Select Page Size"
                   className="w-[70px] h-8 text-xs font-bold"
                   onValueChange={(value: string | null) => value && setPaginationPageSize(Number(value))}
+                />
+              )}
+              {searchable && (
+                <FormInput
+                  placeholder={searchPlaceholder}
+                  value={currentSearch}
+                  onChange={handleSearch}
+                  icon={Search}
+                  className="w-62 h-8"
                 />
               )}
               {exportable && (

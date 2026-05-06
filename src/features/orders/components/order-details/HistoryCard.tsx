@@ -1,49 +1,26 @@
 import React, { useState } from 'react'
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card'
-import { ChevronDown, ChevronUp, Download } from 'lucide-react'
+import { ChevronDown, ChevronUp } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 
-interface HistoryItem {
-  id: string
-  timestamp: string
-  action: string
-  details?: string
+interface HistoryCardProps {
+  history?: {
+    title: string
+    description: string
+    date_time: string
+  }[]
 }
 
-const mockHistory: HistoryItem[] = [
-  {
-    id: '1',
-    timestamp: '07/04/26 09:33 PM',
-    action: 'Shipment Saved',
-    details: 'Shipment saved Blazor_New [Saved]'
-  },
-  {
-    id: '2',
-    timestamp: '07/04/26 09:33 PM',
-    action: 'Shipment Saved',
-    details: 'Shipment saved Blazor_New [Saved]'
-  },
-  {
-    id: '3',
-    timestamp: '07/04/26 09:33 PM',
-    action: 'Shipment Saved',
-    details: 'Shipment saved Blazor_New [Saved]'
-  },
-  {
-    id: '4',
-    timestamp: '07/04/26 09:33 PM',
-    action: 'Shipment Saved',
-    details: 'Shipment saved Blazor_New [Saved]'
-  },
-  {
-    id: '5',
-    timestamp: '07/04/26 09:33 PM',
-    action: 'Shipment Saved',
-    details: 'Shipment saved Blazor_New [Saved]'
-  },
-]
+export const HistoryCard: React.FC<HistoryCardProps> = ({ history }) => {
+  const displayHistory = history && history.length > 0
+    ? history.map((item, index) => ({
+      id: String(index),
+      timestamp: item.date_time,
+      action: item.title,
+      details: item.description
+    }))
+    : [];
 
-export const HistoryCard: React.FC = () => {
   const [isCardExpanded, setIsCardExpanded] = useState(true)
   const [expandedItems, setExpandedItems] = useState<Record<string, boolean>>({})
 
@@ -75,12 +52,12 @@ export const HistoryCard: React.FC = () => {
       {isCardExpanded && (
         <CardContent className="p-0 bg-white dark:bg-zinc-950">
           <div className="flex flex-col">
-            {mockHistory.map((item) => {
+            {displayHistory.map((item) => {
               const isExpanded = expandedItems[item.id]
               return (
                 <div key={item.id}>
                   <div
-                    className="flex items-center justify-between px-5 py-2 transition-colors hover:bg-gray-50/50 dark:hover:bg-zinc-900/50"
+                    className="space-y-2 flex items-center justify-between px-5 py-2 transition-colors hover:bg-gray-50/50 dark:hover:bg-zinc-900/50"
                   >
                     <div className="flex items-center gap-4 flex-1">
                       <Button
@@ -95,21 +72,24 @@ export const HistoryCard: React.FC = () => {
                           <ChevronDown className="h-4 w-4" />
                         )}
                       </Button>
-                      <span className="text-xs font-medium text-gray-500 dark:text-zinc-400 whitespace-nowrap">
+                      {/* <span className="text-xs font-medium text-gray-500 dark:text-zinc-400 whitespace-nowrap">
                         {item.timestamp}
-                      </span>
+                      </span> */}
                       <span className="text-xs font-bold text-gray-900 dark:text-zinc-100">
                         {item.action}
                       </span>
                     </div>
 
-                    <Button
+                    {/* <Button
                       variant="ghost"
                       size="icon"
                       className="h-8 w-8 text-[#0060FE] hover:bg-blue-50 dark:hover:bg-blue-900/20"
                     >
                       <Download className="h-4 w-4" />
-                    </Button>
+                    </Button> */}
+                    <span className="text-xs font-medium text-gray-500 dark:text-zinc-400 whitespace-nowrap">
+                      {item.timestamp}
+                    </span>
                   </div>
 
                   {isExpanded && item.details && (

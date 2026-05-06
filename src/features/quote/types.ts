@@ -33,6 +33,7 @@ export interface ServiceRate {
   carrier_id: number;
   courierCode: string;
   service_code: string;
+  code?: string;
   service_name: string;
   base: number;
   gst: number;

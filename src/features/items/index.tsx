@@ -182,7 +182,7 @@ export default function MyItemsPage() {
           searchValue={search}
           pageSize={pageSize}
           onPageSizeChange={handlePageSizeChange}
-          pageSizeInFooter
+          // pageSizeInFooter
           customHeader={<ItemsHeader onAddItem={handleAddItem} />}
           headerTitle='My Items'
           headerDescription='Manage your shipping items, dimensions, and cubic measurements.'

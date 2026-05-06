@@ -1,4 +1,3 @@
-// import { useState, useRef, useCallback } from 'react'
 import {
   Accordion,
   AccordionContent,
@@ -9,7 +8,9 @@ import {
 // import SelectComponent from '@/components/ui/select'
 // import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
-// import { Upload, X } from 'lucide-react'
+import { Shield, PenLine, CheckCircle2 } from 'lucide-react'
+import { Switch } from '@/components/ui/switch'
+import DatePicker from '@/components/common/DatePicker';
 // import { DOCUMENT_TYPES } from '@/features/orders/constants'
 
 // Moved to constants.ts
@@ -24,9 +25,18 @@ import { Textarea } from '@/components/ui/textarea'
 interface SidePanelProps {
   itemsData?: any[];
   quoteData?: any;
+  handleOptionalFieldsChange: (type: "insurance" | "signature" | "delivery_instructions", value: boolean | string) => void;
+  insuranceSelected: boolean;
+  signatureSelected: boolean;
+  deliveryInstructions: string;
+  pickupDate: Date | undefined;
+  setPickupDate: React.Dispatch<React.SetStateAction<Date | undefined>>;
+  orderType?: string;
 }
 
-export const SidePanel: React.FC<SidePanelProps> = ({ itemsData, quoteData }) => {
+export const SidePanel: React.FC<SidePanelProps> = ({ itemsData, quoteData, handleOptionalFieldsChange, insuranceSelected, signatureSelected, deliveryInstructions, pickupDate, setPickupDate, orderType }) => {
+
+
   // const [tags, setTags] = useState<string[]>(['PRINTED BY: ZACK%40YOPMAIL.COM'])
   // const [tagInput, setTagInput] = useState('')
   // const [uploadedDocs, setUploadedDocs] = useState<UploadedDocument[]>([])
@@ -91,17 +101,192 @@ export const SidePanel: React.FC<SidePanelProps> = ({ itemsData, quoteData }) =>
 
   return (
     <div className="flex flex-col gap-4">
-      <Accordion multiple defaultValue={['notes', 'documents', 'tags', 'details', 'breakdown']} className="flex flex-col gap-3">
+      <Accordion multiple defaultValue={['notes', 'services', 'summary', 'pickup_date']} className="flex flex-col gap-3">
+
+        {/* ORDER QUOTATION SUMMARY */}
+        <AccordionItem value="summary" className="border border-gray-200 dark:border-zinc-800 rounded-xl bg-white dark:bg-zinc-950 shadow-sm px-5 border-b overflow-hidden transition-colors duration-300 [&>h3]:my-0">
+          <AccordionTrigger className="hover:no-underline py-3 px-0 [&>svg]:text-[#0060FE] dark:[&>svg]:text-blue-500">
+            <span className="text-sm font-bold text-gray-900 dark:text-zinc-100 tracking-wider">ORDER QUOTATION SUMMARY</span>
+          </AccordionTrigger>
+          <AccordionContent className="flex flex-col gap-2 pb-4 pt-1">
+            {(() => {
+              const totalItems = itemsData?.reduce((acc, item) => acc + (Number(item.quantity) || 1), 0) || 0;
+              const totalWeight = itemsData?.reduce((acc, item) => acc + (Number(item.weight) * (Number(item.quantity) || 1)), 0) || 0;
+              const volumetric = itemsData?.reduce((acc, item) => {
+                const w = Number(item.width) || 0;
+                const h = Number(item.height) || 0;
+                const l = Number(item.length) || 0;
+                const q = Number(item.quantity) || 1;
+                return acc + ((w * h * l) / 1000000) * q;
+              }, 0) || 0;
+
+              const servicePrice = quoteData?.courier?.base || 0;
+              const gst = quoteData?.courier?.gst || 0;
+              const totalSurcharges = quoteData?.totalSurcharges || 0;
+              const insuranceCost = insuranceSelected ? 6.00 : 0;
+              const grandTotal = (quoteData?.totalPrice || 0) + insuranceCost;
+
+              return (
+                <>
+                  <div className="flex justify-between items-center text-xs">
+                    <span className="text-gray-500 dark:text-zinc-400 font-medium">Total Items</span>
+                    <span className="font-bold text-gray-900 dark:text-zinc-100">{totalItems}</span>
+                  </div>
+                  <div className="flex justify-between items-center text-xs">
+                    <span className="text-gray-500 dark:text-zinc-400 font-medium">Total Weight</span>
+                    <span className="font-bold text-gray-900 dark:text-zinc-100">{totalWeight.toFixed(2)} kg</span>
+                  </div>
+                  <div className="flex justify-between items-center text-xs">
+                    <span className="text-gray-500 dark:text-zinc-400 font-medium">Volumetric</span>
+                    <span className="font-bold text-gray-900 dark:text-zinc-100">{volumetric.toFixed(3)} m³</span>
+                  </div>
+
+                  <div className="border-t border-gray-100 dark:border-zinc-800 my-1"></div>
+
+                  <div className="flex justify-between items-center text-xs">
+                    <span className="text-gray-500 dark:text-zinc-400 font-medium">Service (Inc. F.L)</span>
+                    <span className="font-bold text-gray-900 dark:text-zinc-100">${servicePrice.toFixed(2)}</span>
+                  </div>
+                  <div className="flex justify-between items-center text-xs">
+                    <span className="text-gray-500 dark:text-zinc-400 font-medium">Extra surcharges</span>
+                    <span className="font-bold text-gray-900 dark:text-zinc-100">${totalSurcharges.toFixed(2)}</span>
+                  </div>
+                  {insuranceSelected && (
+                    <div className="flex justify-between items-center text-xs text-[#0060FE] dark:text-blue-400 animate-in fade-in slide-in-from-top-1">
+                      <span className="font-medium">Shipment Protection</span>
+                      <span className="font-bold">+$6.00</span>
+                    </div>
+                  )}
+                  <div className="flex justify-between items-center text-xs">
+                    <span className="text-gray-500 dark:text-zinc-400 font-medium">GST</span>
+                    <span className="font-bold text-gray-900 dark:text-zinc-100">${gst.toFixed(2)}</span>
+                  </div>
+
+                  <div className="border-t border-gray-100 dark:border-zinc-800 my-1 pt-2 flex justify-between items-center">
+                    <span className="text-xs text-gray-900 dark:text-zinc-100 font-bold uppercase">Total inc GST & F.L</span>
+                    <span className="text-sm font-bold text-[#0060FE] dark:text-blue-500">${grandTotal.toFixed(2)}</span>
+                  </div>
+                </>
+              );
+            })()}
+          </AccordionContent>
+        </AccordionItem>
+
+        {/* ADDITIONAL SERVICES */}
+        {orderType === 'create' && (
+          <>
+
+            <AccordionItem value="services" className="border border-gray-200 dark:border-zinc-800 rounded-xl bg-white dark:bg-zinc-950 shadow-sm px-5 border-b overflow-hidden transition-colors duration-300 [&>h3]:my-0">
+              <AccordionTrigger className="hover:no-underline py-3 px-0 [&>svg]:text-[#0060FE] dark:[&>svg]:text-blue-500">
+                <span className="text-sm font-bold text-gray-900 dark:text-zinc-100 tracking-wider">ADDITIONAL SERVICES</span>
+              </AccordionTrigger>
+              <AccordionContent className="flex flex-col gap-5 pb-4 pt-1">
+
+                {/* Shipment Protection */}
+                {quoteData?.courier?.base > 100 && (
+                  <div className="flex flex-col gap-3">
+                    <div className="flex items-center gap-2">
+                      <div className="p-1.5 bg-blue-50 dark:bg-blue-900/20 rounded-md">
+                        <Shield className="w-4 h-4 text-[#0060FE] dark:text-blue-500" />
+                      </div>
+                      <div>
+                        <h4 className="text-xs font-bold text-gray-900 dark:text-zinc-100">Shipment Protection</h4>
+                        <p className="text-[10px] text-gray-500 dark:text-zinc-400 font-medium">Protect your shipment against loss or damage</p>
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-3">
+                      <button
+                        type="button"
+                        onClick={() => handleOptionalFieldsChange('insurance', false)}
+                        className={`cursor-pointer flex flex-col items-start p-3 rounded-[12px] border text-left transition-all duration-200 ${!insuranceSelected
+                          ? 'border-[#0060FE] bg-blue-50/50 dark:bg-blue-900/10 dark:border-blue-500 ring-1 ring-[#0060FE]/20 shadow-sm'
+                          : 'border-gray-200 dark:border-zinc-800 hover:border-gray-300 dark:hover:border-zinc-700 bg-white dark:bg-zinc-950 shadow-sm'
+                          }`}
+                      >
+                        <div className="flex justify-between w-full items-center mb-1">
+                          <span className={`text-xs font-bold ${!insuranceSelected ? 'text-[#0060FE] dark:text-blue-400' : 'text-gray-700 dark:text-zinc-300'}`}>
+                            No protection
+                          </span>
+                          {!insuranceSelected && <CheckCircle2 className="w-3.5 h-3.5 text-[#0060FE] dark:text-blue-500" />}
+                        </div>
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={() => handleOptionalFieldsChange('insurance', true)}
+                        className={`cursor-pointer flex flex-col items-start p-3 rounded-[12px] border text-left transition-all duration-200 ${insuranceSelected
+                          ? 'border-[#0060FE] bg-blue-50/50 dark:bg-blue-900/10 dark:border-blue-500 ring-1 ring-[#0060FE]/20 shadow-sm'
+                          : 'border-gray-200 dark:border-zinc-800 hover:border-gray-300 dark:hover:border-zinc-700 bg-white dark:bg-zinc-950 shadow-sm'
+                          }`}
+                      >
+                        <div className="flex justify-between w-full items-center mb-1">
+                          <span className={`text-xs font-bold ${insuranceSelected ? 'text-[#0060FE] dark:text-blue-400' : 'text-gray-700 dark:text-zinc-300'}`}>
+                            Add cover
+                          </span>
+                          {insuranceSelected && <CheckCircle2 className="w-3.5 h-3.5 text-[#0060FE] dark:text-blue-500" />}
+                        </div>
+                        <span className="text-[10px] text-gray-500 dark:text-zinc-400 font-medium">up to $100</span>
+                        <div className="mt-2 w-full text-right">
+                          <span className="text-xs font-bold text-gray-900 dark:text-zinc-100">+$6.00 AUD</span>
+                        </div>
+                      </button>
+                    </div>
+                  </div>
+                )}
+                <div className="border-t border-gray-100 dark:border-zinc-800/80"></div>
+
+                {/* Signature on Delivery */}
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <div className="p-1.5 bg-gray-200 dark:bg-zinc-900 rounded-md">
+                      <PenLine className="w-4 h-4 text-gray-600 dark:text-zinc-400" />
+                    </div>
+                    <div>
+                      <h4 className="text-xs font-bold text-gray-900 dark:text-zinc-100">Signature on Delivery</h4>
+                      <p className="my-0 text-[10px] text-gray-500 dark:text-zinc-400 font-medium">Ensure the parcel is handed over securely</p>
+                    </div>
+                  </div>
+                  <Switch
+                    checked={signatureSelected}
+                    onCheckedChange={(value) => handleOptionalFieldsChange('signature', value)}
+                    className="data-[state=checked]:bg-[#0060FE] dark:data-[state=checked]:bg-blue-500 shadow-sm"
+                  />
+                </div>
+
+              </AccordionContent>
+            </AccordionItem>
+
+
+            {/* PICKUP DATE */}
+            <AccordionItem value="pickup_date" className="border border-gray-200 dark:border-zinc-800 rounded-xl bg-white dark:bg-zinc-950 shadow-sm px-5 border-b overflow-hidden transition-colors duration-300 [&>h3]:my-0">
+              <AccordionTrigger className="hover:no-underline py-3 px-0 [&>svg]:text-[#0060FE] dark:[&>svg]:text-blue-500 items-center">
+                <span className="text-sm font-bold text-gray-900 dark:text-zinc-100 tracking-wider">Pickup Date</span>
+              </AccordionTrigger>
+              <AccordionContent className="pb-4 justify-self-start">
+                <DatePicker date={pickupDate} setDate={setPickupDate} />
+              </AccordionContent>
+            </AccordionItem>
+          </>
+        )}
         {/* NOTES */}
         <AccordionItem value="notes" className="border border-gray-200 dark:border-zinc-800 rounded-xl bg-white dark:bg-zinc-950 shadow-sm px-5 border-b overflow-hidden transition-colors duration-300 [&>h3]:my-0">
           <AccordionTrigger className="hover:no-underline py-3 px-0 [&>svg]:text-[#0060FE] dark:[&>svg]:text-blue-500 items-center">
             <span className="text-sm font-bold text-gray-900 dark:text-zinc-100 tracking-wider">Delivery Instructions(Printed on Label)</span>
           </AccordionTrigger>
           <AccordionContent className="flex flex-col gap-2 pb-4">
-            <Textarea
-              className="min-h-[100px] border-gray-200 dark:border-zinc-800 text-xs text-gray-700 dark:text-zinc-300 focus:border-[#0060FE] dark:focus:border-blue-500 focus:ring-0 focus-visible:ring-0 transition-all duration-200 shadow-none font-medium"
-              placeholder="Add your notes here..."
-            />
+            {orderType !== 'create' ? (
+              <div className="p-3 rounded-lg bg-gray-50 dark:bg-zinc-900 border border-gray-100 dark:border-zinc-800 text-xs font-medium text-gray-700 dark:text-zinc-300 min-h-[50px]">
+                {deliveryInstructions || "No delivery instructions provided."}
+              </div>
+            ) : (
+              <Textarea
+                className="min-h-[100px] border-gray-200 dark:border-zinc-800 text-xs text-gray-700 dark:text-zinc-300 focus:border-[#0060FE] dark:focus:border-blue-500 focus:ring-0 focus-visible:ring-0 transition-all duration-200 shadow-none font-medium"
+                placeholder="Add your notes here..."
+                value={deliveryInstructions}
+                onChange={(e) => handleOptionalFieldsChange('delivery_instructions', e.target.value)}
+              />
+            )}
           </AccordionContent>
         </AccordionItem>
 
@@ -175,67 +360,6 @@ export const SidePanel: React.FC<SidePanelProps> = ({ itemsData, quoteData }) =>
           </AccordionContent>
         </AccordionItem> */}
 
-        {/* ORDER QUOTATION SUMMARY */}
-        <AccordionItem value="summary" className="border border-gray-200 dark:border-zinc-800 rounded-xl bg-white dark:bg-zinc-950 shadow-sm px-5 border-b overflow-hidden transition-colors duration-300 [&>h3]:my-0">
-          <AccordionTrigger className="hover:no-underline py-3 px-0 [&>svg]:text-[#0060FE] dark:[&>svg]:text-blue-500">
-            <span className="text-sm font-bold text-gray-900 dark:text-zinc-100 tracking-wider">ORDER QUOTATION SUMMARY</span>
-          </AccordionTrigger>
-          <AccordionContent className="flex flex-col gap-2 pb-4 pt-1">
-            {(() => {
-              const totalItems = itemsData?.reduce((acc, item) => acc + (Number(item.quantity) || 1), 0) || 0;
-              const totalWeight = itemsData?.reduce((acc, item) => acc + (Number(item.weight) * (Number(item.quantity) || 1)), 0) || 0;
-              const volumetric = itemsData?.reduce((acc, item) => {
-                const w = Number(item.width) || 0;
-                const h = Number(item.height) || 0;
-                const l = Number(item.length) || 0;
-                const q = Number(item.quantity) || 1;
-                return acc + ((w * h * l) / 1000000) * q;
-              }, 0) || 0;
-
-              const servicePrice = quoteData?.courier?.price || 0;
-              const gst = quoteData?.courier?.gst || 0;
-              const totalSurcharges = quoteData?.totalSurcharges || 0;
-              const grandTotal = quoteData?.totalPrice || 0;
-
-              return (
-                <>
-                  <div className="flex justify-between items-center text-xs">
-                    <span className="text-gray-500 dark:text-zinc-400 font-medium">Total Items</span>
-                    <span className="font-bold text-gray-900 dark:text-zinc-100">{totalItems}</span>
-                  </div>
-                  <div className="flex justify-between items-center text-xs">
-                    <span className="text-gray-500 dark:text-zinc-400 font-medium">Total Weight</span>
-                    <span className="font-bold text-gray-900 dark:text-zinc-100">{totalWeight.toFixed(2)} kg</span>
-                  </div>
-                  <div className="flex justify-between items-center text-xs">
-                    <span className="text-gray-500 dark:text-zinc-400 font-medium">Volumetric</span>
-                    <span className="font-bold text-gray-900 dark:text-zinc-100">{volumetric.toFixed(3)} m³</span>
-                  </div>
-
-                  <div className="border-t border-gray-100 dark:border-zinc-800 my-1"></div>
-
-                  <div className="flex justify-between items-center text-xs">
-                    <span className="text-gray-500 dark:text-zinc-400 font-medium">Service (Inc. F.L)</span>
-                    <span className="font-bold text-gray-900 dark:text-zinc-100">${servicePrice.toFixed(2)}</span>
-                  </div>
-                  <div className="flex justify-between items-center text-xs">
-                    <span className="text-gray-500 dark:text-zinc-400 font-medium">Extra surcharges</span>
-                    <span className="font-bold text-gray-900 dark:text-zinc-100">${totalSurcharges.toFixed(2)}</span>
-                  </div>
-                  <div className="flex justify-between items-center text-xs">
-                    <span className="text-gray-500 dark:text-zinc-400 font-medium">GST</span>
-                    <span className="font-bold text-gray-900 dark:text-zinc-100">${gst.toFixed(2)}</span>
-                  </div>
-
-                  <div className="border-t border-gray-100 dark:border-zinc-800 my-1 pt-2 flex justify-between items-center">
-                    <span className="text-xs text-gray-900 dark:text-zinc-100 font-bold uppercase">Total inc GST & F.L</span>
-                    <span className="text-sm font-bold text-[#0060FE] dark:text-blue-500">${grandTotal.toFixed(2)}</span>
-                  </div>
-                </>
-              );
-            })()}
-          </AccordionContent>
-        </AccordionItem>
 
         {/* TAGS */}
         {/* <AccordionItem value="tags" className="border border-gray-200 dark:border-zinc-800 rounded-xl bg-white dark:bg-zinc-950 shadow-sm px-5 border-b overflow-hidden transition-colors duration-300">
@@ -270,7 +394,7 @@ export const SidePanel: React.FC<SidePanelProps> = ({ itemsData, quoteData }) =>
         </AccordionItem> */}
 
         {/* ADDITIONAL DETAILS */}
-        <AccordionItem value="details" className="border border-gray-200 dark:border-zinc-800 rounded-xl bg-white dark:bg-zinc-950 shadow-sm px-5 border-b overflow-hidden transition-colors duration-300 [&>h3]:my-0">
+        {/* <AccordionItem value="details" className="border border-gray-200 dark:border-zinc-800 rounded-xl bg-white dark:bg-zinc-950 shadow-sm px-5 border-b overflow-hidden transition-colors duration-300 [&>h3]:my-0">
           <AccordionTrigger className="hover:no-underline py-3 px-0 [&>svg]:text-[#0060FE] dark:[&>svg]:text-blue-500">
             <span className="text-sm font-bold text-gray-900 dark:text-zinc-100 tracking-wider">ADDITIONAL DETAILS</span>
           </AccordionTrigger>
@@ -287,7 +411,7 @@ export const SidePanel: React.FC<SidePanelProps> = ({ itemsData, quoteData }) =>
               <span className="text-gray-700 dark:text-zinc-200">0.00</span>
             </div>
           </AccordionContent>
-        </AccordionItem>
+        </AccordionItem> */}
       </Accordion>
     </div>
   )

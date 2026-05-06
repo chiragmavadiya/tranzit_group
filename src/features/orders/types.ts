@@ -167,6 +167,7 @@ export interface CreateOrderDialogProps {
   type?: 'sender' | 'receiver';
   initialData: AddressData;
   onSubmit: (type: "sender" | "receiver", data: AddressData) => void;
+  isEdit: boolean;
 }
 
 export interface PackingColumn {

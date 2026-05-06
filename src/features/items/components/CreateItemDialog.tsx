@@ -44,7 +44,6 @@ export function CreateItemDialog({
     const w = Number(formData.item_width)
     const h = Number(formData.item_height)
     if (!l || !w || !h) return ""
-    console.log((l * w * h / 1000000).toFixed(3))
     return (l * w * h / 1000000).toFixed(3) // cm³ → m³
   }, [formData.item_length, formData.item_width, formData.item_height])
 
@@ -69,7 +68,6 @@ export function CreateItemDialog({
   useEffect(() => {
     if (!open || !detailsData?.data) return;
     const data = detailsData.data;
-    console.log(data, 'API RESPONSE')
     setFormData({
       ...data,
       item_cubic: data.item_cubic,
@@ -81,7 +79,6 @@ export function CreateItemDialog({
     })
   }, [open, detailsData])
 
-  console.log(formData, 'Form data....');
   return (
     <CustomModel
       title={editingItemId ? 'Edit Item' : 'Add New Item'}

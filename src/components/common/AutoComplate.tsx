@@ -126,6 +126,7 @@ const AutoComplete = React.forwardRef<HTMLInputElement, AutoCompleteProps>(
                                     errormsg={errormsg}
                                     required={required}
                                     className={cn("w-full h-full", className)}
+                                // inputHieight={9}
                                 />
                             </div>
                         )}

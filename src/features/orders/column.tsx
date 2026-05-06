@@ -28,7 +28,7 @@ export const getOrdersColumns = (role: string = "customer"): Column<Order>[] => 
     className: 'text-blue-600 font-bold',
     sticky: 'left',
     cell: (value: string) => (
-      <NavLink to={`${role === "admin" ? "/admin/orders" : "/orders"}/${value}`} className="font-bold text-blue-600 underline dark:text-blue-400 ">
+      <NavLink to={`${role === "admin" ? "/admin/orders/edit" : "/orders/edit"}/${value}`} className="font-bold text-blue-600 underline dark:text-blue-400 ">
         {value}
       </NavLink>
     )

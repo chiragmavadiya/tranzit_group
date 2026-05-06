@@ -4,7 +4,7 @@ import { ShoppingBag, FileText, MapPin, Box, Users } from 'lucide-react';
 import { useAppSelector } from '@/hooks/store.hooks';
 import { useDebounce } from '@/hooks/useDebounce';
 import { useGlobalSearch } from '../hooks/useSearch';
-import { AutoComplete } from '@/components/common';
+import AutoComplete from '@/components/common/AutoComplate';
 
 interface GlobalSearchProps {
     className?: string;
@@ -80,7 +80,7 @@ export const GlobalSearch: React.FC<GlobalSearchProps> = ({
 
         return options;
     }, [searchResults]);
-    console.log(searchOptions, 'searchOptions');
+
     const handleSearchSelect = (value: string) => {
         const [type, id] = value.split('-');
         const option = searchOptions.find(opt => opt.value === value);
@@ -104,25 +104,27 @@ export const GlobalSearch: React.FC<GlobalSearchProps> = ({
     };
 
     return (
-        <AutoComplete
-            placeholder={placeholder}
-            className={className}
-            options={searchOptions}
-            value={searchQuery}
-            onChange={setSearchQuery}
-            onSelect={handleSearchSelect}
-            shouldFilter={false}
-            renderOption={(option: any) => (
-                <div className="flex items-center gap-3 py-1 w-full">
-                    <div className="flex items-center justify-center w-8 h-8 rounded-md bg-slate-50 dark:bg-zinc-800 text-slate-400">
-                        {option.icon && <option.icon className="h-4 w-4" />}
+        <div className='h-8'>
+            <AutoComplete
+                placeholder={placeholder}
+                className={className}
+                options={searchOptions}
+                value={searchQuery}
+                onChange={setSearchQuery}
+                onSelect={handleSearchSelect}
+                shouldFilter={false}
+                renderOption={(option: any) => (
+                    <div className="flex items-center gap-3 py-1 w-full">
+                        <div className="flex items-center justify-center w-8 h-8 rounded-md bg-slate-50 dark:bg-zinc-800 text-slate-400">
+                            {option.icon && <option.icon className="h-4 w-4" />}
+                        </div>
+                        <div className="flex flex-col flex-1">
+                            <span className="text-[13px] font-medium text-slate-900 dark:text-zinc-100">{option.label}</span>
+                            <span className="text-[11px] text-slate-500 dark:text-zinc-500 uppercase tracking-wider font-bold">{option.type}</span>
+                        </div>
                     </div>
-                    <div className="flex flex-col flex-1">
-                        <span className="text-[13px] font-medium text-slate-900 dark:text-zinc-100">{option.label}</span>
-                        <span className="text-[11px] text-slate-500 dark:text-zinc-500 uppercase tracking-wider font-bold">{option.type}</span>
-                    </div>
-                </div>
-            )}
-        />
+                )}
+            />
+        </div>
     );
 };

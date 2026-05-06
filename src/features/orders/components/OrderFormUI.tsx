@@ -66,7 +66,6 @@ export const FormInput = React.forwardRef<HTMLInputElement, FormInputProps>(({
 }, ref) => {
   const [showPassword, setShowPassword] = React.useState(false);
   const isHorizontal = useMemo(() => layout === 'horizontal', [layout]);
-  console.log(label, value, 'LABEL & VALUE')
   const handleChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     onChange(e.target.value, e.target.name || '');
   }, [onChange]);

@@ -67,7 +67,7 @@ const CustomToast = ({ message, type = "default", t }: CustomToastProps) => {
         {/* <h4 className={cn("text-base font-bold leading-tight mb-1", style.titleColor)}>
           {title || style.defaultTitle}
         </h4> */}
-        <p className="text-[14px] font-medium text-slate-700 leading-tight dark:text-slate-400  mb-0">
+        <p className="text-[14px]  line-clamp-4 font-medium text-slate-700 leading-tight dark:text-slate-400  mb-0">
           {message}
         </p>
       </div>

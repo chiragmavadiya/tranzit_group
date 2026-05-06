@@ -29,7 +29,7 @@ export const useOrderDetails = (orderNumber: string | number) => {
     queryKey: QUERY_KEYS.ORDERS.DETAILS(orderNumber),
     queryFn: () => ordersService.getOrderDetails(orderNumber),
     enabled: !!orderNumber,
-    refetchInterval: 30000, // Poll every 30 seconds for detail updates
+    // refetchInterval: 30000, // Poll every 30 seconds for detail updates
   });
 };
 

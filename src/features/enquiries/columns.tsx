@@ -1,21 +1,21 @@
-import type { Column } from '@/components/common';
+import type { Column } from '@/components/common/types/DataTable.types';
 import type { Enquiry, EnquiryStatus } from './types';
 import { Button } from '@/components/ui/button';
 import { Eye } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 const STATUS_CONFIG: Record<EnquiryStatus, { label: string; className: string }> = {
-  pending: { 
-    label: 'Pending', 
-    className: 'bg-orange-50 text-orange-600 dark:bg-orange-500/10 dark:text-orange-400 border-orange-100 dark:border-orange-500/20' 
+  pending: {
+    label: 'Pending',
+    className: 'bg-orange-50 text-orange-600 dark:bg-orange-500/10 dark:text-orange-400 border-orange-100 dark:border-orange-500/20'
   },
-  resolved: { 
-    label: 'Resolved', 
-    className: 'bg-emerald-50 text-emerald-600 dark:bg-emerald-500/10 dark:text-emerald-400 border-emerald-100 dark:border-emerald-500/20' 
+  resolved: {
+    label: 'Resolved',
+    className: 'bg-emerald-50 text-emerald-600 dark:bg-emerald-500/10 dark:text-emerald-400 border-emerald-100 dark:border-emerald-500/20'
   },
-  in_progress: { 
-    label: 'In Progress', 
-    className: 'bg-blue-50 text-blue-600 dark:bg-blue-500/10 dark:text-blue-400 border-blue-100 dark:border-blue-500/20' 
+  in_progress: {
+    label: 'In Progress',
+    className: 'bg-blue-50 text-blue-600 dark:bg-blue-500/10 dark:text-blue-400 border-blue-100 dark:border-blue-500/20'
   }
 };
 

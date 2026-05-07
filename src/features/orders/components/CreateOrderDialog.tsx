@@ -59,7 +59,7 @@ export default function CreateOrderDialog({ onOpenChange, type, open, initialDat
       return
     }
     if (value) return
-    navigate(`/orders`);
+    navigate(-1);
   }
   return (
     <CustomModel

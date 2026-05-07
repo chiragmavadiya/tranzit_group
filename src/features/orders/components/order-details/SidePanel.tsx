@@ -98,7 +98,7 @@ export const SidePanel: React.FC<SidePanelProps> = ({ itemsData, quoteData, hand
   // const handleRemoveDoc = useCallback((id: string) => {
   //   setUploadedDocs(prev => prev.filter(doc => doc.id !== id))
   // }, [])
-
+  console.log(quoteData, 'quoteData')
   return (
     <div className="flex flex-col gap-4">
       <Accordion multiple defaultValue={['notes', 'services', 'summary', 'pickup_date']} className="flex flex-col gap-3">
@@ -120,11 +120,11 @@ export const SidePanel: React.FC<SidePanelProps> = ({ itemsData, quoteData, hand
                 return acc + ((w * h * l) / 1000000) * q;
               }, 0) || 0;
 
-              const servicePrice = quoteData?.courier?.base || 0;
-              const gst = quoteData?.courier?.gst || 0;
+              const servicePrice = quoteData?.courier?.base || quoteData?.subtotal || 0;
+              const gst = quoteData?.courier?.gst || quoteData?.tax || 0;
               const totalSurcharges = quoteData?.totalSurcharges || 0;
               const insuranceCost = insuranceSelected ? 6.00 : 0;
-              const grandTotal = (quoteData?.totalPrice || 0) + insuranceCost;
+              const grandTotal = (quoteData?.totalPrice || quoteData?.total || 0) + insuranceCost;
 
               return (
                 <>

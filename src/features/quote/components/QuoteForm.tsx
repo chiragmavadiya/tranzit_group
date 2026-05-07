@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useMemo } from 'react';
+import { useCallback } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
@@ -17,6 +17,7 @@ import {
 import { MapPin, Plus, Trash2, Calculator, Package } from "lucide-react";
 import AutoComplete from "@/components/common/AutoComplate";
 import type { QuoteItem, QuoteLocation } from "../types";
+import { LOCATION_OPTIONS } from '@/constants';
 
 interface QuoteFormProps {
   items: QuoteItem[];
@@ -52,13 +53,6 @@ export function QuoteForm({ items, setItems, setLocations, onGetRate, isValid }:
     setItems((prev) => prev.map(item => item.id === id ? { ...item, [field]: value } as QuoteItem : item));
   }, [setItems]);
 
-  const locationOptions = useMemo(() => [
-    { value: 'SYD-2000', label: 'Sydney, NSW 2000', suburb: 'Sydney', state: 'NSW', postcode: '2000', country: 'Australia' },
-    { value: 'MEL-3000', label: 'Melbourne, VIC 3000', suburb: 'Melbourne', state: 'VIC', postcode: '3000', country: 'Australia' },
-    { value: 'BNE-4000', label: 'Brisbane, QLD 4000', suburb: 'Brisbane', state: 'QLD', postcode: '4000', country: 'Australia' },
-    { value: 'PER-6000', label: 'Perth, WA 6000', suburb: 'Perth', state: 'WA', postcode: '6000', country: 'Australia' },
-  ], []);
-
   return (
     <div className="space-y-4">
       {/* Addresses Section */}
@@ -75,9 +69,9 @@ export function QuoteForm({ items, setItems, setLocations, onGetRate, isValid }:
               <Label className="text-[13px] font-medium text-slate-600 dark:text-zinc-400">Sender Location</Label>
               <AutoComplete
                 placeholder="Start typing suburb or postcode..."
-                options={locationOptions}
+                options={LOCATION_OPTIONS}
                 onSelect={(val) => {
-                  const opt = locationOptions.find(o => o.value === val);
+                  const opt = LOCATION_OPTIONS.find(o => o.value === val);
                   if (opt) setLocations(prev => ({ ...prev, sender: opt }));
                 }}
                 className="[&>div>input]:h-10 [&>div>input]:text-[13px]"
@@ -88,9 +82,9 @@ export function QuoteForm({ items, setItems, setLocations, onGetRate, isValid }:
               <Label className="text-[13px] font-medium text-slate-600 dark:text-zinc-400">Receiver Location</Label>
               <AutoComplete
                 placeholder="Start typing suburb or postcode..."
-                options={locationOptions}
+                options={LOCATION_OPTIONS}
                 onSelect={(val) => {
-                  const opt = locationOptions.find(o => o.value === val);
+                  const opt = LOCATION_OPTIONS.find(o => o.value === val);
                   if (opt) setLocations(prev => ({ ...prev, receiver: opt }));
                 }}
                 className="[&>div>input]:h-10 [&>div>input]:text-[13px]"

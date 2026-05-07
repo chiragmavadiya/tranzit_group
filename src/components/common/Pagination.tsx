@@ -45,7 +45,7 @@ export const Pagination: React.FC<PaginationProps> = ({
     <div className={cn("px-4 pt-4 flex flex-col md:flex-row items-center justify-between gap-4 border-t border-slate-50 dark:border-zinc-900 bg-white/50 dark:bg-transparent", className)}>
 
       {/* <div className="px-6 py-4 flex flex-col md:flex-row items-center justify-between gap-4 border-t border-slate-50 dark:border-zinc-900 bg-white/50 dark:bg-transparent"> */}
-      <span className="text-[12px] font-medium text-slate-400">
+      <span className="text-[12px] font-medium text-slate-500">
         Showing {totalItems === 0 ? 0 : startIndex + 1} to {endIndex} of {totalItems} entries
       </span>
       {pageSizeInFooter && (

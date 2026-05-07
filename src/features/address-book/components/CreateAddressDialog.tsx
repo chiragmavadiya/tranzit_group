@@ -6,6 +6,7 @@ import { FormInput, FormTextarea, FormSelect } from '@/features/orders/component
 import { AUSTRALIAN_STATES, STREET_TYPES } from '../constants';
 import { useAddressBookDetails } from '../hooks/useAddressBook';
 import { AutoComplete } from '@/components/common';
+import { LOCATION_OPTIONS } from '@/constants';
 
 interface CreateAddressDialogProps {
   open: boolean;
@@ -56,7 +57,7 @@ export function CreateAddressDialog({
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     setSubmited(true);
-
+    console.log(formData);
     if (
       formData.code.trim().length === 0 ||
       formData.contact_person.trim().length === 0 ||
@@ -83,7 +84,7 @@ export function CreateAddressDialog({
     setFormData({ ...data })
   }, [open, detailsData])
 
-
+  console.log(formData.address, 'formData.address')
   return (
     <CustomModel
       title={editingAddressId ? 'Edit Address' : 'Add New Address'}
@@ -108,7 +109,7 @@ export function CreateAddressDialog({
           <div className="space-y-6">
             <div className="flex dark:border-zinc-800 rounded-md overflow-hidden bg-white dark:bg-zinc-950">
               <div className="flex-1 relative flex items-center">
-                <AutoComplete
+                {/* <AutoComplete
                   placeholder="Start typing suburb or postcode..."
                   options={[
                     { value: 'SYD-2000', label: 'Sydney, NSW 2000', suburb: 'Sydney', state: 'NSW', postcode: '2000', country: 'Australia' },
@@ -120,6 +121,28 @@ export function CreateAddressDialog({
                     // const opt = locationOptions.find(o => o.value === val);
                     // if (opt) setLocations(prev => ({ ...prev, sender: opt }));
                   }}
+                /> */}
+                <AutoComplete
+                  // label='Address Information'
+                  placeholder="Search suburb or postcode..."
+                  options={LOCATION_OPTIONS}
+                  defaultValue={formData.address}
+                  onSelect={(val) => {
+                    const opt = LOCATION_OPTIONS.find(o => o.value === val);
+                    if (opt) {
+                      handleChange('address', opt.label);
+                      handleChange('street_name', opt.streetName);
+                      handleChange('street_number', opt.streetNumber);
+                      handleChange('street_type', opt.streetType);
+                      handleChange('suburb', opt.suburb);
+                      handleChange('state', opt.state);
+                      handleChange('postcode', opt.postcode);
+                    }
+                  }}
+                  className="[&>div>input]:h-10 [&>div>input]:text-[13px]"
+                  required
+                  error={submited && formData.address?.trim() === ''}
+                  errormsg="Please enter your address"
                 />
               </div>
             </div>
@@ -185,7 +208,7 @@ export function CreateAddressDialog({
                   label="Special Instructions"
                   value={formData.special_instructions || ''}
                   onChange={(val) => handleChange('special_instructions', val)}
-                  placeholder="Delivery instructions..."
+                  placeholder="instructions..."
                   rows={3}
                   isFullWidth
                 />
@@ -194,7 +217,7 @@ export function CreateAddressDialog({
                   label="Additional Details"
                   value={formData.additional_details || ''}
                   onChange={(val) => handleChange('additional_details', val)}
-                  placeholder="Internal notes..."
+                  placeholder="notes..."
                   rows={3}
                   isFullWidth
                 />

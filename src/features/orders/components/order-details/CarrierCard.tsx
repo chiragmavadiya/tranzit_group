@@ -92,8 +92,6 @@ export const CarrierCard: React.FC<CarrierCardProps> = ({ itemData, addresses, o
           shipment_summary: selectedCourier.shipment_summary,
         })
       }
-    } else {
-      onQuoteChange?.(null);
     }
   }, [selectedServiceId, couriers, surchargesMap, onQuoteChange, setCourierData])
 

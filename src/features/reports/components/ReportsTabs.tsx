@@ -27,7 +27,7 @@ export function ReportsTabs({ activeTab, onTabChange, tabs = REPORT_TABS, classN
             )}
           >
             {tab.label}
-            {tab.count > 0 && (
+            {/* {tab.count > 0 && (
               <span className={cn(
                 "px-1.5 py-0.5 text-[10px] rounded-full font-bold transition-all duration-300",
                 isActive
@@ -36,7 +36,7 @@ export function ReportsTabs({ activeTab, onTabChange, tabs = REPORT_TABS, classN
               )}>
                 {tab.count}
               </span>
-            )}
+            )} */}
           </button>
         );
       })}

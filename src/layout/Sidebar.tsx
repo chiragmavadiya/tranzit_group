@@ -33,6 +33,7 @@ export default function Sidebar({ isCollapsed, setIsCollapsed }: SidebarProps) {
       setIsCollapsed(false);
       setActiveSubmenu(item.name);
     } else if (item.subItems) {
+      setIsCollapsed(false);
       toggleExpand(item.name);
     }
   };
@@ -114,7 +115,7 @@ export default function Sidebar({ isCollapsed, setIsCollapsed }: SidebarProps) {
                       return;
                     }
                     if (item.hasDropdown) {
-                      e.preventDefault();
+                      // e.preventDefault();
                       handleItemClick(item);
                     }
                   }}

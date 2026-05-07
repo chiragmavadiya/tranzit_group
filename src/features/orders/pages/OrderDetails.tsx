@@ -137,6 +137,8 @@ const OrderDetailsPage: React.FC = () => {
       setDeliveryInstructions(orderDetail.delivery_instructions || "")
       setInsuranceSelected(orderDetail.limited_liability_cover?.covered || false)
       setCourierData(orderDetail.courier_details)
+      console.log(orderDetail, 'orderDetail')
+      setQuoteData(orderDetail.order_details)
     }
   }, [orderDetail, orderType, setItemsData])
 

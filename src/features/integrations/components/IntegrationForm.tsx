@@ -1,29 +1,21 @@
 import { useEffect, useState } from "react";
-import {
-    Dialog,
-    DialogContent,
-    DialogHeader,
-    DialogTitle,
-    DialogDescription,
-    DialogFooter
-} from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { FormInput } from "@/features/orders/components/OrderFormUI";
-import { useIntegrationStatus, useConnectIntegration, useSyncIntegration } from "../hooks/useIntegrations";
-import { Loader2, RefreshCw } from 'lucide-react'
+import { useIntegrationStatus, useConnectIntegration, useSyncIntegration, useDisconnectIntegration } from "../hooks/useIntegrations";
+import { Loader2, RefreshCw, Save, Link2Off } from 'lucide-react'
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { showToast } from "@/components/ui/custom-toast";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 
-interface IntegrationDialogProps {
+interface IntegrationFormProps {
     provider: { id: string; name: string; type: string };
-    isOpen: boolean;
-    onOpenChange: (open: boolean) => void;
 }
 
-export function IntegrationDialog({ provider, isOpen, onOpenChange }: IntegrationDialogProps) {
-    const { data: statusResponse, isLoading: loadingStatus } = useIntegrationStatus(provider.id, isOpen);
+export function IntegrationForm({ provider }: IntegrationFormProps) {
+    const { data: statusResponse, isLoading: loadingStatus } = useIntegrationStatus(provider.id, true);
     const connectMutation = useConnectIntegration();
     const syncMutation = useSyncIntegration();
+    const disconnectMutation = useDisconnectIntegration();
 
     const [formData, setFormData] = useState<any>({});
     const [submitted, setSubmitted] = useState(false);
@@ -32,12 +24,12 @@ export function IntegrationDialog({ provider, isOpen, onOpenChange }: Integratio
     useEffect(() => {
         if (statusResponse?.data) {
             setFormData(statusResponse.data);
-        } else if (!isOpen) {
+        } else {
             setFormData({});
             setSubmitted(false);
             setErrors({});
         }
-    }, [statusResponse, isOpen]);
+    }, [statusResponse, provider.id]);
 
     const handleInputChange = (value: any, name: any) => {
         setFormData((prev: any) => ({ ...prev, [name]: value }));
@@ -84,10 +76,15 @@ export function IntegrationDialog({ provider, isOpen, onOpenChange }: Integratio
 
         connectMutation.mutate({ provider: provider.id, data: formData }, {
             onSuccess: () => {
-
-                onOpenChange(false);
+                showToast(`${provider.name} settings updated successfully.`, "success");
             },
         });
+    };
+
+    const handleDisconnect = () => {
+        if (window.confirm(`Are you sure you want to disconnect ${provider.name}?`)) {
+            disconnectMutation.mutate(provider.id);
+        }
     };
 
     const renderFields = () => {
@@ -154,67 +151,96 @@ export function IntegrationDialog({ provider, isOpen, onOpenChange }: Integratio
                     </>
                 );
             default:
-                return null;
+                return (
+                    <div className="py-10 text-center">
+                        <p className="text-slate-500">Configuration for {provider.name} is coming soon.</p>
+                    </div>
+                );
         }
     };
 
+    if (loadingStatus) {
+        return (
+            <div className="flex items-center justify-center py-20">
+                <Loader2 className="w-8 h-8 animate-spin text-blue-600" />
+            </div>
+        );
+    }
+
+    const isConnected = statusResponse?.data?.connected;
+
     return (
-        <Dialog open={isOpen} onOpenChange={onOpenChange}>
-            <DialogContent className="sm:max-w-[500px] py-0 gap-0">
-                <DialogHeader className="border-b ">
-                    <DialogTitle className="flex items-center">
-                        {provider.name} Settings
-                    </DialogTitle>
-                    <DialogDescription>
-                        Configure your {provider.name} integration credentials below.
-                    </DialogDescription>
-                </DialogHeader>
-
-                {loadingStatus ? (
-                    <div className="flex items-center justify-center py-10">
-                        <Loader2 className="w-6 h-6 animate-spin text-blue-600" />
-                    </div>
-                ) : (
-                    <form onSubmit={onSubmit} className="space-y-4 py-4">
+        <Card className="bg-white dark:bg-zinc-950 rounded-xl border ring-0 border-gray-100 dark:border-zinc-800 shadow-md p-6">
+            <CardHeader className="px-0 pt-0">
+                <CardTitle className="text-xl font-bold text-slate-900 dark:text-zinc-100">
+                    {provider.name} Settings
+                </CardTitle>
+                <CardDescription>
+                    Configure your {provider.name} integration credentials below.
+                </CardDescription>
+            </CardHeader>
+            <CardContent className="px-0">
+                <form onSubmit={onSubmit} className="space-y-6 ">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         {renderFields()}
+                    </div>
 
-                        {statusResponse?.data?.connected && provider.type === 'ecommerce' && (
-                            <Alert className="bg-blue-50 border-blue-100 dark:bg-blue-900/10 dark:border-blue-900/20">
-                                <RefreshCw className="h-4 w-4 text-blue-600" />
-                                <AlertTitle className="text-sm font-bold text-blue-800 dark:text-blue-300">Sync Data</AlertTitle>
-                                <AlertDescription className="text-xs text-blue-700 dark:text-blue-400 flex items-center justify-between mt-2">
-                                    Last synced: {statusResponse.data.last_synced_at || 'Never'}
-                                    <Button
-                                        type="button"
-                                        variant="outline"
-                                        size="sm"
-                                        className="h-7 text-[10px] bg-white"
-                                        onClick={() => syncMutation.mutate(provider.id)}
-                                        disabled={syncMutation.isPending}
-                                    >
-                                        {syncMutation.isPending ? <Loader2 className="w-3 h-3 animate-spin mr-1" /> : <RefreshCw className="w-3 h-3 mr-1" />}
-                                        Sync Now
-                                    </Button>
-                                </AlertDescription>
-                            </Alert>
+                    {isConnected && provider.type === 'ecommerce' && (
+                        <Alert className="bg-blue-50 border-blue-100 dark:bg-blue-900/10 dark:border-blue-900/20 max-w-2xl">
+                            <RefreshCw className="h-4 w-4 text-blue-600" />
+                            <AlertTitle className="text-sm font-bold text-blue-800 dark:text-blue-300">Sync Data</AlertTitle>
+                            <AlertDescription className="text-xs text-blue-700 dark:text-blue-400 flex items-center justify-between mt-2">
+                                Last synced: {statusResponse.data.last_synced_at || 'Never'}
+                                <Button
+                                    type="button"
+                                    variant="outline"
+                                    size="sm"
+                                    className="h-7 text-[10px] bg-white border-blue-200 hover:bg-blue-50"
+                                    onClick={() => syncMutation.mutate(provider.id)}
+                                    disabled={syncMutation.isPending}
+                                >
+                                    {syncMutation.isPending ? <Loader2 className="w-3 h-3 animate-spin mr-1" /> : <RefreshCw className="w-3 h-3 mr-1" />}
+                                    Sync Now
+                                </Button>
+                            </AlertDescription>
+                        </Alert>
+                    )}
+
+                    <div className="pt-6 border-t border-slate-100 dark:border-zinc-800 flex items-center justify-between gap-3">
+                        {isConnected ? (
+                            <Button
+                                type="button"
+                                variant="ghost"
+                                className="text-red-500 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-950/20 font-bold text-xs"
+                                onClick={handleDisconnect}
+                                disabled={disconnectMutation.isPending}
+                            >
+                                {disconnectMutation.isPending ? (
+                                    <Loader2 className="w-4 h-4  animate-spin" />
+                                ) : (
+                                    <Link2Off className="w-4 h-4 " />
+                                )}
+                                Disconnect Integration
+                            </Button>
+                        ) : (
+                            <div /> /* Spacer */
                         )}
 
-                        <DialogFooter className="pt-4">
-                            <Button variant="outline" type="button" onClick={() => onOpenChange(false)}>
-                                Cancel
-                            </Button>
-                            <Button
-                                type="submit"
-                                className="bg-[#0060FE] hover:bg-blue-700 text-white"
-                                disabled={connectMutation.isPending}
-                            >
-                                {connectMutation.isPending && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
-                                {statusResponse?.data?.connected ? "Update Settings" : "Connect Integration"}
-                            </Button>
-                        </DialogFooter>
-                    </form>
-                )}
-            </DialogContent>
-        </Dialog>
+                        <Button
+                            type="submit"
+                            className="bg-[#0060FE] hover:bg-blue-700 text-white min-w-[140px] font-bold"
+                            disabled={connectMutation.isPending}
+                        >
+                            {connectMutation.isPending ? (
+                                <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                            ) : (
+                                <Save className="w-4 h-4 mr-2" />
+                            )}
+                            {isConnected ? "Save Settings" : "Connect Integration"}
+                        </Button>
+                    </div>
+                </form>
+            </CardContent>
+        </Card>
     );
 }

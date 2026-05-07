@@ -61,12 +61,12 @@ export const clientSidebarItems: SidebarItem[] = [
   {
     name: 'My Wallet',
     icon: Wallet,
-    path: '/wallet',
-    hasDropdown: true,
-    subItems: [
-      { name: 'Transactions', path: '/wallet/transactions' },
-      { name: 'Top Up', path: '/wallet/top-up' },
-    ]
+    path: '/wallet/transactions',
+    // hasDropdown: true,
+    // subItems: [
+    // { name: 'Transactions', path: '/wallet/transactions' },
+    // { name: 'Top Up', path: '/wallet/top-up' },
+    // ]
 
   },
   { name: 'My Items', icon: Box, path: '/items' },

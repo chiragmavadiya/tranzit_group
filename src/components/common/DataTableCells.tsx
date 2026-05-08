@@ -10,24 +10,25 @@ import {
 import { MoreHorizontal, Eye, Edit, Trash, ExternalLink } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useNavigate } from 'react-router-dom';
+import { STATUS_STYLE } from '@/constants';
 
 // Status Badge Cell Renderer
 interface StatusCellProps {
   value: string;
-  statusConfig?: Record<string, { className: string; label?: string }>;
+  statusConfig?: Record<string, string>;
 }
 
 export const StatusCell: React.FC<StatusCellProps> = ({ value, statusConfig }) => {
-  const defaultStatusConfig: Record<string, { className: string; label?: string }> = {
-    active: { className: 'bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-400' },
-    inactive: { className: 'bg-gray-100 text-gray-800 dark:bg-gray-900/20 dark:text-gray-400' },
-    pending: { className: 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/20 dark:text-yellow-400' },
-    completed: { className: 'bg-blue-100 text-blue-800 dark:bg-blue-900/20 dark:text-blue-400' },
-    cancelled: { className: 'bg-red-100 text-red-800 dark:bg-red-900/20 dark:text-red-400' },
-    draft: { className: 'bg-gray-100 text-gray-800 dark:bg-gray-900/20 dark:text-gray-400' },
-  };
+  // const defaultStatusConfig: Record<string, { className: string; label?: string }> = {
+  //   active: { className: 'bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-400' },
+  //   inactive: { className: 'bg-gray-100 text-gray-800 dark:bg-gray-900/20 dark:text-gray-400' },
+  //   pending: { className: 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/20 dark:text-yellow-400' },
+  //   completed: { className: 'bg-blue-100 text-blue-800 dark:bg-blue-900/20 dark:text-blue-400' },
+  //   cancelled: { className: 'bg-red-100 text-red-800 dark:bg-red-900/20 dark:text-red-400' },
+  //   draft: { className: 'bg-gray-100 text-gray-800 dark:bg-gray-900/20 dark:text-gray-400' },
+  // };
 
-  const config = statusConfig || defaultStatusConfig;
+  const config = statusConfig || STATUS_STYLE;
   const statusKey = value?.toLowerCase();
   const statusStyle = config[statusKey] || config.draft;
 
@@ -36,10 +37,10 @@ export const StatusCell: React.FC<StatusCellProps> = ({ value, statusConfig }) =
       variant="secondary"
       className={cn(
         "px-2 py-1 text-xs font-medium border-none",
-        statusStyle.className
+        statusStyle
       )}
     >
-      {statusStyle.label || value}
+      {value}
     </Badge>
   );
 };

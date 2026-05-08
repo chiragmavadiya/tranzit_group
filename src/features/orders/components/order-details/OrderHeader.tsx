@@ -5,15 +5,19 @@ import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 // import { DropdownUI } from '@/features/orders/components/OrderFormUI'
 import { ConformationModal } from '@/components/common/ConformationModal'
+import type { OrderDetailData } from '../../types/order-details.types'
+import { cn } from '@/lib/utils'
+import { Order_status_styles } from '../../constants'
 
 
 interface OrderHeaderProps {
   orderID?: string
   orderType?: string
   onSave?: () => void
+  orderDetail: OrderDetailData
 }
 
-export const OrderHeader: React.FC<OrderHeaderProps> = ({ orderID = '4', orderType = 'create', onSave }) => {
+export const OrderHeader: React.FC<OrderHeaderProps> = ({ orderID = '4', orderType = 'create', onSave, orderDetail }) => {
   const navigate = useNavigate()
   const [showConfirm, setShowConfirm] = useState(false)
 
@@ -129,18 +133,17 @@ export const OrderHeader: React.FC<OrderHeaderProps> = ({ orderID = '4', orderTy
       </div>
 
       {orderType !== 'create' && (<div className="flex flex-wrap items-center gap-x-6 gap-y-2 text-xs text-gray-500 dark:text-zinc-400 font-medium">
-        <Badge variant="secondary" className="bg-gray-100 dark:bg-zinc-800 text-gray-500 dark:text-zinc-400 border-none rounded-sm px-2 py-0 h-5 font-bold">
-          NEW
+        <Badge variant="secondary" className="bg-gray-100 dark:bg-zinc-800 text-gray-500 dark:text-zinc-400 border-none rounded-sm px-2 py-0 h-5 uppercase font-bold">
+          {orderDetail?.order_type || 'NEW'}
         </Badge>
+
+
         <div className="flex items-center gap-1">
-          Last updated <span className="text-gray-700 dark:text-zinc-300">06/04/26 10:22 PM</span>
+          Created <span className="text-gray-700 dark:text-zinc-300">{orderDetail.created_human}</span>
         </div>
-        <div className="flex items-center gap-1">
-          Manual order created <span className="text-gray-700 dark:text-zinc-300">06/04/26 10:22 PM</span>
-        </div>
-        <div className="flex items-center gap-1">
-          Reference #
-        </div>
+        <Badge variant="secondary" className={cn("border-none rounded-sm px-2 py-0 h-5 uppercase font-bold", Order_status_styles[orderDetail.status || 'New'])}>
+          {orderDetail.status || 'NEW'}
+        </Badge>
       </div>)}
     </div>
   )

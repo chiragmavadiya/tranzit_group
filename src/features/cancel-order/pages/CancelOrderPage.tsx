@@ -46,7 +46,7 @@ export default function CancelOrderPage() {
                                 { label: 'Shikhar Digisite', value: 'shikhar' },
                                 { label: 'Ashish', value: 'ashish' },
                             ]}
-                            className="h-8 rounded-lg"
+                            className="h-8 w-64 rounded-lg"
                         />
                     }
                 />

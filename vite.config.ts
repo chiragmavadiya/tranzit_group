@@ -62,11 +62,53 @@ export default defineConfig(({ mode }) => {
       rollupOptions: {
         output: {
           manualChunks(id) {
-            if (id.includes("node_modules")) {
-              if (id.includes("react")) return "react";
-              if (id.includes("@radix-ui")) return "radix";
-              if (id.includes("axios") || id.includes("lodash")) return "vendor";
+            if (!id.includes('node_modules')) return;
+
+            // React
+            if (
+              id.includes('react-dom') ||
+              id.includes('/react/')
+            ) {
+              return 'react';
             }
+
+            // Router
+            if (id.includes('react-router')) {
+              return 'router';
+            }
+
+            // Redux
+            if (
+              id.includes('@reduxjs') ||
+              id.includes('react-redux')
+            ) {
+              return 'redux';
+            }
+
+            // React Query
+            if (id.includes('@tanstack')) {
+              return 'react-query';
+            }
+
+            // Tiptap
+            if (id.includes('@tiptap')) {
+              return 'editor';
+            }
+
+            // Calendar
+            if (id.includes('react-day-picker')) {
+              return 'calendar';
+            }
+
+            // Utilities
+            if (
+              id.includes('axios') ||
+              id.includes('date-fns')
+            ) {
+              return 'utils';
+            }
+
+            return 'vendor';
           }
         },
       },

@@ -1,8 +1,28 @@
 import { Card, CardContent } from "@/components/ui/card";
+import { Skeleton } from "@/components/ui/skeleton";
 import type { StatItem } from "./types/statCard.types";
 import { cn } from "@/lib/utils";
 
-export function StatCard({ label, value, icon: Icon, subValue, color, className, contentClassName, iconBg, iconColor }: StatItem) {
+function StatCardSkeleton({ className }: { className?: string }) {
+  return (
+    <Card className={cn("border ring-0 shadow-md border-gray-200 dark:border-zinc-800 rounded-xl bg-white dark:bg-zinc-950", className)}>
+      <CardContent className="p-5 flex items-center justify-between gap-4">
+        <div className="flex flex-col gap-2 min-w-0">
+          <Skeleton className="h-3 w-16" />
+          <div className="flex items-baseline gap-2">
+            <Skeleton className="h-7 w-20" />
+            <Skeleton className="h-3 w-10" />
+          </div>
+        </div>
+        <Skeleton className="w-12 h-12 rounded-xl shrink-0" />
+      </CardContent>
+    </Card>
+  );
+}
+
+
+export function StatCard({ label, value, icon: Icon, subValue, color, className, contentClassName, iconBg, iconColor, loading = false }: StatItem) {
+  if (loading) return <StatCardSkeleton />
   return (
     <Card className={cn("border ring-0 shadow-md border-gray-200 dark:border-zinc-800 rounded-xl bg-white dark:bg-zinc-950 transition-colors duration-300 hover:-translate-y- hover:border-blue-300", className)}>
       <CardContent className={cn("p-5 flex items-center justify-between gap-4", contentClassName)}>
@@ -33,3 +53,5 @@ export function StatCard({ label, value, icon: Icon, subValue, color, className,
     </Card>
   );
 }
+
+

@@ -1,7 +1,8 @@
-import { CustomTooltip, type Column } from '@/components/common';
+import { CustomTooltip } from '@/components/common/CustomTooltip';
 import type { CourierPostcode } from './types';
 import { Button } from '@/components/ui/button';
 import { Pencil, Trash2 } from 'lucide-react';
+import type { Column } from '@/components/common/types/DataTable.types';
 
 export const POSTCODE_COLUMNS = (onEdit: (row: any) => void, onDelete: (row: any) => void): Column<CourierPostcode>[] => [
   {

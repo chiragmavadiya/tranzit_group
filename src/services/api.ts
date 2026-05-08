@@ -46,7 +46,7 @@ api.interceptors.response.use(
         // Handle global errors (e.g. 401 Unauthorized)
         if (error.response?.status === 401) {
             localStorage.removeItem("auth_token");
-            // Optional: window.location.href = "/login";
+            window.location.href = "/login";
         }
 
         console.error("[API Error]:", {
@@ -58,5 +58,3 @@ api.interceptors.response.use(
         return Promise.reject(error);
     }
 );
-
-export default api;

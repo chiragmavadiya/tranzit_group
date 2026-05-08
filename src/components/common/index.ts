@@ -3,18 +3,18 @@ export { DataTable } from './DataTable';
 export { Pagination, SimplePagination } from './Pagination';
 export { TableSkeleton } from './TableSkeleton';
 export { usePagination, useServerPagination } from './hooks/usePagination';
-export { 
-  StatusCell, 
-  LinkCell, 
-  ActionsCell, 
-  DateCell, 
-  CurrencyCell, 
+export {
+  StatusCell,
+  LinkCell,
+  ActionsCell,
+  DateCell,
+  CurrencyCell,
   AvatarCell,
-  createCommonActions 
+  createCommonActions
 } from './DataTableCells';
-export type { 
-  Column, 
-  SortConfig, 
+export type {
+  Column,
+  SortConfig,
   DataTableProps,
   CellRenderer,
   ActionColumn,
@@ -24,7 +24,6 @@ export type {
 
 // Other common components
 export { default as AutoComplete } from './AutoComplate';
-export { default as CustomTooltip } from './CustomTooltip';
 export { default as ErrorBoundary } from './ErrorBoundary';
 export { default as PasswordInput } from './password-input';
 export { StatCard } from './StatCard';

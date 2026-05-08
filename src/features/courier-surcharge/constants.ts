@@ -11,8 +11,3 @@ export const APPLIES_ON_OPTIONS: GenericOption[] = [
   { label: 'Delivery', value: 'delivery' },
   { label: 'Both', value: 'both' },
 ];
-
-export const YES_NO_OPTIONS: GenericOption[] = [
-  { label: 'Yes', value: 'true' },
-  { label: 'No', value: 'false' },
-];

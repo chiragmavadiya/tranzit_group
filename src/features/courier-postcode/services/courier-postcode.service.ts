@@ -1,9 +1,9 @@
-import api from "@/services/api";
+import { api } from "@/services/api";
 import { API_ENDPOINTS } from "@/constants/api.constants";
-import type { 
-    CourierPostcode, 
-    CourierPostcodeFormData, 
-    CourierPostcodeFilters 
+import type {
+    CourierPostcode,
+    CourierPostcodeFormData,
+    CourierPostcodeFilters
 } from "../types";
 
 export interface CourierPostcodeListResponse {

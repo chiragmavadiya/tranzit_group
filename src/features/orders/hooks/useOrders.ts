@@ -16,7 +16,6 @@ export const useOrders = (params?: {
   return useQuery({
     queryKey: [...QUERY_KEYS.ORDERS.LIST, params],
     queryFn: () => ordersService.getOrders(params),
-    refetchInterval: 30000, // Poll every 30 seconds for list updates
     enabled
   });
 };

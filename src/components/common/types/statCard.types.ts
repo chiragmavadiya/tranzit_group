@@ -10,4 +10,5 @@ export interface StatItem {
     contentClassName?: string;
     iconBg?: string;
     iconColor?: string;
+    loading?: boolean
 }

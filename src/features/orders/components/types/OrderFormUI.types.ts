@@ -53,11 +53,6 @@ export interface SummaryCardProps {
   isRight?: boolean;
 }
 
-export interface SummaryMetricProps {
-  label: string;
-  value: string;
-}
-
 export interface DropdownUIProps {
   icon?: keyof typeof LucideIcons;
   label: string;

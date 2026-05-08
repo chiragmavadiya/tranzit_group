@@ -1,29 +1,14 @@
 "use client";
 
-import { useState, useMemo, useCallback, Fragment } from 'react';
+import { useState, useMemo } from 'react';
 import { QuoteForm } from '../components/QuoteForm';
 import { QuoteSummary } from '../components/QuoteSummary';
 import { SendQuoteDialog } from '../../customer-quote/components/SendQuoteDialog';
 import { useAppSelector } from '@/hooks/store.hooks';
-import type { QuoteItem, QuoteLocation, QuoteCalculations, ServiceRate } from '../types';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Calculator, RefreshCw, Box, Truck } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { FormRadio, FormCheckbox } from '@/features/orders/components/OrderFormUI';
-import { cn } from '@/lib/utils';
-
-const SURCHARGES = [
-  { id: 'airport', name: 'Airport Delivery Surcharge', description: 'Additional charge for airport deliveries.', price: 25.00 },
-  { id: 'exhibition', name: 'Exhibition Centre Surcharge', description: 'Per consignment note (per Delivery / Pickup).', price: 200.00 },
-  { id: 'palletising', name: 'Palletising', description: 'Charge for palletising loose freight.', price: 25.00 },
-  { id: 'tailgate', name: 'Tailgate Pickup / Delivery', description: 'Tailgate service required at pickup or delivery.', price: 45.00 },
-];
-
-import {
-  useGetQuoteServices
-} from '../hooks/useQuote';
-import { useQuoteServices } from '@/features/orders/hooks/useOrders';
-import { showToast } from '@/components/ui/custom-toast';
+import type { QuoteLocation } from '../types';
+import { ItemsTable } from '@/features/orders/components/order-details/ItemsTable';
+import { useOrderItems } from '@/features/orders/hooks/useOrderItems';
+import { CarrierCard } from '@/features/orders/components/order-details/CarrierCard';
 
 export default function GetQuotePage() {
   const { role } = useAppSelector((state) => state.auth);
@@ -31,111 +16,59 @@ export default function GetQuotePage() {
   const [margin, setMargin] = useState<string>('0');
   const [isSendDialogOpen, setIsSendDialogOpen] = useState(false);
 
-  const [items, setItems] = useState<QuoteItem[]>([
-    { id: crypto.randomUUID(), type: 'Parcel', qty: 1, weight: 0, length: 0, width: 0, height: 0 }
-  ]);
+  const {
+    itemsData,
+    updateItem,
+    fullUpdateItem,
+    addItem,
+    removeItem,
+  } = useOrderItems([
+    {
+      type: "box",
+      quantity: 1,
+      weight: 0,
+      length: 0,
+      width: 0,
+      height: 0
+    }
+  ])
   const [locations, setLocations] = useState<{ sender: QuoteLocation | null; receiver: QuoteLocation | null }>({
     sender: null,
     receiver: null
   });
-  const [rates, setRates] = useState<ServiceRate[] | null>(null);
-  const [selectedRateId, setSelectedRateId] = useState<string | null>(null);
-  const [selectedSurcharges, setSelectedSurcharges] = useState<string[]>([]);
+  // const [courierData, setCourierData] = useState<any>({});
+  const [quoteData, setQuoteData] = useState<any>({});
 
-  const { mutate: getServices, isPending: loading } = useGetQuoteServices(role);
-  const { mutate: updateRate, isPending: updatingRate } = useQuoteServices();
+  console.log(quoteData, 'quoteData')
 
-  const calculations = useMemo<QuoteCalculations>(() => {
-    let deadWeight = 0;
-    let volumetricWeight = 0;
-    let totalItems = 0;
+  const calculation = useMemo(() => {
+    const totalItems = itemsData?.reduce((acc, item) => acc + (Number(item.quantity) || 1), 0) || 0;
+    const totalWeight = itemsData?.reduce((acc, item) => acc + (Number(item.weight) * (Number(item.quantity) || 1)), 0) || 0;
+    const volumetric = itemsData?.reduce((acc, item) => {
+      const w = Number(item.width) || 0;
+      const h = Number(item.height) || 0;
+      const l = Number(item.length) || 0;
+      const q = Number(item.quantity) || 1;
+      return acc + ((w * h * l) / 1000000) * q;
+    }, 0) || 0;
 
-    items.forEach(item => {
-      const qty = item.qty || 1;
-      totalItems += qty;
-      deadWeight += item.weight * qty;
-      volumetricWeight += ((item.length * item.width * item.height) / 5000) * qty;
-    });
+    const servicePrice = quoteData?.courier?.base || quoteData?.subtotal || 0;
+    const gst = quoteData?.courier?.gst || quoteData?.tax || 0;
+    const totalSurcharges = quoteData?.totalSurcharges || 0;
+    const marginPrice = (Number(servicePrice) * Number(margin)) / 100;
+    const grandTotal = Number(servicePrice) + Number(gst) + Number(totalSurcharges) + Number(marginPrice);
+    return { totalItems, totalWeight, volumetric, servicePrice, gst, totalSurcharges, grandTotal, margin: marginPrice }
+  }, [itemsData, quoteData, margin])
 
-    const selectedRate = rates?.find(r => r.product_id === selectedRateId) || (rates?.[0] || null);
-    const serviceCost = selectedRate ? selectedRate.price : 0;
-    const gst = selectedRate ? selectedRate.gst : (serviceCost * 0.1);
-
-    const surcharges = selectedSurcharges.reduce((acc, id) => {
-      const surcharge = SURCHARGES.find(s => s.id === id);
-      return acc + (surcharge?.price || 0);
-    }, 0);
-
-    const baseTotal = serviceCost + gst + surcharges;
-    const marginPercentage = parseFloat(margin) || 0;
-    const marginAmount = baseTotal * (marginPercentage / 100);
-
-    return {
-      totalItems,
-      deadWeight,
-      volumetricWeight,
-      serviceCost,
-      gst,
-      surcharges,
-      margin: marginAmount,
-      total: baseTotal + marginAmount
-    };
-  }, [items, rates, selectedRateId, selectedSurcharges, margin]);
 
   const isValid = useMemo(() => {
     return (
       locations.sender !== null &&
       locations.receiver !== null &&
-      items.length > 0 &&
-      items.every(item => item.weight > 0 && item.length > 0 && item.width > 0 && item.height > 0)
+      itemsData.length > 0 &&
+      itemsData.every(item => item.weight > 0 && item.length > 0 && item.width > 0 && item.height > 0)
     );
-  }, [locations, items]);
-
-  const handleGetRate = useCallback(() => {
-    if (!locations.sender || !locations.receiver) return;
-
-    const payload = {
-      sender_details: `${locations.sender.postcode}|${locations.sender.suburb}|${locations.sender.state}`,
-      receiver_details: `${locations.receiver.postcode}|${locations.receiver.suburb}|${locations.receiver.state}`,
-      receiver_address: locations.receiver.label, // Or more detailed if available
-      items: items.map(item => ({
-        type: item.type,
-        quantity: item.qty || 1,
-        weight: item.weight,
-        length: item.length,
-        width: item.width,
-        height: item.height
-      })),
-      is_order: "no" as const
-    };
-    if (role === "admin") {
-      getServices(payload, {
-        onSuccess: (data) => {
-          setRates(data.services);
-          if (data.services.length > 0) {
-            setSelectedRateId(data.services[0].product_id);
-          }
-          showToast(`Found ${data.services.length} available services`, "success");
-        },
-        onError: (err: any) => {
-          showToast(err?.response?.data?.message || 'Failed to fetch rates', "error");
-        }
-      });
-    } else {
-      updateRate(payload, {
-        onSuccess: (data) => {
-          setRates(data.services);
-          if (data.services.length > 0) {
-            setSelectedRateId(data.services[0].product_id);
-          }
-          showToast(`Found ${data.services.length} available services`, "success");
-        },
-        onError: (err: any) => {
-          showToast(err?.response?.data?.message || 'Failed to fetch rates', "error");
-        }
-      });
-    }
-  }, [locations, items, getServices, role, updateRate]);
+  }, [locations, itemsData]);
 
   return (
     <div className="p-page-padding animate-in fade-in duration-700 overflow-auto">
@@ -148,135 +81,38 @@ export default function GetQuotePage() {
           {/* Main Form Area */}
           <div className="xl:col-span-8 space-y-4">
             <QuoteForm
-              items={items}
-              setItems={setItems}
               locations={locations}
               setLocations={setLocations}
-              onGetRate={handleGetRate}
-              isValid={isValid}
+            />
+            <ItemsTable
+              items={itemsData}
+              onUpdateItem={updateItem}
+              onFullUpdateItem={fullUpdateItem}
+              addItem={addItem}
+              removeItem={removeItem}
+
             />
 
             {/* Services Section */}
-            <Card className="shadow-sm border-slate-200 dark:border-zinc-800 bg-white dark:bg-zinc-950 min-h-[250px] gap-0 p-0">
-              <CardHeader className="flex flex-row items-center justify-between border-b border-slate-50 dark:border-zinc-900 py-3 [.border-b]:pb-3">
-                <CardTitle className="inline-flex items-center gap-2 text-[15px] font-semibold text-slate-800 dark:text-zinc-100">
-                  <Truck className="w-4 h-4 text-blue-500" />
-                  Available Services
-                </CardTitle>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className="h-8 gap-1.5 text-[12px] font-medium text-slate-500 hover:text-blue-600 transition-colors"
-                  onClick={() => setRates(null)}
-                >
-                  <RefreshCw className={`w-3.5 h-3.5 ${loading || updatingRate ? 'animate-spin' : ''}`} />
-                  Refresh
-                </Button>
-              </CardHeader>
-              <CardContent className="p-0">
-                {!rates && !loading && !updatingRate ? (
-                  <div className="flex flex-col items-center justify-center min-h-[250px] text-center p-6 bg-slate-50/50 dark:bg-zinc-900/10">
-                    <div className="w-16 h-16 bg-white dark:bg-zinc-900 shadow-sm border border-slate-100 dark:border-zinc-800 rounded-2xl flex items-center justify-center mb-6">
-                      <Calculator className="w-7 h-7 text-slate-300 dark:text-zinc-700" />
-                    </div>
-                    <p className="text-[14px] text-slate-500 dark:text-zinc-400 font-medium max-w-[320px] leading-relaxed">
-                      Fill in addresses and items, then click <span className="text-blue-600 font-bold dark:text-blue-400">Get Live Rate</span> to see options.
-                    </p>
-                  </div>
-                ) : loading || updatingRate ? (
-                  <div className="flex items-center justify-center min-h-[250px]">
-                    <div className="flex flex-col items-center gap-4">
-                      <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-blue-600"></div>
-                      <span className="text-[13px] text-slate-500 dark:text-zinc-400 animate-pulse font-medium">Fetching the best rates for you...</span>
-                    </div>
-                  </div>
-                ) : (
-                  <div className="divide-y divide-slate-100 dark:divide-zinc-900 border border-slate-100 dark:border-zinc-800 overflow-hidden">
-                    {rates && rates.map(rate => (
-                      <Fragment key={rate.product_id}>
-                        <div
-                          onClick={() => setSelectedRateId(rate.product_id)}
-                          className={cn(
-                            "p-5 md:px-6 flex flex-col md:flex-row md:items-center justify-between hover:bg-slate-50/50 dark:hover:bg-zinc-900/30 transition-all duration-300 group cursor-pointer",
-                            selectedRateId === rate.product_id ? "bg-blue-50/40 dark:bg-blue-900/20" : ""
-                          )}
-                        >
-                          <div className="flex items-center gap-4 mb-4 md:mb-0">
-                            <FormRadio
-                              checked={selectedRateId === rate.product_id}
-                              onChange={() => setSelectedRateId(rate.product_id)}
-                            />
-                            <div className="w-12 h-12 bg-white dark:bg-zinc-800 border border-slate-100 dark:border-zinc-800 rounded-xl flex items-center justify-center overflow-hidden shadow-sm group-hover:shadow-md transition-shadow">
-                              {rate.image ? (
-                                <img src={rate.image} alt={rate.carrier} className="w-8 h-8 object-contain" />
-                              ) : (
-                                <Box className="w-6 h-6 text-blue-600/20 dark:text-blue-400/20" />
-                              )}
-                            </div>
-                            <div>
-                              <h4 className="text-[15px] font-bold text-[#111827] dark:text-white leading-tight">{rate.carrier}</h4>
-                              <div className="flex items-center gap-2 mt-0.5">
-                                <span className="text-[12px] font-medium text-slate-500 dark:text-zinc-400 whitespace-nowrap">{rate.service_name}</span>
-                                <span className="w-1 h-1 rounded-full bg-slate-300 dark:bg-zinc-700"></span>
-                                <span className="text-[12px] font-semibold text-blue-600 dark:text-blue-400 whitespace-nowrap">{rate.estimate_delivery_date}</span>
-                              </div>
-                            </div>
-                          </div>
-                          <div className="flex items-center justify-between md:justify-end gap-6 md:gap-8">
-                            <div className="text-right">
-                              <p className="text-[20px] font-extrabold text-[#111827] dark:text-white tracking-tight">${rate.price.toFixed(2)}</p>
-                              {rate.success && (
-                                <div className="inline-flex items-center px-2 py-0.5 rounded-full bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 text-[10px] font-bold uppercase tracking-wider mt-0.5">
-                                  Live Rate
-                                </div>
-                              )}
-                            </div>
-                          </div>
-                        </div>
-
-                        {/* Surcharges Section - Appears below selected service */}
-                        {selectedRateId === rate.product_id && (
-                          <div className="bg-blue-50/10 dark:bg-blue-900/5 animate-in fade-in slide-in-from-top-4 duration-500 ease-out border-t border-slate-100 dark:border-zinc-800">
-                            <div className="px-6 py-3 border-b border-slate-100 dark:border-zinc-800 flex items-center justify-between">
-                              <h5 className="text-[11px] font-bold text-slate-400 dark:text-zinc-500 uppercase tracking-widest">Extra Surcharges</h5>
-                            </div>
-                            <div className="divide-y divide-slate-100 dark:divide-zinc-800">
-                              {SURCHARGES.map((surcharge) => (
-                                <FormCheckbox
-                                  key={surcharge.id}
-                                  label={surcharge.name}
-                                  description={surcharge.description}
-                                  price={surcharge.price}
-                                  checked={selectedSurcharges.includes(surcharge.id)}
-                                  onCheckedChange={(checked) => {
-                                    if (checked) {
-                                      setSelectedSurcharges(prev => [...prev, surcharge.id]);
-                                    } else {
-                                      setSelectedSurcharges(prev => prev.filter(id => id !== surcharge.id));
-                                    }
-                                  }}
-                                  className="hover:bg-white/50 dark:hover:bg-zinc-800/50 py-3 px-6"
-                                />
-                              ))}
-                            </div>
-                          </div>
-                        )}
-                      </Fragment>
-                    ))}
-                  </div>
-                )}
-              </CardContent>
-            </Card>
+            <CarrierCard
+              itemData={itemsData}
+              addresses={locations}
+              module="quote"
+              onQuoteChange={setQuoteData}
+            // setCourierData={setCourierData}
+            // orderDetail={orderDetail}
+            />
           </div>
 
           <div className="xl:col-span-4 sticky top-0">
             <QuoteSummary
-              calculations={calculations}
+              calculation={calculation}
               isAdmin={isAdmin}
               margin={margin}
               setMargin={setMargin}
               onSendQuote={() => setIsSendDialogOpen(true)}
               isValid={isValid}
+              quoteData={quoteData}
             />
           </div>
         </div>
@@ -286,12 +122,13 @@ export default function GetQuotePage() {
         <SendQuoteDialog
           open={isSendDialogOpen}
           onOpenChange={setIsSendDialogOpen}
-          calculations={calculations}
-          selectedRate={rates?.find(r => r.product_id === selectedRateId) || (rates?.[0] || null)}
+          calculations={calculation}
+          courierData={quoteData?.courier}
           locations={locations}
-          items={items}
+          items={itemsData}
           margin={margin}
           pickupCharge={0}
+
         />
       )}
     </div>

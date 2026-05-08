@@ -40,7 +40,7 @@ import { menuBarStateSelector } from './menubarState'
 import { Button } from '@/components/ui/button'
 import { Separator } from '@/components/ui/separator'
 import { cn } from '@/lib/utils'
-import CustomTooltip from '../CustomTooltip'
+import { CustomTooltip } from '../CustomTooltip'
 import {
     DropdownMenu,
     DropdownMenuContent,

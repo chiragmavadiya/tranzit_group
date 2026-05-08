@@ -141,7 +141,7 @@ export const PARCEL_COLUMNS: Column<ParcelReport>[] = [
 
 export const ADMIN_PARCEL_COLUMNS: Column<ParcelReport>[] = [
   {
-    key: 'sender_name',
+    key: 'customer_name',
     header: 'CUSTOMER NAME (SENDER NAME)',
     sortable: true,
     searchable: true,

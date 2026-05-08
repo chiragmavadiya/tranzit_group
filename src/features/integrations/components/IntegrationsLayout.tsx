@@ -1,6 +1,6 @@
 import React, { Suspense, useEffect } from 'react'
 import { Outlet, useParams, useNavigate, useLocation } from 'react-router-dom'
-import { ChevronRight, Settings2 } from 'lucide-react'
+import { ChevronRight, Loader2, Settings2 } from 'lucide-react'
 import { useIntegrationsList } from '../hooks/useIntegrations'
 import IntegrationsSidebar from './IntegrationsSidebar'
 import { PROVIDERS } from '../constants'
@@ -55,7 +55,7 @@ const IntegrationsLayout: React.FC = () => {
                     <Suspense
                         fallback={
                             <div className="flex h-full items-center justify-center">
-                                <div className="h-8 w-8 animate-spin rounded-full border-2 border-blue-600 border-t-transparent" />
+                                <Loader2 className="animate-spin text-blue-400 h-10 w-10" />
                             </div>
                         }
                     >

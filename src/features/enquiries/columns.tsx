@@ -5,17 +5,17 @@ import { Eye } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 const STATUS_CONFIG: Record<EnquiryStatus, { label: string; className: string }> = {
-  pending: {
+  Pending: {
     label: 'Pending',
     className: 'bg-orange-50 text-orange-600 dark:bg-orange-500/10 dark:text-orange-400 border-orange-100 dark:border-orange-500/20'
   },
-  resolved: {
+  Resolved: {
     label: 'Resolved',
     className: 'bg-emerald-50 text-emerald-600 dark:bg-emerald-500/10 dark:text-emerald-400 border-emerald-100 dark:border-emerald-500/20'
   },
-  in_progress: {
-    label: 'In Progress',
-    className: 'bg-blue-50 text-blue-600 dark:bg-blue-500/10 dark:text-blue-400 border-blue-100 dark:border-blue-500/20'
+  Closed: {
+    label: 'Closed',
+    className: 'bg-slate-50 text-slate-600 dark:bg-zinc-500/10 dark:text-zinc-400 border-slate-100 dark:border-zinc-500/20'
   }
 };
 
@@ -38,7 +38,7 @@ export const ENQUIRY_COLUMNS = (onView: (row: Enquiry) => void): Column<Enquiry>
     cell: (val) => <span className="font-bold text-slate-900 dark:text-zinc-100 text-[13px]">{val}</span>
   },
   {
-    key: 'issueType',
+    key: 'issue_type',
     header: 'ISSUE TYPE',
     cell: (val) => <span className="text-slate-500 font-semibold text-[12px]">{val}</span>
   },
@@ -52,10 +52,10 @@ export const ENQUIRY_COLUMNS = (onView: (row: Enquiry) => void): Column<Enquiry>
     header: 'STATUS',
     cell: (val: EnquiryStatus) => (
       <div className={cn(
-        "inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider border transition-all",
-        STATUS_CONFIG[val].className
+        "inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-black tracking-wider border transition-all",
+        STATUS_CONFIG[val]?.className || 'bg-gray-50 text-gray-600'
       )}>
-        {STATUS_CONFIG[val].label}
+        {val}
       </div>
     )
   },

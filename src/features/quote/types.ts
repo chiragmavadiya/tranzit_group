@@ -1,3 +1,5 @@
+import type { ItemData } from "../orders/types";
+
 export interface QuoteLocation {
   label: string;
   suburb: string;
@@ -6,26 +8,28 @@ export interface QuoteLocation {
   country: string;
 }
 
-export interface QuoteItem {
-  id?: string;
-  type: string;
-  qty?: number;
-  quantity?: number;
-  weight: number;
-  length: number;
-  width: number;
-  height: number;
-}
+// export interface QuoteItem {
+//   id?: string;
+//   type: string;
+//   qty?: number;
+//   quantity?: number;
+//   weight: number;
+//   length: number;
+//   width: number;
+//   height: number;
+// }
 
 export interface QuoteCalculations {
   totalItems: number;
-  deadWeight: number;
-  volumetricWeight: number;
-  serviceCost: number;
+  totalWeight: number;
+  volumetric: number;
+  servicePrice: number;
   gst: number;
-  surcharges: number;
-  margin: number;
-  total: number;
+  totalSurcharges: number;
+  margin?: number;
+  insurance?: boolean;
+  insuranceCost?: number;
+  grandTotal: number;
 }
 
 export interface ServiceRate {
@@ -47,6 +51,7 @@ export interface ServiceRate {
   success: boolean;
   shipment_summary: string;
   image: string;
+  message?: string;
 }
 
 export interface QuoteSummary {
@@ -75,7 +80,7 @@ export interface QuoteDetails {
   receiver: {
     address: string;
   };
-  item_details: QuoteItem[];
+  item_details: ItemData[];
   margin_amount: number;
   margin_percent: number;
   pickup_charge: number;
@@ -87,14 +92,14 @@ export interface GetQuoteServicesPayload {
   sender_details: string; // postal_code|city|state
   receiver_details: string;
   receiver_address: string;
-  items: QuoteItem[];
+  items: ItemData[];
   is_order: "yes" | "no";
 }
 
 export interface CreateQuotePayload {
   sender: string;
   receiver: string;
-  parcels: QuoteItem[];
+  parcels: ItemData[];
   service: {
     courier: number;
     carrier_name: string;

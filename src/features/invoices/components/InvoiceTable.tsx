@@ -5,7 +5,9 @@ import { Button } from '@/components/ui/button';
 import type { Invoice } from '../types';
 import { INVOICE_STATUS_COLORS } from '../constants';
 import { cn } from '@/lib/utils';
-import { CustomTooltip, DataTable, type Column } from '@/components/common';
+import { CustomTooltip } from '@/components/common/CustomTooltip';
+import { DataTable } from '@/components/common/DataTable';
+import type { Column } from '@/components/common/types/DataTable.types';
 import { NavLink, useNavigate } from 'react-router-dom';
 import { useAppSelector } from '@/hooks/store.hooks';
 

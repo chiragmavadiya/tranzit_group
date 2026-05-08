@@ -161,8 +161,8 @@ export function IntegrationForm({ provider }: IntegrationFormProps) {
 
     if (loadingStatus) {
         return (
-            <div className="flex items-center justify-center py-20">
-                <Loader2 className="w-8 h-8 animate-spin text-blue-600" />
+            <div className="flex items-center justify-center  w-full h-full">
+                <Loader2 className="animate-spin text-blue-400 h-10 w-10" />
             </div>
         );
     }

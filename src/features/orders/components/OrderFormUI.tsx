@@ -14,31 +14,14 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
 import type {
-  HeaderIconProps,
   FormInputProps,
   FormTextareaProps,
   FormSelectProps,
   SummaryCardProps,
-  SummaryMetricProps,
   DropdownUIProps,
   FormRadioProps,
   FormCheckboxProps
 } from "./types/OrderFormUI.types";
-
-
-export function HeaderIcon({ icon: Icon, title, color }: HeaderIconProps) {
-  return (
-    <div className="flex items-center gap-4 mb-2">
-      <div className={cn(
-        "w-12 h-10 rounded-2xl flex items-center justify-center shadow-lg transition-transform hover:rotate-3",
-        color === 'blue' ? "bg-blue-600 text-white shadow-blue-500/20" : "bg-emerald-600 text-white shadow-emerald-500/20"
-      )}>
-        <Icon className="w-6 h-6" strokeWidth={2.5} />
-      </div>
-      <h3 className="text-xl font-bold text-slate-900 dark:text-zinc-100 tracking-tight">{title}</h3>
-    </div>
-  );
-}
 
 export const Required = () => {
   return (
@@ -238,17 +221,6 @@ export function SummaryCard({ title, name, address, phone, isRight = false }: Su
     </div>
   );
 }
-
-
-export function SummaryMetric({ label, value }: SummaryMetricProps) {
-  return (
-    <div className="flex flex-col gap-0.5">
-      <span className="text-[10px] font-bold text-slate-400 dark:text-zinc-500 uppercase tracking-wider">{label}</span>
-      <span className="text-sm font-bold text-slate-800 dark:text-zinc-200 tracking-tight">{value}</span>
-    </div>
-  );
-}
-
 
 export function DropdownUI({ icon = 'ChevronDown', label, onClick, options }: DropdownUIProps) {
   const IconComponent = useMemo(() => LucideIcons[icon] as React.ComponentType<React.SVGProps<SVGSVGElement>>, [icon]);

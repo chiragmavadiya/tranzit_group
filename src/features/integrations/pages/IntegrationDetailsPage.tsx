@@ -13,7 +13,7 @@ const IntegrationDetailsPage: React.FC = () => {
     }
 
     return (
-        <div className="p-6 mx-auto animate-in fade-in slide-in-from-bottom-4 duration-500">
+        <div className="p-6 mx-auto animate-in fade-in slide-in-from-bottom-4 duration-500 h-full">
             <IntegrationForm provider={provider} />
         </div>
     )

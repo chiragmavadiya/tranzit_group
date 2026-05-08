@@ -7,6 +7,7 @@ import {
   DropdownCustomMenu
 } from "@/components/ui/dropdown-menu";
 import { useState } from "react";
+import { format } from "date-fns";
 
 interface TransactionListProps {
   // metrics: AdminMetrics | CustomerMetrics;
@@ -52,6 +53,11 @@ export function TransactionList({ transactions, className, loading }: Transactio
   const currentTransactions = (transactions as any)?.[activePeriod.toLowerCase() as keyof typeof transactions] || [];
   const currentCount = (transactions as any)?.[countKeys[activePeriod]] || currentTransactions.length || 0;
 
+  const formattedDate = (date: string) => format(
+    new Date(date),
+    "dd MMM yyyy"
+  );
+
   return (
     <Card className={cn("border p-0 gap-0 ring-0 shadow-md border-gray-200 dark:border-zinc-800 rounded-xl bg-white dark:bg-zinc-950 flex flex-col transition-colors duration-300", className)}>
       <CardHeader className="flex flex-row items-center justify-between py-3 px-5 border-b border-gray-100 dark:border-zinc-800 bg-gray-50/50 dark:bg-transparent group-hover:bg-gray-50/50 dark:group-hover:bg-zinc-800/50 transition-colors">
@@ -96,7 +102,7 @@ export function TransactionList({ transactions, className, loading }: Transactio
                     {tx.reason || tx.title}
                   </span>
                   <span className="text-[11px] font-medium text-slate-400 dark:text-zinc-500 truncate">
-                    {tx.payment_method || tx.type}
+                    {tx.payment_method || tx.type || formattedDate(tx.created_at)}
                   </span>
                 </div>
               </div>

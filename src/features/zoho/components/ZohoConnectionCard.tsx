@@ -20,14 +20,14 @@ export function ZohoConnectionCard({
   const redirectUri = 'https://tranzit.digisite.net/admin/zoho/callback';
 
   return (
-    <Card className="p-6 border-gray-100 dark:border-zinc-800 shadow-sm bg-white dark:bg-zinc-950 flex flex-col h-full">
-      <div className="flex items-center gap-3 mb-6">
+    <Card className="p-6 flex flex-col h-full">
+      <div className="flex items-center gap-3 mb-2">
         <div className="w-10 h-10 rounded-xl bg-blue-50 dark:bg-blue-500/10 flex items-center justify-center text-blue-600">
           <Link2 className="w-5 h-5" />
         </div>
         <div>
-          <h3 className="text-base font-bold text-slate-900 dark:text-zinc-100">Connection Status</h3>
-          <p className="text-xs text-slate-500 dark:text-zinc-400">Manage your OAuth link with Zoho</p>
+          <h3 className="mt-0 text-base font-bold text-slate-900 dark:text-zinc-100">Connection Status</h3>
+          <p className="mb-0 text-xs text-slate-500 dark:text-zinc-400">Manage your OAuth link with Zoho</p>
         </div>
       </div>
 
@@ -40,7 +40,7 @@ export function ZohoConnectionCard({
                 {clientId ? 'Configured' : 'Not Set'}
               </Badge>
             </div>
-            <p className="text-sm font-medium text-slate-700 dark:text-zinc-300 truncate">
+            <p className="my-0 text-sm font-medium text-slate-700 dark:text-zinc-300 truncate">
               {clientId || 'Enter your Client ID in settings'}
             </p>
           </div>
@@ -52,7 +52,7 @@ export function ZohoConnectionCard({
                 {organizationId ? 'Configured' : 'Not Set'}
               </Badge>
             </div>
-            <p className="text-sm font-medium text-slate-700 dark:text-zinc-300">
+            <p className="my-0 text-sm font-medium text-slate-700 dark:text-zinc-300">
               {organizationId || 'Enter your Org ID in settings'}
             </p>
           </div>
@@ -97,7 +97,7 @@ export function ZohoConnectionCard({
 
           <div className="mt-4 flex gap-2 p-3 rounded-lg bg-blue-50/50 dark:bg-blue-500/5 border border-blue-100/50 dark:border-blue-500/10">
             <AlertCircle className="w-4 h-4 text-blue-500 shrink-0 mt-0.5" />
-            <p className="text-[10px] text-blue-600/80 dark:text-blue-400/80 leading-relaxed italic">
+            <p className="mb-0 text-[10px] text-blue-600/80 dark:text-blue-400/80 leading-relaxed italic">
               After approval, the refresh token is stored securely and used automatically for future synchronization.
             </p>
           </div>

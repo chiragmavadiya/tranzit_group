@@ -20,7 +20,9 @@ createRoot(document.getElementById('root')!).render(
             <App />
           </BrowserRouter>
         </TooltipProvider>
-        <ReactQueryDevtools initialIsOpen={false} />
+        {import.meta.env.DEV && (
+          <ReactQueryDevtools initialIsOpen={false} />
+        )}
       </QueryClientProvider>
     </Provider>
   </StrictMode>,

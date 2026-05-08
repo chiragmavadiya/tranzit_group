@@ -64,7 +64,7 @@ export default function StaffManagementPage() {
       header: 'DETAILS',
       cell: (_, row) => (
         <div className="flex items-center gap-3 py-1">
-          <div className={cn("w-8 h-8 rounded-full flex items-center justify-center text-[10px] font-bold shadow-sm border border-white dark:border-zinc-800", row.color)}>
+          <div className={cn("w-8 h-8 rounded-full flex items-center justify-center text-[10px] font-bold shadow-sm border border-white dark:border-zinc-800 pt-[3px]", row.color)}>
             {row.initials}
           </div>
           <div className="flex flex-col">

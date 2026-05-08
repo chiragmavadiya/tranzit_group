@@ -11,16 +11,7 @@ import { Textarea } from '@/components/ui/textarea'
 import { Shield, PenLine, CheckCircle2 } from 'lucide-react'
 import { Switch } from '@/components/ui/switch'
 import DatePicker from '@/components/common/DatePicker';
-// import { DOCUMENT_TYPES } from '@/features/orders/constants'
-
-// Moved to constants.ts
-
-// interface UploadedDocument {
-//   id: string;
-//   name: string;
-//   category: string;
-//   size: string;
-// }
+import type { QuoteCalculations } from '@/features/quote/types';
 
 interface SidePanelProps {
   itemsData?: any[];
@@ -32,72 +23,10 @@ interface SidePanelProps {
   pickupDate: Date | undefined;
   setPickupDate: React.Dispatch<React.SetStateAction<Date | undefined>>;
   orderType?: string;
+  calculation: QuoteCalculations
 }
 
-export const SidePanel: React.FC<SidePanelProps> = ({ itemsData, quoteData, handleOptionalFieldsChange, insuranceSelected, signatureSelected, deliveryInstructions, pickupDate, setPickupDate, orderType }) => {
-
-
-  // const [tags, setTags] = useState<string[]>(['PRINTED BY: ZACK%40YOPMAIL.COM'])
-  // const [tagInput, setTagInput] = useState('')
-  // const [uploadedDocs, setUploadedDocs] = useState<UploadedDocument[]>([])
-  // const [uploadError, setUploadError] = useState<string | null>(null)
-  // const [selectedDocType, setSelectedDocType] = useState<string>("")
-  // const fileInputRef = useRef<HTMLInputElement>(null)
-
-  // const handleAddTag = useCallback((e: React.KeyboardEvent<HTMLInputElement>) => {
-  //   if (e.key === 'Enter' && tagInput.trim()) {
-  //     if (!tags.includes(tagInput.trim().toUpperCase())) {
-  //       setTags([...tags, tagInput.trim().toUpperCase()])
-  //     }
-  //     setTagInput('')
-  //   }
-  // }, [tagInput, tags])
-
-  // const handleRemoveTag = useCallback((tagToRemove: string) => {
-  //   setTags(tags.filter(tag => tag !== tagToRemove))
-  // }, [tags])
-
-  // const formatFileSize = (bytes: number) => {
-  //   if (bytes === 0) return '0 Bytes'
-  //   const k = 1024
-  //   const sizes = ['Bytes', 'KB', 'MB']
-  //   const i = Math.floor(Math.log(bytes) / Math.log(k))
-  //   return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i]
-  // }
-
-  // const handleFileUpload = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-  //   const file = e.target.files?.[0]
-  //   setUploadError(null)
-
-  //   if (!file) return
-
-  //   // Validation: Size (1MB = 1024 * 1024 bytes)
-  //   if (file.size > 1024 * 1024) {
-  //     setUploadError('File size exceeds 1MB limit.')
-  //     return
-  //   }
-
-  //   // Validation: Format
-  //   const allowedFormats = ['application/pdf', 'image/jpeg', 'image/png']
-  //   if (!allowedFormats.includes(file.type)) {
-  //     setUploadError('Only PDF, JPG, and PNG files are allowed.')
-  //     return
-  //   }
-
-  //   const newDoc: UploadedDocument = {
-  //     id: Math.random().toString(36).substr(2, 9),
-  //     name: file.name,
-  //     category: selectedDocType,
-  //     size: formatFileSize(file.size)
-  //   }
-
-  //   setUploadedDocs(prev => [...prev, newDoc])
-  //   if (fileInputRef.current) fileInputRef.current.value = ''
-  // }, [selectedDocType])
-
-  // const handleRemoveDoc = useCallback((id: string) => {
-  //   setUploadedDocs(prev => prev.filter(doc => doc.id !== id))
-  // }, [])
+export const SidePanel: React.FC<SidePanelProps> = ({ calculation, handleOptionalFieldsChange, insuranceSelected, signatureSelected, deliveryInstructions, pickupDate, setPickupDate, orderType }) => {
 
   return (
     <div className="flex flex-col gap-4">
@@ -109,66 +38,47 @@ export const SidePanel: React.FC<SidePanelProps> = ({ itemsData, quoteData, hand
             <span className="text-sm font-bold text-gray-900 dark:text-zinc-100 tracking-wider">ORDER QUOTATION SUMMARY</span>
           </AccordionTrigger>
           <AccordionContent className="flex flex-col gap-2 pb-4 pt-1">
-            {(() => {
-              const totalItems = itemsData?.reduce((acc, item) => acc + (Number(item.quantity) || 1), 0) || 0;
-              const totalWeight = itemsData?.reduce((acc, item) => acc + (Number(item.weight) * (Number(item.quantity) || 1)), 0) || 0;
-              const volumetric = itemsData?.reduce((acc, item) => {
-                const w = Number(item.width) || 0;
-                const h = Number(item.height) || 0;
-                const l = Number(item.length) || 0;
-                const q = Number(item.quantity) || 1;
-                return acc + ((w * h * l) / 1000000) * q;
-              }, 0) || 0;
 
-              const servicePrice = quoteData?.courier?.base || 0;
-              const gst = quoteData?.courier?.gst || 0;
-              const totalSurcharges = quoteData?.totalSurcharges || 0;
-              const insuranceCost = insuranceSelected ? 6.00 : 0;
-              const grandTotal = (quoteData?.totalPrice || 0) + insuranceCost;
 
-              return (
-                <>
-                  <div className="flex justify-between items-center text-xs">
-                    <span className="text-gray-500 dark:text-zinc-400 font-medium">Total Items</span>
-                    <span className="font-bold text-gray-900 dark:text-zinc-100">{totalItems}</span>
-                  </div>
-                  <div className="flex justify-between items-center text-xs">
-                    <span className="text-gray-500 dark:text-zinc-400 font-medium">Total Weight</span>
-                    <span className="font-bold text-gray-900 dark:text-zinc-100">{totalWeight.toFixed(2)} kg</span>
-                  </div>
-                  <div className="flex justify-between items-center text-xs">
-                    <span className="text-gray-500 dark:text-zinc-400 font-medium">Volumetric</span>
-                    <span className="font-bold text-gray-900 dark:text-zinc-100">{volumetric.toFixed(3)} m³</span>
-                  </div>
+            <div className="flex justify-between items-center text-xs">
+              <span className="text-gray-500 dark:text-zinc-400 font-medium">Total Items</span>
+              <span className="font-bold text-gray-900 dark:text-zinc-100">{calculation?.totalItems}</span>
+            </div>
+            <div className="flex justify-between items-center text-xs">
+              <span className="text-gray-500 dark:text-zinc-400 font-medium">Total Weight</span>
+              <span className="font-bold text-gray-900 dark:text-zinc-100">{calculation?.totalWeight?.toFixed(2)} kg</span>
+            </div>
+            <div className="flex justify-between items-center text-xs">
+              <span className="text-gray-500 dark:text-zinc-400 font-medium">Volumetric</span>
+              <span className="font-bold text-gray-900 dark:text-zinc-100">{calculation?.volumetric?.toFixed(3)} m³</span>
+            </div>
 
-                  <div className="border-t border-gray-100 dark:border-zinc-800 my-1"></div>
+            <div className="border-t border-gray-100 dark:border-zinc-800 my-1"></div>
 
-                  <div className="flex justify-between items-center text-xs">
-                    <span className="text-gray-500 dark:text-zinc-400 font-medium">Service (Inc. F.L)</span>
-                    <span className="font-bold text-gray-900 dark:text-zinc-100">${servicePrice.toFixed(2)}</span>
-                  </div>
-                  <div className="flex justify-between items-center text-xs">
-                    <span className="text-gray-500 dark:text-zinc-400 font-medium">Extra surcharges</span>
-                    <span className="font-bold text-gray-900 dark:text-zinc-100">${totalSurcharges.toFixed(2)}</span>
-                  </div>
-                  {insuranceSelected && (
-                    <div className="flex justify-between items-center text-xs text-[#0060FE] dark:text-blue-400 animate-in fade-in slide-in-from-top-1">
-                      <span className="font-medium">Shipment Protection</span>
-                      <span className="font-bold">+$6.00</span>
-                    </div>
-                  )}
-                  <div className="flex justify-between items-center text-xs">
-                    <span className="text-gray-500 dark:text-zinc-400 font-medium">GST</span>
-                    <span className="font-bold text-gray-900 dark:text-zinc-100">${gst.toFixed(2)}</span>
-                  </div>
+            <div className="flex justify-between items-center text-xs">
+              <span className="text-gray-500 dark:text-zinc-400 font-medium">Service (Inc. F.L)</span>
+              <span className="font-bold text-gray-900 dark:text-zinc-100">${calculation?.servicePrice?.toFixed(2)}</span>
+            </div>
+            <div className="flex justify-between items-center text-xs">
+              <span className="text-gray-500 dark:text-zinc-400 font-medium">Extra surcharges</span>
+              <span className="font-bold text-gray-900 dark:text-zinc-100">${calculation?.totalSurcharges?.toFixed(2)}</span>
+            </div>
+            {calculation?.insurance && (
+              <div className="flex justify-between items-center text-xs text-[#0060FE] dark:text-blue-400 animate-in fade-in slide-in-from-top-1">
+                <span className="font-medium">Shipment Protection</span>
+                <span className="font-bold">+$6.00</span>
+              </div>
+            )}
+            <div className="flex justify-between items-center text-xs">
+              <span className="text-gray-500 dark:text-zinc-400 font-medium">GST</span>
+              <span className="font-bold text-gray-900 dark:text-zinc-100">${calculation?.gst?.toFixed(2)}</span>
+            </div>
 
-                  <div className="border-t border-gray-100 dark:border-zinc-800 my-1 pt-2 flex justify-between items-center">
-                    <span className="text-xs text-gray-900 dark:text-zinc-100 font-bold uppercase">Total inc GST & F.L</span>
-                    <span className="text-sm font-bold text-[#0060FE] dark:text-blue-500">${grandTotal.toFixed(2)}</span>
-                  </div>
-                </>
-              );
-            })()}
+            <div className="border-t border-gray-100 dark:border-zinc-800 my-1 pt-2 flex justify-between items-center">
+              <span className="text-xs text-gray-900 dark:text-zinc-100 font-bold uppercase">Total inc GST & F.L</span>
+              <span className="text-sm font-bold text-[#0060FE] dark:text-blue-500">${calculation?.grandTotal?.toFixed(2)}</span>
+            </div>
+
           </AccordionContent>
         </AccordionItem>
 
@@ -183,7 +93,7 @@ export const SidePanel: React.FC<SidePanelProps> = ({ itemsData, quoteData, hand
               <AccordionContent className="flex flex-col gap-5 pb-4 pt-1">
 
                 {/* Shipment Protection */}
-                {quoteData?.courier?.base > 100 && (
+                {calculation?.grandTotal > 100 && (
                   <div className="flex flex-col gap-3">
                     <div className="flex items-center gap-2">
                       <div className="p-1.5 bg-blue-50 dark:bg-blue-900/20 rounded-md">

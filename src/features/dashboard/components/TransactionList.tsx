@@ -1,4 +1,5 @@
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
+import { Skeleton } from "@/components/ui/skeleton";
 import type { TransactionMetrics } from "../types";
 import { Wallet, Plus, MoreVertical } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -6,11 +7,13 @@ import {
   DropdownCustomMenu
 } from "@/components/ui/dropdown-menu";
 import { useState } from "react";
+import { format } from "date-fns";
 
 interface TransactionListProps {
   // metrics: AdminMetrics | CustomerMetrics;
   className?: string;
   transactions: TransactionMetrics;
+  loading?: boolean;
 }
 
 const periodsKey = {
@@ -24,23 +27,45 @@ const countKeys = {
   lastMonth: 'lastMonthOrderCount',
   lastYear: 'lastYearCount'
 } as const;
+const TransactionListSkeleton = () => (
+  <div className="space-y-1">
+    {[1, 2, 3, 4].map((i) => (
+      <div key={i} className="flex items-center justify-between p-3 rounded-xl">
+        <div className="flex items-center gap-3">
+          <Skeleton className="w-10 h-10 rounded-xl" />
+          <div className="flex flex-col gap-1.5">
+            <Skeleton className="h-4 w-24" />
+            <Skeleton className="h-3 w-16 opacity-70" />
+          </div>
+        </div>
+        <Skeleton className="h-4 w-14" />
+      </div>
+    ))}
+  </div>
+);
 
-export function TransactionList({ transactions, className }: TransactionListProps) {
+
+export function TransactionList({ transactions, className, loading }: TransactionListProps) {
   const [activePeriod, setActivePeriod] = useState<keyof typeof periodsKey>('last28Days');
   // The error occurs because CustomerMetrics might not have these properties directly.
   // We use type assertion to tell TypeScript that we expect these arrays to exist 
   // on the object we're currently processing.
-  const currentTransactions = (transactions as any)[activePeriod.toLowerCase() as keyof typeof transactions] || [];
-  const currentCount = (transactions as any)[countKeys[activePeriod]] || 0;
+  const currentTransactions = (transactions as any)?.[activePeriod.toLowerCase() as keyof typeof transactions] || [];
+  const currentCount = (transactions as any)?.[countKeys[activePeriod]] || currentTransactions.length || 0;
+
+  const formattedDate = (date: string) => format(
+    new Date(date),
+    "dd MMM yyyy"
+  );
 
   return (
     <Card className={cn("border p-0 gap-0 ring-0 shadow-md border-gray-200 dark:border-zinc-800 rounded-xl bg-white dark:bg-zinc-950 flex flex-col transition-colors duration-300", className)}>
-      <CardHeader className="flex flex-row items-center justify-between py-3 px-5 border-b border-gray-100 dark:border-zinc-800 bg-white dark:bg-zinc-900 group-hover:bg-gray-50/50 dark:group-hover:bg-zinc-800/50 transition-colors">
+      <CardHeader className="flex flex-row items-center justify-between py-3 px-5 border-b border-gray-100 dark:border-zinc-800 bg-gray-50/50 dark:bg-transparent group-hover:bg-gray-50/50 dark:group-hover:bg-zinc-800/50 transition-colors">
         <div className="flex flex-col gap-0.5">
-          <CardTitle className="text-sm font-bold text-gray-900 dark:text-zinc-100 tracking-wider uppercase">
+          <CardTitle className="text-lg font-bold text-gray-800 dark:text-zinc-100">
             Transactions ({currentCount})
           </CardTitle>
-          <p className="text-[10px] font-bold text-gray-400 dark:text-zinc-500 tracking-tight">
+          <p className="text-sm text-gray-500 dark:text-zinc-500 mb-0">
             {periodsKey[activePeriod]} activity
           </p>
         </div>
@@ -59,7 +84,8 @@ export function TransactionList({ transactions, className }: TransactionListProp
       </CardHeader>
       <CardContent className="flex-1 overflow-y-auto custom-scrollbar px-2 py-2">
         <div className="space-y-1">
-          {currentTransactions?.map((tx: any) => (
+          {loading && <TransactionListSkeleton />}
+          {!loading && currentTransactions?.map((tx: any) => (
             <div
               key={tx.id}
               className="flex items-center justify-between p-3 rounded-xl hover:bg-gray-50 dark:hover:bg-zinc-900/50 transition-colors group cursor-default"
@@ -76,7 +102,7 @@ export function TransactionList({ transactions, className }: TransactionListProp
                     {tx.reason || tx.title}
                   </span>
                   <span className="text-[11px] font-medium text-slate-400 dark:text-zinc-500 truncate">
-                    {tx.payment_method || tx.type}
+                    {tx.payment_method || tx.type || formattedDate(tx.created_at)}
                   </span>
                 </div>
               </div>
@@ -88,7 +114,7 @@ export function TransactionList({ transactions, className }: TransactionListProp
               </span>
             </div>
           ))}
-          {(!currentTransactions || currentTransactions.length === 0) && (
+          {!loading && (!currentTransactions || currentTransactions.length === 0) && (
             <div className="flex flex-col items-center justify-center py-12 text-center">
               <div className="w-12 h-12 rounded-full bg-slate-50 dark:bg-zinc-900 flex items-center justify-center mb-3">
                 <Wallet className="w-6 h-6 text-slate-300" />

@@ -1,5 +1,4 @@
 import React, { useMemo } from 'react'
-import { useParams } from 'react-router-dom'
 import { Box, Plus, Trash2, Package, Scale, Ruler } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import SelectComponent from '@/components/ui/select'
@@ -23,6 +22,7 @@ interface ItemsTableProps {
   addItem?: (data?: ItemData) => void
   removeItem?: (index: number | undefined) => void
   onFullUpdateItem?: (index: number, data: ItemData) => void
+  orderType?: string
 }
 
 export const ItemsTable: React.FC<ItemsTableProps> = ({
@@ -34,8 +34,9 @@ export const ItemsTable: React.FC<ItemsTableProps> = ({
   removeItem,
   onFullUpdateItem,
   isEmpty = false,
+  orderType = "create"
 }) => {
-  const { orderType } = useParams<{ orderType?: string }>()
+  // const { orderType } = useParams<{ orderType?: string }>()
   const isReadOnly = orderType !== 'create'
 
   const { data: itemsResponse } = useItems({ per_page: 100 })
@@ -78,6 +79,8 @@ export const ItemsTable: React.FC<ItemsTableProps> = ({
             </div>
             {!isReadOnly && (
               <Button
+                variant="outline"
+                size="sm"
                 onClick={(e: React.MouseEvent<HTMLButtonElement>) => {
                   e.stopPropagation();
                   addItem?.({
@@ -89,9 +92,9 @@ export const ItemsTable: React.FC<ItemsTableProps> = ({
                     height: 0,
                   })
                 }}
-                className="hidden group-aria-expanded/accordion-trigger:flex  bg-[#0A1B39] hover:bg-[#0A1B39]/90 text-white text-xs font-medium py-2 px-4 rounded-md items-center gap-2 h-8 mr-4"
+                className="hidden group-aria-expanded/accordion-trigger:flex h-8 mr-3 gap-1.5 text-[12px] border-slate-200 pt-px dark:border-zinc-800 hover:bg-slate-50 dark:hover:bg-zinc-900 font-medium"
               >
-                <Plus className="h-4 w-4" />
+                <Plus className="w-3.5 h-3.5" />
                 Add item
               </Button>
             )}
@@ -100,27 +103,6 @@ export const ItemsTable: React.FC<ItemsTableProps> = ({
         <AccordionContent className="border-t border-gray-100 dark:border-zinc-800 flex flex-col gap-2 pb-4 pt-4">
 
           <div className="w-full flex flex-col gap-4">
-            {/* <div className="flex items-center justify-between pb-2 border-b border-gray-100 dark:border-zinc-800">
-              <div className="flex items-center gap-2 text-gray-600 dark:text-zinc-300">
-                <Box className="w-5 h-5" />
-                <h3 className="text-base font-semibold text-gray-800 dark:text-zinc-100">Items</h3>
-              </div>
-              <Button
-                onClick={() => addItem?.({
-                  type: 'box',
-                  quantity: 1,
-                  weight: 0,
-                  length: 0,
-                  width: 0,
-                  height: 0,
-                })}
-                className="bg-[#0A1B39] hover:bg-[#0A1B39]/90 text-white text-xs font-medium py-2 px-4 rounded-md flex items-center gap-2 h-8"
-              >
-                <Plus className="h-4 w-4" />
-                Add item
-              </Button>
-            </div> */}
-
             <div className="flex flex-col gap-4">
               {isEmpty || (!items?.length && !children) ? (
                 <div className="py-8 flex items-center justify-center text-sm text-gray-500 font-medium">
@@ -208,6 +190,7 @@ export const ItemsTable: React.FC<ItemsTableProps> = ({
                               onChange={(e) => onUpdateItem?.(idx, 'quantity', Number(e.target.value) || 0)}
                               className="h-8 text-sm font-medium"
                               min="1"
+                              placeholder='Quantity'
                             />
                           </div>
 
@@ -234,6 +217,7 @@ export const ItemsTable: React.FC<ItemsTableProps> = ({
                                   className="h-8 text-sm font-medium"
                                   min="0"
                                   step="0.01"
+                                  placeholder='kg'
                                 />
                               </div>
                               <div className="flex flex-col gap-1 flex-1">
@@ -244,6 +228,7 @@ export const ItemsTable: React.FC<ItemsTableProps> = ({
                                   onChange={(e) => onUpdateItem?.(idx, 'length', Number(e.target.value) || 0)}
                                   className="h-8 text-sm font-medium"
                                   min="0"
+                                  placeholder='cm'
                                 />
                               </div>
                               <div className="flex flex-col gap-1 flex-1">
@@ -254,6 +239,7 @@ export const ItemsTable: React.FC<ItemsTableProps> = ({
                                   onChange={(e) => onUpdateItem?.(idx, 'width', Number(e.target.value) || 0)}
                                   className="h-8 text-sm font-medium"
                                   min="0"
+                                  placeholder='cm'
                                 />
                               </div>
                               <div className="flex flex-col gap-1 flex-1">
@@ -264,6 +250,7 @@ export const ItemsTable: React.FC<ItemsTableProps> = ({
                                   onChange={(e) => onUpdateItem?.(idx, 'height', Number(e.target.value) || 0)}
                                   className="h-8 text-sm font-medium"
                                   min="0"
+                                  placeholder='cm'
                                 />
                               </div>
                             </>

@@ -102,6 +102,10 @@ const AutoComplete = React.forwardRef<HTMLInputElement, AutoCompleteProps>(
             setOpen(true);
         }, []);
 
+        React.useEffect(() => {
+            setInputValue(defaultValue);
+        }, [defaultValue]);
+
         return (
             <div className={cn("relative w-full")}>
                 <Popover.Root

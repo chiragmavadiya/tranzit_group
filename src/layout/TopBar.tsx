@@ -1,9 +1,11 @@
 "use client";
 
-import { LogOut, Sun, Moon, Monitor, Loader2, User, HelpCircle } from 'lucide-react';
+import { LogOut, Sun, Moon, Monitor, Loader2, HelpCircle } from 'lucide-react';
 import { useNavigate, useLocation, useSearchParams } from 'react-router-dom';
-import {
+import DropdownCustomContent, {
   DropdownCustomMenu,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
 } from '@/components/ui/dropdown-menu';
 import { useTheme } from '@/app/providers/theme-provider';
 // import { OrdersTabs } from '@/features/orders/components/OrdersTabs';
@@ -17,7 +19,7 @@ import type { CancelOrderTabType } from '@/features/cancel-order/constants/cance
 import type { BookPickupTabType } from '@/features/book-pickup/constants/book-pickup.constants';
 import type { ReportType } from '@/features/reports/types';
 import { useLogout } from '@/features/auth/hooks/useAuth';
-import CustomTooltip from '@/components/common/CustomTooltip';
+import { CustomTooltip } from '@/components/common/CustomTooltip';
 import { GlobalSearch } from '@/features/search/components/GlobalSearch';
 import { lazy, Suspense } from 'react';
 
@@ -117,12 +119,35 @@ export default function TopBar({ isCollapsed }: { isCollapsed?: boolean }) {
           </div>
         </DropdownCustomMenu>
 
-        <DropdownCustomMenu
-          menus={[
-            { label: 'Profile', icon: User, onClick: () => navigate('/profile') },
-            { label: 'FAQ', icon: HelpCircle, onClick: handleFaq },
-            { label: 'Logout', icon: LogOut, onClick: handleLogout, variant: 'destructive' }
-          ]}
+        <DropdownCustomContent
+          // menus={[
+          //   { label: 'Profile', icon: User, onClick: () => navigate('/profile') },
+          //   { label: 'FAQ', icon: HelpCircle, onClick: handleFaq },
+          //   { label: 'Logout', icon: LogOut, onClick: handleLogout, variant: 'destructive' }
+          // ]}
+          content={
+            <>
+              <div className="p-3 mb-2 bg-slate-50 dark:bg-zinc-950/50 rounded-xl flex items-center gap-3 border border-slate-100 dark:border-zinc-800/50">
+                <div className="h-10 w-10 rounded-full bg-blue-600 flex items-center justify-center text-white font-bold shadow-md">
+                  {user?.first_name?.[0]}{user?.last_name?.[0]}
+                </div>
+                <div className="flex flex-col min-w-0">
+                  <span className="text-sm font-bold text-slate-900 dark:text-zinc-100 truncate">{user?.first_name} {user?.last_name}</span>
+                  <span className="text-xs text-slate-500 dark:text-zinc-500 truncate">{user?.email}</span>
+                </div>
+              </div>
+              <DropdownMenuSeparator className="bg-slate-100 dark:bg-zinc-800" />
+              <DropdownMenuItem variant={"default"} onClick={handleFaq} className={"cursor-pointer py-2 px-3 text-[13px]"}>
+                {<HelpCircle className="w-4 h-4 mr-2" />}
+                FAQ
+              </DropdownMenuItem>
+              <DropdownMenuItem variant={"destructive"} onClick={handleLogout} className={"cursor-pointer py-2 px-3 text-[13px]"}>
+                {<LogOut className="w-4 h-4 mr-2" />}
+                Logout
+              </DropdownMenuItem>
+            </>
+          }
+          contentClassName='ring-0 border-gray-100 shadow-md p-2'
         >
           <div className='max-w-[220px] flex items-center gap-2 cursor-pointer px-[10px] py-[5px] hover:bg-gray-50 dark:hover:bg-zinc-800 rounded-md border border-gray-200 dark:border-zinc-800 text-[13px] font-medium text-gray-700 dark:text-zinc-300 transition-colors outline-none h-8'>
 
@@ -132,14 +157,14 @@ export default function TopBar({ isCollapsed }: { isCollapsed?: boolean }) {
               ) : user?.first_name?.charAt(0).toUpperCase()
               }
             </div>
-            <div className="w-[170px]">
+            <div className="max-w-[170px]">
 
               <CustomTooltip title={user?.email} onlyOnOverflow>
                 {user?.email}
               </CustomTooltip>
             </div>
           </div>
-        </DropdownCustomMenu>
+        </DropdownCustomContent>
       </div>
     </header>
   );

@@ -27,15 +27,15 @@ export function ZohoSettingsCard({
   isLoading
 }: ZohoSettingsCardProps) {
   return (
-    <Card className="p-4 border-gray-100 dark:border-zinc-800 shadow-sm bg-white dark:bg-zinc-950 flex flex-col">
-      <div className="flex items-center justify-between mb-8">
+    <Card className="p-6 border-gray-100 dark:border-zinc-800 shadow-sm bg-white dark:bg-zinc-950 flex flex-col">
+      <div className="flex items-center justify-between mb-2">
         <div className="flex items-center gap-3">
           <div className="w-10 h-10 rounded-xl bg-slate-100 dark:bg-zinc-900 flex items-center justify-center text-slate-600 dark:text-zinc-400">
             <Settings2 className="w-5 h-5" />
           </div>
           <div>
-            <h3 className="text-base font-bold text-slate-900 dark:text-zinc-100">Credentials & Settings</h3>
-            <p className="text-xs text-slate-500 dark:text-zinc-400">Configure your Zoho Books API access</p>
+            <h3 className="mt-0 text-base font-bold text-slate-900 dark:text-zinc-100">Credentials & Settings</h3>
+            <p className="mb-0 text-xs text-slate-500 dark:text-zinc-400">Configure your Zoho Books API access</p>
           </div>
         </div>
         <div className="flex items-center gap-1.5 px-3 py-1 bg-slate-50 dark:bg-zinc-900 rounded-full border border-slate-100 dark:border-zinc-800">
@@ -44,7 +44,7 @@ export function ZohoSettingsCard({
         </div>
       </div>
 
-      <div className="space-y-4">
+      <div className="">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <FormInput
             label="Client ID"
@@ -91,7 +91,7 @@ export function ZohoSettingsCard({
               errormsg="Change to .in, .eu, .com.cn as needed"
               error={false} // Shown as hint
             />
-            <p className="text-[10px] text-slate-400 dark:text-zinc-500 mt-[-16px] ml-1 italic md:col-span-2">
+            <p className="mb-0 text-[10px] text-slate-400 dark:text-zinc-500 mt-[-16px] ml-1 italic md:col-span-2">
               Tip: Change domain extension (.in, .eu, .com.au) based on your Zoho region.
             </p>
           </div>
@@ -117,7 +117,7 @@ export function ZohoSettingsCard({
           <Button
             onClick={onSave}
             disabled={isLoading}
-            className="h-10 px-8 bg-blue-600 hover:bg-blue-700 text-white font-bold uppercase tracking-widest text-[11px] shadow-lg shadow-blue-500/20 transition-all hover:scale-[1.02] active:scale-100"
+          // className="h-10 px-8 bg-blue-600 hover:bg-blue-700 text-white font-bold uppercase tracking-widest text-[11px] shadow-lg shadow-blue-500/20 transition-all hover:scale-[1.02] active:scale-100"
           >
             {isLoading ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Save className="w-4 h-4 mr-2" />}
             {isLoading ? "Saving..." : "Save Settings"}

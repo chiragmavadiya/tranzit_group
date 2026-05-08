@@ -269,7 +269,7 @@ const DropdownCustomMenu = ({ menus, children }: { menus: { label: string, onCli
 function DropdownCustomContent({ content, children, contentClassName }: { content: React.ReactNode, children: React.ReactNode, contentClassName?: string }) {
   return (
     <DropdownMenu>
-      <DropdownMenuTrigger className="p-1 hover:bg-gray-100 dark:hover:bg-zinc-800 rounded transition-colors outline-none">
+      <DropdownMenuTrigger className="hover:bg-gray-100 dark:hover:bg-zinc-800 rounded transition-colors outline-none">
         {children}
       </DropdownMenuTrigger>
       <DropdownMenuPortal>

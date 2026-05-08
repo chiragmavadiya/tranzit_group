@@ -85,7 +85,7 @@ const OrderDetailsPage: React.FC = () => {
   } = useOrderItems([
     {
       type: "box",
-      quantity: 0,
+      quantity: 1,
       weight: 0,
       length: 0,
       width: 0,
@@ -137,6 +137,8 @@ const OrderDetailsPage: React.FC = () => {
       setDeliveryInstructions(orderDetail.delivery_instructions || "")
       setInsuranceSelected(orderDetail.limited_liability_cover?.covered || false)
       setCourierData(orderDetail.courier_details)
+      console.log(orderDetail, 'orderDetail')
+      setQuoteData(orderDetail.order_details)
     }
   }, [orderDetail, orderType, setItemsData])
 
@@ -159,7 +161,26 @@ const OrderDetailsPage: React.FC = () => {
       setDeliveryInstructions(value as string)
     }
   }, [])
-  console.log(quoteData, 'quoteData')
+
+  const calculation = useMemo(() => {
+    const totalItems = itemsData?.reduce((acc, item) => acc + (Number(item.quantity) || 1), 0) || 0;
+    const totalWeight = itemsData?.reduce((acc, item) => acc + (Number(item.weight) * (Number(item.quantity) || 1)), 0) || 0;
+    const volumetric = itemsData?.reduce((acc, item) => {
+      const w = Number(item.width) || 0;
+      const h = Number(item.height) || 0;
+      const l = Number(item.length) || 0;
+      const q = Number(item.quantity) || 1;
+      return acc + ((w * h * l) / 1000000) * q;
+    }, 0) || 0;
+
+    const servicePrice = quoteData?.courier?.base || quoteData?.subtotal || 0;
+    const gst = quoteData?.courier?.gst || quoteData?.tax || 0;
+    const totalSurcharges = quoteData?.totalSurcharges || 0;
+    const insuranceCost = insuranceSelected ? 6.00 : 0;
+    const grandTotal = (quoteData?.totalPrice || quoteData?.total || 0) + insuranceCost;
+    return { totalItems, totalWeight, volumetric, servicePrice, gst, totalSurcharges, insuranceCost, grandTotal, insurance: insuranceSelected }
+  }, [itemsData, quoteData, insuranceSelected])
+
   const handleOnSave = useCallback(() => {
     const isValidItems = itemsData && itemsData.length > 0 && itemsData.every(item =>
       Number(item.height) > 0 && Number(item.width) > 0 && Number(item.length) > 0 && Number(item.weight) > 0 && Number(item.quantity) > 0
@@ -228,7 +249,7 @@ const OrderDetailsPage: React.FC = () => {
           '--webkit-scrollbar-button-display': 'none'
         } as React.CSSProperties}
       >
-        <OrderHeader orderID={orderID} orderType={orderType} onSave={handleOnSave} />
+        <OrderHeader orderID={orderID} orderType={orderType} onSave={handleOnSave} orderDetail={orderDetail!} />
         <main className="mt-3">
           <div className="grid grid-cols-1 xl:grid-cols-[1fr_380px] gap-6 items-start">
             <div className="flex flex-col gap-3 overflow-hidden">
@@ -255,6 +276,7 @@ const OrderDetailsPage: React.FC = () => {
                 onFullUpdateItem={fullUpdateItem}
                 addItem={addItem}
                 removeItem={removeItem}
+                orderType={orderType}
               />
 
               {/* <PackagingTable
@@ -262,7 +284,15 @@ const OrderDetailsPage: React.FC = () => {
                 onUpdate={updatePackaging}
               /> */}
 
-              <CarrierCard itemData={itemsData} addresses={addressData} onQuoteChange={setQuoteData} setCourierData={setCourierData} orderDetail={orderDetail} />
+              <CarrierCard
+                itemData={itemsData}
+                addresses={addressData}
+                onQuoteChange={setQuoteData}
+                setCourierData={setCourierData}
+                orderDetail={orderDetail}
+                orderType={orderType!}
+                module="order"
+              />
               {orderType !== 'create' && <HistoryCard history={orderDetail?.shipping_activity} />}
 
               {/* {orderType === 'create' && (
@@ -333,6 +363,7 @@ const OrderDetailsPage: React.FC = () => {
             </div>
 
             <SidePanel
+              calculation={calculation}
               itemsData={itemsData}
               quoteData={quoteData}
               handleOptionalFieldsChange={handleOptionalFieldsChange}

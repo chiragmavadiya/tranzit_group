@@ -1,13 +1,15 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import {
   Wallet,
   ArrowUpRight,
   ArrowDownLeft,
 } from 'lucide-react';
 import { StatCard, DataTable } from '@/components/common';
-import { ADMIN_TOPUP_COLUMNS, ADMIN_MOCK_TRANSACTIONS, TRANSACTION_TYPES } from '../constants';
+import { ADMIN_TOPUP_COLUMNS, TRANSACTION_TYPES } from '../constants';
 import { FormSelect } from '@/features/orders/components/OrderFormUI';
 import { Button } from '@/components/ui/button';
+import { useAdminTopups } from '../hooks/useWallet';
+import { useDebounce } from '@/hooks/useDebounce';
 
 export default function AdminTopUpPage() {
   const [search, setSearch] = useState('');
@@ -15,6 +17,24 @@ export default function AdminTopUpPage() {
   const [selectedCustomer, setSelectedCustomer] = useState('all');
   const [pageSize, setPageSize] = useState(25);
   const [page, setPage] = useState(1);
+
+  const debouncedSearch = useDebounce(search, 500);
+
+  const { data: topupResponse, isLoading } = useAdminTopups({
+    customer: selectedCustomer === 'all' ? undefined : selectedCustomer,
+    status: transactionType === 'all' ? undefined : transactionType,
+    search: debouncedSearch,
+    page,
+    per_page: pageSize
+  });
+
+  const transactions = topupResponse?.data || [];
+  const totalItems = topupResponse?.meta?.total || 0;
+
+  // Reset page when filters change
+  useEffect(() => {
+    setPage(1);
+  }, [debouncedSearch, transactionType, selectedCustomer]);
 
   const stats = useMemo(() => [
     {
@@ -41,18 +61,6 @@ export default function AdminTopUpPage() {
       iconBg: 'bg-blue-50 dark:bg-blue-500/10',
     },
   ], []);
-
-  const filteredData = useMemo(() => {
-    return ADMIN_MOCK_TRANSACTIONS.filter(item => {
-      const matchesSearch = item.customer_name.toLowerCase().includes(search.toLowerCase()) ||
-        item.transaction_id.toLowerCase().includes(search.toLowerCase());
-      const matchesType = transactionType === 'all' || item.type.toLowerCase() === transactionType.toLowerCase();
-      // Customer filter mock logic
-      const matchesCustomer = selectedCustomer === 'all' || true;
-
-      return matchesSearch && matchesType && matchesCustomer;
-    });
-  }, [search, transactionType, selectedCustomer]);
 
   return (
     <div className="flex flex-col flex-1 gap-4 p-page-padding min-h-0 overflow-y-auto animate-in fade-in slide-in-from-bottom-2 duration-500 bg-slate-50/30 dark:bg-zinc-950/30">
@@ -83,8 +91,8 @@ export default function AdminTopUpPage() {
               onValueChange={(val) => setSelectedCustomer(val || 'all')}
               options={[
                 { label: 'All Customers', value: 'all' },
-                { label: 'Ashish Tukadiya', value: 'c1' },
-                { label: 'Chirag 10 Gondaliya 10', value: 'c2' },
+                { label: 'Ashish Tukadiya', value: '87' },
+                { label: 'Chirag 10 Gondaliya 10', value: '88' },
               ]}
               placeholder="Select Customer"
               className="w-full space-y-0"
@@ -92,15 +100,8 @@ export default function AdminTopUpPage() {
           </div>
           <div className="lg:col-span-4 flex gap-3">
             <Button
-              variant="default"
-              className="h-8 flex-1 bg-slate-900 hover:bg-slate-800 dark:bg-zinc-100 dark:hover:bg-zinc-200 dark:text-zinc-950 font-bold uppercase tracking-widest text-[10px]"
-              onClick={() => { }}
-            >
-              Apply Filter
-            </Button>
-            <Button
               variant="outline"
-              className="h-8 flex-1 border-slate-200 dark:border-zinc-800 text-slate-500 dark:text-zinc-400 font-bold uppercase tracking-widest text-[10px]"
+              className="h-8 max-w-42 flex-1 border-slate-200 dark:border-zinc-800 text-slate-500 dark:text-zinc-400 font-bold uppercase tracking-widest text-[10px]"
               onClick={() => {
                 setSearch('');
                 setTransactionType('all');
@@ -118,7 +119,7 @@ export default function AdminTopUpPage() {
         <DataTable
           headerTitle="Transactions History"
           columns={ADMIN_TOPUP_COLUMNS}
-          data={filteredData}
+          data={transactions}
           searchable
           searchValue={search}
           onSearchChange={setSearch}
@@ -126,8 +127,10 @@ export default function AdminTopUpPage() {
           onPageSizeChange={(val) => setPageSize(Number(val))}
           currentPage={page}
           onPageChange={setPage}
-          totalItems={filteredData.length}
+          totalItems={totalItems}
+          loading={isLoading}
           className="text-xs pb-3"
+          rowKey="id"
         />
       </div>
     </div>

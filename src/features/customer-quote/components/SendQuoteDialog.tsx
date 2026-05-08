@@ -9,20 +9,21 @@ import {
 import { Button } from "@/components/ui/button";
 import { FormInput } from "@/features/orders/components/OrderFormUI";
 import { Mail, Send } from "lucide-react";
-import type { QuoteCalculations, ServiceRate, QuoteItem, QuoteLocation } from "../../quote/types";
+import type { QuoteCalculations, ServiceRate, QuoteLocation } from "../../quote/types";
 import { useCreateQuote } from '../../quote/hooks/useQuote';
 import { showToast } from '@/components/ui/custom-toast';
+import type { ItemData } from '@/features/orders/types';
 
 interface SendQuoteDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   calculations: QuoteCalculations;
-  selectedRate: ServiceRate | null;
+  courierData: ServiceRate | null;
   locations: {
     sender: QuoteLocation | null;
     receiver: QuoteLocation | null;
   };
-  items: QuoteItem[];
+  items: ItemData[];
   margin: string;
   pickupCharge: number;
 }
@@ -31,7 +32,7 @@ export function SendQuoteDialog({
   open,
   onOpenChange,
   calculations,
-  selectedRate,
+  courierData,
   locations,
   items,
   margin,
@@ -39,29 +40,29 @@ export function SendQuoteDialog({
 }: SendQuoteDialogProps) {
   const [email, setEmail] = useState('');
   const { mutate: createQuote, isPending } = useCreateQuote();
-
+  console.log(courierData, 'courierDatacourierData')
   const handleSend = () => {
-    if (!selectedRate || !locations.sender || !locations.receiver) return;
+    if (!courierData || !locations.sender || !locations.receiver) return;
 
     const payload = {
       sender: `${locations.sender.postcode}|${locations.sender.suburb}|${locations.sender.state}`,
       receiver: `${locations.receiver.postcode}|${locations.receiver.suburb}|${locations.receiver.state}`,
       parcels: items.map(item => ({
         type: item.type,
-        quantity: item.qty || item.quantity || 1,
+        quantity: item.quantity || 1,
         weight: item.weight,
         length: item.length,
         width: item.width,
         height: item.height
       })),
       service: {
-        courier: selectedRate.carrier_id,
-        carrier_name: selectedRate.carrier,
-        product_id: selectedRate.product_id,
-        product_type: selectedRate.product_type
+        courier: courierData.carrier_id,
+        carrier_name: courierData.carrier,
+        product_id: courierData.product_id,
+        product_type: courierData.product_type
       },
       surcharges: [],
-      chosenTotal: calculations.total,
+      chosenTotal: calculations.grandTotal,
       email: email,
       margin: Number(margin),
       pickup_charge: pickupCharge
@@ -83,20 +84,20 @@ export function SendQuoteDialog({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
-          <DialogTitle className="flex items-center gap-2">
+          <DialogTitle className="my-2 flex items-center gap-2">
             <Mail className="w-5 h-5 text-blue-600" />
             Send Quote to Customer
           </DialogTitle>
         </DialogHeader>
-        <div className="grid gap-4 py-4">
+        <div className="grid gap-4 pb-0">
           <div className="space-y-4">
             <div className="p-4 bg-slate-50 dark:bg-zinc-900 rounded-lg border border-slate-100 dark:border-zinc-800">
               <p className="text-[13px] font-medium text-slate-500 dark:text-zinc-400">Selected Service</p>
-              <p className="text-[15px] font-bold text-slate-900 dark:text-zinc-100">{selectedRate?.carrier} - {selectedRate?.service_name}</p>
+              <p className="text-[15px] font-bold text-slate-900 dark:text-zinc-100">{courierData?.carrier} - {courierData?.service_name}</p>
               <div className="mt-3 pt-3 border-t border-slate-200 dark:border-zinc-800 flex justify-between items-center">
                 <span className="text-[13px] font-medium text-slate-500 dark:text-zinc-400">Total Quote</span>
                 <span className="text-[16px] font-bold text-blue-600 dark:text-blue-400">
-                  {new Intl.NumberFormat('en-AU', { style: 'currency', currency: 'AUD' }).format(calculations.total)}
+                  {new Intl.NumberFormat('en-AU', { style: 'currency', currency: 'AUD' }).format(calculations.grandTotal)}
                 </span>
               </div>
             </div>

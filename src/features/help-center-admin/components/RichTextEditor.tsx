@@ -1,4 +1,6 @@
-import TextEditor from '@/components/common/TextEditor'
+import { lazy, Suspense } from 'react';
+
+const TextEditor = lazy(() => import('@/components/common/TextEditor'))
 
 interface RichTextEditorProps {
   value: string;
@@ -22,7 +24,9 @@ export function RichTextEditorComponent({ value, onChange, label, required }: Ri
       )}
 
       <div className="rte-container border border-slate-200 dark:border-zinc-800 rounded-lg overflow-hidden bg-white dark:bg-zinc-950 flex flex-col focus-within:ring-2 focus-within:ring-blue-600/10 focus-within:border-blue-600 transition-all min-h-[500px]">
-        <TextEditor value={value} onChange={onChange} />
+        <Suspense fallback={null}>
+          <TextEditor value={value} onChange={onChange} />
+        </Suspense>
       </div>
     </div>
   );

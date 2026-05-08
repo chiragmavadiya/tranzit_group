@@ -129,15 +129,15 @@ export function EnquiryForm() {
   }
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-6">
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+    <form onSubmit={handleSubmit} className="space-y-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div className="space-y-2">
           <FormSelect
             label='Issue Category'
             placeholder='Select enquiry'
             value={formData?.issue_type || ''}
             onValueChange={(value) => setFormData(prev => ({ ...prev, issue_type: (value || '') as IssueCategory }))}
-            className="h-10 border-gray-200 dark:border-zinc-800"
+            className="border-gray-200 dark:border-zinc-800"
             required
             options={ISSUE_CATEGORIES}
             error={isSubmited && formData.issue_type === ''}
@@ -152,7 +152,7 @@ export function EnquiryForm() {
             placeholder='Enter your email'
             value={formData.reply_email}
             onChange={(value) => setFormData(prev => ({ ...prev, reply_email: value }))}
-            className="h-10 border-gray-200 dark:border-zinc-800"
+            className="border-gray-200 dark:border-zinc-800"
             required
             error={isSubmited && (!formData.reply_email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.reply_email))}
             errormsg='Please enter a valid email address'
@@ -167,7 +167,7 @@ export function EnquiryForm() {
                 placeholder='Select your role'
                 value={formData?.sender_role || ''}
                 onValueChange={(value) => setFormData(prev => ({ ...prev, sender_role: value || '' }))}
-                className="h-10 border-gray-200 dark:border-zinc-800"
+                className="border-gray-200 dark:border-zinc-800"
                 required
                 options={SENDER_RECEIVER}
                 error={isSubmited && formData.issue_type === 'sender' && !formData.sender_role}
@@ -180,7 +180,7 @@ export function EnquiryForm() {
                 placeholder='Select local country'
                 value={formData?.local_country || ''}
                 onValueChange={(value) => setFormData(prev => ({ ...prev, local_country: value || '' }))}
-                className="h-10 border-gray-200 dark:border-zinc-800"
+                className="border-gray-200 dark:border-zinc-800"
                 required
                 options={COUNTRY}
                 error={isSubmited && formData.issue_type === 'sender' && !formData.local_country}
@@ -193,7 +193,7 @@ export function EnquiryForm() {
                 placeholder='Enter your contact number'
                 value={formData?.contact_number || ''}
                 onChange={(value) => setFormData(prev => ({ ...prev, contact_number: value }))}
-                className="h-10 border-gray-200 dark:border-zinc-800"
+                className="border-gray-200 dark:border-zinc-800"
                 required
                 error={isSubmited && formData.issue_type === 'sender' && !formData.contact_number}
                 errormsg='Please enter contact number'
@@ -209,7 +209,7 @@ export function EnquiryForm() {
               placeholder='Select nature of issue'
               value={formData?.nature_of_issue || ''}
               onValueChange={(value) => setFormData(prev => ({ ...prev, nature_of_issue: value || '' }))}
-              className="h-10 border-gray-200 dark:border-zinc-800"
+              className="border-gray-200 dark:border-zinc-800"
               required
               options={PARCEL_ENQUIRY_TYPE}
               error={isSubmited && formData.issue_type === 'parcel' && !formData.nature_of_issue}
@@ -224,7 +224,7 @@ export function EnquiryForm() {
               placeholder='Select feedback category'
               value={formData?.feedback_category || ''}
               onValueChange={(value) => setFormData(prev => ({ ...prev, feedback_category: value || '' }))}
-              className="h-10 border-gray-200 dark:border-zinc-800"
+              className="border-gray-200 dark:border-zinc-800"
               required
               options={FEEDBACK_CATEGORIES}
               error={isSubmited && formData.issue_type === 'feedback' && !formData.feedback_category}
@@ -234,7 +234,7 @@ export function EnquiryForm() {
         )}
       </div>
 
-      <div className="space-y-2">
+      <div className="space-y-0.5">
         <FormTextarea
           label='How can we help?'
           placeholder='Please describe your issue in detail...'

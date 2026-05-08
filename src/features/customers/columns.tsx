@@ -42,11 +42,12 @@ export const getCustomerColumns = (onEdit: (id: string | number) => void, handle
         sticky: "left",
         cell: (_, customer) => {
             const fullName = `${customer.first_name} ${customer.last_name}`;
+
             return (
                 <NavLink to={`/admin/customers/${customer.id}`}>
                     <div className="flex items-center gap-3">
                         <div className='w-[35px] h-[35px]'>
-                            <img className='w-[35px] h-[35px] object-cover rounded-full' src={`https://ui-avatars.com/api/?format=svg&name=${fullName}&background=random&rounded=true`} alt={fullName} />
+                            <img className='w-[32px] h-[32px] object-cover rounded-full' src={`https://ui-avatars.com/api/?format=svg&name=${fullName}&background=random&rounded=true&font-size=0.33&bold=true`} alt={fullName} />
                         </div>
                         <div className="flex flex-col">
                             <span className="text-sm font-semibold text-slate-900">{fullName}</span>

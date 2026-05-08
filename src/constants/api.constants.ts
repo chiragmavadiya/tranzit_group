@@ -127,6 +127,11 @@ export const API_ENDPOINTS = {
     SEARCH: {
         GLOBAL: "/globalsearch",
     },
+    ZOHO: {
+        GET_CONFIG: "/admin/zoho",
+        SAVE_CONFIG: "/admin/zoho/save",
+        GET_REDIRECT_URL: "/admin/zoho/redirect",
+    }
 };
 
 export const QUERY_KEYS = {

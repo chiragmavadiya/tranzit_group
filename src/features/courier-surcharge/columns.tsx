@@ -1,8 +1,9 @@
-import { CustomTooltip, type Column } from '@/components/common';
+import { CustomTooltip } from '@/components/common/CustomTooltip';
 import type { CourierSurcharge } from './types';
 import { Button } from '@/components/ui/button';
 import { Pencil, Trash2, CheckCircle2, XCircle } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import type { Column } from '@/components/common/types/DataTable.types';
 
 export const SURCHARGE_COLUMNS = (onEdit: (row: any) => void, onDelete: (row: any) => void): Column<CourierSurcharge>[] => [
   {

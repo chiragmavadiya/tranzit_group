@@ -29,7 +29,8 @@ const QuoteList = lazy(() => import('@/features/customer-quote/pages/QuoteListPa
 const ProfilePage = lazy(() => import('@/features/profile/pages/ProfilePage'));
 
 const HelpCenterAdminPage = lazy(() => import('@/features/help-center-admin/pages/HelpCenterAdminPage'));
-const SettingsPage = lazy(() => import('@/features/settings/pages/SettingsPage'));
+const SettingsLayout = lazy(() => import('@/features/settings/components/SettingsLayout'));
+const CategorySettingsPage = lazy(() => import('@/features/settings/pages/CategorySettingsPage'));
 const ActivityLogPage = lazy(() => import('@/features/activity-log/pages/ActivityLogPage'));
 
 
@@ -71,7 +72,9 @@ export default function AdminRoutes() {
                     <Route path="profile" element={<ProfilePage />} />
 
                     <Route path="help-center" element={<HelpCenterAdminPage />} />
-                    <Route path="settings" element={<SettingsPage />} />
+                    <Route path="settings" element={<SettingsLayout />}>
+                        <Route path=":categoryId" element={<CategorySettingsPage />} />
+                    </Route>
                     <Route path="activity-log" element={<ActivityLogPage />} />
                     <Route path="search" element={<Search />} />
                     {/* Default authenticated route */}

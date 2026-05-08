@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from 'react'
-import { useParams } from 'react-router-dom'
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card'
 import { Truck, AlertCircle, RefreshCw } from 'lucide-react'
 import { Badge } from '@/components/ui/badge'
@@ -8,17 +7,21 @@ import { useGetQuoteServices } from '@/features/quote/hooks/useQuote'
 import { showToast } from '@/components/ui/custom-toast'
 import type { AddressData, ItemData } from '../../types'
 import { useAppSelector } from '@/hooks/store.hooks'
+import type { QuoteLocation } from '@/features/quote/types'
+import { useTraceUpdate } from '@/lib/utils'
 
 interface CarrierCardProps {
   itemData: ItemData[];
-  addresses: { sender: AddressData, receiver: AddressData };
+  addresses: { sender: AddressData | QuoteLocation | null, receiver: AddressData | QuoteLocation | null };
   onQuoteChange?: (data: any) => void;
-  setCourierData: React.Dispatch<React.SetStateAction<any>>;
+  setCourierData?: React.Dispatch<React.SetStateAction<any>>;
   orderDetail?: any;
+  module?: string;
+  orderType?: string
 }
 
-export const CarrierCard: React.FC<CarrierCardProps> = ({ itemData, addresses, onQuoteChange, setCourierData, orderDetail }) => {
-  const { orderType } = useParams<{ orderType?: string }>()
+export const CarrierCard: React.FC<CarrierCardProps> = (props) => {
+  const { itemData, addresses, onQuoteChange, setCourierData, orderDetail, module, orderType = 'create' } = props
   const { role } = useAppSelector((state) => state.auth);
   const [selectedServiceId, setSelectedServiceId] = useState<string>('')
   const [couriers, setCouriers] = useState<any[]>([]);
@@ -26,51 +29,57 @@ export const CarrierCard: React.FC<CarrierCardProps> = ({ itemData, addresses, o
   const [bestDeal, setBestDeal] = useState<string>('');
 
   const { mutate: getServices, isPending: loading } = useGetQuoteServices(role);
-
+  useTraceUpdate(props)
   useEffect(() => {
     if (orderType !== 'create') return;
     // Check if we have valid items with dimensions > 0
     const isValidItems = itemData && itemData.length > 0 && itemData.every(item =>
       Number(item.height) > 0 && Number(item.width) > 0 && Number(item.length) > 0 && Number(item.weight) > 0 && Number(item.quantity) > 0
     );
+    if (!isValidItems) return;
 
     // Check if we have both addresses
-    const hasSenderAddress = Boolean(addresses?.sender?.address1);
-    const hasReceiverAddress = Boolean(addresses?.receiver?.address1);
+    const sender = addresses?.sender;
+    const receiver = addresses?.receiver;
 
-    if (!isValidItems || !hasSenderAddress || !hasReceiverAddress) {
-      return;
-    }
+    const hasSenderAddress = sender && ('address1' in sender ? Boolean(sender.address1) : Boolean(sender.label));
+    const hasReceiverAddress = receiver && ('address1' in receiver ? Boolean(receiver.address1) : Boolean(receiver.label));
 
-    const { suburb, state, postcode, country } = addresses.receiver
-    const receiver_details = `${suburb} ${state} ${postcode} ${country}`;
+    if (!hasSenderAddress || !hasReceiverAddress) return;
 
-    const payload = {
-      items: itemData,
-      sender_details: addresses.sender.address1,
-      receiver_details: receiver_details,
-      receiver_address: addresses.receiver.address1,
-      is_order: "yes" as const,
-    }
-    getServices(payload, {
-      onSuccess: (data) => {
-        setCouriers(data.services || []);
-        setSurchargesMap(data.surcharges || {});
-        if (data.services && data.services.length > 0) {
-          const firstService = data.services[0];
-          const minItem = data.services.reduce((min, curr) =>
-            curr.price < min.price ? curr : min
-          );
-          setBestDeal(minItem.product_id || minItem.code || '');
-          setSelectedServiceId(firstService.product_id || firstService.code || '0');
-        }
-        // showToast(`Found ${data.services.length} available services`, "success");
-      },
-      onError: (err: any) => {
-        showToast(err?.response?.data?.message || 'Failed to fetch rates', "error");
+    const timer = setTimeout(() => {
+      const receiver_details = `${receiver.suburb} ${receiver.state} ${receiver.postcode} ${receiver.country || ''}`.trim();
+      const sender_addr1 = 'address1' in sender ? sender.address1 : sender.label;
+      const receiver_addr1 = 'address1' in receiver ? receiver.address1 : receiver.label;
+
+      const payload = {
+        items: itemData,
+        sender_details: sender_addr1,
+        receiver_details: receiver_details,
+        receiver_address: receiver_addr1,
+        is_order: "yes" as const,
       }
-    });
-  }, [itemData, addresses, getServices, orderType])
+      getServices(payload, {
+        onSuccess: (data) => {
+          setCouriers(data.services || []);
+          setSurchargesMap(data.surcharges || {});
+          if (data.services && data.services.length > 0) {
+            const firstService = data.services[0];
+            const minItem = data.services.reduce((min, curr) =>
+              curr.price < min.price ? curr : min
+            );
+            setBestDeal(minItem.product_id || minItem.code || '');
+            setSelectedServiceId(firstService.product_id || firstService.code || '0');
+          }
+        },
+        onError: (err: any) => {
+          showToast(err?.response?.data?.message || 'Failed to fetch rates', "error");
+        }
+      });
+    }, 500); // 500ms debounce
+    // Cleanup previous timer
+    return () => clearTimeout(timer);
+  }, [itemData, addresses, getServices, orderType, module])
 
   useEffect(() => {
     if (couriers.length > 0 && selectedServiceId) {
@@ -85,20 +94,18 @@ export const CarrierCard: React.FC<CarrierCardProps> = ({ itemData, addresses, o
           totalSurcharges,
           totalPrice
         });
-        setCourierData({
+        setCourierData?.({
           courier: selectedCourier.carrier_id,
           product_id: selectedCourier.product_id,
           product_type: selectedCourier.product_type,
           shipment_summary: selectedCourier.shipment_summary,
         })
       }
-    } else {
-      onQuoteChange?.(null);
     }
   }, [selectedServiceId, couriers, surchargesMap, onQuoteChange, setCourierData])
 
   return (
-    <Card className="border shadow-md pt-1 gap-0 border-gray-200 dark:border-zinc-800 rounded-xl overflow-hidden transition-colors duration-300">
+    <Card className="border shadow-md pt-1 gap-0 border-gray-100 dark:border-zinc-800 rounded-xl overflow-hidden transition-colors duration-300">
       <CardHeader className="flex flex-row items-center justify-between py-3 px-5 border-b border-gray-100 dark:border-zinc-800 bg-white dark:bg-zinc-900 transition-colors">
         <div className="flex justify-between w-full items-center gap-2">
           <div className='flex items-center gap-2'>

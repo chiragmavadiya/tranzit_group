@@ -5,24 +5,27 @@ import { FormInput } from "@/features/orders/components/OrderFormUI";
 import type { QuoteCalculations } from "../types";
 
 interface QuoteSummaryProps {
-  calculations: QuoteCalculations;
+  quoteData: QuoteCalculations;
   isAdmin?: boolean;
   margin?: string;
   setMargin?: (val: string) => void;
   onSendQuote?: () => void;
   isValid?: boolean;
+  calculation?: QuoteCalculations
 }
 
 export function QuoteSummary({
-  calculations,
+  calculation,
+  quoteData,
   isAdmin = false,
   margin = '0',
   setMargin,
   onSendQuote,
   isValid = false
 }: QuoteSummaryProps) {
+  console.log(quoteData, 'quoteData')
   const formatCurrency = (val: number) =>
-    new Intl.NumberFormat('en-AU', { style: 'currency', currency: 'AUD' }).format(val);
+    new Intl.NumberFormat('en-AU', { style: 'currency', currency: 'AUD' }).format(val) || 0;
 
   return (
     <Card className="sticky top-20 p-0 gap-0 shadow-sm border-slate-200 dark:border-zinc-800 bg-white dark:bg-zinc-950 overflow-hidden">
@@ -51,34 +54,34 @@ export function QuoteSummary({
 
         <div className="flex justify-between items-center text-[13.5px]">
           <span className="text-slate-500 dark:text-zinc-400">Total Items</span>
-          <span className="font-semibold text-slate-700 dark:text-zinc-200">{calculations.totalItems}</span>
+          <span className="font-semibold text-slate-700 dark:text-zinc-200">{calculation?.totalItems}</span>
         </div>
         <div className="flex justify-between items-center text-[13.5px]">
           <span className="text-slate-500 dark:text-zinc-400">Dead Weight</span>
-          <span className="font-semibold text-slate-700 dark:text-zinc-200">{calculations.deadWeight.toFixed(2)} kg</span>
+          <span className="font-semibold text-slate-700 dark:text-zinc-200">{calculation?.totalWeight?.toFixed(2)} kg</span>
         </div>
         <div className="flex justify-between items-center text-[13.5px]">
           <span className="text-slate-500 dark:text-zinc-400">Volumetric Weight</span>
-          <span className="font-semibold text-slate-700 dark:text-zinc-200">{calculations.volumetricWeight.toFixed(2)} kg</span>
+          <span className="font-semibold text-slate-700 dark:text-zinc-200">{calculation?.volumetric?.toFixed(2)} kg</span>
         </div>
         <div className="h-px bg-slate-100 dark:bg-zinc-800 my-2" />
         <div className="flex justify-between items-center text-[13.5px]">
           <span className="text-slate-500 dark:text-zinc-400">Service Cost</span>
-          <span className="font-semibold text-slate-700 dark:text-zinc-200">{formatCurrency(calculations.serviceCost)}</span>
+          <span className="font-semibold text-slate-700 dark:text-zinc-200">{formatCurrency(calculation?.servicePrice || 0)}</span>
         </div>
         <div className="flex justify-between items-center text-[13.5px]">
           <span className="text-slate-500 dark:text-zinc-400">GST (10%)</span>
-          <span className="font-semibold text-slate-700 dark:text-zinc-200">{formatCurrency(calculations.gst)}</span>
+          <span className="font-semibold text-slate-700 dark:text-zinc-200">{formatCurrency(calculation?.gst || 0)}</span>
         </div>
         <div className="flex justify-between items-center text-[13.5px]">
           <span className="text-slate-500 dark:text-zinc-400">Extra surcharges</span>
-          <span className="font-semibold text-slate-700 dark:text-zinc-200">{formatCurrency(calculations.surcharges)}</span>
+          <span className="font-semibold text-slate-700 dark:text-zinc-200">{formatCurrency(calculation?.totalSurcharges || 0)}</span>
         </div>
 
-        {isAdmin && calculations.margin > 0 && (
+        {isAdmin && calculation?.margin && Number(calculation?.margin) > 0 && (
           <div className="flex justify-between items-center text-[13.5px]">
             <span className="text-blue-600 font-bold">Admin Margin</span>
-            <span className="font-bold text-blue-600">{formatCurrency(calculations.margin)}</span>
+            <span className="font-bold text-blue-600">{formatCurrency(calculation?.margin || 0)}</span>
           </div>
         )}
 
@@ -88,13 +91,13 @@ export function QuoteSummary({
             <span className="text-[14px] font-bold text-slate-900 dark:text-zinc-100 leading-tight">Total</span>
             <span className="text-[10px] font-normal text-slate-500 dark:text-zinc-500">(inc GST & F.L)</span>
           </div>
-          <span className="text-[22px] font-extrabold text-blue-600 dark:text-blue-400 tracking-tight">{formatCurrency(calculations.total)}</span>
+          <span className="text-[22px] font-extrabold text-blue-600 dark:text-blue-400 tracking-tight">{formatCurrency(calculation?.grandTotal || 0)}</span>
         </div>
 
         {isAdmin && onSendQuote && (
           <Button
             onClick={onSendQuote}
-            disabled={!isValid || calculations.serviceCost === 0}
+            disabled={!isValid || calculation?.servicePrice === 0}
             className="w-full bg-[#0060FE] hover:bg-blue-700 text-white gap-2 h-10 text-[13px] font-bold my-2  shadow-lg active:scale-[0.98] transition-all"
           >
             <Mail className="w-4 h-4" />

@@ -73,7 +73,7 @@ export function QuoteDetailsDialog({ open, onOpenChange, quoteId }: QuoteDetails
                                     {details.item_details.map((item, idx) => (
                                         <TableRow key={idx}>
                                             <TableCell className="py-2">{item.type}</TableCell>
-                                            <TableCell className="py-2 text-center font-medium">{item.quantity || item.qty}</TableCell>
+                                            <TableCell className="py-2 text-center font-medium">{item.quantity}</TableCell>
                                             <TableCell className="py-2 text-center">{item.weight} kg</TableCell>
                                             <TableCell className="py-2 text-center">{item.length}×{item.width}×{item.height} cm</TableCell>
                                         </TableRow>

@@ -1,9 +1,9 @@
-import api from "@/services/api";
+import { api } from "@/services/api";
 import { API_ENDPOINTS } from "@/constants/api.constants";
-import type { 
-    CourierSurcharge, 
-    CourierSurchargeFormData, 
-    CourierSurchargeFilters 
+import type {
+    CourierSurcharge,
+    CourierSurchargeFormData,
+    CourierSurchargeFilters
 } from "../types";
 
 export interface GlobalCourier {

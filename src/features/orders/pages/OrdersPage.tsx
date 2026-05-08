@@ -111,7 +111,7 @@ export default function OrdersPage() {
 
 
   return (
-    <div className="p-page-padding flex-1 flex flex-col space-y-4 animate-in fade-in duration-700 h-full overflow-hidden min-h-0 bg-white dark:bg-zinc-950">
+    <div className="p-page-padding flex-1 flex flex-col space-y-4 animate-in fade-in slide-in-from-bottom-2 duration-300 h-full overflow-hidden min-h-0 bg-white dark:bg-zinc-950">
 
       <div className='rounded-lg shadow-sm flex-1 flex flex-col min-h-0 border border-gray-100 dark:border-zinc-800 bg-white dark:bg-zinc-950 '>
         <div className="flex flex-wrap items-end justify-end gap-4 p-4">

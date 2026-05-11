@@ -31,6 +31,7 @@ import {
   PopoverTrigger,
 } from '@/components/ui/popover'
 import { BANKING_DETAILS, COMPANY_DETAILS, TERMS_CONDITIONS } from '../../constants'
+import { format } from 'date-fns'
 
 interface InvoicePaperProps {
   invoice: any;
@@ -171,7 +172,7 @@ export const InvoicePaper: React.FC<InvoicePaperProps> = ({
               }}
               options={customersData?.data?.map((c: any) => ({
                 value: c.id.toString(),
-                label: c.business_name || `${c.first_name} ${c.last_name}`
+                label: `${c.first_name} ${c.last_name}`
               })) || []}
             />
           </div>
@@ -194,8 +195,9 @@ export const InvoicePaper: React.FC<InvoicePaperProps> = ({
                   selected={invoice?.invoice?.invoice_date ? new Date(invoice?.invoice?.invoice_date) : undefined}
                   onSelect={(date) => {
                     if (date) {
-                      const formattedDate = date.toISOString().split('T')[0]; // YYYY-MM-DD format
-                      onUpdateDate?.(formattedDate);
+                      // onUpdateDate?.(date);
+                      const formattedDate = format(date, 'dd-MM-yyyy');
+                      onUpdateDate?.(formattedDate)
                     }
                   }}
                   initialFocus
@@ -221,11 +223,11 @@ export const InvoicePaper: React.FC<InvoicePaperProps> = ({
                   onValueChange={(val) => updateStatus(val || '')}
                   options={[
                     { value: 'draft', label: 'Draft' },
-                    { value: 'pending', label: 'Pending' },
-                    { value: 'partial', label: 'Partial' },
-                    { value: 'paid', label: 'Paid' },
+                    { value: 'send', label: 'Send' },
                     { value: 'unpaid', label: 'Unpaid' },
+                    { value: 'partial', label: 'Partial' },
                     { value: 'overdue', label: 'Overdue' },
+                    { value: 'paid', label: 'Paid' },
                   ]}
                 />
               ) : (
@@ -308,8 +310,8 @@ export const InvoicePaper: React.FC<InvoicePaperProps> = ({
                         ) : (
                           <Badge variant="outline" className={cn(
                             "text-[10px] font-black uppercase border-none px-2 py-0.5",
-                            item.type === 'order' ? "bg-blue-50 text-blue-600" :
-                              item.type === 'credit' ? "bg-emerald-50 text-emerald-600" :
+                            item.type.toLowerCase() === 'order' ? "bg-blue-50 text-blue-600" :
+                              item.type.toLowerCase() === 'credit' ? "bg-emerald-50 text-emerald-600" :
                                 "bg-slate-100 text-slate-600"
                           )}>
                             {item.type || 'custom'}
@@ -398,9 +400,9 @@ export const InvoicePaper: React.FC<InvoicePaperProps> = ({
                           <Input
                             type="number"
                             className="h-7 text-[10px] w-20 bg-white text-right font-bold focus:ring-1 focus:ring-blue-500"
-                            value={item.amount}
+                            value={item.total}
                             onClick={e => e.stopPropagation()}
-                            onChange={e => updateItemsData(item.id, 'amount', e.target.value)}
+                            onChange={e => updateItemsData(item.id, 'total', e.target.value)}
                           />
                         ) : (
                           <span className="text-xs font-bold text-slate-900 dark:text-white">{formatCurrency(item.total)}</span>
@@ -468,8 +470,8 @@ export const InvoicePaper: React.FC<InvoicePaperProps> = ({
                 {(invoice.payments || []).length > 0 ? (
                   invoice.payments.map((p: any, idx: number) => (
                     <TableRow key={idx} className="border-b border-slate-50 dark:border-zinc-800/50 last:border-0 transition-colors hover:bg-slate-50/30">
-                      <TableCell className="text-[12px] font-medium py-3 pl-4">{p.payment_date}</TableCell>
-                      <TableCell className="text-[12px] font-medium py-3 text-slate-600">{p.payment_method}</TableCell>
+                      <TableCell className="text-[12px] font-medium py-3 pl-4">{p.payment_date || p.date}</TableCell>
+                      <TableCell className="text-[12px] font-medium py-3 text-slate-600">{p.payment_method || p.method}</TableCell>
                       <TableCell className="text-[12px] font-medium py-3 text-slate-600 truncate max-w-[100px]">{p.note || '-'}</TableCell>
                       <TableCell className="text-[12px] font-medium py-3 text-slate-600">{p.added_by || 'Admin'}</TableCell>
                       <TableCell className="text-[12px] font-bold py-3 text-right text-emerald-600 pr-4">{formatCurrency(p.amount)}</TableCell>
@@ -490,25 +492,25 @@ export const InvoicePaper: React.FC<InvoicePaperProps> = ({
       <div className="grid grid-cols-1 lg:grid-cols-[1.5fr_1fr] gap-8 pt-8 dark:border-zinc-800">
 
         {/* Left: Transactions & Banking */}
-        <div className="space-y-10">
+        <div className="space-y-6">
           <div className="bg-slate-50/50 dark:bg-zinc-800/30 p-6 rounded-2xl border border-slate-100 dark:border-zinc-800">
             <h3 className="text-slate-700 mb-4 text-sm mt-0">Banking Details</h3>
-            <div className="grid grid-cols-2 gap-y-2 gap-x-8 text-[11px] font-medium">
+            <div className="grid grid-cols-2 gap-y-4 gap-x-8 text-[11px] font-medium">
               <div>
                 <p className="text-slate-500 mb-0.5">Bank Name</p>
-                <p className="text-slate-800 dark:text-slate-200 font-semibold">{BANKING_DETAILS.bank_name || 'Commonwealth Bank'}</p>
+                <p className="text-slate-800 dark:text-slate-200 font-semibold mb-0">{BANKING_DETAILS.bank_name || 'Commonwealth Bank'}</p>
               </div>
               <div>
                 <p className="text-slate-500 mb-0.5">Account Name</p>
-                <p className="text-slate-800 dark:text-slate-200 font-semibold">{BANKING_DETAILS.account_name || 'Tranzit Group Pty Ltd'}</p>
+                <p className="text-slate-800 dark:text-slate-200 font-semibold mb-0">{BANKING_DETAILS.account_name || 'Tranzit Group Pty Ltd'}</p>
               </div>
               <div>
                 <p className="text-slate-500 mb-0.5">BSB</p>
-                <p className="text-slate-800 dark:text-slate-200 font-semibold">{BANKING_DETAILS.bsb || '063 138'}</p>
+                <p className="text-slate-800 dark:text-slate-200 font-semibold mb-0">{BANKING_DETAILS.bsb || '063 138'}</p>
               </div>
               <div>
                 <p className="text-slate-500 mb-0.5">A/C Number</p>
-                <p className="text-slate-800 dark:text-slate-200 font-semibold">{BANKING_DETAILS.account_number || '1112 4733'}</p>
+                <p className="text-slate-800 dark:text-slate-200 font-semibold mb-0">{BANKING_DETAILS.account_number || '1112 4733'}</p>
               </div>
             </div>
           </div>
@@ -539,7 +541,7 @@ export const InvoicePaper: React.FC<InvoicePaperProps> = ({
             </div>
 
             {/* Content Body */}
-            <div className="p-6 space-y-6">
+            <div className="p-6 space-y-4">
               {/* Cost Breakdown */}
               <div className="space-y-4">
                 <div className="flex justify-between text-xs">
@@ -571,7 +573,7 @@ export const InvoicePaper: React.FC<InvoicePaperProps> = ({
               <div className="border-t-2 border-slate-100 dark:border-zinc-800 pt-6 flex justify-between">
                 <div className="space-y-1">
                   <span className="text-sm font-black text-slate-900 dark:text-white uppercase tracking-tight">Total</span>
-                  <p className="text-[10px] text-slate-400 font-medium">(inc GST)</p>
+                  <p className="text-[10px] text-slate-400 font-medium mb-0">(inc GST)</p>
                 </div>
                 <span className="text-4xl font-black text-blue-600 tracking-tighter">
                   {formatCurrency(invoice?.summary?.amount_due)}

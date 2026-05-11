@@ -4,7 +4,7 @@ import { useState, useMemo, useCallback, useEffect, useRef } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import type { TabType } from '@/features/orders/types';
 import { useOrders, useExportOrders, useImportOrders } from '@/features/orders/hooks/useOrders';
-import { DataTable } from '@/components/common';
+import { DataTable } from '@/components/common/DataTable';
 import { getOrdersColumns } from '../column';
 import DatePicker from '@/components/common/DatePicker';
 import { Button } from '@/components/ui/button';
@@ -189,7 +189,7 @@ export default function OrdersPage() {
                 <span>{importOrders.isPending ? 'Importing...' : 'Import'}</span>
               </Button>
               <Button
-                onClick={() => navigate('/orders/create')}
+                onClick={() => navigate(`${role === 'admin' ? '/admin' : ''}/orders/create`)}
                 className="gap-2 bg-[#0060FE] hover:bg-[#0052db] text-white shadow-lg shadow-blue-100 dark:shadow-none transition-all active:scale-[0.98] font-semibold border-none px-4"
               >
                 <Plus className="w-4 h-4" />

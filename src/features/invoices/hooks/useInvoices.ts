@@ -65,6 +65,7 @@ export const useAdminInvoices = (params?: { search?: string; page?: number; per_
     queryFn: () => invoicesService.getAdminInvoices(params),
     placeholderData: keepPreviousData,
     enabled: enabled,
+    staleTime: 0,
   });
 };
 

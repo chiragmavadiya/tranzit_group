@@ -1,6 +1,7 @@
 import { useState, useMemo } from 'react';
 import { Users, UserCheck, UserX, Plus } from 'lucide-react';
-import { DataTable, StatCard } from '@/components/common';
+import { DataTable } from '@/components/common/DataTable';
+import { StatCard } from '@/components/common/StatCard';
 import SelectComponent from '@/components/ui/select';
 import { Button } from '@/components/ui/button';
 import { SUBURBS, STATES } from '../constants';

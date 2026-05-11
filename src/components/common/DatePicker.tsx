@@ -4,9 +4,10 @@ import { CalendarIcon } from 'lucide-react'
 import { Calendar } from '../ui/calendar'
 import { cn } from '@/lib/utils'
 import { format } from 'date-fns'
-import { useState } from 'react'
+import { memo, useState } from 'react'
+import { CustomLabel } from '@/features/orders/components/OrderFormUI'
 
-const DatePicker = ({ date, setDate, label, className, placeholder = 'DD/MM/YY' }: { date: Date | undefined, setDate: (date: Date | undefined) => void, label?: string, className?: string, placeholder?: string }) => {
+const DatePicker = memo(({ date, setDate, label, className, placeholder = 'DD/MM/YY' }: { date: Date | undefined, setDate: (date: Date | undefined) => void, label?: string, className?: string, placeholder?: string }) => {
   const [open, setOpen] = useState<boolean>(false);
 
   const handleDateChange = (date: Date | undefined) => {
@@ -16,13 +17,14 @@ const DatePicker = ({ date, setDate, label, className, placeholder = 'DD/MM/YY' 
 
   return (
     <div className='flex flex-col'>
-      {label && <label className="text-[13px] font-semibold text-gray-500 dark:text-zinc-400 ml-0.5">{label}</label>}
+      {/* {label && <label className="text-[13px] font-semibold text-gray-700 dark:text-zinc-400 ml-0.5">{label}</label>} */}
+      {label && <CustomLabel label={label} />}
       <Popover open={open} onOpenChange={setOpen}>
         <PopoverTrigger>
           <Button
             variant="outline"
             className={cn(
-              "w-[240px] h-8 justify-between text-left font-normal border-gray-200 dark:border-zinc-800",
+              "w-full h-8 justify-between text-left font-normal border-gray-200 dark:border-zinc-800 px-3",
               !date && "text-muted-foreground", className
             )}
           >
@@ -40,6 +42,6 @@ const DatePicker = ({ date, setDate, label, className, placeholder = 'DD/MM/YY' 
       </Popover>
     </div>
   )
-}
+})
 
-export default DatePicker
+export default DatePicker;

@@ -39,7 +39,7 @@ export const ItemsTable: React.FC<ItemsTableProps> = ({
   // const { orderType } = useParams<{ orderType?: string }>()
   const isReadOnly = orderType !== 'create'
 
-  const { data: itemsResponse } = useItems({ per_page: 100 })
+  const { data: itemsResponse } = useItems({ per_page: 100 }, !isReadOnly)
   const predefinedItems = useMemo(() => itemsResponse?.data || [], [itemsResponse])
 
   const predefinedItemsOptions = useMemo(() => {

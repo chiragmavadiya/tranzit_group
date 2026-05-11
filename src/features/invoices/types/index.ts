@@ -5,6 +5,32 @@ export interface Customer {
   email: string;
 }
 
+export interface InvoiceDocumentData {
+  invoice: {
+    id?: number;
+    invoice_number: string;
+    invoice_date: string;
+    issued_at: string;
+    due_date: string | null;
+    status: string;
+    amount_paid: number;
+    balance_due: number;
+    send_email: string;
+    zoho_invoice_number: string | null;
+  };
+  customer: any;
+  items: any[];
+  summary: {
+    subtotal_ex_gst: number;
+    gst: number;
+    total_inc_gst: number;
+    amount_paid: number;
+    credit_amount: number;
+    amount_due: number;
+  };
+  payments: any[];
+}
+
 export interface Invoice {
   id: number;
   invoice_number: string;
@@ -38,6 +64,11 @@ export interface Invoice {
   can_remind?: boolean;
   reminder_reason?: string;
   till_date_paid?: string | number;
+  totals: any;
+  payment_transactions: any;
+  customer_business_name: string,
+  items: InvoiceItem
+  address: any
 }
 
 export interface InvoiceSummary {

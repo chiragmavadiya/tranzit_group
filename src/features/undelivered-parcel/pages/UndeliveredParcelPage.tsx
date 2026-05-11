@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { DataTable } from '@/components/common';
+import { DataTable } from '@/components/common/DataTable';
 import { UNDELIVERED_COLUMNS } from '../columns';
 import { useUndeliveredParcels, useExportUndeliveredParcels } from '../hooks/useUndeliveredParcel';
 import { useDebounce } from '@/hooks/useDebounce';

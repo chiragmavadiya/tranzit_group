@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { DataTable } from '@/components/common';
+import { DataTable } from '@/components/common/DataTable';
 import { AUSPOST_COLUMNS } from '../columns';
 import { useAuspostOrderSummary } from '../hooks/useAuspostOrderSummary';
 import { useDebounce } from '@/hooks/useDebounce';

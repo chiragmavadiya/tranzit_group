@@ -1,5 +1,5 @@
 import { useState, useMemo } from 'react';
-import { DataTable } from '@/components/common';
+import { DataTable } from '@/components/common/DataTable';
 import { Button } from '@/components/ui/button';
 import { useAdminQuotes, useExportQuotes } from '@/features/quote/hooks/useQuote';
 import { useDebounce } from '@/hooks/useDebounce';

@@ -1,7 +1,7 @@
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Link2, ExternalLink, ShieldCheck, AlertCircle } from 'lucide-react';
+import { Link2, AlertCircle } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 interface ZohoConnectionCardProps {
@@ -17,7 +17,6 @@ export function ZohoConnectionCard({
   isConnected,
   onStartOAuth
 }: ZohoConnectionCardProps) {
-  const redirectUri = 'https://tranzit.digisite.net/admin/zoho/callback';
 
   return (
     <Card className="p-6 flex flex-col h-full">
@@ -58,7 +57,7 @@ export function ZohoConnectionCard({
           </div>
         </div>
 
-        <div className="space-y-2">
+        {/* <div className="space-y-2">
           <div className="flex items-center gap-2 text-xs font-bold text-slate-700 dark:text-zinc-300 uppercase tracking-wide">
             <ShieldCheck className="w-3.5 h-3.5 text-emerald-500" />
             Whitelist Redirect URI
@@ -71,19 +70,21 @@ export function ZohoConnectionCard({
               {redirectUri}
             </code>
           </div>
-        </div>
+        </div> */}
 
         <div className="pt-4 border-t border-slate-100 dark:border-zinc-900">
           <div className="flex items-center justify-between mb-4">
             <span className="text-xs font-bold text-slate-500 uppercase tracking-widest">Status</span>
             <div className={cn(
-              "flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider",
-              isConnected
+              "flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-bold tracking-wider leading-[100%]",
+              !isConnected
                 ? "bg-emerald-50 text-emerald-600 dark:bg-emerald-500/10 border border-emerald-100 dark:border-emerald-500/20"
                 : "bg-orange-50 text-orange-600 dark:bg-orange-500/10 border border-orange-100 dark:border-orange-500/20"
             )}>
-              <span className={cn("w-1.5 h-1.5 rounded-full animate-pulse", isConnected ? "bg-emerald-500" : "bg-orange-500")} />
-              {isConnected ? 'Connected' : 'Not Connected'}
+              <span className={cn("w-1.5 h-1.5 rounded-full animate-pulse", !isConnected ? "bg-emerald-500" : "bg-orange-500")} />
+              <span className='pt-[2px]'>
+                {!isConnected ? 'Connected' : 'Not Connected'}
+              </span>
             </div>
           </div>
 

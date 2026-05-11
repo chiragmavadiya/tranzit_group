@@ -185,9 +185,9 @@ function SelectScrollDownButton({
   )
 }
 
-function SelectComponent({ data, defaultValue, placeholder, className, value, onValueChange, allowClear = false }: { data: { label: string, value: string | number }[], defaultValue?: string, placeholder: string, className?: string, value?: string, onValueChange?: (value: string | null) => void, allowClear?: boolean }) {
+function SelectComponent({ data, defaultValue, placeholder, className, value, onValueChange, allowClear = false, name, disabled }: { data: { label: string, value: string | number }[], defaultValue?: string, placeholder: string, className?: string, value?: string, onValueChange?: (value: string | null) => void, allowClear?: boolean, name?: string, disabled?: boolean }) {
   return (
-    <Select defaultValue={defaultValue} value={value} onValueChange={onValueChange} items={data}>
+    <Select name={name} defaultValue={defaultValue} value={value} onValueChange={onValueChange} items={data} disabled={disabled}>
       {/* <div className="relative"> */}
       <SelectTrigger className={cn("w-full text-xs h-10 rounded-md border-gray-200 dark:border-zinc-800 dark:bg-zinc-900 transition-colors placeholder:text-slate-300 dark:placeholder:text-zinc-700", className)}>
         <SelectValue placeholder={placeholder} className="data-placeholder:font-normal data-placeholder:text-muted-foreground dark:placeholder:text-zinc-700" />

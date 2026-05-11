@@ -1,5 +1,5 @@
 import { useState, useMemo, useEffect } from 'react';
-import { DataTable } from '@/components/common';
+import { DataTable } from '@/components/common/DataTable';
 import { ENQUIRY_COLUMNS } from '../columns';
 import { EnquiryDetailsDialog } from '../components/EnquiryDetailsDialog';
 import type { Enquiry } from '../types';

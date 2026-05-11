@@ -7,11 +7,12 @@ import { showToast } from "@/components/ui/custom-toast";
 /**
  * Hook to fetch items list
  */
-export const useItems = (filters: ItemsFilters) => {
+export const useItems = (filters: ItemsFilters, enabled: boolean = true) => {
   return useQuery({
     queryKey: [...QUERY_KEYS.ITEMS.LIST, filters],
     queryFn: () => itemsService.getList(filters),
     placeholderData: keepPreviousData,
+    enabled: !!enabled,
   });
 };
 

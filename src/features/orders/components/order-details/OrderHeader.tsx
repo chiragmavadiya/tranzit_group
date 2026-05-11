@@ -8,6 +8,9 @@ import { ConformationModal } from '@/components/common/ConformationModal'
 import type { OrderDetailData } from '../../types/order-details.types'
 import { cn } from '@/lib/utils'
 import { Order_status_styles } from '../../constants'
+import { useAppSelector } from '@/hooks/store.hooks'
+import { FormSelect } from '../OrderFormUI'
+import { useCustomers } from '@/features/customers/hooks/useCustomers'
 
 
 interface OrderHeaderProps {
@@ -15,15 +18,20 @@ interface OrderHeaderProps {
   orderType?: string
   onSave?: () => void
   orderDetail: OrderDetailData
+  selectedCustomer: string
+  setSelectedCustomer: React.Dispatch<React.SetStateAction<string>>
 }
 
-export const OrderHeader: React.FC<OrderHeaderProps> = ({ orderID = '4', orderType = 'create', onSave, orderDetail }) => {
+export const OrderHeader: React.FC<OrderHeaderProps> = ({ orderID = '4', orderType = 'create', onSave, orderDetail, selectedCustomer, setSelectedCustomer }) => {
   const navigate = useNavigate()
+  const { role } = useAppSelector((state) => state.auth)
   const [showConfirm, setShowConfirm] = useState(false)
+
+  const { data: customersData } = useCustomers({ pageSize: 1000 }, role === 'admin');
 
   const handleBack = () => {
     if (orderType !== 'create') {
-      navigate('/orders')
+      navigate(`${role === 'admin' ? '/admin' : ''}/orders`)
     } else {
       setShowConfirm(true)
     }
@@ -117,18 +125,20 @@ export const OrderHeader: React.FC<OrderHeaderProps> = ({ orderID = '4', orderTy
             </>
           )}
 
-          {/* <DropdownMenu>
-            <DropdownMenuTrigger className="flex items-center gap-2 border border-gray-200 dark:border-zinc-800 text-gray-700 dark:text-zinc-300 h-10 px-4 rounded-md hover:bg-gray-50 dark:hover:bg-zinc-900 transition-colors cursor-pointer outline-none text-sm font-medium">
-              More actions
-              <ChevronDown className="h-4 w-4" />
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-48">
-              <DropdownMenuItem>Print packing slip</DropdownMenuItem>
-              <DropdownMenuItem>Print packing summary</DropdownMenuItem>
-              <DropdownMenuItem>Archive order</DropdownMenuItem>
-              <DropdownMenuItem className="text-red-600 focus:text-red-600">Delete order</DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu> */}
+          {role === 'admin' && (
+            <FormSelect
+              label={orderType !== "create" ? "" : "Customer"}
+              placeholder="Select Customer"
+              value={selectedCustomer}
+              onValueChange={(val) => setSelectedCustomer(val || 'all')}
+              options={customersData?.data?.map((c: any) => ({
+                value: c.id.toString(),
+                label: `${c.first_name} ${c.last_name}`
+              })) || []}
+              className='w-60'
+              disabled={orderType !== "create"}
+            />
+          )}
         </div>
       </div>
 

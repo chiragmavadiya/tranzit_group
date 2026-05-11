@@ -5,7 +5,7 @@ import { InvoiceStats } from '../components/InvoiceStats';
 import { InvoiceFilters } from '../components/InvoiceFilters';
 import { InvoiceTable } from '../components/InvoiceTable';
 import { CreateInvoiceDialog } from '../components/CreateInvoiceDialog';
-import { useAdminInvoices, useExportCustomerInvoices } from '../hooks/useInvoices';
+import { useAdminInvoices, useCustomerInvoices, useExportAdminInvoices, useExportCustomerInvoices } from '../hooks/useInvoices';
 
 export default function InvoicesPage() {
   const [searchTerm, setSearchTerm] = useState('');
@@ -19,22 +19,33 @@ export default function InvoicesPage() {
   const navigate = useNavigate();
 
   // Connect to API hooks
-  // const { data, isLoading } = useCustomerInvoices({
-  //   search: searchTerm || undefined,
-  //   page: page,
-  //   per_page: pageSize,
-  // });
-  const { data, isLoading } = useAdminInvoices({
+  const { data: adminData, isLoading: isAdminLoading } = useAdminInvoices({
     search: searchTerm || undefined,
     page: page,
     per_page: pageSize,
-  });
+    customer: selectedCustomer || undefined,
+  }, isAdmin);
 
-  const exportMutation = useExportCustomerInvoices();
+  const { data: customerData, isLoading: isCustomerLoading } = useCustomerInvoices({
+    search: searchTerm || undefined,
+    page: page,
+    per_page: pageSize,
+  }, !isAdmin);
+
+  const data = isAdmin ? adminData : customerData;
+  const isLoading = isAdmin ? isAdminLoading : isCustomerLoading;
+
+  const adminExportMutation = useExportAdminInvoices();
+  const customerExportMutation = useExportCustomerInvoices();
+  const exportMutation = isAdmin ? adminExportMutation : customerExportMutation;
 
   const handleExport = useCallback((format: string) => {
-    exportMutation.mutate({ format, search: searchTerm || undefined });
-  }, [exportMutation, searchTerm]);
+    if (isAdmin) {
+      adminExportMutation.mutate({ format, search: searchTerm || undefined, customer: selectedCustomer || undefined });
+    } else {
+      customerExportMutation.mutate({ format, search: searchTerm || undefined });
+    }
+  }, [isAdmin, adminExportMutation, customerExportMutation, searchTerm, selectedCustomer]);
 
   // Transform the API summary object to match InvoiceStats expected props
   // const stats = data?.summary ? {
@@ -69,12 +80,14 @@ export default function InvoicesPage() {
   }, []);
 
   const handleView = useCallback((invoiceNumber: string) => {
+    console.log(invoiceNumber);
     const path = isAdmin ? `/admin/invoices/${invoiceNumber}` : `/invoices/${invoiceNumber}`;
+    console.log(path, 'path,...')
     navigate(path);
   }, [isAdmin, navigate]);
 
   return (
-    <div className="flex flex-col flex-1 gap-4 p-page-padding min-h-0 bg-slate-50/30 dark:bg-zinc-950/30">
+    <div className="flex flex-col flex-1 gap-4 p-page-padding min-h-0 animate-in fade-in slide-in-from-bottom-2 duration-500 bg-slate-50/30 dark:bg-zinc-950/30">
 
       {/* Stats Cards */}
       <InvoiceStats stats={data?.summary} />

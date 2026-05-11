@@ -255,7 +255,7 @@ const DropdownCustomMenu = ({ menus, children }: { menus: { label: string, onCli
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-fit p-2 print:hidden">
         {menus.map((menu) => (
-          <DropdownMenuItem variant={menu.variant || "default"} onClick={menu.onClick} className={cn("cursor-pointer py-2 px-3 text-[13px]", menu.className)}>
+          <DropdownMenuItem key={menu.label} variant={menu.variant || "default"} onClick={menu.onClick} className={cn("cursor-pointer py-2 px-3 text-[13px]", menu.className)}>
             {menu.icon && <menu.icon className="w-4 h-4 mr-2" />}
             {menu.label}
           </DropdownMenuItem>

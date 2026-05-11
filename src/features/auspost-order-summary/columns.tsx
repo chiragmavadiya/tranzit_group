@@ -1,4 +1,4 @@
-import type { Column } from '@/components/common';
+import type { Column } from '@/components/common/types/DataTable.types';
 import type { AuspostOrder } from './types';
 
 export const AUSPOST_COLUMNS: Column<AuspostOrder>[] = [

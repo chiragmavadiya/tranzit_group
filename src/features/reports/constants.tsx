@@ -1,5 +1,5 @@
 import type { ReportTab, ShipmentReport, TransactionReport, InvoiceReport, ParcelReport } from './types';
-import type { Column } from '@/components/common';
+import type { Column } from '@/components/common/types/DataTable.types';
 import { LinkCell } from '@/components/common/DataTableCells';
 
 export const REPORT_TABS: ReportTab[] = [

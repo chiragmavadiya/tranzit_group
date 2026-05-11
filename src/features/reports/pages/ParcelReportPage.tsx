@@ -1,16 +1,18 @@
 import { useState, useCallback, useMemo } from 'react';
-import { Calendar as CalendarIcon, ClipboardList, DollarSign, Users, TrendingUp, Truck, Upload } from 'lucide-react';
+import { ClipboardList, DollarSign, Users, TrendingUp, Truck, Upload } from 'lucide-react';
 import { format } from 'date-fns';
 import { Button } from '@/components/ui/button';
-import { Calendar } from '@/components/ui/calendar';
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+// import { Calendar } from '@/components/ui/calendar';
+// import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { cn } from '@/lib/utils';
-import { DataTable, StatCard } from '@/components/common';
+import { DataTable } from '@/components/common/DataTable';
+import { StatCard } from '@/components/common/StatCard';
 import { PARCEL_COLUMNS, ADMIN_PARCEL_COLUMNS } from '../constants';
 import { useParcelReport, useExportParcelReport } from '../hooks/useReports';
 import { FormSelect } from '@/features/orders/components/OrderFormUI';
 import { Input } from '@/components/ui/input';
 import { useLocation } from 'react-router-dom';
+import DatePicker from '@/components/common/DatePicker';
 
 export default function ParcelReportPage() {
   const location = useLocation();
@@ -103,12 +105,12 @@ export default function ParcelReportPage() {
     setSelectedFile(null);
   }, []);
 
-  const handleFileUpload = () => {
+  const handleFileUpload = useCallback(() => {
     if (selectedFile) {
       // Logic for uploading invoice
       console.log('Uploading file:', selectedFile);
     }
-  };
+  }, [selectedFile]);
 
   return (
     <div className="flex flex-col flex-1 gap-4 overflow-y-auto p-page-padding min-h-0 animate-in fade-in slide-in-from-bottom-2 duration-500 bg-slate-50/30 dark:bg-zinc-950/30">
@@ -127,8 +129,8 @@ export default function ParcelReportPage() {
       <div className="bg-white dark:bg-zinc-950 p-4 rounded-xl border border-gray-100 dark:border-zinc-800 shadow-sm space-y-2">
         <div className="grid grid-cols-1 md:grid-cols-12 gap-4 items-end">
           <div className="md:col-span-3 flex flex-col">
-            <label className="text-[11px] font-extrabold text-slate-700 dark:text-zinc-400 uppercase tracking-wider mb-1 ml-0.5">Start Date</label>
-            <Popover>
+            {/* <label className="text-[11px] font-extrabold text-slate-700 dark:text-zinc-400 uppercase tracking-wider mb-1 ml-0.5">Start Date</label> */}
+            {/* <Popover>
               <PopoverTrigger>
                 <Button
                   variant="outline"
@@ -149,12 +151,18 @@ export default function ParcelReportPage() {
                   initialFocus
                 />
               </PopoverContent>
-            </Popover>
+            </Popover> */}
+            <DatePicker
+              label='Start Date'
+              date={startDate}
+              setDate={setStartDate}
+              className='w-full'
+            />
           </div>
 
           <div className="md:col-span-3 flex flex-col">
-            <label className="text-[11px] font-extrabold text-slate-700 dark:text-zinc-400 uppercase tracking-wider mb-1 ml-0.5">End Date</label>
-            <Popover>
+            {/* <label className="text-[11px] font-extrabold text-slate-700 dark:text-zinc-400 uppercase tracking-wider mb-1 ml-0.5">End Date</label> */}
+            {/* <Popover>
               <PopoverTrigger>
                 <Button
                   variant="outline"
@@ -175,7 +183,13 @@ export default function ParcelReportPage() {
                   initialFocus
                 />
               </PopoverContent>
-            </Popover>
+            </Popover> */}
+            <DatePicker
+              label='End Date'
+              date={endDate}
+              setDate={setEndDate}
+              className='w-full'
+            />
           </div>
 
           {isAdmin && (
@@ -248,7 +262,7 @@ export default function ParcelReportPage() {
                     <label htmlFor="invoice-upload" className="bg-slate-50 dark:bg-zinc-900 px-3 h-full flex items-center text-[10px] font-bold text-slate-500 dark:text-zinc-400 border-r border-slate-200 dark:border-zinc-800 cursor-pointer hover:bg-slate-100 dark:hover:bg-zinc-800 transition-colors uppercase tracking-tight">
                       Choose file
                     </label>
-                    <span className="px-3 text-[11px] text-slate-400 truncate flex-1 font-medium">
+                    <span className="px-3 text-[12px] text-slate-700 truncate flex-1 font-medium">
                       {selectedFile ? selectedFile.name : 'No file chosen'}
                     </span>
                   </div>
@@ -282,6 +296,7 @@ export default function ParcelReportPage() {
           totalItems={data?.meta?.total || 0}
           currentPage={page}
           onPageChange={setPage}
+          rowKey="tranzit_group_order_number"
           loading={isLoading}
           onExport={(format) => exportMutation.mutate({ ...filters, format })}
           isExporting={exportMutation.isPending}

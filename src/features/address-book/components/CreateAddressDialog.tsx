@@ -5,7 +5,7 @@ import type { AddressFormData } from '../types';
 import { FormInput, FormTextarea, FormSelect } from '@/features/orders/components/OrderFormUI';
 import { AUSTRALIAN_STATES, STREET_TYPES } from '../constants';
 import { useAddressBookDetails } from '../hooks/useAddressBook';
-import { AutoComplete } from '@/components/common';
+import AutoComplete from '@/components/common/AutoComplate';
 import { LOCATION_OPTIONS } from '@/constants';
 
 interface CreateAddressDialogProps {

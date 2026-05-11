@@ -1,6 +1,6 @@
 import { useState, useMemo } from 'react';
 import { Plus } from 'lucide-react';
-import { DataTable } from '@/components/common';
+import { DataTable } from '@/components/common/DataTable';
 import { ConformationModal } from '@/components/common/ConformationModal';
 import { Button } from '@/components/ui/button';
 import { POSTCODE_COLUMNS } from '../columns';

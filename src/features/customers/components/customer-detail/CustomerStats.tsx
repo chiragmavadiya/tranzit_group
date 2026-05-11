@@ -1,4 +1,4 @@
-import { StatCard } from '@/components/common';
+import { StatCard } from '@/components/common/StatCard';
 import { MOCK_STATS } from './constants';
 
 export const CustomerStats = () => {

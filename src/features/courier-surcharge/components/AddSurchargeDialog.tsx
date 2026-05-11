@@ -140,7 +140,7 @@ const SurchargeForm = forwardRef<HTMLFormElement, SurchargeFormProps>(
     };
 
     return (
-      <form ref={ref} onSubmit={handleSubmit} className="grid grid-cols-2 gap-x-6 gap-y-4 p-2">
+      <form ref={ref} onSubmit={handleSubmit} className="grid grid-cols-2 gap-x-4 gap-y-4 p-2">
         <GlobalCourierSelect
           value={formData.global_courier_id}
           onValueChange={(val) => handleChange('global_courier_id', val || '')}
@@ -186,6 +186,7 @@ const SurchargeForm = forwardRef<HTMLFormElement, SurchargeFormProps>(
 
         <FormSelect
           label="Charge Basis"
+          name="charge_basis"
           value={formData.charge_basis}
           onValueChange={(val) => handleChange('charge_basis', val || '')}
           options={CHARGE_BASIS_OPTIONS}

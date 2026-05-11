@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, memo } from 'react';
 import type { ReactNode } from 'react'
 import { ArrowUp, ArrowDown, Search, Download, ClipboardCopy, FileText, Upload, File, Loader2 } from 'lucide-react';
 import {
@@ -10,7 +10,7 @@ import {
   TableRow
 } from '@/components/ui/table';
 import { Checkbox } from '@/components/ui/checkbox';
-import { cn, getNestedValue } from '@/lib/utils';
+import { cn, getNestedValue, useTraceUpdate } from '@/lib/utils';
 import SelectComponent from '../ui/select';
 import { usePagination } from './hooks/usePagination';
 import { Pagination } from './Pagination';
@@ -21,54 +21,55 @@ import { Button } from '../ui/button';
 import { DropdownCustomMenu } from '../ui/dropdown-menu';
 import { FormInput } from '@/features/orders/components/OrderFormUI';
 
-export function DataTable<T extends Record<string, any>>({
-  data,
-  columns,
-  rowKey = 'id',
-  // Selection
-  selectable = false,
-  selectedRows = [],
-  onSelectionChange,
-  // Sorting
-  sortable = true,
-  sortConfig,
-  onSort,
-  // Pagination
-  pagination = true,
-  pageSizeInFooter = false,
-  pageSize = 10,
-  currentPage = 1,
-  totalItems,
-  onPageChange,
-  onPageSizeChange,
-  // Search
-  searchable = true,
-  searchValue = '',
-  onSearchChange,
-  searchPlaceholder = 'Search...',
-  // Styling
-  className,
-  tableClassName,
-  headerClassName,
-  rowClassName,
-  cellClassName,
-  // Loading and empty states
-  loading = false,
-  emptyMessage = 'No data found',
-  // Row actions
-  onRowClick,
-  // Custom components
-  header = true,
-  customHeader,
-  headerPosition = 'right',
-  headerTitle,
-  headerDescription,
-  headerClass,
-  customFooter,
-  onExport,
-  isExporting,
-  exportable = true
-}: DataTableProps<T>) {
+const DataTableComponent = <T extends Record<string, any>>(props: DataTableProps<T>) => {
+  const {
+    data,
+    columns,
+    rowKey = 'id',
+    // Selection
+    selectable = false,
+    selectedRows = [],
+    onSelectionChange,
+    // Sorting
+    sortable = true,
+    sortConfig,
+    onSort,
+    // Pagination
+    pagination = true,
+    pageSizeInFooter = false,
+    pageSize = 10,
+    currentPage = 1,
+    totalItems,
+    onPageChange,
+    onPageSizeChange,
+    // Search
+    searchable = true,
+    searchValue = '',
+    onSearchChange,
+    searchPlaceholder = 'Search...',
+    // Styling
+    className,
+    tableClassName,
+    headerClassName,
+    rowClassName,
+    cellClassName,
+    // Loading and empty states
+    loading = false,
+    emptyMessage = 'No data found',
+    // Row actions
+    onRowClick,
+    // Custom components
+    header = true,
+    customHeader,
+    headerPosition = 'right',
+    headerTitle,
+    headerDescription,
+    headerClass,
+    customFooter,
+    onExport,
+    isExporting,
+    exportable = true
+  } = props;
   // Internal state for uncontrolled components
   const [internalSearch, setInternalSearch] = useState('');
   const [internalSortConfig, setInternalSortConfig] = useState<SortConfig>({ key: null, direction: null });
@@ -78,6 +79,8 @@ export function DataTable<T extends Record<string, any>>({
   const currentSearch = searchValue !== undefined ? searchValue : internalSearch;
   const currentSortConfig = sortConfig !== undefined ? sortConfig : internalSortConfig;
   const currentSelectedRows = selectedRows !== undefined ? selectedRows : internalSelectedRows;
+  console.log('Data Table render')
+  useTraceUpdate(props)
   // Get row identifier
   const getRowId = (row: T): string => {
     if (typeof rowKey === 'function') {
@@ -339,7 +342,7 @@ export function DataTable<T extends Record<string, any>>({
                       <TableCell
                         key={column.key}
                         className={cn(
-                          `px-5 py-3.5 text-xs font-medium text-gray-700 dark:text-zinc-300`,
+                          `px-5 py-3.5 text-xs font-medium text-gray-700 dark:text-zinc-300 whitespace-normal`,
                           column.sticky === 'left' && "sticky left-0 bg-background",
                           column.sticky === 'right' && "sticky right-0 bg-background",
                           column.className,
@@ -376,4 +379,6 @@ export function DataTable<T extends Record<string, any>>({
       {typeof customFooter === 'function' ? (customFooter as () => ReactNode)() : customFooter}
     </div>
   );
-}
+};
+
+export const DataTable = memo(DataTableComponent) as typeof DataTableComponent;

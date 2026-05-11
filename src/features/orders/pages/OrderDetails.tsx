@@ -17,12 +17,14 @@ import { useCreateOrder, useOrderDetails } from '../hooks/useOrders'
 import { showToast } from '@/components/ui/custom-toast'
 import { Checkbox } from '@/components/ui/checkbox'
 import { DANGEROUS_GOODS_URL, PRIVACY_POLICY_URL, TERMS_CONDITIONS_URL } from '@/constants'
+import { useAppSelector } from '@/hooks/store.hooks'
 // import { useOrderPackaging } from '@/features/orders/hooks/useOrderPackaging'
 
 const OrderDetailsPage: React.FC = () => {
   const { orderType, orderID } = useParams<{ orderType: string, orderID: string }>()
   const { mutate: createOrder, isPending: saveLoading } = useCreateOrder()
   const { data: orderResponse, isLoading: isOrderLoading } = useOrderDetails(orderID || '')
+  const { role } = useAppSelector((state) => state.auth)
   const orderDetail = orderResponse?.data
   const navigate = useNavigate()
 
@@ -74,6 +76,7 @@ const OrderDetailsPage: React.FC = () => {
   const [ratesAccepted, setRatesAccepted] = useState(false)
   const [dangerousGoodsAccepted, setDangerousGoodsAccepted] = useState(false)
   const [pickupDate, setPickupDate] = useState<Date | undefined>(undefined)
+  const [selectedCustomer, setSelectedCustomer] = useState<string>('')
 
   const {
     itemsData,
@@ -218,17 +221,18 @@ const OrderDetailsPage: React.FC = () => {
       },
       capture: false,
       save_address: addressData?.receiver?.saveToAddressBook ? 1 : 0,
+      customer_id: selectedCustomer || undefined
     }
     createOrder(payload, {
       onSuccess: (response) => {
         showToast('Orders Created successfully', "success");
-        navigate(`/orders/edit/${response.order_number}`)
+        navigate(`${role === 'admin' ? '/admin' : ''}/orders/edit/${response.order_number}`)
       },
       onError: (error: any) => {
         showToast(error?.response?.data?.message || 'Failed to create orders', "error");
       }
     });
-  }, [createOrder, addressData, itemsData, insuranceSelected, signatureSelected, deliveryInstructions, termsAccepted, quoteData, courierData, pickupDate, navigate, ratesAccepted, dangerousGoodsAccepted])
+  }, [createOrder, addressData, itemsData, insuranceSelected, signatureSelected, deliveryInstructions, termsAccepted, quoteData, courierData, pickupDate, navigate, ratesAccepted, dangerousGoodsAccepted, role, selectedCustomer])
 
   if (isOrderLoading && orderType !== 'create') {
     return (
@@ -249,7 +253,14 @@ const OrderDetailsPage: React.FC = () => {
           '--webkit-scrollbar-button-display': 'none'
         } as React.CSSProperties}
       >
-        <OrderHeader orderID={orderID} orderType={orderType} onSave={handleOnSave} orderDetail={orderDetail!} />
+        <OrderHeader
+          orderID={orderID}
+          orderType={orderType}
+          onSave={handleOnSave}
+          orderDetail={orderDetail!}
+          selectedCustomer={selectedCustomer}
+          setSelectedCustomer={setSelectedCustomer}
+        />
         <main className="mt-3">
           <div className="grid grid-cols-1 xl:grid-cols-[1fr_380px] gap-6 items-start">
             <div className="flex flex-col gap-3 overflow-hidden">

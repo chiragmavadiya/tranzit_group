@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { DataTable } from '@/components/common';
+import { DataTable } from '@/components/common/DataTable';
 import { useCustomerOrders, useExportCustomerOrders } from '../../hooks/useCustomers';
 import { downloadFile } from '@/lib/utils';
 import { showToast } from '@/components/ui/custom-toast';

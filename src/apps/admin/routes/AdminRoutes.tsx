@@ -1,12 +1,13 @@
 import { Routes, Route, Navigate } from "react-router-dom";
 import ProtectedRoute from "@/router/ProtectedRoute";
-import { lazy } from "react";
+import { lazy, Suspense } from "react";
 import Layout from "@/layout";
+import { Loader2 } from "lucide-react";
 
 // Lazy load page components
 const Dashboard = lazy(() => import('@/features/dashboard/pages/Dashboard'));
 const Orders = lazy(() => import('@/features/orders/pages/OrdersPage'));
-const OrderDetails = lazy(() => import('@/features/orders/pages/OrderDetails2'));
+const OrderDetails = lazy(() => import('@/features/orders/pages/OrderDetails'));
 const Search = lazy(() => import('@/features/search/pages/SearchPage'));
 const Setup = lazy(() => import('@/features/setup/pages/SetupPage'));
 const Invoices = lazy(() => import('@/features/invoices/pages/InvoicesPage'));
@@ -33,50 +34,59 @@ const SettingsLayout = lazy(() => import('@/features/settings/components/Setting
 const CategorySettingsPage = lazy(() => import('@/features/settings/pages/CategorySettingsPage'));
 const ActivityLogPage = lazy(() => import('@/features/activity-log/pages/ActivityLogPage'));
 
+const withSuspense = (Component: React.ReactNode) => (
+    <Suspense
+        fallback={<div className="flex items-center justify-center h-full w-full">
+            <Loader2 className="animate-spin text-blue-400 h-10 w-10" />
+        </div>}>
+        {Component}
+    </Suspense>
+);
+
 
 export default function AdminRoutes() {
     return (
         <Routes>
             <Route element={<ProtectedRoute role="admin" />}>
                 <Route element={<Layout />}>
-                    <Route path="dashboard" element={<Dashboard />} />
+                    <Route path="dashboard" element={withSuspense(<Dashboard />)} />
                     <Route path="orders">
-                        <Route index element={<Orders />} />
-                        <Route path=":orderID" element={<OrderDetails />} />
-                        <Route path=":orderType/:orderID" element={<OrderDetails />} />
+                        <Route index element={withSuspense(<Orders />)} />
+                        <Route path=":orderType" element={withSuspense(<OrderDetails />)} />
+                        <Route path=":orderType/:orderID" element={withSuspense(<OrderDetails />)} />
                     </Route>
                     <Route path="invoices">
-                        <Route index element={<Invoices />} />
-                        <Route path=":invoiceID" element={<InvoiceDetails />} />
+                        <Route index element={withSuspense(<Invoices />)} />
+                        <Route path=":invoiceID" element={withSuspense(<InvoiceDetails />)} />
                     </Route>
-                    <Route path="setup" element={<Setup />} />
-                    <Route path="customer-parcel-report" element={<ParcelReport />} />
+                    <Route path="setup" element={withSuspense(<Setup />)} />
+                    <Route path="customer-parcel-report" element={withSuspense(<ParcelReport />)} />
                     <Route path="customers">
-                        <Route index element={<CustomerManagement />} />
-                        <Route path=":id" element={<CustomerDetailPage />} />
+                        <Route index element={withSuspense(<CustomerManagement />)} />
+                        <Route path=":id" element={withSuspense(<CustomerDetailPage />)} />
                     </Route>
-                    <Route path="cancel-order" element={<CancelOrderPage />} />
-                    <Route path="book-pickup" element={<BookPickupPage />} />
-                    <Route path="staff" element={<StaffManagementPage />} />
-                    <Route path="zoho-integration" element={<ZohoIntegrationPage />} />
-                    <Route path="topup" element={<AdminTopUpPage />} />
-                    <Route path="courier-surcharge" element={<CourierSurchargePage />} />
-                    <Route path="courier-postcode" element={<CourierPostcodePage />} />
-                    <Route path="enquiry" element={<EnquiryPage />} />
-                    <Route path="order-summary" element={<AuspostOrderSummaryPage />} />
-                    <Route path="undelivered" element={<UndeliveredParcelPage />} />
+                    <Route path="cancel-order" element={withSuspense(<CancelOrderPage />)} />
+                    <Route path="book-pickup" element={withSuspense(<BookPickupPage />)} />
+                    <Route path="staff" element={withSuspense(<StaffManagementPage />)} />
+                    <Route path="zoho-integration" element={withSuspense(<ZohoIntegrationPage />)} />
+                    <Route path="topup" element={withSuspense(<AdminTopUpPage />)} />
+                    <Route path="courier-surcharge" element={withSuspense(<CourierSurchargePage />)} />
+                    <Route path="courier-postcode" element={withSuspense(<CourierPostcodePage />)} />
+                    <Route path="enquiry" element={withSuspense(<EnquiryPage />)} />
+                    <Route path="order-summary" element={withSuspense(<AuspostOrderSummaryPage />)} />
+                    <Route path="undelivered" element={withSuspense(<UndeliveredParcelPage />)} />
                     <Route path="quotes">
-                        <Route index element={<QuoteList />} />
-                        <Route path="create" element={<GetQuote />} />
+                        <Route index element={withSuspense(<QuoteList />)} />
+                        <Route path="create" element={withSuspense(<GetQuote />)} />
                     </Route>
-                    <Route path="profile" element={<ProfilePage />} />
+                    <Route path="profile" element={withSuspense(<ProfilePage />)} />
 
-                    <Route path="help-center" element={<HelpCenterAdminPage />} />
-                    <Route path="settings" element={<SettingsLayout />}>
-                        <Route path=":categoryId" element={<CategorySettingsPage />} />
+                    <Route path="help-center" element={withSuspense(<HelpCenterAdminPage />)} />
+                    <Route path="settings" element={withSuspense(<SettingsLayout />)}>
+                        <Route path=":categoryId" element={withSuspense(<CategorySettingsPage />)} />
                     </Route>
-                    <Route path="activity-log" element={<ActivityLogPage />} />
-                    <Route path="search" element={<Search />} />
+                    <Route path="activity-log" element={withSuspense(<ActivityLogPage />)} />
+                    <Route path="search" element={withSuspense(<Search />)} />
                     {/* Default authenticated route */}
                     <Route path="/" element={<Navigate to="/admin/dashboard" replace />} />
 

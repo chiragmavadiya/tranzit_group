@@ -16,6 +16,8 @@ import { FormInput, FormSelect } from "@/features/orders/components/OrderFormUI"
 import { STATES } from "../constants"
 import { useCreateCustomer, useUpdateCustomer, useCustomerEditDetails } from "../hooks/useCustomers"
 import { showToast } from "@/components/ui/custom-toast"
+import { AutoComplete } from "@/components/common"
+import { LOCATION_OPTIONS } from "@/constants"
 
 interface CustomerDialogProps {
   open: boolean
@@ -269,7 +271,7 @@ export default function CustomerDialog({ open, onOpenChange, customerId }: Custo
               <h3 className="my-0 text-sm font-bold text-slate-900 dark:text-zinc-100">Billing Address</h3>
             </div>
             <div className="grid grid-cols-12 gap-x-4 gap-y-4">
-              <FormInput
+              {/* <FormInput
                 label="Full Address"
                 placeholder="Start typing address..."
                 isFullWidth
@@ -278,7 +280,33 @@ export default function CustomerDialog({ open, onOpenChange, customerId }: Custo
                 required
                 error={submited && !formData.billing_address?.trim()}
                 errormsg="Please enter billing address"
-              />
+              /> */}
+              <div className="col-span-12">
+                <AutoComplete
+                  label='Address Information'
+                  placeholder="Start typing suburb or postcode..."
+                  options={LOCATION_OPTIONS}
+                  onSelect={(val) => {
+                    const opt = LOCATION_OPTIONS.find(o => o.value === val);
+
+                    if (opt) {
+                      handleChange('billing_address', opt.label);
+                      handleChange('billing_suburb', opt.suburb);
+                      handleChange('billing_state', opt.state);
+                      handleChange('billing_street_number', opt.streetNumber);
+                      handleChange('billing_street_name', opt.streetName);
+                      handleChange('billing_street_type', opt.streetType);
+                      handleChange('billing_postcode', opt.postcode);
+                      // handleChange('country', opt.country);
+                    }
+                  }}
+                  className="[&>div>input]:h-10 [&>div>input]:text-[13px]"
+                  required
+                  error={submited && formData.billing_address?.trim() === ''}
+                  errormsg="Please enter your address"
+                />
+              </div>
+
               <FormInput
                 label="Street Name"
                 isHalf
@@ -350,7 +378,7 @@ export default function CustomerDialog({ open, onOpenChange, customerId }: Custo
               <h3 className="my-0 text-sm font-bold text-slate-900 dark:text-zinc-100">Shipping Address</h3>
             </div>
             <div className="grid grid-cols-12 gap-x-4 gap-y-4">
-              <FormInput
+              {/* <FormInput
                 label="Full Address"
                 placeholder="Start typing address..."
                 isFullWidth
@@ -359,7 +387,32 @@ export default function CustomerDialog({ open, onOpenChange, customerId }: Custo
                 required
                 error={submited && !formData.address?.trim()}
                 errormsg="Please enter shipping address"
-              />
+              /> */}
+              <div className="col-span-12">
+                <AutoComplete
+                  label='Address Information'
+                  placeholder="Start typing suburb or postcode..."
+                  options={LOCATION_OPTIONS}
+                  onSelect={(val) => {
+                    const opt = LOCATION_OPTIONS.find(o => o.value === val);
+
+                    if (opt) {
+                      handleChange('address', opt.label);
+                      handleChange('suburb', opt.suburb);
+                      handleChange('state', opt.state);
+                      handleChange('street_number', opt.streetNumber);
+                      handleChange('street_name', opt.streetName);
+                      handleChange('street_type', opt.streetType);
+                      handleChange('postcode', opt.postcode);
+                      // handleChange('country', opt.country);
+                    }
+                  }}
+                  className="[&>div>input]:h-10 [&>div>input]:text-[13px]"
+                  required
+                  error={submited && formData.address?.trim() === ''}
+                  errormsg="Please enter shipping address"
+                />
+              </div>
               <FormInput
                 label="Street #"
                 isCompact

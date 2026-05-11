@@ -10,7 +10,7 @@ import {
 import { FormInput, FormSelect, ValidAddressBadge } from '@/features/orders/components/OrderFormUI';
 import type { AddressData, CreateOrderDialogProps } from '@/features/orders/types';
 import { CustomModel } from '@/components/ui/dialog';
-import { AutoComplete } from '@/components/common';
+import AutoComplete from '@/components/common/AutoComplate';
 import { LOCATION_OPTIONS, STATES } from '@/constants';
 import { showToast } from '@/components/ui/custom-toast';
 import { Checkbox } from '@/components/ui/checkbox';

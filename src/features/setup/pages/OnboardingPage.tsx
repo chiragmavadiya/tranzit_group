@@ -17,7 +17,7 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import brandLogo from '@/assets/Tranzit_Logo.svg';
 import { showToast } from '@/components/ui/custom-toast';
-import { AutoComplete } from '@/components/common';
+import AutoComplete from '@/components/common/AutoComplate';
 import { LOCATION_OPTIONS, STATES, STREET_TYPES } from '@/constants';
 
 const SectionHeader = ({ title, icon: Icon, children }: { title: string, icon: any, children?: React.ReactNode }) => (

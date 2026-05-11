@@ -4,17 +4,19 @@ import {
   ArrowUpRight,
   ArrowDownLeft,
 } from 'lucide-react';
-import { StatCard, DataTable } from '@/components/common';
+import { DataTable } from '@/components/common/DataTable';
+import { StatCard } from '@/components/common/StatCard';
 import { ADMIN_TOPUP_COLUMNS, TRANSACTION_TYPES } from '../constants';
 import { FormSelect } from '@/features/orders/components/OrderFormUI';
 import { Button } from '@/components/ui/button';
 import { useAdminTopups } from '../hooks/useWallet';
 import { useDebounce } from '@/hooks/useDebounce';
+import { useCustomers } from '@/features/customers/hooks/useCustomers';
 
 export default function AdminTopUpPage() {
   const [search, setSearch] = useState('');
-  const [transactionType, setTransactionType] = useState('all');
-  const [selectedCustomer, setSelectedCustomer] = useState('all');
+  const [transactionType, setTransactionType] = useState('');
+  const [selectedCustomer, setSelectedCustomer] = useState<string>('');
   const [pageSize, setPageSize] = useState(25);
   const [page, setPage] = useState(1);
 
@@ -27,6 +29,7 @@ export default function AdminTopUpPage() {
     page,
     per_page: pageSize
   });
+  const { data: customersData } = useCustomers({ pageSize: 1000 });
 
   const transactions = topupResponse?.data || [];
   const totalItems = topupResponse?.meta?.total || 0;
@@ -85,7 +88,7 @@ export default function AdminTopUpPage() {
             />
           </div>
           <div className="lg:col-span-4">
-            <FormSelect
+            {/* <FormSelect
               label="Select Customer"
               value={selectedCustomer}
               onValueChange={(val) => setSelectedCustomer(val || 'all')}
@@ -96,6 +99,16 @@ export default function AdminTopUpPage() {
               ]}
               placeholder="Select Customer"
               className="w-full space-y-0"
+            /> */}
+            <FormSelect
+              label="Customer"
+              placeholder="Select Customer"
+              value={selectedCustomer}
+              onValueChange={(val) => setSelectedCustomer(val || 'all')}
+              options={customersData?.data?.map((c: any) => ({
+                value: c.id.toString(),
+                label: `${c.first_name} ${c.last_name}`
+              })) || []}
             />
           </div>
           <div className="lg:col-span-4 flex gap-3">
@@ -104,8 +117,8 @@ export default function AdminTopUpPage() {
               className="h-8 max-w-42 flex-1 border-slate-200 dark:border-zinc-800 text-slate-500 dark:text-zinc-400 font-bold uppercase tracking-widest text-[10px]"
               onClick={() => {
                 setSearch('');
-                setTransactionType('all');
-                setSelectedCustomer('all');
+                setTransactionType('');
+                setSelectedCustomer('');
               }}
             >
               Reset

@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { CreditCard, Wallet, ShieldCheck } from 'lucide-react';
-import { DataTable } from '@/components/common';
+import { DataTable } from '@/components/common/DataTable';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Checkbox } from '@/components/ui/checkbox';

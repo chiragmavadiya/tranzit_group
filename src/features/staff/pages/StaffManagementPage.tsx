@@ -1,7 +1,8 @@
 import { useState, useCallback } from 'react';
 import { Users, UserCheck, UserSearch, Plus, Trash2, Pencil } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { DataTable, StatCard } from '@/components/common';
+import { DataTable } from '@/components/common/DataTable';
+import { StatCard } from '@/components/common/StatCard';
 import { Switch } from '@/components/ui/switch';
 import { AddSubUserDialog } from '../components/AddSubUserDialog';
 import { MOCK_STAFF } from '../staff.mock';

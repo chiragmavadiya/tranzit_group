@@ -8,7 +8,8 @@ export const useCustomers = (params?: Record<string, any>, enabled: boolean = tr
         queryKey: [...QUERY_KEYS.ADMIN_CUSTOMERS.LIST, params],
         queryFn: () => customerService.getList(params),
         placeholderData: keepPreviousData,
-        enabled: enabled
+        enabled: enabled,
+        staleTime: 30 * 60 * 1000,
     });
 };
 

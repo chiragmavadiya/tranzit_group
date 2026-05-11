@@ -8,7 +8,6 @@ import { showToast } from '@/components/ui/custom-toast'
 import type { AddressData, ItemData } from '../../types'
 import { useAppSelector } from '@/hooks/store.hooks'
 import type { QuoteLocation } from '@/features/quote/types'
-import { useTraceUpdate } from '@/lib/utils'
 
 interface CarrierCardProps {
   itemData: ItemData[];
@@ -29,7 +28,6 @@ export const CarrierCard: React.FC<CarrierCardProps> = (props) => {
   const [bestDeal, setBestDeal] = useState<string>('');
 
   const { mutate: getServices, isPending: loading } = useGetQuoteServices(role);
-  useTraceUpdate(props)
   useEffect(() => {
     if (orderType !== 'create') return;
     // Check if we have valid items with dimensions > 0

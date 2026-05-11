@@ -47,7 +47,7 @@ export function AdminWelcomeBanner({
 
         {/* Heading */}
         <h1 className="text-2xl md:text-3xl font-black text-slate-800 dark:text-white tracking-tight leading-tight">
-          Welcome back, <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-indigo-500 dark:from-blue-400 dark:to-indigo-300 italic!">{userName}</span> 👋
+          Welcome back, <span className="text-transparent pr-1 bg-clip-text bg-linear-to-r from-blue-600 to-indigo-500 dark:from-blue-400 dark:to-indigo-300 italic!">{userName}</span> 👋
         </h1>
 
         {/* Subtext */}
@@ -61,13 +61,13 @@ export function AdminWelcomeBanner({
         {/* Period Selector - Top Right */}
         <div className="flex bg-slate-50 dark:bg-zinc-900/50 p-1 rounded-xl border border-slate-100 dark:border-zinc-800 shadow-sm">
           {Object.keys(periodLabels || {}).map((key) => (
-            <button 
-              key={key} 
-              onClick={() => setActivePeriod(key as any)} 
+            <button
+              key={key}
+              onClick={() => setActivePeriod(key as any)}
               className={cn(
                 "px-4 py-1.5 text-[11px] font-bold rounded-lg transition-all duration-200",
-                activePeriod === key 
-                  ? "text-blue-600 dark:text-blue-400 bg-white dark:bg-zinc-800 shadow-sm ring-1 ring-slate-200 dark:ring-zinc-700" 
+                activePeriod === key
+                  ? "text-blue-600 dark:text-blue-400 bg-white dark:bg-zinc-800 shadow-sm ring-1 ring-slate-200 dark:ring-zinc-700"
                   : "text-slate-500 hover:text-slate-700 dark:hover:text-zinc-300"
               )}
             >

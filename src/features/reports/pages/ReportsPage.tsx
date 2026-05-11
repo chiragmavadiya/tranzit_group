@@ -8,7 +8,7 @@ import {
   INVOICE_COLUMNS,
   PARCEL_COLUMNS,
 } from '../constants';
-import { DataTable } from '@/components/common';
+import { DataTable } from '@/components/common/DataTable';
 import type { ReportType, ReportFilters } from '../types';
 import {
   useShipmentReport,

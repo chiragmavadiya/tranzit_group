@@ -1,4 +1,4 @@
-import type { Column } from '@/components/common';
+import type { Column } from '@/components/common/types/DataTable.types';
 import { Badge } from '@/components/ui/badge';
 import type { ActivityLog } from './types';
 import { cn } from '@/lib/utils';

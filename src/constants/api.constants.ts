@@ -14,7 +14,7 @@ export const API_ENDPOINTS = {
     },
     ORDERS: {
         LIST: "/orders",
-        CREATE: "/customer/orders",
+        CREATE: "/orders",
         DETAILS: (id: string | number) => `/orders/${id}`,
         CANCEL: (id: string | number) => `/customer/orders/${id}/cancel`,
         CONSIGN: (id: string | number) => `/customer/orders/${id}/consign`,
@@ -109,6 +109,9 @@ export const API_ENDPOINTS = {
         GLOBAL_COURIERS: "/admin/courier-surcharges/global-couriers",
         EXPORT: "/admin/courier-surcharges/export",
     },
+    ADMIN_CANCEL_ORDERS: {
+        BASE: "/admin/cancel-orders",
+    },
     ADMIN_REPORTS: {
         PARCELS: "/admin/reports/customer-parcels",
         PARCELS_EXPORT: "/admin/reports/customer-parcels/export",
@@ -196,6 +199,9 @@ export const QUERY_KEYS = {
     },
     ADMIN_COURIER_SURCHARGES: {
         GLOBAL_COURIERS: ["admin", "courier-surcharges", "global-couriers"],
+    },
+    ADMIN_CANCEL_ORDERS: {
+        LIST: ["admin", "cancel-orders", "list"],
     },
     ADMIN_SETTINGS: {
         LIST: ["admin", "settings", "list"],

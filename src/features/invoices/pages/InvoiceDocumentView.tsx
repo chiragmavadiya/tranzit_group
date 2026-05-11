@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from 'react'
+import React, { useCallback, useEffect, useMemo, useState } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { InvoicePaper } from '../components/invoice-details/InvoicePaper'
 // import { MOCK_INVOICES } from '../constants'
@@ -22,20 +22,24 @@ import {
   useZohoSyncAdminInvoice,
   // useAdminInvoicePayment,
   useUpdateAdminInvoice,
-  useCreateCustomerInvoice
+  useCreateCustomerInvoice,
+  useCustomerInvoiceDetails
 } from '../hooks/useInvoices'
 import { Skeleton } from '@/components/ui/skeleton'
 import { AddPaymentDialog } from '../components/AddPaymentDialog'
 import { Badge } from '@/components/ui/badge'
 import { INVOICE_STATUS_COLORS } from '../constants'
 import { cn } from '@/lib/utils';
+import type { InvoiceDocumentData } from '../types'
+
 
 const InvoiceDocumentView: React.FC = () => {
   const { invoiceID } = useParams<{ invoiceID: string }>()
+  console.log(invoiceID, 'invoiceID')
   const navigate = useNavigate()
   const { role } = useAppSelector((state) => state.auth)
   const isAdmin = role === 'admin'
-  const [invoiceData, setInvoiceData] = useState<any>({
+  const [invoiceData, setInvoiceData] = useState<InvoiceDocumentData>({
     "invoice": {
       "invoice_number": "",
       "invoice_date": new Date().toISOString().split('T')[0],
@@ -64,7 +68,38 @@ const InvoiceDocumentView: React.FC = () => {
   // const [isEditItemsDialogOpen, setIsEditItemsDialogOpen] = React.useState(false)
 
   // Fetch Data
-  const { data: details, isLoading } = useAdminInvoiceDetails(invoiceID!, invoiceID !== 'create')
+  const { data: adminDetails, isLoading: adminIsLoading } = useAdminInvoiceDetails(Number(invoiceID!), invoiceID !== 'create' && isAdmin)
+  const { data: customerDetails, isLoading: customerIsLoading } = useCustomerInvoiceDetails(Number(invoiceID!), invoiceID !== 'create' && !isAdmin)
+  const details = useMemo(() => isAdmin ? adminDetails : {
+    status: true,
+    data: {
+      "invoice": {
+        "id": customerDetails?.data?.id,
+        "invoice_number": customerDetails?.data?.invoice_number,
+        "invoice_date": customerDetails?.data?.issue_date,
+        "issued_at": customerDetails?.data?.issue_date,
+        "due_date": '',
+        "status": customerDetails?.data?.status,
+        "amount_paid": customerDetails?.data?.amount_paid,
+        "balance_due": customerDetails?.data?.remaining_balance,
+        "send_email": customerDetails?.data?.send_email,
+        "zoho_invoice_number": customerDetails?.data?.zoho_invoice_number
+      },
+      "customer": {
+        "id": 1,
+        "name": customerDetails?.data?.customer_full_name,
+        "email": customerDetails?.data?.customer_email,
+        "business_name": customerDetails?.data?.customer_business_name,
+        "address_line": customerDetails?.data?.address?.address,
+        "locality_line": customerDetails?.data?.address?.suburb,
+        "address": customerDetails?.data?.address
+      },
+      "items": customerDetails?.data?.items,
+      "summary": customerDetails?.data?.totals,
+      "payments": customerDetails?.data?.payment_transactions || []
+    }
+  }, [customerDetails, isAdmin, adminDetails]);
+  const isLoading = isAdmin ? adminIsLoading : customerIsLoading;
   // const invoiceData = details?.data
 
   // Mutations
@@ -77,8 +112,8 @@ const InvoiceDocumentView: React.FC = () => {
   // const paymentActions = useAdminInvoicePayment()
 
   const handleBack = useCallback(() => {
-    navigate('/admin/invoices')
-  }, [navigate])
+    navigate(isAdmin ? '/admin/invoices' : '/invoices')
+  }, [navigate, isAdmin])
 
   const handleDownload = useCallback(() => {
     if (invoiceID) downloadMutation.mutate(invoiceID)
@@ -97,9 +132,16 @@ const InvoiceDocumentView: React.FC = () => {
   }, [invoiceID, zohoSyncMutation])
 
   const handleUpdateDate = useCallback((date: string) => {
-    if (!invoiceID) return
-    updateMutation.mutate({ id: invoiceID, data: { invoice_date: date } })
-  }, [invoiceID, updateMutation])
+    // if (!invoiceID) return
+    // updateMutation.mutate({ id: invoiceID, data: { invoice_date: date } })
+    setInvoiceData((prev: InvoiceDocumentData) => ({
+      ...prev,
+      invoice: {
+        ...prev.invoice,
+        invoice_date: date
+      }
+    }))
+  }, [])
 
   useEffect(() => {
     if (invoiceID !== 'create' && details?.status) {

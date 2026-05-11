@@ -1,7 +1,7 @@
-import { useState } from "react";
+import { useState, useEffect, useMemo, memo } from "react";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Folder, FolderOpen, Search } from "lucide-react";
-import { Input } from "@/components/ui/input";
+import { FormInput } from "@/features/orders/components/OrderFormUI";
 
 type TreeNode = {
     id: string;
@@ -568,9 +568,43 @@ const permissionsData: TreeNode[] = [
     }
 ];
 
-export default function PermissionTreeView({ title = "Permissions" }: { title?: string }) {
-    const [treeData, setTreeData] = useState<TreeNode[]>(permissionsData);
+const PermissionTreeView = ({
+    title = "Permissions",
+    initialSelected = [],
+    onChange,
+}: {
+    title?: string;
+    initialSelected?: string[];
+    onChange?: (selectedIds: string[]) => void;
+}) => {
+
+    const [treeData, setTreeData] = useState<TreeNode[]>(() =>
+        initialSelected.length > 0
+            ? initializeTree(permissionsData, initialSelected)
+            : permissionsData
+    );
     const [searchQuery, setSearchQuery] = useState("");
+
+    const totalNodesCount = useMemo(() => {
+        const countNodes = (nodes: TreeNode[]): number => {
+            return nodes.reduce(
+                (acc, node) =>
+                    acc + 1 + (node.children ? countNodes(node.children) : 0),
+                0
+            );
+        };
+        return countNodes(permissionsData);
+    }, []);
+
+    const selectedIds = useMemo(() => getAllCheckedIds(treeData), [treeData]);
+    const isAllSelected = selectedIds.length === totalNodesCount;
+
+    useEffect(() => {
+        if (onChange) {
+            onChange(selectedIds);
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [treeData,]);
 
     const filterTree = (nodes: TreeNode[], query: string): TreeNode[] => {
         if (!query) return nodes;
@@ -643,16 +677,40 @@ export default function PermissionTreeView({ title = "Permissions" }: { title?: 
     return (
         <>
             {/* // <Card className="p-6 rounded-2xl shadow-md flex flex-col h-full"> */}
-            <div className="flex items-center justify-between pb-3 sticky top-0 bg-white dark:bg-zinc-950 z-10">
-                <h2 className="text-xl font-semibold">{title}</h2>
-                <div className="relative w-64">
-                    <Search className="absolute left-2.5 top-1.5 h-4 w-4 text-muted-foreground" />
-                    <Input
-                        type="text"
+            <div className="flex flex-col gap-1 pb-4 sticky top-0 bg-white dark:bg-zinc-950 z-10 border-b">
+                <div className="flex items-center justify-between">
+                    <div className="flex flex-col gap-0.5">
+                        <h2 className="text-lg font-bold text-slate-900 dark:text-zinc-100">
+                            {title}
+                        </h2>
+
+                    </div>
+                    <div className="flex items-center gap-2  px-3 py-1.5">
+                        <Checkbox
+                            id="select-all"
+                            checked={isAllSelected}
+                            // indeterminate={selectAllState}
+                            onCheckedChange={(checked) =>
+                                setTreeData(
+                                    updateAllNodes(treeData, Boolean(checked))
+                                )
+                            }
+                        />
+                        <label
+                            htmlFor="select-all"
+                            className="text-xs font-bold text-slate-700 dark:text-zinc-400 cursor-pointer"
+                        >
+                            Select All
+                        </label>
+                    </div>
+                </div>
+                <div className="relative w-full">
+                    <FormInput
                         placeholder="Search permissions..."
-                        className="pl-9 h-8"
+                        icon={Search}
+                        className="h-9"
                         value={searchQuery}
-                        onChange={(e) => setSearchQuery(e.target.value)}
+                        onChange={(val) => setSearchQuery(val)}
                     />
                 </div>
             </div>
@@ -679,6 +737,39 @@ export default function PermissionTreeView({ title = "Permissions" }: { title?: 
     );
 }
 
+// Helper functions for tree manipulation
+const updateAllNodes = (nodes: TreeNode[], checked: boolean): TreeNode[] => {
+    return nodes.map((node) => ({
+        ...node,
+        checked,
+        children: node.children
+            ? updateAllNodes(node.children, checked)
+            : undefined,
+    }));
+};
+
+const getAllCheckedIds = (nodes: TreeNode[]): string[] => {
+    let ids: string[] = [];
+    nodes.forEach((node) => {
+        if (node.checked) ids.push(node.id);
+        if (node.children) ids = ids.concat(getAllCheckedIds(node.children));
+    });
+    return ids;
+};
+
+const initializeTree = (
+    nodes: TreeNode[],
+    selectedIds: string[]
+): TreeNode[] => {
+    return nodes.map((node) => ({
+        ...node,
+        checked: selectedIds.includes(node.id),
+        children: node.children
+            ? initializeTree(node.children, selectedIds)
+            : undefined,
+    }));
+};
+
 type TreeItemProps = {
     node: TreeNode;
     level: number;
@@ -694,9 +785,17 @@ function TreeItem({
     isLast = false,
     searchQuery = "",
 }: TreeItemProps) {
+    const [isOpen, setIsOpen] = useState(node.checked || false);
+
+    useEffect(() => {
+        if (node.checked) {
+            setIsOpen(true);
+        }
+    }, [node.checked]);
+
     const hasChildren = !!node.children?.length;
-    // Submenu is shown if parent is checked, or if we are actively searching
-    const isExpanded = !!node.checked || !!searchQuery;
+    // Submenu is shown if manual toggle is open, or if we are actively searching
+    const isExpanded = isOpen || !!searchQuery;
 
     return (
         <div className="relative">
@@ -714,10 +813,19 @@ function TreeItem({
                 </>
             )}
 
-            <div className="flex items-center justify-between py-2 px-2 rounded-lg hover:bg-muted/50 transition">
-                <div className="flex items-center gap-2">
+            <div className="flex items-center justify-between py-2 px-2 rounded-lg hover:bg-muted/50 transition group">
+                <div
+                    className="flex items-center gap-2 flex-1 cursor-pointer"
+                    onClick={() => onCheck(node.id, !node.checked)}
+                >
                     {hasChildren ? (
-                        <div className="w-5 h-5 flex items-center justify-center shrink-0">
+                        <div
+                            className="w-5 h-5 flex items-center justify-center shrink-0 cursor-pointer hover:bg-accent/50 rounded transition-colors"
+                            onClick={(e) => {
+                                e.stopPropagation();
+                                setIsOpen(!isOpen);
+                            }}
+                        >
                             {isExpanded ? (
                                 <FolderOpen className="w-4 h-4 text-blue-500 fill-blue-500/20" />
                             ) : (
@@ -729,7 +837,9 @@ function TreeItem({
                             <div className="w-1.5 h-1.5 rounded-full bg-muted-foreground/50" />
                         </div>
                     )}
-                    <span className="text-sm font-medium">{node.name}</span>
+                    <span className="text-sm font-medium text-slate-700 dark:text-zinc-300 group-hover:text-slate-900 dark:group-hover:text-zinc-100 transition-colors">
+                        {node.name}
+                    </span>
                 </div>
 
                 {/* RIGHT SIDE CHECKBOX */}
@@ -759,3 +869,6 @@ function TreeItem({
         </div>
     );
 }
+
+const MemoizedTreeView = memo(PermissionTreeView);
+export default MemoizedTreeView;

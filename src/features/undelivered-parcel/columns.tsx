@@ -1,4 +1,4 @@
-import type { Column } from '@/components/common';
+import type { Column } from '@/components/common/types/DataTable.types';
 import type { UndeliveredParcel } from './types';
 
 export const UNDELIVERED_COLUMNS: Column<UndeliveredParcel>[] = [

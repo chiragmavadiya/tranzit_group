@@ -20,7 +20,8 @@ export function AddSubUserDialog({ open, onOpenChange, onSubmit, initialData }: 
     personalMobile: '',
     role: 'Staff',
     password: '',
-    status: 'Active'
+    status: 'Active',
+    permissions: []
   }), []);
 
   const formDataToLoad = useMemo(() => {
@@ -28,7 +29,8 @@ export function AddSubUserDialog({ open, onOpenChange, onSubmit, initialData }: 
       return {
         ...initialData,
         role: initialData.role || 'Staff',
-        status: initialData.status || 'Active'
+        status: initialData.status || 'Active',
+        permissions: initialData.permissions || []
       };
     }
     return initialValues;
@@ -67,7 +69,7 @@ const SubUserForm = forwardRef<HTMLFormElement, SubUserFormProps>(
     const [formData, setFormData] = useState(initialValues);
     const [submited, setSubmited] = useState(false);
 
-    const handleInputChange = useCallback((field: string, value: string) => {
+    const handleInputChange = useCallback((field: string, value: any) => {
       setFormData((prev: any) => ({ ...prev, [field]: value }));
     }, []);
 
@@ -183,7 +185,11 @@ const SubUserForm = forwardRef<HTMLFormElement, SubUserFormProps>(
 
         <div className="col-span-12 my-4 border-t" />
         <div className="col-span-12">
-          <PermissionTreeView title="Role Management" />
+          <PermissionTreeView
+            title="Role Management"
+            initialSelected={formData.permissions}
+            onChange={(ids) => handleInputChange('permissions', ids)}
+          />
         </div>
       </form>
     );

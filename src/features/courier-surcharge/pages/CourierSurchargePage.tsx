@@ -1,6 +1,6 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useCallback } from 'react';
 import { Plus } from 'lucide-react';
-import { DataTable } from '@/components/common';
+import { DataTable } from '@/components/common/DataTable';
 import { ConformationModal } from '@/components/common/ConformationModal';
 import { Button } from '@/components/ui/button';
 import { SURCHARGE_COLUMNS } from '../columns';
@@ -25,7 +25,7 @@ export default function CourierSurchargePage() {
   });
 
   const { deleteSurcharge, isDeleting } = useCourierSurchargeMutations();
-  const exportMutation = useExportCourierSurcharge();
+  const { mutate, isPending } = useExportCourierSurcharge();
 
   const [isAddOpen, setIsAddOpen] = useState(false);
   const [editingRow, setEditingRow] = useState<CourierSurcharge | null>(null);
@@ -39,10 +39,10 @@ export default function CourierSurchargePage() {
     }
   };
 
-  const onAddSurcharge = () => {
+  const onAddSurcharge = useCallback(() => {
     setEditingRow(null);
     setIsAddOpen(true);
-  };
+  }, []);
 
   const columns = useMemo(() => SURCHARGE_COLUMNS(
     (row) => {
@@ -51,6 +51,18 @@ export default function CourierSurchargePage() {
     },
     (row) => setDeletingRow(row)
   ), []);
+
+  const onExport = useCallback((format: "pdf" | "excel" | "print" | "csv") => mutate({ format, search }), [mutate, search])
+
+  const headerContent = useMemo(() => (
+    <Button
+      onClick={onAddSurcharge}
+      className="global-btn"
+    >
+      <Plus className="w-4 h-4" />
+      <span>Add Surcharge</span>
+    </Button>
+  ), [onAddSurcharge]);
 
   return (
     <div className="flex flex-col flex-1 gap-6 p-page-padding min-h-0 animate-in fade-in slide-in-from-bottom-2 duration-500 bg-slate-50/30 dark:bg-zinc-950/30 overflow-y-auto">
@@ -68,18 +80,10 @@ export default function CourierSurchargePage() {
           onPageChange={setPage}
           pageSize={pageSize}
           onPageSizeChange={setPageSize}
-          onExport={(format) => exportMutation.mutate({ format, search })}
-          isExporting={exportMutation.isPending}
+          onExport={onExport}
+          isExporting={isPending}
           className="text-xs pb-3"
-          customHeader={
-            <Button
-              onClick={onAddSurcharge}
-              className="global-btn"
-            >
-              <Plus className="w-4 h-4" />
-              <span>Add Surcharge</span>
-            </Button>
-          }
+          customHeader={headerContent}
         />
       </div>
 

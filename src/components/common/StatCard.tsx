@@ -2,6 +2,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import type { StatItem } from "./types/statCard.types";
 import { cn } from "@/lib/utils";
+import { memo } from "react";
 
 function StatCardSkeleton({ className }: { className?: string }) {
   return (
@@ -21,7 +22,7 @@ function StatCardSkeleton({ className }: { className?: string }) {
 }
 
 
-export function StatCard({ label, value, icon: Icon, subValue, color, className, contentClassName, iconBg, iconColor, loading = false }: StatItem) {
+export const StatCard = memo(({ label, value, icon: Icon, subValue, color, className, contentClassName, iconBg, iconColor, loading = false }: StatItem) => {
   if (loading) return <StatCardSkeleton />
   return (
     <Card className={cn("border ring-0 shadow-md border-gray-200 dark:border-zinc-800 rounded-xl bg-white dark:bg-zinc-950 transition-colors duration-300 hover:-translate-y- hover:border-blue-300", className)}>
@@ -52,6 +53,6 @@ export function StatCard({ label, value, icon: Icon, subValue, color, className,
       </CardContent>
     </Card>
   );
-}
+})
 
 

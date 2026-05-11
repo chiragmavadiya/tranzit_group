@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { DataTable } from '@/components/common';
+import { DataTable } from '@/components/common/DataTable';
 import type { Column } from '@/components/common/types/DataTable.types';
 import { useBookPickups, useCreatePickup } from '../hooks/useBookPickup';
 import type { BookPickup } from '../types';

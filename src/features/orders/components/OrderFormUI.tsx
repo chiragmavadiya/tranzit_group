@@ -1,4 +1,4 @@
-import React, { useMemo, useCallback } from "react";
+import React, { useMemo, useCallback, type ReactNode, memo } from "react";
 import { RefreshCw, CheckCircle2 } from "lucide-react";
 import * as LucideIcons from "lucide-react";
 import { cn } from "@/lib/utils"
@@ -29,8 +29,19 @@ export const Required = () => {
   )
 }
 
+export const CustomLabel = ({ label, isHorizontal = false, required = false, className }: { label: ReactNode, isHorizontal?: boolean, required?: boolean, className?: string }) => {
+  if (!label) return null;
+  return (<Label className={cn(
+    "text-[11px] font-extrabold text-slate-700 dark:text-zinc-400 uppercase tracking-wider gap-0 mb-1",
+    isHorizontal ? "h-fit leading-none" : "ml-0.5",
+    className
+  )}>
+    {label}
+    {required && <Required />}
+  </Label>)
+}
 
-export const FormInput = React.forwardRef<HTMLInputElement, FormInputProps>(({
+export const FormInput = memo(React.forwardRef<HTMLInputElement, FormInputProps>(({
   label,
   value,
   onChange,
@@ -60,13 +71,11 @@ export const FormInput = React.forwardRef<HTMLInputElement, FormInputProps>(({
       className
     )}>
       {label && (
-        <Label className={cn(
-          "text-[11px] font-extrabold text-slate-700 dark:text-zinc-400 uppercase tracking-wider gap-0 mb-1",
-          isHorizontal ? "h-fit leading-none" : "ml-0.5"
-        )}>
-          {label}
-          {required && <Required />}
-        </Label>
+        <CustomLabel
+          label={label}
+          isHorizontal={isHorizontal}
+          required={required}
+        />
       )}
       <div className="relative group">
         {Icon && (
@@ -106,7 +115,10 @@ export const FormInput = React.forwardRef<HTMLInputElement, FormInputProps>(({
       </div>
     </div>
   );
-});
+}));
+
+FormInput.displayName = "FormInput";
+
 
 
 export function FormTextarea({
@@ -132,20 +144,25 @@ export function FormTextarea({
       isHorizontal ? "grid grid-cols-[110px_1fr] items-start gap-4" : "space-y-2",
       isFullWidth ? "col-span-12" : "col-span-12 md:col-span-6"
     )}>
-      <Label className={cn(
+      {/* <Label className={cn(
         "text-[11px] font-extrabold text-slate-700 dark:text-zinc-400 uppercase tracking-wider leading-none ",
         isHorizontal ? "h-fit leading-none" : "ml-0.5"
       )}>
         {label}
         {required && <Required />}
-      </Label>
+      </Label> */}
+      <CustomLabel
+        label={label}
+        isHorizontal={isHorizontal}
+        required={required}
+      />
       <Textarea
         placeholder={placeholder}
         value={value}
         onChange={handleChange}
         rows={rows}
         className={cn(
-          "rounded-md border-slate-200 dark:border-zinc-800 bg-white dark:bg-zinc-950 font-medium focus-visible:ring-0 focus-visible:ring-blue-600 focus-visible:border-blue-600 transition-all placeholder:text-slate-300 text-sm resize-none px-3 py-2",
+          "rounded-md shadow-none border-slate-200 dark:border-zinc-800 bg-white dark:bg-zinc-950 font-medium focus-visible:ring-0 focus-visible:ring-blue-600 focus-visible:border-blue-600 transition-all placeholder:text-muted-foreground placeholder:font-normal dark:placeholder:text-zinc-700 text-sm resize-none px-3 py-2",
           error ? "border-red-500 focus-visible:border-red-500" : ""
         )}
       />
@@ -165,7 +182,7 @@ export function ValidAddressBadge() {
 }
 
 
-export function FormSelect({
+export const FormSelect = memo(({
   label,
   value,
   onValueChange,
@@ -177,8 +194,10 @@ export function FormSelect({
   layout = 'vertical',
   required = false,
   error,
-  errormsg
-}: FormSelectProps) {
+  errormsg,
+  name,
+  disabled
+}: FormSelectProps) => {
   const isHorizontal = useMemo(() => layout === 'horizontal', [layout]);
   const memoizedData = useMemo(() => [...options], [options]);
 
@@ -188,13 +207,18 @@ export function FormSelect({
       isHalf ? "col-span-12 md:col-span-6" : isCompact ? "col-span-6 md:col-span-3" : "col-span-12 md:col-span-6",
       className
     )}>
-      <Label className={cn(
+      {/* <Label className={cn(
         "text-[11px] font-extrabold text-slate-700 dark:text-zinc-400 uppercase tracking-wider gap-0 mb-1",
         !isHorizontal && "ml-0.5"
       )}>
         {label}
         {required && <Required />}
-      </Label>
+      </Label> */}
+      <CustomLabel
+        label={label}
+        isHorizontal={isHorizontal}
+        required={required}
+      />
       <div>
         <SelectComponent
           className={cn("w-full h-8 text-[13px] data-[size=default]:h-8 border-slate-200 rounded-md dark:border-zinc-800 font-medium bg-white dark:bg-zinc-950 text-slate-900 dark:text-zinc-100 focus:ring-blue-600 transition-all text-sm px-3 ", error ? "border-red-500 focus:border-red-500" : "")}
@@ -203,12 +227,16 @@ export function FormSelect({
           onValueChange={onValueChange}
           value={value}
           placeholder={placeholder}
+          name={name}
+          disabled={disabled}
         />
         {error ? <div className="text-red-500 text-[11px] w-full">{errormsg}</div> : null}
       </div>
     </div>
   );
-}
+});
+
+FormSelect.displayName = 'FormSelect';
 
 
 export function SummaryCard({ title, name, address, phone, isRight = false }: SummaryCardProps) {

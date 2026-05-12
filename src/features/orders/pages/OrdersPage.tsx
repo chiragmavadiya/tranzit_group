@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo, useCallback, useEffect, useRef } from 'react';
+import { useState, useMemo, useCallback, useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import type { TabType } from '@/features/orders/types';
 import { useOrders, useExportOrders, useImportOrders } from '@/features/orders/hooks/useOrders';
@@ -8,15 +8,18 @@ import { DataTable } from '@/components/common/DataTable';
 import { getOrdersColumns } from '../column';
 import DatePicker from '@/components/common/DatePicker';
 import { Button } from '@/components/ui/button';
-import { Download, Plus, X, Loader2 } from 'lucide-react';
+import { Download, Plus, Loader2 } from 'lucide-react';
 import { useAppSelector } from '@/hooks/store.hooks';
 import { showToast } from '@/components/ui/custom-toast';
+import { ImportOrdersDialog } from '../components/ImportOrdersDialog';
+import { useCustomers } from '@/features/customers/hooks/useCustomers';
 
 export default function OrdersPage() {
   const [searchParams] = useSearchParams();
   const activeTab = (searchParams.get('tab') as TabType) || 'new';
   const { role } = useAppSelector((state) => state.auth);
   const navigate = useNavigate();
+  const isAdmin = role === 'admin';
 
   // State for pagination and search
   const [page, setPage] = useState(1);
@@ -42,11 +45,20 @@ export default function OrdersPage() {
 
   // Fetch orders data
   const { data: ordersData, isLoading } = useOrders(filters);
+  const { data: customersData } = useCustomers({ pageSize: 1000, enabled: isAdmin });
 
-  // Export mutation
+  const formattedCustomers = useMemo(() => {
+    return customersData?.data?.map((c: any) => ({
+      value: c.id.toString(),
+      label: `${c.first_name} ${c.last_name}`
+    })) || [];
+  }, [customersData]);
+
+  // Mutations
   const exportOrders = useExportOrders();
   const importOrders = useImportOrders();
-  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const [isImportDialogOpen, setIsImportDialogOpen] = useState(false);
 
   const handleSearch = useCallback((val: string) => {
     setSearch(val);
@@ -82,33 +94,19 @@ export default function OrdersPage() {
     setPage(1);
   }, []);
 
-  const handleImportClick = useCallback(() => {
-    fileInputRef.current?.click();
-  }, []);
-
-  const handleFileChange = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (!file) return;
-
-    if (file.type !== 'text/csv' && !file.name.endsWith('.csv')) {
-      showToast('Please select a valid CSV file', "error");
-      return;
-    }
-
-    importOrders.mutate(file, {
+  const handleImportOrders = useCallback((file: File, customerId?: string) => {
+    importOrders.mutate({ file, customerId }, {
       onSuccess: (response) => {
         showToast(response.message || 'Orders imported successfully', "success");
-        if (fileInputRef.current) fileInputRef.current.value = '';
+        setIsImportDialogOpen(false);
       },
       onError: (error: any) => {
         showToast(error?.response?.data?.message || 'Failed to import orders', "error");
-        if (fileInputRef.current) fileInputRef.current.value = '';
       }
     });
   }, [importOrders]);
 
   const columns = useMemo(() => getOrdersColumns(role), [role]);
-
 
   return (
     <div className="p-page-padding flex-1 flex flex-col space-y-4 animate-in fade-in slide-in-from-bottom-2 duration-300 h-full overflow-hidden min-h-0 bg-white dark:bg-zinc-950">
@@ -140,22 +138,15 @@ export default function OrdersPage() {
           {appliedDateRange[0] || appliedDateRange[1] ? (
             <Button
               onClick={handleClearFilters}
-              variant="outline"
+              variant="ghost"
               size="sm"
-              className="h-8 p-3 text-red-500 border-red-500/50 hover:text-red-600 hover:bg-red-500/10"
+              className="h-8 p-3 text-red-500 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/10"
             >
-              <X />
               Clear
             </Button>
           ) : null}
         </div>
-        <input
-          type="file"
-          ref={fileInputRef}
-          hidden
-          accept=".csv"
-          onChange={handleFileChange}
-        />
+
         <DataTable
           columns={columns}
           data={ordersData?.data || []}
@@ -166,7 +157,6 @@ export default function OrdersPage() {
           searchValue={search}
           pageSize={pageSize}
           onPageSizeChange={handlePageSizeChange}
-          // pageSizeInFooter
           headerTitle='Orders'
           headerDescription='Manage and track your customer orders across all channels.'
           headerClass="h-20"
@@ -176,13 +166,12 @@ export default function OrdersPage() {
           onPageChange={setPage}
           onExport={handleExport}
           isExporting={exportOrders.isPending}
-          // header={false}
           customHeader={() => (
             <div className="flex items-center justify-between gap-2">
               <Button
                 variant="outline"
                 className="gap-2 border-gray-200 dark:border-zinc-800 hover:bg-gray-50 dark:hover:bg-zinc-800 font-medium text-slate-700 dark:text-zinc-300 transition-colors"
-                onClick={handleImportClick}
+                onClick={() => setIsImportDialogOpen(true)}
                 disabled={importOrders.isPending}
               >
                 {importOrders.isPending ? <Loader2 className="w-4 h-4 animate-spin" /> : <Download className="w-4 h-4" />}
@@ -197,9 +186,19 @@ export default function OrdersPage() {
               </Button>
             </div>
           )}
-
         />
       </div>
+      {
+        isImportDialogOpen && (
+          <ImportOrdersDialog
+            open={isImportDialogOpen}
+            onOpenChange={setIsImportDialogOpen}
+            onImport={handleImportOrders}
+            isLoading={importOrders.isPending}
+            isAdmin={isAdmin}
+            customers={formattedCustomers}
+          />)
+      }
     </div>
   );
 }

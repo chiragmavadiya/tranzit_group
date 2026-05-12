@@ -198,11 +198,13 @@ export default function CustomerPage() {
                 />
             </div>
 
-            <CustomerDialog
-                open={isDialogOpen}
-                onOpenChange={setIsDialogOpen}
-                customerId={editCustomerId}
-            />
+            {isDialogOpen && (
+                <CustomerDialog
+                    open={isDialogOpen}
+                    onOpenChange={setIsDialogOpen}
+                    customerId={editCustomerId}
+                />
+            )}
 
             <ConformationModal
                 open={isDeleteDialogOpen}

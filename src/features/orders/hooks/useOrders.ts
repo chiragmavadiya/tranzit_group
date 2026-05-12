@@ -137,7 +137,8 @@ export const useConsignOrder = () => {
 export const useImportOrders = () => {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: ordersService.importOrders,
+    mutationFn: ({ file, customerId }: { file: File; customerId?: string }) => 
+      ordersService.importOrders(file, customerId),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.ORDERS.LIST });
     },

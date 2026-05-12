@@ -16,8 +16,7 @@ import { FormInput, FormSelect } from "@/features/orders/components/OrderFormUI"
 import { STATES } from "../constants"
 import { useCreateCustomer, useUpdateCustomer, useCustomerEditDetails } from "../hooks/useCustomers"
 import { showToast } from "@/components/ui/custom-toast"
-import { AutoComplete } from "@/components/common"
-import { LOCATION_OPTIONS } from "@/constants"
+import { PlaceAutocomplete } from "@/components/common/AutoComplateAddress"
 
 interface CustomerDialogProps {
   open: boolean
@@ -134,7 +133,7 @@ export default function CustomerDialog({ open, onOpenChange, customerId }: Custo
     mutation(variables, {
       onSuccess: () => {
         onOpenChange(false)
-        showToast(isEdit ? "Customer updated successfully!" : "Customer added successfully!")
+        showToast(isEdit ? "Customer updated successfully!" : "Customer added successfully!", 'success')
       },
       onError: (error: any) => {
         if (error?.response?.data?.errors) {
@@ -282,28 +281,23 @@ export default function CustomerDialog({ open, onOpenChange, customerId }: Custo
                 errormsg="Please enter billing address"
               /> */}
               <div className="col-span-12">
-                <AutoComplete
-                  label='Address Information'
-                  placeholder="Start typing suburb or postcode..."
-                  options={LOCATION_OPTIONS}
-                  onSelect={(val) => {
-                    const opt = LOCATION_OPTIONS.find(o => o.value === val);
-
-                    if (opt) {
-                      handleChange('billing_address', opt.label);
-                      handleChange('billing_suburb', opt.suburb);
-                      handleChange('billing_state', opt.state);
-                      handleChange('billing_street_number', opt.streetNumber);
-                      handleChange('billing_street_name', opt.streetName);
-                      handleChange('billing_street_type', opt.streetType);
-                      handleChange('billing_postcode', opt.postcode);
-                      // handleChange('country', opt.country);
-                    }
+                <PlaceAutocomplete
+                  label="Address Information"
+                  onPlaceSelect={(opt) => {
+                    handleChange('billing_address', opt.formatted_address);
+                    handleChange('billing_street_name', opt.street_name);
+                    handleChange('billing_street_number', opt.street_number);
+                    handleChange('billing_street_type', opt.street_type);
+                    handleChange('billing_suburb', opt.suburb);
+                    handleChange('billing_state', opt.state);
+                    handleChange('billing_country', opt.country);
+                    handleChange('billing_postcode', opt.post_code);
                   }}
-                  className="[&>div>input]:h-10 [&>div>input]:text-[13px]"
-                  required
+                  onChange={(value) => handleChange('billing_address', value)}
                   error={submited && formData.billing_address?.trim() === ''}
-                  errormsg="Please enter your address"
+                  errormsg='Please enter your billing address'
+                  value={formData.billing_address}
+                  required
                 />
               </div>
 
@@ -389,28 +383,23 @@ export default function CustomerDialog({ open, onOpenChange, customerId }: Custo
                 errormsg="Please enter shipping address"
               /> */}
               <div className="col-span-12">
-                <AutoComplete
-                  label='Address Information'
-                  placeholder="Start typing suburb or postcode..."
-                  options={LOCATION_OPTIONS}
-                  onSelect={(val) => {
-                    const opt = LOCATION_OPTIONS.find(o => o.value === val);
-
-                    if (opt) {
-                      handleChange('address', opt.label);
-                      handleChange('suburb', opt.suburb);
-                      handleChange('state', opt.state);
-                      handleChange('street_number', opt.streetNumber);
-                      handleChange('street_name', opt.streetName);
-                      handleChange('street_type', opt.streetType);
-                      handleChange('postcode', opt.postcode);
-                      // handleChange('country', opt.country);
-                    }
+                <PlaceAutocomplete
+                  label="Address Information"
+                  onPlaceSelect={(opt) => {
+                    handleChange('address', opt.formatted_address);
+                    handleChange('street_name', opt.street_name);
+                    handleChange('street_number', opt.street_number);
+                    handleChange('street_type', opt.street_type);
+                    handleChange('suburb', opt.suburb);
+                    handleChange('state', opt.state);
+                    handleChange('country', opt.country);
+                    handleChange('postcode', opt.post_code);
                   }}
-                  className="[&>div>input]:h-10 [&>div>input]:text-[13px]"
-                  required
+                  onChange={(value) => handleChange('address', value)}
                   error={submited && formData.address?.trim() === ''}
-                  errormsg="Please enter shipping address"
+                  errormsg='Please enter your address'
+                  value={formData.address}
+                  required
                 />
               </div>
               <FormInput

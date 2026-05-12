@@ -17,8 +17,8 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import brandLogo from '@/assets/Tranzit_Logo.svg';
 import { showToast } from '@/components/ui/custom-toast';
-import AutoComplete from '@/components/common/AutoComplate';
-import { LOCATION_OPTIONS, STATES, STREET_TYPES } from '@/constants';
+import { PlaceAutocomplete } from '@/components/common/AutoComplateAddress';
+import { STATES, STREET_TYPES } from '@/constants';
 
 const SectionHeader = ({ title, icon: Icon, children }: { title: string, icon: any, children?: React.ReactNode }) => (
   <div className="flex items-center justify-between pb-3 border-b border-slate-50 dark:border-zinc-800/50 mb-6">
@@ -100,18 +100,27 @@ export default function OnboardingPage() {
       if (!formData[field as keyof typeof formData]) return false;
     }
 
-    if (!/^\d{10}$/.test(formData.mobile.replace(/\s/g, ''))) return false;
+    console.log('1')
+    if (!/^\d{10}$/.test(formData.mobile.replace(/\s/g, ''))) {
+      showToast("Invalid mobile number", "error");
+      return false;
+    };
+    console.log('2')
     if (!/^\d{4}$/.test(formData.postcode)) return false;
+    console.log('3')
 
     if (formData.hasBillingAddress) {
       const billingRequired = [
         'billing_street_number', 'billing_street_name', 'billing_street_type',
         'billing_suburb', 'billing_state', 'billing_postcode'
       ];
+      console.log('4')
       for (const field of billingRequired) {
         if (!formData[field as keyof typeof formData] || formData[field as keyof typeof formData] === "") return false;
       }
+      console.log('5')
       if (!/^\d{4}$/.test(formData.billing_postcode)) return false;
+      console.log('6')
     }
 
     // if (!formData.agree_privacy || !formData.accept_terms) return false;
@@ -130,27 +139,25 @@ export default function OnboardingPage() {
       showToast("Please accept the Privacy Policy and Terms & Conditions", "error");
       return
     }
+    const payload = { ...formData };
     if (!formData.hasBillingAddress) {
-      setFormData(prev => ({
-        ...prev,
-        billing_address: prev.address,
-        billing_unit_number: prev.unit_number,
-        billing_street_number: prev.street_number,
-        billing_street_name: prev.street_name,
-        billing_street_type: prev.street_type,
-        billing_suburb: prev.suburb,
-        billing_state: prev.state,
-        billing_postcode: prev.postcode,
-        billing_country: prev.country,
-      }));
+      payload.billing_address = formData.address;
+      payload.billing_unit_number = formData.unit_number;
+      payload.billing_street_number = formData.street_number;
+      payload.billing_street_name = formData.street_name;
+      payload.billing_street_type = formData.street_type;
+      payload.billing_suburb = formData.suburb;
+      payload.billing_state = formData.state;
+      payload.billing_postcode = formData.postcode;
+      // setFormData(payload);
     }
 
-    onboardingMutation.mutate(formData, {
+    onboardingMutation.mutate(payload, {
       onSuccess: (response) => {
         if (response.status) {
           dispatch(setNextStep(''));
           showToast("Onboarding completed successfully", "success");
-          navigate('/dashboard');
+          navigate('/orders');
         } else {
           showToast(response.message || "Failed to complete onboarding", "error");
         }
@@ -279,8 +286,8 @@ export default function OnboardingPage() {
                       value={formData.mobile}
                       onChange={(val) => handleChange('mobile', val)}
                       required
-                      error={isSubmitted && formData.mobile?.trim() === ''}
-                      errormsg="Please enter your mobile number"
+                      error={isSubmitted && (formData.mobile?.trim() === '' || !/^\d{10}$/.test(formData.mobile.replace(/\s/g, '')))}
+                      errormsg="Please enter a valid 10-digit mobile number"
                     />
                   </div>
                 </div>
@@ -338,37 +345,24 @@ export default function OnboardingPage() {
                 </SectionHeader>
 
                 <div className="space-y-4">
-                  {/* <FormInput
-                    label="Search Address"
-                    placeholder="Search your business address..."
-                    value={formData.address}
-                    onChange={(val) => handleChange('address', val)}
-                    icon={Search}
-                    className="bg-slate-50/50 dark:bg-zinc-950/50"
-                  /> */}
                   <div>
-                    <AutoComplete
-                      label='Address Information'
-                      placeholder="Start typing suburb or postcode..."
-                      options={LOCATION_OPTIONS}
-                      onSelect={(val) => {
-                        const opt = LOCATION_OPTIONS.find(o => o.value === val);
-
-                        if (opt) {
-                          handleChange('address', opt.label);
-                          handleChange('suburb', opt.suburb);
-                          handleChange('state', opt.state);
-                          handleChange('street_number', opt.streetNumber);
-                          handleChange('street_name', opt.streetName);
-                          handleChange('street_type', opt.streetType);
-                          handleChange('postcode', opt.postcode);
-                          handleChange('country', opt.country);
-                        }
+                    <PlaceAutocomplete
+                      label="Address Information"
+                      onPlaceSelect={(opt) => {
+                        handleChange('address', opt.formatted_address);
+                        handleChange('street_name', opt.street_name);
+                        handleChange('street_number', opt.street_number);
+                        handleChange('street_type', opt.street_type);
+                        handleChange('suburb', opt.suburb);
+                        handleChange('state', opt.state);
+                        handleChange('country', opt.country);
+                        handleChange('postcode', opt.post_code);
                       }}
-                      className="[&>div>input]:h-10 [&>div>input]:text-[13px]"
-                      required
+                      onChange={(value) => handleChange('address', value)}
                       error={isSubmitted && formData.address?.trim() === ''}
-                      errormsg="Please enter your address"
+                      errormsg='Please enter your address'
+                      value={formData.address}
+                      required
                     />
                   </div>
                   <div className="grid grid-cols-12  gap-5">
@@ -466,28 +460,23 @@ export default function OnboardingPage() {
 
                   <div className="space-y-4">
                     <div>
-                      <AutoComplete
+                      <PlaceAutocomplete
                         label="Address Information"
-                        placeholder="Search your billing address..."
-                        options={LOCATION_OPTIONS}
-                        onSelect={(val) => {
-                          const opt = LOCATION_OPTIONS.find(o => o.value === val);
-
-                          if (opt) {
-                            handleChange('billing_address', opt.label);
-                            handleChange('billing_suburb', opt.suburb);
-                            handleChange('billing_state', opt.state);
-                            handleChange('billing_street_number', opt.streetNumber);
-                            handleChange('billing_street_name', opt.streetName);
-                            handleChange('billing_street_type', opt.streetType);
-                            handleChange('billing_postcode', opt.postcode);
-                            handleChange('billing_country', opt.country);
-                          }
+                        onPlaceSelect={(opt) => {
+                          handleChange('billing_address', opt.formatted_address);
+                          handleChange('billing_street_name', opt.street_name);
+                          handleChange('billing_street_number', opt.street_number);
+                          handleChange('billing_street_type', opt.street_type);
+                          handleChange('billing_suburb', opt.suburb);
+                          handleChange('billing_state', opt.state);
+                          handleChange('billing_country', opt.country);
+                          handleChange('billing_postcode', opt.post_code);
                         }}
-                        className="[&>div>input]:h-10 [&>div>input]:text-[13px]"
-                        required
+                        onChange={(value) => handleChange('billing_address', value)}
                         error={isSubmitted && formData.billing_address?.trim() === ''}
-                        errormsg="Please enter your billing address"
+                        errormsg='Please enter your billing address'
+                        value={formData.billing_address}
+                        required
                       />
                     </div>
 

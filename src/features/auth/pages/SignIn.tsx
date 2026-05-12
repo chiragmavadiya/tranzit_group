@@ -54,9 +54,9 @@ export default function SignIn({ role = "customer" }: { role?: string }) {
             return;
           }
           if (role === 'admin') {
-            navigate("/admin/dashboard");
+            navigate("/admin/orders");
           } else {
-            navigate("/dashboard");
+            navigate("/orders");
           }
         }
       },

@@ -99,7 +99,6 @@ export function CreateItemDialog({
           </div>
         )}
         <div className="space-y-6">
-
           {/* 🔹 Basic Info */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>

@@ -157,9 +157,10 @@ interface CustomModelProps {
   submitText?: string;
   contentClass?: string;
   showFooter?: boolean;
+  customFooter?: React.ReactNode;
 }
 
-const CustomModel = ({ open, title, description, onOpenChange, children, onSubmit, onCancel, cancelText = 'Cancel', submitText = 'Submit', isLoading = false, contentClass = "", showFooter = true }: CustomModelProps) => {
+const CustomModel = ({ open, title, description, onOpenChange, children, onSubmit, onCancel, cancelText = 'Cancel', submitText = 'Submit', isLoading = false, contentClass = "", showFooter = true, customFooter }: CustomModelProps) => {
   const handleCancel = () => {
     if (onCancel) {
       onCancel()
@@ -168,7 +169,10 @@ const CustomModel = ({ open, title, description, onOpenChange, children, onSubmi
   }
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className={contentClass || "min-w-xl"}>
+      <DialogContent
+        className={contentClass || "min-w-xl"}
+        tabIndex={undefined}
+      >
         <DialogHeader className="border-b border-gray-100 dark:border-zinc-800">
           <DialogTitle className="my-0 mb-3 text-xl font-bold text-slate-900 dark:text-zinc-100 italic!">
             {title}
@@ -179,31 +183,36 @@ const CustomModel = ({ open, title, description, onOpenChange, children, onSubmi
             </DialogDescription>
           )}
         </DialogHeader>
-        <div className="-mx-4 no-scrollbar max-h-[65vh] overflow-y-auto px-4">
+        <div className="-mx-4 no-scrollbar max-h-[65vh] overflow-y-auto px-4" autoFocus={false}>
           {children}
         </div>
         {
           showFooter && (
-            <DialogFooter className="gap-3 p-4 border-t border-gray-100 dark:border-zinc-800 bg-gray-50/50 dark:bg-zinc-900/50">
-              <Button
-                type="button"
-                variant="outline"
-                onClick={handleCancel}
-                disabled={isLoading}
-                className="px-4 border-gray-200 dark:border-zinc-800 font-medium hover:bg-gray-100 dark:hover:bg-zinc-800 h-8"
-              >
-                {cancelText}
-              </Button>
-              <Button
-                type="submit"
-                disabled={isLoading}
-                className="px-4 bg-[#0060FE] hover:bg-[#0052db] text-white font-semibold transition-all shadow-md shadow-blue-100 dark:shadow-none active:scale-[0.98] h-8"
-                onClick={onSubmit}
-              >
-                {isLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : null}
-                {submitText}
-                {/* {isLoading ? 'Processing...' : (isEdit ? 'Save Changes' : 'Create Item')} */}
-              </Button>
+            <DialogFooter className="gap-3 flex sm:justify-between p-4 border-t border-gray-100 dark:border-zinc-800 bg-gray-50/50 dark:bg-zinc-900/50">
+              <div>
+                {customFooter}
+              </div>
+              <div className="flex items-center gap-2">
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={handleCancel}
+                  disabled={isLoading}
+                  className="px-4 border-gray-200 dark:border-zinc-800 font-medium hover:bg-gray-100 dark:hover:bg-zinc-800 h-8"
+                >
+                  {cancelText}
+                </Button>
+                <Button
+                  type="submit"
+                  disabled={isLoading}
+                  className="px-4 bg-[#0060FE] hover:bg-[#0052db] text-white font-semibold transition-all shadow-md shadow-blue-100 dark:shadow-none active:scale-[0.98] h-8"
+                  onClick={onSubmit}
+                >
+                  {isLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : null}
+                  {submitText}
+                  {/* {isLoading ? 'Processing...' : (isEdit ? 'Save Changes' : 'Create Item')} */}
+                </Button>
+              </div>
             </DialogFooter>
           )}
       </DialogContent>

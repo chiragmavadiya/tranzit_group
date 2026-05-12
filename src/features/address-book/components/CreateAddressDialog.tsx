@@ -5,8 +5,8 @@ import type { AddressFormData } from '../types';
 import { FormInput, FormTextarea, FormSelect } from '@/features/orders/components/OrderFormUI';
 import { AUSTRALIAN_STATES, STREET_TYPES } from '../constants';
 import { useAddressBookDetails } from '../hooks/useAddressBook';
-import AutoComplete from '@/components/common/AutoComplate';
-import { LOCATION_OPTIONS } from '@/constants';
+import { PlaceAutocomplete } from '@/components/common/AutoComplateAddress';
+import { showToast } from '@/components/ui/custom-toast';
 
 interface CreateAddressDialogProps {
   open: boolean;
@@ -72,6 +72,7 @@ export function CreateAddressDialog({
       !formData.phone ||
       formData.phone.trim().length === 0
     ) {
+      showToast("Please fill all the required fields", 'error');
       return;
     }
 
@@ -106,50 +107,28 @@ export function CreateAddressDialog({
               </div>
             </div>
           )}
-          <div className="space-y-6">
+          <div className="space-y-4">
             <div className="flex dark:border-zinc-800 rounded-md overflow-hidden bg-white dark:bg-zinc-950">
               <div className="flex-1 relative flex items-center">
-                {/* <AutoComplete
-                  placeholder="Start typing suburb or postcode..."
-                  options={[
-                    { value: 'SYD-2000', label: 'Sydney, NSW 2000', suburb: 'Sydney', state: 'NSW', postcode: '2000', country: 'Australia' },
-                    { value: 'MEL-3000', label: 'Melbourne, VIC 3000', suburb: 'Melbourne', state: 'VIC', postcode: '3000', country: 'Australia' },
-                    { value: 'BNE-4000', label: 'Brisbane, QLD 4000', suburb: 'Brisbane', state: 'QLD', postcode: '4000', country: 'Australia' },
-                    { value: 'PER-6000', label: 'Perth, WA 6000', suburb: 'Perth', state: 'WA', postcode: '6000', country: 'Australia' },
-                  ]}
-                  onSelect={() => {
-                    // const opt = locationOptions.find(o => o.value === val);
-                    // if (opt) setLocations(prev => ({ ...prev, sender: opt }));
+                <PlaceAutocomplete
+                  onPlaceSelect={(opt) => {
+                    handleChange('address', opt.formatted_address);
+                    handleChange('street_name', opt.street_name);
+                    handleChange('street_number', opt.street_number);
+                    handleChange('street_type', opt.street_type);
+                    handleChange('suburb', opt.suburb);
+                    handleChange('state', opt.state);
+                    handleChange('postcode', opt.post_code);
+                    handleChange('longitude', opt.longitude);
+                    handleChange('latitude', opt.latitude);
                   }}
-                /> */}
-                <AutoComplete
-                  // label='Address Information'
-                  placeholder="Search suburb or postcode..."
-                  options={LOCATION_OPTIONS}
-                  defaultValue={formData.address}
-                  onSelect={(val) => {
-                    const opt = LOCATION_OPTIONS.find(o => o.value === val);
-                    if (opt) {
-                      handleChange('address', opt.label);
-                      handleChange('street_name', opt.streetName);
-                      handleChange('street_number', opt.streetNumber);
-                      handleChange('street_type', opt.streetType);
-                      handleChange('suburb', opt.suburb);
-                      handleChange('state', opt.state);
-                      handleChange('postcode', opt.postcode);
-                    }
-                  }}
-                  className="[&>div>input]:h-10 [&>div>input]:text-[13px]"
-                  required
+                  onChange={(value) => handleChange('address', value)}
                   error={submited && formData.address?.trim() === ''}
-                  errormsg="Please enter your address"
+                  errormsg='Please enter an address'
+                  value={formData.address}
                 />
               </div>
             </div>
-
-            {submited && formData.address.length < 1 && (
-              <p className="text-red-500 text-[11px] mt-1">Required Address</p>
-            )}
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-4">
               {/* Left Column */}
@@ -162,7 +141,7 @@ export function CreateAddressDialog({
                   placeholder="Enter code"
                   required
                   error={submited && formData.code.length < 1}
-                  errormsg="Required Code"
+                  errormsg="Please enter a code"
                   isFullWidth
                 />
                 <FormInput
@@ -173,7 +152,7 @@ export function CreateAddressDialog({
                   placeholder="Full name"
                   required
                   error={submited && formData.contact_person.length < 1}
-                  errormsg="Required Contact Person"
+                  errormsg="Please enter contact person name"
                   isFullWidth
                 />
                 <FormInput
@@ -192,7 +171,7 @@ export function CreateAddressDialog({
                   placeholder="example@mail.com"
                   required
                   error={submited && formData.email.length < 1}
-                  errormsg="Required Email"
+                  errormsg="Please enter an email"
                   isFullWidth
                 />
                 <FormInput
@@ -202,6 +181,9 @@ export function CreateAddressDialog({
                   onChange={(val) => handleChange('phone', val)}
                   placeholder="Phone number"
                   isFullWidth
+                  required
+                  error={submited && formData.phone.length < 1}
+                  errormsg="Please enter a phone number"
                 />
                 <FormTextarea
                   layout="horizontal"
@@ -241,7 +223,7 @@ export function CreateAddressDialog({
                   placeholder="e.g. George"
                   required
                   error={submited && formData.street_name.length < 1}
-                  errormsg="Required Street Name"
+                  errormsg="Please enter the street name"
                   isFullWidth
                 />
                 <FormInput
@@ -252,7 +234,7 @@ export function CreateAddressDialog({
                   placeholder="e.g. 123"
                   required
                   error={submited && formData.street_number.length < 1}
-                  errormsg="Required Street Number"
+                  errormsg="Please enter the street number"
                   isFullWidth
                 />
                 <FormSelect
@@ -264,7 +246,7 @@ export function CreateAddressDialog({
                   placeholder="Select type"
                   required
                   error={submited && formData.street_type.length < 1}
-                  errormsg="Required Street Type"
+                  errormsg="Please select the street type"
                 // isFullWidth
                 />
                 <FormInput
@@ -275,7 +257,7 @@ export function CreateAddressDialog({
                   placeholder="e.g. Sydney"
                   required
                   error={submited && formData.suburb.length < 1}
-                  errormsg="Required Suburb"
+                  errormsg="Please enter the suburb"
                   isFullWidth
                 />
                 <FormSelect
@@ -287,7 +269,7 @@ export function CreateAddressDialog({
                   placeholder="Select state"
                   required
                   error={submited && formData.state.length < 1}
-                  errormsg="Required State"
+                  errormsg="Please select the state"
                 // isFullWidth
                 />
                 <FormInput
@@ -298,7 +280,7 @@ export function CreateAddressDialog({
                   placeholder="e.g. 2000"
                   required
                   error={submited && formData.postcode.length < 1}
-                  errormsg="Required Post code"
+                  errormsg="Please enter the post code"
                   isFullWidth
                 />
                 <FormInput

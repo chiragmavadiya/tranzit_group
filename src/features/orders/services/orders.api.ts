@@ -102,9 +102,12 @@ export const ordersService = {
     /**
      * Import orders via CSV
      */
-    importOrders: async (file: File): Promise<{ status: boolean; message: string }> => {
+    importOrders: async (file: File, customerId?: string): Promise<{ status: boolean; message: string }> => {
         const formData = new FormData();
         formData.append("csv", file);
+        if (customerId) {
+            formData.append("customer_id", customerId);
+        }
         const response = await api.post(API_ENDPOINTS.ORDERS.IMPORT, formData, {
             headers: {
                 "Content-Type": "multipart/form-data",

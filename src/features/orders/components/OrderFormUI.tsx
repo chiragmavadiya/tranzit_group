@@ -56,17 +56,18 @@ export const FormInput = memo(React.forwardRef<HTMLInputElement, FormInputProps>
   className, disabled = false,
   error,
   errormsg,
+  inputClassName,
   // rightElement
 }, ref) => {
   const [showPassword, setShowPassword] = React.useState(false);
   const isHorizontal = useMemo(() => layout === 'horizontal', [layout]);
   const handleChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-    onChange(e.target.value, e.target.name || '');
+    onChange?.(e.target.value, e.target.name || '');
   }, [onChange]);
 
   return (
     <div className={cn(
-      isHorizontal ? "grid grid-cols-[110px_1fr] items-center gap-4" : "space-y-0",
+      isHorizontal ? "grid grid-cols-[120px_1fr] items-center gap-4" : "space-y-0",
       isFullWidth ? "col-span-12" : isHalf ? "col-span-12 md:col-span-6" : isCompact ? "col-span-6 md:col-span-3" : "col-span-12 md:col-span-6",
       className
     )}>
@@ -94,7 +95,8 @@ export const FormInput = memo(React.forwardRef<HTMLInputElement, FormInputProps>
             "h-8 rounded-md border-slate-200 dark:border-zinc-800 bg-white dark:bg-zinc-950 font-medium focus-visible:ring-0 focus-visible:ring-blue-600 focus-visible:border-blue-600 transition-all placeholder:text-muted-foreground placeholder:font-normal dark:placeholder:text-zinc-700 text-sm",
             Icon ? "pl-9" : "px-3",
             type === 'password' ? "pr-10" : "",
-            error ? "border-red-500 focus-visible:border-red-500" : ""
+            error ? "border-red-500 focus-visible:border-red-500" : "",
+            inputClassName,
           )}
           disabled={disabled}
         />
@@ -142,7 +144,7 @@ export function FormTextarea({
 
   return (
     <div className={cn(
-      isHorizontal ? "grid grid-cols-[110px_1fr] items-start gap-4" : "space-y-2",
+      isHorizontal ? "grid grid-cols-[120px_1fr] items-start gap-4" : "space-y-2",
       isFullWidth ? "col-span-12" : "col-span-12 md:col-span-6"
     )}>
       {/* <Label className={cn(
@@ -204,7 +206,7 @@ export const FormSelect = memo(({
 
   return (
     <div className={cn(
-      isHorizontal ? "grid grid-cols-[110px_1fr] items-center gap-4" : "space-y-1",
+      isHorizontal ? "grid grid-cols-[120px_1fr] items-center gap-4" : "space-y-1",
       isHalf ? "col-span-12 md:col-span-6" : isCompact ? "col-span-6 md:col-span-3" : "col-span-12 md:col-span-6",
       className
     )}>

@@ -22,7 +22,7 @@ export const API_ENDPOINTS = {
         PAYMENT_INFO: (id: string | number) => `/customer/orders/${id}/payment`,
         PAY_WITH_WALLET: (id: string | number) => `/customer/orders/${id}/pay-with-wallet`,
         WALLET_CHECK: "/customer/orders/wallet-check",
-        IMPORT: "/customer/orders/import",
+        IMPORT: "/orders/import",
         EXPORT: "/orders/export",
         CREATE_OWN_COURIER: "/customer/orders/create-own-courier",
         GET_QUOTE_SERVICES: "/customer/get-quote/services",

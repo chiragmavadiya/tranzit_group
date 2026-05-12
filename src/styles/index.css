@@ -58,7 +58,7 @@
   --popover: oklch(1 0 0);
   --popover-foreground: oklch(0.145 0 0);
   /* --primary: oklch(0.205 0 0); */
-  --primary: #0060fe;
+  --primary: #142f54;
   --primary-foreground: oklch(0.985 0 0);
   --secondary: oklch(0.97 0 0);
   --secondary-foreground: oklch(0.205 0 0);
@@ -326,4 +326,19 @@
 
 .dark .rich-text-content a {
   color: #60a5fa;
+}
+
+/* GOOGLE MAP AUTOCOMPLETE OVERRIDES */
+
+.pac-logo:after {
+  display: none !important;
+}
+
+.pac-container {
+  border-radius: 8px;
+
+}
+
+.pac-item {
+  font-family: 'Geist Variable', sans-serif;
 }

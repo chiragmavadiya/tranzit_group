@@ -13,9 +13,9 @@ export default function ProtectedRoute({ role: requiredRole }: { role: string })
   if (requiredRole && userRole !== requiredRole && next_step !== 'onboarding') {
     // Redirect based on their actual role
     if (userRole === 'admin') {
-      return <Navigate to="/admin/dashboard" replace />;
+      return <Navigate to="/admin/orders" replace />;
     } else {
-      return <Navigate to="/dashboard" replace />;
+      return <Navigate to="/orders" replace />;
     }
   }
 

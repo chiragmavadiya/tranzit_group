@@ -1,11 +1,9 @@
 "use client";
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Label } from "@/components/ui/label";
 import { MapPin } from "lucide-react";
-import AutoComplete from "@/components/common/AutoComplate";
 import type { QuoteLocation } from "../types";
-import { LOCATION_OPTIONS } from '@/constants';
+import { PlaceAutocomplete } from "@/components/common/AutoComplateAddress";
 
 interface QuoteFormProps {
   locations: {
@@ -15,7 +13,7 @@ interface QuoteFormProps {
   setLocations: React.Dispatch<React.SetStateAction<{ sender: QuoteLocation | null; receiver: QuoteLocation | null }>>;
 }
 
-export function QuoteForm({ setLocations }: QuoteFormProps) {
+export function QuoteForm({ locations, setLocations }: QuoteFormProps) {
   return (
     <div className="space-y-4">
       {/* Addresses Section */}
@@ -29,28 +27,67 @@ export function QuoteForm({ setLocations }: QuoteFormProps) {
         <CardContent className="space-y-4">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-0.5">
-              <Label className="text-[13px] font-medium text-slate-600 dark:text-zinc-400">Sender Location</Label>
-              <AutoComplete
-                placeholder="Start typing suburb or postcode..."
-                options={LOCATION_OPTIONS}
-                onSelect={(val) => {
-                  const opt = LOCATION_OPTIONS.find(o => o.value === val);
-                  if (opt) setLocations(prev => ({ ...prev, sender: opt }));
+              <PlaceAutocomplete
+                onPlaceSelect={(opt) => {
+                  setLocations(prev => ({
+                    ...prev,
+                    sender: {
+                      label: opt.formatted_address,
+                      suburb: opt.suburb || '',
+                      state: opt.state || '',
+                      postcode: opt.post_code || '',
+                      country: opt.country || ''
+                    }
+                  }));
                 }}
-                className="[&>div>input]:h-10 [&>div>input]:text-[13px]"
+                errormsg='Please enter an address'
+                label='Sender Location'
+                value={locations.sender?.label}
+                onChange={(value) => {
+                  setLocations(prev => ({
+                    ...prev,
+                    sender: prev.sender ? { ...prev.sender, label: value } : {
+                      label: value,
+                      suburb: '',
+                      state: '',
+                      postcode: '',
+                      country: ''
+                    }
+                  }));
+                }}
+                className='rounded-none'
               />
               <p className="text-[11px] text-slate-400 dark:text-zinc-500 mt-1">Select by suburb or enter postcode to filter</p>
             </div>
             <div className="space-y-0.5">
-              <Label className="text-[13px] font-medium text-slate-600 dark:text-zinc-400">Receiver Location</Label>
-              <AutoComplete
-                placeholder="Start typing suburb or postcode..."
-                options={LOCATION_OPTIONS}
-                onSelect={(val) => {
-                  const opt = LOCATION_OPTIONS.find(o => o.value === val);
-                  if (opt) setLocations(prev => ({ ...prev, receiver: opt }));
+              <PlaceAutocomplete
+                onPlaceSelect={(opt) => {
+                  setLocations(prev => ({
+                    ...prev,
+                    receiver: {
+                      label: opt.formatted_address,
+                      suburb: opt.suburb || '',
+                      state: opt.state || '',
+                      postcode: opt.post_code || '',
+                      country: opt.country || ''
+                    }
+                  }));
                 }}
-                className="[&>div>input]:h-10 [&>div>input]:text-[13px]"
+                errormsg='Please enter an address'
+                label="Receiver Location"
+                value={locations.receiver?.label}
+                onChange={(value) => {
+                  setLocations(prev => ({
+                    ...prev,
+                    receiver: prev.receiver ? { ...prev.receiver, label: value } : {
+                      label: value,
+                      suburb: '',
+                      state: '',
+                      postcode: '',
+                      country: ''
+                    }
+                  }));
+                }}
               />
               <p className="text-[11px] text-slate-400 dark:text-zinc-500 mt-1">Select a suggestion from the dropdown to lock the locality.</p>
             </div>

@@ -10,10 +10,11 @@ import {
 import { FormInput, FormSelect, ValidAddressBadge } from '@/features/orders/components/OrderFormUI';
 import type { AddressData, CreateOrderDialogProps } from '@/features/orders/types';
 import { CustomModel } from '@/components/ui/dialog';
-import AutoComplete from '@/components/common/AutoComplate';
-import { LOCATION_OPTIONS, STATES } from '@/constants';
 import { showToast } from '@/components/ui/custom-toast';
 import { Checkbox } from '@/components/ui/checkbox';
+import { PlaceAutocomplete } from '@/components/common/AutoComplateAddress';
+import { cn } from '@/lib/utils';
+import { STATES } from '@/constants';
 
 // const initialData: AddressData = {
 //   name: '',
@@ -35,7 +36,7 @@ export default function CreateOrderDialog({ onOpenChange, type, open, initialDat
   const [formData, setFormData] = useState<AddressData>(initialData);
   const [isSubmitting, setIsSubmitting] = useState(false);
   // const [isSuccess, setIsSuccess] = useState(false);
-
+  const [activeLookup, setActiveLookup] = useState<string>('address');
   const updateField = (field: keyof AddressData, value: string | boolean | number | string[]) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
   };
@@ -73,8 +74,8 @@ export default function CreateOrderDialog({ onOpenChange, type, open, initialDat
       <div className="flex-1 overflow-y-auto p-4 pt-0 custom-scrollbar">
         <div className="space-y-5 max-w-5xl mx-auto">
 
-          {/* <div className="flex flex-col md:flex-row gap-0"> */}
-          {/* <div className="flex overflow-hidden border border-[#0060fe] shrink-0 h-8">
+          <div className="flex flex-col md:flex-row gap-0">
+            <div className="flex overflow-hidden border border-[#0060fe] shrink-0 h-8">
               <button
                 onClick={() => setActiveLookup('contact')}
                 className={cn(
@@ -93,32 +94,27 @@ export default function CreateOrderDialog({ onOpenChange, type, open, initialDat
               >
                 LOOK UP ADDRESS
               </button>
-            </div> */}
-          <div className="flex-1 relative">
-            <AutoComplete
-              label='Address Information'
-              placeholder="Search suburb or postcode..."
-              options={LOCATION_OPTIONS}
-              defaultValue={formData.address1}
-              onSelect={(val) => {
-                const opt = LOCATION_OPTIONS.find(o => o.value === val);
-                if (opt) {
-                  updateField('address1', opt.label);
+            </div>
+            <div className="flex-1 relative">
+              <PlaceAutocomplete
+                // label="Address Information"
+                // placeholder="Search suburb or postcode..."
+                onPlaceSelect={(opt) => {
+                  updateField('address1', opt.formatted_address);
                   updateField('suburb', opt.suburb);
                   updateField('state', opt.state);
-                  updateField('postcode', opt.postcode);
+                  updateField('postcode', opt.post_code);
                   updateField('country', opt.country);
-                  updateField('street_number', opt.streetNumber);
-                  updateField('street_name', opt.streetName);
-                }
-              }}
-              className="[&>div>input]:h-10 [&>div>input]:text-[13px]"
-              required
-              error={isSubmitting && formData.address1?.trim() === ''}
-              errormsg="Please enter your address"
-            />
+                  updateField('street_name', opt.street_name);
+                  updateField('street_number', opt.street_number);
+                  updateField('street_type', opt.street_type);
+                }}
+                onChange={(value) => updateField('address1', value!)}
+                value={formData.address1}
+                inputClassName='rounded-none'
+              />
+            </div>
           </div>
-          {/* </div> */}
 
           {/* Form Grid */}
           <div className="grid grid-cols-12 gap-x-12 gap-y-6 mt-4">
@@ -134,6 +130,7 @@ export default function CreateOrderDialog({ onOpenChange, type, open, initialDat
                 placeholder="Enter Name"
                 error={isSubmitting && formData.name?.trim() === ''}
                 errormsg="Please enter your name"
+                className='rounded-none'
               />
               <FormInput
                 label="EMAIL"

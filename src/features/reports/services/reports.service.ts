@@ -6,7 +6,8 @@ import type {
     TransactionReport,
     InvoiceReport,
     ParcelReport,
-    PaginatedResponse
+    PaginatedResponse,
+    UploadInvoiceResponse
 } from "../types";
 
 export const reportsService = {
@@ -60,5 +61,27 @@ export const reportsService = {
 
         const filename = `Parcel_Report_${new Date().getTime()}.${filters.format}`;
         return { blob: response.data, filename };
-    }
+    },
+
+    uploadDirectFreightInvoice: async (file: File): Promise<UploadInvoiceResponse> => {
+        const formData = new FormData();
+        formData.append("direct_freight_invoice", file);
+        const response = await api.post(API_ENDPOINTS.ADMIN_REPORTS.DIRECT_FREIGHT_UPLOAD, formData, {
+            headers: {
+                "Content-Type": "multipart/form-data",
+            },
+        });
+        return response.data;
+    },
+
+    uploadAusPostInvoice: async (file: File): Promise<UploadInvoiceResponse> => {
+        const formData = new FormData();
+        formData.append("auspost_invoice", file);
+        const response = await api.post(API_ENDPOINTS.ADMIN_REPORTS.AUSPOST_UPLOAD, formData, {
+            headers: {
+                "Content-Type": "multipart/form-data",
+            },
+        });
+        return response.data;
+    },
 };

@@ -88,3 +88,14 @@ export interface PaginatedResponse<T> {
     last_page: number;
   };
 }
+
+export interface UploadInvoiceResponse {
+  status: boolean;
+  message: string;
+  data: {
+    total_connotes: number;
+    updated: number;
+    missing: number;
+    missing_list: string[];
+  };
+}

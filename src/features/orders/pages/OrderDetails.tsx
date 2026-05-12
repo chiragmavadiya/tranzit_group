@@ -13,7 +13,7 @@ import { ItemsTable } from '@/features/orders/components/order-details/ItemsTabl
 // import { PackagingTable } from '@/features/orders/components/order-details/PackagingTable'
 import { useOrderItems } from '@/features/orders/hooks/useOrderItems'
 import type { AddressData } from '../types'
-import { useCreateOrder, useOrderDetails } from '../hooks/useOrders'
+import { useCreateOrder, useOrderDetails, useDownloadLabel } from '../hooks/useOrders'
 import { showToast } from '@/components/ui/custom-toast'
 import { Checkbox } from '@/components/ui/checkbox'
 import { DANGEROUS_GOODS_URL, PRIVACY_POLICY_URL, TERMS_CONDITIONS_URL } from '@/constants'
@@ -24,6 +24,7 @@ const OrderDetailsPage: React.FC = () => {
   const { orderType, orderID } = useParams<{ orderType: string, orderID: string }>()
   const { mutate: createOrder, isPending: saveLoading } = useCreateOrder()
   const { data: orderResponse, isLoading: isOrderLoading } = useOrderDetails(orderID || '')
+  const { mutate: downloadLabel, isPending: isDownloadingLabel } = useDownloadLabel()
   const { role } = useAppSelector((state) => state.auth)
   const orderDetail = orderResponse?.data
   const navigate = useNavigate()
@@ -257,6 +258,8 @@ const OrderDetailsPage: React.FC = () => {
           orderID={orderID}
           orderType={orderType}
           onSave={handleOnSave}
+          onDownloadLabel={() => downloadLabel(orderID || '')}
+          isDownloadingLabel={isDownloadingLabel}
           orderDetail={orderDetail!}
           selectedCustomer={selectedCustomer}
           setSelectedCustomer={setSelectedCustomer}

@@ -18,7 +18,7 @@ export const API_ENDPOINTS = {
         DETAILS: (id: string | number) => `/orders/${id}`,
         CANCEL: (id: string | number) => `/customer/orders/${id}/cancel`,
         CONSIGN: (id: string | number) => `/customer/orders/${id}/consign`,
-        LABEL_DOWNLOAD: (id: string | number) => `/customer/orders/${id}/label/download`,
+        LABEL_DOWNLOAD: (id: string | number) => `/orders/${id}/label/download`,
         PAYMENT_INFO: (id: string | number) => `/customer/orders/${id}/payment`,
         PAY_WITH_WALLET: (id: string | number) => `/customer/orders/${id}/pay-with-wallet`,
         WALLET_CHECK: "/customer/orders/wallet-check",
@@ -118,6 +118,8 @@ export const API_ENDPOINTS = {
         AUSPOST_ORDER_SUMMARY: "/admin/reports/auspost-order-summary",
         UNDELIVERED_PARCELS: "/admin/reports/undelivered-parcels",
         UNDELIVERED_PARCELS_EXPORT: "/admin/reports/undelivered-parcels/export",
+        DIRECT_FREIGHT_UPLOAD: "/admin/reports/customer-parcels/direct-freight-upload",
+        AUSPOST_UPLOAD: "/admin/reports/customer-parcels/auspost-upload",
     },
     ADMIN_HELP_CENTER: {
         BASE: "/admin/help-center/articles",
@@ -134,6 +136,10 @@ export const API_ENDPOINTS = {
         GET_CONFIG: "/admin/zoho",
         SAVE_CONFIG: "/admin/zoho/save",
         GET_REDIRECT_URL: "/admin/zoho/redirect",
+    },
+    PROFILE: {
+        UPDATE: "/profile",
+        CHANGE_PASSWORD: "/profile/change-password",
     }
 };
 

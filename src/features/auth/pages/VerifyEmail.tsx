@@ -80,7 +80,7 @@ export default function VerifyEmail() {
         </div>
 
         <div className="flex flex-col space-y-4 pt-2">
-          <Link to="/signin" className="text-sm font-medium text-blue-600 hover:text-blue-500 hover:underline transition-colors">
+          <Link to="/login" className="text-sm font-medium text-blue-600 hover:text-blue-500 hover:underline transition-colors">
             Back to sign in
           </Link>
         </div>

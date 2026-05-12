@@ -11,15 +11,23 @@ export const TRANSACTION_STATUS_CONFIG = {
 
 export const WALLET_COLUMNS: Column<WalletTransaction>[] = [
   {
-    key: 'type',
+    key: 'transaction_type',
     header: 'TRANSACTION TYPE',
     sortable: true,
     cell: (value: any) => <StatusCell value={value?.toLowerCase()} statusConfig={TRANSACTION_STATUS_CONFIG} />
   },
-  { key: 'amount', header: 'AMOUNT', sortable: true },
+  {
+    key: 'amount',
+    header: 'AMOUNT',
+    sortable: true,
+    cell: (value: any) => {
+      const amount = typeof value === 'number' ? value : parseFloat(String(value).replace(/[^0-9.-]+/g, ""));
+      return <span className="font-semibold text-slate-900 dark:text-zinc-100">${amount.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>;
+    }
+  },
   { key: 'reason', header: 'REASON', sortable: true },
   { key: 'transaction_id', header: 'TRANSACTION ID', sortable: true },
-  { key: 'date', header: 'TRANSACTION DATE & TIME', sortable: true },
+  { key: 'transaction_date_time', header: 'TRANSACTION DATE & TIME', sortable: true },
   {
     key: 'receipt',
     header: 'PAYMENT RECEIPT',
@@ -52,16 +60,6 @@ export const ADMIN_TOPUP_COLUMNS: Column<any>[] = [
   { key: 'date', header: 'TRANSACTION DATE & TIME', sortable: true, noPrint: true },
 ];
 
-export const MOCK_TRANSACTIONS: WalletTransaction[] = [
-  { id: '1', type: 'Credit', amount: '$8.64', reason: 'Wallet Topup', transaction_id: 'pi_3Sk1r7BUIF6mLDI12f2a4f20', date: '30 Dec 2025, 5:46 PM' },
-  { id: '2', type: 'Credit', amount: '$1000.00', reason: 'Wallet Topup', transaction_id: 'pi_3Ski36BUIF6mLDI10CAAloPo', date: '01 Jan 2026, 2:50 PM' },
-  { id: '3', type: 'Credit', amount: '$65.00', reason: 'Tet enter', transaction_id: '-', date: '19 Jan 2026, 10:15 AM' },
-  { id: '4', type: 'Credit', amount: '$78.00', reason: 'Wallet Topup', transaction_id: 'pi_3SrDXFBUIf6mLDll0v9l4BbL', date: '19 Jan 2026, 1:40 PM' },
-  { id: '5', type: 'Credit', amount: '$10.00', reason: 'Wallet Topup', transaction_id: 'pi_3SrXulBUIF6mLDI10TWD8FxD', date: '20 Jan 2026, 11:25 AM' },
-  { id: '6', type: 'Credit', amount: '$500.00', reason: 'Wallet Topup', transaction_id: 'pi_3SrZS0BUIF6mLDI11nFcl2jr', date: '20 Jan 2026, 1:04 PM' },
-  { id: '7', type: 'Credit', amount: '$150.00', reason: 'Wallet Topup', transaction_id: 'pi_3SrtbhBUIF6mLDI113JgAmkf', date: '21 Jan 2026, 10:35 AM' },
-];
-
 export const ADMIN_MOCK_TRANSACTIONS = [
   { id: '1', customer_name: 'Ashish Tukadiya', type: 'Credit', amount: '$95.26', reason: 'Wallet Topup', transaction_id: 'pi_3SuvdNBUIf6mLDll15s9iRuU', date: '29 Jan 2026, 7:21 PM' },
   { id: '2', customer_name: 'Ashish Tukadiya', type: 'Debit', amount: '$95.26', reason: 'Consignment 01KG50BQFH4TJKTFEZB4ASCGY8', transaction_id: '-', date: '29 Jan 2026, 7:21 PM' },
@@ -73,8 +71,9 @@ export const ADMIN_MOCK_TRANSACTIONS = [
 
 export const TRANSACTION_TYPES = [
   { value: 'all', label: 'All Transactions' },
-  { value: 'credit', label: 'Credit' },
-  { value: 'debit', label: 'Debit' },
+  { value: '1', label: 'Credit' },
+  { value: '2', label: 'Debit' },
+  { value: '3', label: 'Refund' },
 ];
 
 export const TOP_UP_COLUMNS: Column<any>[] = [

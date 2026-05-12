@@ -1,10 +1,11 @@
 import { useCallback } from 'react';
-import { Calendar as CalendarIcon } from 'lucide-react';
-import { format } from 'date-fns';
+// import { Calendar as CalendarIcon } from 'lucide-react';
+// import { format } from 'date-fns';
 import { Button } from '@/components/ui/button';
-import { Calendar } from '@/components/ui/calendar';
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-import { cn } from '@/lib/utils';
+// import { Calendar } from '@/components/ui/calendar';
+// import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+// import { cn } from '@/lib/utils';
+import DatePicker from '@/components/common/DatePicker';
 
 interface ReportsHeaderProps {
   onApply: (startDate: Date | undefined, endDate: Date | undefined) => void;
@@ -25,9 +26,9 @@ export function ReportsHeader({ onApply, startDate, endDate, setStartDate, setEn
   return (
     <div className="flex justify-between gap-6 p-6 border-b border-gray-100 dark:border-zinc-800 bg-white dark:bg-zinc-950 rounded-t-lg">
       <div className="flex flex-col items-start justify-between">
-        <h1 className="text-xl font-bold text-gray-900 dark:text-white">Reports</h1>
+        <h1 className="my-0 text-xl font-bold text-gray-900 dark:text-white">Reports</h1>
         {startDate && endDate && (
-          <div className="mb-4 text-[13px] text-gray-500 dark:text-zinc-400">
+          <div className="mb-0 text-[13px] text-gray-500 dark:text-zinc-400">
             Parcels generated from <span className="font-semibold text-gray-900 dark:text-zinc-200">{startDate.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}</span> to <span className="font-semibold text-gray-900 dark:text-zinc-200">{endDate.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}</span>
           </div>
         )}
@@ -35,8 +36,8 @@ export function ReportsHeader({ onApply, startDate, endDate, setStartDate, setEn
 
       <div className="flex flex-wrap items-end gap-4">
         <div className="flex flex-col">
-          <label className="text-[13px] font-semibold text-gray-500 dark:text-zinc-400 ml-0.5">Start Date</label>
-          <Popover>
+          {/* <label className="text-[13px] font-semibold text-gray-500 dark:text-zinc-400 ml-0.5">Start Date</label> */}
+          {/* <Popover>
             <PopoverTrigger>
               <Button
                 variant="outline"
@@ -56,11 +57,17 @@ export function ReportsHeader({ onApply, startDate, endDate, setStartDate, setEn
                 onSelect={(date) => date instanceof Date && setStartDate(date)}
               />
             </PopoverContent>
-          </Popover>
+          </Popover> */}
+          <DatePicker
+            label="Start Date"
+            date={startDate}
+            setDate={setStartDate}
+            className="w-[180px]"
+          />
         </div>
 
         <div className="flex flex-col">
-          <label className="text-[13px] font-semibold text-gray-500 dark:text-zinc-400 ml-0.5">End Date</label>
+          {/* <label className="text-[13px] font-semibold text-gray-500 dark:text-zinc-400 ml-0.5">End Date</label>
           <Popover>
             <PopoverTrigger>
               <Button
@@ -82,7 +89,13 @@ export function ReportsHeader({ onApply, startDate, endDate, setStartDate, setEn
                 className='z-50'
               />
             </PopoverContent>
-          </Popover>
+          </Popover> */}
+          <DatePicker
+            label="End Date"
+            date={endDate}
+            setDate={setEndDate}
+            className="w-[180px]"
+          />
         </div>
 
         <Button

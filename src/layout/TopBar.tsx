@@ -44,7 +44,7 @@ export default function TopBar({ isCollapsed }: { isCollapsed?: boolean }) {
       onSuccess: () => {
         localStorage.clear();
         dispatch(logout());
-        navigate('/signin');
+        navigate('/login');
       }
     });
   };

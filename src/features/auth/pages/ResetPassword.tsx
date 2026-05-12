@@ -157,7 +157,7 @@ export default function ResetPassword() {
           </Button>
 
           <p className="text-center text-sm font-medium">
-            <Link to="/signin" className="text-blue-600 hover:text-blue-500 hover:underline transition-colors">
+            <Link to="/login" className="text-blue-600 hover:text-blue-500 hover:underline transition-colors">
               Back to sign in
             </Link>
           </p>
@@ -170,7 +170,7 @@ export default function ResetPassword() {
             </p>
           </div>
           <p className="text-center text-sm font-medium">
-            <Link to="/signin" className="text-blue-600 hover:text-blue-500 hover:underline transition-colors">
+            <Link to="/login" className="text-blue-600 hover:text-blue-500 hover:underline transition-colors">
               Back to sign in
             </Link>
           </p>

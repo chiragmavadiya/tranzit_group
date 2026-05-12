@@ -84,7 +84,7 @@ export default function OnboardingPage() {
       onSuccess: () => {
         localStorage.clear();
         dispatch(logout());
-        navigate('/signin');
+        navigate('/login');
       }
     });
   };

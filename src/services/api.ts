@@ -44,7 +44,7 @@ api.interceptors.response.use(
         error.message = message;
 
         // Handle global errors (e.g. 401 Unauthorized)
-        if (error.response?.status === 401) {
+        if (error.response?.status === 401 && error.message !== 'Invalid credentials') {
             localStorage.removeItem("auth_token");
             window.location.href = "/login";
         }

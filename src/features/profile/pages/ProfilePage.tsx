@@ -1,37 +1,73 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { FormInput } from '@/features/orders/components/OrderFormUI';
-import { User, Building, Phone, Mail, Lock, Save } from 'lucide-react';
+import { User, Building, Phone, Mail, Lock, Save, Loader2 } from 'lucide-react';
 import { ChangePasswordDialog } from '../components/ChangePasswordDialog';
-import type { ProfileData } from '../types';
+import type { ProfileData, ChangePasswordData } from '../types';
+import { useUpdateProfile, useChangePassword } from '../hooks/useProfile';
+import { useAppSelector } from '@/hooks/store.hooks';
 
 export default function ProfilePage() {
+  const { user } = useAppSelector((state) => state.auth);
+
   const [profileData, setProfileData] = useState<ProfileData>({
-    businessName: 'Tranzit Group',
-    firstName: 'Super',
-    lastName: 'Admin',
-    mobileNumber: '0423692006',
-    loginEmail: 'admin@gmail.com',
-    personalEmail: 'admin.personal@gmail.com',
-    personalMobile: '0423692006'
+    businessName: '',
+    firstName: '',
+    lastName: '',
+    mobileNumber: '',
+    loginEmail: '',
+    personalEmail: '',
+    personalMobile: ''
   });
+
+  useEffect(() => {
+    if (user) {
+      setProfileData({
+        businessName: user.business_name || 'Tranzit Group',
+        firstName: user.first_name || '',
+        lastName: user.last_name || '',
+        mobileNumber: user.mobile || '',
+        loginEmail: user.email || '',
+        personalEmail: user.personal_email || '',
+        personalMobile: user.personal_mobile || ''
+      });
+    }
+  }, [user]);
+
   const [isPasswordDialogOpen, setIsPasswordDialogOpen] = useState(false);
-  const [submitted, setSubmitted] = useState(false);
+
+  const updateProfileMutation = useUpdateProfile();
+  const changePasswordMutation = useChangePassword();
 
   const handleInputChange = (field: keyof ProfileData, value: string) => {
     setProfileData(prev => ({ ...prev, [field]: value }));
   };
 
   const handleSaveChanges = () => {
-    setSubmitted(true);
-    // Simulate API call
-
-    console.log('Saving profile data:', profileData, submitted);
+    updateProfileMutation.mutate({
+      first_name: profileData.firstName,
+      last_name: profileData.lastName,
+      mobile: profileData.mobileNumber,
+      work_email: profileData.loginEmail,
+      personal_email: profileData.personalEmail,
+      personal_mobile: profileData.personalMobile,
+      // date_of_birth: undefined // Add if needed
+    });
   };
 
-  const handleChangePassword = (data: any) => {
-    console.log('Changing password:', data);
+  const handleChangePassword = (data: ChangePasswordData) => {
+    changePasswordMutation.mutate({
+      current_password: data.currentPassword,
+      new_password: data.newPassword,
+      new_password_confirmation: data.confirmPassword,
+    }, {
+      onSuccess: (response) => {
+        if (response.status) {
+          setIsPasswordDialogOpen(false);
+        }
+      }
+    });
   };
 
   return (
@@ -69,6 +105,7 @@ export default function ProfilePage() {
                 onChange={(val) => handleInputChange('businessName', val)}
                 isFullWidth
                 icon={Building}
+                disabled // Usually business name is not editable here
               />
             </CardContent>
           </Card>
@@ -149,9 +186,14 @@ export default function ProfilePage() {
           <div className="flex justify-end pt-2">
             <Button
               onClick={handleSaveChanges}
+              disabled={updateProfileMutation.isPending}
               className="bg-[#0060FE] hover:bg-blue-700 text-white gap-2 px-8 h-10 text-[13px] font-bold transition-all shadow-md active:scale-[0.98]"
             >
-              <Save className="w-4 h-4" />
+              {updateProfileMutation.isPending ? (
+                <Loader2 className="w-4 h-4 animate-spin" />
+              ) : (
+                <Save className="w-4 h-4" />
+              )}
               Save Changes
             </Button>
           </div>
@@ -190,11 +232,14 @@ export default function ProfilePage() {
         </div>
       </div>
 
-      <ChangePasswordDialog
-        open={isPasswordDialogOpen}
-        onOpenChange={setIsPasswordDialogOpen}
-        onSubmit={handleChangePassword}
-      />
+      {isPasswordDialogOpen && (
+        <ChangePasswordDialog
+          open={isPasswordDialogOpen}
+          onOpenChange={setIsPasswordDialogOpen}
+          onSubmit={handleChangePassword}
+          isLoading={changePasswordMutation.isPending}
+        />
+      )}
     </div>
   );
 }

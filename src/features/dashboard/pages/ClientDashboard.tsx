@@ -43,7 +43,7 @@ export default function ClientDashboard() {
   ];
 
   const columns = [
-    { header: "ORDER NUMBER", key: "order_number" as keyof DashboardOrder, cell: (val: string) => val ? <NavLink replace to={`/orders/${val}`} className="text-blue-600 dark:text-blue-400 cursor-pointer font-bold hover:underline">{val}</NavLink> : '-' },
+    { header: "ORDER NUMBER", key: "order_number" as keyof DashboardOrder, cell: (val: string) => val ? <NavLink replace to={`/orders/edit/${val}`} className="text-blue-600 dark:text-blue-400 cursor-pointer font-bold hover:underline">{val}</NavLink> : '-' },
     { header: "SUBURB", key: "suburb" as keyof DashboardOrder },
     { header: "AMOUNT", key: "amount" as keyof DashboardOrder, cell: (val: unknown) => (typeof val === 'number' ? `$${val.toFixed(2)}` : (val as string)) as React.ReactNode },
     { header: "STATUS", key: "status" as keyof DashboardOrder, cell: (val: unknown) => <StatusBadge status={val as string} /> },

@@ -1,6 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { ordersService } from "@/features/orders/services/orders.api";
 import { QUERY_KEYS } from "@/constants/api.constants";
+import { showToast } from "@/components/ui/custom-toast";
 
 /**
  * Hook to fetch customer orders with filters
@@ -176,5 +177,8 @@ export const useDownloadLabel = () => {
       link.click();
       link.remove();
     },
+    onError: (error: any) => {
+      showToast(error?.message || "Failed to download label", "error")
+    }
   });
 };

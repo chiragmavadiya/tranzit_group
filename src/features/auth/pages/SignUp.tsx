@@ -54,15 +54,12 @@ export default function SignUp() {
       newErrors.confirmPassword = "Passwords do not match";
     }
 
-    if (!data.terms) {
-      newErrors.terms = "Please accept the Privacy Policy and Terms to continue";
-    }
-
     return newErrors;
   }, [data]);
 
   const isValid = useMemo(() => Object.keys(errors).length === 0, [errors]);
 
+  console.log(errors)
   const updateValue = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value, type, checked } = e.target;
     setData((prev) => ({
@@ -76,6 +73,11 @@ export default function SignUp() {
 
     setSubmitted(true);
     if (!isValid) {
+      return;
+    }
+
+    if (!data?.terms) {
+      showToast("Please accept the Privacy Policy and Terms to continue", "error")
       return;
     }
 
@@ -255,7 +257,7 @@ export default function SignUp() {
 
         <p className="text-center text-sm text-slate-600 dark:text-slate-400 pt-3">
           Already have an account?{" "}
-          <Link to="/signin" className="font-bold text-blue-600 hover:text-blue-500 hover:underline transition-colors">
+          <Link to="/login" className="font-bold text-blue-600 hover:text-blue-500 hover:underline transition-colors">
             Sign in instead
           </Link>
         </p>

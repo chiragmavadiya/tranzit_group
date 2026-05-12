@@ -32,7 +32,7 @@ export const Required = () => {
 export const CustomLabel = ({ label, isHorizontal = false, required = false, className }: { label: ReactNode, isHorizontal?: boolean, required?: boolean, className?: string }) => {
   if (!label) return null;
   return (<Label className={cn(
-    "text-[11px] font-extrabold text-slate-700 dark:text-zinc-400 uppercase tracking-wider gap-0 mb-1",
+    "text-[11px] font-extrabold text-slate-700 dark:text-zinc-400 uppercase tracking-wider gap-0 mb-0.5",
     isHorizontal ? "h-fit leading-none" : "ml-0.5",
     className
   )}>
@@ -102,7 +102,8 @@ export const FormInput = memo(React.forwardRef<HTMLInputElement, FormInputProps>
           <button
             type="button"
             onClick={() => setShowPassword(!showPassword)}
-            className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 transition-colors"
+            className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 transition-colors cursor-pointer"
+            tabIndex={-1}
           >
             {showPassword ? (
               <LucideIcons.Eye className="h-4 w-4" />

@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { ArrowLeft, Box, MapPin, Download, Trash2 } from 'lucide-react'
+import { ArrowLeft, Box, MapPin, Download, Trash2, Loader2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 // import { DropdownUI } from '@/features/orders/components/OrderFormUI'
@@ -17,12 +17,23 @@ interface OrderHeaderProps {
   orderID?: string
   orderType?: string
   onSave?: () => void
+  onDownloadLabel?: () => void
+  isDownloadingLabel?: boolean
   orderDetail: OrderDetailData
   selectedCustomer: string
   setSelectedCustomer: React.Dispatch<React.SetStateAction<string>>
 }
 
-export const OrderHeader: React.FC<OrderHeaderProps> = ({ orderID = '4', orderType = 'create', onSave, orderDetail, selectedCustomer, setSelectedCustomer }) => {
+export const OrderHeader: React.FC<OrderHeaderProps> = ({ 
+  orderID = '4', 
+  orderType = 'create', 
+  onSave, 
+  onDownloadLabel,
+  isDownloadingLabel,
+  orderDetail, 
+  selectedCustomer, 
+  setSelectedCustomer 
+}) => {
   const navigate = useNavigate()
   const { role } = useAppSelector((state) => state.auth)
   const [showConfirm, setShowConfirm] = useState(false)
@@ -114,8 +125,13 @@ export const OrderHeader: React.FC<OrderHeaderProps> = ({ orderID = '4', orderTy
 
           {orderType !== 'create' && (
             <>
-              <Button variant="outline" className="flex items-center gap-2 border-gray-200 dark:border-zinc-800 text-gray-700 dark:text-zinc-300 font-bold h-8 px-4 text-xs hover:bg-gray-50 dark:hover:bg-zinc-900 transition-colors">
-                <Download className="h-4 w-4" />
+              <Button 
+                variant="outline" 
+                onClick={onDownloadLabel}
+                disabled={isDownloadingLabel}
+                className="flex items-center gap-2 border-gray-200 dark:border-zinc-800 text-gray-700 dark:text-zinc-300 font-bold h-8 px-4 text-xs hover:bg-gray-50 dark:hover:bg-zinc-900 transition-colors"
+              >
+                {isDownloadingLabel ? <Loader2 className="h-4 w-4 animate-spin" /> : <Download className="h-4 w-4" />}
                 DOWNLOAD LABEL
               </Button>
               <Button variant="outline" className="flex items-center gap-2 border-red-200 dark:border-red-900/30 text-red-600 dark:text-red-400 font-bold h-8 px-4 text-xs hover:bg-red-50 dark:hover:bg-red-950/30 transition-colors">
@@ -149,10 +165,10 @@ export const OrderHeader: React.FC<OrderHeaderProps> = ({ orderID = '4', orderTy
 
 
         <div className="flex items-center gap-1">
-          Created <span className="text-gray-700 dark:text-zinc-300">{orderDetail.created_human}</span>
+          Created <span className="text-gray-700 dark:text-zinc-300">{orderDetail?.created_human}</span>
         </div>
-        <Badge variant="secondary" className={cn("border-none rounded-sm px-2 py-0 h-5 uppercase font-bold", Order_status_styles[orderDetail.status || 'New'])}>
-          {orderDetail.status || 'NEW'}
+        <Badge variant="secondary" className={cn("border-none rounded-sm px-2 py-0 h-5 uppercase font-bold", Order_status_styles[orderDetail?.status || 'New'])}>
+          {orderDetail?.status || 'NEW'}
         </Badge>
       </div>)}
     </div>

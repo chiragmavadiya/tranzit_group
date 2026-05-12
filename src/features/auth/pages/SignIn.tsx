@@ -145,7 +145,7 @@ export default function SignIn({ role = "customer" }: { role?: string }) {
 
         <p className="text-center text-sm text-slate-600 dark:text-slate-400">
           New on our platform?{" "}
-          <Link to="/signup" className="font-semibold text-blue-600 hover:text-blue-500 hover:underline transition-colors">
+          <Link to="/register" className="font-semibold text-blue-600 hover:text-blue-500 hover:underline transition-colors">
             Create an account
           </Link>
         </p>

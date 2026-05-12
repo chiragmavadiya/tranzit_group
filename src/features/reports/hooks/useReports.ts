@@ -97,3 +97,35 @@ export const useExportParcelReport = (isAdmin: boolean = false) => {
     },
   });
 };
+
+export const useUploadDirectFreightInvoice = () => {
+  return useMutation({
+    mutationFn: (file: File) => reportsService.uploadDirectFreightInvoice(file),
+    onSuccess: (response) => {
+      if (response.status) {
+        showToast(response.message || "Direct Freight invoice uploaded successfully", "success");
+      } else {
+        showToast(response.message || "Failed to upload Direct Freight invoice", "error");
+      }
+    },
+    onError: (error: any) => {
+      showToast(error?.response?.data?.message || "An error occurred during upload", "error");
+    },
+  });
+};
+
+export const useUploadAusPostInvoice = () => {
+  return useMutation({
+    mutationFn: (file: File) => reportsService.uploadAusPostInvoice(file),
+    onSuccess: (response) => {
+      if (response.status) {
+        showToast(response.message || "AusPost invoice uploaded successfully", "success");
+      } else {
+        showToast(response.message || "Failed to upload AusPost invoice", "error");
+      }
+    },
+    onError: (error: any) => {
+      showToast(error?.response?.data?.message || "An error occurred during upload", "error");
+    },
+  });
+};

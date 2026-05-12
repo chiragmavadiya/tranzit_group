@@ -9,6 +9,10 @@ export interface User {
     accessToken: string;
     refreshToken: string;
     roles: Roles[];
+    business_name?: string;
+    mobile?: string;
+    personal_email?: string;
+    personal_mobile?: string;
 }
 
 export interface Roles {

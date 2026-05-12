@@ -67,9 +67,9 @@ export const AppRouter = () => {
       <Routes>
         {/* Public Auth Routes (Redirect to dashboard if already logged in) */}
         <Route element={<PublicRoute />}>
-          <Route path="/admin/signin" element={<SignIn role="admin" />} />
-          <Route path="/signin" element={<SignIn role="customer" />} />
-          <Route path="/signup" element={<SignUp />} />
+          <Route path="/admin/login" element={<SignIn role="admin" />} />
+          <Route path="/login" element={<SignIn role="customer" />} />
+          <Route path="/register" element={<SignUp />} />
           <Route path="/forgot-password" element={<ForgotPassword />} />
           <Route path="/reset-password/:token" element={<ResetPassword />} />
           <Route path="/verify-email" element={<VerifyEmail />} />

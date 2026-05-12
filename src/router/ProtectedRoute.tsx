@@ -6,7 +6,7 @@ export default function ProtectedRoute({ role: requiredRole }: { role: string })
 
   // If the user isn't authenticated, redirect to the signin page
   if (!isAuthenticated) {
-    return <Navigate to="/signin" replace />;
+    return <Navigate to="/login" replace />;
   }
 
   // If the component requires a specific role and the user doesn't have it

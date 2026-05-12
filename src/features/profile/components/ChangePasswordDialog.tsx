@@ -8,9 +8,10 @@ interface ChangePasswordDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onSubmit: (data: ChangePasswordData) => void;
+  isLoading?: boolean;
 }
 
-export function ChangePasswordDialog({ open, onOpenChange, onSubmit }: ChangePasswordDialogProps) {
+export function ChangePasswordDialog({ open, onOpenChange, onSubmit, isLoading }: ChangePasswordDialogProps) {
   const [formData, setFormData] = useState<ChangePasswordData>({
     currentPassword: '',
     newPassword: '',
@@ -32,7 +33,6 @@ export function ChangePasswordDialog({ open, onOpenChange, onSubmit }: ChangePas
     if (formData.newPassword !== formData.confirmPassword) return;
 
     onSubmit(formData);
-    onOpenChange(false);
   };
 
   const passwordMismatch = submitted && formData.newPassword !== formData.confirmPassword;
@@ -46,6 +46,7 @@ export function ChangePasswordDialog({ open, onOpenChange, onSubmit }: ChangePas
       onCancel={() => onOpenChange(false)}
       submitText="Save"
       contentClass="sm:max-w-[450px]"
+      isLoading={isLoading}
     >
       <form ref={formRef} onSubmit={handleSubmit} className="space-y-4 py-4">
         <FormInput

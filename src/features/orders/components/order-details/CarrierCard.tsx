@@ -28,8 +28,14 @@ export const CarrierCard: React.FC<CarrierCardProps> = (props) => {
   const [bestDeal, setBestDeal] = useState<string>('');
 
   const { mutate: getServices, isPending: loading } = useGetQuoteServices(role);
+
+  const getAddress = (
+    location: { address1?: string; address?: string; label?: string }
+  ) => {
+    return location.address1 || location.address || location.label || "";
+  };
   useEffect(() => {
-    if (orderType !== 'create') return;
+    if (orderType !== 'create' && orderType !== 'consign') return;
     // Check if we have valid items with dimensions > 0
     const isValidItems = itemData && itemData.length > 0 && itemData.every(item =>
       Number(item.height) > 0 && Number(item.width) > 0 && Number(item.length) > 0 && Number(item.weight) > 0 && Number(item.quantity) > 0
@@ -40,15 +46,19 @@ export const CarrierCard: React.FC<CarrierCardProps> = (props) => {
     const sender = addresses?.sender;
     const receiver = addresses?.receiver;
 
-    const hasSenderAddress = sender && ('address1' in sender ? Boolean(sender.address1) : Boolean(sender.label));
-    const hasReceiverAddress = receiver && ('address1' in receiver ? Boolean(receiver.address1) : Boolean(receiver.label));
-
-    if (!hasSenderAddress || !hasReceiverAddress) return;
+    const sender_addr1 = getAddress(sender!);
+    const receiver_addr1 = getAddress(receiver!);
+    if (sender_addr1 === '' || receiver_addr1 === '') return;
 
     const timer = setTimeout(() => {
-      const receiver_details = `${receiver.suburb} ${receiver.state} ${receiver.postcode} ${receiver.country || ''}`.trim();
-      const sender_addr1 = 'address1' in sender ? sender.address1 : sender.label;
-      const receiver_addr1 = 'address1' in receiver ? receiver.address1 : receiver.label;
+      const receiver_details = `${receiver!.suburb} ${receiver!.state} ${receiver!.postcode} ${receiver!.country || ''}`.trim();
+
+
+      // const sender_addr1 = getAddress(sender);
+      // const receiver_addr1 = getAddress(receiver);
+      // const sender_addr1 = 'address1' in sender ? (sender.address1 || '') : ('address' in sender ? (sender.address || '') : (sender as QuoteLocation).label || '');
+      // const receiver_addr1 = 'address1' in receiver ? (receiver.address1 || '') : ('address' in receiver ? (receiver.address || '') : (receiver as QuoteLocation).label || '');
+
 
       const payload = {
         items: itemData,
@@ -103,7 +113,7 @@ export const CarrierCard: React.FC<CarrierCardProps> = (props) => {
   }, [selectedServiceId, couriers, surchargesMap, onQuoteChange, setCourierData])
 
   return (
-    <Card className="border shadow-md pt-1 gap-0 border-gray-100 dark:border-zinc-800 rounded-xl overflow-hidden transition-colors duration-300">
+    <Card className="border shadow-md py-1 gap-0 border-gray-100 dark:border-zinc-800 rounded-xl overflow-hidden transition-colors duration-300">
       <CardHeader className="flex flex-row items-center justify-between py-3 px-5 border-b border-gray-100 dark:border-zinc-800 bg-white dark:bg-zinc-900 transition-colors">
         <div className="flex justify-between w-full items-center gap-2">
           <div className='flex items-center gap-2'>
@@ -117,7 +127,7 @@ export const CarrierCard: React.FC<CarrierCardProps> = (props) => {
       </CardHeader>
 
       <CardContent className="p-4 bg-gray-50/50 dark:bg-zinc-950">
-        {orderType !== 'create' && orderDetail ? (
+        {orderType !== 'create' && orderType !== 'consign' && orderDetail ? (
           <div className="flex flex-col gap-3">
             <div className="relative flex flex-col p-4 rounded-xl border border-blue-600 bg-blue-50/50 dark:border-blue-500 dark:bg-blue-900/10 shadow-sm">
               <div className="flex items-center justify-between gap-4">

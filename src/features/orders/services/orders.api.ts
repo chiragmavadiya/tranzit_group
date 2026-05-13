@@ -94,10 +94,11 @@ export const ordersService = {
     /**
      * Consign an order
      */
-    consignOrder: async (orderId: string | number, data: any): Promise<any> => {
-        const response = await api.post(API_ENDPOINTS.ORDERS.CONSIGN(orderId), data);
+    consignOrder: async (orderId: string | number, data: any, isAdmin: boolean = false): Promise<any> => {
+        const response = await api.post(API_ENDPOINTS.ORDERS.CONSIGN(orderId, isAdmin), data);
         return response.data;
     },
+
 
     /**
      * Import orders via CSV

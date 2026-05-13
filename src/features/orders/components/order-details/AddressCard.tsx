@@ -20,6 +20,10 @@ export const AddressCard: React.FC<AddressCardProps> = ({
   editable = false,
   onEditClick,
 }) => {
+  console.log(title,
+    name,
+    address,
+    email, "Address card")
   return (
     <Card className="w-full border ring-0 shadow-md border-gray-200 dark:border-zinc-800 py-2 dark:bg-zinc-950 transition-colors duration-300">
       <CardContent className="flex items-center justify-between p-4 py-0">

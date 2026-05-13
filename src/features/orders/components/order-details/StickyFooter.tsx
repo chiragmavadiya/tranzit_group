@@ -14,7 +14,14 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
 
-export const StickyFooter: React.FC<{ orderType: string | undefined, onSave?: () => void, saveLoading: boolean }> = ({ orderType, onSave, saveLoading }) => {
+interface StickyFooterProps {
+  orderType: string | undefined
+  onSave?: () => void
+  saveLoading: boolean
+  onConsign?: () => void
+}
+
+export const StickyFooter: React.FC<StickyFooterProps> = ({ orderType, onSave, saveLoading, onConsign }) => {
   return (
     <div className="sticky bottom-0 -left-5 right-20 bg-white dark:bg-zinc-950 border-t border-gray-200 dark:border-zinc-800 p-3 flex justify-center items-center gap-3 z-50 shadow-[0_-4px_10px_rgba(0,0,0,0.05)] dark:shadow-[0_-4px_10px_rgba(0,0,0,0.2)] transition-colors duration-300">
       {orderType === 'new' && (
@@ -54,6 +61,17 @@ export const StickyFooter: React.FC<{ orderType: string | undefined, onSave?: ()
         >
           {saveLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
           Save
+        </Button>
+      )}
+      {orderType === 'consign' && (
+        <Button
+          onClick={onConsign}
+          variant="default"
+          disabled={saveLoading}
+          className={`flex items-center gap-2 h-8 px-6 uppercase text-xs font-bold transition-all bg-[#0060FE] hover:bg-blue-700 text-white shadow-sm`}
+        >
+          {saveLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
+          Consign order
         </Button>
       )}
     </div>

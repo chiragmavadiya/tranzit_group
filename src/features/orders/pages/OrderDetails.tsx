@@ -13,7 +13,11 @@ import { ItemsTable } from '@/features/orders/components/order-details/ItemsTabl
 // import { PackagingTable } from '@/features/orders/components/order-details/PackagingTable'
 import { useOrderItems } from '@/features/orders/hooks/useOrderItems'
 import type { AddressData } from '../types'
-import { useCreateOrder, useOrderDetails, useDownloadLabel } from '../hooks/useOrders'
+import { useCreateOrder, useOrderDetails, useDownloadLabel, useWalletCheck, useCancelOrder, useConsignOrder } from '../hooks/useOrders'
+
+
+import WalletCheckDialog from '@/features/orders/components/WalletCheckDialog'
+import type { WalletCheckResponse } from '../types/api.types'
 import { showToast } from '@/components/ui/custom-toast'
 import { Checkbox } from '@/components/ui/checkbox'
 import { DANGEROUS_GOODS_URL, PRIVACY_POLICY_URL, TERMS_CONDITIONS_URL } from '@/constants'
@@ -22,45 +26,59 @@ import { useAppSelector } from '@/hooks/store.hooks'
 
 const OrderDetailsPage: React.FC = () => {
   const { orderType, orderID } = useParams<{ orderType: string, orderID: string }>()
+  const { role, user } = useAppSelector((state) => state.auth)
   const { mutate: createOrder, isPending: saveLoading } = useCreateOrder()
+  const { mutate: checkWallet, isPending: walletLoading } = useWalletCheck()
+  const [walletCheckOpen, setWalletCheckOpen] = useState(false)
+  const [walletCheckData, setWalletCheckData] = useState<WalletCheckResponse | null>(null)
   const { data: orderResponse, isLoading: isOrderLoading } = useOrderDetails(orderID || '')
   const { mutate: downloadLabel, isPending: isDownloadingLabel } = useDownloadLabel()
-  const { role } = useAppSelector((state) => state.auth)
+  const { mutate: cancelOrder, isPending: isCancelling } = useCancelOrder()
+  const { mutate: consignOrder, isPending: isConsigning } = useConsignOrder(role === 'admin')
+
+
+
   const orderDetail = orderResponse?.data
   const navigate = useNavigate()
+  const isEditable = orderType === 'create' || orderType === 'consign'
 
   const [quoteData, setQuoteData] = useState<any>(null);
 
-  const [addressData, setAddressData] = useState<{ sender: AddressData, receiver: AddressData }>({
+
+  const [addressData, setAddressData] = useState<{ sender: AddressData, receiver: AddressData }>(() => ({
     sender: {
-      email: "",
-      phone: "",
-      company: "",
-      address1: "150 Collins Street, Melbourne, VIC, 3000, Australia",
-      suburb: "Melbourne",
-      state: "VIC",
-      street_name: "Collins",
-      street_number: "150",
-      postcode: "3000",
-      country: "Australia",
-      name: "Zack",
+      email: user?.email || "",
+      phone: user?.office_number || "",
+      company: user?.company_name || "",
+      address: user?.addresses[0]?.address || '',
+      address1: user?.addresses[0]?.address || '',
+      suburb: user?.addresses[0]?.suburb || '',
+      state: user?.addresses[0]?.state || '',
+      street_name: user?.addresses[0]?.street_name || '',
+      street_number: user?.addresses[0]?.street_number || '',
+      postcode: user?.addresses[0]?.postcode || '',
+      country: "",
+      unit_number: "",
+      name: user?.first_name + " " + user?.last_name,
       saveToAddressBook: false,
     },
     receiver: {
       email: "",
       phone: "",
       company: "",
+      address: "",
       address1: "",
       suburb: "",
       state: "",
       street_name: "",
+      unit_number: "",
       street_number: "",
       postcode: "",
       country: "",
       name: "",
       saveToAddressBook: false
     }
-  })
+  }))
   const [courierData, setCourierData] = useState<any>(null)
   const initialDialogMode = useMemo(() => {
     if (orderType === 'create' && addressData.receiver.address1 === '') {
@@ -97,6 +115,12 @@ const OrderDetailsPage: React.FC = () => {
     }
   ])
 
+  const isValidConsineOrder = useCallback((orderStatus: string | undefined) => {
+    if (orderStatus !== 'new') {
+      navigate(`${role === 'admin' ? '/admin' : ''}/orders/edit/${orderID}`)
+    }
+  }, [role, orderID, navigate])
+
   useEffect(() => {
     if (orderDetail && orderType !== 'create') {
       setAddressData({
@@ -104,13 +128,14 @@ const OrderDetailsPage: React.FC = () => {
           name: orderDetail.sender_details?.name || "",
           email: orderDetail.sender_details?.email || "",
           phone: orderDetail.sender_details?.mobile || "",
-          address1: orderDetail.sender_details?.address || "",
-          company: "",
-          suburb: "",
-          state: "",
-          street_name: "",
-          street_number: "",
-          postcode: "",
+          address1: orderDetail.sender_details?.address_detail?.address_line || "",
+          address: orderDetail.sender_details?.address || "",
+          company: orderDetail.sender_details?.company || "",
+          suburb: orderDetail.sender_details?.address_detail?.suburb || "",
+          state: orderDetail.sender_details?.address_detail?.state || "",
+          street_name: orderDetail.sender_details?.address_detail?.street_name || "",
+          street_number: orderDetail.sender_details?.address_detail?.street_number || "",
+          postcode: orderDetail.sender_details?.address_detail?.postcode || "",
           country: "Australia",
           saveToAddressBook: false,
         },
@@ -118,13 +143,14 @@ const OrderDetailsPage: React.FC = () => {
           name: orderDetail.receiver_details?.name || "",
           email: orderDetail.receiver_details?.email || "",
           phone: orderDetail.receiver_details?.mobile || "",
-          address1: orderDetail.receiver_details?.address || "",
-          company: "",
-          suburb: "",
-          state: "",
-          street_name: "",
-          street_number: "",
-          postcode: "",
+          address1: orderDetail.receiver_details?.address_detail?.address_line || "",
+          address: orderDetail.receiver_details?.address || "",
+          company: orderDetail.receiver_details?.company || "",
+          suburb: orderDetail.receiver_details?.address_detail?.suburb || "",
+          state: orderDetail.receiver_details?.address_detail?.state || "",
+          street_name: orderDetail.receiver_details?.address_detail?.street_name || "",
+          street_number: orderDetail.receiver_details?.address_detail?.street_number || "",
+          postcode: orderDetail.receiver_details?.address_detail?.postcode || "",
           country: "Australia",
           saveToAddressBook: false
         }
@@ -141,10 +167,10 @@ const OrderDetailsPage: React.FC = () => {
       setDeliveryInstructions(orderDetail.delivery_instructions || "")
       setInsuranceSelected(orderDetail.limited_liability_cover?.covered || false)
       setCourierData(orderDetail.courier_details)
-      console.log(orderDetail, 'orderDetail')
       setQuoteData(orderDetail.order_details)
+      isValidConsineOrder(orderDetail.order_status_category)
     }
-  }, [orderDetail, orderType, setItemsData])
+  }, [isValidConsineOrder, orderDetail, orderType, setItemsData])
 
   const handleAddressSubmit = useCallback((type: "sender" | "receiver", data: AddressData) => {
     setAddressData(prev => ({ ...prev, [type]: data }))
@@ -185,7 +211,7 @@ const OrderDetailsPage: React.FC = () => {
     return { totalItems, totalWeight, volumetric, servicePrice, gst, totalSurcharges, insuranceCost, grandTotal, insurance: insuranceSelected }
   }, [itemsData, quoteData, insuranceSelected])
 
-  const handleOnSave = useCallback(() => {
+  const handleOnSave = useCallback((skipWalletCheckArg?: any) => {
     const isValidItems = itemsData && itemsData.length > 0 && itemsData.every(item =>
       Number(item.height) > 0 && Number(item.width) > 0 && Number(item.length) > 0 && Number(item.weight) > 0 && Number(item.quantity) > 0
     );
@@ -220,20 +246,129 @@ const OrderDetailsPage: React.FC = () => {
         total: quoteData?.courier.price || 0,
         freight_levy: quoteData?.courier.freight_levy || 0,
       },
+      // capture: walletCheckData ? walletCheckData?.wallet_balance > calculation.grandTotal : false,
       capture: false,
       save_address: addressData?.receiver?.saveToAddressBook ? 1 : 0,
       customer_id: selectedCustomer || undefined
     }
-    createOrder(payload, {
-      onSuccess: (response) => {
-        showToast('Orders Created successfully', "success");
-        navigate(`${role === 'admin' ? '/admin' : ''}/orders/edit/${response.order_number}`)
+
+    const executeCreateOrder = () => {
+      createOrder(payload, {
+        onSuccess: (response) => {
+          showToast('Orders Created successfully', "success");
+          navigate(`${role === 'admin' ? '/admin' : ''}/orders/edit/${response.order_number}`)
+          setWalletCheckOpen(false)
+        },
+        onError: (error: any) => {
+          showToast(error?.response?.data?.message || 'Failed to create orders', "error");
+        }
+      });
+    }
+
+    if (skipWalletCheckArg === true) {
+      executeCreateOrder()
+      return
+    }
+
+    checkWallet(calculation.grandTotal, {
+      onSuccess: (res) => {
+        if (res.ok) {
+          setWalletCheckData(res)
+          setWalletCheckOpen(true)
+        } else {
+          executeCreateOrder()
+        }
       },
-      onError: (error: any) => {
-        showToast(error?.response?.data?.message || 'Failed to create orders', "error");
+      onError: (err) => {
+        console.error("Wallet check failed:", err)
+        // executeCreateOrder()
       }
-    });
-  }, [createOrder, addressData, itemsData, insuranceSelected, signatureSelected, deliveryInstructions, termsAccepted, quoteData, courierData, pickupDate, navigate, ratesAccepted, dangerousGoodsAccepted, role, selectedCustomer])
+    })
+  }, [createOrder, checkWallet, addressData, itemsData, insuranceSelected, signatureSelected, deliveryInstructions, termsAccepted, quoteData, courierData, pickupDate, navigate, ratesAccepted, dangerousGoodsAccepted, role, selectedCustomer, calculation.grandTotal])
+
+  const onCancelOrder = useCallback(() => {
+    if (orderID) {
+      cancelOrder(orderID, {
+        onSuccess: () => {
+          showToast('Order cancelled successfully', "success");
+          navigate(`${role === 'admin' ? '/admin' : ''}/orders`)
+        },
+
+        onError: (error: any) => {
+          showToast(error?.response?.data?.message || 'Failed to cancel order', "error");
+        }
+      })
+    }
+  }, [orderID, cancelOrder, navigate, role])
+
+  const handleConsign = useCallback(() => {
+    if (!termsAccepted || !ratesAccepted || !dangerousGoodsAccepted) {
+      showToast('You must accept all Terms & Conditions, Dangerous Goods, and Futile Pickup declarations.', "error");
+      return;
+    }
+
+    const payload = {
+      customer_id: selectedCustomer || orderDetail?.sender_details?.customer_id,
+      sender: {
+        name: addressData.sender.name,
+        company: addressData.sender.company,
+        phone: addressData.sender.phone,
+        email: addressData.sender.email,
+        address1: addressData.sender.address1,
+        suburb: addressData.sender.suburb,
+        state: addressData.sender.state,
+        postcode: addressData.sender.postcode,
+        country: addressData.sender.country || 'AU'
+      },
+      receiver: {
+        name: addressData.receiver.name,
+        company: addressData.receiver.company,
+        phone: addressData.receiver.phone,
+        email: addressData.receiver.email,
+        address1: addressData.receiver.address1,
+        suburb: addressData.receiver.suburb,
+        state: addressData.receiver.state,
+        postcode: addressData.receiver.postcode,
+        country: addressData.receiver.country || 'AU'
+      },
+      parcels: itemsData.map(item => ({
+        type: item.type,
+        quantity: item.quantity,
+        weight: item.weight,
+        length: item.length,
+        width: item.width,
+        height: item.height
+      })),
+      service: {
+        ...courierData,
+        cover_limited_liability: insuranceSelected ? 1 : 0,
+        signature_required: signatureSelected ? 1 : 0,
+      },
+      surcharges: [],
+      delivery_instructions: deliveryInstructions,
+      pickup_date: pickupDate ? format(pickupDate, 'yyyy-MM-dd') : '',
+      terms_and_conditions: termsAccepted,
+      totals: {
+        subtotal: quoteData?.courier?.base || calculation.servicePrice,
+        gst: quoteData?.courier?.gst || calculation.gst,
+        total: quoteData?.courier?.price || calculation.grandTotal
+      },
+      capture: true
+    }
+
+    if (orderID) {
+      consignOrder({ orderId: orderID, data: payload }, {
+        onSuccess: () => {
+          showToast('Order consigned successfully', "success");
+          navigate(`${role === 'admin' ? '/admin' : ''}/orders/edit/${orderID}`);
+        },
+        onError: (error: any) => {
+          showToast(error?.response?.data?.message || 'Failed to consign order', "error");
+        }
+      })
+    }
+  }, [orderID, consignOrder, addressData, itemsData, courierData, insuranceSelected, signatureSelected, deliveryInstructions, pickupDate, termsAccepted, quoteData, calculation, selectedCustomer, orderDetail, navigate, role, ratesAccepted, dangerousGoodsAccepted])
+
 
   if (isOrderLoading && orderType !== 'create') {
     return (
@@ -263,24 +398,31 @@ const OrderDetailsPage: React.FC = () => {
           orderDetail={orderDetail!}
           selectedCustomer={selectedCustomer}
           setSelectedCustomer={setSelectedCustomer}
+          onCancelOrder={onCancelOrder}
+          isCancelling={isCancelling}
+
+          isConsigning={isConsigning}
         />
+
+
         <main className="mt-3">
           <div className="grid grid-cols-1 xl:grid-cols-[1fr_380px] gap-6 items-start">
             <div className="flex flex-col gap-3 overflow-hidden">
               <AddressCard
                 title="SENDER"
                 name={addressData.sender.name}
-                address={addressData.sender.address1}
+                address={addressData.sender.address || ''}
                 email={addressData.sender.email}
-                editable={orderType === 'create'}
+                editable={isEditable}
                 onEditClick={() => onEditClick('sender')}
               />
 
               <AddressCard
                 title="RECEIVER"
                 name={addressData.receiver.name}
-                address={addressData.receiver.address1}
-                editable={orderType === 'create'}
+                address={addressData.receiver.address || ''}
+                email={addressData.receiver.email}
+                editable={isEditable}
                 onEditClick={() => onEditClick('receiver')}
               />
 
@@ -293,11 +435,6 @@ const OrderDetailsPage: React.FC = () => {
                 orderType={orderType}
               />
 
-              {/* <PackagingTable
-                data={packagingData}
-                onUpdate={updatePackaging}
-              /> */}
-
               <CarrierCard
                 itemData={itemsData}
                 addresses={addressData}
@@ -309,26 +446,7 @@ const OrderDetailsPage: React.FC = () => {
               />
               {orderType !== 'create' && <HistoryCard history={orderDetail?.shipping_activity} />}
 
-              {/* {orderType === 'create' && (
-                <div className="bg-white dark:bg-zinc-950 rounded-xl border border-gray-200 dark:border-zinc-800 p-5 flex flex-col gap-4 shadow-sm transition-colors duration-300">
-                  <h3 className="my-0 text-sm font-bold text-gray-900 dark:text-zinc-100 uppercase tracking-wider">Pickup Details</h3>
-                  <div className="flex flex-col gap-2">
-                    <label className="text-xs font-bold text-gray-700 dark:text-zinc-300">Select Pickup Date</label>
-                    <Input
-                      type="date"
-                      value={pickupDate}
-                      onChange={(e) => setPickupDate(e.target.value)}
-                      min={new Date().toISOString().split('T')[0]}
-                      className={`h-10 text-xs focus-visible:ring-0 focus-visible:border-[#0060FE] dark:focus-visible:border-blue-500 font-medium w-full max-w-[250px] transition-colors shadow-sm ${!pickupDate ? 'border-red-500 bg-red-50 dark:bg-red-900/10' : 'border-gray-200 dark:border-zinc-800'}`}
-                    />
-                    {!pickupDate && (
-                      <span className="text-[10px] font-bold text-red-500 uppercase mt-1">Pickup date is required</span>
-                    )}
-                  </div>
-                </div>
-              )} */}
-
-              {orderType === 'create' && (
+              {isEditable && (
                 <div className="bg-white dark:bg-zinc-950 rounded-xl border border-gray-200 dark:border-zinc-800 p-5 flex flex-col gap-4 shadow-sm transition-colors duration-300">
                   <h3 className="my-0 text-sm font-bold text-gray-900 dark:text-zinc-100 uppercase tracking-wider">Confirm & Continue</h3>
 
@@ -401,7 +519,22 @@ const OrderDetailsPage: React.FC = () => {
           />
         )}
       </div>
-      <StickyFooter orderType={orderType} onSave={handleOnSave} saveLoading={saveLoading} />
+      <StickyFooter
+        orderType={orderType}
+        onSave={handleOnSave}
+        saveLoading={saveLoading || walletLoading}
+        onConsign={handleConsign}
+      />
+      {walletCheckOpen && walletCheckData && (
+        <WalletCheckDialog
+          open={walletCheckOpen}
+          onOpenChange={setWalletCheckOpen}
+          walletBalance={walletCheckData.wallet_balance}
+          orderTotal={calculation.grandTotal}
+          isPending={saveLoading}
+          onConfirm={() => handleOnSave(true)}
+        />
+      )}
     </>
   )
 }

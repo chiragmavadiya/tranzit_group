@@ -17,8 +17,9 @@ export const API_ENDPOINTS = {
         CREATE: "/orders",
         DETAILS: (id: string | number) => `/orders/${id}`,
         CANCEL: (id: string | number) => `/customer/orders/${id}/cancel`,
-        CONSIGN: (id: string | number) => `/customer/orders/${id}/consign`,
+        CONSIGN: (id: string | number, isAdmin: boolean = false) => isAdmin ? `/admin/orders/${id}/consign` : `/customer/orders/${id}/consign`,
         LABEL_DOWNLOAD: (id: string | number) => `/orders/${id}/label/download`,
+
         PAYMENT_INFO: (id: string | number) => `/customer/orders/${id}/payment`,
         PAY_WITH_WALLET: (id: string | number) => `/customer/orders/${id}/pay-with-wallet`,
         WALLET_CHECK: "/customer/orders/wallet-check",

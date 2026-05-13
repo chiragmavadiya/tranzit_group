@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { ArrowLeft, Box, MapPin, Download, Trash2, Loader2 } from 'lucide-react'
+import { ArrowLeft, Box, MapPin, Download, Loader2, PackagePlus, Trash2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 // import { DropdownUI } from '@/features/orders/components/OrderFormUI'
@@ -22,21 +22,35 @@ interface OrderHeaderProps {
   orderDetail: OrderDetailData
   selectedCustomer: string
   setSelectedCustomer: React.Dispatch<React.SetStateAction<string>>
+  onCancelOrder?: () => void
+  isCancelling?: boolean
+  onConsign?: () => void
+  isConsigning?: boolean
 }
 
-export const OrderHeader: React.FC<OrderHeaderProps> = ({ 
-  orderID = '4', 
-  orderType = 'create', 
-  onSave, 
+
+export const OrderHeader: React.FC<OrderHeaderProps> = ({
+  orderID = '4',
+  orderType = 'create',
+  onSave,
   onDownloadLabel,
   isDownloadingLabel,
-  orderDetail, 
-  selectedCustomer, 
-  setSelectedCustomer 
+  orderDetail,
+  selectedCustomer,
+  setSelectedCustomer,
+  onCancelOrder,
+  isCancelling,
+  // onConsign,
+  isConsigning
 }) => {
+
+
+
   const navigate = useNavigate()
   const { role } = useAppSelector((state) => state.auth)
   const [showConfirm, setShowConfirm] = useState(false)
+  const [showCancelModal, setShowCancelModal] = useState(false)
+
 
   const { data: customersData } = useCustomers({ pageSize: 1000 }, role === 'admin');
 
@@ -58,6 +72,10 @@ export const OrderHeader: React.FC<OrderHeaderProps> = ({
     onSave?.()
   }
 
+  const onConsign = () => {
+    const rolePath = role === 'admin' ? '/admin' : ''
+    navigate(`${rolePath}/orders/consign/${orderID}`)
+  }
   return (
     <div className="flex flex-col gap-3 bg-white dark:bg-zinc-950 border-b border-gray-100 dark:border-zinc-800 transition-colors duration-300 pb-3 pt-0 lg:pb-4">
       <ConformationModal
@@ -122,24 +140,100 @@ export const OrderHeader: React.FC<OrderHeaderProps> = ({
               { value: 'delete_order', label: 'Delete order' },
             ]}
           /> */}
+          {orderType !== 'consign' && orderType !== 'create' && orderDetail?.order_status_category === 'new' && (
+            <Button
+              variant="outline"
+              onClick={onConsign}
+              disabled={isConsigning}
+              className="flex items-center gap-2 border-gray-200 dark:border-zinc-800 text-gray-700 dark:text-zinc-300 font-bold h-8 px-4 text-xs hover:bg-gray-50 dark:hover:bg-zinc-900 transition-colors"
+            >
+              {isConsigning ? <Loader2 className="h-4 w-4 animate-spin" /> : <PackagePlus className="h-4 w-4" />}
+              Consign Order
+            </Button>
 
+          )}
           {orderType !== 'create' && (
             <>
-              <Button 
-                variant="outline" 
-                onClick={onDownloadLabel}
-                disabled={isDownloadingLabel}
-                className="flex items-center gap-2 border-gray-200 dark:border-zinc-800 text-gray-700 dark:text-zinc-300 font-bold h-8 px-4 text-xs hover:bg-gray-50 dark:hover:bg-zinc-900 transition-colors"
-              >
-                {isDownloadingLabel ? <Loader2 className="h-4 w-4 animate-spin" /> : <Download className="h-4 w-4" />}
-                DOWNLOAD LABEL
-              </Button>
-              <Button variant="outline" className="flex items-center gap-2 border-red-200 dark:border-red-900/30 text-red-600 dark:text-red-400 font-bold h-8 px-4 text-xs hover:bg-red-50 dark:hover:bg-red-950/30 transition-colors">
-                <Trash2 className="h-4 w-4" />
-                DELETE ORDER
-              </Button>
+              {orderDetail?.order_status_category !== 'new' && (
+                <Button
+                  variant="outline"
+                  onClick={onDownloadLabel}
+                  disabled={isDownloadingLabel}
+                  className="flex items-center gap-2 border-gray-200 dark:border-zinc-800 text-gray-700 dark:text-zinc-300 font-bold h-8 px-4 text-xs hover:bg-gray-50 dark:hover:bg-zinc-900 transition-colors"
+                >
+                  {isDownloadingLabel ? <Loader2 className="h-4 w-4 animate-spin" /> : <Download className="h-4 w-4" />}
+                  DOWNLOAD LABEL
+                </Button>
+              )}
+              {(orderDetail?.order_status_category === 'new' || orderDetail?.order_status_category === 'printed') && (
+                <Button
+                  variant="outline"
+                  onClick={() => setShowCancelModal(true)}
+                  className="flex items-center gap-2 border-red-200 dark:border-red-900/30 text-red-600 dark:text-red-400 font-bold h-8 px-4 text-xs hover:bg-red-50 dark:hover:bg-red-950/30 transition-colors"
+                >
+                  <Trash2 className="h-4 w-4" />
+                  DELETE ORDER
+                </Button>
+              )}
             </>
           )}
+          <ConformationModal
+            open={showCancelModal}
+            onOpenChange={setShowCancelModal}
+            title="Delete Item"
+            description={
+              <div className="space-y-4">
+                <p className="text-sm mb-0">Are you sure you want to cancel this order?</p>
+                <p className="text-sm mb-0"> This action can’t be undone once the cancellation is processed.</p>
+                <div className="my-3 bg-amber-50 dark:bg-amber-900/20 p-3 rounded-lg border border-amber-100 dark:border-amber-900/30">
+                  <p className="mb-0 text-amber-800 dark:text-amber-400 font-semibold text-xs">Important: A $5 cancellation service fee applies to Direct Freight bookings.</p>
+                </div>
+                <div className="space-y-2">
+                  <p className="font-semibold text-sm mb-0">If the cancellation is successful:</p>
+                  <ul className="list-disc list-inside space-y-1 text-sm">
+                    <li>You will receive a confirmation notification from us</li>
+                    <li>$5 will be deducted from your refund amount</li>
+                  </ul>
+                </div>
+                <p className="mb-0 font-medium text-sm">Do you want to proceed with cancelling this order?</p>
+              </div>
+            }
+            onConfirm={() => onCancelOrder?.()}
+            confirmText="Yes, Cancel order"
+            cancelText="No, Keep order"
+            confirmVariant="destructive"
+            loading={isCancelling}
+            className="max-w-[440px] sm:max-w-[500px]"
+          />
+
+          {/* <ConformationModal
+            open={showCancelModal}
+            onOpenChange={setShowCancelModal}
+            title="Cancel this order?"
+            description={
+              <div className="space-y-4">
+                <p className="text-sm">Are you sure you want to cancel this order?</p>
+                <p className="text-sm"> This action can’t be undone once the cancellation is processed.</p>
+                <div className="bg-amber-50 dark:bg-amber-900/20 p-3 rounded-lg border border-amber-100 dark:border-amber-900/30">
+                  <p className="text-amber-800 dark:text-amber-400 font-semibold text-xs">Important: A $5 cancellation service fee applies to Direct Freight bookings.</p>
+                </div>
+                <div className="space-y-2">
+                  <p className="font-semibold text-sm">If the cancellation is successful:</p>
+                  <ul className="list-disc list-inside space-y-1 text-sm">
+                    <li>You will receive a confirmation notification from us</li>
+                    <li>$5 will be deducted from your refund amount</li>
+                  </ul>
+                </div>
+                <p className="font-medium text-sm">Do you want to proceed with cancelling this order?</p>
+              </div>
+            }
+            onConfirm={() => onCancelOrder?.()}
+            confirmText="YES, CANCEL ORDER"
+            cancelText="NO, KEEP ORDER"
+            confirmVariant="destructive"
+            loading={isCancelling}
+          /> */}
+
 
           {role === 'admin' && (
             <FormSelect

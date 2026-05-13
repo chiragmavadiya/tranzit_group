@@ -43,12 +43,11 @@ export default function CreateOrderDialog({ onOpenChange, type, open, initialDat
 
   const handleSubmit = async () => {
     setIsSubmitting(true);
-    const { address1, country, name, postcode, state, street_name, street_number, suburb } = formData;
-    if (!name || !address1 || !street_number || !street_name || !suburb || !state || !postcode || !country) {
+    const { address1, country, name, postcode, state, street_name, street_number, suburb, phone, email } = formData;
+    if (!name || !address1 || !street_number || !street_name || !suburb || !state || !postcode || !country || !phone || !email) {
       showToast("Please fill in all required fields", "error");
       return;
     }
-    console.log(formData, 'formData')
     onSubmit(type!, formData)
     setIsSubmitting(false);
     onOpenChange(false)
@@ -100,7 +99,9 @@ export default function CreateOrderDialog({ onOpenChange, type, open, initialDat
                 // label="Address Information"
                 // placeholder="Search suburb or postcode..."
                 onPlaceSelect={(opt) => {
-                  updateField('address1', opt.formatted_address);
+
+                  updateField('address', opt.formatted_address);
+                  updateField('address1', opt.address1);
                   updateField('suburb', opt.suburb);
                   updateField('state', opt.state);
                   updateField('postcode', opt.post_code);
@@ -109,8 +110,8 @@ export default function CreateOrderDialog({ onOpenChange, type, open, initialDat
                   updateField('street_number', opt.street_number);
                   updateField('street_type', opt.street_type);
                 }}
-                onChange={(value) => updateField('address1', value!)}
-                value={formData.address1}
+                onChange={(value) => updateField('address', value!)}
+                value={formData.address}
                 inputClassName='rounded-none'
               />
             </div>
@@ -138,6 +139,9 @@ export default function CreateOrderDialog({ onOpenChange, type, open, initialDat
                 onChange={val => updateField('email', val)}
                 layout="horizontal"
                 placeholder="Enter Email"
+                required
+                error={isSubmitting && formData.email?.trim() === ''}
+                errormsg="Please enter your email"
               />
               <FormInput
                 label="PHONE"
@@ -145,6 +149,9 @@ export default function CreateOrderDialog({ onOpenChange, type, open, initialDat
                 onChange={val => updateField('phone', val)}
                 layout="horizontal"
                 placeholder="Enter Phone"
+                required
+                error={isSubmitting && formData.phone?.trim() === ''}
+                errormsg="Please enter your phone"
               />
               <div className="space-y-4">
                 <FormInput
@@ -189,6 +196,13 @@ export default function CreateOrderDialog({ onOpenChange, type, open, initialDat
 
             {/* Right Column */}
             <div className="col-span-12 md:col-span-6 space-y-2">
+              <FormInput
+                label="UNIT NUMBER"
+                value={formData.unit_number}
+                onChange={val => updateField('unit_number', val)}
+                layout="horizontal"
+                placeholder='Enter unit number'
+              />
               <FormInput
                 label="STREET NAME"
                 value={formData.street_name}

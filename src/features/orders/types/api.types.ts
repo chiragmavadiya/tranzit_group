@@ -4,7 +4,8 @@ export interface CreateOrderRequest {
         company?: string;
         phone: string;
         email: string;
-        address1: string;
+        address1?: string | undefined;
+        address?: string | undefined;
         suburb: string;
         state: string;
         postcode: string;
@@ -17,7 +18,8 @@ export interface CreateOrderRequest {
         company?: string;
         phone: string;
         email: string;
-        address1: string;
+        address1?: string | undefined;
+        address?: string | undefined;
         suburb: string;
         state: string;
         postcode: string;

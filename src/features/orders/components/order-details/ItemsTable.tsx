@@ -37,9 +37,9 @@ export const ItemsTable: React.FC<ItemsTableProps> = ({
   orderType = "create"
 }) => {
   // const { orderType } = useParams<{ orderType?: string }>()
-  const isReadOnly = orderType !== 'create'
+  const isEditable = orderType === 'create' || orderType === 'consign'
 
-  const { data: itemsResponse } = useItems({ per_page: 100 }, !isReadOnly)
+  const { data: itemsResponse } = useItems({ per_page: 100 }, isEditable)
   const predefinedItems = useMemo(() => itemsResponse?.data || [], [itemsResponse])
 
   const predefinedItemsOptions = useMemo(() => {
@@ -77,7 +77,7 @@ export const ItemsTable: React.FC<ItemsTableProps> = ({
               <Box className="w-5 h-5" />
               <h3 className="my-0 text-base font-semibold text-gray-800 dark:text-zinc-100">Items {items.length > 0 && ` (${items.length})`}</h3>
             </div>
-            {!isReadOnly && (
+            {isEditable && (
               <Button
                 variant="outline"
                 size="sm"
@@ -112,7 +112,7 @@ export const ItemsTable: React.FC<ItemsTableProps> = ({
                 <div className="flex flex-col gap-4">
                   {items?.map((item, idx) => (
                     <React.Fragment key={idx}>
-                      {isReadOnly ? (
+                      {!isEditable ? (
                         <div className="flex flex-wrap items-center gap-y-4 gap-x-8 p-4 rounded-xl bg-gray-50/50 dark:bg-zinc-900/30 border border-gray-100 dark:border-zinc-800/50 hover:bg-gray-50 dark:hover:bg-zinc-900/50 transition-all duration-200">
                           {/* Item Type */}
                           <div className="flex items-center gap-3 min-w-[140px]">

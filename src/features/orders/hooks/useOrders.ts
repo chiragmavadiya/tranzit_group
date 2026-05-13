@@ -119,17 +119,18 @@ export const useWalletCheck = () => {
 /**
  * Hook to consign an order
  */
-export const useConsignOrder = () => {
+export const useConsignOrder = (isAdmin: boolean = false) => {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: ({ orderId, data }: { orderId: string | number; data: any }) =>
-      ordersService.consignOrder(orderId, data),
+      ordersService.consignOrder(orderId, data, isAdmin),
     onSuccess: (_, { orderId }) => {
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.ORDERS.LIST });
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.ORDERS.DETAILS(orderId) });
     },
   });
 };
+
 
 /**
  * Hook to import orders

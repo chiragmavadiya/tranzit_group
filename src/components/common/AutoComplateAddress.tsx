@@ -6,6 +6,7 @@ import type { FormInputProps } from '@/features/orders/components/types/OrderFor
 // Define the interface for your form data
 export interface AddressData {
     formatted_address: string;
+    address1: string;
     unit_number: string;
     street_number: string;
     street_name: string;
@@ -51,6 +52,7 @@ export const PlaceAutocomplete = ({ onPlaceSelect, ...rest }: PlaceAutocompleteP
             // 2. Map Google components to the fields in image_ed5179.png
             const address: AddressData = {
                 formatted_address: place.formatted_address || '',
+                address1: '',
                 unit_number: '',
                 street_number: '',
                 street_name: '',
@@ -80,6 +82,7 @@ export const PlaceAutocomplete = ({ onPlaceSelect, ...rest }: PlaceAutocompleteP
                 if (types.includes('locality')) address.suburb = value;
                 if (types.includes('administrative_area_level_1')) address.state = component.short_name; // e.g. NSW
                 if (types.includes('postal_code')) address.post_code = value;
+                address.address1 = `${address.street_number} ${address.street_name} ${address.street_type}`;
             });
 
             console.log(address, 'address')

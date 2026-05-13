@@ -130,10 +130,12 @@ export interface AddressData {
   company: string;
   phone: string;
   email: string;
-  address1: string;
+  address1?: string;
+  address?: string;
   suburb: string;
   state: string;
   postcode: string;
+  unit_number?: string;
   country: string;
   street_name: string;
   street_number: string;
@@ -169,6 +171,16 @@ export interface CreateOrderDialogProps {
   onSubmit: (type: "sender" | "receiver", data: AddressData) => void;
   isEdit: boolean;
 }
+
+export interface WalletCheckDialogProps {
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  walletBalance: number;
+  orderTotal: number;
+  onConfirm: () => void;
+  isPending: boolean;
+}
+
 
 export interface PackingColumn {
   key: string

@@ -1,24 +1,74 @@
-export interface User {
+export interface Role {
     id: number;
     name: string;
-    email: string;
-    first_name: string;
-    last_name: string;
-    gender: string;
-    image: string;
-    accessToken: string;
-    refreshToken: string;
-    roles: Roles[];
-    business_name?: string;
-    mobile?: string;
-    personal_email?: string;
-    personal_mobile?: string;
+    guard_name: string;
+    created_at: string;
+    updated_at: string;
+    pivot?: {
+        model_type: string;
+        model_id: number;
+        role_id: number;
+    };
 }
 
-export interface Roles {
+export type Roles = Role;
+
+export interface UserAddress {
     id: number;
-    name: string;
+    addressable_type: string;
+    addressable_id: number;
+    address_type: string;
+    parent_customer_id: number | null;
+    label: string | null;
+    address: string;
+    suburb: string;
+    postcode: string;
+    latitude: string | null;
+    longitude: string | null;
+    unit_number: string;
+    street_number: string;
+    street_name: string;
+    street_type: string;
+    state: string;
+    created_by: number | null;
+    updated_by: number | null;
+    created_at: string;
+    updated_at: string;
+    deleted_at: string | null;
 }
+
+export interface User {
+    id: number;
+    first_name: string;
+    last_name: string;
+    email: string;
+    email_verified_at: string | null;
+    office_number: string | null;
+    personal_email: string | null;
+    personal_mobile: string | null;
+    last_login_at: string | null;
+    last_login_ip: string | null;
+    stripe_customer_id: string | null;
+    status: string;
+    is_onboarded: boolean;
+    created_by: number | null;
+    updated_by: number | null;
+    created_at: string;
+    updated_at: string;
+    deleted_at: string | null;
+    roles: Role[];
+    addresses: UserAddress[];
+    // Compatibility & frontend-specific fields
+    name?: string;
+    gender?: string;
+    image?: string;
+    accessToken?: string;
+    refreshToken?: string;
+    business_name?: string;
+    company_name?: string;
+    mobile?: string;
+}
+
 
 export interface LoginRequest {
     email: string;

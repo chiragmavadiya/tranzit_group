@@ -8,7 +8,7 @@ import {
 // import SelectComponent from '@/components/ui/select'
 // import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
-import { Shield, PenLine, CheckCircle2 } from 'lucide-react'
+import { Shield, PenLine, CheckCircle2, Phone, Info } from 'lucide-react'
 import { Switch } from '@/components/ui/switch'
 import DatePicker from '@/components/common/DatePicker';
 import type { QuoteCalculations } from '@/features/quote/types';
@@ -30,7 +30,7 @@ export const SidePanel: React.FC<SidePanelProps> = ({ calculation, handleOptiona
 
   return (
     <div className="flex flex-col gap-4">
-      <Accordion multiple defaultValue={['notes', 'services', 'summary', 'pickup_date']} className="flex flex-col gap-3">
+      <Accordion multiple defaultValue={['notes', 'services', 'summary', 'pickup_date', "support"]} className="flex flex-col gap-3">
 
         {/* ORDER QUOTATION SUMMARY */}
         <AccordionItem value="summary" className="border border-gray-200 dark:border-zinc-800 rounded-xl bg-white dark:bg-zinc-950 shadow-sm px-5 border-b overflow-hidden transition-colors duration-300 [&>h3]:my-0">
@@ -303,25 +303,32 @@ export const SidePanel: React.FC<SidePanelProps> = ({ calculation, handleOptiona
           </AccordionContent>
         </AccordionItem> */}
 
-        {/* ADDITIONAL DETAILS */}
-        {/* <AccordionItem value="details" className="border border-gray-200 dark:border-zinc-800 rounded-xl bg-white dark:bg-zinc-950 shadow-sm px-5 border-b overflow-hidden transition-colors duration-300 [&>h3]:my-0">
+        {/* SUPPORT & REFERENCE */}
+        <AccordionItem value="support" className="border border-gray-200 dark:border-zinc-800 rounded-xl bg-white dark:bg-zinc-950 shadow-sm px-5 border-b overflow-hidden transition-colors duration-300 [&>h3]:my-0">
           <AccordionTrigger className="hover:no-underline py-3 px-0 [&>svg]:text-[#0060FE] dark:[&>svg]:text-blue-500">
-            <span className="text-sm font-bold text-gray-900 dark:text-zinc-100 tracking-wider">ADDITIONAL DETAILS</span>
+            <span className="text-sm font-bold text-gray-900 dark:text-zinc-100 tracking-wider uppercase">Support & Reference</span>
           </AccordionTrigger>
           <AccordionContent className="flex flex-col gap-4 pb-4 mt-1">
-            <div className="flex justify-between items-center text-[13px]">
-              <span className="text-gray-700 dark:text-zinc-400">Order #</span>
-              <span className="text-gray-700 dark:text-zinc-200">5</span>
+            <div className="flex justify-between items-center text-[13px] p-3 bg-slate-50 dark:bg-zinc-900/50 rounded-lg border border-slate-100 dark:border-zinc-800 transition-colors">
+              <div className="flex items-center gap-2">
+                <Info className="h-4 w-4 text-[#0060FE]" />
+                <span className="text-gray-500 dark:text-zinc-400 font-bold uppercase text-[10px] tracking-widest">Cust Ref</span>
+              </div>
+              <span className="text-gray-900 dark:text-zinc-100 font-bold tracking-tight">SH000099</span>
             </div>
-            <div className="flex justify-between items-center text-[13px]">
-              <span className="text-gray-700 dark:text-zinc-400">Reference</span>
-            </div>
-            <div className="flex justify-between items-center text-[13px]">
-              <span className="text-gray-700 dark:text-zinc-400">Insurance Value</span>
-              <span className="text-gray-700 dark:text-zinc-200">0.00</span>
+
+            <div className="flex flex-col gap-2 p-3 bg-[#0060FE]/5 dark:bg-blue-500/5 rounded-lg border border-[#0060FE]/10 dark:border-blue-500/10 transition-colors">
+              <div className="flex items-center gap-2">
+                <Phone className="h-4 w-4 text-[#0060FE]" />
+                <span className="text-[10px] font-bold text-[#0060FE] dark:text-blue-500 uppercase tracking-widest">Support Hotline</span>
+              </div>
+              <p className="text-sm font-bold text-gray-900 dark:text-zinc-100 my-0!">1300 347 397</p>
+              <p className="text-[11px] text-gray-500 dark:text-zinc-400 font-medium leading-relaxed m-0">
+                For enquiries or online support, contact our dedicated team.
+              </p>
             </div>
           </AccordionContent>
-        </AccordionItem> */}
+        </AccordionItem>
       </Accordion>
     </div>
   )

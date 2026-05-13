@@ -40,18 +40,39 @@ export type OrderDetailData = {
         email: string
         mobile: string
         address: string
+        address_detail: {
+            address_line: string,
+            suburb: string,
+            state: string,
+            postcode: string,
+            country: string,
+            street_name: string,
+            street_number: string,
+        }
+        company?: string,
     }
     receiver_details: {
         name: string
         email: string
         mobile: string
         address: string
+        address_detail: {
+            address_line: string,
+            suburb: string,
+            state: string,
+            postcode: string,
+            country: string,
+            street_name: string,
+            street_number: string,
+        }
+        company?: string,
     }
     limited_liability_cover: {
         covered: boolean
         message: string
     }
     delivery_instructions: string
+    order_status_category: string
     payment_status: string
     status: string
     shipping_activity: ShippingActivity[]

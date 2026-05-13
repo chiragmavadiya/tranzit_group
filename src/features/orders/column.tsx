@@ -3,6 +3,9 @@ import type { Order } from "./types";
 import type { Column } from "@/components/common/types/DataTable.types";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
+import { Eye, PackagePlus } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { CustomTooltip } from "@/components/common/CustomTooltip";
 
 // eslint-disable-next-line react-refresh/only-export-components
 const StatusBadge = ({ status }: { status: string }) => {
@@ -21,7 +24,7 @@ const StatusBadge = ({ status }: { status: string }) => {
   );
 };
 
-export const getOrdersColumns = (role: string = "customer"): Column<Order>[] => [
+export const getOrdersColumns = (role: string = "customer", orderType: string = 'new', navigate: any): Column<Order>[] => [
   {
     header: 'ORDER #',
     key: 'order_number',
@@ -58,4 +61,36 @@ export const getOrdersColumns = (role: string = "customer"): Column<Order>[] => 
   {
     header: 'ORDER DATE', key: 'consignment_date'
   },
+  {
+    header: "",
+    key: "order_number",
+    cell: (value: string) => {
+      if (orderType === "new") {
+        return (
+          <div className="flex gap-2">
+            <CustomTooltip title="Preview Order">
+              <Button
+                onClick={() => navigate(`${role === "admin" ? "/admin/orders/edit" : "/orders/edit"}/${value}`)}
+                variant="ghost"
+                size="sm"
+                className="h-fit w-fit p-0"
+              >
+                <Eye className="h-4 w-4" />
+              </Button>
+            </CustomTooltip>
+            <CustomTooltip title="Consign Order">
+              <Button
+                onClick={() => navigate(`${role === "admin" ? "/admin/orders/consign" : "/orders/consign"}/${value}`)}
+                variant="ghost"
+                size="sm"
+                className="h-fit w-fit p-0"
+              >
+                <PackagePlus className="h-4 w-4" />
+              </Button>
+            </CustomTooltip>
+          </div>
+        )
+      }
+    }
+  }
 ];

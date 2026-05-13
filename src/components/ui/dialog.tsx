@@ -173,12 +173,12 @@ const CustomModel = ({ open, title, description, onOpenChange, children, onSubmi
         className={contentClass || "min-w-xl"}
         tabIndex={undefined}
       >
-        <DialogHeader className="border-b border-gray-100 dark:border-zinc-800">
-          <DialogTitle className="my-0 mb-3 text-xl font-bold text-slate-900 dark:text-zinc-100 italic!">
+        <DialogHeader className="border-b border-gray-100 dark:border-zinc-800 gap-0">
+          <DialogTitle className="my-0 mb-2 text-xl font-bold text-slate-900 dark:text-zinc-100 italic!">
             {title}
           </DialogTitle>
           {description && (
-            <DialogDescription>
+            <DialogDescription className="mb-2">
               {description}
             </DialogDescription>
           )}

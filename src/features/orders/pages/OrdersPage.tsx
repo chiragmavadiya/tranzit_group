@@ -45,7 +45,7 @@ export default function OrdersPage() {
 
   // Fetch orders data
   const { data: ordersData, isLoading } = useOrders(filters);
-  const { data: customersData } = useCustomers({ pageSize: 1000, enabled: isAdmin });
+  const { data: customersData } = useCustomers({ pageSize: 1000 }, isAdmin);
 
   const formattedCustomers = useMemo(() => {
     return customersData?.data?.map((c: any) => ({
@@ -106,7 +106,7 @@ export default function OrdersPage() {
     });
   }, [importOrders]);
 
-  const columns = useMemo(() => getOrdersColumns(role), [role]);
+  const columns = useMemo(() => getOrdersColumns(role, activeTab, navigate), [role, activeTab, navigate]);
 
   return (
     <div className="p-page-padding flex-1 flex flex-col space-y-4 animate-in fade-in slide-in-from-bottom-2 duration-300 h-full overflow-hidden min-h-0 bg-white dark:bg-zinc-950">

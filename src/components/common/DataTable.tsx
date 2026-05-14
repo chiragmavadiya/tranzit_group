@@ -321,7 +321,7 @@ const DataTableComponent = <T extends Record<string, any>>(props: DataTableProps
                   <TableRow
                     key={rowId}
                     className={cn(
-                      "group/row bg-white dark:bg-zinc-950 hover:bg-gray-50 dark:hover:bg-zinc-900 border-b border-gray-100 dark:border-zinc-800 transition-colors",
+                      "group/row bg-white dark:bg-zinc-950 hover:bg-primary/5 dark:hover:bg-primary/10 border-b border-gray-100 dark:border-zinc-800 transition-colors",
                       isSelected && "bg-muted",
                       onRowClick && "cursor-pointer",
                       typeof rowClassName === 'function' ? rowClassName(row, index) : rowClassName

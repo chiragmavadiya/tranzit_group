@@ -1,5 +1,5 @@
 import { cn } from "@/lib/utils";
-import { ShoppingBag, Users, FileText, Tag } from "lucide-react";
+import { ShoppingBag, Users, FileText, Tag, Sparkles } from "lucide-react";
 
 interface AdminWelcomeBannerProps {
   userName: string;
@@ -26,11 +26,28 @@ export function AdminWelcomeBanner({
 }: AdminWelcomeBannerProps) {
   return (
     <div className={cn(
-      "relative overflow-hidden bg-white dark:bg-zinc-950 border border-slate-100 dark:border-zinc-800 rounded-3xl p-6 md:p-8 shadow-sm flex flex-col xl:flex-row items-center justify-between gap-6 transition-all duration-300",
+      "relative overflow-hidden bg-white dark:bg-zinc-950 border border-slate-100 dark:border-zinc-800 rounded-3xl p-6 md:p-8 shadow-xl flex flex-col xl:flex-row items-center justify-between gap-6 transition-all duration-300",
       className
     )}>
+      {/* Animated Background Elements */}
+      <div className="absolute inset-0 overflow-hidden">
+        <div className="absolute top-4 left-4 w-20 h-20 bg-blue-200/30 dark:bg-blue-500/10 rounded-full animate-pulse"></div>
+        <div className="absolute top-4 right-16 w-12 h-12 bg-indigo-200/40 dark:bg-indigo-500/15 rounded-full animate-bounce" style={{ animationDelay: '0.5s' }}></div>
+        <div className="absolute bottom-8 left-1/4 w-16 h-16 bg-cyan-200/30 dark:bg-cyan-500/10 rounded-full animate-pulse" style={{ animationDelay: '1s' }}></div>
+        <div className="absolute bottom-4 right-8 w-8 h-8 bg-purple-200/40 dark:bg-purple-500/15 rounded-full animate-bounce" style={{ animationDelay: '1.5s' }}></div>
+        <Sparkles className="absolute top-6 right-6 w-6 h-6 text-yellow-400/50 animate-spin" style={{ animationDuration: '3s' }} />
+        <Sparkles className="absolute bottom-2 left-2 w-4 h-4 text-pink-400/50 animate-spin" style={{ animationDuration: '4s', animationDelay: '0.5s' }} />
+        {/* Additional Creative Elements */}
+        <div className="absolute top-10 left-125 w-4 h-4 bg-red-400 rounded-full animate-ping" style={{ animationDelay: '2s' }}></div>
+        <div className="absolute inset-0 opacity-10">
+          <svg className="w-full h-full" viewBox="0 0 400 200" xmlns="http://www.w3.org/2000/svg">
+            <path d="M0,100 Q100,50 200,100 T400,100 V200 H0 Z" fill="currentColor" className="text-blue-300 dark:text-blue-700 animate-pulse" style={{ animationDuration: '5s' }} />
+          </svg>
+        </div>
+      </div>
+
       {/* Background Gradients */}
-      <div className="absolute top-0 right-0 w-80 h-80 bg-blue-50/50 dark:bg-blue-900/10 rounded-full -mr-40 -mt-40 blur-3xl opacity-50 pointer-events-none" />
+      <div className="absolute top-0 right-0 w-80 h-80 bg-primary/5 rounded-full -mr-40 -mt-40 blur-3xl opacity-50 pointer-events-none" />
       <div className="absolute bottom-0 left-0 w-60 h-60 bg-purple-50/50 dark:bg-purple-900/10 rounded-full -ml-30 -mb-30 blur-3xl opacity-50 pointer-events-none" />
 
       <div className="relative z-10 flex-1 space-y-3 text-center xl:text-left w-full">
@@ -47,11 +64,11 @@ export function AdminWelcomeBanner({
 
         {/* Heading */}
         <h1 className="text-2xl md:text-3xl font-black text-slate-800 dark:text-white tracking-tight leading-tight">
-          Welcome back, <span className="text-transparent pr-1 bg-clip-text bg-linear-to-r from-blue-600 to-indigo-500 dark:from-blue-400 dark:to-indigo-300 italic!">{userName}</span> 👋
+          Welcome back, <span className="text-transparent pr-1 bg-clip-text bg-linear-to-r from-primary to-primary/80 italic!">{userName}</span> 👋
         </h1>
 
         {/* Subtext */}
-        <p className="text-[14px] font-medium text-slate-500 dark:text-zinc-400 leading-relaxed max-w-lg mx-auto xl:mx-0">
+        <p className="text-[15px] mb-3 md:text-[16px] leading-relaxed font-medium text-slate-600 dark:text-zinc-300 italic animate-in fade-in slide-in-from-bottom-4 duration-1000 max-w-lg mx-auto xl:mx-0">
           Here's what's happening with your business today. You have <span className="font-bold text-slate-900 dark:text-zinc-200">{ordersCount} orders</span> this month and <span className="font-bold text-amber-600 dark:text-amber-400">{pendingInvoicesCount} pending invoices</span> that need attention.
         </p>
       </div>
@@ -67,7 +84,7 @@ export function AdminWelcomeBanner({
               className={cn(
                 "px-4 py-1.5 text-[11px] font-bold rounded-lg transition-all duration-200",
                 activePeriod === key
-                  ? "text-blue-600 dark:text-blue-400 bg-white dark:bg-zinc-800 shadow-sm ring-1 ring-slate-200 dark:ring-zinc-700"
+                  ? "text-primary bg-white dark:bg-zinc-800 shadow-sm ring-1 ring-slate-200 dark:ring-zinc-700"
                   : "text-slate-500 hover:text-slate-700 dark:hover:text-zinc-300"
               )}
             >
@@ -85,8 +102,8 @@ export function AdminWelcomeBanner({
             <span className="text-[13px] font-bold whitespace-nowrap">{ordersCount} Orders</span>
           </div>
 
-          <div className="group flex items-center gap-2.5 px-4 py-2 rounded-2xl bg-blue-50/50 dark:bg-blue-900/10 border border-blue-100 dark:border-blue-800/30 text-blue-700 dark:text-blue-300 transition-all hover:bg-blue-50 dark:hover:bg-blue-900/20 cursor-default shadow-sm hover:shadow-md">
-            <div className="w-8 h-8 rounded-full bg-blue-600 text-white flex items-center justify-center shadow-md shrink-0 group-hover:scale-110 transition-transform">
+          <div className="group flex items-center gap-2.5 px-4 py-2 rounded-2xl bg-primary/5 border border-primary/20 text-primary transition-all hover:bg-primary/10 cursor-default shadow-sm hover:shadow-md">
+            <div className="w-8 h-8 rounded-full bg-primary text-white flex items-center justify-center shadow-md shrink-0 group-hover:scale-110 transition-transform">
               <Users className="w-4 h-4" />
             </div>
             <span className="text-[13px] font-bold whitespace-nowrap">{customersCount} Customers</span>

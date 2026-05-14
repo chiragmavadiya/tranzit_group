@@ -27,7 +27,7 @@ export default function EnquiryPage() {
           <div className="bg-white dark:bg-zinc-950 rounded-xl border border-gray-100 dark:border-zinc-800 shadow-md p-6 overflow-hidden relative">
             {/* Subtle Gradient Decor */}
             <div className="flex items-center gap-3 mb-6">
-              <div className="w-10 h-10 rounded-xl bg-blue-600 flex items-center justify-center text-white shadow-lg shadow-blue-500/20">
+              <div className="w-10 h-10 rounded-xl bg-primary flex items-center justify-center text-white shadow-lg shadow-primary/20">
                 <MessageSquare className="w-5 h-5" />
               </div>
               <div>
@@ -44,7 +44,7 @@ export default function EnquiryPage() {
         <div className="lg:col-span-4 space-y-6">
           <div className="bg-white dark:bg-zinc-950 rounded-xl border border-gray-100 dark:border-zinc-800 shadow-sm p-6">
             <h3 className="text-sm font-bold text-gray-900 dark:text-zinc-100 mb-6 mt-0 flex items-center gap-2">
-              <HelpCircle className="w-4 h-4 text-blue-500" />
+              <HelpCircle className="w-4 h-4 text-primary" />
               Quick Support Info
             </h3>
 
@@ -60,8 +60,8 @@ export default function EnquiryPage() {
               </div>
 
               <div className="flex gap-4">
-                <div className="w-8 h-8 rounded-lg bg-blue-50 dark:bg-blue-900/20 flex items-center justify-center shrink-0">
-                  <ShieldCheck className="w-4 h-4 text-blue-600" />
+                <div className="w-8 h-8 rounded-lg bg-primary/5 dark:bg-primary/10 flex items-center justify-center shrink-0">
+                  <ShieldCheck className="w-4 h-4 text-primary" />
                 </div>
                 <div>
                   <h4 className="text-xs font-semibold text-gray-900 dark:text-zinc-100 mb-1 leading-tight">Priority Support</h4>
@@ -73,13 +73,13 @@ export default function EnquiryPage() {
             <div className="mt-6 pt-6 border-t border-gray-100 dark:border-zinc-800">
               <NavLink
                 to="/help-center"
-                className="flex items-center justify-between p-3 rounded-xl bg-gray-50 dark:bg-zinc-900 group hover:bg-blue-50 dark:hover:bg-blue-900/10 transition-colors"
+                className="flex items-center justify-between p-3 rounded-xl bg-gray-50 dark:bg-zinc-900 group hover:bg-primary/5 dark:hover:bg-primary/10 transition-colors"
               >
                 <div className="flex flex-col">
-                  <span className="text-xs font-bold text-gray-900 dark:text-zinc-100 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors italic">Browse Help Center</span>
+                  <span className="text-xs font-bold text-gray-900 dark:text-zinc-100 group-hover:text-primary transition-colors italic">Browse Help Center</span>
                   <span className="text-[10px] text-gray-500 dark:text-zinc-400">Find instant answers to FAQs</span>
                 </div>
-                <ExternalLink className="w-3 h-3 text-gray-400 group-hover:text-blue-500 transition-colors" />
+                <ExternalLink className="w-3 h-3 text-gray-400 group-hover:text-primary transition-colors" />
               </NavLink>
             </div>
           </div>

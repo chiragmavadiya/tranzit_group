@@ -49,7 +49,7 @@ export const CustomerHeader = ({ customer, onEdit }: CustomerHeaderProps) => {
                 </div>
                 <div className="flex flex-col md:flex-row items-center gap-8 p-4 relative z-10">
                     <div className="relative">
-                        <div className="flex h-18 w-18 items-center justify-center rounded-[1.8rem] bg-gradient-to-br from-blue-500 to-indigo-600 text-2xl font-black text-white shadow-2xl shadow-blue-500/20">
+                        <div className="flex h-18 w-18 items-center justify-center rounded-[1.8rem] bg-primary text-2xl font-black text-white shadow-2xl shadow-primary/20">
                             {fullName.slice(0, 2).toUpperCase()}
                         </div>
                         {customer.is_verified && (

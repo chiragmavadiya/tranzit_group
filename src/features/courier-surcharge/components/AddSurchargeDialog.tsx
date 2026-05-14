@@ -90,7 +90,7 @@ export function AddSurchargeDialog({
       {isFetching && (
         <div className="absolute inset-0 z-50 flex items-center justify-center bg-white/60 dark:bg-zinc-900/60 backdrop-blur-[1px]">
           <div className="flex flex-col items-center gap-2">
-            <Loader2 className="h-8 w-8 text-blue-600 animate-spin" />
+            <Loader2 className="h-8 w-8 text-primary animate-spin" />
             <p className="text-xs font-bold text-slate-500 uppercase tracking-widest">Loading surcharge details...</p>
           </div>
         </div>
@@ -224,7 +224,7 @@ const SurchargeForm = forwardRef<HTMLFormElement, SurchargeFormProps>(
                 id="default_selected"
                 checked={formData.default_selected}
                 onCheckedChange={(checked) => handleChange('default_selected', checked)}
-                className="data-[state=checked]:bg-blue-600 scale-90"
+                className="data-[state=checked]:bg-primary scale-90"
               />
             </div>
 
@@ -234,7 +234,7 @@ const SurchargeForm = forwardRef<HTMLFormElement, SurchargeFormProps>(
                 id="is_auto_apply"
                 checked={formData.is_auto_apply}
                 onCheckedChange={(checked) => handleChange('is_auto_apply', checked)}
-                className="data-[state=checked]:bg-blue-600 scale-90"
+                className="data-[state=checked]:bg-primary scale-90"
               />
             </div>
 
@@ -244,7 +244,7 @@ const SurchargeForm = forwardRef<HTMLFormElement, SurchargeFormProps>(
                 id="is_customer_selectable"
                 checked={formData.is_customer_selectable}
                 onCheckedChange={(checked) => handleChange('is_customer_selectable', checked)}
-                className="data-[state=checked]:bg-blue-600 scale-90"
+                className="data-[state=checked]:bg-primary scale-90"
               />
             </div>
           </div>

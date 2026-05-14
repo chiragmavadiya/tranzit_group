@@ -3,7 +3,6 @@
 import { Button } from "@/components/ui/button";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import brandlogo from '@/assets/Tranzit_Logo.svg';
-import { AuthLayout } from "@/features/auth/components/AuthLayout";
 import { useResendVerification, useVerifyEmail } from "@/features/auth/hooks/useAuth";
 import { useSearchParams } from "react-router-dom";
 import { useEffect } from "react";
@@ -54,37 +53,37 @@ export default function VerifyEmail() {
   };
 
   return (
-    <AuthLayout>
-      <div className="flex flex-col items-center text-center space-y-6 w-sm m-auto">
-        <div className="flex items-center space-x-2">
-          <img src={brandlogo} alt="Logo" className="h-25" />
+    <>
+      <div className="flex flex-col items-center text-center space-y-2 mb-8">
+        <div className="flex items-center space-x-2 pb-2">
+          <img src={brandlogo} alt="Logo" className="h-16 w-auto" />
         </div>
 
-        <div className="space-y-2">
-          <h2 className="text-3xl font-bold tracking-tight text-slate-900 dark:text-white">
-            Verify your email.
-          </h2>
-          <p className="my-0 text-sm text-slate-600 dark:text-slate-400 max-w-xs mx-auto">
-            Account activation link was sent to <span className="font-semibold text-slate-900 dark:text-white">{email}</span>. Please follow the link to continue.
-          </p>
-        </div>
+        <h2 className="text-2xl font-black tracking-tight text-slate-900 dark:text-white">
+          Verify Email
+        </h2>
+        <p className="text-sm font-medium text-slate-500 dark:text-slate-400">
+          Account activation link was sent to <span className="font-bold text-slate-900 dark:text-white">{email}</span>
+        </p>
+      </div>
 
-        <div className="pt-2 w-xs m-auto">
+      <div className="space-y-6 flex flex-col items-center">
+        <div className="w-full">
           <Button
             onClick={handleResend}
             disabled={resendMutation.isPending}
-            className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold h-8 text-sm rounded-md transition-all shadow-md hover:shadow-lg"
+            className="w-full text-white font-bold h-11 text-[13px] rounded-xl bg-primary hover:bg-primary/90 transition-all shadow-lg shadow-primary/20 active:scale-[0.98]"
           >
-            {resendMutation.isPending ? "Sending..." : "Didn't get the email? Resend"}
+            {resendMutation.isPending ? "Resending..." : "Resend Verification Email"}
           </Button>
         </div>
 
-        <div className="flex flex-col space-y-4 pt-2">
-          <Link to="/login" className="text-sm font-medium text-blue-600 hover:text-blue-500 hover:underline transition-colors">
-            Back to sign in
+        <p className="text-center text-[13px] font-medium text-slate-500 dark:text-slate-400">
+          <Link to="/login" className="font-bold text-primary hover:underline underline-offset-4">
+            Back to Sign In
           </Link>
-        </div>
+        </p>
       </div>
-    </AuthLayout>
+    </>
   );
 }

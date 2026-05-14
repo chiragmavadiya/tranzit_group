@@ -45,7 +45,7 @@ export default function ActivityLogPage() {
     const totalItems = activityData?.meta?.total || 0;
 
     const customHeader = useMemo(() => (<Button
-        className="h-8 bg-blue-600 hover:bg-blue-700 dark:bg-blue-600 dark:hover:bg-blue-500 text-white rounded-md shadow-sm shadow-blue-500/20 transition-all"
+        className="h-8 bg-primary hover:bg-primary-hover text-white rounded-md shadow-sm shadow-primary/20 transition-all"
         onClick={() => refetch()}
         disabled={!!isRefetching}
     >
@@ -173,12 +173,6 @@ export default function ActivityLogPage() {
                     </div>
 
                     <div className="lg:col-span-2 content-end ">
-                        {/* <Button
-                            className="w-full h-8 bg-blue-600 hover:bg-blue-700 dark:bg-blue-600 dark:hover:bg-blue-500 text-white rounded-md shadow-sm shadow-blue-500/20 transition-all"
-                            onClick={() => setPage(1)}
-                        >
-                            Refresh Log
-                        </Button> */}
                         <Button
                             onClick={handleReset}
                             variant="ghost"

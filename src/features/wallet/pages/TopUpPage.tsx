@@ -35,14 +35,14 @@ export default function TopUpPage() {
                 <h2 className="text-[11px] font-black text-slate-800 dark:text-zinc-100 uppercase tracking-widest">Account Summary</h2>
               </div>
               <div className="p-4 space-y-4">
-                <div className="p-3 rounded-xl bg-blue-50/50 dark:bg-blue-900/10 border border-blue-100/50 dark:border-blue-900/20 flex flex-col items-center justify-center text-center py-6">
+                <div className="p-3 rounded-xl bg-primary/5 dark:bg-primary/10 border border-primary/20 flex flex-col items-center justify-center text-center py-6">
                   <p className="text-[9px] text-slate-400 uppercase tracking-widest font-black mb-1">Available Balance</p>
-                  <p className="text-3xl font-black text-blue-600 dark:text-blue-400">${walletBalance}</p>
+                  <p className="text-3xl font-black text-primary">${walletBalance}</p>
                 </div>
 
                 <div className="space-y-3">
                   <div className="flex items-center gap-2">
-                    <span className="h-1.5 w-1.5 rounded-full bg-blue-600"></span>
+                    <span className="h-1.5 w-1.5 rounded-full bg-primary"></span>
                     <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Enter Amount</label>
                   </div>
                   <div className="relative group">
@@ -53,13 +53,13 @@ export default function TopUpPage() {
                       type="number"
                       value={amount}
                       onChange={(e) => setAmount(e.target.value)}
-                      className="pl-9 h-10 text-xl font-bold border-slate-200 dark:border-zinc-800 focus-visible:border-blue-500 rounded-lg transition-all bg-white dark:bg-zinc-950"
+                      className="pl-9 h-10 text-xl font-bold border-slate-200 dark:border-zinc-800 focus-visible:border-primary rounded-lg transition-all bg-white dark:bg-zinc-950"
                       placeholder="0.00"
                     />
                   </div>
                   <div className="p-2.5 rounded-lg bg-slate-50 dark:bg-zinc-800/50 border border-slate-100 dark:border-zinc-800">
                     <p className="text-slate-500 dark:text-zinc-400 text-[9px] flex items-center gap-2 font-bold leading-relaxed">
-                      <ShieldCheck className="h-3 w-3 text-blue-600" />
+                      <ShieldCheck className="h-3 w-3 text-primary" />
                       Gateway fee of ${gatewayCharge} will be added.
                     </p>
                   </div>
@@ -67,7 +67,7 @@ export default function TopUpPage() {
               </div>
             </div>
 
-            <div className="bg-blue-600 rounded-xl p-5 text-white shadow-lg shadow-blue-500/20 relative overflow-hidden group">
+            <div className="bg-primary rounded-xl p-5 text-white shadow-lg shadow-primary/20 relative overflow-hidden group">
               <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -mr-16 -mt-16 blur-2xl group-hover:scale-110 transition-transform duration-700"></div>
               <div className="relative">
                 <p className="text-[9px] font-black uppercase tracking-widest opacity-80">Total to Pay</p>
@@ -97,14 +97,14 @@ export default function TopUpPage() {
                         key={card.id}
                         onClick={() => setSelectedCard(card.id)}
                         className={`relative p-4 rounded-xl border-2 transition-all cursor-pointer group ${selectedCard === card.id
-                          ? 'border-blue-500 bg-blue-50/10'
+                          ? 'border-primary bg-primary/5'
                           : 'border-slate-50 dark:border-zinc-800 bg-white dark:bg-zinc-950 hover:border-slate-200 dark:hover:border-zinc-700'
                           }`}
                       >
                         <div className="flex justify-between items-center mb-4">
                           <div className="h-5 px-2 rounded bg-white dark:bg-zinc-800 border border-slate-100 dark:border-zinc-700 flex items-center justify-center shadow-xs">
                             {card.brand === 'visa' ? (
-                              <span className="font-black italic text-[9px] text-blue-800 dark:text-blue-400">VISA</span>
+                              <span className="font-black italic text-[9px] text-primary">VISA</span>
                             ) : (
                               <div className="flex scale-[0.4]">
                                 <div className="h-6 w-6 rounded-full bg-red-500"></div>
@@ -112,14 +112,14 @@ export default function TopUpPage() {
                               </div>
                             )}
                           </div>
-                          <div className={`h-3.5 w-3.5 rounded-full border-2 flex items-center justify-center transition-all ${selectedCard === card.id ? 'bg-blue-600 border-blue-600' : 'border-slate-200 dark:border-zinc-800'
+                          <div className={`h-3.5 w-3.5 rounded-full border-2 flex items-center justify-center transition-all ${selectedCard === card.id ? 'bg-primary border-primary' : 'border-slate-200 dark:border-zinc-800'
                             }`}>
                             {selectedCard === card.id && <ShieldCheck className="h-2 w-2 text-white" />}
                           </div>
                         </div>
 
                         <div>
-                          <p className={`text-xs font-mono font-bold tracking-widest ${selectedCard === card.id ? 'text-blue-900 dark:text-blue-300' : 'text-slate-600 dark:text-zinc-400'}`}>
+                          <p className={`text-xs font-mono font-bold tracking-widest ${selectedCard === card.id ? 'text-primary' : 'text-slate-600 dark:text-zinc-400'}`}>
                             ••••  ••••  ••••  {card.last4}
                           </p>
                           <div className="flex justify-between items-end mt-3">
@@ -166,7 +166,7 @@ export default function TopUpPage() {
 
                   <div className="pt-2">
                     <Button
-                      className="w-full h-10 text-[10px] font-black bg-blue-600 hover:bg-blue-700 text-white rounded-xl transition-all flex items-center justify-center gap-2 shadow-lg shadow-blue-500/10 group"
+                      className="w-full h-10 text-[10px] font-black bg-primary hover:bg-primary-hover text-white rounded-xl transition-all flex items-center justify-center gap-2 shadow-lg shadow-primary/10 group"
                     >
                       <Wallet className="h-3.5 w-3.5 group-hover:scale-110 transition-transform" />
                       Complete Top Up - ${totalAmount}

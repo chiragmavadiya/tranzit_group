@@ -27,7 +27,7 @@ export const ShippingActivity = ({ activity }: { activity: ShippingActivityType[
                         <div key={`${milestone.title}-${milestone.date_time}`} className="relative flex items-start gap-6">
                             <div className={cn(
                                 "z-10 flex h-10 w-10 shrink-0 items-center justify-center rounded-full border-4 border-white shadow-sm ring-1 ring-slate-200 transition-all",
-                                isLast ? "bg-[#0060FE] text-white ring-blue-100" : "bg-white text-slate-400"
+                                isLast ? "bg-primary text-white ring-primary/20" : "bg-white text-slate-400"
                             )}>
                                 {isLast ? (
                                     <PackageCheck className="h-4 w-4" />
@@ -40,7 +40,7 @@ export const ShippingActivity = ({ activity }: { activity: ShippingActivityType[
                             <div className="flex flex-col gap-1">
                                 <p className={cn(
                                     "text-sm font-bold tracking-tight",
-                                    isLast ? "text-[#0060FE]" : "text-slate-900"
+                                    isLast ? "text-primary" : "text-slate-900"
                                 )}>
                                     {milestone.title}
                                 </p>
@@ -52,7 +52,7 @@ export const ShippingActivity = ({ activity }: { activity: ShippingActivityType[
                                         {milestone.date_time}
                                     </span>
                                     {isLast && (
-                                        <Badge variant="secondary" className="h-5 rounded-md bg-blue-50 px-1.5 text-[10px] font-bold uppercase tracking-wider text-blue-600">
+                                        <Badge variant="secondary" className="h-5 rounded-md bg-primary/10 px-1.5 text-[10px] font-bold uppercase tracking-wider text-primary">
                                             Latest
                                         </Badge>
                                     )}

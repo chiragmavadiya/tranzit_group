@@ -72,12 +72,12 @@ export function TransactionList({ transactions, className, loading }: Transactio
 
         <DropdownCustomMenu
           menus={[
-            { label: "Last 28 Days", className: activePeriod == "last28Days" ? "bg-blue-100 text-blue-600 font-medium" : "font-medium", onClick: () => { setActivePeriod('last28Days'); } },
-            { label: "Last month", className: activePeriod == "lastMonth" ? "bg-blue-100 text-blue-600 font-medium" : "font-medium", onClick: () => { setActivePeriod('lastMonth'); } },
-            { label: "Last year", className: activePeriod == "lastYear" ? "bg-blue-100 text-blue-600 font-medium" : "font-medium", onClick: () => { setActivePeriod('lastYear'); } },
+            { label: "Last 28 Days", className: activePeriod == "last28Days" ? "bg-primary/10 text-primary font-medium" : "font-medium", onClick: () => { setActivePeriod('last28Days'); } },
+            { label: "Last month", className: activePeriod == "lastMonth" ? "bg-primary/10 text-primary font-medium" : "font-medium", onClick: () => { setActivePeriod('lastMonth'); } },
+            { label: "Last year", className: activePeriod == "lastYear" ? "bg-primary/10 text-primary font-medium" : "font-medium", onClick: () => { setActivePeriod('lastYear'); } },
           ]}
         >
-          <button className="text-slate-400 hover:text-blue-600 transition-colors outline-none">
+          <button className="text-slate-400 hover:text-primary transition-colors outline-none">
             <MoreVertical className="w-5 h-5" />
           </button>
         </DropdownCustomMenu>
@@ -93,7 +93,7 @@ export function TransactionList({ transactions, className, loading }: Transactio
               <div className="flex items-center gap-3">
                 <div className={cn(
                   "w-10 h-10 rounded-xl flex items-center justify-center transition-transform group-hover:scale-105",
-                  tx.transaction_type === 2 ? "bg-slate-50 dark:bg-zinc-900 text-slate-500" : "bg-blue-50 dark:bg-blue-900/20 text-blue-500"
+                  tx.transaction_type === 2 ? "bg-slate-50 dark:bg-zinc-900 text-slate-500" : "bg-primary/10 text-primary"
                 )}>
                   {tx.transaction_type === 2 ? <Wallet className="w-5 h-5" /> : <Plus className="w-5 h-5" />}
                 </div>

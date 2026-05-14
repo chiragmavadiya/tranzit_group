@@ -16,7 +16,7 @@ export const CustomerTabs = ({ activeTab, onTabChange }: CustomerTabsProps) => {
                     className={cn(
                         "px-5 py-2 text-[11px] font-black uppercase tracking-widest rounded-xl transition-all duration-300",
                         activeTab === tab
-                            ? "bg-blue-100 text-blue-600 shadow-lg dark:bg-zinc-100 dark:text-zinc-950"
+                            ? "bg-primary text-white shadow-lg shadow-primary/20"
                             : "text-slate-400 hover:text-slate-600 dark:text-zinc-500 dark:hover:text-zinc-300"
                     )}
                 >

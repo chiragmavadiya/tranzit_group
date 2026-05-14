@@ -1,5 +1,6 @@
 import { Navigate, Outlet } from 'react-router-dom';
 import { useAppSelector } from '@/hooks/store.hooks';
+import { AuthLayout } from '@/features/auth/components/AuthLayout';
 
 export default function PublicRoute() {
   const { isAuthenticated, role, next_step } = useAppSelector((state) => state.auth);
@@ -13,6 +14,10 @@ export default function PublicRoute() {
     }
   }
 
-  // If the user isn't authenticated, render the children (SignIn, SignUp, etc.)
-  return <Outlet />;
+  // Wrap public routes in the common AuthLayout for persistence and animations
+  return (
+    <AuthLayout>
+      <Outlet />
+    </AuthLayout>
+  );
 }

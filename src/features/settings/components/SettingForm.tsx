@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useSettingDetails, useUpdateSetting } from '../hooks/useSettings';
 import { Loader2, Save, ShieldCheck } from 'lucide-react';
-import { Alert, AlertDescription } from '@/components/ui/alert';
 import { FormInput } from '@/features/orders/components/OrderFormUI';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -74,12 +73,12 @@ const SettingForm = ({ category }: { category: any }) => {
                     onSubmit();
                 }}>
                     <div className="space-y-6 pt-2">
-                        <Alert className="bg-amber-50/50 border-amber-200 dark:bg-amber-900/10 dark:border-amber-900/20 rounded-xl">
+                        <div className="flex items-center p-2 gap-1 border bg-amber-50/50 border-amber-200 dark:bg-amber-900/10 dark:border-amber-900/20 rounded-xl">
                             <ShieldCheck className="h-4 w-4 text-amber-600" />
-                            <AlertDescription className="text-[11px] font-medium text-amber-700 dark:text-amber-400">
+                            <p className="text-[11px] font-medium text-amber-700 dark:text-amber-400 my-0">
                                 This setting contains confidential information. Current values are hidden for security. Entering a new value will overwrite the existing one.
-                            </AlertDescription>
-                        </Alert>
+                            </p>
+                        </div>
 
                         <div className="space-y-5">
                             <div className="grid grid-cols-1 gap-5">
@@ -108,7 +107,7 @@ const SettingForm = ({ category }: { category: any }) => {
 
                         <Button
                             type="submit"
-                            className="bg-[#0060FE] hover:bg-blue-700 text-white min-w-[140px] font-bold"
+                            className="text-white min-w-[140px] font-bold"
                             disabled={isPending}
                         >
                             {isPending ? (

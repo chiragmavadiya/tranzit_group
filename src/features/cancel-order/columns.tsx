@@ -1,7 +1,8 @@
 import type { Column } from '@/components/common/types/DataTable.types';
 import type { CancelOrder } from './types';
+import { NavLink } from 'react-router-dom';
 
-export const CANCEL_ORDER_COLUMNS: Column<CancelOrder>[] = [
+export const getCancelOrderColumns = (role: string): Column<CancelOrder>[] => [
     {
         key: 'customer_name',
         header: 'CUSTOMER NAME',
@@ -16,9 +17,9 @@ export const CANCEL_ORDER_COLUMNS: Column<CancelOrder>[] = [
         key: 'order_number',
         header: 'ORDER NUMBER',
         cell: (val: string) => (
-            <span className="font-bold text-blue-600 dark:text-blue-400 italic underline cursor-pointer">
+            <NavLink to={`${role === "admin" ? "/admin/orders/edit" : "/orders/edit"}/${val}`} className="font-bold text-primary underline">
                 {val}
-            </span>
+            </NavLink>
         )
     },
     {
@@ -68,11 +69,10 @@ export const CANCEL_ORDER_COLUMNS: Column<CancelOrder>[] = [
         cell: (val: string) => {
             const isPending = val.toLowerCase() === 'pending';
             return (
-                <span className={`px-2 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider ${
-                    isPending 
-                        ? 'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400' 
-                        : 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400'
-                }`}>
+                <span className={`px-2 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider ${isPending
+                    ? 'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400'
+                    : 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400'
+                    }`}>
                     {val}
                 </span>
             );

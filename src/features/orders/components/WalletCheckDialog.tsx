@@ -30,8 +30,8 @@ const WalletCheckDialog: React.FC<WalletCheckDialogProps> = ({
             <div className="p-2 pb-0 space-y-4">
                 <div className="flex items-center justify-between p-4 bg-slate-50 dark:bg-zinc-900 border border-slate-100 dark:border-zinc-800 rounded-xl">
                     <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 rounded-full bg-[#0060FE]/10 flex items-center justify-center">
-                            <Wallet className="w-5 h-5 text-[#0060FE]" />
+                        <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
+                            <Wallet className="w-5 h-5 text-primary" />
                         </div>
                         <div>
                             <p className="my-0 text-[10px] font-bold text-slate-500 dark:text-zinc-400 uppercase tracking-wider">Available Balance</p>

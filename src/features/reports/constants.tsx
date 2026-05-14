@@ -37,89 +37,6 @@ export const INVOICE_COLUMNS: Column<InvoiceReport>[] = [
   { key: 'status', header: 'STATUS', sortable: true },
 ];
 
-export const MOCK_PARCEL_REPORTS: ParcelReport[] = [
-  {
-    receiver_name: 'chirag work',
-    receiver_full_address: '150 Pacific Highway, North Sydney NSW, Australia',
-    tranzit_group_order_number: '#SHP000115',
-    actual_parcel_tracking_number: 'ASDASDASD',
-    parcel_status: '-',
-    courier: 'Directfreight',
-    total: 20.59,
-    create_date: '16 Apr 2026',
-  },
-  {
-    receiver_name: 'Ashis',
-    receiver_full_address: '150 Mary Street, Brisbane City QLD, Australia',
-    tranzit_group_order_number: '#SHP000114',
-    actual_parcel_tracking_number: 'MANUAL_CREATE_ORDER',
-    parcel_status: '-',
-    courier: 'Pallet',
-    total: 1300.00,
-    create_date: '16 Apr 2026',
-  },
-  {
-    receiver_name: 'Chirag Dayabhai Mavadiya',
-    receiver_full_address: '150 Collins Street, Melbourne VIC, Australia',
-    tranzit_group_order_number: '#SHP000113',
-    actual_parcel_tracking_number: '111JD8606266',
-    parcel_status: '-',
-    courier: 'Auspost',
-    total: 36.53,
-    create_date: '16 Apr 2026',
-  },
-  {
-    receiver_name: 'Chirag Dayabhai Mavadiya',
-    receiver_full_address: '150 Collins Street, Melbourne VIC, Australia',
-    tranzit_group_order_number: '#SHP000113',
-    actual_parcel_tracking_number: '111JD8606266',
-    parcel_status: '-',
-    courier: 'Auspost',
-    total: 36.53,
-    create_date: '16 Apr 2026',
-  },
-  {
-    receiver_name: 'Chirag Dayabhai Mavadiya',
-    receiver_full_address: '150 Collins Street, Melbourne VIC, Australia',
-    tranzit_group_order_number: '#SHP000113',
-    actual_parcel_tracking_number: '111JD8606266',
-    parcel_status: '-',
-    courier: 'Auspost',
-    total: 36.53,
-    create_date: '16 Apr 2026',
-  },
-  {
-    receiver_name: 'Chirag Dayabhai Mavadiya',
-    receiver_full_address: '150 Collins Street, Melbourne VIC, Australia',
-    tranzit_group_order_number: '#SHP000113',
-    actual_parcel_tracking_number: '111JD8606266',
-    parcel_status: '-',
-    courier: 'Auspost',
-    total: 36.53,
-    create_date: '16 Apr 2026',
-  },
-  {
-    receiver_name: 'Chirag Dayabhai Mavadiya',
-    receiver_full_address: '150 Collins Street, Melbourne VIC, Australia',
-    tranzit_group_order_number: '#SHP000113',
-    actual_parcel_tracking_number: '111JD8606266',
-    parcel_status: '-',
-    courier: 'Auspost',
-    total: 36.53,
-    create_date: '16 Apr 2026',
-  },
-  {
-    receiver_name: 'Chirag Dayabhai Mavadiya',
-    receiver_full_address: '150 Collins Street, Melbourne VIC, Australia',
-    tranzit_group_order_number: '#SHP000113',
-    actual_parcel_tracking_number: '111JD8606266',
-    parcel_status: '-',
-    courier: 'Auspost',
-    total: 36.53,
-    create_date: '16 Apr 2026',
-  }
-];
-
 export const PARCEL_COLUMNS: Column<ParcelReport>[] = [
   { key: 'receiver_name', header: 'RECEIVER NAME', sortable: true, searchable: true },
   { key: 'receiver_full_address', header: 'RECEIVER FULL ADDRESS', sortable: true, searchable: true },
@@ -161,7 +78,7 @@ export const ADMIN_PARCEL_COLUMNS: Column<ParcelReport>[] = [
     sortable: true,
     searchable: true,
     cell: (value) => (
-      <LinkCell value={value} className="font-bold text-blue-600" path={`/admin/orders/all/${value?.replace('#', '')}`} />
+      <LinkCell value={value} className="font-bold text-primary" path={`/admin/orders/all/${value?.replace('#', '')}`} />
     )
   },
   { key: 'actual_parcel_tracking_number', header: 'ACTUAL PARCEL TRACKING NUMBER', sortable: true, searchable: true },

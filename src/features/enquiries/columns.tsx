@@ -68,7 +68,7 @@ export const ENQUIRY_COLUMNS = (onView: (row: Enquiry) => void): Column<Enquiry>
         <Button
           variant="ghost"
           size="icon"
-          className="h-8 w-8 text-slate-400 hover:text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-all active:scale-90"
+          className="h-8 w-8 text-slate-400 hover:text-primary hover:bg-primary/10 dark:hover:bg-primary/20 transition-all active:scale-90"
           onClick={() => onView(row)}
         >
           <Eye className="w-4 h-4" />

@@ -29,10 +29,10 @@ const Search = () => {
             <h2 className="text-2xl font-bold tracking-tight text-slate-900">Search Module</h2>
 
             {isCalculating ? (
-                <div className="p-6 bg-blue-50 border border-blue-200 rounded-md max-w-lg flex flex-col items-center justify-center space-y-3">
-                    <div className="w-8 h-8 border-4 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
-                    <p className="text-blue-700 font-medium text-lg">Computing in background thread...</p>
-                    <p className="text-blue-600/80 text-sm">Notice how the sidebar and UI are totally un-frozen!</p>
+                <div className="p-6 bg-primary/5 border border-primary/20 rounded-md max-w-lg flex flex-col items-center justify-center space-y-3">
+                    <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
+                    <p className="text-primary font-medium text-lg">Computing in background thread...</p>
+                    <p className="text-primary/70 text-sm">Notice how the sidebar and UI are totally un-frozen!</p>
                 </div>
             ) : (
                 <div className="p-6 bg-emerald-50 border border-emerald-200 rounded-md max-w-lg">

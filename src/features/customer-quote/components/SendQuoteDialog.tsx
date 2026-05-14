@@ -85,7 +85,7 @@ export function SendQuoteDialog({
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
           <DialogTitle className="my-2 flex items-center gap-2">
-            <Mail className="w-5 h-5 text-blue-600" />
+            <Mail className="w-5 h-5 text-primary" />
             Send Quote to Customer
           </DialogTitle>
         </DialogHeader>
@@ -96,7 +96,7 @@ export function SendQuoteDialog({
               <p className="text-[15px] font-bold text-slate-900 dark:text-zinc-100">{courierData?.carrier} - {courierData?.service_name}</p>
               <div className="mt-3 pt-3 border-t border-slate-200 dark:border-zinc-800 flex justify-between items-center">
                 <span className="text-[13px] font-medium text-slate-500 dark:text-zinc-400">Total Quote</span>
-                <span className="text-[16px] font-bold text-blue-600 dark:text-blue-400">
+                <span className="text-[16px] font-bold text-primary">
                   {new Intl.NumberFormat('en-AU', { style: 'currency', currency: 'AUD' }).format(calculations.grandTotal)}
                 </span>
               </div>
@@ -116,7 +116,7 @@ export function SendQuoteDialog({
           <Button
             onClick={handleSend}
             disabled={!email || isPending}
-            className="w-full bg-[#0060FE] hover:bg-blue-700 text-white gap-2 font-bold"
+            className="w-full bg-primary hover:bg-primary-hover text-white gap-2 font-bold"
           >
             {isPending ? (
               <span className="flex items-center gap-2 animate-pulse">

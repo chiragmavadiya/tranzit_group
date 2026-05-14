@@ -3,7 +3,6 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Link } from "react-router-dom";
 import brandlogo from '@/assets/Tranzit_Logo.svg';
-import { AuthLayout } from "@/features/auth/components/AuthLayout";
 import { useForgotPassword } from "../hooks/useAuth";
 
 export default function ForgotPassword() {
@@ -18,40 +17,38 @@ export default function ForgotPassword() {
   };
 
   return (
-    <AuthLayout>
-      <div className="flex flex-col items-center text-center space-y-2 max-w-sm m-auto">
-        <div className="flex items-center space-x-2 pb-4">
-          <img src={brandlogo} alt="Logo" className="h-25" />
+    <>
+      <div className="flex flex-col items-center text-center space-y-2 mb-8">
+        <div className="flex items-center space-x-2 pb-2">
+          <img src={brandlogo} alt="Logo" className="h-16 w-auto" />
         </div>
 
-        <h2 className=" my-0 text-2xl font-bold tracking-tight text-slate-900 dark:text-white">
-          Forgot your password?
+        <h2 className="text-2xl font-black tracking-tight text-slate-900 dark:text-white">
+          Reset Password
         </h2>
+        <p className="text-sm font-medium text-slate-500 dark:text-slate-400">
+          We'll send you instructions to reset your password
+        </p>
       </div>
 
       {!isSuccess ? (
-        <form onSubmit={handleSubmit} className="space-y-6 w-sm m-auto">
-          <p className="text-sm text-slate-500 dark:text-slate-400 text-center px-4">
-            Enter your email and we'll send you instructions to reset your password.
-          </p>
-          <div className="space-y-4">
-            <div className="space-y-2 text-left">
-              <Label htmlFor="email" className="text-slate-600 dark:text-slate-400 font-medium">Email</Label>
-              <Input
-                id="email"
-                name="email"
-                placeholder="Enter your email"
-                type="email"
-                required
-                autoCapitalize="none"
-                autoComplete="email"
-                autoCorrect="off"
-                className="bg-white dark:bg-zinc-900 border-slate-300 dark:border-slate-800 transition-all focus-visible:ring-0 focus-visible:ring-offset-0 focus-visible:border-blue-500 h-10"
-              />
-            </div>
+        <form onSubmit={handleSubmit} className="space-y-6">
+          <div className="space-y-1.5">
+            <Label htmlFor="email" className="text-[13px] font-bold text-slate-700 dark:text-slate-300 ml-1">Email ID</Label>
+            <Input
+              id="email"
+              name="email"
+              placeholder="name@example.com"
+              type="email"
+              required
+              autoCapitalize="none"
+              autoComplete="email"
+              autoCorrect="off"
+              className="bg-white dark:bg-zinc-900 border-slate-200 dark:border-slate-800 focus:border-primary transition-all h-11"
+            />
           </div>
           {isError && (
-            <p className="text-center text-sm font-medium text-red-600">
+            <p className="text-center text-sm font-bold text-red-600">
               {error?.message}
             </p>
           )}
@@ -59,14 +56,14 @@ export default function ForgotPassword() {
           <Button
             type="submit"
             disabled={isPending}
-            className="w-full bg-blue-600 hover:bg-blue-700 h-10 text-white font-semibold  text-md rounded-md transition-all shadow-md hover:shadow-lg"
+            className="w-full text-white font-bold h-11 text-[13px] rounded-xl bg-primary hover:bg-primary/90 transition-all shadow-lg shadow-primary/20 active:scale-[0.98]"
           >
-            {isPending ? "Sending..." : "Send reset link"}
+            {isPending ? "Sending..." : "Send Reset Link"}
           </Button>
 
-          <p className="text-center text-sm font-medium">
-            <Link to="/login" className="text-blue-600 hover:text-blue-500 hover:underline transition-colors">
-              Back to sign in
+          <p className="text-center text-[13px] font-medium text-slate-500 dark:text-slate-400">
+            <Link to="/login" className="font-bold text-primary hover:underline underline-offset-4">
+              Back to Sign In
             </Link>
           </p>
         </form>
@@ -78,12 +75,12 @@ export default function ForgotPassword() {
             </p>
           </div>
           <p className="text-center text-sm font-medium">
-            <Link to="/login" className="text-blue-600 hover:text-blue-500 hover:underline transition-colors">
+            <Link to="/login" className="text-primary hover:underline transition-colors">
               Back to sign in
             </Link>
           </p>
         </div>
       )}
-    </AuthLayout>
+    </>
   );
 }

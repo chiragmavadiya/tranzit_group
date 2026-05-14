@@ -80,7 +80,7 @@ export const FormInput = memo(React.forwardRef<HTMLInputElement, FormInputProps>
       )}
       <div className="relative group">
         {Icon && (
-          <div className={cn("absolute left-3", error ? 'top-2' : 'top-1/2 -translate-y-1/2', "text-gray-400 group-focus-within:text-blue-600 transition-colors")}>
+          <div className={cn("absolute left-3", error ? 'top-2' : 'top-1/2 -translate-y-1/2', "text-gray-400 group-focus-within:text-primary transition-colors")}>
             <Icon className="w-4 h-4" />
           </div>
         )}
@@ -92,7 +92,7 @@ export const FormInput = memo(React.forwardRef<HTMLInputElement, FormInputProps>
           onChange={handleChange}
           autoComplete="off"
           className={cn(
-            "h-8 rounded-md border-slate-200 dark:border-zinc-800 bg-white dark:bg-zinc-950 font-medium focus-visible:ring-0 focus-visible:ring-blue-600 focus-visible:border-blue-600 transition-all placeholder:text-muted-foreground placeholder:font-normal dark:placeholder:text-zinc-700 text-sm",
+            "h-8 rounded-md border-slate-200 dark:border-zinc-800 bg-white dark:bg-zinc-950 font-medium focus-visible:ring-0 focus-visible:ring-primary focus-visible:border-primary transition-all placeholder:text-muted-foreground placeholder:font-normal dark:placeholder:text-zinc-700 text-sm",
             Icon ? "pl-9" : "px-3",
             type === 'password' ? "pr-10" : "",
             error ? "border-red-500 focus-visible:border-red-500" : "",
@@ -165,7 +165,7 @@ export function FormTextarea({
         onChange={handleChange}
         rows={rows}
         className={cn(
-          "rounded-md shadow-none border-slate-200 dark:border-zinc-800 bg-white dark:bg-zinc-950 font-medium focus-visible:ring-0 focus-visible:ring-blue-600 focus-visible:border-blue-600 transition-all placeholder:text-muted-foreground placeholder:font-normal dark:placeholder:text-zinc-700 text-sm resize-none px-3 py-2",
+          "rounded-md shadow-none border-slate-200 dark:border-zinc-800 bg-white dark:bg-zinc-950 font-medium focus-visible:ring-0 focus-visible:ring-primary focus-visible:border-primary transition-all placeholder:text-muted-foreground placeholder:font-normal dark:placeholder:text-zinc-700 text-sm resize-none px-3 py-2",
           error ? "border-red-500 focus-visible:border-red-500" : ""
         )}
       />
@@ -224,7 +224,7 @@ export const FormSelect = memo(({
       />
       <div>
         <SelectComponent
-          className={cn("w-full h-8 text-[13px] data-[size=default]:h-8 border-slate-200 rounded-md dark:border-zinc-800 font-medium bg-white dark:bg-zinc-950 text-slate-900 dark:text-zinc-100 focus:ring-blue-600 transition-all text-sm px-3 ", error ? "border-red-500 focus:border-red-500" : "")}
+          className={cn("w-full h-8 text-[13px] data-[size=default]:h-8 border-slate-200 rounded-md dark:border-zinc-800 font-medium bg-white dark:bg-zinc-950 text-slate-900 dark:text-zinc-100 focus:ring-primary transition-all text-sm px-3 ", error ? "border-red-500 focus:border-red-500" : "")}
           data={memoizedData}
           // defaultValue="default"
           onValueChange={onValueChange}
@@ -232,6 +232,7 @@ export const FormSelect = memo(({
           placeholder={placeholder}
           name={name}
           disabled={disabled}
+          allowClear={true}
         />
         {error ? <div className="text-red-500 text-[11px] w-full">{errormsg}</div> : null}
       </div>
@@ -245,7 +246,7 @@ FormSelect.displayName = 'FormSelect';
 export function SummaryCard({ title, name, address, phone, isRight = false }: SummaryCardProps) {
   return (
     <div className={cn("space-y-2", isRight && "pl-8")}>
-      <span className="text-[10px] font-bold text-blue-600 dark:text-blue-400 uppercase tracking-widest block mb-2">{title}</span>
+      <span className="text-[10px] font-bold text-primary uppercase tracking-widest block mb-2">{title}</span>
       <p className="text-lg font-bold text-slate-900 dark:text-zinc-100 leading-none">{name || '—'}</p>
       <p className="border-l-2 border-slate-100 dark:border-zinc-800 pl-4 py-1 text-sm text-slate-500 dark:text-zinc-400 italic mt-3 leading-relaxed">{address || 'No address provided'}</p>
       <p className="text-sm font-bold text-slate-400 dark:text-zinc-500 mt-3 tabular-nums">{phone || 'No phone provided'}</p>
@@ -276,7 +277,7 @@ export function FormRadio({
   onChange,
   label,
   className,
-  activeColor = "bg-[#0060FE]"
+  activeColor = "bg-primary"
 }: FormRadioProps) {
   return (
     <label className={cn("flex items-center gap-2.5 cursor-pointer group", className)}>
@@ -285,7 +286,7 @@ export function FormRadio({
           type="radio"
           className={cn(
             "peer appearance-none w-4 h-4 rounded-full border-2 border-gray-300 dark:border-zinc-700 transition-all",
-            checked && (activeColor === "bg-[#0060FE]" ? "border-[#0060FE]" : `border-${activeColor.replace('bg-[', '').replace(']', '')}`)
+            checked && (activeColor === "bg-primary" ? "border-primary" : `border-${activeColor.replace('bg-[', '').replace(']', '')}`)
           )}
           checked={checked}
           onChange={onChange}

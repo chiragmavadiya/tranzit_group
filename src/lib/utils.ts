@@ -2,6 +2,7 @@ import { clsx, type ClassValue } from "clsx"
 import { useEffect, useRef } from "react";
 import { twMerge } from "tailwind-merge"
 import { parse, format } from "date-fns";
+import { useAppSelector } from "@/hooks/store.hooks";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
@@ -51,4 +52,9 @@ export const convertDateFormat = (
     parse(date as string, "dd/MM/yyyy", new Date()),
     "dd-MM-yyyy"
   );
+};
+
+export const useRole = (): string => {
+  const role = useAppSelector((state) => state.auth.role);
+  return role || 'customer';
 };

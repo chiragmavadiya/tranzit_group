@@ -46,7 +46,7 @@ export default function Sidebar({ isCollapsed, setIsCollapsed }: SidebarProps) {
         {/* Main Menu Header */}
         {!activeSubmenu && (
           <div className={`flex items-center justify-between h-16 ${isCollapsed ? 'px-4' : 'px-4'} sticky top-0 z-20 bg-white dark:bg-zinc-950`}>
-            <button onClick={() => setIsCollapsed(!isCollapsed)} className="p-2 hover:bg-gray-100 dark:hover:bg-zinc-900 rounded-md text-blue-500 transition-colors">
+            <button onClick={() => setIsCollapsed(!isCollapsed)} className="p-2 hover:bg-gray-100 dark:hover:bg-zinc-900 rounded-md text-primary transition-colors">
               <Menu className="w-[22px] h-[22px]" strokeWidth={2.5} />
             </button>
             <div className="flex items-center">
@@ -68,10 +68,10 @@ export default function Sidebar({ isCollapsed, setIsCollapsed }: SidebarProps) {
             </button>
             <div className="flex items-center justify-between px-6 py-4 mt-2">
               <div className="flex items-center gap-3">
-                {currentSubmenuData?.icon && <currentSubmenuData.icon className="w-6 h-6 text-blue-500" />}
+                {currentSubmenuData?.icon && <currentSubmenuData.icon className="w-6 h-6 text-primary" />}
                 <h2 className="text-xl font-bold tracking-tight text-slate-900 dark:text-zinc-100">{activeSubmenu}</h2>
               </div>
-              <ChevronDown className="w-5 h-5 text-blue-500 rotate-180" />
+              <ChevronDown className="w-5 h-5 text-primary rotate-180" />
             </div>
           </div>
         )}
@@ -91,7 +91,7 @@ export default function Sidebar({ isCollapsed, setIsCollapsed }: SidebarProps) {
                         key={subItem.name}
                         to={subItem.path}
                         className={({ isActive }) =>
-                          `flex items-center px-4 py-2 text-[13.5px] font-medium transition-colors ${isActive ? 'text-blue-600 dark:text-blue-400' : 'text-gray-600 dark:text-zinc-400 hover:text-gray-900 dark:hover:text-zinc-100 hover:bg-gray-50 dark:hover:bg-zinc-900'
+                          `flex items-center px-4 py-2 text-[13.5px] font-medium transition-colors ${isActive ? 'text-primary' : 'text-gray-600 dark:text-zinc-400 hover:text-gray-900 dark:hover:text-zinc-100 hover:bg-gray-50 dark:hover:bg-zinc-900'
                           }`
                         }
                       >
@@ -127,7 +127,7 @@ export default function Sidebar({ isCollapsed, setIsCollapsed }: SidebarProps) {
                       finalActive = false;
                     }
 
-                    return `flex items-center justify-between overflow-hidden py-[10px] px-3 border-l-4 rounded-r-md text-[13.5px] font-medium transition-colors ${finalActive && !item.hasDropdown ? 'text-blue-600 dark:text-blue-400 bg-blue-100 dark:bg-blue-900/10 border-blue-600 dark:border-blue-400' : 'text-gray-600 dark:text-zinc-400 hover:text-gray-900 dark:hover:text-zinc-100 hover:bg-gray-100 dark:hover:bg-zinc-900 border-transparent'
+                    return `flex items-center justify-between overflow-hidden py-[10px] px-3 border-l-4 rounded-r-md text-[13.5px] font-medium transition-colors ${finalActive && !item.hasDropdown ? 'text-primary bg-primary/10 border-primary dark:border-primary' : 'text-gray-600 dark:text-zinc-400 hover:text-gray-900 dark:hover:text-zinc-100 hover:bg-gray-100 dark:hover:bg-zinc-900 border-transparent'
                       }`
                   }}
                 >
@@ -142,7 +142,7 @@ export default function Sidebar({ isCollapsed, setIsCollapsed }: SidebarProps) {
                       <>
                         <div className={`flex items-center gap-${!isCollapsed ? 3 : 3} w-full min-w-0 transition-all duration-300`}>
                           <CustomTooltip title={item.name} placement="bottom" className="flex-1">
-                            <item.icon className={`w-[18px] h-[18px] shrink-0 transition-colors ${finalActive && !item.hasDropdown ? 'text-blue-500' : 'text-gray-400 dark:text-zinc-500'}`} strokeWidth={2} />
+                            <item.icon className={`w-[18px] h-[18px] shrink-0 transition-colors ${finalActive && !item.hasDropdown ? 'text-primary' : 'text-gray-400 dark:text-zinc-500'}`} strokeWidth={2} />
                           </CustomTooltip>
                           <div className={`flex items-center min-w-0 flex-1 transition-opacity duration-3000 ${isCollapsed ? 'opacity-100' : 'opacity-100'}`}>
                             <CustomTooltip title={item.name} placement="bottom" onlyOnOverflow={true} className="flex-1">
@@ -168,7 +168,7 @@ export default function Sidebar({ isCollapsed, setIsCollapsed }: SidebarProps) {
                         key={sub.name}
                         to={sub.path}
                         className={({ isActive }) =>
-                          `block px-2 py-2 text-[13.5px] font-medium rounded-md transition-colors ${isActive ? 'text-blue-600 dark:text-blue-400 font-bold' : 'text-gray-500 dark:text-zinc-400 hover:text-gray-900 dark:hover:text-zinc-100'
+                          `block px-2 py-2 text-[13.5px] font-medium rounded-md transition-colors ${isActive ? 'text-primary font-bold' : 'text-gray-500 dark:text-zinc-400 hover:text-gray-900 dark:hover:text-zinc-100'
                           }`
                         }
                       >
@@ -185,7 +185,7 @@ export default function Sidebar({ isCollapsed, setIsCollapsed }: SidebarProps) {
       {/* <div className={`border-t border-gray-200 dark:border-zinc-800 text-sm text-gray-600 dark:text-zinc-400 bg-white dark:bg-zinc-950 transition-[height,padding,opacity] duration-300 overflow-hidden ${isCollapsed ? 'h-0 opacity-0 p-0' : 'p-4 flex items-center justify-between h-[60px] opacity-100'}`}>
         <span className="font-medium text-[13px] whitespace-nowrap">Classic</span>
         <div className="flex items-center gap-2 whitespace-nowrap">
-          <div className="w-[34px] h-[18px] bg-[#0060FE] dark:bg-blue-600 rounded-full relative flex items-center shadow-inner cursor-pointer px-[2px]">
+          <div className="w-[34px] h-[18px] bg-primary rounded-full relative flex items-center shadow-inner cursor-pointer px-[2px]">
             <div className="w-[14px] h-[14px] bg-white dark:bg-zinc-100 rounded-full ml-auto shadow-sm transform transition-transform"></div>
           </div>
           <span className="text-gray-800 dark:text-zinc-200 font-medium text-[13px]">UI 2.0</span>

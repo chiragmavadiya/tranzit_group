@@ -19,7 +19,7 @@ const OrderDetails2: React.FC = () => {
   if (isLoading) {
     return (
       <div className="flex h-[60vh] w-full items-center justify-center">
-        <Loader2 className="h-10 w-10 animate-spin text-blue-600" />
+        <Loader2 className="h-10 w-10 animate-spin text-primary" />
       </div>
     );
   }

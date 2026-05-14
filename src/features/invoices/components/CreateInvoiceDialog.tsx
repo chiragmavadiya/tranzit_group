@@ -61,8 +61,8 @@ export function CreateInvoiceDialog({ isOpen, onOpenChange, onSubmit }: CreateIn
         {/* Header */}
         <div className="px-6 py-4 flex items-center justify-between border-b border-gray-100 dark:border-zinc-900">
           <div className="flex items-center gap-3">
-            <div className="p-2 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
-              <FilePlus className="w-5 h-5 text-blue-600" />
+            <div className="p-2 bg-primary/10 dark:bg-primary/20 rounded-lg">
+              <FilePlus className="w-5 h-5 text-primary" />
             </div>
             <h2 className="text-lg font-bold text-gray-900 dark:text-zinc-100">Create New Invoice</h2>
           </div>
@@ -164,7 +164,7 @@ export function CreateInvoiceDialog({ isOpen, onOpenChange, onSubmit }: CreateIn
             </Button>
             <Button 
               type="submit" 
-              className="bg-[#002B49] text-white hover:bg-[#001F35] min-w-32 gap-2"
+              className="bg-primary text-white hover:bg-primary-hover min-w-32 gap-2"
               disabled={isSubmitting}
             >
               {isSubmitting ? <RefreshCw className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}

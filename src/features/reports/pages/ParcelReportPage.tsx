@@ -80,8 +80,8 @@ export default function ParcelReportPage() {
           label: 'Total Customer',
           value: data?.summary?.total_customers?.toString() || '0',
           icon: Users,
-          iconColor: 'text-blue-500',
-          iconBg: 'bg-blue-50 dark:bg-blue-500/10',
+          iconColor: 'text-primary',
+          iconBg: 'bg-primary/10',
         },
         ...baseStats,
         {
@@ -129,7 +129,7 @@ export default function ParcelReportPage() {
       });
     }
   };
-
+  console.log(customersData, 'customersData')
   return (
     <div className="flex flex-col flex-1 gap-6 p-page-padding min-h-0 animate-in fade-in slide-in-from-bottom-2 duration-500 bg-slate-50/30 dark:bg-zinc-950/30">
 
@@ -165,20 +165,6 @@ export default function ParcelReportPage() {
 
           {isAdmin && (
             <div className="md:col-span-3">
-              {/* <FormSelect
-                label="Customer"
-                value={selectedCustomer}
-                onValueChange={(val) => setSelectedCustomer(val || 'all')}
-                options={[
-                  { label: 'All Customers', value: 'all' },
-                  ...customersData?.data?.map((c: any) => ({
-                    value: c.id.toString(),
-                    label: `${c.first_name} ${c.last_name}`
-                  })) || []
-                ]}
-                placeholder="All Customers"
-                className="w-full space-y-0"
-              /> */}
               <FormSelect
                 label="Customer"
                 placeholder="Select Customer"
@@ -192,16 +178,7 @@ export default function ParcelReportPage() {
             </div>
           )}
 
-          <div className={`flex gap-2 ${isAdmin ? 'md:col-span-3' : 'md:col-span-8'}`}>
-            {/* <Button
-              onClick={handleApplyFilters}
-              // variant="default"
-              // size="sm"
-              // className="h-8 flex-1 bg-slate-900 hover:bg-slate-800 dark:bg-zinc-100 dark:hover:bg-zinc-200 dark:text-zinc-950 font-bold uppercase tracking-widest text-[10px] shadow-sm"
-              className='global-btn flex-1'
-            >
-              Filter
-            </Button> */}
+          <div className={`flex gap-2 ${isAdmin ? 'md:col-span-3' : 'md:col-span-3'}`}>
             <Button
               onClick={handleReset}
               variant="outline"

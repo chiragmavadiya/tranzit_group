@@ -205,7 +205,7 @@ const CustomModel = ({ open, title, description, onOpenChange, children, onSubmi
                 <Button
                   type="submit"
                   disabled={isLoading}
-                  className="px-4 bg-[#0060FE] hover:bg-[#0052db] text-white font-semibold transition-all shadow-md shadow-blue-100 dark:shadow-none active:scale-[0.98] h-8"
+                  className="px-4 bg-primary hover:bg-primary-hover text-white font-semibold transition-all shadow-md shadow-primary/20 dark:shadow-none active:scale-[0.98] h-8"
                   onClick={onSubmit}
                 >
                   {isLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : null}

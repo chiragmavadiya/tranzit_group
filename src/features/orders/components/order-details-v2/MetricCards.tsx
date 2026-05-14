@@ -46,8 +46,8 @@ export const MetricCards = ({ data }: { data: OrderDetailData }) => {
                 value={formatMeasure(totalWeight, 'kg')}
                 hint={`${data.courier_details.courier}`}
                 icon={Truck}
-                iconColor="text-blue-600"
-                iconBg="bg-blue-50"
+                iconColor="text-primary"
+                iconBg="bg-primary/10"
             />
         </section>
     )

@@ -61,27 +61,27 @@ export const getCustomerColumns = (onEdit: (id: string | number) => void, handle
     {
         key: 'mobile',
         header: 'MOBILE',
-        cell: (_, customer) => <span className="text-sm text-slate-600">{customer.personal_mobile || customer.office_number || '-'}</span>,
+        cell: (_, customer) => <span className="text-xs text-slate-600">{customer.personal_mobile || customer.office_number || '-'}</span>,
     },
     {
         key: 'business_name',
         header: 'BUSINESS NAME',
-        cell: (_, customer) => <span className="text-sm text-slate-600">{customer.business_name}</span>,
+        // cell: (_, customer) => <span className="text-sm text-slate-600">{customer.business_name}</span>,
     },
     {
         key: 'customer_id',
         header: 'CUSTOMER ID',
-        cell: (_, customer) => <span className="text-sm font-mono text-slate-600">{customer.id}</span>,
+        // cell: (_, customer) => <span className="text-sm font-mono text-slate-600">{customer.id}</span>,
     },
     {
         key: 'suburb',
         header: 'SUBURB',
-        cell: (_, customer) => <span className="text-sm text-slate-600">{customer.suburb}</span>,
+        // cell: (_, customer) => <span className="text-sm text-slate-600">{customer.suburb}</span>,
     },
     {
         key: 'state',
         header: 'STATE',
-        cell: (_, customer) => <span className="text-sm text-slate-600">{customer.state}</span>,
+        // cell: (_, customer) => <span className="text-sm text-slate-600">{customer.state}</span>,
     },
     {
         key: 'status',
@@ -91,7 +91,7 @@ export const getCustomerColumns = (onEdit: (id: string | number) => void, handle
     {
         key: 'created_at',
         header: 'CREATED AT',
-        cell: (_, customer) => <span className="text-sm text-slate-600">{customer.created_at}</span>,
+        // cell: (_, customer) => <span className="text-sm text-slate-600">{customer.created_at}</span>,
     },
     {
         key: 'actions',

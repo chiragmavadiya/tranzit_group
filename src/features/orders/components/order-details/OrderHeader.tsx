@@ -52,10 +52,10 @@ export const OrderHeader: React.FC<OrderHeaderProps> = ({
   const [showCancelModal, setShowCancelModal] = useState(false)
 
 
-  const { data: customersData } = useCustomers({ pageSize: 1000 }, role === 'admin');
+  const { data: customersData } = useCustomers({ pageSize: 1000 }, role === 'admin' && (orderType === 'create' || orderType === 'consign'));
 
   const handleBack = () => {
-    if (orderType !== 'create') {
+    if (orderType !== 'create' && orderType !== 'create-menual') {
       navigate(`${role === 'admin' ? '/admin' : ''}/orders`)
     } else {
       setShowConfirm(true)
@@ -94,7 +94,7 @@ export const OrderHeader: React.FC<OrderHeaderProps> = ({
             // variant="ghost"
             size="sm"
             onClick={handleBack}
-            className="flex items-center gap-2 bg-[#0060FE] text-white hover:bg-[#0052D9] px-4 rounded-md h-9"
+            className="flex items-center gap-2 bg-primary text-white hover:bg-primary-hover px-4 rounded-md h-9"
           >
             <ArrowLeft className="h-4 w-4" />
             BACK
@@ -102,13 +102,13 @@ export const OrderHeader: React.FC<OrderHeaderProps> = ({
 
           <div className="flex items-center gap-3">
             <div className="flex items-center gap-2 text-primary border-r border-gray-200 dark:border-zinc-800 pr-3">
-              <Box className="h-5 w-5 text-[#0060FE]" />
-              <span className="text-xl font-bold text-gray-900 dark:text-zinc-100">{orderType === 'create' ? 'NEW ORDER' : orderID}</span>
+              <Box className="h-5 w-5 text-primary" />
+              <span className="text-xl font-bold text-gray-900 dark:text-zinc-100">{(orderType === 'create' || orderType === 'create-menual') ? 'NEW ORDER' : orderID}</span>
             </div>
             {/* <div className="flex items-center gap-2 px-0">
               <span className="text-xl font-bold text-gray-900 dark:text-zinc-100 tracking-tight">{orderType === 'create' ? 'NEW ORDER' : 'EDIT ORDER'}</span>
             </div> */}
-            <div className="flex items-center gap-1 text-[#0060FE] font-medium">
+            <div className="flex items-center gap-1 text-primary font-medium">
               <MapPin className="h-4 w-4" />
               <span className="text-sm">AUSTRALIA</span>
             </div>
@@ -140,7 +140,7 @@ export const OrderHeader: React.FC<OrderHeaderProps> = ({
               { value: 'delete_order', label: 'Delete order' },
             ]}
           /> */}
-          {orderType !== 'consign' && orderType !== 'create' && orderDetail?.order_status_category === 'new' && (
+          {orderType !== 'consign' && orderType !== 'create' && orderType !== 'create-menual' && orderDetail?.order_status_category === 'new' && (
             <Button
               variant="outline"
               onClick={onConsign}
@@ -152,9 +152,9 @@ export const OrderHeader: React.FC<OrderHeaderProps> = ({
             </Button>
 
           )}
-          {orderType !== 'create' && (
+          {orderType !== 'create' && orderType !== 'create-menual' && (
             <>
-              {orderDetail?.order_status_category !== 'new' && (
+              {(orderDetail?.order_status_category !== 'new' && orderDetail?.order_status_category !== 'archived') && (
                 <Button
                   variant="outline"
                   onClick={onDownloadLabel}
@@ -237,7 +237,7 @@ export const OrderHeader: React.FC<OrderHeaderProps> = ({
 
           {role === 'admin' && (
             <FormSelect
-              label={orderType !== "create" ? "" : "Customer"}
+              label={(orderType !== "create" && orderType !== "create-menual") ? "" : "Customer"}
               placeholder="Select Customer"
               value={selectedCustomer}
               onValueChange={(val) => setSelectedCustomer(val || 'all')}
@@ -246,13 +246,13 @@ export const OrderHeader: React.FC<OrderHeaderProps> = ({
                 label: `${c.first_name} ${c.last_name}`
               })) || []}
               className='w-60'
-              disabled={orderType !== "create"}
+              disabled={orderType !== "create" && orderType !== "create-menual"}
             />
           )}
         </div>
       </div>
 
-      {orderType !== 'create' && (<div className="flex flex-wrap items-center gap-x-6 gap-y-2 text-xs text-gray-500 dark:text-zinc-400 font-medium">
+      {orderType !== 'create' && orderType !== 'create-menual' && (<div className="flex flex-wrap items-center gap-x-6 gap-y-2 text-xs text-gray-500 dark:text-zinc-400 font-medium">
         <Badge variant="secondary" className="bg-gray-100 dark:bg-zinc-800 text-gray-500 dark:text-zinc-400 border-none rounded-sm px-2 py-0 h-5 uppercase font-bold">
           {orderDetail?.order_type || 'NEW'}
         </Badge>

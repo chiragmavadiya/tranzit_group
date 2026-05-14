@@ -52,7 +52,7 @@ export function FileUpload({ files, onFilesChange, maxFiles = 5, maxSizeMB = 10 
   };
 
   const getFileIcon = (file: File) => {
-    if (file.type.startsWith('image/')) return <ImageIcon className="w-5 h-5 text-blue-500" />;
+    if (file.type.startsWith('image/')) return <ImageIcon className="w-5 h-5 text-primary" />;
     if (file.type.includes('pdf')) return <FileText className="w-5 h-5 text-red-500" />;
     return <FileIcon className="w-5 h-5 text-gray-500" />;
   };
@@ -66,8 +66,8 @@ export function FileUpload({ files, onFilesChange, maxFiles = 5, maxSizeMB = 10 
         className={cn(
           "relative border-2 border-dashed rounded-xl p-8 transition-all duration-200 flex flex-col items-center justify-center text-center cursor-pointer",
           isDragging 
-            ? "border-blue-500 bg-blue-50/50 dark:bg-blue-900/10 scale-[1.01]" 
-            : "border-gray-200 dark:border-zinc-800 hover:border-blue-400 hover:bg-gray-50 dark:hover:bg-zinc-900/50"
+            ? "border-primary bg-primary/5 dark:bg-primary/10 scale-[1.01]" 
+            : "border-gray-200 dark:border-zinc-800 hover:border-primary hover:bg-gray-50 dark:hover:bg-zinc-900/50"
         )}
         onClick={() => document.getElementById('file-upload-input')?.click()}
       >
@@ -80,7 +80,7 @@ export function FileUpload({ files, onFilesChange, maxFiles = 5, maxSizeMB = 10 
           accept=".jpg,.jpeg,.png,.pdf,.doc,.docx,.xls,.xlsx"
         />
         
-        <div className="w-12 h-12 rounded-full bg-blue-50 dark:bg-blue-900/20 flex items-center justify-center mb-4 text-blue-600 dark:text-blue-400">
+        <div className="w-12 h-12 rounded-full bg-primary/10 dark:bg-primary/20 flex items-center justify-center mb-4 text-primary">
           <Upload className="w-6 h-6" />
         </div>
         

@@ -95,7 +95,7 @@ export default function BookPickupPage() {
                         <Button
                             onClick={handleBookPickup}
                             disabled={isBooking || selectedRows.length === 0}
-                            className="gap-2 bg-[#0060FE] hover:bg-[#0052db] text-white shadow-lg shadow-blue-100 dark:shadow-none transition-all active:scale-[0.98] font-semibold border-none px-4 h-8"
+                            className="gap-2 text-white shadow-lg shadow-blue-100 dark:shadow-none transition-all active:scale-[0.98] font-semibold border-none px-4 h-8"
                         >
                             {isBooking ? <Loader2 className="w-4 h-4 animate-spin" /> : null}
                             Book with Direct Freight

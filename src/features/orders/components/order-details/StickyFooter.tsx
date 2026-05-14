@@ -26,22 +26,22 @@ export const StickyFooter: React.FC<StickyFooterProps> = ({ orderType, onSave, s
     <div className="sticky bottom-0 -left-5 right-20 bg-white dark:bg-zinc-950 border-t border-gray-200 dark:border-zinc-800 p-3 flex justify-center items-center gap-3 z-50 shadow-[0_-4px_10px_rgba(0,0,0,0.05)] dark:shadow-[0_-4px_10px_rgba(0,0,0,0.2)] transition-colors duration-300">
       {orderType === 'new' && (
         <>
-          <Button variant="outline" className="flex items-center gap-2 border-gray-200 dark:border-zinc-800 text-[#0060FE] font-bold h-8 px-6 uppercase text-xs hover:bg-gray-50 dark:hover:bg-zinc-900 transition-colors">
+          <Button variant="outline" className="flex items-center gap-2 border-gray-200 dark:border-zinc-800 text-primary font-bold h-8 px-6 uppercase text-xs hover:bg-gray-50 dark:hover:bg-zinc-900 transition-colors">
             <Save className="h-4 w-4" />
             SAVE
           </Button>
 
-          <Button variant="outline" className="flex items-center gap-2 border-gray-200 dark:border-zinc-800 text-[#0060FE] font-bold h-8 px-6 uppercase text-xs hover:bg-gray-50 dark:hover:bg-zinc-900 transition-colors">
+          <Button variant="outline" className="flex items-center gap-2 border-gray-200 dark:border-zinc-800 text-primary font-bold h-8 px-6 uppercase text-xs hover:bg-gray-50 dark:hover:bg-zinc-900 transition-colors">
             <Download className="h-4 w-4" />
             DOWNLOAD
           </Button>
-          <div className="flex bg-[#0060FE] rounded-md overflow-hidden">
-            <Button className="bg-[#0060FE] text-white hover:bg-blue-700 flex items-center gap-2 border-r border-blue-500/50 rounded-none h-8 px-6 font-bold uppercase text-xs">
+          <div className="flex bg-primary rounded-md overflow-hidden">
+            <Button className="bg-primary text-white hover:bg-primary-hover flex items-center gap-2 border-r border-white/10 rounded-none h-8 px-6 font-bold uppercase text-xs">
               <Printer className="h-4 w-4" />
               PRINT AND OPEN NEXT
             </Button>
             <DropdownMenu>
-              <DropdownMenuTrigger className="bg-[#0060FE] text-white hover:bg-blue-700 rounded-none w-8 flex items-center justify-center h-8 border-l border-white/20 cursor-pointer outline-none">
+              <DropdownMenuTrigger className="bg-primary text-white hover:bg-primary-hover rounded-none w-8 flex items-center justify-center h-8 border-l border-white/20 cursor-pointer outline-none">
                 <ChevronUp className="h-4 w-4" />
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-48 mb-2 dark:bg-zinc-900 dark:border-zinc-800">
@@ -52,12 +52,12 @@ export const StickyFooter: React.FC<StickyFooterProps> = ({ orderType, onSave, s
           </div>
         </>
       )}
-      {orderType === 'create' && (
+      {(orderType === 'create' || orderType === 'create-menual') && (
         <Button
           onClick={onSave}
           variant="default"
           disabled={saveLoading}
-          className={`flex items-center gap-2 h-8 px-6 uppercase text-xs font-bold transition-all bg-[#0060FE] hover:bg-blue-700 text-white shadow-sm`}
+          className={`flex items-center gap-2 h-8 px-6 uppercase text-xs font-bold transition-all bg-primary hover:bg-primary-hover text-white shadow-sm`}
         >
           {saveLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
           Save
@@ -68,7 +68,7 @@ export const StickyFooter: React.FC<StickyFooterProps> = ({ orderType, onSave, s
           onClick={onConsign}
           variant="default"
           disabled={saveLoading}
-          className={`flex items-center gap-2 h-8 px-6 uppercase text-xs font-bold transition-all bg-[#0060FE] hover:bg-blue-700 text-white shadow-sm`}
+          className={`flex items-center gap-2 h-8 px-6 uppercase text-xs font-bold transition-all bg-primary hover:bg-primary-hover text-white shadow-sm`}
         >
           {saveLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
           Consign order

@@ -1,13 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import {
-  Accordion,
-  AccordionContent,
-  AccordionItem,
-  AccordionTrigger,
-} from "@/components/ui/accordion";
-// import { generateUniqueId } from '@/lib/utils';
-import { FormInput, FormSelect, ValidAddressBadge } from '@/features/orders/components/OrderFormUI';
+import { FormInput, FormSelect } from '@/features/orders/components/OrderFormUI';
 import type { AddressData, CreateOrderDialogProps } from '@/features/orders/types';
 import { CustomModel } from '@/components/ui/dialog';
 import { showToast } from '@/components/ui/custom-toast';
@@ -15,21 +8,6 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { PlaceAutocomplete } from '@/components/common/AutoComplateAddress';
 import { cn } from '@/lib/utils';
 import { STATES } from '@/constants';
-
-// const initialData: AddressData = {
-//   name: '',
-//   email: '',
-//   phone: '',
-//   company: '',
-//   address1: '',
-//   suburb: '',
-//   state: '',
-//   street_number: '',
-//   street_name: '',
-//   postcode: '',
-//   country: '',
-//   saveToAddressBook: false,
-// };
 
 export default function CreateOrderDialog({ onOpenChange, type, open, initialData, onSubmit, isEdit }: CreateOrderDialogProps) {
   const navigate = useNavigate();
@@ -41,11 +19,25 @@ export default function CreateOrderDialog({ onOpenChange, type, open, initialDat
     setFormData((prev) => ({ ...prev, [field]: value }));
   };
 
+  const isEmailValid = (email: string) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+  const isPhoneValid = (phone: string) => /^(?:\+61|0)[2-478](?:[ -]?[0-9]){8}$/.test(phone.replace(/[\s-()]/g, ''));
+
   const handleSubmit = async () => {
     setIsSubmitting(true);
     const { address1, country, name, postcode, state, street_name, street_number, suburb, phone, email } = formData;
     if (!name || !address1 || !street_number || !street_name || !suburb || !state || !postcode || !country || !phone || !email) {
+      console.log(formData, 'formData')
       showToast("Please fill in all required fields", "error");
+      return;
+    }
+
+    if (!isEmailValid(email)) {
+      showToast("Please enter a valid email address", "error");
+      return;
+    }
+
+    if (!isPhoneValid(phone)) {
+      showToast("Please enter a valid Australian phone number", "error");
       return;
     }
     onSubmit(type!, formData)
@@ -61,6 +53,7 @@ export default function CreateOrderDialog({ onOpenChange, type, open, initialDat
     if (value) return
     navigate(-1);
   }
+
   return (
     <CustomModel
       open={open}
@@ -69,17 +62,31 @@ export default function CreateOrderDialog({ onOpenChange, type, open, initialDat
       description={`Enter the ${type}'s address. You can lookup a customer's details saved in the address book to complete this section.`}
       contentClass='min-w-3xl'
       onSubmit={handleSubmit}
+      customFooter={<div className="flex items-center gap-2 pt-2">
+        <Checkbox
+          id="saveToAddressBook"
+          checked={formData.saveToAddressBook}
+          onCheckedChange={(checked) => updateField('saveToAddressBook', checked as boolean)}
+          className="data-[state=checked]:bg-primary data-[state=checked]:border-primary rounded-[4px]"
+        />
+        <label
+          htmlFor="saveToAddressBook"
+          className="text-[13px] font-semibold text-slate-700 dark:text-zinc-300 cursor-pointer select-none"
+        >
+          Save address to address book
+        </label>
+      </div>}
     >
       <div className="flex-1 overflow-y-auto p-4 pt-0 custom-scrollbar">
         <div className="space-y-5 max-w-5xl mx-auto">
 
           <div className="flex flex-col md:flex-row gap-0">
-            <div className="flex overflow-hidden border border-[#0060fe] shrink-0 h-8">
+            <div className="flex overflow-hidden border border-primary shrink-0 h-8">
               <button
                 onClick={() => setActiveLookup('contact')}
                 className={cn(
-                  "px-6 py-2 text-[10px] font-bold tracking-widest transition-colors border-r border-[#0060fe]",
-                  activeLookup === 'contact' ? "bg-[#0060fe] text-white" : "bg-white text-[#0060fe]"
+                  "px-6 py-2 text-[10px] font-bold tracking-widest transition-colors border-r border-primary",
+                  activeLookup === 'contact' ? "bg-primary text-white" : "bg-white text-primary"
                 )}
               >
                 LOOK UP CONTACT
@@ -88,7 +95,7 @@ export default function CreateOrderDialog({ onOpenChange, type, open, initialDat
                 onClick={() => setActiveLookup('address')}
                 className={cn(
                   "px-6 py-2 text-[10px] font-bold tracking-widest transition-colors",
-                  activeLookup === 'address' ? "bg-[#0060fe] text-white" : "bg-white text-[#0060fe]"
+                  activeLookup === 'address' ? "bg-primary text-white" : "bg-white text-primary"
                 )}
               >
                 LOOK UP ADDRESS
@@ -110,7 +117,7 @@ export default function CreateOrderDialog({ onOpenChange, type, open, initialDat
                   updateField('street_number', opt.street_number);
                   updateField('street_type', opt.street_type);
                 }}
-                onChange={(value) => updateField('address', value!)}
+                onChange={(value) => { updateField('address', value!); updateField('address1', value!) }}
                 value={formData.address}
                 inputClassName='rounded-none'
               />
@@ -140,8 +147,8 @@ export default function CreateOrderDialog({ onOpenChange, type, open, initialDat
                 layout="horizontal"
                 placeholder="Enter Email"
                 required
-                error={isSubmitting && formData.email?.trim() === ''}
-                errormsg="Please enter your email"
+                error={isSubmitting && (!formData.email?.trim() || !isEmailValid(formData.email))}
+                errormsg={!formData.email?.trim() ? "Please enter your email" : "Please enter a valid email address"}
               />
               <FormInput
                 label="PHONE"
@@ -150,8 +157,8 @@ export default function CreateOrderDialog({ onOpenChange, type, open, initialDat
                 layout="horizontal"
                 placeholder="Enter Phone"
                 required
-                error={isSubmitting && formData.phone?.trim() === ''}
-                errormsg="Please enter your phone"
+                error={isSubmitting && (!formData.phone?.trim() || !isPhoneValid(formData.phone))}
+                errormsg={!formData.phone?.trim() ? "Please enter your phone" : "Please enter a valid phone number"}
               />
               <div className="space-y-4">
                 <FormInput
@@ -161,36 +168,9 @@ export default function CreateOrderDialog({ onOpenChange, type, open, initialDat
                   layout="horizontal"
                   placeholder='Enter Company name'
                 />
-                {/* <FormInput
-                label="BUILDING"
-                value={formData.receiverBuilding}
-                onChange={val => updateField('receiverBuilding', val)}
-                layout="horizontal"
-              /> */}
-                {/* <FormTextarea
-                label="INSTRUCTIONS"
-                value={formData.receiverInstructions}
-                onChange={val => updateField('receiverInstructions', val)}
-                rows={5}
-                layout="horizontal"
-              /> */}
-                <div className="flex justify-start">
+                {/* <div className="flex justify-start">
                   <ValidAddressBadge />
-                </div>
-                <div className="flex items-center gap-2 pt-2">
-                  <Checkbox
-                    id="saveToAddressBook"
-                    checked={formData.saveToAddressBook}
-                    onCheckedChange={(checked) => updateField('saveToAddressBook', checked as boolean)}
-                    className="data-[state=checked]:bg-[#0060FE] data-[state=checked]:border-[#0060FE] rounded-[4px]"
-                  />
-                  <label
-                    htmlFor="saveToAddressBook"
-                    className="text-[13px] font-semibold text-slate-700 dark:text-zinc-300 cursor-pointer select-none"
-                  >
-                    Save address to address book
-                  </label>
-                </div>
+                </div> */}
               </div>
             </div>
 
@@ -279,7 +259,7 @@ export default function CreateOrderDialog({ onOpenChange, type, open, initialDat
           </div>
 
           {/* Address Validation Accordion */}
-          <div className="col-span-12">
+          {/* <div className="col-span-12">
             <Accordion className="w-full border border-slate-200 dark:border-zinc-800 rounded-md bg-white dark:bg-zinc-950/50 shadow-sm overflow-hidden">
               <AccordionItem value="validation" className="border-none [&>h3]:my-0">
                 <AccordionTrigger className="px-5 py-3 hover:no-underline flex justify-between items-center group">
@@ -292,7 +272,7 @@ export default function CreateOrderDialog({ onOpenChange, type, open, initialDat
                 </AccordionContent>
               </AccordionItem>
             </Accordion>
-          </div>
+          </div> */}
 
         </div>
       </div>

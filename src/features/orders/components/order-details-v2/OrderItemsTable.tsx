@@ -15,8 +15,8 @@ export const OrderItemsTable = ({ items }: { items: OrderItem[] }) => (
                         Package contents, quantities, and dimensions
                     </CardDescription>
                 </div>
-                <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-blue-100">
-                    <Box className="h-5 w-5" />
+                <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-primary/10">
+                    <Box className="h-5 w-5 text-primary" />
                 </div>
             </div>
         </CardHeader>

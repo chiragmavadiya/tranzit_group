@@ -43,8 +43,8 @@ export default function TransactionsPage() {
       label: 'Balance',
       value: '$1,379.03',
       icon: Wallet,
-      iconColor: 'text-blue-600',
-      iconBg: 'bg-blue-50 dark:bg-blue-500/10',
+      iconColor: 'text-primary',
+      iconBg: 'bg-primary/5 dark:bg-primary/10',
     },
   ], []);
 
@@ -75,7 +75,7 @@ export default function TransactionsPage() {
           <h2 className="text-lg font-bold text-slate-800 dark:text-zinc-200">Wallet Summary</h2>
           <Button
             onClick={() => navigate('/wallet/top-up')}
-            className="h-8 gap-1 bg-[#0060FE] hover:bg-[#0052db]"
+            className="h-8 gap-1 bg-primary hover:bg-primary-hover"
           >
             <Plus className="h-4 w-4" />
             Top Up Wallet

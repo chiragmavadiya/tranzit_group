@@ -10,7 +10,7 @@ interface BookPickupTabsProps {
 
 export function BookPickupTabs({ activeTab, onTabChange, className }: BookPickupTabsProps) {
     return (
-        <nav className={cn("flex items-center space-x-8 h-full", className)} aria-label="Book Pickup Tabs">
+        <nav className={cn("flex space-x-6 h-full items-end", className)} aria-label="Book Pickup Tabs">
             {BOOK_PICKUP_TABS.map((tab) => {
                 const isActive = activeTab === tab.id;
 
@@ -19,21 +19,23 @@ export function BookPickupTabs({ activeTab, onTabChange, className }: BookPickup
                         key={tab.id}
                         onClick={() => onTabChange(tab.id as BookPickupTabType)}
                         className={cn(
-                            "h-full px-1 border-b-2 font-bold text-[13px] uppercase tracking-wider transition-all duration-300 relative flex items-center gap-2 outline-none whitespace-nowrap",
+                            "h-10 px-6 border font-semibold text-[13px] rounded-t-md transition-all duration-200 relative flex items-center gap-2 outline-none whitespace-nowrap",
                             isActive
-                                ? "border-blue-600 text-blue-600 dark:text-blue-400 dark:border-blue-400"
-                                : "border-transparent text-slate-400 dark:text-zinc-500 hover:text-slate-600 dark:hover:text-zinc-300 hover:border-slate-200 dark:hover:border-zinc-800"
+                                ? "border-gray-200 border-b-white text-primary dark:border-zinc-800 dark:border-b-zinc-950"
+                                : "border-transparent text-gray-500 dark:text-zinc-400 hover:text-gray-700 dark:hover:text-zinc-200 hover:border-gray-200 dark:hover:border-zinc-600"
                         )}
                     >
                         {tab.label}
-                        <span className={cn(
-                            "px-1.5 py-0.5 text-[10px] rounded-full font-bold transition-all duration-300",
-                            isActive
-                                ? "bg-blue-100 dark:bg-blue-900/40 text-blue-600 dark:text-blue-400"
-                                : "bg-slate-100 dark:bg-zinc-800 text-slate-400 dark:text-zinc-500"
-                        )}>
-                            {tab.count}
-                        </span>
+                        {tab.count > 0 && (
+                            <span className={cn(
+                                "px-1.5 py-0.5 text-[10px] rounded-full font-bold transition-all duration-300",
+                                isActive
+                                    ? "bg-primary/10 text-primary"
+                                    : "bg-gray-100 dark:bg-zinc-800 text-gray-400 dark:text-zinc-500"
+                            )}>
+                                {tab.count}
+                            </span>
+                        )}
                     </button>
                 );
             })}

@@ -33,7 +33,7 @@ export const WALLET_COLUMNS: Column<WalletTransaction>[] = [
     header: 'PAYMENT RECEIPT',
     className: 'text-center',
     cell: () => (
-      <Button variant="ghost" size="icon" className="h-8 w-8 text-blue-500 hover:text-blue-600 hover:bg-blue-50">
+      <Button variant="ghost" size="icon" className="h-8 w-8 text-primary/70 hover:text-primary hover:bg-primary/10">
         <Download className="h-4 w-4" />
       </Button>
     )
@@ -58,15 +58,6 @@ export const ADMIN_TOPUP_COLUMNS: Column<any>[] = [
   { key: 'reason', header: 'REASON', sortable: true },
   { key: 'transaction_id', header: 'TRANSACTION ID', sortable: true, noPrint: true },
   { key: 'date', header: 'TRANSACTION DATE & TIME', sortable: true, noPrint: true },
-];
-
-export const ADMIN_MOCK_TRANSACTIONS = [
-  { id: '1', customer_name: 'Ashish Tukadiya', type: 'Credit', amount: '$95.26', reason: 'Wallet Topup', transaction_id: 'pi_3SuvdNBUIf6mLDll15s9iRuU', date: '29 Jan 2026, 7:21 PM' },
-  { id: '2', customer_name: 'Ashish Tukadiya', type: 'Debit', amount: '$95.26', reason: 'Consignment 01KG50BQFH4TJKTFEZB4ASCGY8', transaction_id: '-', date: '29 Jan 2026, 7:21 PM' },
-  { id: '3', customer_name: 'Chirag 10 Gondaliya 10', type: 'Credit', amount: '$14.83', reason: 'Wallet Topup', transaction_id: 'pi_3Sk29gBUIF6mLDIll0rf0RYnQ', date: '30 Dec 2025, 6:06 PM' },
-  { id: '4', customer_name: 'Chirag 10 Gondaliya 10', type: 'Debit', amount: '$14.83', reason: 'Consignment 01KDQM3F6PDC0KPWTCH3E5B456', transaction_id: '-', date: '30 Dec 2025, 6:06 PM' },
-  { id: '5', customer_name: 'Chirag 10 Gondaliya 10', type: 'Credit', amount: '$100.00', reason: 'Wallet Topup', transaction_id: 'pi_3Sk2AlBUIF6mLDI107h9dNEN', date: '30 Dec 2025, 6:07 PM' },
-
 ];
 
 export const TRANSACTION_TYPES = [

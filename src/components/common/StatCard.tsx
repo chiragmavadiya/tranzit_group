@@ -25,7 +25,7 @@ function StatCardSkeleton({ className }: { className?: string }) {
 export const StatCard = memo(({ label, value, icon: Icon, subValue, color, className, contentClassName, iconBg, iconColor, loading = false }: StatItem) => {
   if (loading) return <StatCardSkeleton />
   return (
-    <Card className={cn("border ring-0 shadow-md border-gray-200 dark:border-zinc-800 rounded-xl bg-white dark:bg-zinc-950 transition-colors duration-300 hover:-translate-y- hover:border-blue-300", className)}>
+    <Card className={cn("border ring-0 shadow-md border-gray-200 dark:border-zinc-800 rounded-xl bg-white dark:bg-zinc-950 transition-colors duration-300 hover:-translate-y- hover:border-primary/50", className)}>
       <CardContent className={cn("p-5 flex items-center justify-between gap-4", contentClassName)}>
         <div className="flex flex-col min-w-0">
           <span className="text-[11px] font-bold text-slate-500 dark:text-zinc-500 uppercase tracking-widest leading-tight">

@@ -13,8 +13,8 @@ export function InvoiceStats({ stats }: InvoiceStatsProps) {
       label: 'Total Invoice',
       value: stats?.total_invoice || 0,
       icon: FileText,
-      iconColor: 'text-blue-600',
-      iconBg: 'bg-blue-50 dark:bg-blue-500/10',
+      iconColor: 'text-primary',
+      iconBg: 'bg-primary/10 dark:bg-primary/20',
     },
     {
       label: 'Invoice Pending',

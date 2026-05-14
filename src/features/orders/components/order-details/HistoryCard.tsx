@@ -42,9 +42,9 @@ export const HistoryCard: React.FC<HistoryCardProps> = ({ history }) => {
         </CardTitle>
         <div className="flex items-center gap-2">
           {isCardExpanded ? (
-            <ChevronUp className="h-5 w-5 text-[#0060FE]" />
+            <ChevronUp className="h-5 w-5 text-primary" />
           ) : (
-            <ChevronDown className="h-5 w-5 text-[#0060FE]" />
+            <ChevronDown className="h-5 w-5 text-primary" />
           )}
         </div>
       </CardHeader>
@@ -63,7 +63,7 @@ export const HistoryCard: React.FC<HistoryCardProps> = ({ history }) => {
                       <Button
                         variant="ghost"
                         size="icon"
-                        className="h-4 w-4 p-0 text-[#0060FE] hover:bg-transparent"
+                        className="h-4 w-4 p-0 text-primary hover:bg-transparent"
                         onClick={() => toggleItem(item.id)}
                       >
                         {isExpanded ? (
@@ -83,7 +83,7 @@ export const HistoryCard: React.FC<HistoryCardProps> = ({ history }) => {
                     {/* <Button
                       variant="ghost"
                       size="icon"
-                      className="h-8 w-8 text-[#0060FE] hover:bg-blue-50 dark:hover:bg-blue-900/20"
+                      className="h-8 w-8 text-primary hover:bg-primary/10"
                     >
                       <Download className="h-4 w-4" />
                     </Button> */}

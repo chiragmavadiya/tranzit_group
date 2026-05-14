@@ -29,7 +29,7 @@ export const CreditApplicationTab = () => {
                             Reject
                         </Button>
                         <Button
-                            className="h-8 rounded-lg bg-blue-600 hover:bg-blue-700 text-white gap-2 shadow-md shadow-blue-600/10"
+                            className="h-8 rounded-lg bg-primary hover:bg-primary-hover text-white gap-2 shadow-md shadow-primary/20"
                         >
                             <Check className="h-3.5 w-3.5" />
                             Approve

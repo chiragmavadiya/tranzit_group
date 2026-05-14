@@ -187,7 +187,7 @@ export default function CustomerDialog({ open, onOpenChange, customerId }: Custo
         {isLoadingDetails && (
           <div className="absolute inset-0 z-50 flex items-center justify-center bg-white/60 dark:bg-zinc-900/60 backdrop-blur-[1px]">
             <div className="flex flex-col items-center gap-2">
-              <Loader2 className="h-8 w-8 text-blue-600 animate-spin" />
+              <Loader2 className="h-8 w-8 text-primary animate-spin" />
               <p className="text-xs font-bold text-slate-500 uppercase tracking-widest">Loading customer details...</p>
             </div>
           </div>
@@ -266,7 +266,7 @@ export default function CustomerDialog({ open, onOpenChange, customerId }: Custo
         <div className="space-y-8 animate-in fade-in slide-in-from-right-4 duration-300">
           <div className="">
             <div className="flex items-center gap-2 border-b border-slate-50 dark:border-zinc-900 mb-4">
-              <Receipt className="w-4 h-4 text-blue-600" />
+              <Receipt className="w-4 h-4 text-primary" />
               <h3 className="my-0 text-sm font-bold text-slate-900 dark:text-zinc-100">Billing Address</h3>
             </div>
             <div className="grid grid-cols-12 gap-x-4 gap-y-4">
@@ -472,7 +472,7 @@ export default function CustomerDialog({ open, onOpenChange, customerId }: Custo
             <div className="p-4 rounded-2xl border border-slate-100 dark:border-zinc-800 bg-slate-50/50 dark:bg-zinc-900/50 space-y-4">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
-                  <div className="w-8 h-8 rounded-lg bg-blue-100 dark:bg-blue-500/20 flex items-center justify-center text-blue-600 dark:text-blue-400">
+                  <div className="w-8 h-8 rounded-lg bg-primary/10 dark:bg-primary/20 flex items-center justify-center text-primary">
                     <Truck className="w-4 h-4" />
                   </div>
                   <span className="text-sm font-bold">Direct Freight Express</span>
@@ -571,14 +571,14 @@ export default function CustomerDialog({ open, onOpenChange, customerId }: Custo
             </div>
 
             {/* Account Settings */}
-            <div className="p-4 rounded-2xl border border-blue-200 dark:border-blue-900/50 bg-blue-50/30 dark:bg-blue-900/10 flex items-center justify-between">
+            <div className="p-4 rounded-2xl border border-primary/20 dark:border-primary/50 bg-primary/5 dark:bg-primary/10 flex items-center justify-between">
               <div className="flex items-center gap-3">
-                <div className="w-8 h-8 rounded-lg bg-blue-600 text-white flex items-center justify-center">
+                <div className="w-8 h-8 rounded-lg bg-primary text-white flex items-center justify-center">
                   <Wallet className="w-4 h-4" />
                 </div>
                 <div>
                   <span className="text-sm font-bold">Enable Wallet Top-up</span>
-                  <p className="my-0 text-[10px] text-blue-600 dark:text-blue-400 font-medium">Allow customer to add funds to balance</p>
+                  <p className="my-0 text-[10px] text-primary font-medium">Allow customer to add funds to balance</p>
                 </div>
               </div>
               <Switch

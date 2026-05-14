@@ -13,7 +13,7 @@ export const ProfileTab = ({ customerId }: ProfileTabProps) => {
     const { data: response, isLoading } = useCustomerProfile(customerId);
 
     if (isLoading) {
-        return <div className="p-8 flex justify-center"><span className="w-8 h-8 border-4 border-blue-600/30 border-t-blue-600 rounded-full animate-spin" /></div>;
+        return <div className="p-8 flex justify-center"><span className="w-8 h-8 border-4 border-primary/30 border-t-primary rounded-full animate-spin" /></div>;
     }
 
     const customer = response?.data;
@@ -61,8 +61,8 @@ export const ProfileTab = ({ customerId }: ProfileTabProps) => {
                                     <div className="flex items-center justify-between">
                                         <span className="text-xs font-bold text-slate-900 dark:text-zinc-100">{m.title}</span>
                                         <div className="flex items-center gap-1.5">
-                                            <div className="h-1.5 w-1.5 rounded-full bg-blue-500" />
-                                            <span className="text-[10px] font-black text-blue-600 dark:text-blue-400 uppercase tracking-widest">${m.markup}</span>
+                                            <div className="h-1.5 w-1.5 rounded-full bg-primary" />
+                                            <span className="text-[10px] font-black text-primary uppercase tracking-widest">${m.markup}</span>
                                         </div>
                                     </div>
                                     <div className="flex items-center justify-between">

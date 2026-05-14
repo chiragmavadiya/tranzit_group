@@ -827,9 +827,9 @@ function TreeItem({
                             }}
                         >
                             {isExpanded ? (
-                                <FolderOpen className="w-4 h-4 text-blue-500 fill-blue-500/20" />
+                                <FolderOpen className="w-4 h-4 text-primary fill-primary/20" />
                             ) : (
-                                <Folder className="w-4 h-4 text-blue-500 fill-blue-500/20" />
+                                <Folder className="w-4 h-4 text-primary fill-primary/20" />
                             )}
                         </div>
                     ) : (

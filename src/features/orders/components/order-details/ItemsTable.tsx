@@ -37,7 +37,7 @@ export const ItemsTable: React.FC<ItemsTableProps> = ({
   orderType = "create"
 }) => {
   // const { orderType } = useParams<{ orderType?: string }>()
-  const isEditable = orderType === 'create' || orderType === 'consign'
+  const isEditable = orderType === 'create' || orderType === 'create-menual' || orderType === 'consign'
 
   const { data: itemsResponse } = useItems({ per_page: 100 }, isEditable)
   const predefinedItems = useMemo(() => itemsResponse?.data || [], [itemsResponse])
@@ -71,7 +71,7 @@ export const ItemsTable: React.FC<ItemsTableProps> = ({
 
       {/* ORDER QUOTATION SUMMARY */}
       <AccordionItem value="summary" className="border border-gray-200 dark:border-zinc-800 rounded-xl bg-white dark:bg-zinc-950 shadow-sm px-5 border-b overflow-hidden transition-colors duration-300 [&>h3]:my-0">
-        <AccordionTrigger className="hover:no-underline py-3 px-0 [&>svg]:text-[#0060FE] dark:[&>svg]:text-blue-500 items-center">
+        <AccordionTrigger className="hover:no-underline py-3 px-0 [&>svg]:text-primary items-center">
           <div className="flex items-center w-full justify-between ">
             <div className="flex items-center gap-2 text-gray-600 dark:text-zinc-300">
               <Box className="w-5 h-5" />
@@ -116,7 +116,7 @@ export const ItemsTable: React.FC<ItemsTableProps> = ({
                         <div className="flex flex-wrap items-center gap-y-4 gap-x-8 p-4 rounded-xl bg-gray-50/50 dark:bg-zinc-900/30 border border-gray-100 dark:border-zinc-800/50 hover:bg-gray-50 dark:hover:bg-zinc-900/50 transition-all duration-200">
                           {/* Item Type */}
                           <div className="flex items-center gap-3 min-w-[140px]">
-                            <div className="p-2 rounded-lg bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400">
+                            <div className="p-2 rounded-lg bg-primary/10 text-primary">
                               <Package className="w-4 h-4" />
                             </div>
                             <div>

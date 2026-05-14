@@ -16,6 +16,17 @@ export type ShippingActivity = {
     date_time: string
 }
 
+type CancelRequest = {
+    customer_name: string,
+    courier: string,
+    label_no: string,
+    requested_at: string,
+    requested_by: string,
+    refund_amount: number,
+    processed_at: null,
+    processed_by: ""
+}
+
 export type OrderDetailData = {
     order_number: string
     order_type: string
@@ -76,4 +87,5 @@ export type OrderDetailData = {
     payment_status: string
     status: string
     shipping_activity: ShippingActivity[]
+    cancel_request: CancelRequest | null
 }

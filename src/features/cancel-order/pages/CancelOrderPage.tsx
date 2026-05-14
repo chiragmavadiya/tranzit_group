@@ -1,18 +1,21 @@
 import { useMemo, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import SelectComponent from '@/components/ui/select';
 import { DataTable } from '@/components/common/DataTable';
-import { CANCEL_ORDER_COLUMNS } from '../columns';
+import { getCancelOrderColumns } from '../columns';
 import { useCancelOrders } from '../hooks/useCancelOrder';
 import { useDebounce } from '@/hooks/useDebounce';
+import { FormSelect } from '@/features/orders/components/OrderFormUI';
+import { useCustomers } from '@/features/customers/hooks/useCustomers';
+import { useRole } from '@/lib/utils';
 
 export default function CancelOrderPage() {
     const [searchParams] = useSearchParams();
     const activeTab = searchParams.get('tab') || 'request';
+    const role = useRole();
     const [search, setSearch] = useState('');
     const [page, setPage] = useState(1);
     const [pageSize, setPageSize] = useState(25);
-    const [customer, setCustomer] = useState('all');
+    const [customer, setCustomer] = useState('');
 
     const debouncedSearch = useDebounce(search, 500);
 
@@ -20,20 +23,24 @@ export default function CancelOrderPage() {
         status: activeTab === 'request' ? 'pending' : 'processed',
         search: debouncedSearch,
         page,
-        per_page: pageSize
+        per_page: pageSize,
+        customer: customer
     });
+    const { data: customersData } = useCustomers({ pageSize: 1000 });
 
     const orders = useMemo(() => cancelOrderData?.data || [], [cancelOrderData]);
     const totalItems = useMemo(() => cancelOrderData?.meta?.total || 0, [cancelOrderData]);
 
     const headerTitle = activeTab === 'request' ? "Cancel Request" : "Canceled Order";
 
+    const columns = useMemo(() => getCancelOrderColumns(role || ''), [role]);
+
     return (
-        <div className="flex flex-col flex-1 gap-6 p-page-padding min-h-0 animate-in fade-in slide-in-from-bottom-4 duration-700 bg-slate-50/30 dark:bg-zinc-950/30 overflow-y-auto">
+        <div className="flex flex-col flex-1 gap-6 p-page-padding min-h-0 animate-in fade-in slide-in-from-bottom-4 duration-700 bg-slate-50/30 dark:bg-zinc-950/30">
             {/* Table Section */}
             <div className="rounded-lg shadow-sm flex-1 flex flex-col min-h-0 border border-gray-100 dark:border-zinc-800 bg-white dark:bg-zinc-950 ">
                 <DataTable
-                    columns={CANCEL_ORDER_COLUMNS}
+                    columns={columns}
                     data={orders}
                     totalItems={totalItems}
                     pageSize={pageSize}
@@ -50,16 +57,26 @@ export default function CancelOrderPage() {
                     searchValue={search}
                     headerPosition="left"
                     customHeader={
-                        <SelectComponent
-                            placeholder="Select Customer"
+                        // <SelectComponent
+                        //     placeholder="Select Customer"
+                        //     value={customer}
+                        //     onValueChange={(val) => setCustomer(val || 'all')}
+                        //     data={[
+                        //         { label: 'All Customers', value: 'all' },
+                        //         { label: 'Shikhar Digisite', value: 'shikhar' },
+                        //         { label: 'Ashish', value: 'ashish' },
+                        //     ]}
+                        //     className="h-8 w-64 rounded-lg"
+                        // />
+                        <FormSelect
+                            placeholder='All Customers'
                             value={customer}
-                            onValueChange={(val) => setCustomer(val || 'all')}
-                            data={[
-                                { label: 'All Customers', value: 'all' },
-                                { label: 'Shikhar Digisite', value: 'shikhar' },
-                                { label: 'Ashish', value: 'ashish' },
-                            ]}
-                            className="h-8 w-64 rounded-lg"
+                            onValueChange={(val) => setCustomer(val || '')}
+                            options={customersData?.data?.map((c: any) => ({
+                                value: c.id.toString(),
+                                label: `${c.first_name} ${c.last_name}`
+                            })) || []}
+                            className='w-40'
                         />
                     }
                 />

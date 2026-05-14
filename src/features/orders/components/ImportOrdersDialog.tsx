@@ -87,7 +87,7 @@ export function ImportOrdersDialog({
           variant="ghost"
           onClick={handleDownloadSample}
           disabled={isLoading}
-          className="text-[12px] cursor-pointer font-bold text-[#0060FE] hover:text-blue-800 hover:bg-transparent px-0 transition-colors flex items-center gap-2 tracking-wider"
+          className="text-[12px] cursor-pointer font-bold text-primary hover:text-primary-hover hover:bg-transparent px-0 transition-colors flex items-center gap-2 tracking-wider"
         >
           <Download className="w-3.5 h-3.5" />
           <span className='leading-[100%]'>
@@ -115,7 +115,7 @@ export function ImportOrdersDialog({
         <div
           onClick={() => !isLoading && fileInputRef.current?.click()}
           className={`border-2 border-dashed rounded-xl p-10 flex flex-col items-center justify-center gap-3 transition-all ${isLoading ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer hover:bg-gray-50 dark:hover:bg-zinc-900/50'
-            } ${selectedFile ? 'border-blue-200 bg-blue-50/20 dark:border-blue-900/30' : submitted && !selectedFile ? 'border-red-300 bg-red-50/40 dark:border-red-900/30' : 'border-gray-200 dark:border-zinc-800'
+            } ${selectedFile ? 'border-primary/20 bg-primary/5 dark:border-primary/30' : submitted && !selectedFile ? 'border-red-300 bg-red-50/40 dark:border-red-900/30' : 'border-gray-200 dark:border-zinc-800'
             }`}
         >
           <input
@@ -129,8 +129,8 @@ export function ImportOrdersDialog({
 
           {selectedFile ? (
             <div className="flex flex-col items-center gap-2 relative text-center">
-              <div className="w-12 h-12 rounded-xl bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center mb-1">
-                <FileText className="w-6 h-6 text-blue-600" />
+              <div className="w-12 h-12 rounded-xl bg-primary/10 dark:bg-primary/30 flex items-center justify-center mb-1">
+                <FileText className="w-6 h-6 text-primary" />
               </div>
               <span className="text-sm font-bold text-slate-800 dark:text-zinc-200 max-w-[200px] truncate">
                 {selectedFile.name}
@@ -162,7 +162,7 @@ export function ImportOrdersDialog({
             variant="ghost"
             onClick={handleDownloadSample}
             disabled={isLoading}
-            className="text-[12px] cursor-pointer font-bold text-[#0060FE] hover:text-blue-700 transition-colors flex items-center gap-2 tracking-wider"
+            className="text-[12px] cursor-pointer font-bold text-primary hover:text-primary-hover transition-colors flex items-center gap-2 tracking-wider"
           >
             <Download className="w-3.5 h-3.5" />
             Download sample CSV

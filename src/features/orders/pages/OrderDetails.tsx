@@ -1,6 +1,6 @@
 import React, { useCallback, useMemo, useState, useEffect } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
-import { Loader2 } from 'lucide-react'
+import { Loader2, AlertTriangle, XCircle } from 'lucide-react'
 import { format } from 'date-fns'
 import { OrderHeader } from '@/features/orders/components/order-details/OrderHeader'
 import { AddressCard } from '@/features/orders/components/order-details/AddressCard'
@@ -9,8 +9,9 @@ import { HistoryCard } from '@/features/orders/components/order-details/HistoryC
 import { SidePanel } from '@/features/orders/components/order-details/SidePanel'
 import { StickyFooter } from '@/features/orders/components/order-details/StickyFooter'
 import CreateOrderDialog from '@/features/orders/components/CreateOrderDialog'
+import { FormInput, FormSelect } from '@/features/orders/components/OrderFormUI'
+import { useGlobalCouriers } from '@/features/courier-surcharge/hooks/useGlobalCouriers'
 import { ItemsTable } from '@/features/orders/components/order-details/ItemsTable'
-// import { PackagingTable } from '@/features/orders/components/order-details/PackagingTable'
 import { useOrderItems } from '@/features/orders/hooks/useOrderItems'
 import type { AddressData } from '../types'
 import { useCreateOrder, useOrderDetails, useDownloadLabel, useWalletCheck, useCancelOrder, useConsignOrder } from '../hooks/useOrders'
@@ -22,44 +23,43 @@ import { showToast } from '@/components/ui/custom-toast'
 import { Checkbox } from '@/components/ui/checkbox'
 import { DANGEROUS_GOODS_URL, PRIVACY_POLICY_URL, TERMS_CONDITIONS_URL } from '@/constants'
 import { useAppSelector } from '@/hooks/store.hooks'
-// import { useOrderPackaging } from '@/features/orders/hooks/useOrderPackaging'
+import { Button } from '@/components/ui/button'
 
 const OrderDetailsPage: React.FC = () => {
   const { orderType, orderID } = useParams<{ orderType: string, orderID: string }>()
   const { role, user } = useAppSelector((state) => state.auth)
+
+  // API's Hooks
   const { mutate: createOrder, isPending: saveLoading } = useCreateOrder()
   const { mutate: checkWallet, isPending: walletLoading } = useWalletCheck()
-  const [walletCheckOpen, setWalletCheckOpen] = useState(false)
-  const [walletCheckData, setWalletCheckData] = useState<WalletCheckResponse | null>(null)
   const { data: orderResponse, isLoading: isOrderLoading } = useOrderDetails(orderID || '')
   const { mutate: downloadLabel, isPending: isDownloadingLabel } = useDownloadLabel()
   const { mutate: cancelOrder, isPending: isCancelling } = useCancelOrder()
   const { mutate: consignOrder, isPending: isConsigning } = useConsignOrder(role === 'admin')
-
-
+  const { data: globalCouriers } = useGlobalCouriers(role === 'admin' && orderType === 'create-menual')
 
   const orderDetail = orderResponse?.data
   const navigate = useNavigate()
-  const isEditable = orderType === 'create' || orderType === 'consign'
+  const isEditable = orderType === 'create' || orderType === 'consign' || orderType === 'create-menual'
 
+  const [walletCheckOpen, setWalletCheckOpen] = useState(false)
+  const [walletCheckData, setWalletCheckData] = useState<WalletCheckResponse | null>(null)
   const [quoteData, setQuoteData] = useState<any>(null);
-
-
   const [addressData, setAddressData] = useState<{ sender: AddressData, receiver: AddressData }>(() => ({
     sender: {
       email: user?.email || "",
       phone: user?.office_number || "",
       company: user?.company_name || "",
-      address: user?.addresses[0]?.address || '',
-      address1: user?.addresses[0]?.address || '',
-      suburb: user?.addresses[0]?.suburb || '',
-      state: user?.addresses[0]?.state || '',
-      street_name: user?.addresses[0]?.street_name || '',
-      street_number: user?.addresses[0]?.street_number || '',
-      postcode: user?.addresses[0]?.postcode || '',
+      address: user?.addresses?.[0]?.address || '',
+      address1: user?.addresses?.[0]?.address || '',
+      suburb: user?.addresses?.[0]?.suburb || '',
+      state: user?.addresses?.[0]?.state || '',
+      street_name: user?.addresses?.[0]?.street_name || '',
+      street_number: user?.addresses?.[0]?.street_number || '',
+      postcode: user?.addresses?.[0]?.postcode || '',
       country: "",
       unit_number: "",
-      name: user?.first_name + " " + user?.last_name,
+      name: (user?.first_name || '') + " " + (user?.last_name || ''),
       saveToAddressBook: false,
     },
     receiver: {
@@ -80,8 +80,14 @@ const OrderDetailsPage: React.FC = () => {
     }
   }))
   const [courierData, setCourierData] = useState<any>(null)
+  const [manualOrderData, setManualOrderData] = useState({
+    trackingNumber: '',
+    courierId: '',
+    amount: '',
+  });
+
   const initialDialogMode = useMemo(() => {
-    if (orderType === 'create' && addressData.receiver.address1 === '') {
+    if ((orderType === 'create' || orderType === 'create-menual') && addressData.receiver.address1 === '') {
       return "receiver"
     }
     return null
@@ -122,7 +128,29 @@ const OrderDetailsPage: React.FC = () => {
   }, [role, orderID, navigate])
 
   useEffect(() => {
-    if (orderDetail && orderType !== 'create') {
+    if (role === 'customer' && user && (orderType === 'create' || orderType === 'create-menual')) {
+      setAddressData(prev => ({
+        ...prev,
+        sender: {
+          ...prev.sender,
+          email: user.email || "",
+          phone: user.office_number || "",
+          company: user.company_name || "",
+          address: user.addresses?.[0]?.address || '',
+          address1: user.addresses?.[0]?.address || '',
+          suburb: user.addresses?.[0]?.suburb || '',
+          state: user.addresses?.[0]?.state || '',
+          street_name: user.addresses?.[0]?.street_name || '',
+          street_number: user.addresses?.[0]?.street_number || '',
+          postcode: user.addresses?.[0]?.postcode || '',
+          name: user.first_name + " " + user.last_name,
+        }
+      }))
+    }
+  }, [user, role, orderType])
+
+  useEffect(() => {
+    if (orderDetail && orderType !== 'create' && orderType !== 'create-menual') {
       setAddressData({
         sender: {
           name: orderDetail.sender_details?.name || "",
@@ -218,8 +246,18 @@ const OrderDetailsPage: React.FC = () => {
     const hasSenderAddress = Boolean(addressData?.sender?.address1);
     const hasReceiverAddress = Boolean(addressData?.receiver?.address1);
 
+    if (role === "admin" && !selectedCustomer) {
+      showToast('Please select a customer.', "error");
+      return;
+    }
+
     if (!isValidItems || !hasSenderAddress || !hasReceiverAddress) {
       showToast('Please fill out item dimensions and complete both addresses.', "error");
+      return;
+    }
+
+    if (role === 'admin' && !pickupDate) {
+      showToast('Please select a pickup date.', "error");
       return;
     }
 
@@ -246,18 +284,27 @@ const OrderDetailsPage: React.FC = () => {
         total: quoteData?.courier.price || 0,
         freight_levy: quoteData?.courier.freight_levy || 0,
       },
-      // capture: walletCheckData ? walletCheckData?.wallet_balance > calculation.grandTotal : false,
-      capture: false,
+      // capture: role === "admin" ? true : walletCheckData ? walletCheckData?.wallet_balance > calculation.grandTotal : false,
+      capture: role === "admin" || (walletCheckData?.wallet_balance ?? 0) > calculation.grandTotal,
       save_address: addressData?.receiver?.saveToAddressBook ? 1 : 0,
-      customer_id: selectedCustomer || undefined
+      customer_id: selectedCustomer || undefined,
+      ...(orderType === 'create-menual' ? {
+        tracking_number: manualOrderData.trackingNumber,
+        courier_id: manualOrderData.courierId,
+        amount: manualOrderData.amount
+      } : {})
     }
 
     const executeCreateOrder = () => {
       createOrder(payload, {
         onSuccess: (response) => {
-          showToast('Orders Created successfully', "success");
-          navigate(`${role === 'admin' ? '/admin' : ''}/orders/edit/${response.order_number}`)
-          setWalletCheckOpen(false)
+          if (response.ok) {
+            showToast('Orders Created successfully', "success");
+            navigate(`${role === 'admin' ? '/admin' : ''}/orders/edit/${response.order_number}`)
+            setWalletCheckOpen(false)
+          } else {
+            showToast(response.message || "Failed to create orders", "error");
+          }
         },
         onError: (error: any) => {
           showToast(error?.response?.data?.message || 'Failed to create orders', "error");
@@ -265,7 +312,7 @@ const OrderDetailsPage: React.FC = () => {
       });
     }
 
-    if (skipWalletCheckArg === true) {
+    if (skipWalletCheckArg === true || role === "admin") {
       executeCreateOrder()
       return
     }
@@ -279,18 +326,18 @@ const OrderDetailsPage: React.FC = () => {
           executeCreateOrder()
         }
       },
-      onError: (err) => {
-        console.error("Wallet check failed:", err)
+      onError: () => {
+        showToast('Failed to create orders', "error");
         // executeCreateOrder()
       }
     })
-  }, [createOrder, checkWallet, addressData, itemsData, insuranceSelected, signatureSelected, deliveryInstructions, termsAccepted, quoteData, courierData, pickupDate, navigate, ratesAccepted, dangerousGoodsAccepted, role, selectedCustomer, calculation.grandTotal])
+  }, [itemsData, addressData, role, selectedCustomer, pickupDate, termsAccepted, ratesAccepted, dangerousGoodsAccepted, courierData, insuranceSelected, signatureSelected, deliveryInstructions, quoteData?.courier, walletCheckData, calculation.grandTotal, orderType, manualOrderData.trackingNumber, manualOrderData.courierId, manualOrderData.amount, checkWallet, createOrder, navigate])
 
   const onCancelOrder = useCallback(() => {
     if (orderID) {
       cancelOrder(orderID, {
-        onSuccess: () => {
-          showToast('Order cancelled successfully', "success");
+        onSuccess: (response) => {
+          showToast(response?.message || "Order cancelled successfully", "success");
           navigate(`${role === 'admin' ? '/admin' : ''}/orders`)
         },
 
@@ -353,7 +400,12 @@ const OrderDetailsPage: React.FC = () => {
         gst: quoteData?.courier?.gst || calculation.gst,
         total: quoteData?.courier?.price || calculation.grandTotal
       },
-      capture: true
+      capture: true,
+      ...(orderType === 'create-menual' ? {
+        tracking_number: manualOrderData.trackingNumber,
+        courier_id: manualOrderData.courierId,
+        amount: manualOrderData.amount
+      } : {})
     }
 
     if (orderID) {
@@ -367,14 +419,14 @@ const OrderDetailsPage: React.FC = () => {
         }
       })
     }
-  }, [orderID, consignOrder, addressData, itemsData, courierData, insuranceSelected, signatureSelected, deliveryInstructions, pickupDate, termsAccepted, quoteData, calculation, selectedCustomer, orderDetail, navigate, role, ratesAccepted, dangerousGoodsAccepted])
+  }, [termsAccepted, ratesAccepted, dangerousGoodsAccepted, selectedCustomer, orderDetail?.sender_details?.customer_id, addressData.sender.name, addressData.sender.company, addressData.sender.phone, addressData.sender.email, addressData.sender.address1, addressData.sender.suburb, addressData.sender.state, addressData.sender.postcode, addressData.sender.country, addressData.receiver.name, addressData.receiver.company, addressData.receiver.phone, addressData.receiver.email, addressData.receiver.address1, addressData.receiver.suburb, addressData.receiver.state, addressData.receiver.postcode, addressData.receiver.country, itemsData, courierData, insuranceSelected, signatureSelected, deliveryInstructions, pickupDate, quoteData?.courier?.base, quoteData?.courier?.gst, quoteData?.courier?.price, calculation.servicePrice, calculation.gst, calculation.grandTotal, orderType, manualOrderData.trackingNumber, manualOrderData.courierId, manualOrderData.amount, orderID, consignOrder, navigate, role])
 
 
-  if (isOrderLoading && orderType !== 'create') {
+  if (isOrderLoading && orderType !== 'create' && orderType !== 'create-menual') {
     return (
       <div className="flex items-center justify-center h-screen bg-white dark:bg-zinc-950">
         <div className="flex flex-col items-center gap-4">
-          <Loader2 className="w-10 h-10 animate-spin text-[#0060FE]" />
+          <Loader2 className="w-10 h-10 animate-spin text-primary" />
           <span className="text-sm font-bold text-gray-500 animate-pulse uppercase tracking-widest">Loading Order Details...</span>
         </div>
       </div>
@@ -405,7 +457,72 @@ const OrderDetailsPage: React.FC = () => {
         />
 
 
+        {orderDetail?.cancel_request && (
+          <div className="mb-4 p-5 bg-amber-50 dark:bg-amber-900/10 border border-amber-200 dark:border-amber-900/30 rounded-xl flex flex-col md:flex-row items-start md:items-center justify-between gap-4 animate-in slide-in-from-top-2 duration-500 shadow-sm">
+            <div className="flex items-center gap-4">
+              <div className="h-12 w-12 rounded-full bg-amber-100 dark:bg-amber-900/40 flex items-center justify-center text-amber-600 dark:text-amber-400 shrink-0">
+                <AlertTriangle size={24} />
+              </div>
+              <div>
+                <h3 className="mt-0 text-sm font-bold text-amber-900 dark:text-amber-100 uppercase tracking-widest">Cancellation Request Pending</h3>
+                <div className="mt-1.5 flex flex-wrap gap-x-6 gap-y-1 text-xs font-bold text-amber-700 dark:text-amber-400/80">
+                  <div className="flex items-center gap-1.5">
+                    <span className="opacity-80 font-medium">Requested By:</span>
+                    <span>{orderDetail.cancel_request.requested_by}</span>
+                  </div>
+                  <div className="flex items-center gap-1.5">
+                    <span className="opacity-80 font-medium">Date:</span>
+                    <span>{orderDetail.cancel_request.requested_at}</span>
+                  </div>
+                  <div className="flex items-center gap-1.5">
+                    <span className="opacity-80 font-medium">Est. Refund:</span>
+                    <span className="text-sm text-amber-900 dark:text-amber-200">${orderDetail.cancel_request.refund_amount.toFixed(2)}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <Button
+              onClick={onCancelOrder}
+              disabled={isCancelling}
+              className="bg-red-600 hover:bg-red-700 text-white font-bold h-11 px-8 rounded-xl shadow-lg shadow-red-600/20 active:scale-[0.98] transition-all flex items-center gap-2"
+            >
+              {isCancelling ? <Loader2 className="h-4 w-4 animate-spin" /> : <XCircle size={18} />}
+              SUBMIT CANCEL
+            </Button>
+          </div>
+        )}
+
         <main className="mt-3">
+          {orderType === 'create-menual' && (
+            <div className="mb-4 p-5 bg-white dark:bg-zinc-950 rounded-xl border border-gray-200 dark:border-zinc-800 shadow-sm transition-colors duration-300">
+              <h3 className="mb-4 text-sm font-bold text-gray-900 dark:text-zinc-100 uppercase tracking-wider">Manual Order Details</h3>
+              <div className="flex flex-col md:flex-row gap-4">
+                <FormInput
+                  label="Label Number (Tracking Number)"
+                  value={manualOrderData.trackingNumber}
+                  onChange={(val) => setManualOrderData(prev => ({ ...prev, trackingNumber: val }))}
+                  placeholder="Enter tracking number"
+                  className="flex-1"
+                />
+                <FormSelect
+                  label="Courier"
+                  value={manualOrderData.courierId}
+                  onValueChange={(val) => setManualOrderData(prev => ({ ...prev, courierId: val || '' }))}
+                  options={globalCouriers || []}
+                  placeholder="Select courier"
+                  className="flex-1"
+                />
+                <FormInput
+                  label="Amount"
+                  value={manualOrderData.amount}
+                  onChange={(val) => setManualOrderData(prev => ({ ...prev, amount: val }))}
+                  placeholder="Enter amount"
+                  className="flex-1"
+                  type="number"
+                />
+              </div>
+            </div>
+          )}
           <div className="grid grid-cols-1 xl:grid-cols-[1fr_380px] gap-6 items-start">
             <div className="flex flex-col gap-3 overflow-hidden">
               <AddressCard
@@ -413,7 +530,7 @@ const OrderDetailsPage: React.FC = () => {
                 name={addressData.sender.name}
                 address={addressData.sender.address || ''}
                 email={addressData.sender.email}
-                editable={isEditable}
+                editable={isEditable && role === 'admin'}
                 onEditClick={() => onEditClick('sender')}
               />
 
@@ -435,16 +552,18 @@ const OrderDetailsPage: React.FC = () => {
                 orderType={orderType}
               />
 
-              <CarrierCard
-                itemData={itemsData}
-                addresses={addressData}
-                onQuoteChange={setQuoteData}
-                setCourierData={setCourierData}
-                orderDetail={orderDetail}
-                orderType={orderType!}
-                module="order"
-              />
-              {orderType !== 'create' && <HistoryCard history={orderDetail?.shipping_activity} />}
+              {orderType !== 'create-menual' && (
+                <CarrierCard
+                  itemData={itemsData}
+                  addresses={addressData}
+                  onQuoteChange={setQuoteData}
+                  setCourierData={setCourierData}
+                  orderDetail={orderDetail}
+                  orderType={orderType!}
+                  module="order"
+                />
+              )}
+              {orderType !== 'create' && orderType !== 'create-menual' && <HistoryCard history={orderDetail?.shipping_activity} />}
 
               {isEditable && (
                 <div className="bg-white dark:bg-zinc-950 rounded-xl border border-gray-200 dark:border-zinc-800 p-5 flex flex-col gap-4 shadow-sm transition-colors duration-300">
@@ -455,11 +574,11 @@ const OrderDetailsPage: React.FC = () => {
                       <Checkbox
                         checked={termsAccepted}
                         onCheckedChange={(c) => setTermsAccepted(c)}
-                        className="mt-0.5 rounded-[6px] data-[state=checked]:bg-[#0060FE] data-[state=checked]:border-[#0060FE]"
+                        className="mt-0.5 rounded-[6px] data-[state=checked]:bg-primary data-[state=checked]:border-primary"
                       />
                       <div className="flex flex-col">
                         <span className="text-sm font-bold text-gray-900 dark:text-zinc-100">
-                          I accept the <a href={TERMS_CONDITIONS_URL} target="_blank" className="text-[#0060FE] hover:underline">Terms & Conditions</a> and <a href={PRIVACY_POLICY_URL} target="_blank" className="text-[#0060FE] hover:underline">Privacy Policy</a>
+                          I accept the <a href={TERMS_CONDITIONS_URL} target="_blank" className="text-primary hover:underline">Terms & Conditions</a> and <a href={PRIVACY_POLICY_URL} target="_blank" className="text-primary hover:underline">Privacy Policy</a>
                         </span>
                       </div>
                     </label>
@@ -468,7 +587,7 @@ const OrderDetailsPage: React.FC = () => {
                       <Checkbox
                         checked={ratesAccepted}
                         onCheckedChange={(c) => setRatesAccepted(c)}
-                        className="mt-0.5 rounded-[6px] data-[state=checked]:bg-[#0060FE] data-[state=checked]:border-[#0060FE]"
+                        className="mt-0.5 rounded-[6px] data-[state=checked]:bg-primary data-[state=checked]:border-primary"
                       />
                       <div className="flex flex-col">
                         <span className="text-sm font-medium text-gray-700 dark:text-zinc-300">
@@ -481,11 +600,11 @@ const OrderDetailsPage: React.FC = () => {
                       <Checkbox
                         checked={dangerousGoodsAccepted}
                         onCheckedChange={(c) => setDangerousGoodsAccepted(c)}
-                        className="mt-0.5 rounded-[6px] data-[state=checked]:bg-[#0060FE] data-[state=checked]:border-[#0060FE]"
+                        className="mt-0.5 rounded-[6px] data-[state=checked]:bg-primary data-[state=checked]:border-primary"
                       />
                       <div className="flex flex-col">
                         <span className="text-sm font-medium text-gray-700 dark:text-zinc-300">
-                          This consignment does not contain <a href={DANGEROUS_GOODS_URL} target="_blank" className="text-[#0060FE] hover:underline">dangerous goods</a>
+                          This consignment does not contain <a href={DANGEROUS_GOODS_URL} target="_blank" className="text-primary hover:underline">dangerous goods</a>
                         </span>
                       </div>
                     </label>
@@ -505,6 +624,9 @@ const OrderDetailsPage: React.FC = () => {
               pickupDate={pickupDate}
               setPickupDate={setPickupDate}
               orderType={orderType}
+              liabilityMessage={orderDetail?.limited_liability_cover?.message}
+              // liability={orderDetail?.limited_liability_cover?.covered || false}
+              liability={orderDetail?.limited_liability_cover?.covered || false}
             />
           </div>
         </main>

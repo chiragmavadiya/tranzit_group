@@ -32,7 +32,7 @@ export const CarrierCard: React.FC<CarrierCardProps> = (props) => {
   const getAddress = (
     location: { address1?: string; address?: string; label?: string }
   ) => {
-    return location.address1 || location.address || location.label || "";
+    return location?.address1 || location?.address || location?.label || "";
   };
   useEffect(() => {
     if (orderType !== 'create' && orderType !== 'consign') return;
@@ -117,7 +117,7 @@ export const CarrierCard: React.FC<CarrierCardProps> = (props) => {
       <CardHeader className="flex flex-row items-center justify-between py-3 px-5 border-b border-gray-100 dark:border-zinc-800 bg-white dark:bg-zinc-900 transition-colors">
         <div className="flex justify-between w-full items-center gap-2">
           <div className='flex items-center gap-2'>
-            <Truck className="h-4 w-4 text-blue-600 dark:text-blue-500" />
+            <Truck className="h-4 w-4 text-primary" />
             <CardTitle className="text-sm font-bold text-gray-900 dark:text-zinc-100 tracking-wider">
               SHIPMENT OPTIONS
             </CardTitle>
@@ -129,11 +129,11 @@ export const CarrierCard: React.FC<CarrierCardProps> = (props) => {
       <CardContent className="p-4 bg-gray-50/50 dark:bg-zinc-950">
         {orderType !== 'create' && orderType !== 'consign' && orderDetail ? (
           <div className="flex flex-col gap-3">
-            <div className="relative flex flex-col p-4 rounded-xl border border-blue-600 bg-blue-50/50 dark:border-blue-500 dark:bg-blue-900/10 shadow-sm">
+            <div className="relative flex flex-col p-4 rounded-xl border border-primary bg-primary/5 dark:bg-primary/10 shadow-sm">
               <div className="flex items-center justify-between gap-4">
                 <div className="flex items-center gap-4">
                   <div className="w-12 h-12 rounded-lg bg-white dark:bg-zinc-800 border border-gray-100 dark:border-zinc-700 flex items-center justify-center p-2 shadow-sm">
-                    <Truck className="w-6 h-6 text-blue-600 dark:text-blue-400" />
+                    <Truck className="w-6 h-6 text-primary" />
                   </div>
                   <div>
                     <h4 className="text-sm font-bold text-gray-900 dark:text-zinc-100 uppercase tracking-tight">
@@ -141,7 +141,7 @@ export const CarrierCard: React.FC<CarrierCardProps> = (props) => {
                     </h4>
                     <div className="flex items-center gap-2 mt-1">
                       <span className="text-[10px] font-bold text-gray-500 dark:text-zinc-400 uppercase">Tracking:</span>
-                      <span className="text-[10px] font-bold text-blue-600 dark:text-blue-400">{orderDetail.courier_details?.tracking_number || 'N/A'}</span>
+                      <span className="text-[10px] font-bold text-primary">{orderDetail.courier_details?.tracking_number || 'N/A'}</span>
                     </div>
                   </div>
                 </div>
@@ -157,12 +157,12 @@ export const CarrierCard: React.FC<CarrierCardProps> = (props) => {
             </div>
           </div>
         ) : loading && couriers.length === 0 ? (
-          <div className="py-8 flex items-center justify-center text-sm text-gray-500 font-medium gap-2">
-            <RefreshCw className="h-4 w-4 animate-spin text-[#0060FE]" />
+          <div className="py-8 h-34 flex items-center justify-center text-sm text-gray-500 font-medium gap-2">
+            <RefreshCw className="h-4 w-4 animate-spin text-primary" />
             Fetching available carriers...
           </div>
         ) : couriers.length === 0 ? (
-          <div className="py-8 flex flex-col items-center justify-center text-sm text-gray-500 font-medium gap-2">
+          <div className="py-8 h-34 flex flex-col items-center justify-center text-sm text-gray-500 font-medium gap-2">
             <AlertCircle className="h-5 w-5 text-gray-400" />
             No shipment options available yet.<br />
             <span className="text-xs">Please fill out item dimensions and complete both addresses.</span>
@@ -170,6 +170,7 @@ export const CarrierCard: React.FC<CarrierCardProps> = (props) => {
         ) : (
           <div className="flex flex-col gap-3">
             {couriers.map((courier, idx) => {
+              console.log(courier)
               const serviceId = courier.product_id || courier.code || String(idx);
 
               // Map additional charges by courierCode
@@ -179,12 +180,30 @@ export const CarrierCard: React.FC<CarrierCardProps> = (props) => {
               const totalPrice = courier.price + totalSurcharges
               const isSelected = selectedServiceId === serviceId
 
+              if (courier.success === false) {
+                return (
+                  <div
+                    key={serviceId}
+                    onClick={() => setSelectedServiceId(serviceId)}
+                    className={`relative flex flex-col p-4 rounded-xl border-2 cursor-pointer transition-all duration-200 ${isSelected
+                      ? 'border-primary bg-primary/5 dark:bg-primary/10'
+                      : 'border-transparent bg-white dark:bg-zinc-900 hover:border-gray-200 dark:hover:border-zinc-700 shadow-sm'
+                      }`}
+                  >
+                    <span className="font-bold text-gray-900 dark:text-zinc-100 text-sm">
+                      {courier.carrier}
+                    </span>
+                    <div key={serviceId}>{courier.message}</div>
+                  </div>
+                )
+              }
+
               return (
                 <div
                   key={serviceId}
                   onClick={() => setSelectedServiceId(serviceId)}
                   className={`relative flex flex-col p-4 rounded-xl border-2 cursor-pointer transition-all duration-200 ${isSelected
-                    ? 'border-blue-600 bg-blue-50/50 dark:border-blue-500 dark:bg-blue-900/10'
+                    ? 'border-primary bg-primary/5 dark:bg-primary/10'
                     : 'border-transparent bg-white dark:bg-zinc-900 hover:border-gray-200 dark:hover:border-zinc-700 shadow-sm'
                     }`}
                 >
@@ -201,7 +220,7 @@ export const CarrierCard: React.FC<CarrierCardProps> = (props) => {
                     {/* Left Side: Logo & Info */}
                     <div className="flex items-center gap-4">
                       {/* Radio Button Visual */}
-                      <div className={`w-4 h-4 rounded-full border flex items-center justify-center shrink-0 ${isSelected ? 'border-blue-600 bg-blue-600 dark:border-blue-500 dark:bg-blue-500' : 'border-gray-300 dark:border-zinc-600'
+                      <div className={`w-4 h-4 rounded-full border flex items-center justify-center shrink-0 ${isSelected ? 'border-primary bg-primary' : 'border-gray-300 dark:border-zinc-600'
                         }`}>
                         {isSelected && <div className="w-1.5 h-1.5 bg-white rounded-full" />}
                       </div>

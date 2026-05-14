@@ -3,7 +3,7 @@ import type { ActivityItem } from './types';
 
 export const SectionHeader = ({ title, icon: Icon }: { title: string, icon: any }) => (
     <div className="flex items-center gap-2 mb-2">
-        <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-blue-50 dark:bg-blue-500/10 text-blue-600 dark:text-blue-400">
+        <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary/10 text-primary">
             <Icon className="h-4 w-4" />
         </div>
         <h3 className="text-sm font-bold text-slate-900 dark:text-zinc-100 uppercase tracking-widest my-0">{title}</h3>
@@ -23,7 +23,7 @@ export const DetailItem = ({ label, value, icon: Icon }: { label: string, value:
 export const TimelineItem = ({ item, isLast }: { item: ActivityItem, isLast: boolean }) => {
     const getIcon = () => {
         switch (item.type) {
-            case 'login': return <div className="h-2.5 w-2.5 rounded-full bg-blue-500" />;
+            case 'login': return <div className="h-2.5 w-2.5 rounded-full bg-primary" />;
             case 'logout': return <div className="h-2.5 w-2.5 rounded-full bg-slate-400" />;
             case 'payment': return <div className="h-2.5 w-2.5 rounded-full bg-emerald-500" />;
             default: return <div className="h-2.5 w-2.5 rounded-full bg-slate-300" />;

@@ -20,7 +20,7 @@ export function QuoteForm({ locations, setLocations }: QuoteFormProps) {
       <Card className="">
         <CardHeader className="pb-0">
           <CardTitle className="inline-flex items-center gap-2 text-[15px] font-semibold text-slate-800 dark:text-zinc-100">
-            <MapPin className="w-4 h-4 text-blue-500" />
+            <MapPin className="w-4 h-4 text-primary" />
             Addresses
           </CardTitle>
         </CardHeader>

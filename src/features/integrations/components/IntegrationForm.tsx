@@ -162,7 +162,7 @@ export function IntegrationForm({ provider }: IntegrationFormProps) {
     if (loadingStatus) {
         return (
             <div className="flex items-center justify-center  w-full h-full">
-                <Loader2 className="animate-spin text-blue-400 h-10 w-10" />
+                <Loader2 className="animate-spin text-primary h-10 w-10" />
             </div>
         );
     }
@@ -186,16 +186,16 @@ export function IntegrationForm({ provider }: IntegrationFormProps) {
                     </div>
 
                     {isConnected && provider.type === 'ecommerce' && (
-                        <Alert className="bg-blue-50 border-blue-100 dark:bg-blue-900/10 dark:border-blue-900/20 max-w-2xl">
-                            <RefreshCw className="h-4 w-4 text-blue-600" />
-                            <AlertTitle className="text-sm font-bold text-blue-800 dark:text-blue-300">Sync Data</AlertTitle>
-                            <AlertDescription className="text-xs text-blue-700 dark:text-blue-400 flex items-center justify-between mt-2">
+                        <Alert className="bg-primary/5 border-primary/20 dark:bg-primary/10 dark:border-primary/20 max-w-2xl">
+                            <RefreshCw className="h-4 w-4 text-primary" />
+                            <AlertTitle className="text-sm font-bold text-primary/80 dark:text-primary/30">Sync Data</AlertTitle>
+                            <AlertDescription className="text-xs text-primary/70 dark:text-primary/40 flex items-center justify-between mt-2">
                                 Last synced: {statusResponse.data.last_synced_at || 'Never'}
                                 <Button
                                     type="button"
                                     variant="outline"
                                     size="sm"
-                                    className="h-7 text-[10px] bg-white border-blue-200 hover:bg-blue-50"
+                                    className="h-7 text-[10px] bg-white border-primary/20 hover:bg-primary/5"
                                     onClick={() => syncMutation.mutate(provider.id)}
                                     disabled={syncMutation.isPending}
                                 >
@@ -228,7 +228,7 @@ export function IntegrationForm({ provider }: IntegrationFormProps) {
 
                         <Button
                             type="submit"
-                            className="bg-[#0060FE] hover:bg-blue-700 text-white min-w-[140px] font-bold"
+                            className="bg-primary hover:bg-primary-hover text-white min-w-[140px] font-bold"
                             disabled={connectMutation.isPending}
                         >
                             {connectMutation.isPending ? (

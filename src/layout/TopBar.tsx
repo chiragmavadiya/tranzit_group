@@ -128,7 +128,7 @@ export default function TopBar({ isCollapsed }: { isCollapsed?: boolean }) {
           content={
             <>
               <div className="p-3 mb-2 bg-slate-50 dark:bg-zinc-950/50 rounded-xl flex items-center gap-3 border border-slate-100 dark:border-zinc-800/50">
-                <div className="h-10 w-10 rounded-full bg-blue-600 flex items-center justify-center text-white font-bold shadow-md">
+                <div className="h-10 w-10 rounded-full bg-primary flex items-center justify-center text-white font-bold shadow-md">
                   {user?.first_name?.[0]}{user?.last_name?.[0]}
                 </div>
                 <div className="flex flex-col min-w-0">
@@ -151,7 +151,7 @@ export default function TopBar({ isCollapsed }: { isCollapsed?: boolean }) {
         >
           <div className='max-w-[220px] flex items-center gap-2 cursor-pointer px-[10px] py-[5px] hover:bg-gray-50 dark:hover:bg-zinc-800 rounded-md border border-gray-200 dark:border-zinc-800 text-[13px] font-medium text-gray-700 dark:text-zinc-300 transition-colors outline-none h-8'>
 
-            <div className="w-[22px] h-[22px] rounded-full pt-[2px] bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center text-[#0060FE] dark:text-blue-400 text-xs font-semibold shadow-sm">
+            <div className="w-[22px] h-[22px] rounded-full pt-[2px] bg-primary/10 flex items-center justify-center text-primary text-xs font-semibold shadow-sm">
               {logoutMutation.isPending ? (
                 <Loader2 className="w-4 h-4 animate-spin" />
               ) : user?.first_name?.charAt(0).toUpperCase()

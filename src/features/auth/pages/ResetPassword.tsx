@@ -6,7 +6,6 @@ import PasswordInput from "@/components/common/password-input";
 import { Link, useParams, useSearchParams } from "react-router-dom";
 import { useResetPassword } from "@/features/auth/hooks/useAuth";
 import brandlogo from '@/assets/Tranzit_Logo.svg';
-import { AuthLayout } from "@/features/auth/components/AuthLayout";
 import { showToast } from "@/components/ui/custom-toast";
 
 export default function ResetPassword() {
@@ -16,7 +15,6 @@ export default function ResetPassword() {
 
   const [password, setPassword] = useState("");
   const { mutate: resetPassword, isPending } = useResetPassword();
-  // const [error, setError] = useState<string | null>(null);
   const [isSuccess, setIsSuccess] = useState(false);
 
   const validations = [
@@ -31,26 +29,22 @@ export default function ResetPassword() {
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    // setError(null);
     const formData = new FormData(e.currentTarget);
     const password = formData.get("password") as string;
     const confirmPassword = formData.get("confirmPassword") as string;
 
     if (!isPasswordValid) {
-      // setError("Please ensure your password .");
       showToast("Please ensure your password is valid", "error");
       return;
     }
 
     if (password !== confirmPassword) {
       showToast("Passwords do not match", "error");
-      // setError("Passwords do not match.");
       return;
     }
 
     if (!token || !email) {
       showToast("Invalid reset link. Token or email is missing.", "error");
-      // setError("Invalid reset link. Token or email is missing.");
       return;
     }
 
@@ -65,7 +59,6 @@ export default function ResetPassword() {
           setIsSuccess(true);
           showToast("Password reset successfully", "success");
         } else {
-          // setError(response.message || "Failed to reset password");
           showToast(response.message || "Failed to reset password", "error");
         }
       },
@@ -77,20 +70,20 @@ export default function ResetPassword() {
   };
 
   return (
-    <AuthLayout>
-      <div className="flex flex-col items-center text-center space-y-2 max-w-sm m-auto">
-        <div className="flex items-center space-x-2 pb-4">
-          <img src={brandlogo} alt="Logo" className="h-25" />
+    <>
+      <div className="flex flex-col items-center text-center space-y-2 mb-8">
+        <div className="flex items-center space-x-2 pb-2">
+          <img src={brandlogo} alt="Logo" className="h-16 w-auto" />
         </div>
 
-        <h2 className="text-2xl font-bold tracking-tight text-slate-900 dark:text-white">
-          Set a new password.
+        <h2 className="text-2xl font-black tracking-tight text-slate-900 dark:text-white">
+          Set a new password
         </h2>
       </div>
 
       {!isSuccess ? (
-        <form onSubmit={handleSubmit} className="space-y-4 w-sm m-auto">
-          <p className="text-sm text-slate-500 dark:text-slate-400 text-center px-4">
+        <form onSubmit={handleSubmit} className="space-y-6 w-full max-w-sm m-auto">
+          <p className="text-sm font-medium text-slate-500 dark:text-slate-400 text-center px-4">
             Your new password must be different from previously used passwords.
           </p>
 
@@ -104,10 +97,9 @@ export default function ResetPassword() {
                 required
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="bg-white dark:bg-zinc-900 border-slate-300 dark:border-slate-800 transition-all focus-visible:ring-0 focus-visible:ring-offset-0 focus-visible:border-blue-500 h-10"
+                className="bg-white dark:bg-zinc-900 border-slate-300 dark:border-slate-800 transition-all focus-visible:ring-0 focus-visible:ring-offset-0 h-11 rounded-xl"
               />
-              {/* Password Validation Rules */}
-              <div className="space-y-2 pb-3 px-1 text-left">
+              <div className="space-y-2 pt-2 px-1 text-left">
                 {validations.map((v, i) => (
                   <div
                     key={i}
@@ -130,8 +122,6 @@ export default function ResetPassword() {
               </div>
             </div>
 
-
-
             <div className="space-y-2 text-left">
               <Label htmlFor="confirmPassword" className="text-slate-600 dark:text-slate-400 font-medium">Confirm password</Label>
               <PasswordInput
@@ -139,43 +129,39 @@ export default function ResetPassword() {
                 name="confirmPassword"
                 placeholder="Re-enter your password"
                 required
-                className="bg-white dark:bg-zinc-900 border-slate-300 dark:border-slate-800 transition-all focus-visible:ring-0 focus-visible:ring-offset-0 focus-visible:border-blue-500 h-10"
+                className="bg-white dark:bg-zinc-900 border-slate-300 dark:border-slate-800 transition-all focus-visible:ring-0 focus-visible:ring-offset-0 h-11 rounded-xl"
               />
             </div>
-
-            {/* {error && (
-              <p className="text-sm font-medium text-red-500 text-center">{error}</p>
-            )} */}
           </div>
 
           <Button
             type="submit"
             disabled={isPending}
-            className="w-full h-10 mt-2 bg-blue-600 hover:bg-blue-700 text-white font-semibold text-md rounded-md transition-all shadow-md hover:shadow-lg"
+            className="w-full text-white font-bold h-11 text-[13px] rounded-xl bg-primary hover:bg-primary/90 transition-all shadow-lg shadow-primary/20 active:scale-[0.98]"
           >
             {isPending ? "Setting password..." : "Set new password"}
           </Button>
 
-          <p className="text-center text-sm font-medium">
-            <Link to="/login" className="text-blue-600 hover:text-blue-500 hover:underline transition-colors">
+          <p className="text-center text-[13px] font-medium">
+            <Link to="/login" className="font-bold text-primary hover:underline underline-offset-4">
               Back to sign in
             </Link>
           </p>
         </form>
       ) : (
-        <div className="space-y-6 text-center w-full">
-          <div className="rounded-md bg-green-50 p-4 border border-green-200">
+        <div className="space-y-6 text-center w-full max-w-sm m-auto">
+          <div className="rounded-xl bg-green-50 p-4 border border-green-200">
             <p className="text-sm font-medium text-green-800">
               Password updated successfully.
             </p>
           </div>
           <p className="text-center text-sm font-medium">
-            <Link to="/login" className="text-blue-600 hover:text-blue-500 hover:underline transition-colors">
+            <Link to="/login" className="text-primary hover:underline transition-colors">
               Back to sign in
             </Link>
           </p>
         </div>
       )}
-    </AuthLayout>
+    </>
   );
 }

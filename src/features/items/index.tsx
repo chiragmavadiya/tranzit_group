@@ -159,7 +159,7 @@ export default function MyItemsPage() {
       className: "w-20 px-0 pr-3 print:hidden",
       cell: (_, row) => (
         <div className="flex items-center gap-4">
-          <Button variant="ghost" size="sm" className="p-0 hover:text-blue-600 bg-transparent dark:hover:bg-transparent" onClick={() => handleEditItem(row)}>
+          <Button variant="ghost" size="sm" className="p-0 hover:text-primary bg-transparent dark:hover:bg-transparent" onClick={() => handleEditItem(row)}>
             <Pencil className='h-4 w-4' />
           </Button>
           <Button variant="ghost" size="sm" className="p-0 hover:text-red-600 bg-transparent dark:hover:bg-transparent" onClick={() => handleDeleteClick(row.id)}>
@@ -177,7 +177,7 @@ export default function MyItemsPage() {
         <DataTable
           columns={columns}
           data={itemsData?.data || []}
-          loading={isLoading}
+          loading={!isLoading}
           searchPlaceholder="Search items..."
           onSearchChange={handleSearch}
           searchValue={search}

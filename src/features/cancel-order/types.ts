@@ -23,6 +23,7 @@ export interface CancelOrderFilters {
     search?: string;
     per_page?: number;
     page?: number;
+    customer?: string;
 }
 
 export interface CancelOrderResponse {

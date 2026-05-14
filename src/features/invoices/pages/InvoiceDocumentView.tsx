@@ -230,7 +230,7 @@ const InvoiceDocumentView: React.FC = () => {
             BACK
           </Button>
           <div className="h-6 w-px bg-slate-200 dark:bg-zinc-800 mx-2" />
-          <span className="text-blue-600 font-bold dark:text-blue-400">#{invoiceData?.invoice?.invoice_number}</span>
+          <span className="text-primary font-bold">#{invoiceData?.invoice?.invoice_number}</span>
           <Badge className={cn("px-3 py-1 font-bold border-none", INVOICE_STATUS_COLORS[invoiceData?.invoice?.status as keyof typeof INVOICE_STATUS_COLORS])}>
             {invoiceData?.invoice?.status}
           </Badge>
@@ -239,44 +239,47 @@ const InvoiceDocumentView: React.FC = () => {
         <div className="flex items-center gap-2">
           {isAdmin && (
             <>
-              <Button
-                variant="outline"
-                onClick={() => setIsPaymentDialogOpen(true)}
-                className="h-8 flex items-center gap-2 border-slate-200 dark:border-zinc-800 font-bold text-emerald-600 hover:text-emerald-700 hover:bg-emerald-50 shadow-sm"
-              >
-                <CircleDollarSign className="h-4 w-4" />
-                Add Payment
-              </Button>
+              {invoiceID !== 'create' && (
+                <>
+                  <Button
+                    variant="outline"
+                    onClick={() => setIsPaymentDialogOpen(true)}
+                    className="h-8 flex items-center gap-2 border-slate-200 dark:border-zinc-800 font-bold text-emerald-600 hover:text-emerald-700 hover:bg-emerald-50 shadow-sm"
+                  >
+                    <CircleDollarSign className="h-4 w-4" />
+                    Add Payment
+                  </Button>
 
-              <Button
-                variant="outline"
-                onClick={handleRemind}
-                disabled={remindMutation.isPending}
-                className="h-8 flex items-center gap-2 border-slate-200 dark:border-zinc-800 font-bold text-amber-600 hover:text-amber-700 hover:bg-amber-50 shadow-sm"
-              >
-                {remindMutation.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Bell className="h-4 w-4" />}
-                Send Remainder
-              </Button>
+                  <Button
+                    variant="outline"
+                    onClick={handleRemind}
+                    disabled={remindMutation.isPending}
+                    className="h-8 flex items-center gap-2 border-slate-200 dark:border-zinc-800 font-bold text-amber-600 hover:text-amber-700 hover:bg-amber-50 shadow-sm"
+                  >
+                    {remindMutation.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Bell className="h-4 w-4" />}
+                    Send Remainder
+                  </Button>
 
-              <Button
-                variant="outline"
-                onClick={handleZohoSync}
-                disabled={zohoSyncMutation.isPending}
-                className="h-8 flex items-center gap-2 border-slate-200 dark:border-zinc-800 font-bold text-purple-600 hover:text-purple-700 hover:bg-purple-50 shadow-sm"
-              >
-                {zohoSyncMutation.isPending ? <RefreshCw className="h-4 w-4 animate-spin" /> : <RefreshCw className="h-4 w-4" />}
-                Send to Zoho
-              </Button>
-              <Button
-                variant="outline"
-                onClick={handleSend}
-                disabled={sendMutation.isPending}
-                className="h-8 flex items-center gap-2 border-slate-200 dark:border-zinc-800 font-bold text-blue-600 hover:text-blue-700 hover:bg-blue-50 shadow-sm"
-              >
-                {sendMutation.isPending ? <RefreshCw className="h-4 w-4 animate-spin" /> : <Mail className="h-4 w-4" />}
-                Save & Send
-              </Button>
-
+                  <Button
+                    variant="outline"
+                    onClick={handleZohoSync}
+                    disabled={zohoSyncMutation.isPending}
+                    className="h-8 flex items-center gap-2 border-slate-200 dark:border-zinc-800 font-bold text-purple-600 hover:text-purple-700 hover:bg-purple-50 shadow-sm"
+                  >
+                    {zohoSyncMutation.isPending ? <RefreshCw className="h-4 w-4 animate-spin" /> : <RefreshCw className="h-4 w-4" />}
+                    Send to Zoho
+                  </Button>
+                  <Button
+                    variant="outline"
+                    onClick={handleSend}
+                    disabled={sendMutation.isPending}
+                    className="h-8 flex items-center gap-2 border-slate-200 dark:border-zinc-800 font-bold text-primary hover:text-primary-hover hover:bg-primary/5 shadow-sm"
+                  >
+                    {sendMutation.isPending ? <RefreshCw className="h-4 w-4 animate-spin" /> : <Mail className="h-4 w-4" />}
+                    Save & Send
+                  </Button>
+                </>
+              )}
               <Button
                 variant="outline"
                 onClick={handleSave}
@@ -291,7 +294,7 @@ const InvoiceDocumentView: React.FC = () => {
           <Button
             onClick={handleDownload}
             disabled={downloadMutation.isPending}
-            className="h-8 bg-blue-600 hover:bg-blue-700 text-white flex items-center gap-2 font-bold shadow-lg shadow-blue-500/20 px-4"
+            className="h-8 bg-primary hover:bg-primary-hover text-white flex items-center gap-2 font-bold shadow-lg shadow-primary/20 px-4"
           >
             {downloadMutation.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Download className="h-4 w-4" />}
             Download

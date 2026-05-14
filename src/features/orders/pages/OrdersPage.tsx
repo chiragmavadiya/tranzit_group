@@ -179,7 +179,7 @@ export default function OrdersPage() {
               </Button>
               <Button
                 onClick={() => navigate(`${role === 'admin' ? '/admin' : ''}/orders/create`)}
-                className="gap-2 bg-[#0060FE] hover:bg-[#0052db] text-white shadow-lg shadow-blue-100 dark:shadow-none transition-all active:scale-[0.98] font-semibold border-none px-4"
+                className="gap-2 bg-primary hover:bg-primary-hover text-white shadow-lg shadow-primary/20 dark:shadow-none transition-all active:scale-[0.98] font-semibold border-none px-4"
               >
                 <Plus className="w-4 h-4" />
                 <span>Create Order</span>

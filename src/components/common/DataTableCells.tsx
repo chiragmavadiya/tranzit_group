@@ -74,7 +74,7 @@ export const LinkCell: React.FC<LinkCellProps> = ({
 
   const content = (
     <span className={cn(
-      "text-blue-600 dark:text-blue-400 hover:underline cursor-pointer font-medium inline-flex items-center gap-1",
+      "text-primary hover:underline cursor-pointer font-medium inline-flex items-center gap-1",
       className
     )}>
       {String(value)}

@@ -30,7 +30,7 @@ const HelpCenterLayout = lazy(() => import('@/features/help-center/components/He
 const withSuspense = (Component: React.ReactNode) => (
   <Suspense
     fallback={<div className="flex items-center justify-center h-full w-full">
-      <Loader2 className="animate-spin text-blue-400 h-10 w-10" />
+      <Loader2 className="animate-spin text-primary h-10 w-10" />
     </div>}>
     {Component}
   </Suspense>

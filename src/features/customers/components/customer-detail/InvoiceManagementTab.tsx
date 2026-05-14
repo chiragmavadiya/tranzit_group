@@ -46,8 +46,8 @@ export const InvoiceManagementTab = ({ customerId }: InvoiceManagementTabProps) 
                     label="Invoice"
                     value={summary.total_invoices.toString()}
                     icon={FileText}
-                    iconBg="bg-blue-50 dark:bg-blue-500/10"
-                    iconColor="text-blue-500"
+                    iconBg="bg-primary/10 dark:bg-primary/20"
+                    iconColor="text-primary"
                     className="border-none shadow-md"
                 />
                 <StatCard

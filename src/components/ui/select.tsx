@@ -188,21 +188,21 @@ function SelectScrollDownButton({
 function SelectComponent({ data, defaultValue, placeholder, className, value, onValueChange, allowClear = false, name, disabled }: { data: { label: string, value: string | number }[], defaultValue?: string, placeholder: string, className?: string, value?: string, onValueChange?: (value: string | null) => void, allowClear?: boolean, name?: string, disabled?: boolean }) {
   return (
     <Select name={name} defaultValue={defaultValue} value={value} onValueChange={onValueChange} items={data} disabled={disabled}>
-      {/* <div className="relative"> */}
-      <SelectTrigger className={cn("w-full text-xs h-10 rounded-md border-gray-200 dark:border-zinc-800 dark:bg-zinc-900 transition-colors placeholder:text-slate-300 dark:placeholder:text-zinc-700", className)}>
-        <SelectValue placeholder={placeholder} className="data-placeholder:font-normal data-placeholder:text-muted-foreground dark:placeholder:text-zinc-700" />
-      </SelectTrigger>
-      {allowClear && value && <X className="absolute right-[9px] top-[50%] origin-center translate-y-[-50%] size-4 text-muted-foreground bg-white dark:bg-zinc-900 cursor-pointer" onClick={(e) => { console.log('cliecnk....'); e.preventDefault(); onValueChange?.('') }} />}
-      <SelectContent alignItemWithTrigger={false} align="start" className="min-w-min dark:bg-zinc-900 dark:border-zinc-800 p-1 rounded-md max-h-[220px]">
-        <SelectGroup>
-          {data.map((item) => (
-            <SelectItem key={item.value} value={item.value} className="h-7 text-xs font-medium data-highlighted:bg-blue-500/20 data-selected:bg-blue-500/90" >
-              {item.label}
-            </SelectItem>
-          ))}
-        </SelectGroup>
-      </SelectContent>
-      {/* </div> */}
+      <div className="relative">
+        <SelectTrigger className={cn("w-full text-xs h-10 rounded-md border-gray-200 dark:border-zinc-800 dark:bg-zinc-900 transition-colors placeholder:text-slate-300 dark:placeholder:text-zinc-700", className)}>
+          <SelectValue placeholder={placeholder} className="data-placeholder:font-normal data-placeholder:text-muted-foreground dark:placeholder:text-zinc-700" />
+        </SelectTrigger>
+        {allowClear && value && <X className="absolute right-[10px] top-[50%] origin-center translate-y-[-50%] size-4 text-muted-foreground bg-white dark:bg-zinc-900 cursor-pointer" onClick={(e) => { console.log('cliecnk....'); e.preventDefault(); onValueChange?.('') }} />}
+        <SelectContent alignItemWithTrigger={false} align="start" className="min-w-min dark:bg-zinc-900 dark:border-zinc-800 p-1 rounded-md max-h-[220px]">
+          <SelectGroup>
+            {data.map((item) => (
+              <SelectItem key={item.value} value={item.value} className="h-7 text-xs font-medium data-highlighted:bg-primary/20 data-selected:bg-primary" >
+                {item.label}
+              </SelectItem>
+            ))}
+          </SelectGroup>
+        </SelectContent>
+      </div>
     </Select>
   )
 }

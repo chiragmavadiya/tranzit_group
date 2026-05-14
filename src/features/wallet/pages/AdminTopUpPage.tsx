@@ -60,8 +60,8 @@ export default function AdminTopUpPage() {
       label: 'Balance',
       value: '$2,101.70',
       icon: Wallet,
-      iconColor: 'text-blue-500',
-      iconBg: 'bg-blue-50 dark:bg-blue-500/10',
+      iconColor: 'text-primary',
+      iconBg: 'bg-primary/5 dark:bg-primary/10',
     },
   ], []);
 

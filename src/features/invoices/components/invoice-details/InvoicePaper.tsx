@@ -143,7 +143,7 @@ export const InvoicePaper: React.FC<InvoicePaperProps> = ({
             <p className='my-1'>{COMPANY_DETAILS.email || 'accounts@tranzitgroup.com.au'}</p>
           </div>
           <div className="space-y-1 text-xs font-bold text-slate-600 dark:text-zinc-300">
-            <p><span className="text-slate-400 font-medium">Invoice No:</span> <span className="text-blue-600 dark:text-white font-black">{invoice?.invoice?.invoice_number}</span></p>
+            <p><span className="text-slate-400 font-medium">Invoice No:</span> <span className="text-primary font-black">{invoice?.invoice?.invoice_number}</span></p>
             <p><span className="text-slate-400 font-medium">Date:</span> <span className="text-slate-800 dark:text-white font-black">{invoice?.invoice?.invoice_date}</span></p>
           </div>
         </div>
@@ -285,7 +285,7 @@ export const InvoicePaper: React.FC<InvoicePaperProps> = ({
                       ref={isEditing ? editingRowRef : null}
                       className={cn(
                         "hover:bg-slate-50/30 dark:hover:bg-zinc-800/30 border-b border-slate-50 dark:border-zinc-800/50 last:border-0 transition-colors group relative",
-                        isEditing && "bg-blue-50/50 dark:bg-blue-900/10"
+                        isEditing && "bg-primary/5 dark:bg-primary/10"
                       )}
                       onClick={() => {
                         if (isAdmin && !isEditing) {
@@ -310,7 +310,7 @@ export const InvoicePaper: React.FC<InvoicePaperProps> = ({
                         ) : (
                           <Badge variant="outline" className={cn(
                             "text-[10px] font-black uppercase border-none px-2 py-0.5",
-                            item.type.toLowerCase() === 'order' ? "bg-blue-50 text-blue-600" :
+                            item.type.toLowerCase() === 'order' ? "bg-primary/10 text-primary" :
                               item.type.toLowerCase() === 'credit' ? "bg-emerald-50 text-emerald-600" :
                                 "bg-slate-100 text-slate-600"
                           )}>
@@ -399,7 +399,7 @@ export const InvoicePaper: React.FC<InvoicePaperProps> = ({
                         {isEditing ? (
                           <Input
                             type="number"
-                            className="h-7 text-[10px] w-20 bg-white text-right font-bold focus:ring-1 focus:ring-blue-500"
+                            className="h-7 text-[10px] w-20 bg-white text-right font-bold focus:ring-1 focus:ring-primary"
                             value={item.total}
                             onClick={e => e.stopPropagation()}
                             onChange={e => updateItemsData(item.id, 'total', e.target.value)}
@@ -536,8 +536,8 @@ export const InvoicePaper: React.FC<InvoicePaperProps> = ({
           <div className="bg-white dark:bg-zinc-950 border border-slate-200 dark:border-zinc-800 rounded-2xl overflow-hidden shadow-sm">
             {/* Header */}
             <div className="bg-slate-50/50 dark:bg-zinc-900/50 px-6 py-4 border-b border-slate-200 dark:border-zinc-800 flex items-center gap-2">
-              <FileText className="w-5 h-5 text-blue-600" />
-              <h3 className="text-sm my-0 font-black text-blue-600 uppercase tracking-tight">Invoice Summary</h3>
+              <FileText className="w-5 h-5 text-primary" />
+              <h3 className="text-sm my-0 font-black text-primary uppercase tracking-tight">Invoice Summary</h3>
             </div>
 
             {/* Content Body */}
@@ -565,7 +565,7 @@ export const InvoicePaper: React.FC<InvoicePaperProps> = ({
                 </div>
                 <div className="flex justify-between text-xs">
                   <span className="text-slate-500 font-medium uppercase tracking-widest text-[10px]">Credit Amount</span>
-                  <span className="text-blue-500 font-bold">-{formatCurrency(invoice?.summary?.credit_amount || 0)}</span>
+                  <span className="text-primary font-bold">-{formatCurrency(invoice?.summary?.credit_amount || 0)}</span>
                 </div>
               </div>
 
@@ -575,7 +575,7 @@ export const InvoicePaper: React.FC<InvoicePaperProps> = ({
                   <span className="text-sm font-black text-slate-900 dark:text-white uppercase tracking-tight">Total</span>
                   <p className="text-[10px] text-slate-400 font-medium mb-0">(inc GST)</p>
                 </div>
-                <span className="text-4xl font-black text-blue-600 tracking-tighter">
+                <span className="text-4xl font-black text-primary tracking-tighter">
                   {formatCurrency(invoice?.summary?.amount_due)}
                 </span>
               </div>

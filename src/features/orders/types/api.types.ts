@@ -62,6 +62,8 @@ export interface CreateOrderResponse {
     order_number: string;
     redirect: string;
     tracking_number?: string;
+    success?: boolean;
+    message?: string
 }
 
 export interface QuoteServicesRequest {

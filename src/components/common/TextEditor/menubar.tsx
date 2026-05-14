@@ -82,8 +82,8 @@ const ToolbarButton = ({ onClick, active, disabled, tooltip, icon, className }: 
             className={cn(
                 "transition-all duration-200",
                 active
-                    ? "bg-blue-50 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400 font-bold shadow-sm"
-                    : "text-slate-600 dark:text-slate-400 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-slate-100 dark:hover:bg-slate-800",
+                    ? "bg-primary/10 text-primary dark:bg-primary/20 dark:text-primary font-bold shadow-sm"
+                    : "text-slate-600 dark:text-slate-400 hover:text-primary hover:bg-slate-100 dark:hover:bg-slate-800",
                 className
             )}
         >
@@ -171,7 +171,7 @@ export const MenuBar = ({
                                     onClick={() => editor.chain().focus().setFontFamily(font.value).run()}
                                     className={cn(
                                         "text-xs font-medium cursor-pointer",
-                                        editorState.currentFontFamily === font.value && "bg-blue-50 text-blue-600 dark:bg-blue-900/20"
+                                        editorState.currentFontFamily === font.value && "bg-primary/10 text-primary"
                                     )}
                                     style={{ fontFamily: font.value }}
                                 >
@@ -204,7 +204,7 @@ export const MenuBar = ({
                                     onClick={() => editor.chain().focus().setFontSize(size).run()}
                                     className={cn(
                                         "text-xs font-medium cursor-pointer",
-                                        editorState.currentFontSize === size && "bg-blue-50 text-blue-600 dark:bg-blue-900/20"
+                                        editorState.currentFontSize === size && "bg-primary/10 text-primary"
                                     )}
                                 >
                                     {size}
@@ -368,7 +368,7 @@ export const MenuBar = ({
             {editorState.isInTable && (
                 <>
                     <Separator orientation="vertical" className="h-6 mx-1" />
-                    <div className="flex items-center gap-0.5 px-1 bg-blue-50/50 dark:bg-blue-900/10 rounded-md">
+                    <div className="flex items-center gap-0.5 px-1 bg-primary/5 dark:bg-primary/10 rounded-md">
                         <ToolbarButton
                             onClick={() => editor.chain().focus().addRowAfter().run()}
                             tooltip="Add Row After"

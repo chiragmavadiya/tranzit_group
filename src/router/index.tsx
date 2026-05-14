@@ -29,7 +29,7 @@ const PageLoader = () => (
         />
         <div className="absolute -bottom-8 left-1/2 -translate-x-1/2">
           <div className="h-1.5 w-24 overflow-hidden rounded-full bg-slate-100 dark:bg-slate-800">
-            <div className="h-full w-full origin-left animate-[loading_1.5s_infinite_ease-in-out] bg-[#0060FE]"></div>
+            <div className="h-full w-full origin-left animate-[loading_1.5s_infinite_ease-in-out] bg-primary"></div>
           </div>
         </div>
       </div>

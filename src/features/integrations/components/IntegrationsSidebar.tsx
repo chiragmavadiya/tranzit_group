@@ -26,7 +26,7 @@ const IntegrationsSidebar: React.FC<IntegrationsSidebarProps> = ({ connectedProv
                     cn(
                         'flex items-center justify-between px-5 py-2 rounded-lg text-sm transition-all duration-200 group',
                         isActive
-                            ? 'bg-blue-50 text-blue-700 dark:bg-blue-900/20 dark:text-blue-400 font-medium'
+                            ? 'bg-primary/10 text-primary font-medium'
                             : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900 dark:text-zinc-400 dark:hover:bg-zinc-900 dark:hover:text-zinc-100'
                     )
                 }
@@ -34,7 +34,7 @@ const IntegrationsSidebar: React.FC<IntegrationsSidebarProps> = ({ connectedProv
                 <div className="flex items-center gap-2.5 min-w-0">
                     <Icon className={cn(
                         "w-4 h-4 shrink-0 transition-colors",
-                        "group-hover:text-blue-600 dark:group-hover:text-blue-400"
+                        "group-hover:text-primary"
                     )} />
                     <span className="truncate">{provider.name}</span>
                 </div>

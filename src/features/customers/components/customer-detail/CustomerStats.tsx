@@ -10,7 +10,7 @@ export const CustomerStats = () => {
                     <StatCard
                         key={idx}
                         {...stat}
-                        className="bg-white dark:bg-zinc-900 shadow-md border-none group hover:shadow-xl hover:shadow-blue-500/5 transition-all duration-300"
+                        className="bg-white dark:bg-zinc-900 shadow-md border-none group hover:shadow-xl hover:shadow-primary/5 transition-all duration-300"
                     />
                 ))}
             </div>

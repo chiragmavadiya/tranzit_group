@@ -65,7 +65,7 @@ export function InvoiceTable({
       header: 'Invoice #',
       sticky: 'left',
       cell: (value, row) => (
-        <NavLink to={`${isAdmin ? '/admin' : ''}/invoices/${row.id}`} className="font-bold text-blue-600 dark:text-blue-400 hover:underline">
+        <NavLink to={`${isAdmin ? '/admin' : ''}/invoices/${row.id}`} className="font-bold text-primary hover:underline">
           {value}
         </NavLink>
       )
@@ -198,7 +198,7 @@ export function InvoiceTable({
                     variant="ghost"
                     size="sm"
                     disabled={disableReminder}
-                    className={`p-0 bg-transparent hover:bg-transparent dark:hover:bg-transparent ${disableReminder ? 'text-gray-400 opacity-50 cursor-not-allowed' : 'hover:text-blue-500'}`}
+                    className={`p-0 bg-transparent hover:bg-transparent dark:hover:bg-transparent ${disableReminder ? 'text-gray-400 opacity-50 cursor-not-allowed' : 'hover:text-primary'}`}
                     onClick={() => !disableReminder && onSend?.(row.id)}
                   >
                     <Bell className="w-4 h-4" />
@@ -225,7 +225,7 @@ export function InvoiceTable({
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <Button
           onClick={onAddInvoice}
-          className="gap-2 bg-[#0060FE] hover:bg-[#0052db] text-white shadow-lg shadow-blue-100 dark:shadow-none transition-all active:scale-[0.98] font-semibold border-none px-4"
+          className="gap-2 bg-primary hover:bg-primary-hover text-white shadow-lg shadow-primary/20 dark:shadow-none transition-all active:scale-[0.98] font-semibold border-none px-4"
         >
           <Plus className="w-4 h-4" />
           <span>Add Invoice</span>

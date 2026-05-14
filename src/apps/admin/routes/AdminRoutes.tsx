@@ -37,7 +37,7 @@ const ActivityLogPage = lazy(() => import('@/features/activity-log/pages/Activit
 const withSuspense = (Component: React.ReactNode) => (
     <Suspense
         fallback={<div className="flex items-center justify-center h-full w-full">
-            <Loader2 className="animate-spin text-blue-400 h-10 w-10" />
+            <Loader2 className="animate-spin text-primary h-10 w-10" />
         </div>}>
         {Component}
     </Suspense>

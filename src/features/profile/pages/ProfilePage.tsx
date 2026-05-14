@@ -93,7 +93,7 @@ export default function ProfilePage() {
           <Card className="shadow-sm gap-0 border-slate-200 dark:border-zinc-800 bg-white dark:bg-zinc-950">
             <CardHeader className="pb-4 border-b border-gray-200 dark:border-zinc-900">
               <CardTitle className="inline-flex items-center gap-2 text-[15px] font-semibold text-slate-800 dark:text-zinc-100">
-                <Building className="w-4 h-4 text-blue-500" />
+                <Building className="w-4 h-4 text-primary" />
                 Business Details
               </CardTitle>
             </CardHeader>
@@ -114,7 +114,7 @@ export default function ProfilePage() {
           <Card className="shadow-sm gap-0 border-slate-200 dark:border-zinc-800 bg-white dark:bg-zinc-950">
             <CardHeader className="pb-4 border-b border-gray-200 dark:border-zinc-900">
               <CardTitle className="inline-flex items-center gap-2 text-[15px] font-semibold text-slate-800 dark:text-zinc-100">
-                <User className="w-4 h-4 text-blue-500" />
+                <User className="w-4 h-4 text-primary" />
                 Account Information
               </CardTitle>
             </CardHeader>
@@ -159,7 +159,7 @@ export default function ProfilePage() {
           <Card className="shadow-sm gap-0 border-slate-200 dark:border-zinc-800 bg-white dark:bg-zinc-950">
             <CardHeader className="pb-4 border-b border-gray-200 dark:border-zinc-900">
               <CardTitle className="inline-flex items-center gap-2 text-[15px] font-semibold text-slate-800 dark:text-zinc-100">
-                <Mail className="w-4 h-4 text-blue-500" />
+                <Mail className="w-4 h-4 text-primary" />
                 Private Contact Details
               </CardTitle>
             </CardHeader>
@@ -187,7 +187,7 @@ export default function ProfilePage() {
             <Button
               onClick={handleSaveChanges}
               disabled={updateProfileMutation.isPending}
-              className="bg-[#0060FE] hover:bg-blue-700 text-white gap-2 px-8 h-10 text-[13px] font-bold transition-all shadow-md active:scale-[0.98]"
+              className="bg-primary hover:bg-primary-hover text-white gap-2 px-8 h-10 text-[13px] font-bold transition-all shadow-md active:scale-[0.98]"
             >
               {updateProfileMutation.isPending ? (
                 <Loader2 className="w-4 h-4 animate-spin" />
@@ -201,29 +201,29 @@ export default function ProfilePage() {
 
         {/* Sidebar info */}
         <div className="col-span-12 lg:col-span-4">
-          <Card className="bg-blue-50/50 py-0 dark:bg-blue-900/10 border-blue-100/50 dark:border-blue-800/30 sticky top-page-padding">
+          <Card className="bg-primary/5 py-0 dark:bg-primary/10 border-primary/20 dark:border-primary/20 sticky top-page-padding">
             <CardContent className="p-6">
-              <h3 className="my-0 text-sm font-bold text-blue-900 dark:text-blue-400 mb-2 uppercase tracking-wider">Profile Information</h3>
-              <p className="my-0 text-[13px] text-blue-800/70 dark:text-blue-300/70 leading-relaxed">
+              <h3 className="my-0 text-sm font-bold text-primary dark:text-primary mb-2 uppercase tracking-wider">Profile Information</h3>
+              <p className="my-0 text-[13px] text-primary/70 dark:text-primary/70 leading-relaxed">
                 Your profile information is used for communications and billing. Please ensure your contact details are kept up to date.
               </p>
-              <div className="mt-4 pt-6 border-t border-blue-100 dark:border-blue-800/50 space-y-4">
+              <div className="mt-4 pt-6 border-t border-primary/10 dark:border-primary/20 space-y-4">
                 <div className="flex items-center gap-3">
-                  <div className="w-8 h-8 rounded-full bg-white dark:bg-zinc-900 flex items-center justify-center shadow-sm border border-blue-100/50 dark:border-blue-800/30">
-                    <Building className="w-4 h-4 text-blue-500" />
+                  <div className="w-8 h-8 rounded-full bg-white dark:bg-zinc-900 flex items-center justify-center shadow-sm border border-primary/10 dark:border-primary/20">
+                    <Building className="w-4 h-4 text-primary" />
                   </div>
                   <div>
-                    <p className="text-[11px] my-0 font-bold text-blue-900/50 dark:text-blue-400/50 uppercase">Organization</p>
-                    <p className="text-[13px] my-0 font-bold text-blue-900 dark:text-blue-100">{profileData.businessName}</p>
+                    <p className="text-[11px] my-0 font-bold text-primary/50 dark:text-primary/50 uppercase">Organization</p>
+                    <p className="text-[13px] my-0 font-bold text-primary/90 dark:text-zinc-100">{profileData.businessName}</p>
                   </div>
                 </div>
                 <div className="flex items-center gap-3">
-                  <div className="w-8 h-8 rounded-full bg-white dark:bg-zinc-900 flex items-center justify-center shadow-sm border border-blue-100/50 dark:border-blue-800/30">
-                    <Mail className="w-4 h-4 text-blue-500" />
+                  <div className="w-8 h-8 rounded-full bg-white dark:bg-zinc-900 flex items-center justify-center shadow-sm border border-primary/10 dark:border-primary/20">
+                    <Mail className="w-4 h-4 text-primary" />
                   </div>
                   <div>
-                    <p className="text-[11px] my-0 font-bold text-blue-900/50 dark:text-blue-400/50 uppercase">Login ID</p>
-                    <p className="text-[13px] my-0 font-bold text-blue-900 dark:text-blue-100">{profileData.loginEmail}</p>
+                    <p className="text-[11px] my-0 font-bold text-primary/50 dark:text-primary/50 uppercase">Login ID</p>
+                    <p className="text-[13px] my-0 font-bold text-primary/90 dark:text-zinc-100">{profileData.loginEmail}</p>
                   </div>
                 </div>
               </div>

@@ -23,7 +23,7 @@ import { STATES, STREET_TYPES } from '@/constants';
 const SectionHeader = ({ title, icon: Icon, children }: { title: string, icon: any, children?: React.ReactNode }) => (
   <div className="flex items-center justify-between pb-3 border-b border-slate-50 dark:border-zinc-800/50 mb-6">
     <div className="flex items-center gap-3">
-      <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-blue-50 dark:bg-blue-500/10 text-blue-600 dark:text-blue-400">
+      <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary/10 text-primary">
         <Icon className="h-4 w-4" />
       </div>
       <h3 className="text-sm font-bold text-slate-900 dark:text-zinc-100 uppercase tracking-widest my-0">{title}</h3>
@@ -188,11 +188,11 @@ export default function OnboardingPage() {
                   <span className="text-xs font-bold text-slate-900 dark:text-zinc-100">{user?.email}</span>
                   <span className="text-[10px] text-slate-500 dark:text-zinc-500 font-medium">Customer Account</span>
                 </div>
-                <div className="h-8 w-8 rounded-full bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center border border-blue-200 dark:border-blue-800 transition-transform group-hover:scale-105 overflow-hidden">
+                <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center border border-primary/20 transition-transform group-hover:scale-105 overflow-hidden">
                   {user?.image ? (
                     <img src={user.image} alt="Avatar" className="h-full w-full object-cover" />
                   ) : (
-                    <User className="h-4 w-4 text-blue-600 dark:text-blue-400" />
+                    <User className="h-4 w-4 text-primary" />
                   )}
                 </div>
                 <ChevronDown className="h-4 w-4 text-slate-400 transition-transform duration-200 group-data-[state=open]:rotate-180" />
@@ -200,7 +200,7 @@ export default function OnboardingPage() {
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-64 p-2 rounded-2xl dark:bg-zinc-900 border-slate-200 dark:border-zinc-800 shadow-2xl z-50">
               <div className="p-3 mb-2 bg-slate-50 dark:bg-zinc-950/50 rounded-xl flex items-center gap-3 border border-slate-100 dark:border-zinc-800/50">
-                <div className="h-10 w-10 rounded-full bg-blue-600 flex items-center justify-center text-white font-bold shadow-lg shadow-blue-500/20 flex-shrink-0">
+                <div className="h-10 w-10 rounded-full bg-primary flex items-center justify-center text-white font-bold shadow-lg shadow-primary/20 flex-shrink-0">
                   {user?.first_name?.[0]}{user?.last_name?.[0]}
                 </div>
                 <div className="flex flex-col min-w-0">
@@ -228,13 +228,13 @@ export default function OnboardingPage() {
         <main className="flex-1 overflow-y-auto">
           <div className="max-w-7xl mx-auto w-full p-6 space-y-4 animate-in fade-in slide-in-from-top-4 duration-700">
             {/* Banner */}
-            <div className="bg-white dark:bg-blue-900/5 border border-blue-100 dark:border-blue-900/20 p-5 rounded-2xl flex items-center gap-4 shadow-sm">
-              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-blue-600 text-white shadow-lg shadow-blue-500/20">
+            <div className="bg-primary/5 border border-primary/20 p-5 rounded-2xl flex items-center gap-4 shadow-sm">
+              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary text-white shadow-lg shadow-primary/20">
                 <AlertCircle className="w-5 h-5" />
               </div>
               <div className="flex flex-col">
-                <span className="text-base text-slate-900 dark:text-blue-100 font-bold">Complete your business profile</span>
-                <span className="text-sm text-slate-500 dark:text-blue-300">
+                <span className="text-base text-slate-900 dark:text-zinc-100 font-bold">Complete your business profile</span>
+                <span className="text-sm text-slate-500 dark:text-zinc-400">
                   Provide your details to unlock full access to our shipping platform and competitive rates.
                 </span>
               </div>

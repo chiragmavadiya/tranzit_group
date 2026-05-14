@@ -49,7 +49,7 @@ export const AddressCard: React.FC<AddressCardProps> = ({
 
         {/* Edit Action */}
         {editable && (
-          <Button onClick={onEditClick} variant="ghost" size="icon" className="h-8 w-8 text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/20 hover:text-blue-700">
+          <Button onClick={onEditClick} variant="ghost" size="icon" className="h-8 w-8 text-primary hover:bg-primary/10 hover:text-primary-hover">
             <Pencil className="h-4 w-4" />
           </Button>
         )}

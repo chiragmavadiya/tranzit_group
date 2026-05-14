@@ -21,7 +21,7 @@ export function ZohoConnectionCard({
   return (
     <Card className="p-6 flex flex-col h-full">
       <div className="flex items-center gap-3 mb-2">
-        <div className="w-10 h-10 rounded-xl bg-blue-50 dark:bg-blue-500/10 flex items-center justify-center text-blue-600">
+        <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center text-primary">
           <Link2 className="w-5 h-5" />
         </div>
         <div>
@@ -96,9 +96,9 @@ export function ZohoConnectionCard({
             Start OAuth Grant
           </Button>
 
-          <div className="mt-4 flex gap-2 p-3 rounded-lg bg-blue-50/50 dark:bg-blue-500/5 border border-blue-100/50 dark:border-blue-500/10">
-            <AlertCircle className="w-4 h-4 text-blue-500 shrink-0 mt-0.5" />
-            <p className="mb-0 text-[10px] text-blue-600/80 dark:text-blue-400/80 leading-relaxed italic">
+          <div className="mt-4 flex gap-2 p-3 rounded-lg bg-primary/5 dark:bg-primary/10 border border-primary/20">
+            <AlertCircle className="w-4 h-4 text-primary shrink-0 mt-0.5" />
+            <p className="mb-0 text-[10px] text-primary leading-relaxed italic">
               After approval, the refresh token is stored securely and used automatically for future synchronization.
             </p>
           </div>

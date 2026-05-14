@@ -42,7 +42,7 @@ export function QuoteDetailsDialog({ open, onOpenChange, quoteId }: QuoteDetails
                         </div>
                         <div className="flex flex-col gap-1">
                             <span className="text-slate-500 uppercase font-bold tracking-wider">Total Amount</span>
-                            <span className="font-bold text-blue-600 text-sm">${details.quote_summary.total_amount.toFixed(2)}</span>
+                            <span className="font-bold text-primary text-sm">${details.quote_summary.total_amount.toFixed(2)}</span>
                         </div>
                     </div>
 

@@ -11,7 +11,7 @@ import { CustomTooltip } from "@/components/common/CustomTooltip";
 const StatusBadge = ({ status }: { status: string }) => {
   const variants: Record<string, string> = {
     'Printed': 'bg-slate-100 text-slate-600 dark:bg-zinc-800 dark:text-zinc-400',
-    'Payment pending': 'bg-amber-100 text-amber-600 dark:bg-blue-900/20 dark:text-blue-400',
+    'Payment pending': 'bg-amber-100 text-amber-600 dark:bg-primary/20 dark:text-primary/80',
     'Partial': 'bg-orange-50 text-orange-600 dark:bg-orange-900/20 dark:text-orange-400',
     'Unpaid': 'bg-red-50 text-red-600 dark:bg-red-900/20 dark:text-red-400',
     'Draft': 'bg-slate-100 text-slate-600 dark:bg-zinc-800 dark:text-zinc-400',
@@ -28,10 +28,10 @@ export const getOrdersColumns = (role: string = "customer", orderType: string = 
   {
     header: 'ORDER #',
     key: 'order_number',
-    className: 'text-blue-600 font-bold',
+    className: 'text-primary font-bold',
     sticky: 'left',
     cell: (value: string) => (
-      <NavLink to={`${role === "admin" ? "/admin/orders/edit" : "/orders/edit"}/${value}`} className="font-bold text-blue-600 underline dark:text-blue-400 ">
+      <NavLink to={`${role === "admin" ? "/admin/orders/edit" : "/orders/edit"}/${value}`} className="font-bold text-primary underline">
         {value}
       </NavLink>
     )

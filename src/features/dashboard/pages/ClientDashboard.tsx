@@ -1,5 +1,4 @@
 import { WelcomeBanner } from "../components/WelcomeBanner";
-import { StatCard } from "../../../components/common/StatCard";
 import { TransactionList } from "../components/TransactionList";
 import { DashboardTable } from "../components/DashboardTable";
 import {
@@ -32,7 +31,7 @@ export default function ClientDashboard() {
       label: "Total Spend",
       value: isLoading ? '$0' : (typeof metrics?.totalSpend === 'number' ? `$${metrics.totalSpend.toFixed(2)}` : (metrics?.totalSpend || "$0.00")),
       icon: DollarSign,
-      color: "bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400"
+      color: "bg-primary/10 text-primary"
     },
     {
       label: "Invoice Pending",
@@ -43,7 +42,7 @@ export default function ClientDashboard() {
   ];
 
   const columns = [
-    { header: "ORDER NUMBER", key: "order_number" as keyof DashboardOrder, cell: (val: string) => val ? <NavLink replace to={`/orders/edit/${val}`} className="text-blue-600 dark:text-blue-400 cursor-pointer font-bold hover:underline">{val}</NavLink> : '-' },
+    { header: "ORDER NUMBER", key: "order_number" as keyof DashboardOrder, cell: (val: string) => val ? <NavLink replace to={`/orders/edit/${val}`} className="text-primary cursor-pointer font-bold hover:underline">{val}</NavLink> : '-' },
     { header: "SUBURB", key: "suburb" as keyof DashboardOrder },
     { header: "AMOUNT", key: "amount" as keyof DashboardOrder, cell: (val: unknown) => (typeof val === 'number' ? `$${val.toFixed(2)}` : (val as string)) as React.ReactNode },
     { header: "STATUS", key: "status" as keyof DashboardOrder, cell: (val: unknown) => <StatusBadge status={val as string} /> },
@@ -52,7 +51,7 @@ export default function ClientDashboard() {
   const StatusBadge = ({ status }: { status: string }) => {
     const variants: Record<string, string> = {
       'Printed': 'bg-slate-100 text-slate-600 dark:bg-zinc-800 dark:text-zinc-400',
-      'Payment Pending': 'bg-amber-100 text-amber-600 dark:bg-blue-900/20 dark:text-blue-400',
+      'Payment Pending': 'bg-amber-100 text-amber-600 dark:bg-primary/10 dark:text-primary',
       'Partial': 'bg-orange-50 text-orange-600 dark:bg-orange-900/20 dark:text-orange-400',
       'Unpaid': 'bg-red-50 text-red-600 dark:bg-red-900/20 dark:text-red-400',
       'Draft': 'bg-slate-100 text-slate-600 dark:bg-zinc-800 dark:text-zinc-400'
@@ -68,20 +67,15 @@ export default function ClientDashboard() {
   return (
     <div className="p-page-padding space-y-4 overflow-y-auto animate-in fade-in duration-700">
       <WelcomeBanner
-        variant="blue"
+        variant="primary"
         userName="Welcome to Tranzit Group, Customer1 User"
         description="Manage pickups, create shipments, and track every parcel in real time, all from one dashboard built to keep your delivery costs low."
         buttons={[
           { label: "Send Parcel", variant: "default", onClick: () => navigate("/orders/create") },
           { label: "View Orders", variant: "outline", onClick: () => navigate("/orders") },
         ]}
+        stats={stats}
       />
-
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        {stats.map((stat, idx) => (
-          <StatCard key={idx} {...stat} />
-        ))}
-      </div>
 
       <div className="grid grid-cols-1 xl:grid-cols-12 gap-4 items-start">
         <div className="xl:col-span-8">
@@ -92,10 +86,10 @@ export default function ClientDashboard() {
             columns={columns}
           />
         </div>
-        <div className="xl:col-span-4 h-[550px]">
+        <div className="xl:col-span-4 max-h-[550px]">
           {/* {isLoading ? (
             <div className="flex items-center justify-center h-full">
-              <Loader2 className="h-8 w-8 text-blue-600 animate-spin" />
+              <Loader2 className="h-8 w-8 text-primary animate-spin" />
             </div>
           ) : (
           )} */}

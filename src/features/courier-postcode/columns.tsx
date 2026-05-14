@@ -36,7 +36,7 @@ export const POSTCODE_COLUMNS = (onEdit: (row: any) => void, onDelete: (row: any
           <Button
             variant="ghost"
             size="icon"
-            className="h-8 w-8 text-slate-400 hover:text-blue-500 hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-all active:scale-90"
+            className="h-8 w-8 text-slate-400 hover:text-primary hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-all active:scale-90"
             onClick={() => onEdit(row)}
           >
             <Pencil className="w-4 h-4" />

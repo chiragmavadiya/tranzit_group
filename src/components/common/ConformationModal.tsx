@@ -89,7 +89,7 @@ export function ConformationModal({
                         disabled={loading}
                         className={cn(
                             "px-6 h-8 font-semibold transition-all shadow-sm active:scale-95",
-                            confirmVariant === 'default' && "bg-blue-600 hover:bg-blue-700 text-white shadow-blue-200 dark:shadow-none"
+                            confirmVariant === 'default' && "bg-primary hover:bg-primary-hover text-white shadow-primary/20 dark:shadow-none"
                         )}
                     >
                         {loading ? <Spinner className="mr-2 h-4 w-4" /> : null}

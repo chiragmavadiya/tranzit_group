@@ -38,11 +38,11 @@ const CustomToast = ({ message, type = "default", t }: CustomToastProps) => {
       defaultTitle: "Something went wrong!",
     },
     default: {
-      bg: "bg-[#EFF6FF] dark:bg-blue-950/20",
-      border: "border-[#3B82F6]",
-      icon: <Lightbulb className="w-5 h-5 text-[#3B82F6]" />,
-      iconBg: "bg-[#3B82F6]",
-      titleColor: "text-[#1E40AF] dark:text-blue-400",
+      bg: "bg-primary/5 dark:bg-primary/10",
+      border: "border-primary",
+      icon: <Lightbulb className="w-5 h-5 text-primary" />,
+      iconBg: "bg-primary",
+      titleColor: "text-primary",
       defaultTitle: "Did you know?",
     },
   };

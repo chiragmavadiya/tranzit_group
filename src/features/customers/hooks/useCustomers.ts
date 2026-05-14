@@ -10,6 +10,12 @@ export const useCustomers = (params?: Record<string, any>, enabled: boolean = tr
         placeholderData: keepPreviousData,
         enabled: enabled,
         staleTime: 30 * 60 * 1000,
+        // select: (data: any) => {
+        //     return data?.data?.map((c: any) => ({
+        //         value: c.id.toString(),
+        //         label: `${c.first_name} ${c.last_name}`
+        //     }));
+        // }
     });
 };
 

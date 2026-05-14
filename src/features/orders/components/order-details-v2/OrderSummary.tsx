@@ -19,8 +19,8 @@ export const OrderSummary = ({
     <Card className="border-border/60 bg-white shadow-sm">
         <CardHeader className="border-b border-border/60 pb-4">
             <div className="flex items-center gap-3">
-                <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-blue-100">
-                    <UserRound className="h-5 w-5" />
+                <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-primary/10">
+                    <UserRound className="h-5 w-5 text-primary" />
                 </div>
                 <div>
                     <CardTitle className="text-lg">Order Summary</CardTitle>

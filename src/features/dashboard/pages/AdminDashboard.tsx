@@ -35,7 +35,7 @@ export default function AdminDashboard() {
   //     label: "Customers",
   //     value: metrics?.statsByPeriod[activePeriod]?.customers,
   //     icon: Users,
-  //     color: "bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400",
+  //     color: "bg-primary/10 text-primary",
   //     loading: isLoading
   //   },
   //   {
@@ -100,7 +100,7 @@ export default function AdminDashboard() {
   ];
 
   const columns = [
-    { header: "#", key: "id", cell: (val: string) => val ? <NavLink replace to={`/admin/invoices/${val}`} className="text-blue-600 dark:text-blue-400 cursor-pointer font-bold hover:underline">#{val}</NavLink> : '-' },
+    { header: "#", key: "id", cell: (val: string) => val ? <NavLink replace to={`/admin/invoices/${val}`} className="text-primary cursor-pointer font-bold hover:underline">#{val}</NavLink> : '-' },
     { header: "STATUS", key: "status", cell: (val: string) => <StatusCell value={val} /> },
     { header: "TOTAL", key: "amount", cell: (val: unknown) => `$${Number(val).toFixed(2)}` },
     { header: "ISSUED DATE", key: "invoice_date" },
@@ -127,7 +127,7 @@ export default function AdminDashboard() {
             <h2 className="text-sm font-bold text-slate-400 uppercase tracking-widest">Statistics</h2>
             <div className="flex bg-slate-100 dark:bg-zinc-800 p-1 rounded-lg">
               {Object.keys(metrics?.periodLabels || {}).map((key) => (
-                <button key={key} onClick={() => setActivePeriod(key as any)} className={`px-3 py-1 text-[11px] font-bold rounded-md hover:bg-white dark:hover:bg-zinc-700 transition-all ${activePeriod === key ? 'text-blue-600 dark:text-blue-400 bg-blue-100/50 dark:bg-blue-900/20' : 'text-slate-500'}`}>
+                <button key={key} onClick={() => setActivePeriod(key as any)} className={`px-3 py-1 text-[11px] font-bold rounded-md hover:bg-white dark:hover:bg-zinc-700 transition-all ${activePeriod === key ? 'text-primary bg-primary/10' : 'text-slate-500'}`}>
                   {metrics?.periodLabels?.[key]}
                 </button>
               ))}

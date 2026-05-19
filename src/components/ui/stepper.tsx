@@ -44,7 +44,7 @@ export function Stepper({
             <div key={idx} className="relative z-10 flex flex-col items-center gap-3">
               <div
                 className={cn(
-                  "w-10 h-10 rounded-2xl flex items-center justify-center border-2 transition-all duration-500",
+                  "w-8 h-8 rounded-2xl flex items-center justify-center border-2 transition-all duration-500",
                   isCurrent
                     ? `${activeColor} ${accentColor} text-white shadow-[0_0_15px_rgba(20,47,84,0.25)] scale-110`
                     : isPassed
@@ -56,7 +56,7 @@ export function Stepper({
               </div>
               <span
                 className={cn(
-                  "text-[10px] font-bold tracking-widest uppercase mb-[-4px]",
+                  "text-[12px] font-medium  mb-[-4px]",
                   isCurrent ? "text-slate-900 dark:text-zinc-100" : "text-slate-400 dark:text-zinc-500"
                 )}
               >

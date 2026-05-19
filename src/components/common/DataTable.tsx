@@ -343,8 +343,8 @@ const DataTableComponent = <T extends Record<string, any>>(props: DataTableProps
                         key={column.key}
                         className={cn(
                           `px-5 py-3.5 text-xs font-medium text-gray-700 dark:text-zinc-300 whitespace-normal`,
-                          column.sticky === 'left' && "sticky left-0 bg-background",
-                          column.sticky === 'right' && "sticky right-0 bg-background",
+                          column.sticky === 'left' && "sticky left-0 bg-white",
+                          column.sticky === 'right' && "sticky right-0 bg-white",
                           column.className,
                           cellClassName,
                           column.noPrint && 'print:hidden'

@@ -151,7 +151,6 @@ export function InvoiceTable({
       header: 'Action',
       sticky: 'right',
       cell: (_, row) => {
-        const rowStatus = row.status.toUpperCase();
         const isCustomer = role === 'customer';
 
         if (isCustomer) {
@@ -167,11 +166,10 @@ export function InvoiceTable({
         }
 
         // Admin rules
-        const showPreview = rowStatus === 'PAID';
-        const showEdit = ['SEND', 'DRAFT', 'OVERDUE', 'PARTIAL', 'UNPAID'].includes(rowStatus);
-        const showReminder = ['SEND', 'OVERDUE'].includes(rowStatus);
-        const disableReminder = ['DRAFT', 'PARTIAL', 'UNPAID'].includes(rowStatus);
-        const showDelete = ['DRAFT', 'OVERDUE', 'PARTIAL', 'UNPAID'].includes(rowStatus);
+        const showPreview = row.actions.includes('view');
+        const showEdit = row.actions.includes('edit');
+        const showReminder = row.actions.includes('reminder');
+        const showDelete = row.actions.includes('delete');
 
         return (
           <div className="flex items-center gap-2">
@@ -191,15 +189,14 @@ export function InvoiceTable({
               </CustomTooltip>
             )}
 
-            {(showReminder || disableReminder) && (
-              <CustomTooltip title={disableReminder ? "Cannot send reminder" : "Send reminder"} placement="bottom">
+            {(showReminder) && (
+              <CustomTooltip title={"Send reminder"} placement="bottom">
                 <span>
                   <Button
                     variant="ghost"
                     size="sm"
-                    disabled={disableReminder}
-                    className={`p-0 bg-transparent hover:bg-transparent dark:hover:bg-transparent ${disableReminder ? 'text-gray-400 opacity-50 cursor-not-allowed' : 'hover:text-primary'}`}
-                    onClick={() => !disableReminder && onSend?.(row.id)}
+                    className={`p-0 bg-transparent hover:bg-transparent dark:hover:bg-transparent hover:text-primary`}
+                    onClick={() => onSend?.(row.id)}
                   >
                     <Bell className="w-4 h-4" />
                   </Button>

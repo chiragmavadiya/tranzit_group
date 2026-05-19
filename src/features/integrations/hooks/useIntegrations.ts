@@ -27,9 +27,9 @@ export const useConnectIntegration = () => {
             return integrationService.connect(provider, data);
         },
         onSuccess: (_, variables) => {
-            queryClient.invalidateQueries({ queryKey: ["integrations"] });
+            // queryClient.invalidateQueries({ queryKey: ["integrations"] });
             queryClient.invalidateQueries({ queryKey: ["integration-status", variables.provider] });
-            showToast("Integration settings updated successfully!", "success");
+            // showToast("Integration settings updated successfully!", "success");
         },
         onError: (error: any) => {
             showToast(error.message || "Failed to connect", "error");

@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { useMapsLibrary } from '@vis.gl/react-google-maps';
 import { FormInput } from '@/features/orders/components/OrderFormUI';
 import type { FormInputProps } from '@/features/orders/components/types/OrderFormUI.types';
+import { Search } from 'lucide-react';
 
 // Define the interface for your form data
 export interface AddressData {
@@ -36,12 +37,14 @@ export const PlaceAutocomplete = ({ onPlaceSelect, ...rest }: PlaceAutocompleteP
             fields: ['address_components', 'geometry', 'formatted_address'],
             componentRestrictions: { country: 'au' }
         };
+        console.log(places, 'places')
 
         const autocomplete = new places.Autocomplete(inputRef.current, options);
         setPlaceAutocomplete(autocomplete);
     }, [places]);
 
     useEffect(() => {
+        console.log(placeAutocomplete, 'placeAutocomplete')
         if (!placeAutocomplete) return;
 
         placeAutocomplete.addListener('place_changed', () => {
@@ -96,6 +99,7 @@ export const PlaceAutocomplete = ({ onPlaceSelect, ...rest }: PlaceAutocompleteP
                 ref={inputRef}
                 placeholder="Start typing address..."
                 className="address-input"
+                icon={Search}
                 {...rest}
             />
 

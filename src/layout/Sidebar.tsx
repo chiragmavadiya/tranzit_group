@@ -66,10 +66,10 @@ export default function Sidebar({ isCollapsed, setIsCollapsed }: SidebarProps) {
               <ArrowLeft className="w-4 h-4" />
               <span>Back to main menu</span>
             </button>
-            <div className="flex items-center justify-between px-6 py-4 mt-2">
+            <div className="flex items-center justify-between px-6 py-2 mt-2">
               <div className="flex items-center gap-3">
                 {currentSubmenuData?.icon && <currentSubmenuData.icon className="w-6 h-6 text-primary" />}
-                <h2 className="text-xl font-bold tracking-tight text-slate-900 dark:text-zinc-100">{activeSubmenu}</h2>
+                <h2 className="my-0 text-xl font-bold tracking-tight text-slate-900 dark:text-zinc-100">{activeSubmenu}</h2>
               </div>
               <ChevronDown className="w-5 h-5 text-primary rotate-180" />
             </div>

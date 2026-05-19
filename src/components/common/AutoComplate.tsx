@@ -35,6 +35,7 @@ export interface AutoCompleteProps {
     error?: boolean;
     errormsg?: string;
     required?: boolean;
+    inputClassName?: string;
 }
 
 const AutoComplete = React.forwardRef<HTMLInputElement, AutoCompleteProps>(
@@ -55,6 +56,7 @@ const AutoComplete = React.forwardRef<HTMLInputElement, AutoCompleteProps>(
             error,
             errormsg,
             required,
+            inputClassName,
         },
         ref
     ) => {
@@ -130,6 +132,7 @@ const AutoComplete = React.forwardRef<HTMLInputElement, AutoCompleteProps>(
                                     errormsg={errormsg}
                                     required={required}
                                     className={cn("w-full h-full", className)}
+                                    inputClassName={inputClassName}
                                 // inputHieight={9}
                                 />
                             </div>

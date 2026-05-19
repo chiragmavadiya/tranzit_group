@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/button';
 import { SUBURBS, STATES } from '../constants';
 import { getCustomerColumns } from '../columns';
 import CustomerDialog from '../components/CustomerDialog';
-import { useCustomers, useExportCustomers, useDeleteCustomer } from '../hooks/useCustomers';
+import { useCustomers, useExportCustomers, useDeleteCustomer, useCustomerCounts } from '../hooks/useCustomers';
 import { downloadFile } from '@/lib/utils';
 import { useDebounce } from '@/hooks/useDebounce';
 import { ConformationModal } from '@/components/common/ConformationModal';
@@ -60,6 +60,7 @@ export default function CustomerPage() {
     };
 
     const { data: customerData, isLoading } = useCustomers({ ...queryParams, search: useDebounce(search, 500) });
+    const { data: countsData } = useCustomerCounts();
 
     const customers = useMemo(() => customerData?.data || [], [customerData?.data]);
     const meta = customerData?.meta;
@@ -68,26 +69,26 @@ export default function CustomerPage() {
     const stats = useMemo(() => [
         {
             label: 'Total Customer',
-            value: totalItems.toString(),
+            value: (countsData?.data?.total ?? totalItems).toString(),
             icon: Users,
             iconColor: 'text-slate-600',
             iconBg: 'bg-slate-50 dark:bg-slate-500/10',
         },
         {
             label: 'Active Customer',
-            value: customers.filter(c => c.status === 'active').length.toString(),
+            value: (countsData?.data?.active ?? customers.filter(c => c.status === 'active').length).toString(),
             icon: UserCheck,
             iconColor: 'text-emerald-600',
             iconBg: 'bg-emerald-50 dark:bg-emerald-500/10',
         },
         {
             label: 'Inactive Customer',
-            value: customers.filter(c => c.status !== 'active').length.toString(),
+            value: (countsData?.data?.inactive ?? customers.filter(c => c.status !== 'active').length).toString(),
             icon: UserX,
             iconColor: 'text-rose-600',
             iconBg: 'bg-rose-50 dark:bg-rose-500/10',
         },
-    ], [totalItems, customers]);
+    ], [totalItems, customers, countsData]);
 
     const suburbOptions = useMemo(() => [
         { label: 'All Suburbs', value: 'all' },

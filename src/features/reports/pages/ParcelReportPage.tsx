@@ -43,7 +43,7 @@ export default function ParcelReportPage() {
     search: search || undefined,
     per_page: pageSize,
     page: page,
-    customer_id: isAdmin && selectedCustomer !== '' ? selectedCustomer : undefined,
+    customer: isAdmin && selectedCustomer !== '' ? selectedCustomer : undefined,
     invoice_type: isAdmin ? invoiceType : undefined,
   }), [startDate, endDate, search, pageSize, page, isAdmin, selectedCustomer, invoiceType]);
 

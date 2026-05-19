@@ -7,7 +7,8 @@ import type {
     InvoiceReport,
     ParcelReport,
     PaginatedResponse,
-    UploadInvoiceResponse
+    UploadInvoiceResponse,
+    ReportCountsResponse
 } from "../types";
 
 export const reportsService = {
@@ -82,6 +83,11 @@ export const reportsService = {
                 "Content-Type": "multipart/form-data",
             },
         });
+        return response.data;
+    },
+
+    getReportCounts: async (): Promise<ReportCountsResponse> => {
+        const response = await api.get<ReportCountsResponse>(API_ENDPOINTS.REPORTS.COUNTS);
         return response.data;
     },
 };

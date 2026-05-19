@@ -193,3 +193,10 @@ export interface CustomerStats {
     active: number;
     inactive: number;
 }
+
+export interface CustomerStatsResponse {
+    status: boolean;
+    message: string;
+    data: CustomerStats;
+}
+

@@ -20,6 +20,7 @@ export const API_ENDPOINTS = {
         CONSIGN: (id: string | number, isAdmin: boolean = false) => isAdmin ? `/admin/orders/${id}/consign` : `/customer/orders/${id}/consign`,
         LABEL_DOWNLOAD: (id: string | number) => `/orders/${id}/label/download`,
 
+        COUNTS: "/orders/counts",
         PAYMENT_INFO: (id: string | number) => `/customer/orders/${id}/payment`,
         PAY_WITH_WALLET: (id: string | number) => `/customer/orders/${id}/pay-with-wallet`,
         WALLET_CHECK: "/customer/orders/wallet-check",
@@ -48,10 +49,12 @@ export const API_ENDPOINTS = {
         INVOICE: "/customer/report/invoice",
         PARCELS: "/customer/report/parcels",
         PARCELS_EXPORT: "/customer/report/parcels/Export",
+        COUNTS: "/customer/report/counts",
     },
     INVOICES: {
         BASE: "/customer/invoices",
         EXPORT: "/customer/invoices/export",
+        DOWNLOAD: (id: string | number) => `/customer/invoices/${id}/download`,
     },
     ADMIN_INVOICES: {
         BASE: "/admin/customer-invoice-management",
@@ -73,6 +76,7 @@ export const API_ENDPOINTS = {
     },
     ADMIN_CUSTOMERS: {
         BASE: "/admin/customers",
+        COUNTS: "/admin/customers/counts",
         DETAILS: (id: string | number) => `/admin/customers/${id}`,
         EDIT: (id: string | number) => `/admin/customers/${id}/edit`,
         PROFILE: (id: string | number) => `/admin/customers/${id}/profile`,
@@ -89,6 +93,10 @@ export const API_ENDPOINTS = {
     },
     ADMIN_ACTIVITIES: {
         BASE: "/admin/activities",
+    },
+    ADMIN_BOOK_PICKUP: {
+        BASE: "/admin/book-pickup",
+        COUNTS: "/admin/book-pickup/counts",
     },
     ADMIN_COURIER_POSTCODES: {
         BASE: "/admin/courier-postcodes",
@@ -112,6 +120,7 @@ export const API_ENDPOINTS = {
     },
     ADMIN_CANCEL_ORDERS: {
         BASE: "/admin/cancel-orders",
+        COUNTS: "/admin/cancel-orders/counts",
     },
     ADMIN_REPORTS: {
         PARCELS: "/admin/reports/customer-parcels",
@@ -153,6 +162,7 @@ export const QUERY_KEYS = {
         LIST: ["orders", "list"],
         DETAILS: (id: string | number) => ["orders", "details", id],
         PAYMENT_INFO: (id: string | number) => ["orders", "payment", id],
+        COUNTS: (customer?: string | number) => ["orders", "counts", customer || "all"],
     },
     DASHBOARD: {
         METRICS: ["dashboard", "metrics"],
@@ -164,6 +174,7 @@ export const QUERY_KEYS = {
     ADDRESS_BOOK: {
         LIST: ["address-book", "list"],
         DETAILS: (id: number | string) => ["address-book", "details", id],
+        SEARCH: (q: string) => ["address-book", "search", q],
     },
     REPORTS: {
         SHIPMENT: ["reports", "shipment"],
@@ -172,6 +183,7 @@ export const QUERY_KEYS = {
         PARCELS: ["reports", "parcels"],
         AUSPOST_SUMMARY: ["reports", "auspost-summary"],
         UNDELIVERED_PARCELS: ["reports", "undelivered-parcels"],
+        COUNTS: ["reports", "counts"],
     },
     ADMIN_HELP_CENTER: {
         LIST: ["admin", "help-center", "list"],
@@ -187,6 +199,7 @@ export const QUERY_KEYS = {
     },
     ADMIN_CUSTOMERS: {
         LIST: ["admin", "customers", "list"],
+        COUNTS: ["admin", "customers", "counts"],
         DETAILS: (id: string | number) => ["admin", "customers", "details", id],
         PROFILE: (id: string | number) => ["admin", "customers", "profile", id],
         ORDERS: (id: string | number) => ["admin", "customers", "orders", id],
@@ -195,6 +208,10 @@ export const QUERY_KEYS = {
     },
     ADMIN_ACTIVITIES: {
         LIST: ["admin", "activities", "list"],
+    },
+    ADMIN_BOOK_PICKUP: {
+        LIST: ["admin", "book-pickup", "list"],
+        COUNTS: ["admin", "book-pickup", "counts"],
     },
     ADMIN_COURIER_POSTCODES: {
         LIST: ["admin", "courier-postcodes", "list"],
@@ -209,6 +226,7 @@ export const QUERY_KEYS = {
     },
     ADMIN_CANCEL_ORDERS: {
         LIST: ["admin", "cancel-orders", "list"],
+        COUNTS: ["admin", "cancel-orders", "counts"],
     },
     ADMIN_SETTINGS: {
         LIST: ["admin", "settings", "list"],

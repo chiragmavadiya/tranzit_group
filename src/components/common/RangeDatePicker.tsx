@@ -6,11 +6,12 @@ import { cn } from '@/lib/utils'
 import { format } from 'date-fns'
 import { memo, useState } from 'react'
 import { CustomLabel } from '@/features/orders/components/OrderFormUI'
+import type { DateRange } from 'react-day-picker';
 
-const DatePicker = memo(({ date, setDate, label, className, placeholder = 'DD/MM/YY', disabled }: { date: Date | undefined, setDate: (date: Date | undefined) => void, label?: string, className?: string, placeholder?: string, disabled?: { after?: Date | undefined, before?: Date | undefined } }) => {
+const RangeDatePicker = memo(({ date, setDate, label, className, placeholder = 'DD/MM/YY' }: { date: DateRange | undefined, setDate: (date: DateRange | undefined) => void, label?: string, className?: string, placeholder?: string }) => {
   const [open, setOpen] = useState<boolean>(false);
 
-  const handleDateChange = (date: Date | undefined) => {
+  const handleDateChange = (date: DateRange | undefined) => {
     setDate(date);
     setOpen(false);
   };
@@ -28,16 +29,17 @@ const DatePicker = memo(({ date, setDate, label, className, placeholder = 'DD/MM
               !date && "text-muted-foreground", className
             )}
           >
-            {date ? format(date, "dd/MM/yy") : <span>{placeholder}</span>}
+            {date ? `${format(date.from!, "dd/MM/yy")} - ${format(date.to!, "dd/MM/yy")}` : <span>{placeholder}</span>}
             <CalendarIcon className="h-4 w-4 opacity-50" />
           </Button>
         </PopoverTrigger>
         <PopoverContent className="w-auto p-0" align="start">
           <Calendar
-            mode="single"
+            mode="range"
             selected={date}
             onSelect={handleDateChange}
-            disabled={disabled as any}
+            numberOfMonths={2}
+            className="rounded-lg border"
           />
         </PopoverContent>
       </Popover>
@@ -45,4 +47,4 @@ const DatePicker = memo(({ date, setDate, label, className, placeholder = 'DD/MM
   )
 })
 
-export default DatePicker;
+export default RangeDatePicker;

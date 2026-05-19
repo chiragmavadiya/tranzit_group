@@ -26,6 +26,9 @@ interface OrderHeaderProps {
   isCancelling?: boolean
   onConsign?: () => void
   isConsigning?: boolean
+  setShowCancelModal: React.Dispatch<React.SetStateAction<boolean>>
+  showCancelModal: boolean
+  requiresManualLabel: boolean
 }
 
 
@@ -41,7 +44,10 @@ export const OrderHeader: React.FC<OrderHeaderProps> = ({
   onCancelOrder,
   isCancelling,
   // onConsign,
-  isConsigning
+  isConsigning,
+  setShowCancelModal,
+  showCancelModal,
+  requiresManualLabel
 }) => {
 
 
@@ -49,8 +55,6 @@ export const OrderHeader: React.FC<OrderHeaderProps> = ({
   const navigate = useNavigate()
   const { role } = useAppSelector((state) => state.auth)
   const [showConfirm, setShowConfirm] = useState(false)
-  const [showCancelModal, setShowCancelModal] = useState(false)
-
 
   const { data: customersData } = useCustomers({ pageSize: 1000 }, role === 'admin' && (orderType === 'create' || orderType === 'consign'));
 
@@ -158,14 +162,14 @@ export const OrderHeader: React.FC<OrderHeaderProps> = ({
                 <Button
                   variant="outline"
                   onClick={onDownloadLabel}
-                  disabled={isDownloadingLabel}
+                  disabled={isDownloadingLabel || requiresManualLabel}
                   className="flex items-center gap-2 border-gray-200 dark:border-zinc-800 text-gray-700 dark:text-zinc-300 font-bold h-8 px-4 text-xs hover:bg-gray-50 dark:hover:bg-zinc-900 transition-colors"
                 >
                   {isDownloadingLabel ? <Loader2 className="h-4 w-4 animate-spin" /> : <Download className="h-4 w-4" />}
-                  DOWNLOAD LABEL
+                  {requiresManualLabel ? 'LABEL NOT YET GENERATED' : 'DOWNLOAD LABEL'}
                 </Button>
               )}
-              {(orderDetail?.order_status_category === 'new' || orderDetail?.order_status_category === 'printed') && (
+              {(orderDetail?.order_status_category === 'new' || orderDetail?.order_status_category === 'printed' || orderDetail?.status.toLocaleLowerCase() === 'new' || orderDetail?.status.toLowerCase() === 'printed') && (
                 <Button
                   variant="outline"
                   onClick={() => setShowCancelModal(true)}
@@ -206,36 +210,7 @@ export const OrderHeader: React.FC<OrderHeaderProps> = ({
             className="max-w-[440px] sm:max-w-[500px]"
           />
 
-          {/* <ConformationModal
-            open={showCancelModal}
-            onOpenChange={setShowCancelModal}
-            title="Cancel this order?"
-            description={
-              <div className="space-y-4">
-                <p className="text-sm">Are you sure you want to cancel this order?</p>
-                <p className="text-sm"> This action can’t be undone once the cancellation is processed.</p>
-                <div className="bg-amber-50 dark:bg-amber-900/20 p-3 rounded-lg border border-amber-100 dark:border-amber-900/30">
-                  <p className="text-amber-800 dark:text-amber-400 font-semibold text-xs">Important: A $5 cancellation service fee applies to Direct Freight bookings.</p>
-                </div>
-                <div className="space-y-2">
-                  <p className="font-semibold text-sm">If the cancellation is successful:</p>
-                  <ul className="list-disc list-inside space-y-1 text-sm">
-                    <li>You will receive a confirmation notification from us</li>
-                    <li>$5 will be deducted from your refund amount</li>
-                  </ul>
-                </div>
-                <p className="font-medium text-sm">Do you want to proceed with cancelling this order?</p>
-              </div>
-            }
-            onConfirm={() => onCancelOrder?.()}
-            confirmText="YES, CANCEL ORDER"
-            cancelText="NO, KEEP ORDER"
-            confirmVariant="destructive"
-            loading={isCancelling}
-          /> */}
-
-
-          {role === 'admin' && (
+          {role === 'admin' && (orderType === "create" || orderType === "create-menual") && (
             <FormSelect
               label={(orderType !== "create" && orderType !== "create-menual") ? "" : "Customer"}
               placeholder="Select Customer"

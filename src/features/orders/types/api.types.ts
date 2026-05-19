@@ -144,3 +144,17 @@ export interface PaymentInfoResponse {
         }>;
     };
 }
+
+export interface OrderCountsResponse {
+    status: boolean;
+    message?: string;
+    data: {
+        all?: number;
+        pending?: number;
+        ready?: number;
+        consigned?: number;
+        cancelled?: number;
+        [key: string]: number | boolean | string | undefined;
+    };
+}
+

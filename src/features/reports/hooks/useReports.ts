@@ -129,3 +129,12 @@ export const useUploadAusPostInvoice = () => {
     },
   });
 };
+
+export const useReportCounts = (enabled: boolean = true) => {
+  return useQuery({
+    queryKey: QUERY_KEYS.REPORTS.COUNTS,
+    queryFn: () => reportsService.getReportCounts(),
+    enabled,
+  });
+};
+

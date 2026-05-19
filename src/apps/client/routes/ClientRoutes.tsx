@@ -26,6 +26,11 @@ const TopUp = lazy(() => import('@/features/wallet/pages/TopUpPage'));
 const IntegrationsLayout = lazy(() => import('@/features/integrations/components/IntegrationsLayout'));
 const IntegrationDetails = lazy(() => import('@/features/integrations/pages/IntegrationDetailsPage'));
 const HelpCenterLayout = lazy(() => import('@/features/help-center/components/HelpCenterLayout'));
+const CustomerSettingsLayout = lazy(() => import('@/features/customer-settings/components/CustomerSettingsLayout'));
+const AccountSettingsPage = lazy(() => import('@/features/customer-settings/pages/AccountSettingsPage'));
+const TeamAccessPage = lazy(() => import('@/features/customer-settings/pages/TeamAccessPage'));
+const EcommerceIntegrationsPage = lazy(() => import('@/features/customer-settings/pages/EcommerceIntegrationsPage'));
+const CarrierIntegrationsPage = lazy(() => import('@/features/customer-settings/pages/CarrierIntegrationsPage'));
 
 const withSuspense = (Component: React.ReactNode) => (
   <Suspense
@@ -74,6 +79,15 @@ export default function ClientRoutes() {
             {/* <Route index element={<HelpCenter />} /> */}
             <Route path=":slug" element={withSuspense(<HelpCenterArticle />)} />
           </Route>
+
+          <Route path="settings" element={withSuspense(<CustomerSettingsLayout />)}>
+            <Route index element={<Navigate to="account" replace />} />
+            <Route path="account" element={withSuspense(<AccountSettingsPage />)} />
+            <Route path="team" element={withSuspense(<TeamAccessPage />)} />
+            <Route path="ecommerce" element={withSuspense(<EcommerceIntegrationsPage />)} />
+            <Route path="carriers" element={withSuspense(<CarrierIntegrationsPage />)} />
+          </Route>
+
           {/* Default authenticated route */}
           <Route path="/" element={<Navigate to="/orders" replace />} />
 

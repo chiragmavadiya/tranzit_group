@@ -7,7 +7,8 @@ import type {
     QuoteServicesRequest,
     QuoteServicesResponse,
     WalletCheckResponse,
-    PaymentInfoResponse
+    PaymentInfoResponse,
+    OrderCountsResponse
 } from "../types/api.types";
 import type { OrderDetailData } from "../types/order-details.types";
 
@@ -86,8 +87,8 @@ export const ordersService = {
     /**
      * Cancel an order
      */
-    cancelOrder: async (orderId: string | number): Promise<any> => {
-        const response = await api.post(API_ENDPOINTS.ORDERS.CANCEL(orderId));
+    cancelOrder: async (orderId: string | number, data: any): Promise<any> => {
+        const response = await api.post(API_ENDPOINTS.ORDERS.CANCEL(orderId), data);
         return response.data;
     },
 
@@ -144,6 +145,15 @@ export const ordersService = {
         const response = await api.get(API_ENDPOINTS.ORDERS.LABEL_DOWNLOAD(orderId), {
             responseType: "blob",
         });
+        return response.data;
+    },
+
+    /**
+     * Get order status counts
+     */
+    getOrderCounts: async (customerId?: string | number): Promise<OrderCountsResponse> => {
+        const params = customerId ? { customer: customerId } : undefined;
+        const response = await api.get<OrderCountsResponse>(API_ENDPOINTS.ORDERS.COUNTS, { params });
         return response.data;
     },
 };

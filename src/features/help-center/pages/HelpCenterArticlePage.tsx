@@ -2,7 +2,6 @@ import React from 'react'
 import { Navigate, useParams } from 'react-router-dom'
 
 import { Badge } from '@/components/ui/badge'
-import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
 import { useHelpArticleDetails } from '../hooks/useHelpCenter'
 
@@ -66,14 +65,6 @@ const HelpCenterArticlePage: React.FC = () => {
                                 rich-text-content"
                                 dangerouslySetInnerHTML={{ __html: article.content || '' }}
                             />
-                        </div>
-
-                        <div className="mt-16 rounded-2xl bg-slate-100 dark:bg-zinc-900 p-8 text-center">
-                            <h3 className="text-lg font-semibold text-slate-900 dark:text-zinc-100">Was this article helpful?</h3>
-                            <div className="mt-4 flex justify-center gap-4">
-                                <Button variant="outline" className="rounded-full px-6">Yes</Button>
-                                <Button variant="outline" className="rounded-full px-6">No</Button>
-                            </div>
                         </div>
                     </div>
                 ) : null}

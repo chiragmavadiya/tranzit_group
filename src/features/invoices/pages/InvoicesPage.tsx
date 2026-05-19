@@ -5,7 +5,8 @@ import { InvoiceStats } from '../components/InvoiceStats';
 import { InvoiceFilters } from '../components/InvoiceFilters';
 import { InvoiceTable } from '../components/InvoiceTable';
 import { CreateInvoiceDialog } from '../components/CreateInvoiceDialog';
-import { useAdminInvoices, useCustomerInvoices, useExportAdminInvoices, useExportCustomerInvoices } from '../hooks/useInvoices';
+import { useAdminInvoices, useCustomerInvoices, useExportAdminInvoices, useExportCustomerInvoices, useDeleteAdminInvoice, useRemindAdminInvoice } from '../hooks/useInvoices';
+import { ConformationModal } from '@/components/common/ConformationModal';
 
 export default function InvoicesPage() {
   const [searchTerm, setSearchTerm] = useState('');
@@ -13,6 +14,7 @@ export default function InvoicesPage() {
   const [page, setPage] = useState(1);
   const [selectedCustomer, setSelectedCustomer] = useState('');
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [invoiceToDelete, setInvoiceToDelete] = useState<number | null>(null);
 
   const { role } = useAppSelector((state) => state.auth);
   const isAdmin = useMemo(() => role === 'admin', [role]);
@@ -32,12 +34,29 @@ export default function InvoicesPage() {
     per_page: pageSize,
   }, !isAdmin);
 
+  const deleteMutation = useDeleteAdminInvoice();
+  const remindMutation = useRemindAdminInvoice();
+
   const data = isAdmin ? adminData : customerData;
   const isLoading = isAdmin ? isAdminLoading : isCustomerLoading;
 
   const adminExportMutation = useExportAdminInvoices();
   const customerExportMutation = useExportCustomerInvoices();
   const exportMutation = isAdmin ? adminExportMutation : customerExportMutation;
+
+  const handleDelete = useCallback((id: number) => {
+    setInvoiceToDelete(id);
+  }, []);
+
+  const handleConfirmDelete = useCallback(() => {
+    if (invoiceToDelete !== null) {
+      deleteMutation.mutate(invoiceToDelete, {
+        onSuccess: () => {
+          setInvoiceToDelete(null);
+        }
+      });
+    }
+  }, [invoiceToDelete, deleteMutation]);
 
   const handleExport = useCallback((format: string) => {
     if (isAdmin) {
@@ -116,10 +135,10 @@ export default function InvoicesPage() {
           onSearchChange={handleSearchChange}
           onExport={handleExport}
           isExporting={exportMutation.isPending}
-          onEdit={(id) => console.log('Edit', id)}
-          onDelete={(id) => console.log('Delete', id)}
+          onEdit={(id) => navigate(`${isAdmin ? '/admin' : ''}/invoices/${id}`)}
+          onDelete={handleDelete}
           onView={handleView}
-          onSend={(id) => console.log('Send', id)}
+          onSend={(id) => remindMutation.mutate(id)}
           isAdmin={isAdmin}
         />
       </div>
@@ -128,6 +147,17 @@ export default function InvoicesPage() {
         isOpen={isDialogOpen}
         onOpenChange={setIsDialogOpen}
         onSubmit={handleInvoiceCreate}
+      />
+
+      <ConformationModal
+        open={invoiceToDelete !== null}
+        onOpenChange={(open) => !open && setInvoiceToDelete(null)}
+        title="Delete Invoice"
+        description="Are you sure you want to delete this invoice? This action cannot be undone."
+        onConfirm={handleConfirmDelete}
+        confirmText="Delete"
+        confirmVariant="destructive"
+        loading={deleteMutation.isPending}
       />
     </div>
   );

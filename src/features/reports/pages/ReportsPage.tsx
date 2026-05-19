@@ -6,7 +6,7 @@ import {
   SHIPMENT_COLUMNS,
   TRANSACTION_COLUMNS,
   INVOICE_COLUMNS,
-  PARCEL_COLUMNS,
+  // PARCEL_COLUMNS,
 } from '../constants';
 import { DataTable } from '@/components/common/DataTable';
 import type { ReportType, ReportFilters } from '../types';
@@ -14,7 +14,7 @@ import {
   useShipmentReport,
   useTransactionReport,
   useInvoiceReport,
-  useParcelReport,
+  // useParcelReport,
   useExportShipmentReport,
   useExportTransactionReport,
   useExportParcelReport
@@ -50,7 +50,7 @@ export default function ReportsPage() {
   const { data: shipmentData, isLoading: shipmentLoading } = useShipmentReport(filters);
   const { data: transactionData, isLoading: transactionLoading } = useTransactionReport(filters);
   const { data: invoiceData, isLoading: invoiceLoading } = useInvoiceReport(filters);
-  const { data: parcelData, isLoading: parcelLoading } = useParcelReport(filters);
+  // const { data: parcelData, isLoading: parcelLoading } = useParcelReport(filters);
 
   const [currentTab, setCurrentTab] = useState(activeTab);
 
@@ -116,14 +116,14 @@ export default function ReportsPage() {
           total: invoiceData?.meta?.total || 0,
           isExporting: false
         };
-      case 'parcel':
-        return {
-          data: parcelData?.data || [],
-          columns: PARCEL_COLUMNS,
-          isLoading: parcelLoading,
-          total: parcelData?.meta?.total || 0,
-          isExporting: exportParcel.isPending
-        };
+      // case 'parcel':
+      //   return {
+      //     data: parcelData?.data || [],
+      //     columns: PARCEL_COLUMNS,
+      //     isLoading: parcelLoading,
+      //     total: parcelData?.meta?.total || 0,
+      //     isExporting: exportParcel.isPending
+      //   };
       default:
         return { data: [], columns: [], isLoading: false, total: 0, isExporting: false };
     }
@@ -132,7 +132,7 @@ export default function ReportsPage() {
     shipmentData, shipmentLoading, exportShipment.isPending,
     transactionData, transactionLoading, exportTransaction.isPending,
     invoiceData, invoiceLoading,
-    parcelData, parcelLoading, exportParcel.isPending
+    // exportParcel.isPending
   ]);
 
   return (

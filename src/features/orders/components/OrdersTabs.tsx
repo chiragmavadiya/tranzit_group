@@ -1,6 +1,8 @@
 import { cn } from '@/lib/utils';
 import type { TabType } from '@/features/orders/types';
 import { TABS } from '@/features/orders/constants';
+import { useOrderCounts } from '@/features/orders/hooks/useOrders';
+import { useAppSelector } from '@/hooks/store.hooks';
 
 interface OrdersTabsProps {
   activeTab: TabType;
@@ -8,23 +10,22 @@ interface OrdersTabsProps {
   className?: string;
 }
 
-// border: 1px solid #ebe6e7;
-// border - top - left - radius: 10px;
-// border - top - right - radius: 10px;
-// padding: 0 30px;
-// border - bottom - color: #fff;
-
 export function OrdersTabs({ activeTab, onTabChange, className }: OrdersTabsProps) {
+  const { role } = useAppSelector((state) => state.auth);
+  // Fetch status counts from the counts API
+  const { data: countsData } = useOrderCounts(undefined, !!role);
+
   return (
     <nav className={cn("flex space-x-6 h-full items-end", className)} aria-label="Tabs">
       {TABS.map((tab) => {
-        // const count = 61;
-        const isActive = activeTab === tab.toLowerCase();
+        const key = tab.toLowerCase();
+        const count = countsData?.data?.[key] ?? countsData?.data?.[tab] ?? 0;
+        const isActive = activeTab === key;
 
         return (
           <button
             key={tab}
-            onClick={() => onTabChange(tab.toLowerCase() as TabType)}
+            onClick={() => onTabChange(key as TabType)}
             className={cn(
               "h-10 px-6 border font-semibold text-[13px] rounded-t-md transition-all duration-200 relative flex items-center gap-2 outline-none whitespace-nowrap",
               isActive
@@ -33,7 +34,7 @@ export function OrdersTabs({ activeTab, onTabChange, className }: OrdersTabsProp
             )}
           >
             {tab}
-            {/* {count > 0 && (
+            {typeof count === 'number' && (
               <span className={cn(
                 "px-1.5 py-0.5 text-[10px] rounded-full font-bold transition-all duration-300",
                 isActive
@@ -42,11 +43,10 @@ export function OrdersTabs({ activeTab, onTabChange, className }: OrdersTabsProp
               )}>
                 {count}
               </span>
-            )} */}
+            )}
           </button>
         );
       })}
     </nav>
   );
 }
-

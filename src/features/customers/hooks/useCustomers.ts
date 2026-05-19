@@ -16,8 +16,16 @@ export const useCustomers = (params?: Record<string, any>, enabled: boolean = tr
         //         label: `${c.first_name} ${c.last_name}`
         //     }));
         // }
+     });
+};
+
+export const useCustomerCounts = () => {
+    return useQuery({
+        queryKey: QUERY_KEYS.ADMIN_CUSTOMERS.COUNTS,
+        queryFn: () => customerService.getCounts(),
     });
 };
+
 
 export const useCustomerDetails = (id: number | string) => {
     return useQuery({
@@ -74,6 +82,7 @@ export const useCreateCustomer = () => {
         mutationFn: (data: CustomerFormData) => customerService.create(data),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: QUERY_KEYS.ADMIN_CUSTOMERS.LIST });
+            queryClient.invalidateQueries({ queryKey: QUERY_KEYS.ADMIN_CUSTOMERS.COUNTS });
         },
     });
 };
@@ -85,6 +94,7 @@ export const useUpdateCustomer = () => {
         mutationFn: ({ id, data }: { id: number | string; data: CustomerFormData }) => customerService.update(id, data),
         onSuccess: (_, variables) => {
             queryClient.invalidateQueries({ queryKey: QUERY_KEYS.ADMIN_CUSTOMERS.LIST });
+            queryClient.invalidateQueries({ queryKey: QUERY_KEYS.ADMIN_CUSTOMERS.COUNTS });
             queryClient.invalidateQueries({ queryKey: QUERY_KEYS.ADMIN_CUSTOMERS.DETAILS(variables.id) });
             queryClient.invalidateQueries({ queryKey: QUERY_KEYS.ADMIN_CUSTOMERS.PROFILE(variables.id) });
         },
@@ -98,6 +108,7 @@ export const useDeleteCustomer = () => {
         mutationFn: (id: number | string) => customerService.delete(id),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: QUERY_KEYS.ADMIN_CUSTOMERS.LIST });
+            queryClient.invalidateQueries({ queryKey: QUERY_KEYS.ADMIN_CUSTOMERS.COUNTS });
         },
     });
 };
@@ -121,6 +132,7 @@ export const useToggleCustomerStatus = () => {
         mutationFn: (id: number | string) => customerService.toggleStatus(id),
         onSuccess: (_, id) => {
             queryClient.invalidateQueries({ queryKey: QUERY_KEYS.ADMIN_CUSTOMERS.LIST });
+            queryClient.invalidateQueries({ queryKey: QUERY_KEYS.ADMIN_CUSTOMERS.COUNTS });
             queryClient.invalidateQueries({ queryKey: QUERY_KEYS.ADMIN_CUSTOMERS.DETAILS(id) });
             queryClient.invalidateQueries({ queryKey: QUERY_KEYS.ADMIN_CUSTOMERS.PROFILE(id) });
         },

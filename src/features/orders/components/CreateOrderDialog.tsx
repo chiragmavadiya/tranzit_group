@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { FormInput, FormSelect } from '@/features/orders/components/OrderFormUI';
 import type { AddressData, CreateOrderDialogProps } from '@/features/orders/types';
@@ -8,13 +8,39 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { PlaceAutocomplete } from '@/components/common/AutoComplateAddress';
 import { cn } from '@/lib/utils';
 import { STATES } from '@/constants';
+import { AutoComplete } from '@/components/common';
+import { useAddressBookSearch } from '@/features/address-book/hooks/useAddressBook';
 
 export default function CreateOrderDialog({ onOpenChange, type, open, initialData, onSubmit, isEdit }: CreateOrderDialogProps) {
   const navigate = useNavigate();
   const [formData, setFormData] = useState<AddressData>(initialData);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [searchAddress, setSearchAddress] = useState('');
   // const [isSuccess, setIsSuccess] = useState(false);
   const [activeLookup, setActiveLookup] = useState<string>('address');
+
+  const { data: addressBookData } = useAddressBookSearch(searchAddress);
+
+  const options = useMemo(() => {
+    if (!addressBookData?.data) return [];
+    console.log(addressBookData)
+    return addressBookData.data.map((item) => ({
+      value: item.value,
+      label: item.label,
+      name: item.data.receiver_name,
+      phone: item.data.receiver_phone,
+      email: item.data.receiver_email,
+      address: item.data.receiver_address,
+      address1: item.data.receiver_address,
+      suburb: item.data.suburb,
+      state: item.data.state,
+      postcode: item.data.postcode,
+      country: "Australia",
+      street_name: item.data.street_name,
+      street_number: item.data.street_number,
+      street_type: item.data.street_type,
+    }));
+  }, [addressBookData]);
   const updateField = (field: keyof AddressData, value: string | boolean | number | string[]) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
   };
@@ -53,7 +79,7 @@ export default function CreateOrderDialog({ onOpenChange, type, open, initialDat
     if (value) return
     navigate(-1);
   }
-
+  console.log(formData, 'formDataformData..')
   return (
     <CustomModel
       open={open}
@@ -102,25 +128,52 @@ export default function CreateOrderDialog({ onOpenChange, type, open, initialDat
               </button>
             </div>
             <div className="flex-1 relative">
-              <PlaceAutocomplete
-                // label="Address Information"
-                // placeholder="Search suburb or postcode..."
-                onPlaceSelect={(opt) => {
-
-                  updateField('address', opt.formatted_address);
-                  updateField('address1', opt.address1);
-                  updateField('suburb', opt.suburb);
-                  updateField('state', opt.state);
-                  updateField('postcode', opt.post_code);
-                  updateField('country', opt.country);
-                  updateField('street_name', opt.street_name);
-                  updateField('street_number', opt.street_number);
-                  updateField('street_type', opt.street_type);
-                }}
-                onChange={(value) => { updateField('address', value!); updateField('address1', value!) }}
-                value={formData.address}
-                inputClassName='rounded-none'
-              />
+              {activeLookup === 'address' ? (
+                <PlaceAutocomplete
+                  onPlaceSelect={(opt) => {
+                    updateField('address', opt.formatted_address);
+                    updateField('address1', opt.address1);
+                    updateField('suburb', opt.suburb);
+                    updateField('state', opt.state);
+                    updateField('postcode', opt.post_code);
+                    updateField('country', opt.country);
+                    updateField('street_name', opt.street_name);
+                    updateField('street_number', opt.street_number);
+                    updateField('street_type', opt.street_type);
+                  }}
+                  onChange={(value) => { updateField('address', value!); updateField('address1', value!) }}
+                  value={formData.address}
+                  inputClassName='rounded-none'
+                />
+              ) : (
+                <AutoComplete
+                  placeholder='Search contact...'
+                  className='rounded-none'
+                  inputClassName='rounded-none'
+                  onChange={(value) => { setSearchAddress(value!); }}
+                  value={searchAddress}
+                  onSearch={(value) => setSearchAddress(value)}
+                  onSelect={(value) => {
+                    const option = options.find((opt) => opt.value === value);
+                    console.log(option, 'option....')
+                    if (option) {
+                      updateField('name', option.name);
+                      updateField('phone', option.phone);
+                      updateField('email', option.email);
+                      updateField('address', option.address);
+                      updateField('address1', option.address1);
+                      updateField('suburb', option.suburb);
+                      updateField('state', option.state);
+                      updateField('postcode', option.postcode);
+                      updateField('country', option.country);
+                      updateField('street_name', option.street_name);
+                      updateField('street_number', option.street_number);
+                      updateField('street_type', option.street_type);
+                    }
+                  }}
+                  options={options}
+                />
+              )}
             </div>
           </div>
 

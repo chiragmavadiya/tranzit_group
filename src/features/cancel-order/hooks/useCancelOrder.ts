@@ -9,3 +9,11 @@ export function useCancelOrders(filters: CancelOrderFilters) {
         queryFn: () => cancelOrderService.getList(filters),
     });
 }
+
+export function useCancelOrderCounts() {
+    return useQuery({
+        queryKey: QUERY_KEYS.ADMIN_CANCEL_ORDERS.COUNTS,
+        queryFn: () => cancelOrderService.getCounts(),
+    });
+}
+

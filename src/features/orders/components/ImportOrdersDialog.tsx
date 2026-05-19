@@ -1,9 +1,10 @@
-import { useState, useRef } from 'react';
+import { useState, useRef, useMemo } from 'react';
 import { CustomModel } from '@/components/ui/dialog';
 import { Plus, FileText, Download, X } from 'lucide-react';
 import { showToast } from '@/components/ui/custom-toast';
 import { Button } from '@/components/ui/button';
 import { FormSelect } from './OrderFormUI';
+import { useCustomers } from '@/features/customers/hooks/useCustomers';
 
 interface ImportOrdersDialogProps {
   open: boolean;
@@ -11,7 +12,6 @@ interface ImportOrdersDialogProps {
   onImport: (file: File, customerId?: string) => void;
   isLoading: boolean;
   isAdmin?: boolean;
-  customers?: { value: string; label: string }[];
 }
 
 export function ImportOrdersDialog({
@@ -20,12 +20,21 @@ export function ImportOrdersDialog({
   onImport,
   isLoading,
   isAdmin = false,
-  customers = []
 }: ImportOrdersDialogProps) {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [selectedCustomer, setSelectedCustomer] = useState<string>('');
   const [submitted, setSubmitted] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+
+  const { data: customersData } = useCustomers({ pageSize: 1000 }, isAdmin);
+
+  const formattedCustomers = useMemo(() => {
+    return customersData?.data?.map((c: any) => ({
+      value: c.id.toString(),
+      label: `${c.first_name} ${c.last_name}`
+    })) || [];
+  }, [customersData]);
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -102,7 +111,7 @@ export function ImportOrdersDialog({
             <FormSelect
               label="Select Customer"
               placeholder="Choose a customer"
-              options={customers}
+              options={formattedCustomers}
               value={selectedCustomer}
               onValueChange={(val) => setSelectedCustomer(val || '')}
               className="w-full"

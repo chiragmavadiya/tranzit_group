@@ -1,4 +1,4 @@
-import { useState, useMemo, useRef, useCallback } from 'react';
+import { useState, useMemo, useRef, useCallback, useEffect } from 'react';
 import { CustomModel } from '@/components/ui/dialog';
 import { FormInput, FormSelect, FormTextarea } from '@/features/orders/components/OrderFormUI';
 import { RichTextEditorComponent } from './RichTextEditor';
@@ -7,19 +7,19 @@ import { Label } from '@/components/ui/label';
 import { Loader2 } from 'lucide-react';
 import { ARTICLE_CATEGORIES } from '../constants';
 import { useHelpArticleMutations, useHelpArticleDetails } from '../hooks/useHelpCenterAdmin';
-import type { HelpArticle, HelpArticleFormData } from '../types';
+import type { HelpArticleFormData } from '../types';
 import React from 'react';
 
 interface AddArticleDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  initialData?: HelpArticle | null;
+  initialData?: number | null;
 }
 
 export function AddArticleDialog({ open, onOpenChange, initialData }: AddArticleDialogProps) {
   const { createArticle, isCreating, updateArticle, isUpdating } = useHelpArticleMutations();
 
-  const { data: detailsResponse, isLoading: isFetching } = useHelpArticleDetails(initialData?.id || null);
+  const { data: detailsResponse, isLoading: isFetching } = useHelpArticleDetails(initialData!);
 
   const surchargeDetails = detailsResponse?.data;
   const isLoading = isCreating || isUpdating;
@@ -33,7 +33,7 @@ export function AddArticleDialog({ open, onOpenChange, initialData }: AddArticle
   }), []);
 
   const formDataToLoad = useMemo(() => {
-    const data = surchargeDetails || initialData;
+    const data = surchargeDetails;
     if (data) {
       return {
         title: data.title,
@@ -44,13 +44,13 @@ export function AddArticleDialog({ open, onOpenChange, initialData }: AddArticle
       };
     }
     return initialValues;
-  }, [surchargeDetails, initialData, initialValues]);
+  }, [surchargeDetails, initialValues]);
 
   const formRef = useRef<HTMLFormElement>(null);
 
   const handleSubmit = (data: HelpArticleFormData) => {
     if (initialData) {
-      updateArticle({ id: initialData.id, data }, {
+      updateArticle({ id: initialData, data }, {
         onSuccess: () => onOpenChange(false)
       });
     } else {
@@ -82,7 +82,7 @@ export function AddArticleDialog({ open, onOpenChange, initialData }: AddArticle
       )}
       {open && (
         <ArticleForm
-          key={initialData?.id || 'new'}
+          key={initialData || 'new'}
           ref={formRef}
           initialValues={formDataToLoad}
           onSubmit={handleSubmit}
@@ -98,6 +98,7 @@ interface ArticleFormProps {
 }
 
 const ArticleForm = ({ initialValues, onSubmit, ref }: ArticleFormProps & { ref: any }) => {
+  console.log(initialValues)
   const [formData, setFormData] = useState<HelpArticleFormData>({
     ...initialValues
   });
@@ -117,6 +118,10 @@ const ArticleForm = ({ initialValues, onSubmit, ref }: ArticleFormProps & { ref:
 
     onSubmit(formData);
   };
+
+  useEffect(() => {
+    setFormData(initialValues)
+  }, [initialValues])
 
   return (
     <form ref={ref} onSubmit={handleSubmit} className="grid grid-cols-12 gap-x-6 gap-y-5 py-4">
@@ -138,7 +143,7 @@ const ArticleForm = ({ initialValues, onSubmit, ref }: ArticleFormProps & { ref:
           value={formData.title}
           onChange={(val) => handleInputChange('title', val)}
           error={submited && !formData.title}
-          errormsg="Title is required"
+          errormsg="Please enter Title"
         />
       </div>
       <div className="col-span-12">
@@ -158,7 +163,7 @@ const ArticleForm = ({ initialValues, onSubmit, ref }: ArticleFormProps & { ref:
           onChange={(val) => handleInputChange('content', val)}
         />
         {submited && !formData.content && (
-          <p className="text-red-500 text-[11px] mt-1 font-bold">Content is required</p>
+          <p className="text-red-500 text-[11px] mt-1 font-bold">Please enter Content</p>
         )}
       </div>
 

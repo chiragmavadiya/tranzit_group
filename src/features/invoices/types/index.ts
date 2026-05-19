@@ -6,30 +6,39 @@ export interface Customer {
 }
 
 export interface InvoiceDocumentData {
-  invoice: {
-    id?: number;
-    invoice_number: string;
-    invoice_date: string;
-    issued_at: string;
-    due_date: string | null;
-    status: string;
-    amount_paid: number;
-    balance_due: number;
-    send_email: string;
-    zoho_invoice_number: string | null;
-  };
-  customer: any;
-  items: any[];
-  summary: {
+  id?: number;
+  invoice_number: string;
+  zoho_invoice_number: string | null;
+  status: string;
+  customer_full_name?: string;
+  customer_email?: string;
+  customer_business_name?: string;
+  customer?: any;
+  total: number;
+  issue_date: string;
+  due_date?: string | null;
+  send_email?: string;
+  till_date_paid: number;
+  remaining_balance: number;
+  totals: {
     subtotal_ex_gst: number;
     gst: number;
     total_inc_gst: number;
     amount_paid: number;
-    credit_amount: number;
     amount_due: number;
+    credit_amount: number;
   };
-  payments: any[];
+  address: {
+    address: string;
+    suburb: string;
+    state: string;
+    postcode: string;
+  };
+  items: any[];
+  orders: any[];
+  payment_transactions: any[];
 }
+
 
 export interface Invoice {
   id: number;
@@ -69,6 +78,7 @@ export interface Invoice {
   customer_business_name: string,
   items: InvoiceItem
   address: any
+  actions: string[];
 }
 
 export interface InvoiceSummary {

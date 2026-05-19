@@ -115,3 +115,15 @@ export const useExportAddressBook = () => {
         },
     });
 };
+
+/**
+ * Hook to search address book entries
+ */
+export const useAddressBookSearch = (query: string, enabled = true) => {
+    return useQuery({
+        queryKey: QUERY_KEYS.ADDRESS_BOOK.SEARCH(query),
+        queryFn: () => addressBookService.search(query),
+        enabled: enabled && !!query && query.trim().length >= 2,
+    });
+};
+

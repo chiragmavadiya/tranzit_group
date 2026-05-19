@@ -8,10 +8,11 @@ interface CustomToastProps {
   message: string;
   type?: ToastType;
   t: string | number; // Sonner's toast ID
+  description?: string;
 }
 
 // eslint-disable-next-line react-refresh/only-export-components
-const CustomToast = ({ message, type = "default", t }: CustomToastProps) => {
+const CustomToast = ({ message, type = "default", t, description }: CustomToastProps) => {
   const styles = {
     success: {
       bg: "bg-[#F0FDF4] dark:bg-emerald-950/20",
@@ -70,6 +71,9 @@ const CustomToast = ({ message, type = "default", t }: CustomToastProps) => {
         <p className="text-[14px]  line-clamp-4 font-medium text-slate-700 leading-tight dark:text-slate-400  mb-0">
           {message}
         </p>
+        {description && <p className="text-[13px]  line-clamp-4 font-medium text-slate-700 leading-tight dark:text-slate-400  mb-0">
+          {description}
+        </p>}
       </div>
 
       {/* Close Button */}
@@ -89,11 +93,12 @@ const CustomToast = ({ message, type = "default", t }: CustomToastProps) => {
  * @param type success | warning | error | default
  * @param title Optional title
  */
-export const showToast = (message: string, type: ToastType = "default") => {
+export const showToast = (message: string, type: ToastType = "default", description?: string) => {
   toast.dismiss();
   toast.custom((t) => (
     <CustomToast
       message={message}
+      description={description}
       type={type}
       t={t}
     />

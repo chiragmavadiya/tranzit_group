@@ -85,5 +85,27 @@ export const clientSidebarItems: SidebarItem[] = [
   { name: 'Help Center', icon: HelpCircle, path: '/help-center' },
   { name: 'Parcel Report', icon: FileArchive, path: '/parcel-report' },
   { name: 'Integrations', icon: Link, path: '/integrations' },
+  {
+    name: 'Settings',
+    icon: Settings,
+    path: '/settings',
+    hasDropdown: true,
+    subGroups: [
+      {
+        title: 'Organization',
+        items: [
+          { name: 'Account Details', path: '/settings/account' },
+          { name: 'Team Access', path: '/settings/team' },
+        ]
+      },
+      {
+        title: 'Integrations',
+        items: [
+          { name: 'Ecommerce', path: '/settings/ecommerce' },
+          { name: 'Carriers', path: '/settings/carriers' },
+        ]
+      },
+    ]
+  },
   { name: 'Help', icon: LifeBuoy, path: 'mailto:info@tranzitgroup.com.au?subject=Support Request from Portal&body=Hi Team', isExternal: true },
 ];

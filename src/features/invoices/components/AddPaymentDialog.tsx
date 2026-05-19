@@ -32,7 +32,7 @@ export function AddPaymentDialog({ isOpen, onOpenChange, invoiceId }: AddPayment
     }, {
       onSuccess: () => {
         // Invalidate the invoice details query to trigger a refetch
-        queryClient.invalidateQueries({ queryKey: ['admin', 'invoices', 'details', invoiceId.toString()] });
+        queryClient.invalidateQueries({ queryKey: ['admin', 'invoices', 'details', Number(invoiceId)] });
 
         onOpenChange(false);
         setFormData({

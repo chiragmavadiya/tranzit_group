@@ -10,6 +10,7 @@ import type {
     CustomerOrdersResponse,
     CustomerTransactionsResponse,
     CustomerInvoicesResponse,
+    CustomerStatsResponse,
 } from "../types";
 
 export const customerService = {
@@ -18,6 +19,14 @@ export const customerService = {
      */
     getList: async (params?: Record<string, any>): Promise<CustomerListResponse> => {
         const response = await api.get<CustomerListResponse>(API_ENDPOINTS.ADMIN_CUSTOMERS.BASE, { params });
+        return response.data;
+    },
+
+    /**
+     * Get customer counts
+     */
+    getCounts: async (): Promise<CustomerStatsResponse> => {
+        const response = await api.get<CustomerStatsResponse>(API_ENDPOINTS.ADMIN_CUSTOMERS.COUNTS);
         return response.data;
     },
 

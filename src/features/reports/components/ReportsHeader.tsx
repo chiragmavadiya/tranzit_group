@@ -6,6 +6,9 @@ import { Button } from '@/components/ui/button';
 // import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 // import { cn } from '@/lib/utils';
 import DatePicker from '@/components/common/DatePicker';
+// import RangeDatePicker from '@/components/common/RangeDatePicker';
+// import type { DateRange } from 'react-day-picker';
+// import { addDays } from 'date-fns';
 
 interface ReportsHeaderProps {
   onApply: (startDate: Date | undefined, endDate: Date | undefined) => void;
@@ -18,6 +21,11 @@ interface ReportsHeaderProps {
 export function ReportsHeader({ onApply, startDate, endDate, setStartDate, setEndDate }: ReportsHeaderProps) {
   // const [startDate, setStartDate] = useState<Date | undefined>(new Date());
   // const [endDate, setEndDate] = useState<Date | undefined>(new Date());
+  // const [dateRange, setDateRange] = React.useState<DateRange | undefined>({
+  //   // from: addDays(new Date(), -7),
+  //   // to: new Date(),
+
+  // })
 
   const handleApply = useCallback(() => {
     onApply(startDate, endDate);
@@ -58,6 +66,10 @@ export function ReportsHeader({ onApply, startDate, endDate, setStartDate, setEn
               />
             </PopoverContent>
           </Popover> */}
+          {/* <RangeDatePicker
+            date={dateRange}
+            setDate={setDateRange}
+          /> */}
           <DatePicker
             label="Start Date"
             date={startDate}

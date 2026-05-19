@@ -63,8 +63,8 @@ export const useCreateOrder = () => {
 export const useCancelOrder = () => {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: ordersService.cancelOrder,
-    onSuccess: (_, orderId) => {
+    mutationFn: ({ orderId, data }: { orderId: string | number; data?: any }) => ordersService.cancelOrder(orderId, data),
+    onSuccess: (_, { orderId }) => {
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.ORDERS.LIST });
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.ORDERS.DETAILS(orderId) });
     },
@@ -138,7 +138,7 @@ export const useConsignOrder = (isAdmin: boolean = false) => {
 export const useImportOrders = () => {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: ({ file, customerId }: { file: File; customerId?: string }) => 
+    mutationFn: ({ file, customerId }: { file: File; customerId?: string }) =>
       ordersService.importOrders(file, customerId),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.ORDERS.LIST });
@@ -184,3 +184,15 @@ export const useDownloadLabel = () => {
     }
   });
 };
+
+/**
+ * Hook to fetch order status counts
+ */
+export const useOrderCounts = (customerId?: string | number, enabled: boolean = true) => {
+  return useQuery({
+    queryKey: QUERY_KEYS.ORDERS.COUNTS(customerId),
+    queryFn: () => ordersService.getOrderCounts(customerId),
+    enabled
+  });
+};
+

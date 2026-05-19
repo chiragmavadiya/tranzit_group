@@ -18,20 +18,15 @@ import {
 import { cn } from '@/lib/utils'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
 
 import {
   DropdownCustomMenu,
 } from '@/components/ui/dropdown-menu';
-import { FormSelect } from '@/features/orders/components/OrderFormUI'
-import { Calendar } from '@/components/ui/calendar'
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from '@/components/ui/popover'
+import { FormInput, FormSelect } from '@/features/orders/components/OrderFormUI'
 import { BANKING_DETAILS, COMPANY_DETAILS, TERMS_CONDITIONS } from '../../constants'
 import { format } from 'date-fns'
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
+import { Calendar } from '@/components/ui/calendar'
 
 interface InvoicePaperProps {
   invoice: any;
@@ -67,7 +62,17 @@ export const InvoicePaper: React.FC<InvoicePaperProps> = ({
   const updateItemsData = useCallback((id: string | number, type: string, value: string | number) => {
     setInvoiceData?.((prev: any) => ({
       ...prev,
-      items: prev?.items?.map((i: any) => i.id === id ? { ...i, [type]: value } : i)
+      items: prev?.items?.map((i: any) => {
+        if (i.id === id) {
+          const updated = { ...i, [type]: value };
+          if (type === 'total') {
+            updated.total_charge_credit = Number(value);
+            updated.total = Number(value);
+          }
+          return updated;
+        }
+        return i;
+      })
     }))
   }, [setInvoiceData])
 
@@ -76,6 +81,7 @@ export const InvoicePaper: React.FC<InvoicePaperProps> = ({
       id: Date.now(),
       type,
       date: type === 'order' ? new Date().toLocaleDateString('en-GB') : '',
+      ...(type === 'order' ? { order_number: '' } : { description: '' }),
       description: '',
       from: '',
       destination: '',
@@ -92,17 +98,17 @@ export const InvoicePaper: React.FC<InvoicePaperProps> = ({
   }, [setInvoiceData])
 
   const updateStatus = useCallback((status: string) => {
-    setInvoiceData?.((prev: any) => ({ ...prev, invoice: { ...prev?.invoice, status } }))
+    setInvoiceData?.((prev: any) => ({ ...prev, status }))
   }, [setInvoiceData])
 
   // Auto-edit newly added item
   React.useEffect(() => {
-    if (shouldAutoEdit && invoice.line_items?.length > 0) {
-      const lastItem = invoice.line_items[invoice.line_items.length - 1];
+    if (shouldAutoEdit && invoice.items?.length > 0) {
+      const lastItem = invoice.items[invoice.items.length - 1];
       setEditingRowId(lastItem.id);
       setShouldAutoEdit(false);
     }
-  }, [invoice.line_items, shouldAutoEdit]);
+  }, [invoice.items, shouldAutoEdit]);
 
   const formatCurrency = (amount: number | string) => {
     return amount ? `$${amount}` : `$0`
@@ -130,9 +136,9 @@ export const InvoicePaper: React.FC<InvoicePaperProps> = ({
           </div>
 
           <div className="text-xs space-y-1 text-slate-500 dark:text-zinc-400 font-medium max-w-[380px]">
-            <p className='font-bold text-xl text-slate-800 dark:text-white'>{invoice.customer?.business_name || ''}</p>
-            <p>{invoice.customer?.address_line || ''}</p>
-            <p>{invoice.customer?.address?.suburb || ''}</p>
+            <p className='font-bold text-xl text-slate-800 dark:text-white'>{invoice.customer_business_name || invoice.customer?.business_name || invoice.customer_full_name || ''}</p>
+            <p>{invoice.address?.address || ''}</p>
+            <p>{(invoice.address?.suburb || '') + " " + (invoice.address?.state || '') + " " + (invoice.address?.postcode || '')}</p>
           </div>
         </div>
 
@@ -143,8 +149,8 @@ export const InvoicePaper: React.FC<InvoicePaperProps> = ({
             <p className='my-1'>{COMPANY_DETAILS.email || 'accounts@tranzitgroup.com.au'}</p>
           </div>
           <div className="space-y-1 text-xs font-bold text-slate-600 dark:text-zinc-300">
-            <p><span className="text-slate-400 font-medium">Invoice No:</span> <span className="text-primary font-black">{invoice?.invoice?.invoice_number}</span></p>
-            <p><span className="text-slate-400 font-medium">Date:</span> <span className="text-slate-800 dark:text-white font-black">{invoice?.invoice?.invoice_date}</span></p>
+            <p><span className="text-slate-400 font-medium">Invoice No:</span> <span className="text-primary font-black">{invoice?.invoice_number}</span></p>
+            <p><span className="text-slate-400 font-medium">Date:</span> <span className="text-slate-800 dark:text-white font-black">{invoice?.issue_date}</span></p>
           </div>
         </div>
       </div>
@@ -185,18 +191,19 @@ export const InvoicePaper: React.FC<InvoicePaperProps> = ({
             <Popover>
               <PopoverTrigger>
                 <button className="flex items-center justify-between w-full group cursor-pointer outline-none">
-                  <span className="text-[14px] font-bold mt-[2px]">{invoice?.invoice?.invoice_date}</span>
+                  <span className="text-[14px] font-bold mt-[2px]">{invoice?.issue_date}</span>
                   <CalendarIcon className="w-4 h-4 ml-2 text-slate-300 group-hover:text-slate-400 transition-colors" />
                 </button>
               </PopoverTrigger>
               <PopoverContent className="w-auto p-0" align="start">
                 <Calendar
                   mode="single"
-                  selected={invoice?.invoice?.invoice_date ? new Date(invoice?.invoice?.invoice_date) : undefined}
+                  selected={invoice?.issue_date ? new Date(invoice?.issue_date) : undefined}
                   onSelect={(date) => {
                     if (date) {
                       // onUpdateDate?.(date);
-                      const formattedDate = format(date, 'dd-MM-yyyy');
+                      const formattedDate = format(date, 'MM-dd-yyyy');
+                      // const formattedDate = format(date, 'dd-MM-yyyy');
                       onUpdateDate?.(formattedDate)
                     }
                   }}
@@ -204,9 +211,21 @@ export const InvoicePaper: React.FC<InvoicePaperProps> = ({
                 />
               </PopoverContent>
             </Popover>
+            // <DatePicker
+            //   date={invoice?.invoice?.invoice_date}
+            //   setDate={(date) => {
+            //     if (date) {
+            //       // onUpdateDate?.(date);
+            //       console.log(date);
+
+            //       const formattedDate = format(date, 'dd-MM-yyyy');
+            //       onUpdateDate?.(formattedDate)
+            //     }
+            //   }}
+            // />
           ) : (
             <div className="flex items-center justify-between">
-              <span className="text-[14px] font-bold">{invoice.invoice?.invoice_date}</span>
+              <span className="text-[14px] font-bold">{invoice?.issue_date}</span>
               <CalendarIcon className="w-4 h-4 text-slate-300" />
             </div>
           )}
@@ -219,7 +238,7 @@ export const InvoicePaper: React.FC<InvoicePaperProps> = ({
               {isAdmin ? (
                 <FormSelect
                   label="Status"
-                  value={invoice.invoice?.status}
+                  value={invoice?.status?.toLowerCase()}
                   onValueChange={(val) => updateStatus(val || '')}
                   options={[
                     { value: 'draft', label: 'Draft' },
@@ -236,20 +255,20 @@ export const InvoicePaper: React.FC<InvoicePaperProps> = ({
                   <div className="flex items-center justify-between">
                     <span className={cn(
                       "text-[14px] font-bold",
-                      invoice.invoice?.status === 'Paid' ? "text-emerald-600" :
-                        invoice.invoice?.status === 'Overdue' ? "text-rose-600" : "text-amber-600"
-                    )}>{invoice.invoice?.status}</span>
+                      invoice?.status === 'Paid' ? "text-emerald-600" :
+                        invoice?.status === 'Overdue' ? "text-rose-600" : "text-amber-600"
+                    )}>{invoice?.status}</span>
                   </div>
                 </>
               )}
             </div>
             <div className="p-4 border-r border-slate-100 dark:border-zinc-800 bg-slate-50/30 dark:bg-zinc-800/20">
               <p className="text-[11px] font-extrabold text-slate-700 dark:text-zinc-400 uppercase tracking-wider mb-2">Amount Paid</p>
-              <span className="text-[18px] font-bold text-emerald-600">{formatCurrency(invoice.invoice?.amount_paid)}</span>
+              <span className="text-[18px] font-bold text-emerald-600">{formatCurrency(invoice?.till_date_paid)}</span>
             </div>
             <div className="p-4 bg-slate-50/30 dark:bg-zinc-800/20">
               <p className="text-[11px] font-extrabold text-slate-700 dark:text-zinc-400 uppercase tracking-wider mb-2">Balance Due</p>
-              <span className="text-[18px] font-bold text-slate-900 dark:text-white">{formatCurrency(invoice.invoice?.balance_due)}</span>
+              <span className="text-[18px] font-bold text-slate-900 dark:text-white">{formatCurrency(invoice?.remaining_balance)}</span>
             </div>
           </>
         )}
@@ -263,15 +282,15 @@ export const InvoicePaper: React.FC<InvoicePaperProps> = ({
           <div className="overflow-x-auto">
             <Table className="min-w-[1000px]">
               <TableHeader className="bg-slate-50/50 dark:bg-zinc-800/50">
-                <TableRow className="hover:bg-transparent border-b border-slate-100 dark:border-zinc-800">
-                  <TableHead className="text-[10px] font-black uppercase text-slate-400 py-3">Type</TableHead>
-                  <TableHead className="text-[10px] font-black uppercase text-slate-400 py-3">Date</TableHead>
-                  <TableHead className="text-[10px] font-black uppercase text-slate-400 py-3">Description</TableHead>
-                  <TableHead className="text-[10px] font-black uppercase text-slate-400 py-3">From</TableHead>
-                  <TableHead className="text-[10px] font-black uppercase text-slate-400 py-3">Destination</TableHead>
-                  <TableHead className="text-[10px] font-black uppercase text-slate-400 py-3">To</TableHead>
-                  <TableHead className="text-[10px] font-black uppercase text-slate-400 py-3">Receiver</TableHead>
-                  <TableHead className="text-[10px] font-black uppercase text-slate-400 py-3 text-right">Amount</TableHead>
+                <TableRow className="hover:bg-transparent border-b border-slate-200 dark:border-zinc-800">
+                  <TableHead className="text-[10px] font-black uppercase text-slate-500 py-3">Type</TableHead>
+                  <TableHead className="text-[10px] font-black uppercase text-slate-500 py-3">Date</TableHead>
+                  <TableHead className="text-[10px] font-black uppercase text-slate-500 py-3">Order Number/Description</TableHead>
+                  <TableHead className="text-[10px] font-black uppercase text-slate-500 py-3">From</TableHead>
+                  <TableHead className="text-[10px] font-black uppercase text-slate-500 py-3">Destination</TableHead>
+                  <TableHead className="text-[10px] font-black uppercase text-slate-500 py-3">To</TableHead>
+                  <TableHead className="text-[10px] font-black uppercase text-slate-500 py-3">Receiver</TableHead>
+                  <TableHead className="text-[10px] font-black uppercase text-slate-500 py-3 text-right">Amount</TableHead>
                   {isAdmin && <TableHead className="text-[9px] font-black uppercase text-slate-400 py-3 text-center"></TableHead>}
                 </TableRow>
               </TableHeader>
@@ -299,6 +318,7 @@ export const InvoicePaper: React.FC<InvoicePaperProps> = ({
                             <FormSelect
                               label=""
                               value={item.type}
+
                               onValueChange={(val) => updateItemsData(item.id, 'type', val || '')}
                               options={[
                                 { value: 'order', label: 'Order' },
@@ -320,12 +340,12 @@ export const InvoicePaper: React.FC<InvoicePaperProps> = ({
                       </TableCell>
                       <TableCell className="py-4">
                         {isEditing ? (
-                          <Input
-                            className="h-7 text-[10px] w-24 bg-white focus:ring-1 focus:ring-blue-500 disabled:opacity-30"
-                            value={item.date}
+                          <FormInput
+                            className="w-28 shadow-none"
+                            inputClassName="h-7 text-[10px] bg-white focus:ring-1 focus:ring-primary disabled:opacity-30"
+                            value={item.date || ''}
                             disabled={item.type !== 'order'}
-                            onClick={e => e.stopPropagation()}
-                            onChange={e => updateItemsData(item.id, 'date', e.target.value)}
+                            onChange={(val) => updateItemsData(item.id, 'date', val)}
                           />
                         ) : (
                           <span className="text-[12px] font-medium py-3 text-slate-600">{item.date || '-'}</span>
@@ -333,24 +353,24 @@ export const InvoicePaper: React.FC<InvoicePaperProps> = ({
                       </TableCell>
                       <TableCell className="py-4">
                         {isEditing ? (
-                          <Input
-                            className="h-7 text-[10px] bg-white min-w-[150px] focus:ring-1 focus:ring-blue-500"
-                            value={item.description}
-                            onClick={e => e.stopPropagation()}
-                            onChange={e => updateItemsData(item.id, 'description', e.target.value)}
+                          <FormInput
+                            className="w-full min-w-[150px] shadow-none"
+                            inputClassName="h-7 text-[10px] bg-white focus:ring-1 focus:ring-primary"
+                            value={item.type === 'order' ? item.order_number : item.description || ''}
+                            onChange={(val) => updateItemsData(item.id, item.type === 'order' ? 'order_number' : 'description', val)}
                           />
                         ) : (
-                          <span className="text-[12px] font-bold text-slate-700 dark:text-zinc-200">{item.description || '-'}</span>
+                          <span className="text-[12px] font-bold text-slate-700 dark:text-zinc-200">{item.type === 'order' ? item.order_number : item.description || '-'}</span>
                         )}
                       </TableCell>
                       <TableCell className="py-4">
                         {isEditing ? (
-                          <Input
-                            className="h-7 text-[10px] w-20 bg-white focus:ring-1 focus:ring-blue-500 disabled:opacity-30"
-                            value={item.from}
+                          <FormInput
+                            className="w-20 shadow-none"
+                            inputClassName="h-7 text-[10px] bg-white focus:ring-1 focus:ring-primary disabled:opacity-30"
+                            value={item.from || ''}
                             disabled={item.type !== 'order'}
-                            onClick={e => e.stopPropagation()}
-                            onChange={e => updateItemsData(item.id, 'from', e.target.value)}
+                            onChange={(val) => updateItemsData(item.id, 'from', val)}
                           />
                         ) : (
                           <span className="text-[12px] font-medium text-slate-600">{item.from || '-'}</span>
@@ -358,12 +378,12 @@ export const InvoicePaper: React.FC<InvoicePaperProps> = ({
                       </TableCell>
                       <TableCell className="py-4">
                         {isEditing ? (
-                          <Input
-                            className="h-7 text-[10px] w-20 bg-white focus:ring-1 focus:ring-blue-500 disabled:opacity-30"
-                            value={item.destination}
+                          <FormInput
+                            className="w-20 shadow-none"
+                            inputClassName="h-7 text-[10px] bg-white focus:ring-1 focus:ring-primary disabled:opacity-30"
+                            value={item.destination || ''}
                             disabled={item.type !== 'order'}
-                            onClick={e => e.stopPropagation()}
-                            onChange={e => updateItemsData(item.id, 'destination', e.target.value)}
+                            onChange={(val) => updateItemsData(item.id, 'destination', val)}
                           />
                         ) : (
                           <span className="text-[12px] font-medium text-slate-600">{item.destination || '-'}</span>
@@ -371,12 +391,12 @@ export const InvoicePaper: React.FC<InvoicePaperProps> = ({
                       </TableCell>
                       <TableCell className="py-4">
                         {isEditing ? (
-                          <Input
-                            className="h-7 text-[10px] w-20 bg-white focus:ring-1 focus:ring-blue-500 disabled:opacity-30"
-                            value={item.to}
+                          <FormInput
+                            className="w-20 shadow-none"
+                            inputClassName="h-7 text-[10px] bg-white focus:ring-1 focus:ring-primary disabled:opacity-30"
+                            value={item.to || ''}
                             disabled={item.type !== 'order'}
-                            onClick={e => e.stopPropagation()}
-                            onChange={e => updateItemsData(item.id, 'to', e.target.value)}
+                            onChange={(val) => updateItemsData(item.id, 'to', val)}
                           />
                         ) : (
                           <span className="text-[12px] font-medium text-slate-600">{item.to || '-'}</span>
@@ -384,12 +404,12 @@ export const InvoicePaper: React.FC<InvoicePaperProps> = ({
                       </TableCell>
                       <TableCell className="py-4">
                         {isEditing ? (
-                          <Input
-                            className="h-7 text-[10px] w-24 bg-white focus:ring-1 focus:ring-blue-500 disabled:opacity-30"
-                            value={item.receiver}
+                          <FormInput
+                            className="w-24 shadow-none"
+                            inputClassName="h-7 text-[10px] bg-white focus:ring-1 focus:ring-primary disabled:opacity-30"
+                            value={item.receiver || ''}
                             disabled={item.type !== 'order'}
-                            onClick={e => e.stopPropagation()}
-                            onChange={e => updateItemsData(item.id, 'receiver', e.target.value)}
+                            onChange={(val) => updateItemsData(item.id, 'receiver', val)}
                           />
                         ) : (
                           <span className="text-[12px] font-medium text-slate-600">{item.receiver || '-'}</span>
@@ -397,15 +417,15 @@ export const InvoicePaper: React.FC<InvoicePaperProps> = ({
                       </TableCell>
                       <TableCell className="py-4 text-right">
                         {isEditing ? (
-                          <Input
+                          <FormInput
                             type="number"
-                            className="h-7 text-[10px] w-20 bg-white text-right font-bold focus:ring-1 focus:ring-primary"
-                            value={item.total}
-                            onClick={e => e.stopPropagation()}
-                            onChange={e => updateItemsData(item.id, 'total', e.target.value)}
+                            className="w-20 text-right shadow-none"
+                            inputClassName="h-7 text-[10px] bg-white text-right font-bold focus:ring-1 focus:ring-primary"
+                            value={item.total || item.total_charge_credit || ''}
+                            onChange={(val) => updateItemsData(item.id, 'total', val)}
                           />
                         ) : (
-                          <span className="text-xs font-bold text-slate-900 dark:text-white">{formatCurrency(item.total)}</span>
+                          <span className="text-xs font-bold text-slate-900 dark:text-white">{formatCurrency(item.total || item.total_charge_credit)}</span>
                         )}
                       </TableCell>
                       {isAdmin && (
@@ -431,7 +451,7 @@ export const InvoicePaper: React.FC<InvoicePaperProps> = ({
 
                 {/* Add Item Row (Admin Only) */}
                 {isAdmin && (
-                  <TableRow className="bg-slate-50/50 hover:bg-slate-50/50 dark:bg-zinc-800/30 border-t-2 border-slate-100 dark:border-zinc-800">
+                  <TableRow className=" hover:bg-slate-50/50 dark:bg-zinc-800/30 border-t-2 border-slate-100 dark:border-zinc-800">
                     <TableCell colSpan={9} className="py-2">
                       <DropdownCustomMenu
                         menus={[
@@ -452,41 +472,43 @@ export const InvoicePaper: React.FC<InvoicePaperProps> = ({
       </div>
 
       {/* Payment transactions */}
-      <div>
-        <h3 className="text-[10px] font-black text-slate-700 uppercase tracking-[0.2em] mb-4">Payment Transactions</h3>
-        <div className="border border-slate-200 dark:border-zinc-800 rounded-xl overflow-hidden ">
-          <div className="overflow-x-auto">
-            <Table className="min-w-[500px]">
-              <TableHeader className="bg-slate-50/50 dark:bg-zinc-800/50">
-                <TableRow className="hover:bg-transparent border-b border-slate-100 dark:border-zinc-800">
-                  <TableHead className="text-[10px] font-black uppercase text-slate-400 py-2 pl-4">Date</TableHead>
-                  <TableHead className="text-[10px] font-black uppercase text-slate-400 py-2">Method</TableHead>
-                  <TableHead className="text-[10px] font-black uppercase text-slate-400 py-2">Note</TableHead>
-                  <TableHead className="text-[10px] font-black uppercase text-slate-400 py-2">Added By</TableHead>
-                  <TableHead className="text-[10px] font-black uppercase text-slate-400 py-2 text-right pr-4">Amount</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {(invoice.payments || []).length > 0 ? (
-                  invoice.payments.map((p: any, idx: number) => (
-                    <TableRow key={idx} className="border-b border-slate-50 dark:border-zinc-800/50 last:border-0 transition-colors hover:bg-slate-50/30">
-                      <TableCell className="text-[12px] font-medium py-3 pl-4">{p.payment_date || p.date}</TableCell>
-                      <TableCell className="text-[12px] font-medium py-3 text-slate-600">{p.payment_method || p.method}</TableCell>
-                      <TableCell className="text-[12px] font-medium py-3 text-slate-600 truncate max-w-[100px]">{p.note || '-'}</TableCell>
-                      <TableCell className="text-[12px] font-medium py-3 text-slate-600">{p.added_by || 'Admin'}</TableCell>
-                      <TableCell className="text-[12px] font-bold py-3 text-right text-emerald-600 pr-4">{formatCurrency(p.amount)}</TableCell>
-                    </TableRow>
-                  ))
-                ) : (
-                  <TableRow>
-                    <TableCell colSpan={5} className="text-[10px] font-medium text-slate-300 text-center py-6 italic">No transactions recorded</TableCell>
+      {invoiceId !== 'create' && (
+        <div>
+          <h3 className="text-[10px] font-black text-slate-700 uppercase tracking-[0.2em] mb-2">Payment Transactions</h3>
+          <div className="border border-slate-200 dark:border-zinc-800 rounded-xl overflow-hidden ">
+            <div className="overflow-x-auto">
+              <Table className="min-w-[500px]">
+                <TableHeader className="bg-slate-50/50 dark:bg-zinc-800/50">
+                  <TableRow className="hover:bg-transparent border-b border-slate-100 dark:border-zinc-800">
+                    <TableHead className="text-[10px] font-black uppercase text-slate-400 py-2 pl-4">Date</TableHead>
+                    <TableHead className="text-[10px] font-black uppercase text-slate-400 py-2">Method</TableHead>
+                    <TableHead className="text-[10px] font-black uppercase text-slate-400 py-2">Note</TableHead>
+                    <TableHead className="text-[10px] font-black uppercase text-slate-400 py-2">Added By</TableHead>
+                    <TableHead className="text-[10px] font-black uppercase text-slate-400 py-2 text-right pr-4">Amount</TableHead>
                   </TableRow>
-                )}
-              </TableBody>
-            </Table>
+                </TableHeader>
+                <TableBody>
+                  {(invoice.payment_transactions || []).length > 0 ? (
+                    invoice.payment_transactions.map((p: any, idx: number) => (
+                      <TableRow key={idx} className="border-b border-slate-50 dark:border-zinc-800/50 last:border-0 transition-colors hover:bg-slate-50/30">
+                        <TableCell className="text-[12px] font-medium py-3 pl-4">{p.payment_date || p.date}</TableCell>
+                        <TableCell className="text-[12px] font-medium py-3 text-slate-600">{p.payment_method || p.method}</TableCell>
+                        <TableCell className="text-[12px] font-medium py-3 text-slate-600 truncate max-w-[100px]">{p.note || '-'}</TableCell>
+                        <TableCell className="text-[12px] font-medium py-3 text-slate-600">{p.added_by || 'Admin'}</TableCell>
+                        <TableCell className="text-[12px] font-bold py-3 text-right text-emerald-600 pr-4">{formatCurrency(p.amount)}</TableCell>
+                      </TableRow>
+                    ))
+                  ) : (
+                    <TableRow>
+                      <TableCell colSpan={5} className="text-[10px] font-medium text-slate-300 text-center py-6 italic">No transactions recorded</TableCell>
+                    </TableRow>
+                  )}
+                </TableBody>
+              </Table>
+            </div>
           </div>
         </div>
-      </div>
+      )}
 
       {/* 4. Bottom Layout */}
       <div className="grid grid-cols-1 lg:grid-cols-[1.5fr_1fr] gap-8 pt-8 dark:border-zinc-800">
@@ -546,26 +568,26 @@ export const InvoicePaper: React.FC<InvoicePaperProps> = ({
               <div className="space-y-4">
                 <div className="flex justify-between text-xs">
                   <span className="text-slate-500 font-medium">Subtotal (ex GST)</span>
-                  <span className="text-slate-900 dark:text-white font-bold">{formatCurrency(invoice?.summary?.subtotal_ex_gst)}</span>
+                  <span className="text-slate-900 dark:text-white font-bold">{formatCurrency(invoice?.totals?.subtotal_ex_gst)}</span>
                 </div>
                 <div className="flex justify-between text-xs">
                   <span className="text-slate-500 font-medium">GST (10%)</span>
-                  <span className="text-slate-900 dark:text-white font-bold">{formatCurrency(invoice?.summary?.gst)}</span>
+                  <span className="text-slate-900 dark:text-white font-bold">{formatCurrency(invoice?.totals?.gst)}</span>
                 </div>
                 <div className="flex justify-between text-xs border-t border-slate-50 dark:border-zinc-800/50 pt-4 mt-4">
                   <span className="text-slate-900 dark:text-white font-black">Total (inc GST)</span>
-                  <span className="text-slate-900 dark:text-white font-black">{formatCurrency(invoice?.summary?.total_inc_gst)}</span>
+                  <span className="text-slate-900 dark:text-white font-black">{formatCurrency(invoice?.totals?.total_inc_gst)}</span>
                 </div>
               </div>
 
               <div className="border-t border-slate-100 dark:border-zinc-800 pt-6 space-y-4">
                 <div className="flex justify-between text-xs">
                   <span className="text-slate-500 font-medium uppercase tracking-widest text-[10px]">Amount Paid</span>
-                  <span className="text-emerald-600 font-bold">-{formatCurrency(invoice?.summary?.amount_paid)}</span>
+                  <span className="text-emerald-600 font-bold">-{formatCurrency(invoice?.totals?.amount_paid)}</span>
                 </div>
                 <div className="flex justify-between text-xs">
                   <span className="text-slate-500 font-medium uppercase tracking-widest text-[10px]">Credit Amount</span>
-                  <span className="text-primary font-bold">-{formatCurrency(invoice?.summary?.credit_amount || 0)}</span>
+                  <span className="text-primary font-bold">-{formatCurrency(invoice?.totals?.credit_amount || 0)}</span>
                 </div>
               </div>
 
@@ -576,7 +598,7 @@ export const InvoicePaper: React.FC<InvoicePaperProps> = ({
                   <p className="text-[10px] text-slate-400 font-medium mb-0">(inc GST)</p>
                 </div>
                 <span className="text-4xl font-black text-primary tracking-tighter">
-                  {formatCurrency(invoice?.summary?.amount_due)}
+                  {formatCurrency(invoice?.totals?.amount_due)}
                 </span>
               </div>
             </div>

@@ -12,7 +12,6 @@ import { Download, Plus, Loader2 } from 'lucide-react';
 import { useAppSelector } from '@/hooks/store.hooks';
 import { showToast } from '@/components/ui/custom-toast';
 import { ImportOrdersDialog } from '../components/ImportOrdersDialog';
-import { useCustomers } from '@/features/customers/hooks/useCustomers';
 
 export default function OrdersPage() {
   const [searchParams] = useSearchParams();
@@ -45,14 +44,6 @@ export default function OrdersPage() {
 
   // Fetch orders data
   const { data: ordersData, isLoading } = useOrders(filters);
-  const { data: customersData } = useCustomers({ pageSize: 1000 }, isAdmin);
-
-  const formattedCustomers = useMemo(() => {
-    return customersData?.data?.map((c: any) => ({
-      value: c.id.toString(),
-      label: `${c.first_name} ${c.last_name}`
-    })) || [];
-  }, [customersData]);
 
   // Mutations
   const exportOrders = useExportOrders();
@@ -196,7 +187,6 @@ export default function OrdersPage() {
             onImport={handleImportOrders}
             isLoading={importOrders.isPending}
             isAdmin={isAdmin}
-            customers={formattedCustomers}
           />)
       }
     </div>

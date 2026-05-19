@@ -38,3 +38,15 @@ export interface CancelOrderResponse {
         last_page: number;
     };
 }
+
+export interface CancelOrderCounts {
+    canceled_order: number;
+    cancel_request: number;
+}
+
+export interface CancelOrderCountsResponse {
+    status: boolean;
+    message: string;
+    data: CancelOrderCounts;
+}
+

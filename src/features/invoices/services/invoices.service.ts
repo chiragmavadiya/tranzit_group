@@ -24,6 +24,14 @@ export const invoicesService = {
     return { blob: response.data, filename };
   },
 
+  downloadCustomerInvoice: async (id: string | number): Promise<{ blob: Blob; filename: string }> => {
+    const response = await api.get(API_ENDPOINTS.INVOICES.DOWNLOAD(id), {
+      responseType: 'blob',
+    });
+    const filename = `Invoice_${id}.pdf`;
+    return { blob: response.data, filename };
+  },
+
   createCustomerInvoice: async (data: any): Promise<{ status: boolean; message: string; data: any }> => {
     const response = await api.post(API_ENDPOINTS.ADMIN_INVOICES.BASE, data);
     return response.data;

@@ -99,3 +99,16 @@ export interface UploadInvoiceResponse {
     missing_list: string[];
   };
 }
+
+export interface ReportCountsResponse {
+  status: boolean;
+  message?: string;
+  data: {
+    shipment?: number;
+    transaction?: number;
+    invoice?: number;
+    parcel?: number;
+    [key: string]: number | boolean | string | undefined;
+  };
+}
+

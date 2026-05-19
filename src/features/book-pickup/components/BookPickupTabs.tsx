@@ -1,6 +1,7 @@
 import { cn } from '@/lib/utils';
 import { BOOK_PICKUP_TABS } from '../constants/book-pickup.constants';
 import type { BookPickupTabType } from '../constants/book-pickup.constants';
+import { useBookPickupCounts } from '../hooks/useBookPickup';
 
 interface BookPickupTabsProps {
     activeTab: BookPickupTabType;
@@ -9,10 +10,15 @@ interface BookPickupTabsProps {
 }
 
 export function BookPickupTabs({ activeTab, onTabChange, className }: BookPickupTabsProps) {
+    const { data: countsData } = useBookPickupCounts();
+
     return (
         <nav className={cn("flex space-x-6 h-full items-end", className)} aria-label="Book Pickup Tabs">
             {BOOK_PICKUP_TABS.map((tab) => {
                 const isActive = activeTab === tab.id;
+                const count = tab.id === 'new'
+                    ? (countsData?.data?.new ?? 0)
+                    : (countsData?.data?.booked ?? 0);
 
                 return (
                     <button
@@ -26,16 +32,14 @@ export function BookPickupTabs({ activeTab, onTabChange, className }: BookPickup
                         )}
                     >
                         {tab.label}
-                        {tab.count > 0 && (
-                            <span className={cn(
-                                "px-1.5 py-0.5 text-[10px] rounded-full font-bold transition-all duration-300",
-                                isActive
-                                    ? "bg-primary/10 text-primary"
-                                    : "bg-gray-100 dark:bg-zinc-800 text-gray-400 dark:text-zinc-500"
-                            )}>
-                                {tab.count}
-                            </span>
-                        )}
+                        <span className={cn(
+                            "px-1.5 py-0.5 text-[12px] rounded-full transition-all duration-300",
+                            isActive
+                                ? "bg-primary/10 text-primary"
+                                : "bg-gray-100 dark:bg-zinc-800 text-gray-400 dark:text-zinc-500"
+                        )}>
+                            {count}
+                        </span>
                     </button>
                 );
             })}

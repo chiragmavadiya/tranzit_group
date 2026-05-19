@@ -14,6 +14,7 @@ const StatusBadge = ({ status }: { status: string }) => {
     'Payment pending': 'bg-amber-100 text-amber-600 dark:bg-primary/20 dark:text-primary/80',
     'Partial': 'bg-orange-50 text-orange-600 dark:bg-orange-900/20 dark:text-orange-400',
     'Unpaid': 'bg-red-50 text-red-600 dark:bg-red-900/20 dark:text-red-400',
+    'Courier not assign': 'bg-red-50 text-red-600 dark:bg-red-900/20 dark:text-red-400',
     'Draft': 'bg-slate-100 text-slate-600 dark:bg-zinc-800 dark:text-zinc-400',
     'Paid': 'bg-green-100 text-green-600 dark:bg-green-900/20 dark:text-green-400',
   };
@@ -47,7 +48,7 @@ export const getOrdersColumns = (role: string = "customer", orderType: string = 
     header: 'AMOUNT', key: 'amount'
   },
   {
-    header: 'STATUS', key: 'status', cell: (value: string) => <StatusBadge status={value} />
+    header: 'STATUS', key: 'status', cell: (value: string) => <StatusBadge status={value === "Payment pending" ? "Courier not assign" : value} />
   },
   {
     header: 'PAYMENT STATUS', key: 'payment_status', cell: (value: string) => <StatusBadge status={value} />

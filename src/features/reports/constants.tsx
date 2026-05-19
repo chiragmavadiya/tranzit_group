@@ -6,7 +6,7 @@ export const REPORT_TABS: ReportTab[] = [
   { id: 'shipment', label: 'Shipment', count: 9 },
   { id: 'transaction', label: 'Transaction', count: 4 },
   { id: 'invoice', label: 'Invoice', count: 1 },
-  { id: 'parcel', label: 'Parcel', count: 3 },
+  // { id: 'parcel', label: 'Parcel', count: 3 },
 ];
 
 export const SHIPMENT_COLUMNS: Column<ShipmentReport>[] = [

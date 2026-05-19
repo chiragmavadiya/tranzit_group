@@ -1,6 +1,7 @@
 import { cn } from '@/lib/utils';
 import type { ReportType, ReportTab } from '../types';
 import { REPORT_TABS } from '../constants';
+import { useReportCounts } from '../hooks/useReports';
 
 interface ReportsTabsProps {
   activeTab: ReportType;
@@ -10,10 +11,13 @@ interface ReportsTabsProps {
 }
 
 export function ReportsTabs({ activeTab, onTabChange, tabs = REPORT_TABS, className }: ReportsTabsProps) {
+  const { data: countsData } = useReportCounts();
+
   return (
     <nav className={cn("flex space-x-6 h-full items-end", className)} aria-label="Tabs">
       {tabs.map((tab) => {
         const isActive = activeTab === tab.id;
+        const count = countsData?.data?.[tab.id] ?? 0;
 
         return (
           <button
@@ -27,6 +31,16 @@ export function ReportsTabs({ activeTab, onTabChange, tabs = REPORT_TABS, classN
             )}
           >
             {tab.label}
+            {typeof count === 'number' && (
+              <span className={cn(
+                "px-1.5 py-0.5 text-[10px] rounded-full font-bold transition-all duration-300",
+                isActive
+                  ? "bg-primary/10 text-primary"
+                  : "bg-gray-100 dark:bg-zinc-800 text-gray-400 dark:text-zinc-500"
+              )}>
+                {count}
+              </span>
+            )}
           </button>
         );
       })}

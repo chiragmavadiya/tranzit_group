@@ -1,5 +1,6 @@
 import { cn } from '@/lib/utils';
 import { CANCEL_ORDER_TABS, type CancelOrderTabType } from '../constants/cancelOrder.constants';
+import { useCancelOrderCounts } from '../hooks/useCancelOrder';
 
 interface CancelOrderTabsProps {
     activeTab: CancelOrderTabType;
@@ -8,10 +9,15 @@ interface CancelOrderTabsProps {
 }
 
 export function CancelOrderTabs({ activeTab, onTabChange, className }: CancelOrderTabsProps) {
+    const { data: countsData } = useCancelOrderCounts();
+
     return (
         <nav className={cn("flex space-x-6 h-full items-end", className)} aria-label="Cancel Order Tabs">
             {CANCEL_ORDER_TABS.map((tab) => {
                 const isActive = activeTab === tab.id;
+                const count = tab.id === 'request'
+                    ? (countsData?.data?.cancel_request ?? 0)
+                    : (countsData?.data?.canceled_order ?? 0);
 
                 return (
                     <button
@@ -25,19 +31,18 @@ export function CancelOrderTabs({ activeTab, onTabChange, className }: CancelOrd
                         )}
                     >
                         {tab.label}
-                        {tab.count > 0 && (
-                            <span className={cn(
-                                "px-1.5 py-0.5 text-[10px] rounded-full font-bold transition-all duration-300",
-                                isActive
-                                    ? "bg-primary/10 text-primary"
-                                    : "bg-gray-100 dark:bg-zinc-800 text-gray-400 dark:text-zinc-500"
-                            )}>
-                                {tab.count}
-                            </span>
-                        )}
+                        <span className={cn(
+                            "px-1.5 py-0.5 text-[12px] rounded-full transition-all duration-300",
+                            isActive
+                                ? "bg-primary/10 text-primary"
+                                : "bg-gray-100 dark:bg-zinc-800 text-gray-400 dark:text-zinc-500"
+                        )}>
+                            {count}
+                        </span>
                     </button>
                 );
             })}
         </nav>
     );
 }
+

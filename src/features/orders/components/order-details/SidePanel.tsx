@@ -171,7 +171,7 @@ export const SidePanel: React.FC<SidePanelProps> = ({ calculation, handleOptiona
                 <div className="flex flex-col">
                   {/* <span className="text-xs font-bold text-gray-900 dark:text-zinc-100 tracking-wider">Pickup Date</span> */}
                   <CustomLabel label='Pickup Date' />
-                  <DatePicker date={pickupDate} setDate={setPickupDate} className='w-full' />
+                  <DatePicker date={pickupDate} setDate={setPickupDate} className='w-full' disabled={{ before: new Date() }} />
                 </div>
 
               </AccordionContent>
@@ -303,48 +303,49 @@ export const SidePanel: React.FC<SidePanelProps> = ({ calculation, handleOptiona
         </AccordionItem> */}
 
         {/* LIABILITY COVER */}
-        <AccordionItem value="liability" className={cn(
-          "border rounded-xl shadow-sm px-5 border-b overflow-hidden transition-colors duration-300 [&>h3]:my-0",
-          liability
-            ? "border-emerald-200 dark:border-emerald-900/30 bg-emerald-50/50 dark:bg-emerald-900/10"
-            : "border-slate-200 dark:border-zinc-800 bg-slate-50 dark:bg-zinc-900/50"
-        )}>
-          <AccordionTrigger className={cn(
-            "hover:no-underline py-3 px-0",
-            liability ? "[&>svg]:text-emerald-600 dark:[&>svg]:text-emerald-500" : "[&>svg]:text-slate-400 dark:[&>svg]:text-zinc-500"
+        {(orderType !== "create" && orderType !== "create-menual") && (
+          <AccordionItem value="liability" className={cn(
+            "border rounded-xl shadow-sm px-5 border-b overflow-hidden transition-colors duration-300 [&>h3]:my-0",
+            liability
+              ? "border-emerald-200 dark:border-emerald-900/30 bg-emerald-50/50 dark:bg-emerald-900/10"
+              : "border-slate-200 dark:border-zinc-800 bg-slate-50 dark:bg-zinc-900/50"
           )}>
-            <div className={cn(
-              "flex items-center gap-2",
-              liability ? "text-emerald-700 dark:text-emerald-400" : "text-slate-600 dark:text-zinc-400"
+            <AccordionTrigger className={cn(
+              "hover:no-underline py-3 px-0",
+              liability ? "[&>svg]:text-emerald-600 dark:[&>svg]:text-emerald-500" : "[&>svg]:text-slate-400 dark:[&>svg]:text-zinc-500"
             )}>
-              <Shield className="h-4 w-4" />
-              <span className="text-sm font-bold tracking-wider uppercase">Liability Cover</span>
-            </div>
-          </AccordionTrigger>
-          <AccordionContent className="pb-4 pt-1">
-            <div className="flex flex-col gap-2">
-              <p className={cn(
-                "text-[11px] font-medium leading-relaxed m-0",
-                liability ? "text-emerald-800 dark:text-emerald-300" : "text-slate-500 dark:text-zinc-400"
+              <div className={cn(
+                "flex items-center gap-2",
+                liability ? "text-emerald-700 dark:text-emerald-400" : "text-slate-600 dark:text-zinc-400"
               )}>
-                {liabilityMessage || (liability ? "This order is covered by our limited liability protection." : "This order is not covered by liability protection.")}
-              </p>
-              <div className="flex items-center gap-1.5 mt-1">
-                {liability ? (
-                  <>
-                    <CheckCircle2 className="h-3.5 w-3.5 text-emerald-600" />
-                    <span className="text-[10px] font-bold text-emerald-700 dark:text-emerald-400 uppercase tracking-widest">Active Coverage</span>
-                  </>
-                ) : (
-                  <>
-                    <ShieldOff className="h-3.5 w-3.5 text-slate-400" />
-                    <span className="text-[10px] font-bold text-slate-500 dark:text-zinc-500 uppercase tracking-widest">No Coverage</span>
-                  </>
-                )}
+                <Shield className="h-4 w-4" />
+                <span className="text-sm font-bold tracking-wider uppercase">Liability Cover</span>
               </div>
-            </div>
-          </AccordionContent>
-        </AccordionItem>
+            </AccordionTrigger>
+            <AccordionContent className="pb-4 pt-1">
+              <div className="flex flex-col gap-2">
+                <p className={cn(
+                  "text-[11px] font-medium leading-relaxed m-0",
+                  liability ? "text-emerald-800 dark:text-emerald-300" : "text-slate-500 dark:text-zinc-400"
+                )}>
+                  {liabilityMessage || (liability ? "This order is covered by our limited liability protection." : "This order is not covered by liability protection.")}
+                </p>
+                <div className="flex items-center gap-1.5 mt-1">
+                  {liability ? (
+                    <>
+                      <CheckCircle2 className="h-3.5 w-3.5 text-emerald-600" />
+                      <span className="text-[10px] font-bold text-emerald-700 dark:text-emerald-400 uppercase tracking-widest">Active Coverage</span>
+                    </>
+                  ) : (
+                    <>
+                      <ShieldOff className="h-3.5 w-3.5 text-slate-400" />
+                      <span className="text-[10px] font-bold text-slate-500 dark:text-zinc-500 uppercase tracking-widest">No Coverage</span>
+                    </>
+                  )}
+                </div>
+              </div>
+            </AccordionContent>
+          </AccordionItem>)}
 
         {/* SUPPORT & REFERENCE */}
         <AccordionItem value="support" className="border border-gray-200 dark:border-zinc-800 rounded-xl bg-white dark:bg-zinc-950 shadow-sm px-5 border-b overflow-hidden transition-colors duration-300 [&>h3]:my-0">

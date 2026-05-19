@@ -17,6 +17,7 @@ import { useAppSelector } from '@/hooks/store.hooks'
 import {
   useAdminInvoiceDetails,
   useDownloadAdminInvoice,
+  useDownloadCustomerInvoice,
   useSendAdminInvoice,
   useRemindAdminInvoice,
   useZohoSyncAdminInvoice,
@@ -40,28 +41,35 @@ const InvoiceDocumentView: React.FC = () => {
   const { role } = useAppSelector((state) => state.auth)
   const isAdmin = role === 'admin'
   const [invoiceData, setInvoiceData] = useState<InvoiceDocumentData>({
-    "invoice": {
-      "invoice_number": "",
-      "invoice_date": new Date().toISOString().split('T')[0],
-      "issued_at": new Date().toISOString().split('T')[0],
-      "due_date": null,
-      "status": "Send",
-      "amount_paid": 0,
-      "balance_due": 0,
-      "send_email": "yes",
-      "zoho_invoice_number": null
-    },
+    "invoice_number": "",
+    "zoho_invoice_number": null,
+    "status": "Send",
+    "customer_full_name": "",
+    "customer_email": "",
     "customer": {},
-    "items": [],
-    "summary": {
+    "total": 0,
+    "issue_date": new Date().toISOString().split('T')[0],
+    "due_date": null,
+    "send_email": "yes",
+    "till_date_paid": 0,
+    "remaining_balance": 0,
+    "totals": {
       "subtotal_ex_gst": 0,
       "gst": 0,
       "total_inc_gst": 0,
       "amount_paid": 0,
-      "credit_amount": 0,
-      "amount_due": 0
+      "amount_due": 0,
+      "credit_amount": 0
     },
-    "payments": []
+    "address": {
+      "address": "",
+      "suburb": "",
+      "state": "",
+      "postcode": ""
+    },
+    "items": [],
+    "orders": [],
+    "payment_transactions": []
   })
 
   const [isPaymentDialogOpen, setIsPaymentDialogOpen] = React.useState(false)
@@ -70,41 +78,15 @@ const InvoiceDocumentView: React.FC = () => {
   // Fetch Data
   const { data: adminDetails, isLoading: adminIsLoading } = useAdminInvoiceDetails(Number(invoiceID!), invoiceID !== 'create' && isAdmin)
   const { data: customerDetails, isLoading: customerIsLoading } = useCustomerInvoiceDetails(Number(invoiceID!), invoiceID !== 'create' && !isAdmin)
-  const details = useMemo(() => isAdmin ? adminDetails : {
-    status: true,
-    data: {
-      "invoice": {
-        "id": customerDetails?.data?.id,
-        "invoice_number": customerDetails?.data?.invoice_number,
-        "invoice_date": customerDetails?.data?.issue_date,
-        "issued_at": customerDetails?.data?.issue_date,
-        "due_date": '',
-        "status": customerDetails?.data?.status,
-        "amount_paid": customerDetails?.data?.amount_paid,
-        "balance_due": customerDetails?.data?.remaining_balance,
-        "send_email": customerDetails?.data?.send_email,
-        "zoho_invoice_number": customerDetails?.data?.zoho_invoice_number
-      },
-      "customer": {
-        "id": 1,
-        "name": customerDetails?.data?.customer_full_name,
-        "email": customerDetails?.data?.customer_email,
-        "business_name": customerDetails?.data?.customer_business_name,
-        "address_line": customerDetails?.data?.address?.address,
-        "locality_line": customerDetails?.data?.address?.suburb,
-        "address": customerDetails?.data?.address
-      },
-      "items": customerDetails?.data?.items,
-      "summary": customerDetails?.data?.totals,
-      "payments": customerDetails?.data?.payment_transactions || []
-    }
-  }, [customerDetails, isAdmin, adminDetails]);
+  const details = useMemo(() => isAdmin ? adminDetails : customerDetails, [customerDetails, isAdmin, adminDetails]);
   const isLoading = isAdmin ? adminIsLoading : customerIsLoading;
   // const invoiceData = details?.data
 
   // Mutations
   const updateMutation = useUpdateAdminInvoice()
-  const downloadMutation = useDownloadAdminInvoice()
+  const downloadAdminMutation = useDownloadAdminInvoice()
+  const downloadCustomerMutation = useDownloadCustomerInvoice()
+  const downloadMutation = isAdmin ? downloadAdminMutation : downloadCustomerMutation
   const sendMutation = useSendAdminInvoice()
   const remindMutation = useRemindAdminInvoice()
   const zohoSyncMutation = useZohoSyncAdminInvoice()
@@ -132,44 +114,56 @@ const InvoiceDocumentView: React.FC = () => {
   }, [invoiceID, zohoSyncMutation])
 
   const handleUpdateDate = useCallback((date: string) => {
-    // if (!invoiceID) return
-    // updateMutation.mutate({ id: invoiceID, data: { invoice_date: date } })
     setInvoiceData((prev: InvoiceDocumentData) => ({
       ...prev,
-      invoice: {
-        ...prev.invoice,
-        invoice_date: date
-      }
+      issue_date: date
     }))
   }, [])
 
   useEffect(() => {
     if (invoiceID !== 'create' && details?.status) {
-      setInvoiceData(details?.data)
+      const data = details?.data
+      setInvoiceData({
+        ...data,
+        customer: data.customer || {
+          id: data.customer_id,
+          first_name: data.customer_full_name?.split(' ')[0] || '',
+          last_name: data.customer_full_name?.split(' ').slice(1).join(' ') || '',
+          email: data.customer_email,
+          business_name: data.customer_business_name
+        }
+      })
     } else if (invoiceID === 'create') {
       setInvoiceData({
-        "invoice": {
-          "invoice_number": "",
-          "invoice_date": new Date().toISOString().split('T')[0],
-          "issued_at": new Date().toISOString().split('T')[0],
-          "due_date": null,
-          "status": "Send",
-          "amount_paid": 0,
-          "balance_due": 0,
-          "send_email": "yes",
-          "zoho_invoice_number": null
-        },
+        "invoice_number": "",
+        "zoho_invoice_number": null,
+        "status": "Send",
+        "customer_full_name": "",
+        "customer_email": "",
         "customer": {},
-        "items": [],
-        "summary": {
+        "total": 0,
+        "issue_date": new Date().toISOString().split('T')[0],
+        "due_date": null,
+        "send_email": "yes",
+        "till_date_paid": 0,
+        "remaining_balance": 0,
+        "totals": {
           "subtotal_ex_gst": 0,
           "gst": 0,
           "total_inc_gst": 0,
           "amount_paid": 0,
-          "credit_amount": 0,
-          "amount_due": 0
+          "amount_due": 0,
+          "credit_amount": 0
         },
-        "payments": []
+        "address": {
+          "address": "",
+          "suburb": "",
+          "state": "",
+          "postcode": ""
+        },
+        "items": [],
+        "orders": [],
+        "payment_transactions": []
       })
     }
   }, [details, invoiceID, details?.status])
@@ -177,17 +171,39 @@ const InvoiceDocumentView: React.FC = () => {
   const handleSave = useCallback(() => {
     if (!invoiceID) return
     const payload = {
-      ...invoiceData.invoice,
-      items: invoiceData.items,
-      customer_id: invoiceData.customer?.id
+      invoice_number: invoiceData.invoice_number,
+      invoice_date: invoiceData.issue_date,
+      issued_at: invoiceData.issue_date,
+      due_date: invoiceData.due_date,
+      status: invoiceData.status,
+      amount_paid: invoiceData.till_date_paid || 0,
+      balance_due: invoiceData.remaining_balance || 0,
+      send_email: invoiceData.send_email || 'yes',
+      zoho_invoice_number: invoiceData.zoho_invoice_number,
+      customer_id: invoiceData.customer?.id,
+      items: invoiceData.items?.map((item: any) => ({
+        type: item.type?.toLowerCase(),
+        description: item.description,
+        total: Number(item.total || item.total_charge_credit || 0),
+        order_number: item.order_number,
+        item_date: item.date || item.item_date,
+        from: item.from,
+        destination: item.destination,
+        to: item.to,
+        receiver: item.receiver
+      }))
     }
 
     if (invoiceID === 'create') {
-      createMutation.mutate(payload)
+      createMutation.mutate(payload, {
+        onSuccess: (response) => {
+          navigate(`${isAdmin ? '/admin' : ''}/invoices/${response?.data?.id}`)
+        }
+      })
     } else {
       updateMutation.mutate({ id: invoiceID, data: payload })
     }
-  }, [invoiceID, invoiceData, updateMutation, createMutation])
+  }, [invoiceID, invoiceData, createMutation, navigate, isAdmin, updateMutation])
 
   if (isLoading) {
     return (
@@ -230,9 +246,9 @@ const InvoiceDocumentView: React.FC = () => {
             BACK
           </Button>
           <div className="h-6 w-px bg-slate-200 dark:bg-zinc-800 mx-2" />
-          <span className="text-primary font-bold">#{invoiceData?.invoice?.invoice_number}</span>
-          <Badge className={cn("px-3 py-1 font-bold border-none", INVOICE_STATUS_COLORS[invoiceData?.invoice?.status as keyof typeof INVOICE_STATUS_COLORS])}>
-            {invoiceData?.invoice?.status}
+          <span className="text-primary font-bold">#{invoiceData?.invoice_number}</span>
+          <Badge className={cn("px-3 py-1 font-bold border-none", INVOICE_STATUS_COLORS[invoiceData?.status as keyof typeof INVOICE_STATUS_COLORS])}>
+            {invoiceData?.status}
           </Badge>
         </div>
 
@@ -291,14 +307,16 @@ const InvoiceDocumentView: React.FC = () => {
               </Button>
             </>
           )}
-          <Button
-            onClick={handleDownload}
-            disabled={downloadMutation.isPending}
-            className="h-8 bg-primary hover:bg-primary-hover text-white flex items-center gap-2 font-bold shadow-lg shadow-primary/20 px-4"
-          >
-            {downloadMutation.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Download className="h-4 w-4" />}
-            Download
-          </Button>
+          {invoiceID !== 'create' && (
+            <Button
+              onClick={handleDownload}
+              disabled={downloadMutation.isPending}
+              className="h-8 bg-primary hover:bg-primary-hover text-white flex items-center gap-2 font-bold shadow-lg shadow-primary/20 px-4"
+            >
+              {downloadMutation.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Download className="h-4 w-4" />}
+              Download
+            </Button>
+          )}
         </div>
       </div>
 

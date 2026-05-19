@@ -17,7 +17,7 @@ export const getCancelOrderColumns = (role: string): Column<CancelOrder>[] => [
         key: 'order_number',
         header: 'ORDER NUMBER',
         cell: (val: string) => (
-            <NavLink to={`${role === "admin" ? "/admin/orders/edit" : "/orders/edit"}/${val}`} className="font-bold text-primary underline">
+            <NavLink to={`${role === "admin" ? "/admin/orders/cancel" : "/orders/cancel"}/${val}`} className="font-bold text-primary underline">
                 {val}
             </NavLink>
         )

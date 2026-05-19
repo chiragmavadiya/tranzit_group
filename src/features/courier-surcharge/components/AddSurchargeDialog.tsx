@@ -123,12 +123,7 @@ const SurchargeForm = forwardRef<HTMLFormElement, SurchargeFormProps>(
       e.preventDefault();
       setSubmited(true);
 
-      if (!formData.global_courier_id && !initialValues.global_courier_id) {
-        // In edit mode we might not have global_courier_id in the form but it's required by API?
-        // Actually the Postman says global_courier_id is required in both POST and PUT.
-      }
-
-      if (!formData.code || !formData.name || !formData.amount_ex_gst) {
+      if (formData.global_courier_id || !formData.code || !formData.name || !formData.amount_ex_gst) {
         return;
       }
 
@@ -147,7 +142,7 @@ const SurchargeForm = forwardRef<HTMLFormElement, SurchargeFormProps>(
           required
           className="col-span-1"
           error={submited && !formData.global_courier_id}
-          errormsg="Courier Name is required"
+          errormsg="Please Select a Courier"
         />
 
         <FormInput
@@ -158,7 +153,7 @@ const SurchargeForm = forwardRef<HTMLFormElement, SurchargeFormProps>(
           required
           className="col-span-1"
           error={submited && !formData.code}
-          errormsg="Code is required"
+          errormsg="Please enter Code"
         />
 
         <FormInput
@@ -169,7 +164,7 @@ const SurchargeForm = forwardRef<HTMLFormElement, SurchargeFormProps>(
           required
           className="col-span-2"
           error={submited && !formData.name}
-          errormsg="Name is required"
+          errormsg="Please enter Name"
         />
 
         <FormTextarea
@@ -181,7 +176,7 @@ const SurchargeForm = forwardRef<HTMLFormElement, SurchargeFormProps>(
           rows={3}
           required
           error={submited && !formData.description}
-          errormsg="Description is required"
+          errormsg="Please enter Description"
         />
 
         <FormSelect
@@ -202,7 +197,7 @@ const SurchargeForm = forwardRef<HTMLFormElement, SurchargeFormProps>(
           required
           className="col-span-1"
           error={submited && !formData.amount_ex_gst}
-          errormsg="Amount is required"
+          errormsg="Please enter Amount"
         />
 
         <div className="col-span-12 grid grid-cols-12 gap-4 items-center mt-2 bg-slate-50/50 dark:bg-zinc-900/50 p-5 rounded-2xl border border-slate-100 dark:border-zinc-800">

@@ -177,7 +177,7 @@ export default function MyItemsPage() {
         <DataTable
           columns={columns}
           data={itemsData?.data || []}
-          loading={!isLoading}
+          loading={isLoading}
           searchPlaceholder="Search items..."
           onSearchChange={handleSearch}
           searchValue={search}

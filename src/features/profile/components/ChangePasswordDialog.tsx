@@ -60,7 +60,7 @@ export function ChangePasswordDialog({ open, onOpenChange, onSubmit, isLoading }
           required
           icon={Lock}
           error={submitted && !formData.currentPassword}
-          errormsg="Current password is required"
+          errormsg="Please enter Current Password"
         />
 
         <FormInput
@@ -72,7 +72,7 @@ export function ChangePasswordDialog({ open, onOpenChange, onSubmit, isLoading }
           required
           icon={Lock}
           error={submitted && !formData.newPassword}
-          errormsg="New password is required"
+          errormsg="Please enter New Password"
         />
 
         <FormInput
@@ -84,7 +84,7 @@ export function ChangePasswordDialog({ open, onOpenChange, onSubmit, isLoading }
           required
           icon={Lock}
           error={submitted && (!formData.confirmPassword || passwordMismatch)}
-          errormsg={passwordMismatch ? "Passwords do not match" : "Confirmation is required"}
+          errormsg={passwordMismatch ? "Passwords do not match" : "Please enter Confirmation Password"}
         />
       </form>
     </CustomModel>

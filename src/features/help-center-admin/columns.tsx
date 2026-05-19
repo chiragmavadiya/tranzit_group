@@ -6,13 +6,13 @@ import { format } from 'date-fns';
 import { Badge } from '@/components/ui/badge';
 
 export const ARTICLE_COLUMNS = (
-  onEdit: (row: HelpArticle) => void,
+  onEdit: (id: number) => void,
   onDelete: (row: HelpArticle) => void
 ): Column<HelpArticle>[] => [
     {
       key: 'id',
       header: '#',
-      cell: (_, __, index) => <span className="text-slate-400 font-medium">{index + 1}</span>,
+      cell: (val) => <span className="text-slate-400 font-medium">{val as string}</span>,
     },
     {
       key: 'title',
@@ -67,7 +67,7 @@ export const ARTICLE_COLUMNS = (
             variant="ghost"
             size="icon"
             className="h-8 w-8 text-slate-400 hover:text-blue-500 hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-all active:scale-90"
-            onClick={() => onEdit(row)}
+            onClick={() => onEdit(Number(row.id))}
           >
             <Pencil className="w-3.5 h-3.5" />
           </Button>

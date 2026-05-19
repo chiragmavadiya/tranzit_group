@@ -95,7 +95,7 @@ const SubUserForm = forwardRef<HTMLFormElement, SubUserFormProps>(
             value={formData.firstName}
             onChange={(val) => handleInputChange('firstName', val)}
             error={submited && !formData.firstName}
-            errormsg="First Name is required"
+            errormsg="Please enter First Name"
           />
         </div>
         <div className="col-span-12 md:col-span-6">
@@ -106,7 +106,7 @@ const SubUserForm = forwardRef<HTMLFormElement, SubUserFormProps>(
             value={formData.lastName}
             onChange={(val) => handleInputChange('lastName', val)}
             error={submited && !formData.lastName}
-            errormsg="Last Name is required"
+            errormsg="Please enter Last Name"
           />
         </div>
         <div className="col-span-12 md:col-span-6">
@@ -117,7 +117,7 @@ const SubUserForm = forwardRef<HTMLFormElement, SubUserFormProps>(
             value={formData.loginEmail}
             onChange={(val) => handleInputChange('loginEmail', val)}
             error={submited && !formData.loginEmail}
-            errormsg="Email is required"
+            errormsg="Please enter Email Address"
           />
         </div>
         <div className="col-span-12 md:col-span-6">
@@ -128,7 +128,7 @@ const SubUserForm = forwardRef<HTMLFormElement, SubUserFormProps>(
             value={formData.mobile}
             onChange={(val) => handleInputChange('mobile', val)}
             error={submited && !formData.mobile}
-            errormsg="Mobile is required"
+            errormsg="Please enter Mobile Number"
           />
         </div>
         <div className="col-span-12 md:col-span-6">
@@ -168,7 +168,7 @@ const SubUserForm = forwardRef<HTMLFormElement, SubUserFormProps>(
             value={formData.password}
             onChange={(val) => handleInputChange('password', val)}
             error={submited && !formData.password}
-            errormsg="Password is required"
+            errormsg="Please enter Password"
           />
         </div>
         <div className="col-span-12 md:col-span-6">

@@ -24,6 +24,7 @@ import { Checkbox } from '@/components/ui/checkbox'
 import { DANGEROUS_GOODS_URL, PRIVACY_POLICY_URL, TERMS_CONDITIONS_URL } from '@/constants'
 import { useAppSelector } from '@/hooks/store.hooks'
 import { Button } from '@/components/ui/button'
+import { ConformationModal } from '@/components/common/ConformationModal'
 
 const OrderDetailsPage: React.FC = () => {
   const { orderType, orderID } = useParams<{ orderType: string, orderID: string }>()
@@ -85,6 +86,9 @@ const OrderDetailsPage: React.FC = () => {
     courierId: '',
     amount: '',
   });
+  const [showCancelModal, setShowCancelModal] = useState(false)
+  const [showItemCountModal, setShowItemCountModal] = useState(false)
+
 
   const initialDialogMode = useMemo(() => {
     if ((orderType === 'create' || orderType === 'create-menual') && addressData.receiver.address1 === '') {
@@ -122,10 +126,10 @@ const OrderDetailsPage: React.FC = () => {
   ])
 
   const isValidConsineOrder = useCallback((orderStatus: string | undefined) => {
-    if (orderStatus !== 'new') {
+    if (orderStatus !== 'new' && orderType === 'consign') {
       navigate(`${role === 'admin' ? '/admin' : ''}/orders/edit/${orderID}`)
     }
-  }, [role, orderID, navigate])
+  }, [role, orderID, navigate, orderType])
 
   useEffect(() => {
     if (role === 'customer' && user && (orderType === 'create' || orderType === 'create-menual')) {
@@ -239,6 +243,14 @@ const OrderDetailsPage: React.FC = () => {
     return { totalItems, totalWeight, volumetric, servicePrice, gst, totalSurcharges, insuranceCost, grandTotal, insurance: insuranceSelected }
   }, [itemsData, quoteData, insuranceSelected])
 
+  const requiresManualLabel = useMemo(() => {
+    console.log(orderType, 'ordertype....')
+    if (orderType !== 'edit') return false;
+    const hasManyItems = calculation.totalItems > 4;
+    const hasHeavyItem = itemsData?.some(item => Number(item.weight) > 28);
+    return hasManyItems || hasHeavyItem;
+  }, [orderType, calculation.totalItems, itemsData]);
+
   const handleOnSave = useCallback((skipWalletCheckArg?: any) => {
     const isValidItems = itemsData && itemsData.length > 0 && itemsData.every(item =>
       Number(item.height) > 0 && Number(item.width) > 0 && Number(item.length) > 0 && Number(item.weight) > 0 && Number(item.quantity) > 0
@@ -263,6 +275,11 @@ const OrderDetailsPage: React.FC = () => {
 
     if (!termsAccepted || !ratesAccepted || !dangerousGoodsAccepted) {
       showToast('You must accept all Terms & Conditions, Dangerous Goods, and Futile Pickup declarations.', "error");
+      return;
+    }
+
+    if (calculation.totalItems > 4 && skipWalletCheckArg !== 'skipItemCountCheck' && skipWalletCheckArg !== true) {
+      setShowItemCountModal(true);
       return;
     }
 
@@ -331,20 +348,22 @@ const OrderDetailsPage: React.FC = () => {
         // executeCreateOrder()
       }
     })
-  }, [itemsData, addressData, role, selectedCustomer, pickupDate, termsAccepted, ratesAccepted, dangerousGoodsAccepted, courierData, insuranceSelected, signatureSelected, deliveryInstructions, quoteData?.courier, walletCheckData, calculation.grandTotal, orderType, manualOrderData.trackingNumber, manualOrderData.courierId, manualOrderData.amount, checkWallet, createOrder, navigate])
+  }, [itemsData, addressData, role, selectedCustomer, pickupDate, termsAccepted, ratesAccepted, dangerousGoodsAccepted, courierData, insuranceSelected, signatureSelected, deliveryInstructions, quoteData?.courier, walletCheckData, calculation, orderType, manualOrderData.trackingNumber, manualOrderData.courierId, manualOrderData.amount, checkWallet, createOrder, navigate])
 
-  const onCancelOrder = useCallback(() => {
+  const onCancelOrder = useCallback((manual: boolean = false) => {
     if (orderID) {
-      cancelOrder(orderID, {
-        onSuccess: (response) => {
-          showToast(response?.message || "Order cancelled successfully", "success");
-          navigate(`${role === 'admin' ? '/admin' : ''}/orders`)
-        },
-
-        onError: (error: any) => {
-          showToast(error?.response?.data?.message || 'Failed to cancel order', "error");
+      cancelOrder(
+        { orderId: orderID, data: { manual: typeof manual === 'boolean' ? manual : false } },
+        {
+          onSuccess: (response) => {
+            showToast(response?.message || "Order cancelled successfully", "success");
+            navigate(`${role === 'admin' ? '/admin' : ''}/orders`);
+          },
+          onError: (error: any) => {
+            showToast(error?.response?.data?.message || 'Failed to cancel order', "error");
+          }
         }
-      })
+      );
     }
   }, [orderID, cancelOrder, navigate, role])
 
@@ -452,9 +471,27 @@ const OrderDetailsPage: React.FC = () => {
           setSelectedCustomer={setSelectedCustomer}
           onCancelOrder={onCancelOrder}
           isCancelling={isCancelling}
-
           isConsigning={isConsigning}
+          showCancelModal={showCancelModal}
+          setShowCancelModal={setShowCancelModal}
+          requiresManualLabel={requiresManualLabel}
         />
+
+        {requiresManualLabel && (
+          <div className="mb-4 mt-3 p-5 bg-red-50 dark:bg-red-900/10 border border-red-200 dark:border-red-900/30 rounded-xl flex flex-col md:flex-row items-start md:items-center justify-between gap-4 animate-in slide-in-from-top-2 duration-500 shadow-sm">
+            <div className="flex items-center gap-4">
+              <div className="h-12 w-12 rounded-full bg-red-100 dark:bg-red-900/40 flex items-center justify-center text-red-600 dark:text-red-400 shrink-0">
+                <AlertTriangle size={24} />
+              </div>
+              <div>
+                <h3 className="mt-0 text-sm font-bold text-red-900 dark:text-red-100 uppercase tracking-widest">Manual Label Required</h3>
+                <p className="mt-1 text-sm text-red-700 dark:text-red-300 mb-0 font-medium">
+                  The shipping label cannot be generated for this order at the moment, this order requires manual label creation by admin.
+                </p>
+              </div>
+            </div>
+          </div>
+        )}
 
 
         {orderDetail?.cancel_request && (
@@ -468,21 +505,21 @@ const OrderDetailsPage: React.FC = () => {
                 <div className="mt-1.5 flex flex-wrap gap-x-6 gap-y-1 text-xs font-bold text-amber-700 dark:text-amber-400/80">
                   <div className="flex items-center gap-1.5">
                     <span className="opacity-80 font-medium">Requested By:</span>
-                    <span>{orderDetail.cancel_request.requested_by}</span>
+                    <span>{orderDetail?.cancel_request?.requested_by}</span>
                   </div>
                   <div className="flex items-center gap-1.5">
                     <span className="opacity-80 font-medium">Date:</span>
-                    <span>{orderDetail.cancel_request.requested_at}</span>
+                    <span>{orderDetail?.cancel_request?.requested_at}</span>
                   </div>
                   <div className="flex items-center gap-1.5">
                     <span className="opacity-80 font-medium">Est. Refund:</span>
-                    <span className="text-sm text-amber-900 dark:text-amber-200">${orderDetail.cancel_request.refund_amount.toFixed(2)}</span>
+                    <span className="text-sm text-amber-900 dark:text-amber-200">${orderDetail?.cancel_request?.refund_amount.toFixed(2)}</span>
                   </div>
                 </div>
               </div>
             </div>
             <Button
-              onClick={onCancelOrder}
+              onClick={() => onCancelOrder(false)}
               disabled={isCancelling}
               className="bg-red-600 hover:bg-red-700 text-white font-bold h-11 px-8 rounded-xl shadow-lg shadow-red-600/20 active:scale-[0.98] transition-all flex items-center gap-2"
             >
@@ -657,6 +694,24 @@ const OrderDetailsPage: React.FC = () => {
           onConfirm={() => handleOnSave(true)}
         />
       )}
+      <ConformationModal
+        open={showItemCountModal}
+        onOpenChange={setShowItemCountModal}
+        title="Shipping Label Not Generated"
+        description={
+          <div className="space-y-4">
+            <p className="text-sm">The shipping label cannot be generated for this order at the moment.</p>
+            <p className="text-sm font-semibold">The shipping label will be created by our support team once the payment has been successfully completed.</p>
+          </div>
+        }
+        onConfirm={() => {
+          setShowItemCountModal(false);
+          handleOnSave('skipItemCountCheck');
+        }}
+        confirmText="Continue"
+        cancelText="Cancel"
+        className="sm:max-w-[500px]"
+      />
     </>
   )
 }

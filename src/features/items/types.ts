@@ -48,4 +48,5 @@ export interface ItemsFilters {
   search?: string;
   per_page?: number;
   page?: number;
+  customer?: number;
 }

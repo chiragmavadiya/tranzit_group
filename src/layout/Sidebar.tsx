@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from 'react';
-import { NavLink, useLocation } from 'react-router-dom';
+import { NavLink, useLocation, useNavigate } from 'react-router-dom';
 import { Menu, ArrowLeft, ChevronDown } from 'lucide-react';
 import type { SidebarItem } from './types/Sidebar.types';
 import { adminSidebarItems, clientSidebarItems } from '../router/Navigation';
@@ -19,7 +19,7 @@ export default function Sidebar({ isCollapsed, setIsCollapsed }: SidebarProps) {
   const [expandedItems, setExpandedItems] = useState<string[]>([]);
   const { role } = useAppSelector((state) => state.auth);
   const location = useLocation();
-
+  const navigate = useNavigate();
   const sidebarItems = role === 'admin' ? adminSidebarItems : clientSidebarItems;
 
   const toggleExpand = (name: string) => {
@@ -36,6 +36,11 @@ export default function Sidebar({ isCollapsed, setIsCollapsed }: SidebarProps) {
       setIsCollapsed(false);
       toggleExpand(item.name);
     }
+  };
+
+  const handleBackToMainMenu = () => {
+    setActiveSubmenu(null);
+    navigate(`${role === 'admin' ? '/admin' : ''}/orders`);
   };
 
   const currentSubmenuData = sidebarItems.find(i => i.name === activeSubmenu);
@@ -60,7 +65,7 @@ export default function Sidebar({ isCollapsed, setIsCollapsed }: SidebarProps) {
         {activeSubmenu && !isCollapsed && (
           <div className="flex flex-col pt-2 animate-in slide-in-from-left-4 duration-300">
             <button
-              onClick={() => setActiveSubmenu(null)}
+              onClick={handleBackToMainMenu}
               className="flex items-center gap-2 px-4 py-2 text-[13px] text-gray-500 dark:text-zinc-400 hover:text-gray-900 dark:hover:text-zinc-100 transition-colors"
             >
               <ArrowLeft className="w-4 h-4" />
@@ -91,7 +96,7 @@ export default function Sidebar({ isCollapsed, setIsCollapsed }: SidebarProps) {
                         key={subItem.name}
                         to={subItem.path}
                         className={({ isActive }) =>
-                          `flex items-center px-4 py-2 text-[13.5px] font-medium transition-colors ${isActive ? 'text-primary' : 'text-gray-600 dark:text-zinc-400 hover:text-gray-900 dark:hover:text-zinc-100 hover:bg-gray-50 dark:hover:bg-zinc-900'
+                          `flex items-center px-4 py-2 text-[13.5px] border-l-4 font-medium transition-colors rounded-r-md ${isActive ? 'text-primary bg-primary/10 border-primary dark:border-primary' : 'text-gray-600 dark:text-zinc-400 hover:text-gray-900 dark:hover:text-zinc-100 hover:bg-gray-50 dark:hover:bg-zinc-900 border-transparent'
                           }`
                         }
                       >

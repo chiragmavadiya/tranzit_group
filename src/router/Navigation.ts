@@ -53,9 +53,17 @@ export const adminSidebarItems: SidebarItem[] = [
   { name: 'Profile', icon: User, path: '/admin/profile' },
 ];
 
+const getOrderTab = () => localStorage.getItem('order_tab');
+
 export const clientSidebarItems: SidebarItem[] = [
   { name: 'Dashboard', icon: LayoutDashboard, path: '/dashboard' },
-  { name: 'Orders', icon: Package, path: '/orders' },
+  {
+    name: 'Orders',
+    icon: Package,
+    get path() {
+      return `/orders?tab=${getOrderTab() || 'new'}`;
+    }
+  },
   { name: 'Create Order', icon: PlusCircle, path: '/orders/create' },
   { name: 'Get Quote', icon: Calculator, path: '/quote' },
   {

@@ -92,7 +92,7 @@ export const FormInput = memo(React.forwardRef<HTMLInputElement, FormInputProps>
           onChange={handleChange}
           autoComplete="off"
           className={cn(
-            "h-8 rounded-md border-slate-200 dark:border-zinc-800 bg-white dark:bg-zinc-950 font-normal focus-visible:ring-0 focus-visible:ring-primary focus-visible:border-primary transition-all placeholder:text-muted-foreground placeholder:font-normal dark:placeholder:text-zinc-700 text-sm",
+            "h-8 rounded-sm border-slate-200 dark:border-zinc-800 bg-white dark:bg-zinc-950 font-normal focus-visible:ring-0 focus-visible:ring-primary focus-visible:border-primary transition-all placeholder:text-muted-foreground placeholder:font-normal dark:placeholder:text-zinc-700 text-sm",
             Icon ? "pl-9" : "px-3",
             type === 'password' ? "pr-10" : "",
             error ? "border-red-500 focus-visible:border-red-500" : "",
@@ -165,7 +165,7 @@ export function FormTextarea({
         onChange={handleChange}
         rows={rows}
         className={cn(
-          "rounded-md shadow-none border-slate-200 dark:border-zinc-800 bg-white dark:bg-zinc-950 font-medium focus-visible:ring-0 focus-visible:ring-primary focus-visible:border-primary transition-all placeholder:text-muted-foreground placeholder:font-normal dark:placeholder:text-zinc-700 text-sm resize-none px-3 py-2",
+          "rounded-sm shadow-none border-slate-200 dark:border-zinc-800 bg-white dark:bg-zinc-950 font-medium focus-visible:ring-0 focus-visible:ring-primary focus-visible:border-primary transition-all placeholder:text-muted-foreground placeholder:font-normal dark:placeholder:text-zinc-700 text-sm resize-none px-3 py-2",
           error ? "border-red-500 focus-visible:border-red-500" : ""
         )}
       />
@@ -176,7 +176,7 @@ export function FormTextarea({
 
 export function ValidAddressBadge() {
   return (
-    <div className="flex items-center gap-2 px-3 py-1 bg-white dark:bg-zinc-900 border border-emerald-600 rounded-md text-[10px] font-bold text-emerald-600 uppercase tracking-wider w-fit shadow-sm">
+    <div className="flex items-center gap-2 px-3 py-1 bg-white dark:bg-zinc-900 border border-emerald-600 rounded-sm text-[10px] font-bold text-emerald-600 uppercase tracking-wider w-fit shadow-sm">
       <CheckCircle2 className="w-3 h-3" />
       Valid Address
       <RefreshCw className="w-3 h-3 ml-1 cursor-pointer hover:rotate-180 transition-transform duration-500" />
@@ -224,7 +224,7 @@ export const FormSelect = memo(({
       />
       <div>
         <SelectComponent
-          className={cn("w-full h-8 text-[13px] data-[size=default]:h-8 border-slate-200 rounded-md dark:border-zinc-800 font-medium bg-white dark:bg-zinc-950 text-slate-900 dark:text-zinc-100 focus:ring-primary transition-all text-sm px-3 ", error ? "border-red-500 focus:border-red-500" : "")}
+          className={cn("w-full h-8 text-[13px] data-[size=default]:h-8 border-slate-200 rounded-sm dark:border-zinc-800 font-medium bg-white dark:bg-zinc-950 text-slate-900 dark:text-zinc-100 focus:ring-primary transition-all text-sm px-3 ", error ? "border-red-500 focus:border-red-500" : "")}
           data={memoizedData}
           // defaultValue="default"
           onValueChange={onValueChange}
@@ -258,7 +258,7 @@ export function DropdownUI({ icon = 'ChevronDown', label, onClick, options }: Dr
   const IconComponent = useMemo(() => LucideIcons[icon] as React.ComponentType<React.SVGProps<SVGSVGElement>>, [icon]);
   return (
     <DropdownMenu>
-      <DropdownMenuTrigger className="flex items-center gap-2 border border-gray-200 dark:border-zinc-800 text-gray-700 dark:text-zinc-300 h-10 px-4 rounded-md hover:bg-gray-50 dark:hover:bg-zinc-900 transition-colors cursor-pointer outline-none text-sm font-medium">
+      <DropdownMenuTrigger className="flex items-center gap-2 border border-gray-200 dark:border-zinc-800 text-gray-700 dark:text-zinc-300 h-10 px-4 rounded-sm hover:bg-gray-50 dark:hover:bg-zinc-900 transition-colors cursor-pointer outline-none text-sm font-medium">
         {label}
         <IconComponent className="h-4 w-4" />
       </DropdownMenuTrigger>

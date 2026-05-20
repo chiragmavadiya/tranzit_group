@@ -1,6 +1,6 @@
 "use client";
 
-import { LogOut, Sun, Moon, Monitor, Loader2, HelpCircle } from 'lucide-react';
+import { LogOut, Sun, Moon, Monitor, Loader2, HelpCircle, User } from 'lucide-react';
 import { useNavigate, useLocation, useSearchParams } from 'react-router-dom';
 import DropdownCustomContent, {
   DropdownCustomMenu,
@@ -54,6 +54,10 @@ export default function TopBar({ isCollapsed }: { isCollapsed?: boolean }) {
     window.open('https://tranzitgroup.com.au/faq', '_blank');
   }
 
+  const handleProfile = () => {
+    // open new window
+    navigate('/settings/account');
+  }
   return (
     <header className={`print:hidden h-16 bg-white dark:bg-zinc-950 border-b border-gray-200 dark:border-zinc-800 flex items-center justify-between px-6 fixed top-0 right-0 z-10 transition-[left] duration-300 ease-in-out ${isCollapsed ? 'left-[64px]' : 'left-[240px]'}`}>
       <div className='flex justify-center flex-1'>
@@ -137,6 +141,10 @@ export default function TopBar({ isCollapsed }: { isCollapsed?: boolean }) {
                 </div>
               </div>
               <DropdownMenuSeparator className="bg-slate-100 dark:bg-zinc-800" />
+              <DropdownMenuItem variant={"default"} onClick={handleProfile} className={"cursor-pointer py-2 px-3 text-[13px]"}>
+                {<User className="w-4 h-4 mr-2" />}
+                Edit Profile
+              </DropdownMenuItem>
               <DropdownMenuItem variant={"default"} onClick={handleFaq} className={"cursor-pointer py-2 px-3 text-[13px]"}>
                 {<HelpCircle className="w-4 h-4 mr-2" />}
                 FAQ

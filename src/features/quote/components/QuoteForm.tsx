@@ -18,8 +18,8 @@ export function QuoteForm({ locations, setLocations }: QuoteFormProps) {
     <div className="space-y-4">
       {/* Addresses Section */}
       <Card className="">
-        <CardHeader className="pb-0">
-          <CardTitle className="inline-flex items-center gap-2 text-[15px] font-semibold text-slate-800 dark:text-zinc-100">
+        <CardHeader className="p-4 bg-transparent border-b">
+          <CardTitle className=" inline-flex items-center gap-2 text-[15px] font-semibold text-slate-800 dark:text-zinc-100">
             <MapPin className="w-4 h-4 text-primary" />
             Addresses
           </CardTitle>

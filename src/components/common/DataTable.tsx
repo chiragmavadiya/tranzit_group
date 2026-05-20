@@ -31,7 +31,7 @@ const DataTableComponent = <T extends Record<string, any>>(props: DataTableProps
     selectedRows = [],
     onSelectionChange,
     // Sorting
-    sortable = true,
+    sortable = false,
     sortConfig,
     onSort,
     // Pagination
@@ -79,7 +79,6 @@ const DataTableComponent = <T extends Record<string, any>>(props: DataTableProps
   const currentSearch = searchValue !== undefined ? searchValue : internalSearch;
   const currentSortConfig = sortConfig !== undefined ? sortConfig : internalSortConfig;
   const currentSelectedRows = selectedRows !== undefined ? selectedRows : internalSelectedRows;
-  console.log('Data Table render')
   useTraceUpdate(props)
   // Get row identifier
   const getRowId = (row: T): string => {

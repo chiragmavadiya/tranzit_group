@@ -72,12 +72,16 @@ export const CarrierCard: React.FC<CarrierCardProps> = (props) => {
           setCouriers(data.services || []);
           setSurchargesMap(data.surcharges || {});
           if (data.services && data.services.length > 0) {
-            const firstService = data.services[0];
+            const getServiceTotalPrice = (service: any) => {
+              const surcharges = data.surcharges?.[service.courierCode] || [];
+              const totalSurcharges = surcharges.reduce((acc: number, curr: any) => acc + curr.amount, 0);
+              return service.price + totalSurcharges;
+            };
             const minItem = data.services.reduce((min, curr) =>
-              curr.price < min.price ? curr : min
+              getServiceTotalPrice(curr) < getServiceTotalPrice(min) ? curr : min
             );
-            setBestDeal(minItem.product_id || minItem.code || '');
-            setSelectedServiceId(firstService.product_id || firstService.code || '0');
+            setBestDeal(minItem.product_id || minItem.courierCode || '');
+            setSelectedServiceId(minItem.product_id || minItem.courierCode || '');
           }
         },
         onError: (err: any) => {
@@ -91,7 +95,7 @@ export const CarrierCard: React.FC<CarrierCardProps> = (props) => {
 
   useEffect(() => {
     if (couriers.length > 0 && selectedServiceId) {
-      const selectedCourier = couriers.find((c, idx) => (c.product_id || c.code || String(idx)) === selectedServiceId);
+      const selectedCourier = couriers.find((c, idx) => (c.product_id || c.courierCode || String(idx)) === selectedServiceId);
       if (selectedCourier) {
         const courierSurcharges = surchargesMap[selectedCourier.courierCode] || [];
         const totalSurcharges = courierSurcharges.reduce((acc: any, curr: any) => acc + curr.amount, 0);
@@ -132,8 +136,17 @@ export const CarrierCard: React.FC<CarrierCardProps> = (props) => {
             <div className="relative flex flex-col p-4 rounded-xl border border-primary bg-primary/5 dark:bg-primary/10 shadow-sm">
               <div className="flex items-center justify-between gap-4">
                 <div className="flex items-center gap-4">
-                  <div className="w-12 h-12 rounded-lg bg-white dark:bg-zinc-800 border border-gray-100 dark:border-zinc-700 flex items-center justify-center p-2 shadow-sm">
-                    <Truck className="w-6 h-6 text-primary" />
+                  <div className="w-12 h-12 rounded-lg bg-white dark:bg-zinc-800 border border-gray-100 dark:border-zinc-700 flex items-center justify-center p-1 shadow-sm">
+                    {orderDetail.courier_details?.image_url ? (<img
+                      src={orderDetail.courier_details?.image_url}
+                      alt={orderDetail.courier_details?.courier}
+                      className="max-w-full max-h-full object-contain"
+                      onError={(e) => {
+                        (e.target as HTMLImageElement).src = 'https://placehold.co/100x40?text=Logo'
+                      }}
+                    />) : (<Truck className="w-6 h-6 text-primary" />)}
+
+
                   </div>
                   <div>
                     <h4 className="text-sm font-bold text-gray-900 dark:text-zinc-100 uppercase tracking-tight">
@@ -170,8 +183,7 @@ export const CarrierCard: React.FC<CarrierCardProps> = (props) => {
         ) : (
           <div className="flex flex-col gap-3">
             {couriers.map((courier, idx) => {
-              console.log(courier)
-              const serviceId = courier.product_id || courier.code || String(idx);
+              const serviceId = courier.product_id || courier.courierCode || String(idx);
 
               // Map additional charges by courierCode
               const courierSurcharges = surchargesMap[courier.courierCode] || [];
@@ -183,9 +195,9 @@ export const CarrierCard: React.FC<CarrierCardProps> = (props) => {
               if (courier.success === false) {
                 return (
                   <div
-                    key={serviceId}
-                    onClick={() => setSelectedServiceId(serviceId)}
-                    className={`relative flex flex-col p-4 rounded-xl border-2 cursor-pointer transition-all duration-200 ${isSelected
+                    // key={serviceId}
+                    // onClick={() => setSelectedServiceId(serviceId)}
+                    className={`relative flex flex-col p-4 rounded-xl border-2 transition-all duration-200 ${isSelected
                       ? 'border-primary bg-primary/5 dark:bg-primary/10'
                       : 'border-transparent bg-white dark:bg-zinc-900 hover:border-gray-200 dark:hover:border-zinc-700 shadow-sm'
                       }`}
@@ -259,25 +271,40 @@ export const CarrierCard: React.FC<CarrierCardProps> = (props) => {
                         <TooltipProvider>
                           <Tooltip>
                             <TooltipTrigger>
-                              <div className="flex items-center gap-1 text-[11px] text-orange-600 dark:text-orange-400 font-medium hover:underline cursor-help">
+                              <div className="flex items-center gap-1 text-[11px] text-orange-600 dark:text-orange-400 font-medium hover:underline cursor-help transition-colors duration-150">
                                 Includes ${totalSurcharges.toFixed(2)} surcharges
                                 <AlertCircle className="w-3 h-3" />
                               </div>
                             </TooltipTrigger>
-                            <TooltipContent className="bg-white dark:bg-zinc-800 text-xs text-gray-700 dark:text-zinc-300 border-gray-200 dark:border-zinc-700 shadow-lg p-3">
-                              <p className="font-bold mb-2">Price Breakdown</p>
-                              <div className="flex justify-between gap-4 mb-1">
-                                <span>Base Price:</span>
-                                <span className="font-medium">${courier.price.toFixed(2)}</span>
+                            <TooltipContent className="flex flex-col items-stretch w-80 max-w-none bg-white dark:bg-zinc-900 border border-gray-100 dark:border-zinc-800 text-xs text-gray-700 dark:text-zinc-300 shadow-xl rounded-xl p-4 gap-2.5">
+                              <div className="border-b border-gray-100 dark:border-zinc-800 pb-2">
+                                <span className="font-bold text-gray-900 dark:text-zinc-100 text-sm">
+                                  Price Breakdown
+                                </span>
                               </div>
-                              {courierSurcharges.map((charge, i) => (
-                                <div key={i} className="flex justify-between gap-4 mb-1 text-orange-600 dark:text-orange-400">
-                                  <span>{charge.name}:</span>
-                                  <span>+${charge.amount.toFixed(2)}</span>
+
+                              <div className="flex justify-between items-center text-gray-600 dark:text-zinc-400 py-0.5">
+                                <span>Base Price</span>
+                                <span className="font-semibold text-gray-900 dark:text-zinc-100">
+                                  ${courier.price.toFixed(2)}
+                                </span>
+                              </div>
+
+                              {courierSurcharges.filter((charge) => charge.amount > 0).length > 0 && (
+                                <div className="flex flex-col gap-1.5 py-1">
+                                  {courierSurcharges
+                                    .filter((charge) => charge.amount > 0)
+                                    .map((charge, i) => (
+                                      <div key={i} className="flex justify-between items-start text-[11px] text-primary-600 dark:text-amber-400">
+                                        <span className="text-left leading-tight max-w-[200px]">{charge.name}</span>
+                                        <span className="font-medium shrink-0 ml-4">+${charge.amount.toFixed(2)}</span>
+                                      </div>
+                                    ))}
                                 </div>
-                              ))}
-                              <div className="border-t border-gray-100 dark:border-zinc-700 mt-2 pt-2 flex justify-between gap-4 font-bold text-gray-900 dark:text-white">
-                                <span>Total:</span>
+                              )}
+
+                              <div className="border-t border-gray-100 dark:border-zinc-800 pt-2.5 mt-0.5 flex justify-between items-center font-bold text-sm text-gray-900 dark:text-white">
+                                <span>Total Price</span>
                                 <span>${totalPrice.toFixed(2)}</span>
                               </div>
                             </TooltipContent>

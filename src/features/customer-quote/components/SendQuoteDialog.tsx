@@ -40,7 +40,7 @@ export function SendQuoteDialog({
 }: SendQuoteDialogProps) {
   const [email, setEmail] = useState('');
   const { mutate: createQuote, isPending } = useCreateQuote();
-  console.log(courierData, 'courierDatacourierData')
+
   const handleSend = () => {
     if (!courierData || !locations.sender || !locations.receiver) return;
 

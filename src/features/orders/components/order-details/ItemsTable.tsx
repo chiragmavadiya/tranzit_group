@@ -12,6 +12,7 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from '@/components/ui/accordion'
+import { useAppSelector } from '@/hooks/store.hooks'
 
 interface ItemsTableProps {
   items: ItemData[]
@@ -23,6 +24,7 @@ interface ItemsTableProps {
   removeItem?: (index: number | undefined) => void
   onFullUpdateItem?: (index: number, data: ItemData) => void
   orderType?: string
+  customerId?: number
 }
 
 export const ItemsTable: React.FC<ItemsTableProps> = ({
@@ -34,12 +36,14 @@ export const ItemsTable: React.FC<ItemsTableProps> = ({
   removeItem,
   onFullUpdateItem,
   isEmpty = false,
-  orderType = "create"
+  orderType = "create",
+  customerId,
 }) => {
   // const { orderType } = useParams<{ orderType?: string }>()
   const isEditable = orderType === 'create' || orderType === 'create-menual' || orderType === 'consign'
+  const { role } = useAppSelector((state) => state.auth);
 
-  const { data: itemsResponse } = useItems({ per_page: 100 }, isEditable)
+  const { data: itemsResponse } = useItems({ per_page: 100, customer: customerId }, isEditable && (role !== 'admin' || !!customerId))
   const predefinedItems = useMemo(() => itemsResponse?.data || [], [itemsResponse])
 
   const predefinedItemsOptions = useMemo(() => {
@@ -262,6 +266,7 @@ export const ItemsTable: React.FC<ItemsTableProps> = ({
                             size="icon"
                             className="h-8 w-10 shrink-0 bg-red-50 hover:bg-red-100 text-red-500 dark:bg-red-950/30 dark:hover:bg-red-900/50 rounded-md"
                             onClick={() => removeItem?.(idx)}
+                            disabled={items?.length === 1}
                           >
                             <Trash2 className="h-4 w-4" />
                           </Button>

@@ -36,7 +36,6 @@ import type { InvoiceDocumentData } from '../types'
 
 const InvoiceDocumentView: React.FC = () => {
   const { invoiceID } = useParams<{ invoiceID: string }>()
-  console.log(invoiceID, 'invoiceID')
   const navigate = useNavigate()
   const { role } = useAppSelector((state) => state.auth)
   const isAdmin = role === 'admin'

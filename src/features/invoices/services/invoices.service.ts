@@ -9,7 +9,6 @@ export const invoicesService = {
   },
 
   getCustomerInvoiceDetails: async (id: number): Promise<{ status: boolean; message: string; data: Invoice }> => {
-    console.log(id, "getCustomerInvoiceDetails")
     const response = await api.get(`${API_ENDPOINTS.INVOICES.BASE}/${id}`);
     return response.data;
   },

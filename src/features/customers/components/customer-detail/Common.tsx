@@ -2,7 +2,7 @@ import { FileText } from 'lucide-react';
 import type { ActivityItem } from './types';
 
 export const SectionHeader = ({ title, icon: Icon }: { title: string, icon: any }) => (
-    <div className="flex items-center gap-2 mb-2">
+    <div className="flex items-center gap-2">
         <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary/10 text-primary">
             <Icon className="h-4 w-4" />
         </div>
@@ -43,7 +43,7 @@ export const TimelineItem = ({ item, isLast }: { item: ActivityItem, isLast: boo
                     <h4 className="text-sm font-bold text-slate-900 dark:text-zinc-100">{item.title}</h4>
                     <span className="text-[10px] font-medium text-slate-400 dark:text-zinc-500 uppercase tracking-wider">{item.timestamp}</span>
                 </div>
-                <p className="text-xs text-slate-500 dark:text-zinc-400 leading-relaxed">{item.description}</p>
+                <p className="text-xs text-slate-500 dark:text-zinc-400 leading-relaxed max-w-[calc(100%-190px)]">{item.description}</p>
                 {item.invoiceNo && (
                     <div className="mt-2 inline-flex items-center gap-2 rounded-lg bg-slate-50 dark:bg-zinc-900/50 p-2 border border-slate-100 dark:border-zinc-800 w-fit">
                         <FileText className="h-3 w-3 text-slate-400" />

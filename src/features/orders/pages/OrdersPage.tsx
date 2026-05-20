@@ -3,7 +3,7 @@
 import { useState, useMemo, useCallback, useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import type { TabType } from '@/features/orders/types';
-import { useOrders, useExportOrders, useImportOrders } from '@/features/orders/hooks/useOrders';
+import { useOrders, useExportOrders, useImportOrders, useDownloadLabel, useCancelOrder } from '@/features/orders/hooks/useOrders';
 import { DataTable } from '@/components/common/DataTable';
 import { getOrdersColumns } from '../column';
 import DatePicker from '@/components/common/DatePicker';
@@ -12,6 +12,9 @@ import { Download, Plus, Loader2 } from 'lucide-react';
 import { useAppSelector } from '@/hooks/store.hooks';
 import { showToast } from '@/components/ui/custom-toast';
 import { ImportOrdersDialog } from '../components/ImportOrdersDialog';
+import { ConformationModal } from '@/components/common/ConformationModal';
+import CreateOrderDialog from '../components/CreateOrderDialog';
+import { useDebounce } from '@/hooks/useDebounce';
 
 export default function OrdersPage() {
   const [searchParams] = useSearchParams();
@@ -24,12 +27,25 @@ export default function OrdersPage() {
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(25);
   const [search, setSearch] = useState('');
+  const debouncedSearch = useDebounce(search, 400);
   const [dateRange, setDateRange] = useState<[Date | undefined, Date | undefined]>([undefined, undefined]);
   const [appliedDateRange, setAppliedDateRange] = useState<[Date | undefined, Date | undefined]>([undefined, undefined]);
+  const [selectedRows, setSelectedRows] = useState<string[]>([]);
+  const [isDownloadingLabels, setIsDownloadingLabels] = useState(false);
+  const [isCancellingOrders, setIsCancellingOrders] = useState(false);
+  const [showCancelModal, setShowCancelModal] = useState(false);
+  const [orderToCancel, setOrderToCancel] = useState<string | null>(null);
+  const [addressEditModal, setAddressEditModal] = useState<string>();
+
+  const downloadLabelMutation = useDownloadLabel();
+  const cancelOrderMutation = useCancelOrder();
+
 
   // Reset page when tab changes
   useEffect(() => {
     setPage(1);
+    setSelectedRows([]);
+    localStorage.setItem('order_tab', activeTab);
   }, [activeTab]);
 
   // Memoized filters for useOrders
@@ -37,10 +53,10 @@ export default function OrdersPage() {
     status: activeTab.toLowerCase(),
     per_page: pageSize,
     page: page,
-    search: search || undefined,
+    search: debouncedSearch || undefined,
     start_date: appliedDateRange[0]?.toISOString(),
     end_date: appliedDateRange[1]?.toISOString(),
-  }), [activeTab, pageSize, page, search, appliedDateRange]);
+  }), [activeTab, pageSize, page, debouncedSearch, appliedDateRange]);
 
   // Fetch orders data
   const { data: ordersData, isLoading } = useOrders(filters);
@@ -77,12 +93,14 @@ export default function OrdersPage() {
   const handleApplyFilters = useCallback(() => {
     setAppliedDateRange(dateRange);
     setPage(1);
+    setSelectedRows([]);
   }, [dateRange]);
 
   const handleClearFilters = useCallback(() => {
     setDateRange([undefined, undefined]);
     setAppliedDateRange([undefined, undefined]);
     setPage(1);
+    setSelectedRows([]);
   }, []);
 
   const handleImportOrders = useCallback((file: File, customerId?: string) => {
@@ -97,13 +115,128 @@ export default function OrdersPage() {
     });
   }, [importOrders]);
 
-  const columns = useMemo(() => getOrdersColumns(role, activeTab, navigate), [role, activeTab, navigate]);
+  const handleDownloadMultipleLabels = useCallback(async () => {
+    if (selectedRows.length === 0) return;
+    setIsDownloadingLabels(true);
+    // let successCount = 0;
+    // let failCount = 0;
+    // for (const orderId of selectedRows) {
+    //   try {
+    //     downloadLabelMutation.mutateAsync(orderId);
+    //     successCount++;
+    //   } catch {
+    //     failCount++;
+    //   }
+    // }
+    const results = await Promise.allSettled(
+      selectedRows.map((orderId) =>
+        downloadLabelMutation.mutateAsync(orderId)
+      )
+    );
+
+    const successCount = results.filter(
+      (result) => result.status === "fulfilled"
+    ).length;
+
+    const failCount = results.filter(
+      (result) => result.status === "rejected"
+    ).length;
+    if (successCount > 0) {
+      showToast(`Successfully downloaded ${successCount} label(s).`, "success");
+    }
+    if (failCount > 0) {
+      showToast(`Failed to download ${failCount} label(s).`, "error");
+    }
+    setSelectedRows([]);
+    setIsDownloadingLabels(false);
+  }, [selectedRows, downloadLabelMutation]);
+
+  const handleCancelMultipleOrders = useCallback(async () => {
+    if (selectedRows.length === 0) return;
+    setIsCancellingOrders(true);
+    let successCount = 0;
+    let failCount = 0;
+    for (const orderId of selectedRows) {
+      try {
+        await cancelOrderMutation.mutateAsync({ orderId, data: { manual: false } });
+        successCount++;
+      } catch {
+        failCount++;
+      }
+    }
+    if (successCount > 0) {
+      showToast(`Successfully cancelled ${successCount} order(s).`, "success");
+    }
+    if (failCount > 0) {
+      showToast(`Failed to cancel ${failCount} order(s).`, "error");
+    }
+    setSelectedRows([]);
+    setShowCancelModal(false);
+    setIsCancellingOrders(false);
+  }, [selectedRows, cancelOrderMutation]);
+
+  const handleCustomerEdit = useCallback((id: string) => {
+    setAddressEditModal(id);
+
+  }, []);
+
+  const handleDownloadSingleLabel = useCallback(async (orderId: string) => {
+    try {
+      await downloadLabelMutation.mutateAsync(orderId);
+      showToast(`Label for order ${orderId} downloaded successfully.`, "success");
+    } catch {
+      showToast(`Failed to download label for order ${orderId}.`, "error");
+    }
+  }, [downloadLabelMutation]);
+
+  const handleCancelSingleOrderClick = useCallback((orderId: string) => {
+    setOrderToCancel(orderId);
+  }, []);
+
+  const columns = useMemo(() => getOrdersColumns(
+    role,
+    activeTab,
+    navigate,
+    handleCustomerEdit,
+    handleDownloadSingleLabel,
+    handleCancelSingleOrderClick
+  ), [role, activeTab, navigate, handleCustomerEdit, handleDownloadSingleLabel, handleCancelSingleOrderClick]);
 
   return (
     <div className="p-page-padding flex-1 flex flex-col space-y-4 animate-in fade-in slide-in-from-bottom-2 duration-300 h-full overflow-hidden min-h-0 bg-white dark:bg-zinc-950">
 
       <div className='rounded-lg shadow-sm flex-1 flex flex-col min-h-0 border border-gray-100 dark:border-zinc-800 bg-white dark:bg-zinc-950 '>
         <div className="flex flex-wrap items-end justify-end gap-4 p-4">
+          {selectedRows.length > 0 && (
+            <div className="flex items-center gap-2 mr-2 border-r border-gray-200 dark:border-zinc-800 pr-4">
+              <span className="text-xs text-slate-500 dark:text-zinc-400 font-medium mr-2 whitespace-nowrap">
+                {selectedRows.length} Selected
+              </span>
+              {activeTab === 'printed' && (
+                <Button
+                  variant="default"
+                  size="sm"
+                  className="h-8 gap-2 bg-primary hover:bg-primary-hover text-white transition-colors font-semibold shadow-lg shadow-primary/20 dark:shadow-none"
+                  onClick={handleDownloadMultipleLabels}
+                  disabled={isDownloadingLabels || isCancellingOrders}
+                >
+                  {isDownloadingLabels ? <Loader2 className="w-4 h-4 animate-spin" /> : <Download className="w-4 h-4" />}
+                  <span>Download Labels</span>
+                </Button>
+              )}
+              <Button
+                variant="outline"
+                size="sm"
+                className="h-8 gap-2 border-red-200 dark:border-red-900/30 hover:border-red-300 hover:bg-red-50 dark:hover:bg-red-900/10 text-red-600 dark:text-red-400 transition-colors font-semibold"
+                onClick={() => setShowCancelModal(true)}
+                disabled={isCancellingOrders || isDownloadingLabels}
+              >
+                {isCancellingOrders ? <Loader2 className="w-4 h-4 animate-spin" /> : null}
+                <span>Cancel Orders</span>
+              </Button>
+
+            </div>
+          )}
           <DatePicker
             label="Start Date"
             date={dateRange[0]}
@@ -157,8 +290,12 @@ export default function OrdersPage() {
           onPageChange={setPage}
           onExport={handleExport}
           isExporting={exportOrders.isPending}
+          selectable
+          selectedRows={selectedRows}
+          onSelectionChange={setSelectedRows}
           customHeader={() => (
             <div className="flex items-center justify-between gap-2">
+
               <Button
                 variant="outline"
                 className="gap-2 border-gray-200 dark:border-zinc-800 hover:bg-gray-50 dark:hover:bg-zinc-800 font-medium text-slate-700 dark:text-zinc-300 transition-colors"
@@ -189,6 +326,58 @@ export default function OrdersPage() {
             isAdmin={isAdmin}
           />)
       }
+      {
+        showCancelModal && (
+          <ConformationModal
+            open={showCancelModal}
+            onOpenChange={setShowCancelModal}
+            title="Cancel Selected Orders"
+            description={`Are you sure you want to cancel the ${selectedRows.length} selected order(s)? This action cannot be undone.`}
+            onConfirm={handleCancelMultipleOrders}
+            confirmText="Yes, Cancel"
+            cancelText="No, Keep"
+            confirmVariant="destructive"
+            loading={isCancellingOrders}
+          />
+        )
+      }
+      {
+        orderToCancel && (
+          <ConformationModal
+            open={!!orderToCancel}
+            onOpenChange={(open) => !open && setOrderToCancel(null)}
+            title="Cancel Order"
+            description={`Are you sure you want to cancel order ${orderToCancel}? This action cannot be undone.`}
+            onConfirm={async () => {
+              setIsCancellingOrders(true);
+              try {
+                await cancelOrderMutation.mutateAsync({ orderId: orderToCancel, data: { manual: false } });
+                showToast(`Order ${orderToCancel} cancelled successfully.`, "success");
+              } catch (err: any) {
+                showToast(err?.response?.data?.message || `Failed to cancel order ${orderToCancel}.`, "error");
+              } finally {
+                setIsCancellingOrders(false);
+                setOrderToCancel(null);
+              }
+            }}
+            confirmText="Yes, Cancel"
+            cancelText="No, Keep"
+            confirmVariant="destructive"
+            loading={isCancellingOrders}
+          />
+        )
+      }
+      {addressEditModal && (
+        <CreateOrderDialog
+          orderId={addressEditModal}
+          open={!!addressEditModal}
+          onOpenChange={() => setAddressEditModal('')}
+          type="customer"
+          onSubmit={() => { }}
+          // initialData={{}}
+          isEdit={true}
+        />
+      )}
     </div>
   );
 }

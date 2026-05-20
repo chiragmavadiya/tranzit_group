@@ -1,0 +1,559 @@
+import { useCallback, useMemo, useState, useEffect } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
+import { format } from 'date-fns';
+import { useAppSelector } from '@/hooks/store.hooks';
+import { showToast } from '@/components/ui/custom-toast';
+import { useOrderItems } from './useOrderItems';
+import {
+  useCreateOrder,
+  useOrderDetails,
+  useDownloadLabel,
+  useWalletCheck,
+  useCancelOrder,
+  useConsignOrder,
+} from './useOrders';
+import { useGlobalCouriers } from '@/features/courier-surcharge/hooks/useGlobalCouriers';
+import type { AddressData, WalletCheckResponse } from '../types';
+
+export const useOrderWorkflow = () => {
+  const { orderType, orderID } = useParams<{ orderType: string; orderID: string }>();
+  const { role, user } = useAppSelector((state) => state.auth);
+  const navigate = useNavigate();
+
+  // API Hooks
+  const { mutate: createOrder, isPending: saveLoading } = useCreateOrder();
+  const { mutate: checkWallet, isPending: walletLoading } = useWalletCheck();
+  const { data: orderResponse, isLoading: isOrderLoading } = useOrderDetails(orderID || '');
+  const { mutate: downloadLabel, isPending: isDownloadingLabel } = useDownloadLabel();
+  const { mutate: cancelOrder, isPending: isCancelling } = useCancelOrder();
+  const { mutate: consignOrder, isPending: isConsigning } = useConsignOrder(role === 'admin');
+  const { data: globalCouriers } = useGlobalCouriers(role === 'admin' && orderType === 'create-menual');
+
+  const orderDetail = orderResponse?.data;
+  const isEditable = orderType === 'create' || orderType === 'consign' || orderType === 'create-menual';
+
+  // State Management
+  const [walletCheckOpen, setWalletCheckOpen] = useState(false);
+  const [walletCheckData, setWalletCheckData] = useState<WalletCheckResponse | null>(null);
+  const [quoteData, setQuoteData] = useState<any>(null);
+  const [courierData, setCourierData] = useState<any>(null);
+
+  const [addressData, setAddressData] = useState<{ sender: AddressData; receiver: AddressData }>(() => ({
+    sender: {
+      email: user?.email || '',
+      phone: user?.office_number || '',
+      company: user?.company_name || '',
+      address: user?.addresses?.[0]?.address || '',
+      address1: user?.addresses?.[0]?.address || '',
+      suburb: user?.addresses?.[0]?.suburb || '',
+      state: user?.addresses?.[0]?.state || '',
+      street_name: user?.addresses?.[0]?.street_name || '',
+      street_number: user?.addresses?.[0]?.street_number || '',
+      postcode: user?.addresses?.[0]?.postcode || '',
+      country: '',
+      unit_number: '',
+      name: `${user?.first_name || ''} ${user?.last_name || ''}`.trim(),
+      saveToAddressBook: false,
+    },
+    receiver: {
+      email: '',
+      phone: '',
+      company: '',
+      address: '',
+      address1: '',
+      suburb: '',
+      state: '',
+      street_name: '',
+      unit_number: '',
+      street_number: '',
+      postcode: '',
+      country: '',
+      name: '',
+      saveToAddressBook: false,
+    },
+  }));
+
+  const [manualOrderData, setManualOrderData] = useState({
+    trackingNumber: '',
+    courierId: '',
+    amount: '',
+  });
+
+  const [showCancelModal, setShowCancelModal] = useState(false);
+  const [showItemCountModal, setShowItemCountModal] = useState(false);
+
+  const initialDialogMode = useMemo(() => {
+    if ((orderType === 'create' || orderType === 'create-menual') && addressData.receiver.address1 === '') {
+      return 'receiver';
+    }
+    return null;
+  }, [addressData.receiver.address1, orderType]);
+
+  const [insuranceSelected, setInsuranceSelected] = useState<boolean>(false);
+  const [signatureSelected, setSignatureSelected] = useState<boolean>(false);
+  const [orderDialogMode, setOrderDialogMode] = useState<'sender' | 'receiver' | null>(initialDialogMode);
+  const [deliveryInstructions, setDeliveryInstructions] = useState<string>('');
+  const [isEdit, setIsEdit] = useState<boolean>(false);
+  const [termsAccepted, setTermsAccepted] = useState(false);
+  const [ratesAccepted, setRatesAccepted] = useState(false);
+  const [dangerousGoodsAccepted, setDangerousGoodsAccepted] = useState(false);
+  const [pickupDate, setPickupDate] = useState<Date | undefined>(undefined);
+  const [selectedCustomer, setSelectedCustomer] = useState<number>();
+
+  const {
+    itemsData,
+    updateItem,
+    fullUpdateItem,
+    addItem,
+    removeItem,
+    setItemsData,
+  } = useOrderItems([
+    {
+      type: 'box',
+      quantity: 1,
+      weight: 0,
+      length: 0,
+      width: 0,
+      height: 0,
+    },
+  ]);
+
+  const isValidConsignOrder = useCallback((orderStatus: string | undefined) => {
+    if (orderStatus !== 'new' && orderType === 'consign') {
+      navigate(`${role === 'admin' ? '/admin' : ''}/orders/edit/${orderID}`);
+    }
+  }, [role, orderID, navigate, orderType]);
+
+  // Sync user profile sender address (Create Mode)
+  useEffect(() => {
+    if (role === 'customer' && user && (orderType === 'create' || orderType === 'create-menual')) {
+      setAddressData((prev) => ({
+        ...prev,
+        sender: {
+          ...prev.sender,
+          email: user.email || '',
+          phone: user.office_number || '',
+          company: user.company_name || '',
+          address: user.addresses?.[0]?.address || '',
+          address1: user.addresses?.[0]?.address || '',
+          suburb: user.addresses?.[0]?.suburb || '',
+          state: user.addresses?.[0]?.state || '',
+          street_name: user.addresses?.[0]?.street_name || '',
+          street_number: user.addresses?.[0]?.street_number || '',
+          postcode: user.addresses?.[0]?.postcode || '',
+          name: `${user.first_name || ''} ${user.last_name || ''}`.trim(),
+        },
+      }));
+    }
+  }, [user, role, orderType]);
+
+  // Sync existing order details (Edit/Consign Mode)
+  useEffect(() => {
+    if (orderDetail && orderType !== 'create' && orderType !== 'create-menual') {
+      setAddressData({
+        sender: {
+          name: orderDetail.sender_details?.name || '',
+          email: orderDetail.sender_details?.email || '',
+          phone: orderDetail.sender_details?.mobile || '',
+          address1: orderDetail.sender_details?.address_detail?.address_line || '',
+          address: orderDetail.sender_details?.address || '',
+          company: orderDetail.sender_details?.company || '',
+          suburb: orderDetail.sender_details?.address_detail?.suburb || '',
+          state: orderDetail.sender_details?.address_detail?.state || '',
+          street_name: orderDetail.sender_details?.address_detail?.street_name || '',
+          street_number: orderDetail.sender_details?.address_detail?.street_number || '',
+          postcode: orderDetail.sender_details?.address_detail?.postcode || '',
+          country: 'Australia',
+          saveToAddressBook: false,
+        },
+        receiver: {
+          name: orderDetail.receiver_details?.name || '',
+          email: orderDetail.receiver_details?.email || '',
+          phone: orderDetail.receiver_details?.mobile || '',
+          address1: orderDetail.receiver_details?.address_detail?.address_line || '',
+          address: orderDetail.receiver_details?.address || '',
+          company: orderDetail.receiver_details?.company || '',
+          suburb: orderDetail.receiver_details?.address_detail?.suburb || '',
+          state: orderDetail.receiver_details?.address_detail?.state || '',
+          street_name: orderDetail.receiver_details?.address_detail?.street_name || '',
+          street_number: orderDetail.receiver_details?.address_detail?.street_number || '',
+          postcode: orderDetail.receiver_details?.address_detail?.postcode || '',
+          country: 'Australia',
+          saveToAddressBook: false,
+        },
+      });
+      setItemsData(orderDetail.order_details?.items?.map((item) => ({
+        type: item.type,
+        quantity: item.quantity,
+        weight: item.weight,
+        length: item.length,
+        width: item.width,
+        height: item.height,
+        description: item.description || '',
+      })) || []);
+      setDeliveryInstructions(orderDetail.delivery_instructions || '');
+      setInsuranceSelected(orderDetail.limited_liability_cover?.covered || false);
+      setCourierData(orderDetail.courier_details);
+      setQuoteData(orderDetail.order_details);
+      isValidConsignOrder(orderDetail.order_status_category);
+    }
+  }, [isValidConsignOrder, orderDetail, orderType, setItemsData]);
+
+  const handleAddressSubmit = useCallback((type: 'sender' | 'receiver' | 'customer', data: AddressData) => {
+    setAddressData((prev) => ({ ...prev, [type]: data }));
+    setOrderDialogMode(null);
+  }, []);
+
+  const onEditClick = useCallback((type: 'sender' | 'receiver') => {
+    setOrderDialogMode(type);
+    setIsEdit(true);
+  }, []);
+
+  const handleOptionalFieldsChange = useCallback((type: 'insurance' | 'signature' | 'delivery_instructions', value: string | boolean) => {
+    if (type === 'insurance') {
+      setInsuranceSelected(value as boolean);
+    } else if (type === 'signature') {
+      setSignatureSelected(value as boolean);
+    } else if (type === 'delivery_instructions') {
+      setDeliveryInstructions(value as string);
+    }
+  }, []);
+
+  // Summary Metrics calculations
+  const calculation = useMemo(() => {
+    const totalItems = itemsData?.reduce((acc, item) => acc + (Number(item.quantity) || 1), 0) || 0;
+    const totalWeight = itemsData?.reduce((acc, item) => acc + (Number(item.weight) * (Number(item.quantity) || 1)), 0) || 0;
+
+    const volumetric = itemsData?.reduce((acc, item) => {
+      const w = Number(item.width) || 0;
+      const h = Number(item.height) || 0;
+      const l = Number(item.length) || 0;
+      const q = Number(item.quantity) || 1;
+      return acc + ((w * h * l) / 1000000) * q;
+    }, 0) || 0;
+
+    const servicePrice = quoteData?.courier?.base || quoteData?.subtotal || 0;
+    const gst = quoteData?.courier?.gst || quoteData?.tax || 0;
+    const totalSurcharges = quoteData?.totalSurcharges || 0;
+    const insuranceCost = insuranceSelected ? 6.0 : 0;
+    const grandTotal = (quoteData?.totalPrice || quoteData?.total || 0) + insuranceCost;
+
+    return {
+      totalItems,
+      totalWeight,
+      volumetric,
+      servicePrice,
+      gst,
+      totalSurcharges,
+      insuranceCost,
+      grandTotal,
+      insurance: insuranceSelected,
+    };
+  }, [itemsData, quoteData, insuranceSelected]);
+
+  const requiresManualLabel = useMemo(() => {
+    if (orderType !== 'edit') return false;
+    const hasManyItems = calculation.totalItems > 4;
+    const hasHeavyItem = itemsData?.some((item) => Number(item.weight) > 28);
+    return hasManyItems || hasHeavyItem;
+  }, [orderType, calculation.totalItems, itemsData]);
+
+  // Order Submission/Saving Flow
+  const handleOnSave = useCallback((skipWalletCheckArg?: any) => {
+    const isValidItems = itemsData && itemsData.length > 0 && itemsData.every((item) =>
+      Number(item.height) > 0 && Number(item.width) > 0 && Number(item.length) > 0 && Number(item.weight) > 0 && Number(item.quantity) > 0
+    );
+    const hasSenderAddress = Boolean(addressData?.sender?.address1);
+    const hasReceiverAddress = Boolean(addressData?.receiver?.address1);
+
+    if (role === 'admin' && !selectedCustomer) {
+      showToast('Please select a customer.', 'error');
+      return;
+    }
+
+    if (!isValidItems || !hasSenderAddress || !hasReceiverAddress) {
+      showToast('Please fill out item dimensions and complete both addresses.', 'error');
+      return;
+    }
+
+    if (role === 'admin' && !pickupDate) {
+      showToast('Please select a pickup date.', 'error');
+      return;
+    }
+
+    if (!termsAccepted || !ratesAccepted || !dangerousGoodsAccepted) {
+      showToast('You must accept all Terms & Conditions, Dangerous Goods, and Futile Pickup declarations.', 'error');
+      return;
+    }
+
+    if (calculation.totalItems > 4 && skipWalletCheckArg !== 'skipItemCountCheck' && skipWalletCheckArg !== true) {
+      setShowItemCountModal(true);
+      return;
+    }
+
+    const payload: any = {
+      ...addressData,
+      parcels: itemsData,
+      service: {
+        ...courierData,
+        cover_limited_liability: insuranceSelected ? 1 : 0,
+        signature_required: signatureSelected ? 1 : 0,
+      },
+      surcharges: [],
+      delivery_instructions: deliveryInstructions,
+      pickup_date: pickupDate ? format(pickupDate, 'yyyy-MM-dd') : '',
+      terms_and_conditions: termsAccepted,
+      totals: {
+        subtotal: quoteData?.courier?.base || 0,
+        gst: quoteData?.courier?.gst || 0,
+        total: quoteData?.courier?.price || 0,
+        freight_levy: quoteData?.courier?.freight_levy || 0,
+      },
+      capture: role === 'admin' || (walletCheckData?.wallet_balance ?? 0) > calculation.grandTotal,
+      save_address: addressData?.receiver?.saveToAddressBook ? 1 : 0,
+      customer_id: selectedCustomer || undefined,
+      ...(orderType === 'create-menual' ? {
+        tracking_number: manualOrderData.trackingNumber,
+        courier_id: manualOrderData.courierId,
+        amount: manualOrderData.amount,
+      } : {}),
+    };
+
+    const executeCreateOrder = () => {
+      createOrder(payload, {
+        onSuccess: (response) => {
+          if (response.ok) {
+            showToast('Orders Created successfully', 'success');
+            navigate(`${role === 'admin' ? '/admin' : ''}/orders/edit/${response.order_number}`);
+            setWalletCheckOpen(false);
+          } else {
+            showToast(response.message || 'Failed to create orders', 'error');
+          }
+        },
+        onError: (err: any) => {
+          showToast(err?.response?.data?.message || 'Failed to create orders', 'error');
+        },
+      });
+    };
+
+    if (skipWalletCheckArg === true || role === 'admin') {
+      executeCreateOrder();
+      return;
+    }
+
+    checkWallet(calculation.grandTotal, {
+      onSuccess: (res) => {
+        if (res.ok) {
+          setWalletCheckData(res);
+          setWalletCheckOpen(true);
+        } else {
+          executeCreateOrder();
+        }
+      },
+      onError: () => {
+        showToast('Failed to create orders', 'error');
+      },
+    });
+  }, [
+    itemsData,
+    addressData,
+    role,
+    selectedCustomer,
+    pickupDate,
+    termsAccepted,
+    ratesAccepted,
+    dangerousGoodsAccepted,
+    courierData,
+    insuranceSelected,
+    signatureSelected,
+    deliveryInstructions,
+    quoteData?.courier,
+    walletCheckData,
+    calculation,
+    orderType,
+    manualOrderData.trackingNumber,
+    manualOrderData.courierId,
+    manualOrderData.amount,
+    checkWallet,
+    createOrder,
+    navigate,
+  ]);
+
+  // Order Cancellation Flow
+  const onCancelOrder = useCallback((manual: boolean = false) => {
+    if (orderID) {
+      cancelOrder(
+        { orderId: orderID, data: { manual: typeof manual === 'boolean' ? manual : false } },
+        {
+          onSuccess: (response) => {
+            showToast(response?.message || 'Order cancelled successfully', 'success');
+            navigate(`${role === 'admin' ? '/admin' : ''}/orders`);
+          },
+          onError: (err: any) => {
+            showToast(err?.response?.data?.message || 'Failed to cancel order', 'error');
+          },
+        }
+      );
+    }
+  }, [orderID, cancelOrder, navigate, role]);
+
+  // Order Consignment Flow
+  const handleConsign = useCallback(() => {
+    if (!termsAccepted || !ratesAccepted || !dangerousGoodsAccepted) {
+      showToast('You must accept all Terms & Conditions, Dangerous Goods, and Futile Pickup declarations.', 'error');
+      return;
+    }
+
+    const payload = {
+      customer_id: selectedCustomer || orderDetail?.sender_details?.customer_id,
+      sender: {
+        name: addressData.sender.name,
+        company: addressData.sender.company,
+        phone: addressData.sender.phone,
+        email: addressData.sender.email,
+        address1: addressData.sender.address1,
+        suburb: addressData.sender.suburb,
+        state: addressData.sender.state,
+        postcode: addressData.sender.postcode,
+        country: addressData.sender.country || 'AU',
+      },
+      receiver: {
+        name: addressData.receiver.name,
+        company: addressData.receiver.company,
+        phone: addressData.receiver.phone,
+        email: addressData.receiver.email,
+        address1: addressData.receiver.address1,
+        suburb: addressData.receiver.suburb,
+        state: addressData.receiver.state,
+        postcode: addressData.receiver.postcode,
+        country: addressData.receiver.country || 'AU',
+      },
+      parcels: itemsData.map((item) => ({
+        type: item.type,
+        quantity: item.quantity,
+        weight: item.weight,
+        length: item.length,
+        width: item.width,
+        height: item.height,
+      })),
+      service: {
+        ...courierData,
+        cover_limited_liability: insuranceSelected ? 1 : 0,
+        signature_required: signatureSelected ? 1 : 0,
+      },
+      surcharges: [],
+      delivery_instructions: deliveryInstructions,
+      pickup_date: pickupDate ? format(pickupDate, 'yyyy-MM-dd') : '',
+      terms_and_conditions: termsAccepted,
+      totals: {
+        subtotal: quoteData?.courier?.base || calculation.servicePrice,
+        gst: quoteData?.courier?.gst || calculation.gst,
+        total: quoteData?.courier?.price || calculation.grandTotal,
+      },
+      capture: true,
+      ...(orderType === 'create-menual' ? {
+        tracking_number: manualOrderData.trackingNumber,
+        courier_id: manualOrderData.courierId,
+        amount: manualOrderData.amount,
+      } : {}),
+    };
+
+    if (orderID) {
+      consignOrder(
+        { orderId: orderID, data: payload },
+        {
+          onSuccess: () => {
+            showToast('Order consigned successfully', 'success');
+            navigate(`${role === 'admin' ? '/admin' : ''}/orders/edit/${orderID}`);
+          },
+          onError: (err: any) => {
+            showToast(err?.response?.data?.message || 'Failed to consign order', 'error');
+          },
+        }
+      );
+    }
+  }, [
+    termsAccepted,
+    ratesAccepted,
+    dangerousGoodsAccepted,
+    selectedCustomer,
+    orderDetail?.sender_details?.customer_id,
+    addressData.sender,
+    addressData.receiver,
+    itemsData,
+    courierData,
+    insuranceSelected,
+    signatureSelected,
+    deliveryInstructions,
+    pickupDate,
+    quoteData?.courier,
+    calculation,
+    orderType,
+    manualOrderData,
+    orderID,
+    consignOrder,
+    navigate,
+    role,
+  ]);
+
+  return {
+    orderType,
+    orderID,
+    role,
+    user,
+    saveLoading,
+    walletLoading,
+    isOrderLoading,
+    isDownloadingLabel,
+    isCancelling,
+    isConsigning,
+    globalCouriers,
+    orderDetail,
+    isEditable,
+    walletCheckOpen,
+    setWalletCheckOpen,
+    walletCheckData,
+    quoteData,
+    setQuoteData,
+    courierData,
+    setCourierData,
+    addressData,
+    setAddressData,
+    manualOrderData,
+    setManualOrderData,
+    showCancelModal,
+    setShowCancelModal,
+    showItemCountModal,
+    setShowItemCountModal,
+    insuranceSelected,
+    signatureSelected,
+    orderDialogMode,
+    setOrderDialogMode,
+    deliveryInstructions,
+    isEdit,
+    termsAccepted,
+    setTermsAccepted,
+    ratesAccepted,
+    setRatesAccepted,
+    dangerousGoodsAccepted,
+    setDangerousGoodsAccepted,
+    pickupDate,
+    setPickupDate,
+    selectedCustomer,
+    setSelectedCustomer,
+    itemsData,
+    updateItem,
+    fullUpdateItem,
+    addItem,
+    removeItem,
+    handleAddressSubmit,
+    onEditClick,
+    handleOptionalFieldsChange,
+    calculation,
+    requiresManualLabel,
+    handleOnSave,
+    onCancelOrder,
+    handleConsign,
+    downloadLabel,
+  };
+};

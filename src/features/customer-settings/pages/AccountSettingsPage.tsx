@@ -8,6 +8,7 @@ import { CustomModel } from '@/components/ui/dialog';
 import { showToast } from '@/components/ui/custom-toast';
 import { PlaceAutocomplete } from '@/components/common/AutoComplateAddress';
 import { useAppSelector } from '@/hooks/store.hooks';
+import SubscriptionPlanModal from '../components/SubscriptionPlanModal';
 
 const cardVariants = {
   hidden: { opacity: 0, y: 20 },
@@ -25,6 +26,7 @@ const cardVariants = {
 export default function AccountSettingsPage() {
   const [isEditingProfile, setIsEditingProfile] = useState(true);
   const [isPasswordOpen, setIsPasswordOpen] = useState(false);
+  const [isPlanModalOpen, setIsPlanModalOpen] = useState(false);
   const { user } = useAppSelector((state) => state.auth);
   console.log(user, 'user...')
 
@@ -351,7 +353,11 @@ export default function AccountSettingsPage() {
           <Card className="w-full border-gray-200/60 shadow-sm rounded-md">
             <CardHeader className="flex flex-row items-center justify-between px-6 py-4 border-b border-gray-100 dark:border-zinc-800 bg-slate-50/30 dark:bg-zinc-950 space-y-0 rounded-t-md">
               <CardTitle className="text-[15px] font-medium text-gray-800 dark:text-zinc-200">Plan Information</CardTitle>
-              <Button size="sm" className="h-8 px-4 text-[13px] font-medium text-white shadow-sm shrink-0 rounded-sm">
+              <Button
+                size="sm"
+                className="h-8 px-4 text-[13px] font-medium text-white shadow-sm shrink-0 rounded-sm"
+                onClick={() => setIsPlanModalOpen(true)}
+              >
                 Upgrade Plan
               </Button>
             </CardHeader>
@@ -473,6 +479,10 @@ export default function AccountSettingsPage() {
         </div>
       </CustomModel>
 
+      <SubscriptionPlanModal
+        open={isPlanModalOpen}
+        onOpenChange={setIsPlanModalOpen}
+      />
     </div>
   );
 }

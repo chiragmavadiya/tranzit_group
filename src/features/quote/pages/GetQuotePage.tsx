@@ -39,8 +39,6 @@ export default function GetQuotePage() {
   // const [courierData, setCourierData] = useState<any>({});
   const [quoteData, setQuoteData] = useState<any>({});
 
-  console.log(quoteData, 'quoteData')
-
   const calculation = useMemo(() => {
     const totalItems = itemsData?.reduce((acc, item) => acc + (Number(item.quantity) || 1), 0) || 0;
     const totalWeight = itemsData?.reduce((acc, item) => acc + (Number(item.weight) * (Number(item.quantity) || 1)), 0) || 0;

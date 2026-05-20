@@ -283,14 +283,14 @@ export const InvoicePaper: React.FC<InvoicePaperProps> = ({
             <Table className="min-w-[1000px]">
               <TableHeader className="bg-slate-50/50 dark:bg-zinc-800/50">
                 <TableRow className="hover:bg-transparent border-b border-slate-200 dark:border-zinc-800">
-                  <TableHead className="text-[10px] font-black uppercase text-slate-500 py-3">Type</TableHead>
-                  <TableHead className="text-[10px] font-black uppercase text-slate-500 py-3">Date</TableHead>
-                  <TableHead className="text-[10px] font-black uppercase text-slate-500 py-3">Order Number/Description</TableHead>
-                  <TableHead className="text-[10px] font-black uppercase text-slate-500 py-3">From</TableHead>
-                  <TableHead className="text-[10px] font-black uppercase text-slate-500 py-3">Destination</TableHead>
-                  <TableHead className="text-[10px] font-black uppercase text-slate-500 py-3">To</TableHead>
-                  <TableHead className="text-[10px] font-black uppercase text-slate-500 py-3">Receiver</TableHead>
-                  <TableHead className="text-[10px] font-black uppercase text-slate-500 py-3 text-right">Amount</TableHead>
+                  <TableHead className="text-xs font-bold text-slate-500 py-3">Type</TableHead>
+                  <TableHead className="text-xs font-bold text-slate-500 py-3">Date</TableHead>
+                  <TableHead className="text-xs font-bold text-slate-500 py-3">Order Number/Description</TableHead>
+                  <TableHead className="text-xs font-bold text-slate-500 py-3">From</TableHead>
+                  <TableHead className="text-xs font-bold text-slate-500 py-3">Destination</TableHead>
+                  <TableHead className="text-xs font-bold text-slate-500 py-3">To</TableHead>
+                  <TableHead className="text-xs font-bold text-slate-500 py-3">Receiver</TableHead>
+                  <TableHead className="text-xs font-bold text-slate-500 py-3 text-right">Amount</TableHead>
                   {isAdmin && <TableHead className="text-[9px] font-black uppercase text-slate-400 py-3 text-center"></TableHead>}
                 </TableRow>
               </TableHeader>

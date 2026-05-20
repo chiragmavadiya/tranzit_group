@@ -1,6 +1,6 @@
-import type { TabType } from '@/features/orders/types';
+import type { TabType } from '../types';
 
-export const TABS: TabType[] = ['New', 'Printed', 'Shipped', 'Archived'];
+export const TABS: TabType[] = ['new', 'printed', 'shipped', 'archived'];
 
 export const Order_status_styles: Record<string, string> = {
   New: 'bg-primary/10 dark:bg-primary/30 text-primary border-primary/20',
@@ -20,4 +20,3 @@ export const Order_status_styles: Record<string, string> = {
   cancelled: 'bg-red-100 text-red-800 dark:bg-red-900/20 dark:text-red-400',
   draft: 'bg-gray-100 text-gray-800 dark:bg-gray-900/20 dark:text-gray-400',
 };
-

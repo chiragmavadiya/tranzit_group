@@ -37,19 +37,16 @@ export const PlaceAutocomplete = ({ onPlaceSelect, ...rest }: PlaceAutocompleteP
             fields: ['address_components', 'geometry', 'formatted_address'],
             componentRestrictions: { country: 'au' }
         };
-        console.log(places, 'places')
 
         const autocomplete = new places.Autocomplete(inputRef.current, options);
         setPlaceAutocomplete(autocomplete);
     }, [places]);
 
     useEffect(() => {
-        console.log(placeAutocomplete, 'placeAutocomplete')
         if (!placeAutocomplete) return;
 
         placeAutocomplete.addListener('place_changed', () => {
             const place = placeAutocomplete.getPlace();
-            console.log(place, "place")
             if (!place.address_components) return;
 
             // 2. Map Google components to the fields in image_ed5179.png
@@ -88,7 +85,6 @@ export const PlaceAutocomplete = ({ onPlaceSelect, ...rest }: PlaceAutocompleteP
                 address.address1 = `${address.street_number} ${address.street_name} ${address.street_type}`;
             });
 
-            console.log(address, 'address')
             onPlaceSelect(address);
         });
     }, [onPlaceSelect, placeAutocomplete]);

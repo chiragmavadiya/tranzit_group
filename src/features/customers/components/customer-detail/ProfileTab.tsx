@@ -29,11 +29,11 @@ export const ProfileTab = ({ customerId }: ProfileTabProps) => {
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 animate-in fade-in slide-in-from-left-4 duration-500">
             {/* Left Column: Details */}
             <div className="lg:col-span-4 flex flex-col gap-6">
-                <Card className="bg-white dark:bg-zinc-900 gap-1 shadow-lg border-none rounded-3xl overflow-hidden">
-                    <CardHeader className="">
+                <Card className="bg-white dark:bg-zinc-900 gap-1 shadow-lg border-none rounded-sm overflow-hidden">
+                    <CardHeader className="p-4 border-b border-slate-100">
                         <SectionHeader title="About" icon={Users} />
                     </CardHeader>
-                    <CardContent className="flex flex-col gap-2">
+                    <CardContent className="flex flex-col gap-2 p-4">
                         <DetailItem label="Full Name" value={customer.about.full_name} icon={Users} />
                         <DetailItem label="Status" value={customer.about.status} icon={CheckCircle2} />
                         <DetailItem label="Role" value={customer.about.role} icon={Settings} />

@@ -16,7 +16,6 @@ export default function Layout() {
 
   useEffect(() => {
     const handleResize = () => {
-      console.log(window.innerWidth < 1280)
       setIsCollapsed(window.innerWidth < 1280);
     };
 

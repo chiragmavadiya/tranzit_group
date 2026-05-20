@@ -100,27 +100,21 @@ export default function OnboardingPage() {
       if (!formData[field as keyof typeof formData]) return false;
     }
 
-    console.log('1')
     if (!/^\d{10}$/.test(formData.mobile.replace(/\s/g, ''))) {
       showToast("Invalid mobile number", "error");
       return false;
     };
-    console.log('2')
     if (!/^\d{4}$/.test(formData.postcode)) return false;
-    console.log('3')
 
     if (formData.hasBillingAddress) {
       const billingRequired = [
         'billing_street_number', 'billing_street_name', 'billing_street_type',
         'billing_suburb', 'billing_state', 'billing_postcode'
       ];
-      console.log('4')
       for (const field of billingRequired) {
         if (!formData[field as keyof typeof formData] || formData[field as keyof typeof formData] === "") return false;
       }
-      console.log('5')
       if (!/^\d{4}$/.test(formData.billing_postcode)) return false;
-      console.log('6')
     }
 
     // if (!formData.agree_privacy || !formData.accept_terms) return false;

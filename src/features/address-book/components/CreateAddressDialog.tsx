@@ -57,7 +57,6 @@ export function CreateAddressDialog({
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     setSubmited(true);
-    console.log(formData);
     if (
       formData.code.trim().length === 0 ||
       formData.contact_person.trim().length === 0 ||
@@ -85,7 +84,6 @@ export function CreateAddressDialog({
     setFormData({ ...data })
   }, [open, detailsData])
 
-  console.log(formData.address, 'formData.address')
   return (
     <CustomModel
       title={editingAddressId ? 'Edit Address' : 'Add New Address'}

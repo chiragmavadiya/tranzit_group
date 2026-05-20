@@ -99,9 +99,7 @@ export default function InvoicesPage() {
   }, []);
 
   const handleView = useCallback((invoiceNumber: string) => {
-    console.log(invoiceNumber);
     const path = isAdmin ? `/admin/invoices/${invoiceNumber}` : `/invoices/${invoiceNumber}`;
-    console.log(path, 'path,...')
     navigate(path);
   }, [isAdmin, navigate]);
 

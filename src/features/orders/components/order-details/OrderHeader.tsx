@@ -20,8 +20,8 @@ interface OrderHeaderProps {
   onDownloadLabel?: () => void
   isDownloadingLabel?: boolean
   orderDetail: OrderDetailData
-  selectedCustomer: string
-  setSelectedCustomer: React.Dispatch<React.SetStateAction<string>>
+  selectedCustomer?: number
+  setSelectedCustomer: React.Dispatch<React.SetStateAction<number | undefined>>
   onCancelOrder?: () => void
   isCancelling?: boolean
   onConsign?: () => void
@@ -60,7 +60,7 @@ export const OrderHeader: React.FC<OrderHeaderProps> = ({
 
   const handleBack = () => {
     if (orderType !== 'create' && orderType !== 'create-menual') {
-      navigate(`${role === 'admin' ? '/admin' : ''}/orders`)
+      navigate(`${role === 'admin' ? '/admin' : ''}/orders?tab=${localStorage.getItem('order_tab') || 'new'}`)
     } else {
       setShowConfirm(true)
     }
@@ -68,7 +68,7 @@ export const OrderHeader: React.FC<OrderHeaderProps> = ({
 
   const handleDiscard = () => {
     setShowConfirm(false)
-    navigate(-1)
+    navigate(`${role === 'admin' ? '/admin' : ''}/orders?tab=${localStorage.getItem('order_tab') || 'new'}`)
   }
 
   const handleSave = () => {
@@ -174,9 +174,10 @@ export const OrderHeader: React.FC<OrderHeaderProps> = ({
                   variant="outline"
                   onClick={() => setShowCancelModal(true)}
                   className="flex items-center gap-2 border-red-200 dark:border-red-900/30 text-red-600 dark:text-red-400 font-bold h-8 px-4 text-xs hover:bg-red-50 dark:hover:bg-red-950/30 transition-colors"
+                  disabled={orderDetail?.cancel_request !== null}
                 >
                   <Trash2 className="h-4 w-4" />
-                  DELETE ORDER
+                  {orderDetail?.cancel_request !== null ? 'CANCEL REQUESTED' : 'DELETE ORDER'}
                 </Button>
               )}
             </>
@@ -214,8 +215,8 @@ export const OrderHeader: React.FC<OrderHeaderProps> = ({
             <FormSelect
               label={(orderType !== "create" && orderType !== "create-menual") ? "" : "Customer"}
               placeholder="Select Customer"
-              value={selectedCustomer}
-              onValueChange={(val) => setSelectedCustomer(val || 'all')}
+              value={selectedCustomer?.toString() || ""}
+              onValueChange={(val) => setSelectedCustomer(val ? Number(val) : undefined)}
               options={customersData?.data?.map((c: any) => ({
                 value: c.id.toString(),
                 label: `${c.first_name} ${c.last_name}`

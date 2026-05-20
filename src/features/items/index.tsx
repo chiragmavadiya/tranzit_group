@@ -5,7 +5,7 @@ import type { Item, ItemFormData } from './types';
 import { DataTable } from '@/components/common/DataTable';
 import type { Column } from '@/components/common/types/DataTable.types';
 import { Button } from '@/components/ui/button';
-import { Pencil, Trash } from 'lucide-react';
+import { Pencil, Star, Trash } from 'lucide-react';
 import { ConformationModal } from '@/components/common/ConformationModal';
 
 import {
@@ -119,12 +119,25 @@ export default function MyItemsPage() {
   // }, []);
 
   const columns = useMemo<Column<Item>[]>(() => [
+    // {
+    //   key: "select",
+    //   header: "",
+    //   cell: () => (
+    //     <Star className='h-4 w-4 text-amber-400 fill-amber-400' />
+    //   )
+    // },
     {
       key: "item_name",
       accessor: "item_name",
       header: "Item Name",
       sortable: true,
       searchable: true,
+      cell: (val, _, index) => (
+        <div className='flex items-center gap-3'>
+          <Star className={`h-4 w-4 ${index === 0 ? 'fill-amber-400 text-amber-400' : 'text-primary-400'}`} />
+          <span className='text-xs font-medium'>{val}</span>
+        </div>
+      )
     },
     {
       key: "item_code",

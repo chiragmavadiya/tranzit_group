@@ -3,7 +3,7 @@ import type { Order } from "./types";
 import type { Column } from "@/components/common/types/DataTable.types";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
-import { Eye, PackagePlus } from "lucide-react";
+import { Download, Eye, PackagePlus, Pencil, Trash } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { CustomTooltip } from "@/components/common/CustomTooltip";
 
@@ -25,60 +25,73 @@ const StatusBadge = ({ status }: { status: string }) => {
   );
 };
 
-export const getOrdersColumns = (role: string = "customer", orderType: string = 'new', navigate: any): Column<Order>[] => [
-  {
-    header: 'ORDER #',
-    key: 'order_number',
-    className: 'text-primary font-bold',
-    sticky: 'left',
-    cell: (value: string) => (
-      <NavLink to={`${role === "admin" ? "/admin/orders/edit" : "/orders/edit"}/${value}`} className="font-bold text-primary underline">
-        {value}
-      </NavLink>
-    )
+export const getOrdersColumns = (
+  role: string = "customer",
+  orderType: string = 'new',
+  navigate: any,
+  customerEditClick: (id: string) => void,
+  onDownloadLabel?: (orderId: string) => void,
+  onCancelOrder?: (orderId: string) => void,
+): Column<Order>[] => [
+    {
+      header: 'ORDER #',
+      key: 'order_number',
+      className: 'text-primary font-bold',
+      // sticky: 'left',
+      cell: (value: string) => (
+        <NavLink to={`${role === "admin" ? "/admin/orders/edit" : "/orders/edit"}/${value}`} className="font-bold text-primary underline">
+          {value}
+        </NavLink>
+      )
 
-  },
-  {
-    header: 'CUSTOMER NAME', key: 'customer_name'
-  },
-  {
-    header: 'SUBURB', key: 'suburb'
-  },
-  {
-    header: 'AMOUNT', key: 'amount'
-  },
-  {
-    header: 'STATUS', key: 'status', cell: (value: string) => <StatusBadge status={value === "Payment pending" ? "Courier not assign" : value} />
-  },
-  {
-    header: 'PAYMENT STATUS', key: 'payment_status', cell: (value: string) => <StatusBadge status={value} />
-  },
-  {
-    header: 'COURIER', key: 'courier'
-  },
-  {
-    header: 'ORDER TYPE', key: 'order_type'
-  },
-  {
-    header: 'ORDER DATE', key: 'consignment_date'
-  },
-  {
-    header: "",
-    key: "order_number",
-    cell: (value: string) => {
-      if (orderType === "new") {
-        return (
-          <div className="flex gap-2">
-            <CustomTooltip title="Preview Order">
-              <Button
-                onClick={() => navigate(`${role === "admin" ? "/admin/orders/edit" : "/orders/edit"}/${value}`)}
-                variant="ghost"
-                size="sm"
-                className="h-fit w-fit p-0"
-              >
-                <Eye className="h-4 w-4" />
-              </Button>
-            </CustomTooltip>
+    },
+    {
+      header: 'CUSTOMER NAME',
+      key: 'customer_name',
+      cell: (value: string, row: Order) => (
+        <div className="flex justify-between">
+          {value}
+          <Pencil onClick={() => customerEditClick(row.order_number)} className="h-3 w-3 cursor-pointer text-primary hidden group-hover/row:block" />
+        </div>
+      )
+    },
+    {
+      header: 'SUBURB', key: 'suburb'
+    },
+    {
+      header: 'AMOUNT', key: 'amount'
+    },
+    {
+      header: 'STATUS', key: 'status', cell: (value: string) => <StatusBadge status={value === "Payment pending" ? "Courier not assign" : value} />
+    },
+    {
+      header: 'PAYMENT STATUS', key: 'payment_status', cell: (value: string) => <StatusBadge status={value} />
+    },
+    {
+      header: 'COURIER', key: 'courier'
+    },
+    {
+      header: 'ORDER TYPE', key: 'order_type'
+    },
+    {
+      header: 'ORDER DATE', key: 'consignment_date'
+    },
+    {
+      header: "",
+      key: "order_number",
+      cell: (value: string) => (
+        <div className="flex gap-2" onClick={(e) => e.stopPropagation()}>
+          <CustomTooltip title="Preview Order">
+            <Button
+              onClick={() => navigate(`${role === "admin" ? "/admin/orders/edit" : "/orders/edit"}/${value}`)}
+              variant="ghost"
+              size="sm"
+              className="h-fit w-fit p-0"
+            >
+              <Eye className="h-4 w-4" />
+            </Button>
+          </CustomTooltip>
+          {orderType === 'new' && (
             <CustomTooltip title="Consign Order">
               <Button
                 onClick={() => navigate(`${role === "admin" ? "/admin/orders/consign" : "/orders/consign"}/${value}`)}
@@ -89,9 +102,32 @@ export const getOrdersColumns = (role: string = "customer", orderType: string = 
                 <PackagePlus className="h-4 w-4" />
               </Button>
             </CustomTooltip>
-          </div>
-        )
-      }
+          )}
+          {orderType === 'printed' && (
+            <>
+              <CustomTooltip title="Download Label">
+                <Button
+                  onClick={() => onDownloadLabel?.(value)}
+                  variant="ghost"
+                  size="sm"
+                  className="h-fit w-fit p-0 group/button"
+                >
+                  <Download className="h-4 w-4 text-primary" />
+                </Button>
+              </CustomTooltip>
+              <CustomTooltip title="Cancel Order">
+                <Button
+                  onClick={() => onCancelOrder?.(value)}
+                  variant="ghost"
+                  size="sm"
+                  className="h-fit w-fit p-0 group/button"
+                >
+                  <Trash className="h-4 w-4 group-hover/button:text-destructive" />
+                </Button>
+              </CustomTooltip>
+            </>
+          )}
+        </div>
+      )
     }
-  }
-];
+  ];

@@ -75,6 +75,8 @@ export type OrderDetailData = {
             country: string,
             street_name: string,
             street_number: string,
+            street_type: string,
+            unit_number?: string,
         }
         company?: string,
     }

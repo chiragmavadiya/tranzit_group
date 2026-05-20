@@ -129,7 +129,7 @@ export default function ParcelReportPage() {
       });
     }
   };
-  console.log(customersData, 'customersData')
+
   return (
     <div className="flex flex-col flex-1 gap-6 p-page-padding min-h-0 animate-in fade-in slide-in-from-bottom-2 duration-500 bg-slate-50/30 dark:bg-zinc-950/30">
 

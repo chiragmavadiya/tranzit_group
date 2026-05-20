@@ -189,7 +189,7 @@ function SelectComponent({ data, defaultValue, placeholder, className, value, on
   return (
     <Select name={name} defaultValue={defaultValue} value={value} onValueChange={onValueChange} items={data} disabled={disabled}>
       <div className="relative">
-        <SelectTrigger className={cn("w-full text-xs h-10 rounded-md border-gray-200 dark:border-zinc-800 dark:bg-zinc-900 transition-colors placeholder:text-slate-300 dark:placeholder:text-zinc-700", className)}>
+        <SelectTrigger className={cn("w-full cursor-pointer text-xs h-10 rounded-sm border-gray-200 dark:border-zinc-800 dark:bg-zinc-900 transition-colors placeholder:text-slate-300 dark:placeholder:text-zinc-700", className)}>
           <SelectValue placeholder={placeholder} className="data-placeholder:font-normal data-placeholder:text-muted-foreground dark:placeholder:text-zinc-700" />
         </SelectTrigger>
         {allowClear && !disabled && value && <X className="absolute right-[10px] top-[50%] disabled:hidden  origin-center translate-y-[-50%] size-4 text-muted-foreground bg-white dark:bg-zinc-900 cursor-pointer" onClick={(e) => { console.log('cliecnk....'); e.preventDefault(); onValueChange?.('') }} />}

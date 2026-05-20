@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { FormInput, FormSelect } from '@/features/orders/components/OrderFormUI';
 import type { AddressData, CreateOrderDialogProps } from '@/features/orders/types';
@@ -10,20 +10,38 @@ import { cn } from '@/lib/utils';
 import { STATES } from '@/constants';
 import { AutoComplete } from '@/components/common';
 import { useAddressBookSearch } from '@/features/address-book/hooks/useAddressBook';
+import { useDebounce } from '@/hooks/useDebounce';
+import { useOrderDetails } from '../hooks/useOrders';
 
-export default function CreateOrderDialog({ onOpenChange, type, open, initialData, onSubmit, isEdit }: CreateOrderDialogProps) {
+export default function CreateOrderDialog({ onOpenChange, type, open, initialData, onSubmit, isEdit, orderId }: CreateOrderDialogProps) {
   const navigate = useNavigate();
-  const [formData, setFormData] = useState<AddressData>(initialData);
+  const [formData, setFormData] = useState<AddressData>({
+    email: "",
+    phone: "",
+    company: "",
+    address: "",
+    address1: "",
+    suburb: "",
+    state: "",
+    street_name: "",
+    unit_number: "",
+    street_number: "",
+    postcode: "",
+    country: "",
+    name: "",
+    saveToAddressBook: false
+  });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [searchAddress, setSearchAddress] = useState('');
   // const [isSuccess, setIsSuccess] = useState(false);
   const [activeLookup, setActiveLookup] = useState<string>('address');
 
-  const { data: addressBookData } = useAddressBookSearch(searchAddress);
-
+  const debouncedSearchAddress = useDebounce(searchAddress, 400);
+  const { data: addressBookData } = useAddressBookSearch(debouncedSearchAddress);
+  const { data: orderResponse, isLoading: isOrderLoading } = useOrderDetails(orderId || '')
+  console.log(orderResponse, isOrderLoading, orderId, 'addre...')
   const options = useMemo(() => {
     if (!addressBookData?.data) return [];
-    console.log(addressBookData)
     return addressBookData.data.map((item) => ({
       value: item.value,
       label: item.label,
@@ -52,7 +70,6 @@ export default function CreateOrderDialog({ onOpenChange, type, open, initialDat
     setIsSubmitting(true);
     const { address1, country, name, postcode, state, street_name, street_number, suburb, phone, email } = formData;
     if (!name || !address1 || !street_number || !street_name || !suburb || !state || !postcode || !country || !phone || !email) {
-      console.log(formData, 'formData')
       showToast("Please fill in all required fields", "error");
       return;
     }
@@ -79,7 +96,32 @@ export default function CreateOrderDialog({ onOpenChange, type, open, initialDat
     if (value) return
     navigate(-1);
   }
-  console.log(formData, 'formDataformData..')
+
+  useEffect(() => {
+    if (initialData) setFormData(initialData);
+  }, [initialData])
+
+  useEffect(() => {
+    if (orderResponse?.data) {
+      setFormData({
+        email: orderResponse?.data.receiver_details.email,
+        phone: orderResponse?.data.receiver_details.mobile,
+        company: orderResponse?.data.receiver_details.company || '',
+        address: orderResponse?.data.receiver_details.address,
+        address1: orderResponse?.data.receiver_details.address_detail.address_line,
+        suburb: orderResponse?.data.receiver_details.address_detail.suburb,
+        state: orderResponse?.data.receiver_details.address_detail.state,
+        street_name: orderResponse?.data.receiver_details.address_detail.street_name,
+        street_number: orderResponse?.data.receiver_details.address_detail.street_number,
+        street_type: orderResponse?.data.receiver_details.address_detail.street_type,
+        postcode: orderResponse?.data.receiver_details.address_detail.postcode,
+        country: orderResponse?.data.receiver_details?.address_detail?.country || 'Australia',
+        name: orderResponse?.data.receiver_details?.name,
+        saveToAddressBook: false,
+      });
+    }
+  }, [orderResponse])
+
   return (
     <CustomModel
       open={open}
@@ -183,7 +225,7 @@ export default function CreateOrderDialog({ onOpenChange, type, open, initialDat
             {/* Left Column */}
             <div className="col-span-12 md:col-span-6 space-y-2">
               <FormInput
-                label="NAME"
+                label="Name"
                 value={formData.name}
                 onChange={val => updateField('name', val)}
                 layout="horizontal"
@@ -194,7 +236,7 @@ export default function CreateOrderDialog({ onOpenChange, type, open, initialDat
                 className='rounded-none'
               />
               <FormInput
-                label="EMAIL"
+                label="Email"
                 value={formData.email}
                 onChange={val => updateField('email', val)}
                 layout="horizontal"
@@ -204,7 +246,7 @@ export default function CreateOrderDialog({ onOpenChange, type, open, initialDat
                 errormsg={!formData.email?.trim() ? "Please enter your email" : "Please enter a valid email address"}
               />
               <FormInput
-                label="PHONE"
+                label="Phone"
                 value={formData.phone}
                 onChange={val => updateField('phone', val)}
                 layout="horizontal"
@@ -215,7 +257,7 @@ export default function CreateOrderDialog({ onOpenChange, type, open, initialDat
               />
               <div className="space-y-4">
                 <FormInput
-                  label="COMPANY"
+                  label="Company"
                   value={formData.company}
                   onChange={val => updateField('company', val)}
                   layout="horizontal"
@@ -230,14 +272,14 @@ export default function CreateOrderDialog({ onOpenChange, type, open, initialDat
             {/* Right Column */}
             <div className="col-span-12 md:col-span-6 space-y-2">
               <FormInput
-                label="UNIT NUMBER"
+                label="Unit Number"
                 value={formData.unit_number}
                 onChange={val => updateField('unit_number', val)}
                 layout="horizontal"
                 placeholder='Enter unit number'
               />
               <FormInput
-                label="STREET NAME"
+                label="Street Name"
                 value={formData.street_name}
                 onChange={val => updateField('street_name', val)}
                 layout="horizontal"
@@ -247,7 +289,7 @@ export default function CreateOrderDialog({ onOpenChange, type, open, initialDat
                 errormsg="Please enter your street name"
               />
               <FormInput
-                label="STREET NUMBER"
+                label="Street Number"
                 value={formData.street_number}
                 onChange={val => updateField('street_number', val)}
                 layout="horizontal"
@@ -257,7 +299,7 @@ export default function CreateOrderDialog({ onOpenChange, type, open, initialDat
                 errormsg="Please enter your street number"
               />
               <FormInput
-                label="SUBURB"
+                label="Suburb"
                 value={formData.suburb}
                 onChange={val => updateField('suburb', val ?? '')}
                 layout="horizontal"
@@ -267,7 +309,7 @@ export default function CreateOrderDialog({ onOpenChange, type, open, initialDat
                 errormsg="Please enter your suburb"
               />
               <FormInput
-                label="POSTCODE"
+                label="Postcode"
                 value={formData.postcode}
                 onChange={val => updateField('postcode', val ?? '')}
                 // options={POSTCODES}
@@ -298,7 +340,7 @@ export default function CreateOrderDialog({ onOpenChange, type, open, initialDat
 
               <div className="space-y-4">
                 <FormInput
-                  label="COUNTRY"
+                  label="Country"
                   value={formData.country}
                   onChange={val => updateField('country', val)}
                   layout="horizontal"

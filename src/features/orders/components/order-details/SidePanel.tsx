@@ -32,7 +32,7 @@ interface SidePanelProps {
 }
 
 export const SidePanel: React.FC<SidePanelProps> = ({ calculation, handleOptionalFieldsChange, insuranceSelected, signatureSelected, deliveryInstructions, pickupDate, setPickupDate, orderType, liability = false, liabilityMessage }) => {
-  const isCreate = useMemo(() => orderType === 'create' || orderType === 'create-menual', [orderType]);
+  const isCreate = useMemo(() => orderType === 'create' || orderType === 'create-menual' || orderType === 'consign', [orderType]);
   return (
     <div className="flex flex-col gap-4">
       <Accordion multiple defaultValue={['notes', 'services', 'summary', "support", "liability"]} className="flex flex-col gap-3">
@@ -303,7 +303,7 @@ export const SidePanel: React.FC<SidePanelProps> = ({ calculation, handleOptiona
         </AccordionItem> */}
 
         {/* LIABILITY COVER */}
-        {(orderType !== "create" && orderType !== "create-menual") && (
+        {!isCreate && (
           <AccordionItem value="liability" className={cn(
             "border rounded-xl shadow-sm px-5 border-b overflow-hidden transition-colors duration-300 [&>h3]:my-0",
             liability

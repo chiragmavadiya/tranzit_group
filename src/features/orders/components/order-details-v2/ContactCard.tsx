@@ -19,7 +19,7 @@ export const ContactCard = ({
     mobile: string
     address: string
 }) => (
-    <Card className="border-border/60 bg-white shadow-sm">
+    <Card className="border-border/60 bg-white">
         <CardHeader className="border-b border-border/60 pb-4">
             <CardTitle className="text-lg">{title}</CardTitle>
             <CardDescription>Contact and address information</CardDescription>

@@ -312,11 +312,10 @@ export default function EcommerceIntegrationsPage() {
 
   return (
     <div className="flex flex-col gap-6 h-full">
-      <div className="bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-800 rounded-xl shadow-sm overflow-hidden flex flex-col flex-1">
-        {integrationsData.length === 0 && !loadingList ? (
-          <div className="flex flex-col flex-1">
-            {/* Header */}
-            {/* <div className="flex justify-between items-center border-b border-gray-100 dark:border-zinc-800 p-4">
+      {integrationsData.length === 0 && !loadingList ? (
+        <div className="flex flex-col flex-1">
+          {/* Header */}
+          {/* <div className="flex justify-between items-center border-b border-gray-100 dark:border-zinc-800 p-4">
               <div className="flex flex-col">
                 <h1 className="text-lg font-bold text-gray-800 dark:text-zinc-200 my-0">Ecommerce Integrations</h1>
                 <p className="text-sm text-gray-500 dark:text-zinc-400 mb-0">Connect your online stores to automatically sync orders.</p>
@@ -327,22 +326,24 @@ export default function EcommerceIntegrationsPage() {
               </Button>
             </div> */}
 
-            {/* Centered Empty State Box */}
-            <div className="flex-1 flex items-center justify-center p-8 bg-gray-50/30 dark:bg-zinc-950/20">
-              <div className="bg-white dark:bg-zinc-900 border border-gray-100 dark:border-zinc-800 p-10 rounded-2xl shadow-[0_4px_20px_rgba(0,0,0,0.03)] dark:shadow-none text-center flex flex-col items-center max-w-sm w-full gap-5">
-                <div className="w-12 h-12 rounded-xl bg-primary/5 dark:bg-primary/10 flex items-center justify-center text-primary">
-                  <Store className="w-6 h-6" />
-                </div>
-                <p className="text-xs text-slate-500 dark:text-zinc-400 font-medium leading-relaxed max-w-[280px]">
-                  Our platform integrates with all your stores and marketplaces and with your favorite couriers. So you can batch orders, print labels, and send tracking to your customers in fewer clicks than ever.
-                </p>
-                <Button onClick={() => setIsAddOpen(true)} className="h-8 bg-primary hover:bg-primary/90 text-white font-semibold text-[13px] px-6 rounded-sm">
-                  Click to connect your first channel
-                </Button>
+          {/* Centered Empty State Box */}
+          <div className="flex-1 flex items-center justify-center p-8 bg-gray-50/30 dark:bg-zinc-950/20">
+            <div className="bg-white dark:bg-zinc-900 border border-gray-100 dark:border-zinc-800 p-10 rounded-2xl shadow-[0_4px_20px_rgba(0,0,0,0.03)] dark:shadow-none text-center flex flex-col items-center max-w-sm w-full gap-5">
+              <div className="w-12 h-12 rounded-xl bg-primary/5 dark:bg-primary/10 flex items-center justify-center text-primary">
+                <Store className="w-6 h-6" />
               </div>
+              <p className="text-xs text-slate-500 dark:text-zinc-400 font-medium leading-relaxed max-w-[280px]">
+                Our platform integrates with all your stores and marketplaces and with your favorite couriers. So you can batch orders, print labels, and send tracking to your customers in fewer clicks than ever.
+              </p>
+              <Button onClick={() => setIsAddOpen(true)} className="h-8 bg-primary hover:bg-primary/90 text-white font-semibold text-[13px] px-6 rounded-sm">
+                Click to connect your first Ecommerce Store
+              </Button>
             </div>
           </div>
-        ) : (
+        </div>
+      ) : (
+        <div className="bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-800 rounded-xl shadow-sm overflow-hidden flex flex-col flex-1">
+
           <DataTable
             data={integrationsData}
             columns={columns}
@@ -360,8 +361,8 @@ export default function EcommerceIntegrationsPage() {
               </Button>
             }
           />
-        )}
-      </div>
+        </div>
+      )}
 
       <Drawer
         open={isAddOpen}

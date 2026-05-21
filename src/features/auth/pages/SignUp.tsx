@@ -104,7 +104,7 @@ export default function SignUp() {
 
 
   return (
-    <>
+    <div className="w-lg">
       <div className="flex flex-col items-center text-center space-y-2 mb-8">
         <div className="flex items-center space-x-2 pb-2">
           <img src={brandlogo} alt="Logo" className="h-16 w-auto" />
@@ -259,6 +259,6 @@ export default function SignUp() {
           </Link>
         </p>
       </form>
-    </>
+    </div>
   );
 }

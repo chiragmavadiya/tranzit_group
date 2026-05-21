@@ -59,7 +59,7 @@ export function TransactionList({ transactions, className, loading }: Transactio
   );
 
   return (
-    <Card className={cn("border p-0 gap-0 ring-0 shadow-md border-gray-200 dark:border-zinc-800 rounded-xl bg-white dark:bg-zinc-950 flex flex-col transition-colors duration-300", className)}>
+    <Card className={cn("border p-0 gap-0 ring-0 border-gray-200 dark:border-zinc-800 bg-white dark:bg-zinc-950 flex flex-col transition-colors duration-300", className)}>
       <CardHeader className="flex flex-row items-center justify-between py-3 px-5 border-b border-gray-100 dark:border-zinc-800 bg-gray-50/50 dark:bg-transparent group-hover:bg-gray-50/50 dark:group-hover:bg-zinc-800/50 transition-colors">
         <div className="flex flex-col gap-0.5">
           <CardTitle className="text-lg font-bold text-gray-800 dark:text-zinc-100">

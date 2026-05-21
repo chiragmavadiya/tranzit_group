@@ -108,7 +108,21 @@ export const useUpdateAdminInvoice = () => {
       }
     },
     onError: (error: any) => {
-      showToast(error?.response?.data?.message || "Failed to update invoice", "error");
+      if (error?.response?.data?.errors) {
+        const beErrors = error.response.data.errors;
+        const formattedErrors: Record<string, string> = {};
+        Object.keys(beErrors).forEach(key => {
+          showToast(beErrors[key][0], "error");
+          formattedErrors[key] = beErrors[key][0];
+        });
+        console.log(formattedErrors, 'formattedErrors')
+        // setErrors(formattedErrors);
+        // if (formattedErrors.email || formattedErrors.order_prefix) {
+        //   setCurrentStep(0);
+        // }
+      } else {
+        showToast(error?.response?.data?.message || "Failed to update invoice", "error");
+      }
     },
   });
 };
@@ -197,6 +211,9 @@ export const useAdminInvoicePayment = () => {
           queryClient.invalidateQueries({ queryKey: ['admin', 'invoices', 'details', Number(variables.id)] });
         }
       },
+      onError: (error: any) => {
+        showToast(error?.response?.data?.message || "Failed to add payment", "error");
+      },
     }),
     update: useMutation({
       mutationFn: ({ invoiceId, paymentId, data }: { invoiceId: string | number; paymentId: string | number; data: any }) => invoicesService.updateAdminInvoicePayment(invoiceId, paymentId, data),
@@ -205,6 +222,9 @@ export const useAdminInvoicePayment = () => {
           showToast("Payment updated successfully", "success");
           queryClient.invalidateQueries({ queryKey: ['admin', 'invoices', 'details', Number(variables.invoiceId)] });
         }
+      },
+      onError: (error: any) => {
+        showToast(error?.response?.data?.message || "Failed to update payment", "error");
       },
     }),
     delete: useMutation({
@@ -215,6 +235,7 @@ export const useAdminInvoicePayment = () => {
           queryClient.invalidateQueries({ queryKey: ['admin', 'invoices', 'details', Number(variables.invoiceId)] });
         }
       },
+
     }),
   };
 };

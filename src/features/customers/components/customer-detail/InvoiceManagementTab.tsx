@@ -112,6 +112,7 @@ export const InvoiceManagementTab = ({ customerId }: InvoiceManagementTabProps) 
                     exportable
                     isExporting={isExporting}
                     onExport={handleExport}
+                    className='pb-3'
                 />
             </Card>
         </div>

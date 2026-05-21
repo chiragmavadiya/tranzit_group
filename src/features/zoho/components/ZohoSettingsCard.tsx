@@ -27,7 +27,7 @@ export function ZohoSettingsCard({
   isLoading
 }: ZohoSettingsCardProps) {
   return (
-    <Card className="p-6 border-gray-100 dark:border-zinc-800 shadow-sm bg-white dark:bg-zinc-950 flex flex-col">
+    <Card className="p-6 border-gray-100 dark:border-zinc-800 bg-white dark:bg-zinc-950 flex flex-col">
       <div className="flex items-center justify-between mb-2">
         <div className="flex items-center gap-3">
           <div className="w-10 h-10 rounded-xl bg-slate-100 dark:bg-zinc-900 flex items-center justify-center text-slate-600 dark:text-zinc-400">

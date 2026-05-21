@@ -1,105 +1,131 @@
-import { useEffect, useState, type ReactNode } from "react";
-import { Check, Sparkles } from "lucide-react";
-import { cn } from "@/lib/utils";
-import { useLocation } from "react-router-dom";
+import { type ReactNode } from "react";
+import { CheckCircle2, Star, Headphones, Zap, Rocket } from "lucide-react";
 
 interface AuthLayoutProps {
   children: ReactNode;
 }
 
-// Module-level variable to track if the animation has played once in the current project session
-let hasPlayedAuthAnimation = false;
+function CreditCardOff(props: React.ComponentProps<"svg">) {
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      width="24"
+      height="24"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      {...props}
+    >
+      <path d="M2 2l20 20" />
+      <path d="M5 5H3a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2" />
+      <path d="M23 17V7a2 2 0 0 0-2-2h-7" />
+      <path d="M1 10h18" />
+    </svg>
+  );
+}
 
 export function AuthLayout({ children }: AuthLayoutProps) {
-  const location = useLocation();
-  const [shouldAnimate] = useState(!hasPlayedAuthAnimation);
+  const features = [
+    {
+      icon: <CheckCircle2 className="h-6 w-6 text-[#f59e0b]" />,
+      label: "Onboarding",
+      title: "Free onboarding",
+    },
+    {
+      icon: <Zap className="h-6 w-6 text-[#f59e0b] fill-[#f59e0b]/20" />,
+      label: "Efficiency",
+      title: "Save up to 50% handling time",
+    },
+    {
+      icon: <Star className="h-6 w-6 text-[#f59e0b] fill-[#f59e0b]/20" />,
+      label: "Reliability",
+      title: "5-star rating",
+    },
+    {
+      icon: <Rocket className="h-6 w-6 text-[#f59e0b] fill-[#f59e0b]/20" />,
+      label: "Growth",
+      title: "Reach customers faster",
+    },
+    {
+      icon: <Headphones className="h-6 w-6 text-[#f59e0b]" />,
+      label: "Assistance",
+      title: "Local support",
+    },
+    {
+      icon: <CreditCardOff className="h-6 w-6 text-[#f59e0b]" />,
+      label: "Easy Access",
+      title: "No credit card required",
+    },
+  ];
 
-  useEffect(() => {
-    // Mark as played after the first mount
-    hasPlayedAuthAnimation = true;
-  }, []);
   return (
-    <div className="relative min-h-screen w-full flex items-center justify-center p-4 overflow-hidden bg-slate-50 dark:bg-zinc-950">
-      {/* Dynamic Background */}
-      <div className="absolute inset-0 z-0">
-        <div className="absolute inset-0 bg-[linear-gradient(165deg,#0a2540_0%,#215090_40%,#1e3a5f_100%)] opacity-95" />
+    <div className="grid min-h-screen grid-cols-1 lg:grid-cols-10">
+      {/* Left Column (Brand/Info) */}
+      <div className="relative hidden lg:flex flex-col justify-between p-12 lg:p-16 text-white overflow-hidden lg:col-span-6">
+        {/* Background Image */}
+        <div
+          className="absolute inset-0 bg-cover bg-center bg-no-repeat"
+          style={{
+            backgroundImage: `url("https://lh3.googleusercontent.com/aida-public/AB6AXuD8D4ZA_EG_GW9ylnj1k_YOXHHWXIiubUR4IEq1cA8mhwXeDkcjVhKoFQr4K_SF_L24bjr-e0lLbVJE5gGKHTjMFNyvJ8ALY5a_n5lhpjE1e_pmz9XMbuX3-E_0ClknJUPaocWsChkDfcrBnU-4y5PRrSxZr9IinVkRmM58SKxX1nCox0efm9264-TBVl7fN1nAkjB9-bS1Sepq6mFwhHPH0h6oaMLuTp9W0DAVomzLin3jyQqY_UrGasgf3HI7E1Ww3QSZOazNMRM")`,
+          }}
+        />
+        {/* Deep blue/navy-tint overlay */}
+        <div className="absolute inset-0 bg-[#0a2342]/90 mix-blend-multiply" />
 
-        {/* Animated Blobs */}
-        <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-white/10 rounded-full blur-[120px] animate-pulse" />
-        <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-primary/20 rounded-full blur-[120px] animate-pulse" style={{ animationDelay: '1s' }} />
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[60%] h-[60%] bg-blue-300/10 rounded-full blur-[150px] animate-pulse" style={{ animationDelay: '2s' }} />
+        {/* Content Wrapper */}
+        <div className="relative z-10 flex flex-col justify-between h-full">
+          <div>
+            {/* Title */}
+            <h1 className="text-4xl font-extrabold tracking-tight text-white lg:text-5xl leading-tight max-w-xl">
+              Shipping automation that just works
+            </h1>
+            {/* Description */}
+            <p className="mt-6 text-base text-slate-300 leading-relaxed max-w-xl">
+              Print labels, compare couriers, and track deliveries - all from one platform. No per-label fees • Bring your own rates*
+            </p>
 
-        {/* Floating Sparkles */}
-        <Sparkles className="absolute top-[15%] left-[10%] w-8 h-8 text-white/20 animate-bounce" style={{ animationDuration: '3s' }} />
-        <Sparkles className="absolute bottom-[15%] right-[10%] w-12 h-12 text-white/20 animate-bounce" style={{ animationDuration: '4s', animationDelay: '1s' }} />
-        <Sparkles className="absolute top-[60%] right-[15%] w-6 h-6 text-white/20 animate-spin" style={{ animationDuration: '5s' }} />
+            {/* Features Grid */}
+            <div className="grid grid-cols-2 gap-x-8 gap-y-10 mt-16 max-w-xl">
+              {features.map((feature, idx) => (
+                <div key={idx} className="flex items-start gap-4">
+                  <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-white/10 flex items-center justify-center border border-white/20 transition-transform group-hover:scale-110">
+                    {feature.icon}
+                  </div>
+                  <div className="flex flex-col">
+                    <span className="text-[11px] font-semibold uppercase tracking-wider text-slate-300">
+                      {feature.label}
+                    </span>
+                    <span className="text-sm font-bold text-white mt-1">
+                      {feature.title}
+                    </span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
 
-        {/* Subtle SVG Wave */}
-        <div className="absolute bottom-0 left-0 w-full opacity-10">
-          <svg viewBox="0 0 1440 320" xmlns="http://www.w3.org/2000/svg">
-            <path fill="#ffffff" fillOpacity="1" d="M0,160L48,176C96,192,192,224,288,213.3C384,203,480,149,576,144C672,139,768,181,864,202.7C960,224,1056,224,1152,197.3C1248,171,1344,117,1392,90.7L1440,64L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z"></path>
-          </svg>
+          {/* Pro Tip Card */}
+          <div className="relative mt-12 rounded-lg border-l-4 border-[#f59e0b] bg-white/5 p-6 backdrop-blur-sm max-w-xl border border-white/5">
+            <span className="text-[11px] font-black uppercase tracking-wider text-[#f59e0b]">
+              Pro Tip
+            </span>
+            <p className="mt-2 text-sm text-slate-200 leading-relaxed">
+              Join <strong className="font-bold text-white">5,000+ retailers</strong> using Tranzit Group to automate their fulfilment.
+            </p>
+          </div>
         </div>
       </div>
 
-      {/* Auth Card */}
-      <div className={cn(
-        "relative z-10 w-full lg:w-[70vw] max-w-[1400px] grid grid-cols-1 lg:grid-cols-12 gap-0 overflow-hidden rounded-3xl border border-white/20 bg-white/70 dark:bg-zinc-950/70 backdrop-blur-2xl shadow-2xl transition-all duration-500 ease-in-out",
-        shouldAnimate && "animate-in zoom-in-95 duration-700"
-      )}>
-        {/* Brand Info Section (Integrated) */}
-        <div className="lg:col-span-5 p-8 lg:p-12 flex flex-col justify-center bg-linear-to-br from-primary/10 to-purple-500/10 border-b lg:border-b-0 lg:border-r border-white/20">
-          <div className="space-y-6">
-            <div className="space-y-2">
-              <h1 className="text-3xl font-black tracking-tight text-slate-900 dark:text-white leading-tight">
-                Shipping automation that <span className="text-primary italic">just works</span>
-              </h1>
-              <p className="text-sm font-medium text-slate-600 dark:text-slate-400">
-                Print labels, compare couriers, and track deliveries - all from one platform. No per-label fees • Bring your own rates*
-              </p>
-            </div>
-
-            <ul className="grid grid-cols-1 gap-3">
-              {[
-                "No credit card required",
-                "5-star",
-                "Local support",
-                "Free onboarding",
-                "Save up to 50% handling time",
-                "See online orders reach customers faster"
-              ].map((feature, i) => (
-                <li key={i} className="flex items-center space-x-3 text-xs font-bold text-slate-700 dark:text-slate-300">
-                  <div className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-primary/20 text-primary">
-                    <Check className="h-3 w-3" strokeWidth={4} />
-                  </div>
-                  <span>{feature}</span>
-                </li>
-              ))}
-            </ul>
-
-            <div className="pt-4">
-              <div className="rounded-2xl border border-primary/20 bg-primary/5 p-4 backdrop-blur-sm">
-                <p className="text-[11px] font-bold text-primary uppercase tracking-widest mb-1">PRO TIP</p>
-                <p className="text-xs font-medium text-slate-600 dark:text-slate-400 leading-relaxed">
-                  Join 5,000+ retailers using Tranzit Group to automate their fulfilment.
-                </p>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Form Section */}
-        <div className="lg:col-span-7 flex flex-col justify-center p-8 lg:p-16 relative">
-          <div className="mx-auto w-full max-w-[400px]">
-            <div
-              key={location.pathname}
-              className="animate-in fade-in slide-in-from-bottom-2 duration-500"
-            >
-              {children}
-            </div>
-          </div>
+      {/* Right Column (Form) */}
+      <div className="flex flex-col items-center justify-center p-8 sm:p-12 lg:p-16 bg-white dark:bg-zinc-950 lg:col-span-4">
+        <div className="mx-auto flex w-full flex-col justify-center items-center space-y-8 max-w-xl">
+          {children}
         </div>
       </div>
     </div>
   );
 }
+

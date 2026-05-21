@@ -36,7 +36,7 @@ export function OrdersTabs({ activeTab, onTabChange, className }: OrdersTabsProp
             {tab}
             {typeof count === 'number' && (
               <span className={cn(
-                "px-2 py-0.5 text-[11px] rounded-full font-bold transition-all duration-300",
+                "px-2 py-0.5 text-[10px] rounded-full font-bold transition-all duration-300",
                 isActive
                   ? "bg-primary/10 text-primary"
                   : "bg-gray-100 dark:bg-zinc-800 text-gray-400 dark:text-zinc-500"

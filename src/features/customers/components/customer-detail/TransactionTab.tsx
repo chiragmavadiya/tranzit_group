@@ -73,6 +73,7 @@ export const TransactionTab = ({ customerId }: TransactionTabProps) => {
                         <span className="text-xs uppercase tracking-wider font-bold">Add Top Up</span>
                     </Button>
                 }
+                className='pb-3'
             />
         </Card>
     );

@@ -199,7 +199,9 @@ export const FormSelect = memo(({
   error,
   errormsg,
   name,
-  disabled
+  disabled,
+  selectClassName,
+  allowClear = true
 }: FormSelectProps) => {
   const isHorizontal = useMemo(() => layout === 'horizontal', [layout]);
   const memoizedData = useMemo(() => [...options], [options]);
@@ -224,7 +226,7 @@ export const FormSelect = memo(({
       />
       <div>
         <SelectComponent
-          className={cn("w-full h-8 text-[13px] data-[size=default]:h-8 border-slate-200 rounded-sm dark:border-zinc-800 font-medium bg-white dark:bg-zinc-950 text-slate-900 dark:text-zinc-100 focus:ring-primary transition-all text-sm px-3 ", error ? "border-red-500 focus:border-red-500" : "")}
+          className={cn("w-full h-8 text-[13px] data-[size=default]:h-8 border-slate-200 rounded-sm dark:border-zinc-800 font-medium bg-white dark:bg-zinc-950 text-slate-900 dark:text-zinc-100 focus:ring-primary transition-all text-sm px-3 ", error ? "border-red-500 focus:border-red-500" : "", selectClassName)}
           data={memoizedData}
           // defaultValue="default"
           onValueChange={onValueChange}
@@ -232,7 +234,7 @@ export const FormSelect = memo(({
           placeholder={placeholder}
           name={name}
           disabled={disabled}
-          allowClear={true}
+          allowClear={allowClear}
         />
         {error ? <div className="text-red-500 text-[11px] w-full">{errormsg}</div> : null}
       </div>

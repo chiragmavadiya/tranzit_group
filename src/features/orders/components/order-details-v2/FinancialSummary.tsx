@@ -15,7 +15,7 @@ export const FinancialSummary = ({
     paid: number
     balanceDue: number
 }) => (
-    <Card className="border-border/60 bg-white shadow-sm">
+    <Card className="border-border/60 bg-white">
         <CardHeader className="border-b border-border/60 pb-4">
             <CardTitle className="text-lg">Financial Summary</CardTitle>
             <CardDescription>

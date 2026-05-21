@@ -16,8 +16,8 @@ export const CreditApplicationTab = () => {
     });
 
     return (
-        <Card className="bg-white dark:bg-zinc-900 shadow-md border-none ring-0 shadow-md rounded-xl overflow-hidden animate-in fade-in slide-in-from-left-4 duration-500">
-            <CardHeader className="pb-4 border-b border-slate-50 dark:border-zinc-800/50">
+        <Card className="bg-white dark:bg-zinc-900 ring-0 overflow-hidden animate-in fade-in slide-in-from-left-4 duration-500">
+            <CardHeader className="p-4 border-b border-slate-50 dark:border-zinc-800/50">
                 <div className="flex items-center justify-between">
                     <SectionHeader title="Company Details" icon={Building2} />
                     <div className="flex items-center gap-3">
@@ -37,7 +37,7 @@ export const CreditApplicationTab = () => {
                     </div>
                 </div>
             </CardHeader>
-            <CardContent className="">
+            <CardContent className="py-4 px-6 pt-0">
                 <div className="grid grid-cols-12 gap-x-8 gap-y-5">
                     <FormInput
                         label="Registered Name (in full)"

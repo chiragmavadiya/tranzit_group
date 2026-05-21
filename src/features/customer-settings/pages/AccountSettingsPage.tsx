@@ -163,7 +163,7 @@ export default function AccountSettingsPage() {
         variants={cardVariants}
         className="lg:col-span-6 flex"
       >
-        <Card className="flex flex-col w-full hover:shadow-md transition-shadow duration-300 border-gray-200/60 shadow-sm rounded-md">
+        <Card className="flex flex-col w-full hover:shadow-md transition-shadow duration-300 border-gray-200/60 shadow-xs rounded-md">
           <CardHeader className="flex flex-row items-center justify-between px-6 py-4 border-b border-gray-100 dark:border-zinc-800 bg-slate-50/30 dark:bg-zinc-950 space-y-0 rounded-t-md">
             <CardTitle className="text-[15px] font-medium text-gray-800 dark:text-zinc-200">Company Information</CardTitle>
             {isEditingProfile ? (
@@ -333,7 +333,7 @@ export default function AccountSettingsPage() {
 
         {/* Balance Card */}
         <motion.div custom={1} initial="hidden" animate="visible" variants={cardVariants} className="flex h-fit">
-          <Card className="w-full border-gray-200/60 shadow-sm rounded-md">
+          <Card className="w-full border-gray-200/60 shadow-xs">
             <CardHeader className="flex flex-row items-center justify-between px-6 py-4 border-b border-gray-100 dark:border-zinc-800 bg-slate-50/30 dark:bg-zinc-950 space-y-0 rounded-t-md">
               <CardTitle className="text-[15px] font-medium text-gray-800 dark:text-zinc-200">Balance</CardTitle>
             </CardHeader>
@@ -350,7 +350,7 @@ export default function AccountSettingsPage() {
 
         {/* Plan Information Card */}
         <motion.div custom={2} initial="hidden" animate="visible" variants={cardVariants} className="flex">
-          <Card className="w-full border-gray-200/60 shadow-sm rounded-md">
+          <Card className="w-full border-gray-200/60 ">
             <CardHeader className="flex flex-row items-center justify-between px-6 py-4 border-b border-gray-100 dark:border-zinc-800 bg-slate-50/30 dark:bg-zinc-950 space-y-0 rounded-t-md">
               <CardTitle className="text-[15px] font-medium text-gray-800 dark:text-zinc-200">Plan Information</CardTitle>
               <Button
@@ -377,7 +377,7 @@ export default function AccountSettingsPage() {
 
         {/* Sender Address Card */}
         <motion.div custom={3} initial="hidden" animate="visible" variants={cardVariants} className="flex">
-          <Card className="flex flex-col w-full hover:shadow-md transition-shadow duration-300 border-gray-200/60 shadow-sm rounded-md">
+          <Card className="flex flex-col w-full transition-shadow duration-300 border-gray-200/60">
             <CardHeader className="flex flex-row items-center justify-between px-6 py-4 border-b border-gray-100 dark:border-zinc-800 bg-slate-50/30 dark:bg-zinc-950 space-y-0 rounded-t-md">
               <CardTitle className="text-[15px] font-medium text-gray-800 dark:text-zinc-200">Sender Address</CardTitle>
               <Button size="sm" className="h-8 px-4 text-[13px] font-medium text-white shadow-sm shrink-0 rounded-sm">

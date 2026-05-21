@@ -61,11 +61,9 @@ export const InvoicePaper: React.FC<InvoicePaperProps> = ({
   }, [editingRowId]);
 
   const updateItemsData = useCallback((id: string | number, type: string, value: string | number | Date) => {
-    console.log(id, type, value, 'setInvoiceData')
     setInvoiceData?.((prev: any) => ({
       ...prev,
       items: prev?.items?.map((i: any) => {
-        console.log(id, type, value)
         if (i.id === id) {
           const updated = { ...i, [type]: value };
           if (type === 'total') {

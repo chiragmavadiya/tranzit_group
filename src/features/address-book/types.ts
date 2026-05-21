@@ -20,27 +20,40 @@ export interface Address {
     created_at?: string;
     updated_at?: string;
     is_active?: number;
+
+    // NEED TO CHECK ON BACKEND
+    name: string;
+    instructions: string;
+    default_carrier: string;
+    default_code: string;
+    signature_required: boolean;
+
+    company: string;
+    building: string;
+    street: string;
+    city: string;
+    country: string;
 }
 
 export interface AddressFormData {
-    id?: number;
-    address: string;
-    unit_number: string;
-    street_number: string;
-    street_name: string;
-    street_type: string;
-    suburb: string;
-    state: string;
-    postcode: string;
-    latitude: string;
-    longitude: string;
-    code: string;
-    contact_person: string;
-    business_name: string;
+    id?: number | string;
+    name: string;
     email: string;
     phone: string;
-    additional_details: string;
-    special_instructions: string;
+    instructions: string;
+    default_carrier: string;
+    default_code: string;
+    signature_required: boolean;
+
+    address: string;
+    company: string;
+    building: string;
+    street: string;
+    suburb: string;
+    city: string;
+    state: string;
+    postcode: string;
+    country: string;
 }
 
 export interface AddressBookListResponse {

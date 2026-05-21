@@ -1,4 +1,4 @@
-import { useState, useCallback, useMemo } from 'react';
+import { useState, useCallback, useMemo, useEffect } from 'react';
 import { AddressBookHeader } from './components/AddressBookHeader';
 import { CreateAddressDialog } from './components/CreateAddressDialog';
 import type { Address, AddressFormData } from './types';
@@ -14,8 +14,10 @@ import {
   useDeleteAddress,
   useExportAddressBook
 } from './hooks/useAddressBook';
+import { useNavigate } from 'react-router-dom';
 
 export default function AddressBookPage() {
+  const navigate = useNavigate();
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [editingAddressId, setEditingAddressId] = useState<number | null>(null);
@@ -97,6 +99,17 @@ export default function AddressBookPage() {
     exportMutation.mutate({ format, search });
   }, [exportMutation, search]);
 
+  const createOrder = useCallback((addr: Address) => {
+    sessionStorage.setItem('address', JSON.stringify(addr));
+    navigate('/orders/create');
+  }, [navigate]);
+
+  useEffect(() => {
+    sessionStorage.removeItem('address');
+  }, []);
+
+
+
   const columns = useMemo<Column<Address>[]>(() => [
     {
       key: "code",
@@ -144,6 +157,9 @@ export default function AddressBookPage() {
       className: "w-20 px-0 pr-3 print:hidden",
       cell: (_, row) => (
         <div className="flex items-center gap-4">
+          <Button size="sm" variant='outline' className="" onClick={() => createOrder(row)}>
+            Create Order
+          </Button>
           <Button variant="ghost" size="sm" className="p-0 hover:text-primary bg-transparent dark:hover:bg-transparent" onClick={() => handleEditAddress(row)}>
             <Pencil className='h-4 w-4' />
           </Button>

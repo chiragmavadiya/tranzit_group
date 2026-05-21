@@ -150,6 +150,10 @@ export const API_ENDPOINTS = {
     PROFILE: {
         UPDATE: "/profile",
         CHANGE_PASSWORD: "/profile/change-password",
+    },
+    WALLET: {
+        SUMMARY: "/customer/wallet",
+        RECEIPT: (transactionId: string | number) => `/customer/wallet/transactions/${transactionId}/receipt`,
     }
 };
 
@@ -234,5 +238,8 @@ export const QUERY_KEYS = {
     },
     SEARCH: {
         GLOBAL: (q: string) => ["search", "global", q],
+    },
+    WALLET: {
+        SUMMARY: ["wallet", "summary"],
     }
 };

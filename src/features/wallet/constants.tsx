@@ -9,7 +9,10 @@ export const TRANSACTION_STATUS_CONFIG = {
   debit: 'bg-red-100 text-red-800 dark:bg-red-900/20 dark:text-red-400',
 };
 
-export const WALLET_COLUMNS: Column<WalletTransaction>[] = [
+export const getWalletColumns = (
+  onDownload: (row: WalletTransaction) => void,
+  isDownloadingId?: string | number | null
+): Column<WalletTransaction>[] => [
   {
     key: 'transaction_type',
     header: 'TRANSACTION TYPE',
@@ -32,11 +35,25 @@ export const WALLET_COLUMNS: Column<WalletTransaction>[] = [
     key: 'receipt',
     header: 'PAYMENT RECEIPT',
     className: 'text-center',
-    cell: () => (
-      <Button variant="ghost" size="icon" className="h-8 w-8 text-primary/70 hover:text-primary hover:bg-primary/10">
-        <Download className="h-4 w-4" />
-      </Button>
-    )
+    cell: (_: any, row: WalletTransaction) => {
+      const targetId = row.id || row.transaction_id;
+      const isDownloading = isDownloadingId === targetId;
+      return (
+        <Button
+          variant="ghost"
+          size="icon"
+          onClick={() => onDownload(row)}
+          disabled={isDownloading}
+          className="h-8 w-8 text-primary/70 hover:text-primary hover:bg-primary/10"
+        >
+          {isDownloading ? (
+            <span className="w-4 h-4 border-2 border-primary border-t-transparent rounded-full animate-spin"></span>
+          ) : (
+            <Download className="h-4 w-4" />
+          )}
+        </Button>
+      );
+    }
   },
 ];
 

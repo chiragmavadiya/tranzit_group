@@ -6,7 +6,6 @@ import { Skeleton } from '@/components/ui/skeleton'
 import { useHelpArticleDetails } from '../hooks/useHelpCenter'
 
 const HelpCenterArticlePage: React.FC = () => {
-    console.log('HelpCenter artical page render...')
     const { slug } = useParams<{ slug: string }>()
     const { data, isLoading } = useHelpArticleDetails(slug || '')
 

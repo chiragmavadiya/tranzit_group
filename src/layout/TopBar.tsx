@@ -19,9 +19,9 @@ import type { CancelOrderTabType } from '@/features/cancel-order/constants/cance
 import type { BookPickupTabType } from '@/features/book-pickup/constants/book-pickup.constants';
 import type { ReportType } from '@/features/reports/types';
 import { useLogout } from '@/features/auth/hooks/useAuth';
-import { CustomTooltip } from '@/components/common/CustomTooltip';
 import { GlobalSearch } from '@/features/search/components/GlobalSearch';
 import { lazy, Suspense } from 'react';
+import { useWalletSummary } from '@/features/wallet/hooks/useWallet';
 
 const OrdersTabs = lazy(() => import('@/features/orders/components/OrdersTabs').then(module => ({ default: module.OrdersTabs })));
 const ReportsTabs = lazy(() => import('@/features/reports/components/ReportsTabs').then(module => ({ default: module.ReportsTabs })));
@@ -37,6 +37,8 @@ export default function TopBar({ isCollapsed }: { isCollapsed?: boolean }) {
   const { theme, setTheme } = useTheme();
 
   const logoutMutation = useLogout();
+  const role = localStorage.getItem("user_role") || "customer";
+  const { data: walletData } = useWalletSummary(role === 'customer');
 
   const handleLogout = () => {
     // on success return to /signin
@@ -132,12 +134,18 @@ export default function TopBar({ isCollapsed }: { isCollapsed?: boolean }) {
           content={
             <>
               <div className="p-3 mb-2 bg-slate-50 dark:bg-zinc-950/50 rounded-xl flex items-center gap-3 border border-slate-100 dark:border-zinc-800/50">
-                <div className="h-10 w-10 rounded-full bg-primary flex items-center justify-center text-white font-bold shadow-md">
+                <div className="h-8 w-8 text-[11px] rounded-full bg-primary flex items-center justify-center text-white font-bold shadow-md">
                   {user?.first_name?.[0]}{user?.last_name?.[0]}
                 </div>
                 <div className="flex flex-col min-w-0">
                   <span className="text-sm font-bold text-slate-900 dark:text-zinc-100 truncate">{user?.first_name} {user?.last_name}</span>
                   <span className="text-xs text-slate-500 dark:text-zinc-500 truncate">{user?.email}</span>
+                  {role === 'customer' && walletData?.data && (
+                    <span className="text-xs font-semibold text-emerald-600 dark:text-emerald-400 mt-1 flex items-center gap-1.5">
+                      <span className="inline-block w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                      Balance: {new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(Number(walletData.data.wallet_balance || 0))}
+                    </span>
+                  )}
                 </div>
               </div>
               <DropdownMenuSeparator className="bg-slate-100 dark:bg-zinc-800" />
@@ -156,21 +164,25 @@ export default function TopBar({ isCollapsed }: { isCollapsed?: boolean }) {
             </>
           }
           contentClassName='ring-0 border-gray-100 shadow-md p-2'
+          triggerClassName="rounded-full"
         >
-          <div className='max-w-[220px] flex items-center gap-2 cursor-pointer px-[10px] py-[5px] hover:bg-gray-50 dark:hover:bg-zinc-800 rounded-md border border-gray-200 dark:border-zinc-800 text-[13px] font-medium text-gray-700 dark:text-zinc-300 transition-colors outline-none h-8'>
+          {/* <div className=' flex items-center gap-2 cursor-pointer px-[10px] py-[5px] rounded-md text-[13px] font-medium text-gray-700 dark:text-zinc-300 transition-colors outline-none h-8'> */}
 
-            <div className="w-[22px] h-[22px] rounded-full pt-[2px] bg-primary/10 flex items-center justify-center text-primary text-xs font-semibold shadow-sm">
-              {logoutMutation.isPending ? (
-                <Loader2 className="w-4 h-4 animate-spin" />
-              ) : user?.first_name?.charAt(0).toUpperCase()
-              }
-            </div>
-            <div className="max-w-[170px]">
+          <div className="w-[32px] h-[32px] rounded-full pt-[2px] bg-primary/20 text-primary flex items-center justify-center text-xs font-semibold shadow-sm">
+            {logoutMutation.isPending ? (
+              <Loader2 className="w-4 h-4 animate-spin" />
+            ) : user?.first_name?.[0]}{user?.last_name?.[0]
+            }
+          </div>
+          <div className="max-w-[170px]">
 
-              <CustomTooltip title={user?.email} onlyOnOverflow>
+            {/* <CustomTooltip title={user?.email} onlyOnOverflow>
                 {user?.email}
-              </CustomTooltip>
-            </div>
+                <div className="h-10 w-10 rounded-full bg-primary flex items-center justify-center text-white font-bold shadow-md">
+                  {user?.first_name?.[0]}{user?.last_name?.[0]}
+                </div>
+              </CustomTooltip> */}
+            {/* </div> */}
           </div>
         </DropdownCustomContent>
       </div>

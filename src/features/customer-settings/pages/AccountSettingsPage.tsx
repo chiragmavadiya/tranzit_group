@@ -28,7 +28,6 @@ export default function AccountSettingsPage() {
   const [isPasswordOpen, setIsPasswordOpen] = useState(false);
   const [isPlanModalOpen, setIsPlanModalOpen] = useState(false);
   const { user } = useAppSelector((state) => state.auth);
-  console.log(user, 'user...')
 
   // Initial Form values matching user's request
   const [formData, setFormData] = useState({

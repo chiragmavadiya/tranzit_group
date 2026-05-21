@@ -137,7 +137,6 @@ const InvoiceDocumentView: React.FC = () => {
         ...item,
         id: Date.now() + Math.random()
       }))
-      console.log(itemsData)
       setInvoiceData({
         ...data,
         items: itemsData,

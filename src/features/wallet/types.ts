@@ -1,6 +1,7 @@
 export type TransactionType = 'Credit' | 'Debit';
 
 export interface WalletTransaction {
+  id?: number | string;
   transaction_type: string;
   amount: number | string;
   reason: string;
@@ -59,3 +60,14 @@ export interface WalletExportParams {
   search?: string;
   transaction_type?: string | number;
 }
+
+export interface WalletSummaryResponse {
+  status: boolean;
+  message: string;
+  data: {
+    wallet_balance: number;
+    total_credit: number;
+    total_debit: number;
+  };
+}
+

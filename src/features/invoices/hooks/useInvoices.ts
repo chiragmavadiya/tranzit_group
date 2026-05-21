@@ -115,7 +115,6 @@ export const useUpdateAdminInvoice = () => {
           showToast(beErrors[key][0], "error");
           formattedErrors[key] = beErrors[key][0];
         });
-        console.log(formattedErrors, 'formattedErrors')
         // setErrors(formattedErrors);
         // if (formattedErrors.email || formattedErrors.order_prefix) {
         //   setCurrentStep(0);

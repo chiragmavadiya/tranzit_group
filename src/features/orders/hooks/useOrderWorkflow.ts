@@ -83,7 +83,7 @@ export const useOrderWorkflow = () => {
   const [showItemCountModal, setShowItemCountModal] = useState(false);
 
   const initialDialogMode = useMemo(() => {
-    if ((orderType === 'create' || orderType === 'create-menual') && addressData.receiver.address1 === '') {
+    if ((orderType === 'create' || orderType === 'create-menual') && sessionStorage.getItem('address') === null && addressData.receiver.address1 === '') {
       return 'receiver';
     }
     return null;
@@ -495,6 +495,42 @@ export const useOrderWorkflow = () => {
     navigate,
     role,
   ]);
+
+  useEffect(() => {
+    const savedAddressStr = sessionStorage.getItem('address');
+    if (savedAddressStr) {
+      try {
+        const savedAddr = JSON.parse(savedAddressStr);
+        const splitAddress = savedAddr.address.split(',');
+        setAddressData(prev => ({
+          ...prev,
+          receiver: {
+            email: savedAddr.email || '',
+            phone: savedAddr.phone || '',
+            company: savedAddr.company || '',
+            address: savedAddr.address || '',
+            address1: splitAddress[0] || '',
+            suburb: savedAddr.suburb || '',
+            state: savedAddr.state || '',
+            street_name: savedAddr.street || '',
+            unit_number: savedAddr.building || '',
+            street_number: '',
+            postcode: savedAddr.postcode || '',
+            country: savedAddr.country || '',
+            name: savedAddr.contact_person || '',
+            saveToAddressBook: false,
+          }
+        }));
+      } catch (e) {
+        console.error("Failed to parse address from sessionStorage:", e);
+      }
+    }
+
+    return () => {
+      sessionStorage.removeItem('address');
+    };
+  }, []);
+
 
   return {
     orderType,

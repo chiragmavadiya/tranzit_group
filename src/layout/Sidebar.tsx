@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { NavLink, useLocation, useNavigate } from 'react-router-dom';
 import { Menu, ArrowLeft, ChevronDown } from 'lucide-react';
 import type { SidebarItem } from './types/Sidebar.types';
@@ -21,6 +21,26 @@ export default function Sidebar({ isCollapsed, setIsCollapsed }: SidebarProps) {
   const location = useLocation();
   const navigate = useNavigate();
   const sidebarItems = role === 'admin' ? adminSidebarItems : clientSidebarItems;
+
+  useEffect(() => {
+    const matchingItem = sidebarItems.find(item => {
+      if (item.subGroups) {
+        return item.subGroups.some(group =>
+          group.items.some(subItem => 
+            location.pathname === subItem.path || 
+            location.pathname.startsWith(subItem.path)
+          )
+        );
+      }
+      return false;
+    });
+
+    if (matchingItem) {
+      setActiveSubmenu(matchingItem.name);
+    } else {
+      setActiveSubmenu(null);
+    }
+  }, [location.pathname, sidebarItems]);
 
   const toggleExpand = (name: string) => {
     setExpandedItems(prev =>

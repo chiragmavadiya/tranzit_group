@@ -5,7 +5,6 @@ import { useHelpCenterArticles } from '../hooks/useHelpCenter'
 import HelpCenterSidebar from './HelpCenterSidebar'
 
 const HelpCenterLayout: React.FC = () => {
-    console.log('HelpCenterLayout render...')
     const { slug } = useParams<{ slug: string }>()
     const { data, isLoading } = useHelpCenterArticles('')
 

@@ -3,10 +3,12 @@ import { Loader2 } from 'lucide-react';
 import { CustomModel, } from '@/components/ui/dialog';
 import type { AddressFormData } from '../types';
 import { FormInput, FormTextarea, FormSelect } from '@/features/orders/components/OrderFormUI';
-import { AUSTRALIAN_STATES, STREET_TYPES } from '../constants';
+import { AUSTRALIAN_STATES } from '../constants';
 import { useAddressBookDetails } from '../hooks/useAddressBook';
 import { PlaceAutocomplete } from '@/components/common/AutoComplateAddress';
 import { showToast } from '@/components/ui/custom-toast';
+// import { GlobalCourierSelect } from '@/features/courier-surcharge/components/GlobalCourierSelect';
+import { Checkbox } from '@/components/ui/checkbox';
 
 interface CreateAddressDialogProps {
   open: boolean;
@@ -16,6 +18,26 @@ interface CreateAddressDialogProps {
   isLoading?: boolean;
 }
 
+const MOCK_COURIERS = [
+  {
+    "label": "MyPost Business",
+    "value": "5"
+  },
+  {
+    "label": "Aramex Tranzit Group",
+    "value": "6"
+  },
+  {
+    "label": "Australia Post",
+    "value": "8"
+  },
+  {
+    "label": "Direct Freight Express Tranzit Group",
+    "value": "13"
+  }
+]
+
+
 export function CreateAddressDialog({
   open,
   onOpenChange,
@@ -24,31 +46,28 @@ export function CreateAddressDialog({
   isLoading = false,
 }: CreateAddressDialogProps) {
   const [formData, setFormData] = useState<AddressFormData>({
-    code: '',
-    contact_person: '',
-    business_name: '',
+    name: '',
     email: '',
     phone: '',
-    unit_number: '',
-    street_number: '',
-    street_name: '',
-    street_type: '',
+    instructions: '',
+    default_carrier: '',
+    default_code: '',
+    signature_required: false,
+
+    address: '',
+    company: '',
+    building: '',
+    street: '',
     suburb: '',
+    city: '',
     state: '',
     postcode: '',
-    additional_details: '',
-    special_instructions: '',
-    address: '',
-    latitude: '',
-    longitude: '',
+    country: 'Australia',
   });
   const [submited, setSubmited] = useState(false);
   const { data: detailsData, isLoading: isFetchingDetails } = useAddressBookDetails(editingAddressId || undefined);
 
   const formRef = useRef<HTMLFormElement>(null);
-
-  // Use a unique key to force remount when the underlying data changes
-  // const formKey = editingAddressId ? `edit-${editingAddressId}-${detailsData?.data ? 'loaded' : 'loading'}` : 'new';
 
   const handleChange = useCallback((field: keyof AddressFormData, value: any) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
@@ -58,13 +77,12 @@ export function CreateAddressDialog({
     e.preventDefault();
     setSubmited(true);
     if (
-      formData.code.trim().length === 0 ||
-      formData.contact_person.trim().length === 0 ||
+      formData.name.trim().length === 0 ||
       formData.email.trim().length === 0 ||
-      formData.address.trim().length === 0 ||
-      formData.street_number.trim().length === 0 ||
-      formData.street_name.trim().length === 0 ||
-      formData.street_type.trim().length === 0 ||
+      formData.phone.trim().length === 0 ||
+      formData.company.trim().length === 0 ||
+      formData.building.trim().length === 0 ||
+      formData.street.trim().length === 0 ||
       formData.suburb.trim().length === 0 ||
       formData.state.trim().length === 0 ||
       formData.postcode.trim().length === 0 ||
@@ -106,19 +124,15 @@ export function CreateAddressDialog({
             </div>
           )}
           <div className="space-y-4">
-            <div className="flex dark:border-zinc-800 rounded-md overflow-hidden bg-white dark:bg-zinc-950">
+            <div className="flex dark:border-zinc-800 rounded-xs overflow-hidden bg-white dark:bg-zinc-950">
               <div className="flex-1 relative flex items-center">
                 <PlaceAutocomplete
                   onPlaceSelect={(opt) => {
                     handleChange('address', opt.formatted_address);
-                    handleChange('street_name', opt.street_name);
-                    handleChange('street_number', opt.street_number);
-                    handleChange('street_type', opt.street_type);
+                    handleChange('street', opt.street_name);
                     handleChange('suburb', opt.suburb);
                     handleChange('state', opt.state);
                     handleChange('postcode', opt.post_code);
-                    handleChange('longitude', opt.longitude);
-                    handleChange('latitude', opt.latitude);
                   }}
                   onChange={(value) => handleChange('address', value)}
                   error={submited && formData.address?.trim() === ''}
@@ -133,32 +147,13 @@ export function CreateAddressDialog({
               <div className="space-y-4">
                 <FormInput
                   layout="horizontal"
-                  label="Code"
-                  value={formData.code}
-                  onChange={(val) => handleChange('code', val)}
-                  placeholder="Enter code"
-                  required
-                  error={submited && formData.code.length < 1}
-                  errormsg="Please enter a code"
-                  isFullWidth
-                />
-                <FormInput
-                  layout="horizontal"
                   label="Contact Person"
-                  value={formData.contact_person}
-                  onChange={(val) => handleChange('contact_person', val)}
+                  value={formData.name}
+                  onChange={(val) => handleChange('name', val)}
                   placeholder="Full name"
                   required
-                  error={submited && formData.contact_person.length < 1}
+                  error={submited && formData.name.length < 1}
                   errormsg="Please enter contact person name"
-                  isFullWidth
-                />
-                <FormInput
-                  layout="horizontal"
-                  label="Business Name"
-                  value={formData.business_name}
-                  onChange={(val) => handleChange('business_name', val)}
-                  placeholder="Company name"
                   isFullWidth
                 />
                 <FormInput
@@ -186,66 +181,89 @@ export function CreateAddressDialog({
                 <FormTextarea
                   layout="horizontal"
                   label="Special Instructions"
-                  value={formData.special_instructions || ''}
-                  onChange={(val) => handleChange('special_instructions', val)}
+                  value={formData.instructions || ''}
+                  onChange={(val) => handleChange('instructions', val)}
                   placeholder="instructions..."
                   rows={3}
                   isFullWidth
                 />
-                <FormTextarea
+                <FormSelect
                   layout="horizontal"
-                  label="Additional Details"
-                  value={formData.additional_details || ''}
-                  onChange={(val) => handleChange('additional_details', val)}
-                  placeholder="notes..."
-                  rows={3}
+                  label="Default Carrier"
+                  value={formData.default_carrier || ''}
+                  onValueChange={(val) => handleChange('default_carrier', val)}
+                  options={MOCK_COURIERS}
+                  placeholder="Select type"
+                  required
+                  error={submited && formData.default_carrier.length < 1}
+                  errormsg="Please select the carrier"
                   isFullWidth
                 />
+                {/* <GlobalCourierSelect
+                  layout='horizontal'
+                  value={formData.default_carrier}
+                  onValueChange={(val) => handleChange('default_carrier', val || '')}
+                  required
+                  error={submited && !formData.default_carrier}
+                  errormsg="Please select a Default Courier"
+                /> */}
+                <FormInput
+                  layout="horizontal"
+                  label="Code"
+                  value={formData.default_code}
+                  onChange={(val) => handleChange('default_code', val)}
+                  placeholder="Enter code"
+                  required
+                  error={submited && formData.default_code.length < 1}
+                  errormsg="Please enter a code"
+                  isFullWidth
+                />
+                <div className="flex items-center justify-end gap-2 pt-2">
+                  <Checkbox
+                    id="signature_required"
+                    checked={formData.signature_required}
+                    onCheckedChange={(checked) => handleChange('signature_required', checked as boolean)}
+                    className="data-[state=checked]:bg-primary data-[state=checked]:border-primary rounded-[4px]"
+                  />
+                  <label
+                    htmlFor="signature_required"
+                    className="text-[13px] font-semibold text-slate-700 dark:text-zinc-300 cursor-pointer select-none"
+                  >
+                    Signature Required
+                  </label>
+                </div>
+
+
               </div>
 
               {/* Right Column */}
               <div className="space-y-4">
                 <FormInput
                   layout="horizontal"
-                  label="Unit Number"
-                  value={formData.unit_number || ''}
-                  onChange={(val) => handleChange('unit_number', val)}
-                  placeholder="e.g. 1A"
+                  label="Company Name"
+                  value={formData.company || ''}
+                  onChange={(val) => handleChange('company', val)}
+                  placeholder="Company name"
                   isFullWidth
                 />
                 <FormInput
                   layout="horizontal"
-                  label="Street Name"
-                  value={formData.street_name || ''}
-                  onChange={(val) => handleChange('street_name', val)}
+                  label="Building"
+                  value={formData.building || ''}
+                  onChange={(val) => handleChange('building', val)}
+                  placeholder="e.g. 1234"
+                  isFullWidth
+                />
+                <FormInput
+                  layout="horizontal"
+                  label="Street"
+                  value={formData.street || ''}
+                  onChange={(val) => handleChange('street', val)}
                   placeholder="e.g. George"
                   required
-                  error={submited && formData.street_name.length < 1}
-                  errormsg="Please enter the street name"
+                  error={submited && formData.street.length < 1}
+                  errormsg="Please enter the street"
                   isFullWidth
-                />
-                <FormInput
-                  layout="horizontal"
-                  label="Street Number"
-                  value={formData.street_number || ''}
-                  onChange={(val) => handleChange('street_number', val)}
-                  placeholder="e.g. 123"
-                  required
-                  error={submited && formData.street_number.length < 1}
-                  errormsg="Please enter the street number"
-                  isFullWidth
-                />
-                <FormSelect
-                  layout="horizontal"
-                  label="Street Type"
-                  value={formData.street_type || ''}
-                  onValueChange={(val) => handleChange('street_type', val)}
-                  options={STREET_TYPES}
-                  placeholder="Select type"
-                  required
-                  error={submited && formData.street_type.length < 1}
-                  errormsg="Please select the street type"
-                // isFullWidth
                 />
                 <FormInput
                   layout="horizontal"
@@ -256,6 +274,17 @@ export function CreateAddressDialog({
                   required
                   error={submited && formData.suburb.length < 1}
                   errormsg="Please enter the suburb"
+                  isFullWidth
+                />
+                <FormInput
+                  layout="horizontal"
+                  label="City"
+                  value={formData.city || ''}
+                  onChange={(val) => handleChange('city', val)}
+                  placeholder="e.g. Sydney"
+                  // required
+                  // error={submited && formData.city.length < 1}
+                  // errormsg="Please enter the city"
                   isFullWidth
                 />
                 <FormSelect
@@ -283,20 +312,16 @@ export function CreateAddressDialog({
                 />
                 <FormInput
                   layout="horizontal"
-                  label="Latitude"
-                  value={formData.latitude || ''}
-                  onChange={(val) => handleChange('latitude', val)}
-                  placeholder="e.g. -33.8688"
+                  label="Country"
+                  value={formData.country || ''}
+                  onChange={(val) => handleChange('country', val)}
+                  placeholder="e.g. Australia"
+                  required
+                  error={submited && formData.country.length < 1}
+                  errormsg="Please enter the country"
                   isFullWidth
                 />
-                <FormInput
-                  layout="horizontal"
-                  label="Longitude"
-                  value={formData.longitude || ''}
-                  onChange={(val) => handleChange('longitude', val)}
-                  placeholder="e.g. 151.2093"
-                  isFullWidth
-                />
+
               </div>
             </div>
           </div>

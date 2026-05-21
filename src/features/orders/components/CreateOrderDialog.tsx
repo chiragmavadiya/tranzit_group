@@ -33,13 +33,11 @@ export default function CreateOrderDialog({ onOpenChange, type, open, initialDat
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [searchAddress, setSearchAddress] = useState('');
-  // const [isSuccess, setIsSuccess] = useState(false);
   const [activeLookup, setActiveLookup] = useState<string>('address');
 
   const debouncedSearchAddress = useDebounce(searchAddress, 400);
   const { data: addressBookData } = useAddressBookSearch(debouncedSearchAddress);
-  const { data: orderResponse, isLoading: isOrderLoading } = useOrderDetails(orderId || '')
-  console.log(orderResponse, isOrderLoading, orderId, 'addre...')
+  const { data: orderResponse } = useOrderDetails(orderId || '')
   const options = useMemo(() => {
     if (!addressBookData?.data) return [];
     return addressBookData.data.map(({ value, label, data }) => ({
@@ -121,7 +119,6 @@ export default function CreateOrderDialog({ onOpenChange, type, open, initialDat
       });
     }
   }, [orderResponse])
-  console.log(formData, 'formdata')
   return (
     <CustomModel
       open={open}
@@ -197,7 +194,6 @@ export default function CreateOrderDialog({ onOpenChange, type, open, initialDat
                   onSearch={(value) => setSearchAddress(value)}
                   onSelect={(value) => {
                     const option = options.find((opt) => opt.value === value);
-                    console.log(option, 'option....')
                     if (option) {
                       updateField('name', option.name);
                       updateField('phone', option.phone);

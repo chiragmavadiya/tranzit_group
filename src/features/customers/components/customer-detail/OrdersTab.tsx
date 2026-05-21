@@ -63,6 +63,7 @@ export const OrdersTab = ({ customerId }: OrdersTabProps) => {
                 exportable
                 isExporting={isExporting}
                 onExport={handleExport}
+                className='pb-3'
             />
         </Card>
     );

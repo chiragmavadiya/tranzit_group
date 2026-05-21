@@ -117,7 +117,7 @@ export const CarrierCard: React.FC<CarrierCardProps> = (props) => {
   }, [selectedServiceId, couriers, surchargesMap, onQuoteChange, setCourierData])
 
   return (
-    <Card className="border shadow-md py-1 gap-0 border-gray-100 dark:border-zinc-800 rounded-xl overflow-hidden transition-colors duration-300">
+    <Card className="border py-1 gap-0 border-gray-100 dark:border-zinc-800 overflow-hidden transition-colors duration-300">
       <CardHeader className="flex flex-row items-center justify-between py-3 px-5 border-b border-gray-100 dark:border-zinc-800 bg-white dark:bg-zinc-900 transition-colors">
         <div className="flex justify-between w-full items-center gap-2">
           <div className='flex items-center gap-2'>

@@ -90,14 +90,14 @@ export default function ProfilePage() {
       <div className="grid grid-cols-12 gap-4">
         <div className="col-span-12 lg:col-span-8 space-y-4">
           {/* Business Details */}
-          <Card className="shadow-sm gap-0 border-slate-200 dark:border-zinc-800 bg-white dark:bg-zinc-950">
-            <CardHeader className="pb-4 border-b border-gray-200 dark:border-zinc-900">
+          <Card className="gap-0 border-slate-200 dark:border-zinc-800 bg-white dark:bg-zinc-950">
+            <CardHeader className="p-4 border-b border-gray-200 dark:border-zinc-900">
               <CardTitle className="inline-flex items-center gap-2 text-[15px] font-semibold text-slate-800 dark:text-zinc-100">
                 <Building className="w-4 h-4 text-primary" />
                 Business Details
               </CardTitle>
             </CardHeader>
-            <CardContent className="pt-4">
+            <CardContent className="p-4">
               <FormInput
                 label="Registered Business Name"
                 placeholder="Enter your registered business name"
@@ -111,14 +111,14 @@ export default function ProfilePage() {
           </Card>
 
           {/* Personal & Contact Details */}
-          <Card className="shadow-sm gap-0 border-slate-200 dark:border-zinc-800 bg-white dark:bg-zinc-950">
-            <CardHeader className="pb-4 border-b border-gray-200 dark:border-zinc-900">
+          <Card className="gap-0 border-slate-200 dark:border-zinc-800 bg-white dark:bg-zinc-950">
+            <CardHeader className="p-4 border-b border-gray-200 dark:border-zinc-900">
               <CardTitle className="inline-flex items-center gap-2 text-[15px] font-semibold text-slate-800 dark:text-zinc-100">
                 <User className="w-4 h-4 text-primary" />
                 Account Information
               </CardTitle>
             </CardHeader>
-            <CardContent className="pt-4 grid grid-cols-12 gap-5">
+            <CardContent className="p-4 grid grid-cols-12 gap-5">
               <FormInput
                 label="First Name"
                 placeholder="First Name"
@@ -156,14 +156,14 @@ export default function ProfilePage() {
           </Card>
 
           {/* Private Contact Details */}
-          <Card className="shadow-sm gap-0 border-slate-200 dark:border-zinc-800 bg-white dark:bg-zinc-950">
-            <CardHeader className="pb-4 border-b border-gray-200 dark:border-zinc-900">
+          <Card className="gap-0 border-slate-200 dark:border-zinc-800 bg-white dark:bg-zinc-950">
+            <CardHeader className="p-4 border-b border-gray-200 dark:border-zinc-900">
               <CardTitle className="inline-flex items-center gap-2 text-[15px] font-semibold text-slate-800 dark:text-zinc-100">
                 <Mail className="w-4 h-4 text-primary" />
                 Private Contact Details
               </CardTitle>
             </CardHeader>
-            <CardContent className="pt-4 grid grid-cols-12 gap-5">
+            <CardContent className="p-4 grid grid-cols-12 gap-5">
               <FormInput
                 label="Personal Email Address"
                 placeholder="personal@example.com"

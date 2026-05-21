@@ -75,7 +75,7 @@ export default function SignIn({ role = "customer" }: { role?: string }) {
 
   return (
     <>
-      <div className="flex flex-col items-center text-center space-y-2 mb-8">
+      <div className="flex flex-col items-center text-center space-y-2 mb-8 w-md">
         <div className="flex items-center space-x-2 pb-2">
           <img src={brandlogo} alt="Logo" className="h-16 w-auto" />
         </div>
@@ -88,7 +88,7 @@ export default function SignIn({ role = "customer" }: { role?: string }) {
         </p>
       </div>
 
-      <form onSubmit={handleSubmit} className="space-y-5">
+      <form onSubmit={handleSubmit} className="space-y-5 w-md">
         <div className="space-y-1">
           <Label htmlFor="email" className="text-[13px] font-bold text-slate-700 dark:text-slate-300 ml-1">Email ID</Label>
           <Input
@@ -137,7 +137,7 @@ export default function SignIn({ role = "customer" }: { role?: string }) {
           </Link>
         </div>
 
-        <Button type="submit" disabled={loginMutation.isPending} className="w-full text-white font-bold h-11 text-[13px] rounded-xl bg-primary hover:bg-primary/90 transition-all shadow-lg shadow-primary/20 active:scale-[0.98]">
+        <Button type="submit" disabled={loginMutation.isPending} className="w-full text-white font-bold h-11 text-[13px] rounded-md bg-primary hover:bg-primary/90 transition-all shadow-lg shadow-primary/20 active:scale-[0.98]">
           {loginMutation.isPending && <Spinner data-icon="inline-start" />}
           Login
         </Button>

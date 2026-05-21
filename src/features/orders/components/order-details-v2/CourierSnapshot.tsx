@@ -14,7 +14,7 @@ export const CourierSnapshot = ({
     reference: string
     instructions: string
 }) => (
-    <Card className="border-border/60 bg-white shadow-sm gap-1">
+    <Card className="border-border/60 bg-white gap-1">
         <CardHeader className="border-b border-white/10 pb-4">
             <CardTitle className="text-lg">Courier Snapshot</CardTitle>
             <CardDescription className="text-muted-foreground">

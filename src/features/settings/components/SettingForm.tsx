@@ -58,8 +58,8 @@ const SettingForm = ({ category }: { category: any }) => {
         );
     }
     return (
-        <Card className="bg-white dark:bg-zinc-950 rounded-xl border ring-0 border-gray-100 dark:border-zinc-800 shadow-md p-6 fade-in slide-in-from-bottom-4 duration-500">
-            <CardHeader className="px-0 pt-0">
+        <Card className="bg-white dark:bg-zinc-950 rounded-xl border ring-0 border-gray-100 dark:border-zinc-800 shadow-md fade-in slide-in-from-bottom-4 duration-500">
+            <CardHeader className="p-4 border-b border-gray-100 dark:border-zinc-800">
                 <CardTitle className="text-xl font-bold text-slate-900 dark:text-zinc-100">
                     {category.name} Settings
                 </CardTitle>
@@ -67,7 +67,7 @@ const SettingForm = ({ category }: { category: any }) => {
                     Configure your {category.name} integration credentials below.
                 </CardDescription>
             </CardHeader>
-            <CardContent className="px-0">
+            <CardContent className="p-4 pt-0">
                 <form onSubmit={(e) => {
                     e.preventDefault();
                     onSubmit();

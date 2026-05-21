@@ -42,21 +42,21 @@ export default function CreateOrderDialog({ onOpenChange, type, open, initialDat
   console.log(orderResponse, isOrderLoading, orderId, 'addre...')
   const options = useMemo(() => {
     if (!addressBookData?.data) return [];
-    return addressBookData.data.map((item) => ({
-      value: item.value,
-      label: item.label,
-      name: item.data.receiver_name,
-      phone: item.data.receiver_phone,
-      email: item.data.receiver_email,
-      address: item.data.receiver_address,
-      address1: item.data.receiver_address,
-      suburb: item.data.suburb,
-      state: item.data.state,
-      postcode: item.data.postcode,
+    return addressBookData.data.map(({ value, label, data }) => ({
+      value: value,
+      label: label,
+      name: data.receiver_name,
+      phone: data.receiver_phone,
+      email: data.receiver_email,
+      address: `${data.street_number} ${data.street_name} ${data.street_type} ${data.suburb} ${data.state} ${data.postcode}`,
+      address1: data.receiver_address,
+      suburb: data.suburb,
+      state: data.state,
+      postcode: data.postcode,
       country: "Australia",
-      street_name: item.data.street_name,
-      street_number: item.data.street_number,
-      street_type: item.data.street_type,
+      street_name: data.street_name,
+      street_number: data.street_number,
+      street_type: data.street_type,
     }));
   }, [addressBookData]);
   const updateField = (field: keyof AddressData, value: string | boolean | number | string[]) => {
@@ -121,7 +121,7 @@ export default function CreateOrderDialog({ onOpenChange, type, open, initialDat
       });
     }
   }, [orderResponse])
-
+  console.log(formData, 'formdata')
   return (
     <CustomModel
       open={open}

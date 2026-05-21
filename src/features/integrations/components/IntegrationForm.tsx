@@ -180,7 +180,7 @@ export function IntegrationForm({ provider }: IntegrationFormProps) {
     return (
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-10 items-stretch">
             <div className={`col-span-1 ${(provider.id === 'woocommerce' || provider.id === 'shopify') ? 'lg:col-span-6' : 'lg:col-span-12'}`}>
-                <Card className="bg-white dark:bg-zinc-950 rounded-xl border ring-0 border-gray-100 dark:border-zinc-800 shadow-md p-6 h-full flex flex-col">
+                <Card className="bg-white dark:bg-zinc-950 border ring-0 border-gray-100 dark:border-zinc-800 p-6 h-full flex flex-col">
                     <CardHeader className="px-0 pt-0">
                         <CardTitle className="text-xl font-bold text-slate-900 dark:text-zinc-100">
                             {provider.name} Settings
@@ -257,9 +257,9 @@ export function IntegrationForm({ provider }: IntegrationFormProps) {
             {(provider.id === 'woocommerce' || provider.id === 'shopify') && (
                 <div className="col-span-1 lg:col-span-6 relative group h-full">
                     {/* Subtle Gradient background blur */}
-                    <div className="absolute inset-0 bg-gradient-to-br from-primary/10 via-primary/5 to-transparent rounded-xl blur-2xl group-hover:blur-3xl transition-all duration-700 opacity-60"></div>
+                    <div className="absolute inset-0 bg-gradient-to-br from-primary/10 via-primary/5 to-transparent blur-2xl group-hover:blur-3xl transition-all duration-700 opacity-60"></div>
 
-                    <Card className="relative bg-white/80 dark:bg-zinc-950/80 backdrop-blur-xl p-6 rounded-xl border ring-0 border-gray-100 dark:border-zinc-800 shadow-md h-full transition-all overflow-hidden flex flex-col justify-center">
+                    <Card className="relative bg-white/80 dark:bg-zinc-950/80 backdrop-blur-xl p-6 border ring-0 border-gray-100 dark:border-zinc-800 shadow-md h-full transition-all overflow-hidden flex flex-col justify-center">
                         {/* Decorative top gradient line */}
                         <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-primary via-primary/50 to-transparent"></div>
 

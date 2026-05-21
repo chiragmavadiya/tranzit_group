@@ -33,7 +33,7 @@ export function BookPickupTabs({ activeTab, onTabChange, className }: BookPickup
                     >
                         {tab.label}
                         <span className={cn(
-                            "px-1.5 py-0.5 text-[12px] rounded-full transition-all duration-300",
+                            "px-1.5 py-0.5 text-[10px] rounded-full transition-all duration-300",
                             isActive
                                 ? "bg-primary/10 text-primary"
                                 : "bg-gray-100 dark:bg-zinc-800 text-gray-400 dark:text-zinc-500"

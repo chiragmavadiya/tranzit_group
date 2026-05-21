@@ -175,7 +175,7 @@ export function InvoiceTable({
           <div className="flex items-center gap-2">
             {showPreview && (
               <CustomTooltip title="View invoice" placement="bottom">
-                <Button variant="ghost" size="sm" className="p-0 hover:text-blue-500 bg-transparent hover:bg-transparent dark:hover:bg-transparent" onClick={() => onView?.(row.invoice_number)}>
+                <Button variant="ghost" size="sm" className="p-0 hover:text-blue-500 bg-transparent hover:bg-transparent dark:hover:bg-transparent" onClick={() => onView?.(row.id?.toString())}>
                   <Eye className="w-4 h-4" />
                 </Button>
               </CustomTooltip>

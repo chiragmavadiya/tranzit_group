@@ -66,7 +66,18 @@ const InvoiceDocumentView: React.FC = () => {
       "state": "",
       "postcode": ""
     },
-    "items": [],
+    "items": [{
+      id: `1`,
+      type: "",
+      description: "",
+      total_charge_credit: 0,
+      order_number: "",
+      item_date: "",
+      from: "",
+      destination: "Destination",
+      to: "To",
+      receiver: "Receiver"
+    }],
     "orders": [],
     "payment_transactions": []
   })
@@ -122,8 +133,14 @@ const InvoiceDocumentView: React.FC = () => {
   useEffect(() => {
     if (invoiceID !== 'create' && details?.status) {
       const data = details?.data
+      const itemsData = data.items?.map((item: any) => ({
+        ...item,
+        id: Date.now() + Math.random()
+      }))
+      console.log(itemsData)
       setInvoiceData({
         ...data,
+        items: itemsData,
         customer: data.customer || {
           id: data.customer_id,
           first_name: data.customer_full_name?.split(' ')[0] || '',
@@ -160,7 +177,18 @@ const InvoiceDocumentView: React.FC = () => {
           "state": "",
           "postcode": ""
         },
-        "items": [],
+        "items": [{
+          id: `1`,
+          type: "",
+          description: "",
+          total_charge_credit: 0,
+          order_number: "",
+          item_date: "",
+          from: "",
+          destination: "",
+          to: "",
+          receiver: ""
+        }],
         "orders": [],
         "payment_transactions": []
       })

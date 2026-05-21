@@ -71,16 +71,15 @@ export default function ResetPassword() {
 
   return (
     <>
-      <div className="flex flex-col items-center text-center space-y-2 mb-8">
+      <div className="flex flex-col items-center text-center space-y-2 mb-2">
         <div className="flex items-center space-x-2 pb-2">
           <img src={brandlogo} alt="Logo" className="h-16 w-auto" />
         </div>
 
-        <h2 className="text-2xl font-black tracking-tight text-slate-900 dark:text-white">
+        <h2 className="text-2xl mt-0 font-black tracking-tight text-slate-900 dark:text-white">
           Set a new password
         </h2>
       </div>
-
       {!isSuccess ? (
         <form onSubmit={handleSubmit} className="space-y-6 w-full max-w-sm m-auto">
           <p className="text-sm font-medium text-slate-500 dark:text-slate-400 text-center px-4">
@@ -155,7 +154,7 @@ export default function ResetPassword() {
               Password updated successfully.
             </p>
           </div>
-          <p className="text-center text-sm font-medium">
+          <p className="text-left text-sm font-medium">
             <Link to="/login" className="text-primary hover:underline transition-colors">
               Back to sign in
             </Link>

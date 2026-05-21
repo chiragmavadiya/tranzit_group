@@ -48,7 +48,7 @@ export function DashboardTable<T extends { id: number }>({
 
   // Select the active query based on role
   const activeQuery = role === 'admin' ? adminQuery : customerQuery;
-  
+
   // Extract data and total count safely
   const tableData = (activeQuery.data?.data || []) as unknown as T[];
   const totalItems = (activeQuery.data as any)?.meta?.total || tableData.length;
@@ -82,7 +82,7 @@ export function DashboardTable<T extends { id: number }>({
   const isExporting = adminExport.isPending || customerExport.isPending;
 
   return (
-    <Card className={cn("border gap-0 ring-0 shadow-md border-gray-200 dark:border-zinc-800 rounded-xl overflow-hidden group transition-colors duration-300 p-0", className)}>
+    <Card className={cn("border gap-0 ring-0 border-gray-200 dark:border-zinc-800 overflow-hidden group transition-colors duration-300 p-0", className)}>
       <CardContent className="p-0 bg-white dark:bg-zinc-950 flex-1 flex flex-col min-h-0">
         <div className="overflow-x-auto flex-1 h-[450px]">
           <DataTable

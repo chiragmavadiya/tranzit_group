@@ -27,6 +27,7 @@ import { BANKING_DETAILS, COMPANY_DETAILS, TERMS_CONDITIONS } from '../../consta
 import { format } from 'date-fns'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import { Calendar } from '@/components/ui/calendar'
+import DatePicker from '@/components/common/DatePicker'
 
 interface InvoicePaperProps {
   invoice: any;
@@ -59,10 +60,12 @@ export const InvoicePaper: React.FC<InvoicePaperProps> = ({
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, [editingRowId]);
 
-  const updateItemsData = useCallback((id: string | number, type: string, value: string | number) => {
+  const updateItemsData = useCallback((id: string | number, type: string, value: string | number | Date) => {
+    console.log(id, type, value, 'setInvoiceData')
     setInvoiceData?.((prev: any) => ({
       ...prev,
       items: prev?.items?.map((i: any) => {
+        console.log(id, type, value)
         if (i.id === id) {
           const updated = { ...i, [type]: value };
           if (type === 'total') {
@@ -80,7 +83,7 @@ export const InvoicePaper: React.FC<InvoicePaperProps> = ({
     const defaultItem = {
       id: Date.now(),
       type,
-      date: type === 'order' ? new Date().toLocaleDateString('en-GB') : '',
+      date: type === 'order' ? new Date() : '',
       ...(type === 'order' ? { order_number: '' } : { description: '' }),
       description: '',
       from: '',
@@ -94,7 +97,7 @@ export const InvoicePaper: React.FC<InvoicePaperProps> = ({
   };
 
   const handleRemoveItem = useCallback((itemId: string | number) => {
-    setInvoiceData?.((prev: any) => ({ ...prev, items: prev?.items?.filter((i: any) => i.id !== itemId) }))
+    setInvoiceData?.((prev: any) => ({ ...prev, items: prev?.items.length > 1 ? prev?.items?.filter((i: any) => i.id !== itemId) : prev?.items }))
   }, [setInvoiceData])
 
   const updateStatus = useCallback((status: string) => {
@@ -117,6 +120,53 @@ export const InvoicePaper: React.FC<InvoicePaperProps> = ({
     //   style: 'currency',
     //   currency: 'AUD',
     // }).format(typeof amount === 'string' ? parseFloat(amount) : amount)
+  }
+
+  const calculateGSTBreakdown = (finalAmount: number, gstPercent: number) => {
+    const basePrice = finalAmount / (1 + gstPercent / 100);
+    const gstAmount = finalAmount - basePrice;
+
+    return {
+      basePrice: Number(basePrice.toFixed(2)),
+      gstAmount: Number(gstAmount.toFixed(2)),
+      finalAmount: Number(finalAmount.toFixed(2)),
+    };
+  };
+
+  const isCreate = invoiceId === 'create';
+
+  let subtotalExGst = 0;
+  let gstVal = 0;
+  let totalIncGst = 0;
+  let amountPaid = 0;
+  let creditAmount = 0;
+  let amountDue = 0;
+
+  if (isCreate) {
+    let finalAmount = 0;
+    (invoice?.items || []).forEach((item: any) => {
+      const itemVal = Number(item?.item?.total || item?.total || item?.total_charge_credit || 0);
+      if (item?.type === 'credit') {
+        finalAmount -= itemVal;
+        creditAmount += itemVal;
+      } else {
+        finalAmount += itemVal;
+      }
+    });
+    console.log(finalAmount + creditAmount)
+    const breakdown = calculateGSTBreakdown(finalAmount + creditAmount, 10);
+    subtotalExGst = breakdown.basePrice;
+    gstVal = breakdown.gstAmount;
+    totalIncGst = breakdown.finalAmount;
+    amountPaid = 0;
+    amountDue = finalAmount;
+  } else {
+    subtotalExGst = Number(invoice?.totals?.subtotal_ex_gst || 0);
+    gstVal = Number(invoice?.totals?.gst || 0);
+    totalIncGst = Number(invoice?.totals?.total_inc_gst || 0);
+    amountPaid = Number(invoice?.totals?.amount_paid || 0);
+    creditAmount = Number(invoice?.totals?.credit_amount || 0);
+    amountDue = Number(invoice?.totals?.amount_due || 0);
   }
 
   return (
@@ -243,6 +293,7 @@ export const InvoicePaper: React.FC<InvoicePaperProps> = ({
                   options={[
                     { value: 'draft', label: 'Draft' },
                     { value: 'send', label: 'Send' },
+                    { value: 'pending', label: 'Pending' },
                     { value: 'unpaid', label: 'Unpaid' },
                     { value: 'partial', label: 'Partial' },
                     { value: 'overdue', label: 'Overdue' },
@@ -275,7 +326,7 @@ export const InvoicePaper: React.FC<InvoicePaperProps> = ({
       </div>
 
       {/* 3. Line Items Section */}
-      <div className="mb-4 grow">
+      <div className="mb-4 grow" ref={editingRowRef}>
         <h3 className="text-[10px] font-black text-slate-700 uppercase tracking-[0.2em] mb-2">Items</h3>
 
         <div className="border border-slate-100 dark:border-zinc-800 rounded-xl overflow-hidden">
@@ -296,19 +347,19 @@ export const InvoicePaper: React.FC<InvoicePaperProps> = ({
               </TableHeader>
               <TableBody>
                 {(invoice.items || []).map((item: any, idx: number) => {
-                  const isEditing = editingRowId === item.id;
+                  const isEditing = isAdmin;
 
                   return (
                     <TableRow
                       key={item.id || idx}
-                      ref={isEditing ? editingRowRef : null}
+                      // ref={isEditing ? editingRowRef : null}
                       className={cn(
                         "hover:bg-slate-50/30 dark:hover:bg-zinc-800/30 border-b border-slate-50 dark:border-zinc-800/50 last:border-0 transition-colors group relative",
                         isEditing && "bg-primary/5 dark:bg-primary/10"
                       )}
                       onClick={() => {
                         if (isAdmin && !isEditing) {
-                          setEditingRowId(item.id);
+                          setEditingRowId(item.id || idx);
                         }
                       }}
                     >
@@ -318,13 +369,14 @@ export const InvoicePaper: React.FC<InvoicePaperProps> = ({
                             <FormSelect
                               label=""
                               value={item.type}
-
                               onValueChange={(val) => updateItemsData(item.id, 'type', val || '')}
                               options={[
                                 { value: 'order', label: 'Order' },
                                 { value: 'credit', label: 'Credit' },
                                 { value: 'custom', label: 'Custom' },
                               ]}
+                              selectClassName='data-[size=default]:h-7'
+                              allowClear={false}
                             />
                           </div>
                         ) : (
@@ -339,16 +391,20 @@ export const InvoicePaper: React.FC<InvoicePaperProps> = ({
                         )}
                       </TableCell>
                       <TableCell className="py-4">
-                        {isEditing ? (
-                          <FormInput
-                            className="w-28 shadow-none"
-                            inputClassName="h-7 text-[10px] bg-white focus:ring-1 focus:ring-primary disabled:opacity-30"
-                            value={item.date || ''}
-                            disabled={item.type !== 'order'}
-                            onChange={(val) => updateItemsData(item.id, 'date', val)}
+                        {isEditing && item.type === 'order' ? (
+                          // <FormInput
+                          //   className="w-28 shadow-none"
+                          //   inputClassName="h-7 text-[10px] bg-white focus:ring-1 focus:ring-primary disabled:opacity-30"
+                          //   value={item.date || ''}
+                          //   disabled={item.type !== 'order'}
+                          //   onChange={(val) => updateItemsData(item.id, 'date', val)}
+                          // />
+                          <DatePicker
+                            date={item.date || ''}
+                            setDate={(val) => updateItemsData(item.id, 'date', val!)}
                           />
                         ) : (
-                          <span className="text-[12px] font-medium py-3 text-slate-600">{item.date || '-'}</span>
+                          <span className="text-[12px] font-medium py-3 text-slate-600">{item.type === 'order' ? item.date : '-'}</span>
                         )}
                       </TableCell>
                       <TableCell className="py-4">
@@ -364,7 +420,7 @@ export const InvoicePaper: React.FC<InvoicePaperProps> = ({
                         )}
                       </TableCell>
                       <TableCell className="py-4">
-                        {isEditing ? (
+                        {isEditing && item.type === 'order' ? (
                           <FormInput
                             className="w-20 shadow-none"
                             inputClassName="h-7 text-[10px] bg-white focus:ring-1 focus:ring-primary disabled:opacity-30"
@@ -373,11 +429,11 @@ export const InvoicePaper: React.FC<InvoicePaperProps> = ({
                             onChange={(val) => updateItemsData(item.id, 'from', val)}
                           />
                         ) : (
-                          <span className="text-[12px] font-medium text-slate-600">{item.from || '-'}</span>
+                          <span className="text-[12px] font-medium text-slate-600">{item.type === 'order' ? item.from : '-'}</span>
                         )}
                       </TableCell>
                       <TableCell className="py-4">
-                        {isEditing ? (
+                        {isEditing && item.type === 'order' ? (
                           <FormInput
                             className="w-20 shadow-none"
                             inputClassName="h-7 text-[10px] bg-white focus:ring-1 focus:ring-primary disabled:opacity-30"
@@ -386,11 +442,11 @@ export const InvoicePaper: React.FC<InvoicePaperProps> = ({
                             onChange={(val) => updateItemsData(item.id, 'destination', val)}
                           />
                         ) : (
-                          <span className="text-[12px] font-medium text-slate-600">{item.destination || '-'}</span>
+                          <span className="text-[12px] font-medium text-slate-600">{item.type === 'order' ? item.destination : '-'}</span>
                         )}
                       </TableCell>
                       <TableCell className="py-4">
-                        {isEditing ? (
+                        {isEditing && item.type === 'order' ? (
                           <FormInput
                             className="w-20 shadow-none"
                             inputClassName="h-7 text-[10px] bg-white focus:ring-1 focus:ring-primary disabled:opacity-30"
@@ -399,11 +455,11 @@ export const InvoicePaper: React.FC<InvoicePaperProps> = ({
                             onChange={(val) => updateItemsData(item.id, 'to', val)}
                           />
                         ) : (
-                          <span className="text-[12px] font-medium text-slate-600">{item.to || '-'}</span>
+                          <span className="text-[12px] font-medium text-slate-600">{item.type === 'order' ? item.to : '-'}</span>
                         )}
                       </TableCell>
                       <TableCell className="py-4">
-                        {isEditing ? (
+                        {isEditing && item.type === 'order' ? (
                           <FormInput
                             className="w-24 shadow-none"
                             inputClassName="h-7 text-[10px] bg-white focus:ring-1 focus:ring-primary disabled:opacity-30"
@@ -412,7 +468,7 @@ export const InvoicePaper: React.FC<InvoicePaperProps> = ({
                             onChange={(val) => updateItemsData(item.id, 'receiver', val)}
                           />
                         ) : (
-                          <span className="text-[12px] font-medium text-slate-600">{item.receiver || '-'}</span>
+                          <span className="text-[12px] font-medium text-slate-600">{item.type === 'order' ? item.receiver : '-'}</span>
                         )}
                       </TableCell>
                       <TableCell className="py-4 text-right">
@@ -421,8 +477,9 @@ export const InvoicePaper: React.FC<InvoicePaperProps> = ({
                             type="number"
                             className="w-20 text-right shadow-none"
                             inputClassName="h-7 text-[10px] bg-white text-right font-bold focus:ring-1 focus:ring-primary"
-                            value={item.total || item.total_charge_credit || ''}
+                            value={item.total || item.total_charge_credit || 0}
                             onChange={(val) => updateItemsData(item.id, 'total', val)}
+
                           />
                         ) : (
                           <span className="text-xs font-bold text-slate-900 dark:text-white">{formatCurrency(item.total || item.total_charge_credit)}</span>
@@ -434,11 +491,12 @@ export const InvoicePaper: React.FC<InvoicePaperProps> = ({
                             <Button
                               variant="ghost"
                               size="sm"
+                              disabled={invoice.items?.length === 1}
                               onClick={(e) => {
                                 e.stopPropagation();
                                 handleRemoveItem(item.id);
                               }}
-                              className="h-7 w-7 p-0 text-slate-300 hover:text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-950/20 opacity-0 group-hover:opacity-100 transition-all duration-200"
+                              className="h-7 w-7 p-0 text-slate-600 hover:text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-950/20 opacity-0 group-hover:opacity-100 transition-all duration-200"
                             >
                               <Trash2 className="w-3.5 h-3.5" />
                             </Button>
@@ -568,26 +626,28 @@ export const InvoicePaper: React.FC<InvoicePaperProps> = ({
               <div className="space-y-4">
                 <div className="flex justify-between text-xs">
                   <span className="text-slate-500 font-medium">Subtotal (ex GST)</span>
-                  <span className="text-slate-900 dark:text-white font-bold">{formatCurrency(invoice?.totals?.subtotal_ex_gst)}</span>
+                  <span className="text-slate-900 dark:text-white font-bold">{formatCurrency(subtotalExGst)}</span>
                 </div>
                 <div className="flex justify-between text-xs">
                   <span className="text-slate-500 font-medium">GST (10%)</span>
-                  <span className="text-slate-900 dark:text-white font-bold">{formatCurrency(invoice?.totals?.gst)}</span>
+                  <span className="text-slate-900 dark:text-white font-bold">{formatCurrency(gstVal)}</span>
                 </div>
                 <div className="flex justify-between text-xs border-t border-slate-50 dark:border-zinc-800/50 pt-4 mt-4">
                   <span className="text-slate-900 dark:text-white font-black">Total (inc GST)</span>
-                  <span className="text-slate-900 dark:text-white font-black">{formatCurrency(invoice?.totals?.total_inc_gst)}</span>
+                  <span className="text-slate-900 dark:text-white font-black">{formatCurrency(totalIncGst)}</span>
                 </div>
               </div>
 
               <div className="border-t border-slate-100 dark:border-zinc-800 pt-6 space-y-4">
-                <div className="flex justify-between text-xs">
-                  <span className="text-slate-500 font-medium uppercase tracking-widest text-[10px]">Amount Paid</span>
-                  <span className="text-emerald-600 font-bold">-{formatCurrency(invoice?.totals?.amount_paid)}</span>
-                </div>
+                {!isCreate && (
+                  <div className="flex justify-between text-xs">
+                    <span className="text-slate-500 font-medium uppercase tracking-widest text-[10px]">Amount Paid</span>
+                    <span className="text-emerald-600 font-bold">-{formatCurrency(amountPaid)}</span>
+                  </div>
+                )}
                 <div className="flex justify-between text-xs">
                   <span className="text-slate-500 font-medium uppercase tracking-widest text-[10px]">Credit Amount</span>
-                  <span className="text-primary font-bold">-{formatCurrency(invoice?.totals?.credit_amount || 0)}</span>
+                  <span className="text-primary font-bold">-{formatCurrency(creditAmount)}</span>
                 </div>
               </div>
 
@@ -598,7 +658,7 @@ export const InvoicePaper: React.FC<InvoicePaperProps> = ({
                   <p className="text-[10px] text-slate-400 font-medium mb-0">(inc GST)</p>
                 </div>
                 <span className="text-4xl font-black text-primary tracking-tighter">
-                  {formatCurrency(invoice?.totals?.amount_due)}
+                  {formatCurrency(amountDue)}
                 </span>
               </div>
             </div>

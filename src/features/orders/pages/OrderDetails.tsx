@@ -181,7 +181,7 @@ const OrderDetailsPage: React.FC = () => {
             />
           )}
 
-          <div className="grid grid-cols-1 xl:grid-cols-[1fr_380px] gap-6 items-start">
+          <div className="grid grid-cols-1 xl:grid-cols-[1fr_380px] gap-4 items-start">
             <div className="flex flex-col gap-3 overflow-hidden">
               <AddressCard
                 title="SENDER"

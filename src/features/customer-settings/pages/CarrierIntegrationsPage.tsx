@@ -15,6 +15,7 @@ import {
   useDisconnectIntegration
 } from '@/features/integrations/hooks/useIntegrations';
 import { showToast } from '@/components/ui/custom-toast';
+import { CustomTooltip } from '@/components/common/CustomTooltip';
 
 const carriers = [
   { id: 'auspost', name: 'Australia Post', icon: Truck, status: 'available' },
@@ -176,40 +177,51 @@ export default function CarrierIntegrationsPage() {
       key: 'actions',
       cell: (_: any, row: any) => (
         <div className="flex items-center gap-2">
-          <Button
-            variant="ghost"
-            size="icon-sm"
-            className="h-8 w-8 text-slate-400 hover:text-primary"
-            onClick={() => handleSync(row.id)}
-            disabled={syncMutation.isPending && syncMutation.variables === row.id}
-          >
-            {syncMutation.isPending && syncMutation.variables === row.id ? (
-              <Loader2 className="w-4 h-4 animate-spin" />
-            ) : (
-              <RefreshCw className="w-4 h-4" />
-            )}
-          </Button>
-          <Button
-            variant="ghost"
-            size="icon-sm"
-            className="h-8 w-8 text-slate-400 hover:text-slate-900 dark:hover:text-white"
-            onClick={() => handleEdit(row.id)}
-          >
-            <Settings2 className="w-4 h-4" />
-          </Button>
-          <Button
-            variant="ghost"
-            size="icon-sm"
-            className="h-8 w-8 text-red-400 hover:text-red-600"
-            onClick={() => handleDisconnect(row.id)}
-            disabled={disconnectMutation.isPending && disconnectMutation.variables === row.id}
-          >
-            {disconnectMutation.isPending && disconnectMutation.variables === row.id ? (
-              <Loader2 className="w-4 h-4 animate-spin" />
-            ) : (
-              <Link2Off className="w-4 h-4" />
-            )}
-          </Button>
+          <CustomTooltip title="Sync">
+
+            <Button
+              variant="ghost"
+              size="icon-sm"
+              className="h-8 w-8 text-slate-400 hover:text-primary"
+              onClick={() => handleSync(row.id)}
+              disabled={syncMutation.isPending && syncMutation.variables === row.id}
+            >
+              {syncMutation.isPending && syncMutation.variables === row.id ? (
+                <Loader2 className="w-4 h-4 animate-spin" />
+              ) : (
+                <RefreshCw className="w-4 h-4" />
+              )}
+            </Button>
+          </CustomTooltip>
+
+          <CustomTooltip title="Edit Settings">
+
+            <Button
+              variant="ghost"
+              size="icon-sm"
+              className="h-8 w-8 text-slate-400 hover:text-slate-900 dark:hover:text-white"
+              onClick={() => handleEdit(row.id)}
+            >
+              <Settings2 className="w-4 h-4" />
+            </Button>
+          </CustomTooltip>
+
+          <CustomTooltip title="Disconnect">
+            <Button
+              variant="ghost"
+              size="icon-sm"
+              className="h-8 w-8 text-red-400 hover:text-red-600"
+              onClick={() => handleDisconnect(row.id)}
+              disabled={disconnectMutation.isPending && disconnectMutation.variables === row.id}
+            >
+              {disconnectMutation.isPending && disconnectMutation.variables === row.id ? (
+                <Loader2 className="w-4 h-4 animate-spin" />
+              ) : (
+                <Link2Off className="w-4 h-4" />
+              )}
+            </Button>
+          </CustomTooltip>
+
         </div>
       )
     }

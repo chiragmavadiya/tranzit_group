@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useEffectEvent, useState } from 'react'
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card'
 import { Truck, AlertCircle, RefreshCw } from 'lucide-react'
 import { Badge } from '@/components/ui/badge'
@@ -34,6 +34,31 @@ export const CarrierCard: React.FC<CarrierCardProps> = (props) => {
   ) => {
     return location?.address1 || location?.address || location?.label || "";
   };
+
+  const handleServiceSuccess = useEffectEvent((data: any) => {
+    setCouriers(data.services || []);
+    setSurchargesMap(data.surcharges || {});
+    if (data.services && data.services.length > 0) {
+      const getServiceTotalPrice = (service: any) => {
+        const surcharges = data.surcharges?.[service.courierCode] || [];
+        const totalSurcharges = surcharges.reduce((acc: number, curr: any) => acc + curr.amount, 0);
+        return service.price + totalSurcharges;
+      };
+      const minItem = data.services.reduce((min: any, curr: any) =>
+        getServiceTotalPrice(curr) < getServiceTotalPrice(min) ? curr : min
+      );
+      setBestDeal(minItem.product_id || minItem.courierCode || '');
+      const selectedFromQuote = sessionStorage.getItem('quote_courier');
+      if (selectedFromQuote) {
+        const courier = JSON.parse(selectedFromQuote);
+        setSelectedServiceId(courier.courier.product_id || courier.courier.courierCode || '');
+      } else if (!selectedServiceId) {
+        setSelectedServiceId(minItem.product_id || minItem.courierCode || '');
+      }
+      // if (!selectedServiceId)
+      //   setSelectedServiceId(minItem.product_id || minItem.courierCode || '');
+    }
+  })
   useEffect(() => {
     if (orderType !== 'create' && orderType !== 'consign') return;
     // Check if we have valid items with dimensions > 0
@@ -69,20 +94,7 @@ export const CarrierCard: React.FC<CarrierCardProps> = (props) => {
       }
       getServices(payload, {
         onSuccess: (data) => {
-          setCouriers(data.services || []);
-          setSurchargesMap(data.surcharges || {});
-          if (data.services && data.services.length > 0) {
-            const getServiceTotalPrice = (service: any) => {
-              const surcharges = data.surcharges?.[service.courierCode] || [];
-              const totalSurcharges = surcharges.reduce((acc: number, curr: any) => acc + curr.amount, 0);
-              return service.price + totalSurcharges;
-            };
-            const minItem = data.services.reduce((min, curr) =>
-              getServiceTotalPrice(curr) < getServiceTotalPrice(min) ? curr : min
-            );
-            setBestDeal(minItem.product_id || minItem.courierCode || '');
-            setSelectedServiceId(minItem.product_id || minItem.courierCode || '');
-          }
+          handleServiceSuccess(data);
         },
         onError: (err: any) => {
           showToast(err?.response?.data?.message || 'Failed to fetch rates', "error");
@@ -117,7 +129,7 @@ export const CarrierCard: React.FC<CarrierCardProps> = (props) => {
   }, [selectedServiceId, couriers, surchargesMap, onQuoteChange, setCourierData])
 
   return (
-    <Card className="border py-1 gap-0 border-gray-100 dark:border-zinc-800 overflow-hidden transition-colors duration-300">
+    <Card className="border py-1 gap-0 border-gray-200 dark:border-zinc-800 overflow-hidden transition-colors duration-300">
       <CardHeader className="flex flex-row items-center justify-between py-3 px-5 border-b border-gray-100 dark:border-zinc-800 bg-white dark:bg-zinc-900 transition-colors">
         <div className="flex justify-between w-full items-center gap-2">
           <div className='flex items-center gap-2'>

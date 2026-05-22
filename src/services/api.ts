@@ -1,3 +1,4 @@
+import { showToast, suspendToast } from "@/components/ui/custom-toast";
 import axios, { AxiosError, type InternalAxiosRequestConfig } from "axios";
 
 const baseURL = import.meta.env.VITE_API_BASE_URL || import.meta.env.VITE_API_URL || "http://127.0.0.1:8000/api";
@@ -38,7 +39,8 @@ api.interceptors.response.use(
         return response;
     },
     (error: AxiosError) => {
-        const message = (error.response?.data as any)?.message || error.message || "An error occurred";
+        const data = error.response?.data as any;
+        const message = data?.message || error.message || "An error occurred";
 
         // Update error message to use the server-side message if it exists
         error.message = message;
@@ -54,7 +56,17 @@ api.interceptors.response.use(
             message,
             url: error.config?.url,
         });
-
+        if (error.message === 'Validation failed') {
+            if (data?.errors) {
+                const beErrors = data.errors;
+                const formattedErrors: Record<string, string> = {};
+                Object.keys(beErrors).forEach(key => {
+                    showToast(beErrors[key][0], "error");
+                    formattedErrors[key] = beErrors[key][0];
+                    suspendToast();
+                });
+            }
+        }
         return Promise.reject(error);
     }
 );

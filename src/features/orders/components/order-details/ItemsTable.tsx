@@ -74,7 +74,7 @@ export const ItemsTable: React.FC<ItemsTableProps> = ({
     <Accordion multiple defaultValue={['notes', 'services', 'summary', 'pickup_date']} className="flex flex-col gap-3">
 
       {/* ORDER QUOTATION SUMMARY */}
-      <AccordionItem value="summary" className="border border-gray-200 dark:border-zinc-800 rounded-sm bg-white dark:bg-zinc-950 shadow-sm px-5 border-b overflow-hidden transition-colors duration-300 [&>h3]:my-0">
+      <AccordionItem value="summary" className="border border-gray-200 dark:border-zinc-800 rounded-md bg-white dark:bg-zinc-950 shadow-xs px-5 border-b overflow-hidden transition-colors duration-300 [&>h3]:my-0">
         <AccordionTrigger className="hover:no-underline py-3 px-0 [&>svg]:text-primary items-center">
           <div className="flex items-center w-full justify-between ">
             <div className="flex items-center gap-2 text-gray-600 dark:text-zinc-300">

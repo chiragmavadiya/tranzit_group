@@ -92,7 +92,7 @@ export function EnquiryDetailsDialog({ enquiryId, onClose }: EnquiryDetailsDialo
                 {enquiry.attachments.map((file: any, index: number) => (
                   <a
                     key={index}
-                    href={file.url}
+                    href={`${import.meta.env.VITE_API_BASE_URL}/storage/app/public/${file}`}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="flex items-center gap-2 px-3 py-1.5 bg-slate-50 dark:bg-zinc-900 border border-slate-200 dark:border-zinc-800 rounded-md hover:border-blue-300 transition-colors"

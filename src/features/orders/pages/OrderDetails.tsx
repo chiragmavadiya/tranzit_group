@@ -74,6 +74,7 @@ const OrderDetailsPage: React.FC = () => {
     downloadLabel,
   } = useOrderWorkflow();
 
+
   if (isOrderLoading && orderType !== 'create' && orderType !== 'create-menual') {
     return (
       <div className="flex items-center justify-center h-screen bg-white dark:bg-zinc-950">
@@ -113,7 +114,7 @@ const OrderDetailsPage: React.FC = () => {
         />
 
         {requiresManualLabel && (
-          <div className="mb-4 mt-3 py-2 px-5  bg-red-50 dark:bg-red-900/10 border border-red-200 dark:border-red-900/30 rounded-xl flex flex-col md:flex-row items-start md:items-center justify-between gap-4 animate-in slide-in-from-top-2 duration-500 shadow-sm">
+          <div className="mb-4 mt-3 py-2 px-4  bg-red-50 dark:bg-red-900/10 border border-red-200 dark:border-red-900/30 rounded-xl flex flex-col md:flex-row items-start md:items-center justify-between gap-4 animate-in slide-in-from-top-2 duration-500 shadow-sm">
             <div className="flex items-center gap-4">
               <div className="h-8 w-8 rounded-full bg-red-100 dark:bg-red-900/40 flex items-center justify-center text-red-600 dark:text-red-400 shrink-0">
                 <AlertTriangle size={20} />
@@ -132,16 +133,16 @@ const OrderDetailsPage: React.FC = () => {
         )}
 
         {orderDetail?.cancel_request && orderDetail.status !== 'Cancelled' && (
-          <div className="mb-4 p-4 bg-amber-50 dark:bg-amber-900/10 border border-amber-200 dark:border-amber-900/30 rounded-xl flex flex-col md:flex-row items-start md:items-center justify-between gap-4 animate-in slide-in-from-top-2 duration-500 shadow-sm">
+          <div className="mb-4 py-2 px-4 bg-amber-50 dark:bg-amber-900/10 border border-amber-200 dark:border-amber-900/30 rounded-xl flex flex-col md:flex-row items-start md:items-center justify-between gap-4 animate-in slide-in-from-top-2 duration-500 shadow-sm">
             <div className="flex items-center gap-4">
-              <div className="h-12 w-12 rounded-full bg-amber-100 dark:bg-amber-900/40 flex items-center justify-center text-amber-600 dark:text-amber-400 shrink-0">
-                <AlertTriangle size={24} />
+              <div className="h-8 w-8 rounded-full bg-amber-100 dark:bg-amber-900/40 flex items-center justify-center text-amber-600 dark:text-amber-400 shrink-0">
+                <AlertTriangle size={20} />
               </div>
               <div>
-                <h3 className="mt-0 text-sm font-bold text-amber-900 dark:text-amber-100 uppercase tracking-widest">
+                <h3 className="my-0 text-[12px] font-bold text-amber-900 dark:text-amber-100 uppercase tracking-wider">
                   Cancellation Request Pending
                 </h3>
-                <div className="mt-1.5 flex flex-wrap gap-x-6 gap-y-1 text-xs font-bold text-amber-700 dark:text-amber-400/80">
+                <div className=" flex flex-wrap gap-x-6 gap-y-1 text-[11px] font-bold text-amber-700 dark:text-amber-400/80">
                   <div className="flex items-center gap-1.5">
                     <span className="opacity-80 font-medium">Requested By:</span>
                     <span>{orderDetail?.cancel_request?.requested_by}</span>
@@ -251,6 +252,7 @@ const OrderDetailsPage: React.FC = () => {
               orderType={orderType}
               liabilityMessage={orderDetail?.limited_liability_cover?.message}
               liability={orderDetail?.limited_liability_cover?.covered || false}
+              payment_status={orderDetail?.payment_status}
             />
           </div>
         </main>

@@ -33,6 +33,10 @@ export function QuoteForm({ locations, setLocations }: QuoteFormProps) {
                     ...prev,
                     sender: {
                       label: opt.formatted_address,
+                      address1: opt.address1 || '',
+                      street_name: opt.street_name || '',
+                      street_number: opt.street_number || '',
+                      street_type: opt.street_type || '',
                       suburb: opt.suburb || '',
                       state: opt.state || '',
                       postcode: opt.post_code || '',
@@ -48,6 +52,10 @@ export function QuoteForm({ locations, setLocations }: QuoteFormProps) {
                     ...prev,
                     sender: prev.sender ? { ...prev.sender, label: value } : {
                       label: value,
+                      address1: '',
+                      street_name: '',
+                      street_number: '',
+                      street_type: '',
                       suburb: '',
                       state: '',
                       postcode: '',
@@ -66,6 +74,10 @@ export function QuoteForm({ locations, setLocations }: QuoteFormProps) {
                     ...prev,
                     receiver: {
                       label: opt.formatted_address,
+                      address1: opt.address1 || '',
+                      street_name: opt.street_name || '',
+                      street_number: opt.street_number || '',
+                      street_type: opt.street_type || '',
                       suburb: opt.suburb || '',
                       state: opt.state || '',
                       postcode: opt.post_code || '',
@@ -81,6 +93,10 @@ export function QuoteForm({ locations, setLocations }: QuoteFormProps) {
                     ...prev,
                     receiver: prev.receiver ? { ...prev.receiver, label: value } : {
                       label: value,
+                      address1: '',
+                      street_name: '',
+                      street_number: '',
+                      street_type: '',
                       suburb: '',
                       state: '',
                       postcode: '',

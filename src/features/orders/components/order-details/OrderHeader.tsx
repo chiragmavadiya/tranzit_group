@@ -11,6 +11,7 @@ import { Order_status_styles } from '../../constants'
 import { useAppSelector } from '@/hooks/store.hooks'
 import { FormSelect } from '../OrderFormUI'
 import { useCustomers } from '@/features/customers/hooks/useCustomers'
+import { CustomTooltip } from '@/components/common/CustomTooltip'
 
 
 interface OrderHeaderProps {
@@ -235,7 +236,10 @@ export const OrderHeader: React.FC<OrderHeaderProps> = ({
 
 
         <div className="flex items-center gap-1">
-          Created <span className="text-gray-700 dark:text-zinc-300">{orderDetail?.created_human}</span>
+          Created
+          <CustomTooltip title={orderDetail.created_at}>
+            <span className="text-gray-700 dark:text-zinc-300">{orderDetail?.created_human}</span>
+          </CustomTooltip>
         </div>
         <Badge variant="secondary" className={cn("border-none rounded-sm px-2 py-0 h-5 uppercase font-bold", Order_status_styles[orderDetail?.status || 'New'])}>
           {orderDetail?.status || 'NEW'}

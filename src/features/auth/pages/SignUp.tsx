@@ -104,7 +104,7 @@ export default function SignUp() {
 
 
   return (
-    <div className="w-lg">
+    <div className="w-full">
       <div className="flex flex-col items-center text-center space-y-2 mb-8">
         <div className="flex items-center space-x-2 pb-2">
           <img src={brandlogo} alt="Logo" className="h-16 w-auto" />
@@ -128,7 +128,7 @@ export default function SignUp() {
               id="firstName"
               name="firstName"
               placeholder="First name"
-              className="bg-white dark:bg-zinc-900 border-slate-200 dark:border-slate-800 focus:border-primary transition-all h-11 shadow-sm"
+              className="bg-white dark:bg-zinc-900 border-slate-200 dark:border-slate-800 focus:border-primary transition-all h-11 shadow-xs"
               value={data.firstName}
               onChange={updateValue}
               error={submitted && (!data.firstName || !!errors.firstName)}
@@ -143,7 +143,7 @@ export default function SignUp() {
               id="lastName"
               name="lastName"
               placeholder="Last name"
-              className="bg-white dark:bg-zinc-900 border-slate-200 dark:border-slate-800 focus:border-primary transition-all h-11 shadow-sm"
+              className="bg-white dark:bg-zinc-900 border-slate-200 dark:border-slate-800 focus:border-primary transition-all h-11 shadow-xs"
               value={data.lastName}
               onChange={updateValue}
               error={submitted && (!data.lastName || !!errors.lastName)}
@@ -164,7 +164,7 @@ export default function SignUp() {
             autoCapitalize="none"
             autoComplete="email"
             autoCorrect="off"
-            className="bg-white dark:bg-zinc-900 border-slate-200 dark:border-slate-800 focus:border-primary transition-all h-11 shadow-sm"
+            className="bg-white dark:bg-zinc-900 border-slate-200 dark:border-slate-800 focus:border-primary transition-all h-11 shadow-xs"
             value={data.email}
             onChange={updateValue}
             error={submitted && (!data.email || !!errors.email)}
@@ -203,7 +203,7 @@ export default function SignUp() {
             name="password"
             placeholder="Enter your password"
             autoComplete="new-password"
-            className="bg-white dark:bg-zinc-900 border-slate-200 dark:border-slate-800 focus:border-primary transition-all h-11 shadow-sm"
+            className="bg-white dark:bg-zinc-900 border-slate-200 dark:border-slate-800 focus:border-primary transition-all h-11 shadow-xs"
             value={data.password}
             onChange={updateValue}
             error={submitted && (!data.password || !!errors.password)}
@@ -220,7 +220,7 @@ export default function SignUp() {
             name="confirmPassword"
             placeholder="Re-enter your password"
             autoComplete="new-password"
-            className="bg-white dark:bg-zinc-900 border-slate-200 dark:border-slate-800 focus:border-primary transition-all h-11 shadow-sm"
+            className="bg-white dark:bg-zinc-900 border-slate-200 dark:border-slate-800 focus:border-primary transition-all h-11 shadow-xs"
             value={data.confirmPassword}
             onChange={updateValue}
             error={submitted && (!data.confirmPassword || !!errors.confirmPassword)}
@@ -248,7 +248,7 @@ export default function SignUp() {
           {/* {submitted && errors.terms && <p className="text-red-500 text-[11px] mt-1 mb-0">{errors.terms}</p>} */}
         </div>
 
-        <Button type="submit" disabled={registerMutation.isPending} className="w-full text-white font-bold h-11 text-[13px] rounded-xl bg-primary hover:bg-primary/90 transition-all shadow-lg shadow-primary/20 active:scale-[0.98]">
+        <Button type="submit" disabled={registerMutation.isPending} className="w-full text-white font-bold h-11 text-[13px] rounded-md bg-primary hover:bg-primary/90 transition-all shadow-lg shadow-primary/20 active:scale-[0.98]">
           {registerMutation.isPending ? "Creating Account..." : "Create Account"}
         </Button>
 

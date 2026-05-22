@@ -16,6 +16,7 @@ import { useGlobalCouriers } from '@/features/courier-surcharge/hooks/useGlobalC
 import type { AddressData, WalletCheckResponse } from '../types';
 
 export const useOrderWorkflow = () => {
+  console.log('render......')
   const { orderType, orderID } = useParams<{ orderType: string; orderID: string }>();
   const { role, user } = useAppSelector((state) => state.auth);
   const navigate = useNavigate();
@@ -526,11 +527,50 @@ export const useOrderWorkflow = () => {
       }
     }
 
-    return () => {
-      sessionStorage.removeItem('address');
-    };
-  }, []);
+    const qSender = sessionStorage.getItem('quote_sender');
+    const qReceiver = sessionStorage.getItem('quote_receiver');
+    const qItems = sessionStorage.getItem('quote_items');
+    const qCourier = sessionStorage.getItem('quote_courier');
 
+    if (qSender || qReceiver || qItems || qCourier) {
+      try {
+        if (qSender && qReceiver) {
+          setAddressData(prev => ({
+            ...prev,
+            // sender: JSON.parse(qSender),
+            receiver: JSON.parse(qReceiver),
+          }));
+        }
+        if (qItems) {
+          setItemsData(JSON.parse(qItems));
+        }
+        if (qCourier) {
+          const parsedCourier = JSON.parse(qCourier);
+          setQuoteData(parsedCourier);
+          setCourierData({
+            courier: parsedCourier.courier?.carrier_id,
+            product_id: parsedCourier.courier?.product_id,
+            product_type: parsedCourier.courier?.product_type,
+            shipment_summary: parsedCourier.courier?.shipment_summary,
+          });
+        }
+      } catch (e) {
+        console.error("Failed to parse quote prefill from sessionStorage:", e);
+      }
+      // finally {
+      //   sessionStorage.removeItem('quote_sender');
+      //   sessionStorage.removeItem('quote_receiver');
+      //   sessionStorage.removeItem('quote_items');
+      //   sessionStorage.removeItem('quote_courier');
+      // }
+    }
+    return () => {
+      sessionStorage.removeItem('address')
+      sessionStorage.removeItem('quote_sender')
+      sessionStorage.removeItem('quote_receiver')
+      sessionStorage.removeItem('quote_items')
+    }
+  }, [setItemsData, setQuoteData, setCourierData]);
 
   return {
     orderType,

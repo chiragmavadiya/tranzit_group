@@ -27,7 +27,7 @@ export function OrdersTabs({ activeTab, onTabChange, className }: OrdersTabsProp
             key={tab}
             onClick={() => onTabChange(key as TabType)}
             className={cn(
-              "h-10 px-4 border cursor-pointer font-semibold text-[13px] rounded-t-md transition-all duration-200 relative flex items-center gap-2 outline-none whitespace-nowrap",
+              "h-10 px-4 border cursor-pointer capitalize font-semibold text-[13px] rounded-t-md transition-all duration-200 relative flex items-center gap-2 outline-none whitespace-nowrap",
               isActive
                 ? "border-gray-200 border-b-white text-primary dark:border-zinc-800 dark:border-b-zinc-950"
                 : "border-transparent text-gray-500 dark:text-zinc-400 hover:text-gray-700 dark:hover:text-zinc-200 "

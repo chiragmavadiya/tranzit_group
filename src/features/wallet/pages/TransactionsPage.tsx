@@ -66,7 +66,7 @@ export default function TransactionsPage() {
       iconColor: 'text-primary',
       iconBg: 'bg-primary/5 dark:bg-primary/10',
     },
-  ], []);
+  ], [summary?.total_credit, summary?.total_debit, summary?.wallet_balance]);
 
   const handleTransactionTypeChange = (val: string) => {
     setTransactionType(val);

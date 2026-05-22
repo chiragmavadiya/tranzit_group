@@ -87,6 +87,15 @@ const CustomToast = ({ message, type = "default", t, description }: CustomToastP
   );
 };
 
+let isGloballySuspended = false;
+
+export const suspendToast = () => {
+  isGloballySuspended = true;
+  setTimeout(() => {
+    isGloballySuspended = false;
+  }, 0);
+};
+
 /**
  * Custom Toast Utility
  * @param message The message to display
@@ -94,6 +103,7 @@ const CustomToast = ({ message, type = "default", t, description }: CustomToastP
  * @param title Optional title
  */
 export const showToast = (message: string, type: ToastType = "default", description?: string) => {
+  if (isGloballySuspended) return;
   toast.dismiss();
   toast.custom((t) => (
     <CustomToast

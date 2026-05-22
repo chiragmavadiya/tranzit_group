@@ -20,7 +20,7 @@ export default function EnquiryPage() {
     per_page: pageSize
   });
 
-  const inquiries = inquiriesResponse?.data.map((e, i) => ({ ...e, id: i })) || [];
+  const inquiries = inquiriesResponse?.data || [];
   const totalItems = inquiriesResponse?.meta?.total || 0;
 
   // Reset page when search changes

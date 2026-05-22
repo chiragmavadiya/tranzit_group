@@ -15,6 +15,7 @@ import type { QuoteCalculations } from '@/features/quote/types';
 import { useMemo } from 'react';
 import { CustomLabel } from '../OrderFormUI';
 import { cn } from '@/lib/utils';
+import { StatusBadge } from '../StatusBadge';
 
 interface SidePanelProps {
   itemsData?: any[];
@@ -29,9 +30,10 @@ interface SidePanelProps {
   calculation: QuoteCalculations
   liability: boolean;
   liabilityMessage: string | undefined;
+  payment_status?: string;
 }
 
-export const SidePanel: React.FC<SidePanelProps> = ({ calculation, handleOptionalFieldsChange, insuranceSelected, signatureSelected, deliveryInstructions, pickupDate, setPickupDate, orderType, liability = false, liabilityMessage }) => {
+export const SidePanel: React.FC<SidePanelProps> = ({ calculation, handleOptionalFieldsChange, insuranceSelected, signatureSelected, deliveryInstructions, pickupDate, setPickupDate, orderType, liability = false, liabilityMessage, payment_status }) => {
   const isCreate = useMemo(() => orderType === 'create' || orderType === 'create-menual' || orderType === 'consign', [orderType]);
   return (
     <div className="flex flex-col gap-4">
@@ -39,9 +41,13 @@ export const SidePanel: React.FC<SidePanelProps> = ({ calculation, handleOptiona
 
         {/* ORDER QUOTATION SUMMARY */}
         {orderType !== 'create-menual' && (
-          <AccordionItem value="summary" className="border border-gray-200 dark:border-zinc-800 rounded-xl bg-white dark:bg-zinc-950 shadow-sm px-5 border-b overflow-hidden transition-colors duration-300 [&>h3]:my-0">
+          <AccordionItem value="summary" className="border border-gray-200 dark:border-zinc-800 rounded-xl bg-white dark:bg-zinc-950 shadow-xs px-5 border-b overflow-hidden transition-colors duration-300 [&>h3]:my-0">
             <AccordionTrigger className="hover:no-underline py-3 px-0 [&>svg]:text-primary">
-              <span className="text-sm font-bold text-gray-900 dark:text-zinc-100 tracking-wider">ORDER QUOTATION SUMMARY</span>
+              <div className='flex justify-between w-full'>
+
+                <div className="text-sm font-bold text-gray-900 dark:text-zinc-100 tracking-wider">ORDER QUOTATION SUMMARY</div>
+                {payment_status && <StatusBadge status={payment_status} />}
+              </div>
             </AccordionTrigger>
             <AccordionContent className="flex flex-col gap-2 pb-4 pt-1">
 
@@ -91,7 +97,7 @@ export const SidePanel: React.FC<SidePanelProps> = ({ calculation, handleOptiona
         {/* ADDITIONAL SERVICES */}
         {(isCreate) && (
           <>
-            <AccordionItem value="services" className="border border-gray-200 dark:border-zinc-800 rounded-xl bg-white dark:bg-zinc-950 shadow-sm px-5 border-b overflow-hidden transition-colors duration-300 [&>h3]:my-0">
+            <AccordionItem value="services" className="border border-gray-200 dark:border-zinc-800 rounded-xl bg-white dark:bg-zinc-950 shadow-xs px-5 border-b overflow-hidden transition-colors duration-300 [&>h3]:my-0">
               <AccordionTrigger className="hover:no-underline py-3 px-0 [&>svg]:text-primary">
                 <span className="text-sm font-bold text-gray-900 dark:text-zinc-100 tracking-wider">ADDITIONAL SERVICES</span>
               </AccordionTrigger>
@@ -179,7 +185,7 @@ export const SidePanel: React.FC<SidePanelProps> = ({ calculation, handleOptiona
           </>
         )}
         {/* NOTES */}
-        <AccordionItem value="notes" className="border border-gray-200 dark:border-zinc-800 rounded-xl bg-white dark:bg-zinc-950 shadow-sm px-5 border-b overflow-hidden transition-colors duration-300 [&>h3]:my-0">
+        <AccordionItem value="notes" className="border border-gray-200 dark:border-zinc-800 rounded-xl bg-white dark:bg-zinc-950 shadow-xs px-5 border-b overflow-hidden transition-colors duration-300 [&>h3]:my-0">
           <AccordionTrigger className="hover:no-underline py-3 px-0 [&>svg]:text-primary items-center">
             <span className="text-sm font-bold text-gray-900 dark:text-zinc-100 tracking-wider">Delivery Instructions(Printed on Label)</span>
           </AccordionTrigger>
@@ -305,7 +311,7 @@ export const SidePanel: React.FC<SidePanelProps> = ({ calculation, handleOptiona
         {/* LIABILITY COVER */}
         {!isCreate && (
           <AccordionItem value="liability" className={cn(
-            "border rounded-xl shadow-sm px-5 border-b overflow-hidden transition-colors duration-300 [&>h3]:my-0",
+            "border rounded-xl shadow-xs px-5 border-b overflow-hidden transition-colors duration-300 [&>h3]:my-0",
             liability
               ? "border-emerald-200 dark:border-emerald-900/30 bg-emerald-50/50 dark:bg-emerald-900/10"
               : "border-slate-200 dark:border-zinc-800 bg-slate-50 dark:bg-zinc-900/50"
@@ -348,7 +354,7 @@ export const SidePanel: React.FC<SidePanelProps> = ({ calculation, handleOptiona
           </AccordionItem>)}
 
         {/* SUPPORT & REFERENCE */}
-        <AccordionItem value="support" className="border border-gray-200 dark:border-zinc-800 rounded-xl bg-white dark:bg-zinc-950 shadow-sm px-5 border-b overflow-hidden transition-colors duration-300 [&>h3]:my-0">
+        <AccordionItem value="support" className="border border-gray-200 dark:border-zinc-800 rounded-xl bg-white dark:bg-zinc-950 shadow-xs px-5 border-b overflow-hidden transition-colors duration-300 [&>h3]:my-0">
           <AccordionTrigger className="hover:no-underline py-3 px-0 [&>svg]:text-primary">
             <span className="text-sm font-bold text-gray-900 dark:text-zinc-100 tracking-wider uppercase">Support & Reference</span>
           </AccordionTrigger>

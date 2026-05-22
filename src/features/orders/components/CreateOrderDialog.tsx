@@ -186,7 +186,7 @@ export default function CreateOrderDialog({ onOpenChange, type, open, initialDat
                 />
               ) : (
                 <AutoComplete
-                  placeholder='Search contact...'
+                  placeholder='Enter name or code to search the address book'
                   className='rounded-none'
                   inputClassName='rounded-none'
                   onChange={(value) => { setSearchAddress(value!); }}

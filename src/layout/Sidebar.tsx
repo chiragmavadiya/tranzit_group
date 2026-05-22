@@ -26,8 +26,8 @@ export default function Sidebar({ isCollapsed, setIsCollapsed }: SidebarProps) {
     const matchingItem = sidebarItems.find(item => {
       if (item.subGroups) {
         return item.subGroups.some(group =>
-          group.items.some(subItem => 
-            location.pathname === subItem.path || 
+          group.items.some(subItem =>
+            location.pathname === subItem.path ||
             location.pathname.startsWith(subItem.path)
           )
         );
@@ -142,6 +142,18 @@ export default function Sidebar({ isCollapsed, setIsCollapsed }: SidebarProps) {
                     if (item.hasDropdown) {
                       // e.preventDefault();
                       handleItemClick(item);
+                    }
+                    if (sessionStorage.getItem('quote_courier')) {
+                      sessionStorage.removeItem('quote_courier');
+                    }
+                    if (sessionStorage.getItem('quote_items')) {
+                      sessionStorage.removeItem('quote_items');
+                    }
+                    if (sessionStorage.getItem('quote_sender')) {
+                      sessionStorage.removeItem('quote_sender');
+                    }
+                    if (sessionStorage.getItem('quote_receiver')) {
+                      sessionStorage.removeItem('quote_receiver');
                     }
                   }}
                   className={({ isActive }) => {

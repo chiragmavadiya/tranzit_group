@@ -2,6 +2,10 @@ import type { ItemData } from "../orders/types";
 
 export interface QuoteLocation {
   label: string;
+  address1?: string;
+  street_name?: string;
+  street_number?: string;
+  street_type?: string;
   suburb: string;
   state: string;
   postcode: string;

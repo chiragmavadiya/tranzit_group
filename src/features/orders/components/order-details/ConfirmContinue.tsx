@@ -20,7 +20,7 @@ export const ConfirmContinue: React.FC<ConfirmContinueProps> = ({
   setDangerousGoodsAccepted,
 }) => {
   return (
-    <div className="bg-white dark:bg-zinc-950 rounded-xl border border-gray-200 dark:border-zinc-800 p-5 flex flex-col gap-4 shadow-sm transition-colors duration-300">
+    <div className="bg-white dark:bg-zinc-950 rounded-sm border border-gray-200 dark:border-zinc-800 p-5 flex flex-col gap-4 shadow-xs transition-colors duration-300">
       <h3 className="my-0 text-sm font-bold text-gray-900 dark:text-zinc-100 uppercase tracking-wider">Confirm & Continue</h3>
 
       <div className="flex flex-col gap-3">

@@ -341,3 +341,16 @@
 .pac-item {
   font-family: 'Geist Variable', sans-serif;
 }
+
+.pace .pace-progress {
+  /* background: var(--primary); */
+  height: 1.5px;
+  /* Your gradient background */
+  background: linear-gradient(90deg, #fff, #8ea6c7, var(--primary));
+
+  /* Optional: Soft glow that matches the gradient */
+  box-shadow: 0 2px 8px rgba(254, 180, 123, 0.5);
+
+  /* Smooth CSS transition handled by Pace */
+  transition: transform 0.2s ease-out;
+}

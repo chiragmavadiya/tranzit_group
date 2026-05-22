@@ -55,9 +55,9 @@ export const HistoryCard: React.FC<HistoryCardProps> = ({ history }) => {
             {displayHistory.map((item) => {
               const isExpanded = expandedItems[item.id]
               return (
-                <div key={item.id}>
+                <div key={item.id} className='py-2'>
                   <div
-                    className="space-y-2 flex items-center justify-between px-5 py-2 transition-colors hover:bg-gray-50/50 dark:hover:bg-zinc-900/50"
+                    className="flex items-center justify-between px-5 py-0 transition-colors hover:bg-gray-50/50 dark:hover:bg-zinc-900/50"
                   >
                     <div className="flex items-center gap-4 flex-1">
                       <Button
@@ -79,22 +79,14 @@ export const HistoryCard: React.FC<HistoryCardProps> = ({ history }) => {
                         {item.action}
                       </span>
                     </div>
-
-                    {/* <Button
-                      variant="ghost"
-                      size="icon"
-                      className="h-8 w-8 text-primary hover:bg-primary/10"
-                    >
-                      <Download className="h-4 w-4" />
-                    </Button> */}
                     <span className="text-xs font-medium text-gray-500 dark:text-zinc-400 whitespace-nowrap">
                       {item.timestamp}
                     </span>
                   </div>
 
                   {isExpanded && item.details && (
-                    <div className="px-5 pb-4 pl-[52px]">
-                      <p className="text-xs text-gray-400 dark:text-zinc-500">
+                    <div className="px-5 pl-[52px]">
+                      <p className="my-0 text-xs text-gray-400 dark:text-zinc-500">
                         {item.details}
                       </p>
                     </div>

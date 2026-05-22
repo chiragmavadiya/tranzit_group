@@ -385,7 +385,7 @@ export default function CustomerDialog({ open, onOpenChange, customerId }: Custo
                 <PlaceAutocomplete
                   label="Address Information"
                   onPlaceSelect={(opt) => {
-                    handleChange('address', opt.formatted_address);
+                    handleChange('address', opt.address1);
                     handleChange('street_name', opt.street_name);
                     handleChange('street_number', opt.street_number);
                     handleChange('street_type', opt.street_type);

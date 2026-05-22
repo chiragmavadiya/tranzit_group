@@ -88,7 +88,7 @@ export default function SignIn({ role = "customer" }: { role?: string }) {
         </p>
       </div>
 
-      <form onSubmit={handleSubmit} className="space-y-5 w-md">
+      <form onSubmit={handleSubmit} className="space-y-5 max-w-sm w-full">
         <div className="space-y-1">
           <Label htmlFor="email" className="text-[13px] font-bold text-slate-700 dark:text-slate-300 ml-1">Email ID</Label>
           <Input

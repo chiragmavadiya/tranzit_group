@@ -1,6 +1,6 @@
 "use client";
 
-import { LogOut, Sun, Moon, Monitor, Loader2, HelpCircle, User } from 'lucide-react';
+import { LogOut, Sun, Moon, Monitor, Loader2, HelpCircle, User, ArrowLeftRight } from 'lucide-react';
 import { useNavigate, useLocation, useSearchParams } from 'react-router-dom';
 import DropdownCustomContent, {
   DropdownCustomMenu,
@@ -20,8 +20,9 @@ import type { BookPickupTabType } from '@/features/book-pickup/constants/book-pi
 import type { ReportType } from '@/features/reports/types';
 import { useLogout } from '@/features/auth/hooks/useAuth';
 import { GlobalSearch } from '@/features/search/components/GlobalSearch';
-import { lazy, Suspense } from 'react';
+import { lazy, Suspense, useState } from 'react';
 import { useWalletSummary } from '@/features/wallet/hooks/useWallet';
+import { AccountSwitchDialog } from '@/features/profile/components/AccountSwitchDialog';
 
 const OrdersTabs = lazy(() => import('@/features/orders/components/OrdersTabs').then(module => ({ default: module.OrdersTabs })));
 const ReportsTabs = lazy(() => import('@/features/reports/components/ReportsTabs').then(module => ({ default: module.ReportsTabs })));
@@ -35,6 +36,7 @@ export default function TopBar({ isCollapsed }: { isCollapsed?: boolean }) {
   const location = useLocation();
   const [searchParams, setSearchParams] = useSearchParams();
   const { theme, setTheme } = useTheme();
+  const [isAccountSwitchOpen, setIsAccountSwitchOpen] = useState(false);
 
   const logoutMutation = useLogout();
   const role = localStorage.getItem("user_role") || "customer";
@@ -153,6 +155,10 @@ export default function TopBar({ isCollapsed }: { isCollapsed?: boolean }) {
                 {<User className="w-4 h-4 mr-2" />}
                 Edit Profile
               </DropdownMenuItem>
+              <DropdownMenuItem variant={"default"} onClick={() => setIsAccountSwitchOpen(true)} className={"cursor-pointer py-2 px-3 text-[13px]"}>
+                {<ArrowLeftRight className="w-4 h-4 mr-2" />}
+                Account Switch
+              </DropdownMenuItem>
               <DropdownMenuItem variant={"default"} onClick={handleFaq} className={"cursor-pointer py-2 px-3 text-[13px]"}>
                 {<HelpCircle className="w-4 h-4 mr-2" />}
                 FAQ
@@ -186,6 +192,10 @@ export default function TopBar({ isCollapsed }: { isCollapsed?: boolean }) {
           </div>
         </DropdownCustomContent>
       </div>
+      <AccountSwitchDialog
+        open={isAccountSwitchOpen}
+        onOpenChange={setIsAccountSwitchOpen}
+      />
     </header>
   );
 }

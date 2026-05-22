@@ -96,7 +96,7 @@ export default function ResetPassword() {
                 required
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="bg-white dark:bg-zinc-900 border-slate-300 dark:border-slate-800 transition-all focus-visible:ring-0 focus-visible:ring-offset-0 h-11 rounded-xl"
+                className="bg-white dark:bg-zinc-900 border-slate-300 dark:border-slate-800 transition-all focus-visible:ring-0 focus-visible:ring-offset-0 h-11 "
               />
               <div className="space-y-2 pt-2 px-1 text-left">
                 {validations.map((v, i) => (
@@ -128,7 +128,7 @@ export default function ResetPassword() {
                 name="confirmPassword"
                 placeholder="Re-enter your password"
                 required
-                className="bg-white dark:bg-zinc-900 border-slate-300 dark:border-slate-800 transition-all focus-visible:ring-0 focus-visible:ring-offset-0 h-11 rounded-xl"
+                className="bg-white dark:bg-zinc-900 border-slate-300 dark:border-slate-800 transition-all focus-visible:ring-0 focus-visible:ring-offset-0 h-11 "
               />
             </div>
           </div>
@@ -136,7 +136,7 @@ export default function ResetPassword() {
           <Button
             type="submit"
             disabled={isPending}
-            className="w-full text-white font-bold h-11 text-[13px] rounded-xl bg-primary hover:bg-primary/90 transition-all shadow-lg shadow-primary/20 active:scale-[0.98]"
+            className="w-full text-white font-bold h-11 text-[13px] rounded-md bg-primary hover:bg-primary/90 transition-all shadow-lg shadow-primary/20 active:scale-[0.98]"
           >
             {isPending ? "Setting password..." : "Set new password"}
           </Button>

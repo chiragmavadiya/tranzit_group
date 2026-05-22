@@ -10,7 +10,7 @@ import {
   TableRow
 } from '@/components/ui/table';
 import { Checkbox } from '@/components/ui/checkbox';
-import { cn, getNestedValue, useTraceUpdate } from '@/lib/utils';
+import { cn, getNestedValue } from '@/lib/utils';
 import SelectComponent from '../ui/select';
 import { usePagination } from './hooks/usePagination';
 import { Pagination } from './Pagination';
@@ -79,7 +79,6 @@ const DataTableComponent = <T extends Record<string, any>>(props: DataTableProps
   const currentSearch = searchValue !== undefined ? searchValue : internalSearch;
   const currentSortConfig = sortConfig !== undefined ? sortConfig : internalSortConfig;
   const currentSelectedRows = selectedRows !== undefined ? selectedRows : internalSelectedRows;
-  useTraceUpdate(props)
   // Get row identifier
   const getRowId = (row: T): string => {
     if (typeof rowKey === 'function') {
@@ -272,9 +271,9 @@ const DataTableComponent = <T extends Record<string, any>>(props: DataTableProps
                 </TableHead>
               )}
 
-              {columns.map((column) => (
+              {columns.map((column, index) => (
                 <TableHead
-                  key={column.key}
+                  key={`${column.key}-${index}`}
                   className={cn(
                     "h-12 text-[12px] font-bold text-gray-900 dark:text-zinc-100 uppercase tracking-wider px-5",
                     column.sortable !== false && sortable && "cursor-pointer hover:bg-muted/50",
@@ -315,7 +314,6 @@ const DataTableComponent = <T extends Record<string, any>>(props: DataTableProps
               displayData.map((row, index) => {
                 const rowId = getRowId(row);
                 const isSelected = currentSelectedRows.includes(rowId);
-
                 return (
                   <TableRow
                     key={rowId}
@@ -337,9 +335,9 @@ const DataTableComponent = <T extends Record<string, any>>(props: DataTableProps
                       </TableCell>
                     )}
 
-                    {columns.map((column) => (
+                    {columns.map((column, index) => (
                       <TableCell
-                        key={column.key}
+                        key={`${column.key}-${rowId}-${index}`}
                         className={cn(
                           `px-5 py-3.5 text-xs font-medium text-gray-700 dark:text-zinc-300 whitespace-normal`,
                           column.sticky === 'left' && "sticky left-0 bg-white",

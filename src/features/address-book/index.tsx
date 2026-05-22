@@ -169,7 +169,7 @@ export default function AddressBookPage() {
         </div>
       )
     }
-  ], [handleEditAddress, handleConfirmDelete]);
+  ], [handleEditAddress, handleConfirmDelete, createOrder]);
 
   return (
     <div className="flex flex-col flex-1 gap-2 p-page-padding min-h-0 animate-in fade-in slide-in-from-bottom-2 duration-500">

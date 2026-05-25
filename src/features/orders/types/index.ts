@@ -11,6 +11,7 @@ export interface Order {
   courier: string;
   order_type: string;
   consignment_date: string;
+  courier_logo?: string;
 }
 
 export type TabType = 'new' | 'printed' | 'shipped' | 'archived';
@@ -27,19 +28,20 @@ export interface Packet {
 
 export interface AddressData {
   name: string;
-  company: string;
-  phone: string;
   email: string;
+  phone: string;
+  company: string;
+  building: string;
+  instructions: string;
+
   address1?: string;
   address?: string;
+  street: string;
   suburb: string;
+  city: string;
   state: string;
   postcode: string;
-  unit_number?: string;
   country: string;
-  street_name: string;
-  street_number: string;
-  street_type?: string;
   saveToAddressBook: boolean;
 }
 

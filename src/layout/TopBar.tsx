@@ -23,6 +23,7 @@ import { GlobalSearch } from '@/features/search/components/GlobalSearch';
 import { lazy, Suspense, useState } from 'react';
 import { useWalletSummary } from '@/features/wallet/hooks/useWallet';
 import { AccountSwitchDialog } from '@/features/profile/components/AccountSwitchDialog';
+import { formateCurrency } from '@/lib/utils';
 
 const OrdersTabs = lazy(() => import('@/features/orders/components/OrdersTabs').then(module => ({ default: module.OrdersTabs })));
 const ReportsTabs = lazy(() => import('@/features/reports/components/ReportsTabs').then(module => ({ default: module.ReportsTabs })));
@@ -145,7 +146,7 @@ export default function TopBar({ isCollapsed }: { isCollapsed?: boolean }) {
                   {role === 'customer' && walletData?.data && (
                     <span className="text-xs font-semibold text-emerald-600 dark:text-emerald-400 mt-1 flex items-center gap-1.5">
                       <span className="inline-block w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
-                      Balance: {new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(Number(walletData.data.wallet_balance || 0))}
+                      Balance: {formateCurrency(Number(walletData.data.wallet_balance))}
                     </span>
                   )}
                 </div>
@@ -177,19 +178,17 @@ export default function TopBar({ isCollapsed }: { isCollapsed?: boolean }) {
           <div className="w-[32px] h-[32px] rounded-full pt-[2px] bg-primary/20 text-primary flex items-center justify-center text-xs font-semibold shadow-sm">
             {logoutMutation.isPending ? (
               <Loader2 className="w-4 h-4 animate-spin" />
-            ) : user?.first_name?.[0]}{user?.last_name?.[0]
-            }
+            ) : (user?.first_name?.[0] || '') + (user?.last_name?.[0] || '')}
           </div>
-          <div className="max-w-[170px]">
+          {/* <div className="max-w-[170px]">
 
-            {/* <CustomTooltip title={user?.email} onlyOnOverflow>
+            <CustomTooltip title={user?.email} onlyOnOverflow>
                 {user?.email}
                 <div className="h-10 w-10 rounded-full bg-primary flex items-center justify-center text-white font-bold shadow-md">
                   {user?.first_name?.[0]}{user?.last_name?.[0]}
                 </div>
-              </CustomTooltip> */}
-            {/* </div> */}
-          </div>
+              </CustomTooltip>
+          </div> */}
         </DropdownCustomContent>
       </div>
       <AccountSwitchDialog

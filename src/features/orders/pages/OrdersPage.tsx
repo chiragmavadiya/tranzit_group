@@ -206,7 +206,7 @@ export default function OrdersPage() {
     <div className="p-page-padding flex-1 flex flex-col space-y-4 animate-in fade-in slide-in-from-bottom-2 duration-300 h-full overflow-hidden min-h-0 bg-white dark:bg-zinc-950">
 
       <div className='rounded-lg shadow-sm flex-1 flex flex-col min-h-0 border border-gray-100 dark:border-zinc-800 bg-white dark:bg-zinc-950 '>
-        <div className="flex flex-wrap items-end justify-end gap-4 p-4">
+        <div className="flex flex-wrap items-end justify-end gap-4 p-4 pb-0 bg-gray-50/50 dark:bg-zinc-950/50">
           {selectedRows.length > 0 && (
             <div className="flex items-center gap-2 mr-2 border-r border-gray-200 dark:border-zinc-800 pr-4">
               <span className="text-xs text-slate-500 dark:text-zinc-400 font-medium mr-2 whitespace-nowrap">

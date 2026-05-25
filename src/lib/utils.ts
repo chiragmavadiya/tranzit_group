@@ -58,3 +58,7 @@ export const useRole = (): string => {
   const role = useAppSelector((state) => state.auth.role);
   return role || 'customer';
 };
+
+export const formateCurrency = (value: number) => {
+  return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(Number(value || 0));
+}

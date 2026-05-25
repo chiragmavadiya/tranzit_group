@@ -31,7 +31,7 @@ export default function EnquiryPage() {
                 <MessageSquare className="w-5 h-5" />
               </div>
               <div>
-                <h2 className="text-lg font-bold text-gray-900 dark:text-zinc-100 italic mt-0 mb-0">Submit an Enquiry</h2>
+                <h2 className="text-lg font-bold text-gray-900 dark:text-zinc-100 mt-0 mb-0">Submit an Enquiry</h2>
                 <p className="text-xs text-gray-500 dark:text-zinc-400 mb-0">We're here to help you with any issues or questions.</p>
               </div>
             </div>
@@ -76,7 +76,7 @@ export default function EnquiryPage() {
                 className="flex items-center justify-between p-3 rounded-xl bg-gray-50 dark:bg-zinc-900 group hover:bg-primary/5 dark:hover:bg-primary/10 transition-colors"
               >
                 <div className="flex flex-col">
-                  <span className="text-xs font-bold text-gray-900 dark:text-zinc-100 group-hover:text-primary transition-colors italic">Browse Help Center</span>
+                  <span className="text-xs font-bold text-gray-900 dark:text-zinc-100 group-hover:text-primary transition-colors">Browse Help Center</span>
                   <span className="text-[10px] text-gray-500 dark:text-zinc-400">Find instant answers to FAQs</span>
                 </div>
                 <ExternalLink className="w-3 h-3 text-gray-400 group-hover:text-primary transition-colors" />

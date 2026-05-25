@@ -284,9 +284,10 @@ export default function CustomerDialog({ open, onOpenChange, customerId }: Custo
                   label="Address Information"
                   onPlaceSelect={(opt) => {
                     handleChange('billing_address', opt.formatted_address);
-                    handleChange('billing_street_name', opt.street_name);
-                    handleChange('billing_street_number', opt.street_number);
-                    handleChange('billing_street_type', opt.street_type);
+                    handleChange('billing_street', opt.street);
+                    // handleChange('billing_street_name', opt.street_name);
+                    // handleChange('billing_street_number', opt.street_number);
+                    // handleChange('billing_street_type', opt.street_type);
                     handleChange('billing_suburb', opt.suburb);
                     handleChange('billing_state', opt.state);
                     handleChange('billing_country', opt.country);
@@ -386,9 +387,10 @@ export default function CustomerDialog({ open, onOpenChange, customerId }: Custo
                   label="Address Information"
                   onPlaceSelect={(opt) => {
                     handleChange('address', opt.address1);
-                    handleChange('street_name', opt.street_name);
-                    handleChange('street_number', opt.street_number);
-                    handleChange('street_type', opt.street_type);
+                    handleChange('street', opt.street);
+                    // handleChange('street_name', opt.street_name);
+                    // handleChange('street_number', opt.street_number);
+                    // handleChange('street_type', opt.street_type);
                     handleChange('suburb', opt.suburb);
                     handleChange('state', opt.state);
                     handleChange('country', opt.country);

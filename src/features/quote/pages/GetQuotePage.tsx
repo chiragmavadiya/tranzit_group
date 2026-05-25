@@ -11,11 +11,13 @@ import { ItemsTable } from '@/features/orders/components/order-details/ItemsTabl
 import { useOrderItems } from '@/features/orders/hooks/useOrderItems';
 import { CarrierCard } from '@/features/orders/components/order-details/CarrierCard';
 import { Button } from '@/components/ui/button';
+import { History } from 'lucide-react';
 
 export default function GetQuotePage() {
   const { role, user } = useAppSelector((state) => state.auth);
   const isAdmin = role === 'admin';
   const [margin, setMargin] = useState<string>('0');
+  const [pickupCharge, setPickupCharge] = useState<string>('0');
   const [isSendDialogOpen, setIsSendDialogOpen] = useState(false);
   const navigate = useNavigate();
 
@@ -57,9 +59,9 @@ export default function GetQuotePage() {
     const gst = quoteData?.courier?.gst || quoteData?.tax || 0;
     const totalSurcharges = quoteData?.totalSurcharges || 0;
     const marginPrice = (Number(servicePrice) * Number(margin)) / 100;
-    const grandTotal = Number(servicePrice) + Number(gst) + Number(totalSurcharges) + Number(marginPrice);
-    return { totalItems, totalWeight, volumetric, servicePrice, gst, totalSurcharges, grandTotal, margin: marginPrice }
-  }, [itemsData, quoteData, margin])
+    const grandTotal = Number(servicePrice) + Number(gst) + Number(totalSurcharges) + Number(marginPrice) + Number(pickupCharge || 0);
+    return { totalItems, totalWeight, volumetric, servicePrice, gst, totalSurcharges, grandTotal, margin: marginPrice, pickupCharge: Number(pickupCharge || 0) }
+  }, [itemsData, quoteData, margin, pickupCharge])
 
 
   const isValid = useMemo(() => {
@@ -137,11 +139,16 @@ export default function GetQuotePage() {
 
   return (
     <>
-      <div className="p-page-padding animate-in fade-in duration-700 overflow-auto">
-        <div className="flex flex-col gap-8">
-          {/* <div className="flex items-center justify-between">
-          <h1 className="text-2xl font-bold tracking-tight text-[#111827] dark:text-white">Get Quote</h1>
-        </div> */}
+      <div className="p-page-padding animate-in flex-1 fade-in duration-700 overflow-auto">
+        <div className="flex flex-col gap-3">
+          <div className="flex items-center justify-end">
+            <Button
+              variant="outline"
+              onClick={() => navigate('/admin/quotes/history')}
+            >
+              <History className='w-4 h-4' />Quote History
+            </Button>
+          </div>
 
           <div className="grid grid-cols-1 xl:grid-cols-12 gap-4 items-start">
             {/* Main Form Area */}
@@ -176,6 +183,8 @@ export default function GetQuotePage() {
                 isAdmin={isAdmin}
                 margin={margin}
                 setMargin={setMargin}
+                pickupCharge={pickupCharge}
+                setPickupCharge={setPickupCharge}
                 onSendQuote={() => setIsSendDialogOpen(true)}
                 isValid={isValid}
                 quoteData={quoteData}
@@ -193,7 +202,7 @@ export default function GetQuotePage() {
             locations={locations}
             items={itemsData}
             margin={margin}
-            pickupCharge={0}
+            pickupCharge={Number(pickupCharge || 0)}
 
           />
         )}

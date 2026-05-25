@@ -25,6 +25,9 @@ export default function Sidebar({ isCollapsed, setIsCollapsed }: SidebarProps) {
   useEffect(() => {
     const matchingItem = sidebarItems.find(item => {
       if (item.subGroups) {
+        if (location.pathname === item.path || location.pathname.startsWith(item.path + '/')) {
+          return true;
+        }
         return item.subGroups.some(group =>
           group.items.some(subItem =>
             location.pathname === subItem.path ||
@@ -116,11 +119,18 @@ export default function Sidebar({ isCollapsed, setIsCollapsed }: SidebarProps) {
                         key={subItem.name}
                         to={subItem.path}
                         className={({ isActive }) =>
-                          `flex items-center px-4 py-2 text-[13.5px] border-l-4 font-medium transition-colors rounded-r-md ${isActive ? 'text-primary bg-primary/10 border-primary dark:border-primary' : 'text-gray-600 dark:text-zinc-400 hover:text-gray-900 dark:hover:text-zinc-100 hover:bg-gray-50 dark:hover:bg-zinc-900 border-transparent'
+                          `flex items-center gap-3 px-4 py-2 text-[13.5px] border-l-4 font-medium transition-colors rounded-r-md ${isActive ? 'text-primary bg-primary/10 border-primary dark:border-primary' : 'text-gray-600 dark:text-zinc-400 hover:text-gray-900 dark:hover:text-zinc-100 hover:bg-gray-50 dark:hover:bg-zinc-900 border-transparent'
                           }`
                         }
                       >
-                        {subItem.name}
+                        {({ isActive }) => (
+                          <>
+                            {subItem.icon && (
+                              <subItem.icon className={`w-[18px] h-[18px] shrink-0 transition-colors ${isActive ? 'text-primary' : 'text-gray-400 dark:text-zinc-500'}`} strokeWidth={2} />
+                            )}
+                            <span>{subItem.name}</span>
+                          </>
+                        )}
                       </NavLink>
                     ))}
                   </div>
@@ -164,7 +174,7 @@ export default function Sidebar({ isCollapsed, setIsCollapsed }: SidebarProps) {
                       finalActive = false;
                     }
 
-                    return `flex items-center justify-between overflow-hidden py-[10px] px-3 border-l-4 rounded-r-md text-[13.5px] font-medium transition-colors ${finalActive && !item.hasDropdown ? 'text-primary bg-primary/10 border-primary dark:border-primary' : 'text-gray-600 dark:text-zinc-400 hover:text-gray-900 dark:hover:text-zinc-100 hover:bg-gray-100 dark:hover:bg-zinc-900 border-transparent'
+                    return `flex items-center justify-between overflow-hidden py-[10px] px-3 border-l-4 rounded-r-md text-[14px] font-medium transition-colors ${finalActive && !item.hasDropdown ? 'text-primary bg-primary/10 border-primary dark:border-primary font-semibold' : 'text-gray-600 dark:text-zinc-400 hover:text-gray-900 dark:hover:text-zinc-100 hover:bg-gray-100 dark:hover:bg-zinc-900 border-transparent'
                       }`
                   }}
                 >

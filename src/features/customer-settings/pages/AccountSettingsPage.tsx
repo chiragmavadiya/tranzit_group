@@ -9,6 +9,7 @@ import { showToast } from '@/components/ui/custom-toast';
 import { PlaceAutocomplete } from '@/components/common/AutoComplateAddress';
 import { useAppSelector } from '@/hooks/store.hooks';
 import SubscriptionPlanModal from '../components/SubscriptionPlanModal';
+import { CreateAddressDialog } from '@/features/address-book/components/CreateAddressDialog';
 
 const cardVariants = {
   hidden: { opacity: 0, y: 20 },
@@ -24,11 +25,11 @@ const cardVariants = {
 };
 
 export default function AccountSettingsPage() {
-  const [isEditingProfile, setIsEditingProfile] = useState(true);
+  const [isEditingProfile, setIsEditingProfile] = useState(false);
   const [isPasswordOpen, setIsPasswordOpen] = useState(false);
   const [isPlanModalOpen, setIsPlanModalOpen] = useState(false);
   const { user } = useAppSelector((state) => state.auth);
-
+  const { summary } = useAppSelector((state) => state.wallet);
   // Initial Form values matching user's request
   const [formData, setFormData] = useState({
     firstName: '',
@@ -38,27 +39,28 @@ export default function AccountSettingsPage() {
     companyName: '',
     abn: '',
     address: '',
-    streetNumber: '',
-    streetName: '',
-    streetType: '',
+    // streetNumber: '',
+    street: '',
+    // streetType: '',
     suburb: '',
     state: '',
     postcode: '3810',
   });
-
   const [backupData, setBackupData] = useState({ ...formData });
-
   const [passwordData, setPasswordData] = useState({
     currentPassword: '',
     newPassword: '',
     confirmPassword: '',
   });
-
   const [passwordErrors, setPasswordErrors] = useState({
     currentPassword: '',
     newPassword: '',
     confirmPassword: '',
   });
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [editingAddressId, setEditingAddressId] = useState<string | null>(null);
+
+
 
   const handleInputChange = (value: any, name: string) => {
     setFormData(prev => ({ ...prev, [name]: value }));
@@ -133,9 +135,10 @@ export default function AccountSettingsPage() {
         companyName: user.business_name || '',
         abn: '',
         address: user.addresses[0]?.address || '',
-        streetNumber: user.addresses[0]?.street_number || '',
-        streetName: user.addresses[0]?.street_name || '',
-        streetType: user.addresses[0]?.street_type || '',
+        // streetNumber: user.addresses[0]?.street_number || '',
+        // streetName: user.addresses[0]?.street_name || '',
+        // streetType: user.addresses[0]?.street_type || '',
+        street: user.addresses[0]?.street || '',
         suburb: user.addresses[0]?.suburb || '',
         state: user.addresses[0]?.state || '',
         postcode: user.addresses[0]?.postcode || '',
@@ -253,9 +256,10 @@ export default function AccountSettingsPage() {
                     setFormData(prev => ({
                       ...prev,
                       address: opt.formatted_address || opt.address1,
-                      streetNumber: opt.street_number || '',
-                      streetName: opt.street_name || '',
-                      streetType: opt.street_type || '',
+                      // streetNumber: opt.street_number || '',
+                      // streetName: opt.street_name || '',
+                      // streetType: opt.street_type || '',
+                      street: opt.street || '',
                       suburb: opt.suburb,
                       state: opt.state,
                       postcode: opt.post_code,
@@ -270,26 +274,8 @@ export default function AccountSettingsPage() {
                   label="Street Number"
                   required
                   disabled={!isEditingProfile}
-                  value={formData.streetNumber}
-                  onChange={(val) => handleInputChange(val, 'streetNumber')}
-                />
-              </div>
-              <div className="col-span-6">
-                <FormInput
-                  label="Street Name"
-                  required
-                  disabled={!isEditingProfile}
-                  value={formData.streetName}
-                  onChange={(val) => handleInputChange(val, 'streetName')}
-                />
-              </div>
-              <div className="col-span-3">
-                <FormInput
-                  label="Street Type"
-                  required
-                  disabled={!isEditingProfile}
-                  value={formData.streetType}
-                  onChange={(val) => handleInputChange(val, 'streetType')}
+                  value={formData.street}
+                  onChange={(val) => handleInputChange(val, 'street')}
                 />
               </div>
 
@@ -340,7 +326,7 @@ export default function AccountSettingsPage() {
               <div className="flex items-center gap-2">
                 <span className="text-[13px] font-semibold text-slate-500">Current Balance:</span>
                 <span className="text-[13px] font-bold text-emerald-700 bg-emerald-50 dark:bg-emerald-950/50 dark:text-emerald-400 px-2 py-0.5 rounded-sm">
-                  + 50.00
+                  {new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(Number(summary?.wallet_balance || 0))}
                 </span>
               </div>
             </CardContent>
@@ -379,37 +365,78 @@ export default function AccountSettingsPage() {
           <Card className="flex flex-col w-full transition-shadow duration-300 border-gray-200/60">
             <CardHeader className="flex flex-row items-center justify-between px-6 py-4 border-b border-gray-100 dark:border-zinc-800 bg-slate-50/30 dark:bg-zinc-950 space-y-0 rounded-t-md">
               <CardTitle className="text-[15px] font-medium text-gray-800 dark:text-zinc-200">Sender Address</CardTitle>
-              <Button size="sm" className="h-8 px-4 text-[13px] font-medium text-white shadow-sm shrink-0 rounded-sm">
+              <Button
+                size="sm"
+                onClick={() => {
+                  setEditingAddressId('');
+                  setIsDialogOpen(true);
+                }}
+                className="h-8 px-4 text-[13px] font-medium text-white shadow-sm shrink-0 rounded-sm">
                 Add Address
               </Button>
             </CardHeader>
 
             <CardContent className="p-0 flex-1">
-              <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between px-6 py-6 hover:bg-gray-50/50 dark:hover:bg-zinc-900/50 transition-colors gap-4 sm:gap-0">
-                {/* Left: User/Name */}
-                <div className="flex items-center gap-2 min-w-[120px]">
-                  <User className="w-4 h-4 text-slate-400" />
-                  <span className="text-[11px] font-medium bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-300 px-2 py-0.5 rounded-sm">Test</span>
-                </div>
+              <div className='space-y-4 p-4 pt-0'>
+                <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between hover:bg-gray-50/50 dark:hover:bg-zinc-900/50 transition-colors gap-4 sm:gap-0">
+                  {/* Left: User/Name */}
+                  <div className="flex items-center gap-2 min-w-[120px]">
+                    <User className="w-4 h-4 text-slate-400" />
+                    <span className="text-[11px] font-medium bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-300 px-2 py-0.5 rounded-sm">Test</span>
+                  </div>
 
-                {/* Middle: Address & Default Badge */}
-                <div className="flex items-center gap-2 flex-1 justify-center text-center">
-                  <Map className="w-4 h-4 text-[#5D6B98] shrink-0" />
-                  <span className="text-[13px] font-medium text-[#5D6B98] uppercase tracking-wide">
-                    {formData.suburb}, {formData.state}, {formData.postcode}, AU
-                  </span>
-                  <span className="text-[10px] font-medium bg-orange-100 text-orange-600 px-2 py-0.5 rounded-sm ml-2 shrink-0">default</span>
-                </div>
+                  {/* Middle: Address & Default Badge */}
+                  <div className="flex items-center gap-2 flex-1 justify-center text-center">
+                    <Map className="w-4 h-4 text-[#5D6B98] shrink-0" />
+                    <span className="text-[13px] font-medium text-[#5D6B98] uppercase tracking-wide">
+                      {formData.suburb}, {formData.state}, {formData.postcode}, AU
+                    </span>
+                    <span className="text-[10px] font-medium bg-orange-100 text-orange-600 px-2 py-0.5 rounded-sm ml-2 shrink-0">default</span>
+                  </div>
 
-                {/* Right: Actions */}
-                <div className="flex items-center gap-3 min-w-[80px] justify-end">
-                  <button className="text-blue-500 hover:text-blue-600 transition-colors">
-                    <Edit2 className="w-4 h-4" />
-                  </button>
-                  <div className="h-4 w-[1px] bg-gray-200 dark:bg-zinc-700"></div>
-                  <button className="text-red-500 hover:text-red-600 transition-colors">
-                    <Trash2 className="w-4 h-4" />
-                  </button>
+                  {/* Right: Actions */}
+                  <div className="flex items-center gap-3 min-w-[80px] justify-end">
+                    <button className="text-blue-500 cursor-pointer hover:text-blue-600 transition-colors" onClick={() => {
+                      setEditingAddressId('');
+                      setIsDialogOpen(true);
+                    }}>
+                      <Edit2 className="w-4 h-4" />
+                    </button>
+                    <div className="h-4 w-[1px] bg-gray-200 dark:bg-zinc-700"></div>
+                    <button className="text-red-500 cursor-pointer hover:text-red-600 transition-colors">
+                      <Trash2 className="w-4 h-4" />
+                    </button>
+                  </div>
+                </div>
+                <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between hover:bg-gray-50/50 dark:hover:bg-zinc-900/50 transition-colors gap-4 sm:gap-0">
+                  {/* Left: User/Name */}
+                  <div className="flex items-center gap-2 min-w-[120px]">
+                    <User className="w-4 h-4 text-slate-400" />
+                    <span className="text-[11px] font-medium bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-300 px-2 py-0.5 rounded-sm">Test</span>
+                  </div>
+
+                  {/* Middle: Address & Default Badge */}
+                  <div className="flex items-center gap-2 flex-1 justify-center text-center">
+                    <Map className="w-4 h-4 text-[#5D6B98] shrink-0" />
+                    <span className="text-[13px] font-medium text-[#5D6B98] uppercase tracking-wide">
+                      {formData.suburb}, {formData.state}, {formData.postcode}, AU
+                    </span>
+                    <span className="text-[10px] font-medium bg-orange-100 text-orange-600 px-2 py-0.5 rounded-sm ml-2 shrink-0">default</span>
+                  </div>
+
+                  {/* Right: Actions */}
+                  <div className="flex items-center gap-3 min-w-[80px] justify-end">
+                    <button className="text-blue-500 cursor-pointer hover:text-blue-600 transition-colors" onClick={() => {
+                      setEditingAddressId('');
+                      setIsDialogOpen(true);
+                    }}>
+                      <Edit2 className="w-4 h-4" />
+                    </button>
+                    <div className="h-4 w-[1px] bg-gray-200 dark:bg-zinc-700"></div>
+                    <button className="text-red-500 cursor-pointer hover:text-red-600 transition-colors">
+                      <Trash2 className="w-4 h-4" />
+                    </button>
+                  </div>
                 </div>
               </div>
             </CardContent>
@@ -477,11 +504,24 @@ export default function AccountSettingsPage() {
           </div>
         </div>
       </CustomModel>
+      {isPlanModalOpen && (
+        <SubscriptionPlanModal
+          open={isPlanModalOpen}
+          onOpenChange={setIsPlanModalOpen}
+        />
+      )}
 
-      <SubscriptionPlanModal
-        open={isPlanModalOpen}
-        onOpenChange={setIsPlanModalOpen}
-      />
+      {isDialogOpen && (
+
+        <CreateAddressDialog
+          key={isDialogOpen ? (editingAddressId || 'new') : 'closed'}
+          open={isDialogOpen}
+          onOpenChange={setIsDialogOpen}
+          onSubmit={() => { }}
+          editingAddressId={editingAddressId}
+          isLoading={false}
+        />
+      )}
     </div>
   );
 }

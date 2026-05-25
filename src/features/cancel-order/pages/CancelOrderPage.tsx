@@ -33,7 +33,13 @@ export default function CancelOrderPage() {
 
     const headerTitle = activeTab === 'request' ? "Cancel Request" : "Canceled Order";
 
-    const columns = useMemo(() => getCancelOrderColumns(role || ''), [role]);
+    const columns = useMemo(() => {
+        const allColumns = getCancelOrderColumns(role || '');
+        if (activeTab === 'request') {
+            return allColumns.filter(col => col.key !== 'processed_at' && col.key !== 'status');
+        }
+        return allColumns;
+    }, [role, activeTab]);
 
     return (
         <div className="flex flex-col flex-1 gap-6 p-page-padding min-h-0 animate-in fade-in slide-in-from-bottom-4 duration-700 bg-slate-50/30 dark:bg-zinc-950/30">

@@ -3,6 +3,7 @@ import type { ElementType } from 'react';
 export interface SidebarSubItem {
   name: string;
   path: string;
+  icon?: ElementType;
 }
 
 export interface SidebarSubGroup {

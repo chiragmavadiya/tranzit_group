@@ -91,7 +91,7 @@ export function ZohoSettingsCard({
               errormsg="Change to .in, .eu, .com.cn as needed"
               error={false} // Shown as hint
             />
-            <p className="mb-0 text-[10px] text-slate-400 dark:text-zinc-500 mt-[-16px] ml-1 italic md:col-span-2">
+            <p className="mb-0 text-[10px] text-slate-400 dark:text-zinc-500 mt-[-16px] ml-1 md:col-span-2">
               Tip: Change domain extension (.in, .eu, .com.au) based on your Zoho region.
             </p>
           </div>

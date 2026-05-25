@@ -556,7 +556,7 @@ export const InvoicePaper: React.FC<InvoicePaperProps> = ({
                     ))
                   ) : (
                     <TableRow>
-                      <TableCell colSpan={5} className="text-[10px] font-medium text-slate-300 text-center py-6 italic">No transactions recorded</TableCell>
+                      <TableCell colSpan={5} className="text-[10px] font-medium text-slate-300 text-center py-6">No transactions recorded</TableCell>
                     </TableRow>
                   )}
                 </TableBody>
@@ -597,7 +597,7 @@ export const InvoicePaper: React.FC<InvoicePaperProps> = ({
               Terms & Conditions
               <Info className="w-3 h-3 opacity-50" />
             </h3>
-            <ul className="text-[10px] text-slate-400 space-y-2.5 font-medium leading-relaxed italic">
+            <ul className="text-[10px] text-slate-400 space-y-2.5 font-medium leading-relaxed">
               {TERMS_CONDITIONS.map((t: string, i: number) => (
                 <li key={i} className="flex gap-3">
                   <span className="text-slate-200 mt-1.5 h-1 w-1 rounded-full bg-slate-300 shrink-0" />

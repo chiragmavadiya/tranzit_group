@@ -129,7 +129,7 @@ export function CreateAddressDialog({
                 <PlaceAutocomplete
                   onPlaceSelect={(opt) => {
                     handleChange('address', opt.formatted_address);
-                    handleChange('street', opt.street_name);
+                    handleChange('street', opt.street);
                     handleChange('suburb', opt.suburb);
                     handleChange('state', opt.state);
                     handleChange('postcode', opt.post_code);

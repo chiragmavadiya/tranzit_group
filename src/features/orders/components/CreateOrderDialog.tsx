@@ -23,11 +23,12 @@ export default function CreateOrderDialog({ onOpenChange, type, open, initialDat
     address1: "",
     suburb: "",
     state: "",
-    street_name: "",
-    unit_number: "",
-    street_number: "",
+    street: "",
+    city: "",
+    building: "",
+    instructions: "",
     postcode: "",
-    country: "",
+    country: "AUSTRALIA",
     name: "",
     saveToAddressBook: false
   });
@@ -51,7 +52,7 @@ export default function CreateOrderDialog({ onOpenChange, type, open, initialDat
       suburb: data.suburb,
       state: data.state,
       postcode: data.postcode,
-      country: "Australia",
+      country: "AUSTRALIA",
       street_name: data.street_name,
       street_number: data.street_number,
       street_type: data.street_type,
@@ -66,18 +67,18 @@ export default function CreateOrderDialog({ onOpenChange, type, open, initialDat
 
   const handleSubmit = async () => {
     setIsSubmitting(true);
-    const { address1, country, name, postcode, state, street_name, street_number, suburb, phone, email } = formData;
-    if (!name || !address1 || !street_number || !street_name || !suburb || !state || !postcode || !country || !phone || !email) {
+    const { address1, country, name, postcode, state, street, suburb, phone, email } = formData;
+    if (!name || !address1 || !street || !suburb || !state || !postcode || !country) {
       showToast("Please fill in all required fields", "error");
       return;
     }
 
-    if (!isEmailValid(email)) {
+    if (email && !isEmailValid(email)) {
       showToast("Please enter a valid email address", "error");
       return;
     }
 
-    if (!isPhoneValid(phone)) {
+    if (phone && !isPhoneValid(phone)) {
       showToast("Please enter a valid Australian phone number", "error");
       return;
     }
@@ -102,19 +103,20 @@ export default function CreateOrderDialog({ onOpenChange, type, open, initialDat
   useEffect(() => {
     if (orderResponse?.data) {
       setFormData({
+        name: orderResponse?.data.receiver_details?.name,
         email: orderResponse?.data.receiver_details.email,
         phone: orderResponse?.data.receiver_details.mobile,
         company: orderResponse?.data.receiver_details.company || '',
+        building: orderResponse?.data.receiver_details.address_detail.building || '',
+        instructions: orderResponse?.data.receiver_details.address_detail.instructions || '',
         address: orderResponse?.data.receiver_details.address,
         address1: orderResponse?.data.receiver_details.address_detail.address_line,
+        street: orderResponse?.data.receiver_details.address_detail.street || '',
         suburb: orderResponse?.data.receiver_details.address_detail.suburb,
         state: orderResponse?.data.receiver_details.address_detail.state,
-        street_name: orderResponse?.data.receiver_details.address_detail.street_name,
-        street_number: orderResponse?.data.receiver_details.address_detail.street_number,
-        street_type: orderResponse?.data.receiver_details.address_detail.street_type,
+        city: orderResponse?.data.receiver_details.address_detail.city,
         postcode: orderResponse?.data.receiver_details.address_detail.postcode,
         country: orderResponse?.data.receiver_details?.address_detail?.country || 'Australia',
-        name: orderResponse?.data.receiver_details?.name,
         saveToAddressBook: false,
       });
     }
@@ -136,9 +138,9 @@ export default function CreateOrderDialog({ onOpenChange, type, open, initialDat
         />
         <label
           htmlFor="saveToAddressBook"
-          className="text-[13px] font-semibold text-slate-700 dark:text-zinc-300 cursor-pointer select-none"
+          className="text-sm font-semibold text-slate-700 dark:text-zinc-300 cursor-pointer select-none"
         >
-          Save address to address book
+          Save contact to address book
         </label>
       </div>}
     >
@@ -151,7 +153,7 @@ export default function CreateOrderDialog({ onOpenChange, type, open, initialDat
                 onClick={() => setActiveLookup('contact')}
                 className={cn(
                   "px-6 py-2 text-[10px] font-bold tracking-widest transition-colors border-r border-primary",
-                  activeLookup === 'contact' ? "bg-primary text-white" : "bg-white text-primary"
+                  activeLookup === 'contact' ? "bg-primary text-white" : "bg-white dark:bg-zinc-950 text-primary"
                 )}
               >
                 LOOK UP CONTACT
@@ -160,7 +162,7 @@ export default function CreateOrderDialog({ onOpenChange, type, open, initialDat
                 onClick={() => setActiveLookup('address')}
                 className={cn(
                   "px-6 py-2 text-[10px] font-bold tracking-widest transition-colors",
-                  activeLookup === 'address' ? "bg-primary text-white" : "bg-white text-primary"
+                  activeLookup === 'address' ? "bg-primary text-white" : "bg-white dark:bg-zinc-950 text-primary"
                 )}
               >
                 LOOK UP ADDRESS
@@ -176,9 +178,7 @@ export default function CreateOrderDialog({ onOpenChange, type, open, initialDat
                     updateField('state', opt.state);
                     updateField('postcode', opt.post_code);
                     updateField('country', opt.country);
-                    updateField('street_name', opt.street_name);
-                    updateField('street_number', opt.street_number);
-                    updateField('street_type', opt.street_type);
+                    updateField('street', opt.street);
                   }}
                   onChange={(value) => { updateField('address', value!); updateField('address1', value!) }}
                   value={formData.address}
@@ -200,13 +200,11 @@ export default function CreateOrderDialog({ onOpenChange, type, open, initialDat
                       updateField('email', option.email);
                       updateField('address', option.address);
                       updateField('address1', option.address1);
+                      updateField('street', option.street_name);
                       updateField('suburb', option.suburb);
                       updateField('state', option.state);
                       updateField('postcode', option.postcode);
                       updateField('country', option.country);
-                      updateField('street_name', option.street_name);
-                      updateField('street_number', option.street_number);
-                      updateField('street_type', option.street_type);
                     }
                   }}
                   options={options}
@@ -237,9 +235,9 @@ export default function CreateOrderDialog({ onOpenChange, type, open, initialDat
                 onChange={val => updateField('email', val)}
                 layout="horizontal"
                 placeholder="Enter Email"
-                required
-                error={isSubmitting && (!formData.email?.trim() || !isEmailValid(formData.email))}
-                errormsg={!formData.email?.trim() ? "Please enter your email" : "Please enter a valid email address"}
+              // required
+              // error={isSubmitting && (!formData.email?.trim() || !isEmailValid(formData.email))}
+              // errormsg={!formData.email?.trim() ? "Please enter your email" : "Please enter a valid email address"}
               />
               <FormInput
                 label="Phone"
@@ -247,9 +245,9 @@ export default function CreateOrderDialog({ onOpenChange, type, open, initialDat
                 onChange={val => updateField('phone', val)}
                 layout="horizontal"
                 placeholder="Enter Phone"
-                required
-                error={isSubmitting && (!formData.phone?.trim() || !isPhoneValid(formData.phone))}
-                errormsg={!formData.phone?.trim() ? "Please enter your phone" : "Please enter a valid phone number"}
+              // required
+              // error={isSubmitting && (!formData.phone?.trim() || !isPhoneValid(formData.phone))}
+              // errormsg={!formData.phone?.trim() ? "Please enter your phone" : "Please enter a valid phone number"}
               />
               <div className="space-y-4">
                 <FormInput
@@ -259,40 +257,29 @@ export default function CreateOrderDialog({ onOpenChange, type, open, initialDat
                   layout="horizontal"
                   placeholder='Enter Company name'
                 />
-                {/* <div className="flex justify-start">
-                  <ValidAddressBadge />
-                </div> */}
+              </div>
+              <div className="space-y-4">
+                <FormInput
+                  label="Building"
+                  value={formData.building}
+                  onChange={val => updateField('building', val)}
+                  layout="horizontal"
+                  placeholder='Enter Building name'
+                />
               </div>
             </div>
 
             {/* Right Column */}
             <div className="col-span-12 md:col-span-6 space-y-2">
               <FormInput
-                label="Unit Number"
-                value={formData.unit_number}
-                onChange={val => updateField('unit_number', val)}
-                layout="horizontal"
-                placeholder='Enter unit number'
-              />
-              <FormInput
-                label="Street Name"
-                value={formData.street_name}
-                onChange={val => updateField('street_name', val)}
+                label="Street"
+                value={formData.street}
+                onChange={val => updateField('street', val)}
                 layout="horizontal"
                 placeholder='Enter Street name'
                 required
-                error={isSubmitting && formData.street_name?.trim() === ''}
+                error={isSubmitting && formData.street?.trim() === ''}
                 errormsg="Please enter your street name"
-              />
-              <FormInput
-                label="Street Number"
-                value={formData.street_number}
-                onChange={val => updateField('street_number', val)}
-                layout="horizontal"
-                placeholder='Enter Street number'
-                required
-                error={isSubmitting && formData.street_number?.trim() === ''}
-                errormsg="Please enter your street number"
               />
               <FormInput
                 label="Suburb"
@@ -305,23 +292,12 @@ export default function CreateOrderDialog({ onOpenChange, type, open, initialDat
                 errormsg="Please enter your suburb"
               />
               <FormInput
-                label="Postcode"
-                value={formData.postcode}
-                onChange={val => updateField('postcode', val ?? '')}
-                // options={POSTCODES}
+                label="City"
+                value={formData.city}
+                onChange={val => updateField('city', val ?? '')}
                 layout="horizontal"
-                placeholder='Postcode'
-                required
-                error={isSubmitting && formData.postcode?.trim() === ''}
-                errormsg="Please enter your postcode"
+                placeholder="Enter city"
               />
-              {/* <FormInput
-                label="STATE"
-                value={formData.state}
-                onChange={val => updateField('state', val)}
-                layout="horizontal"
-                required
-              /> */}
               <FormSelect
                 label="State"
                 options={STATES}
@@ -333,7 +309,17 @@ export default function CreateOrderDialog({ onOpenChange, type, open, initialDat
                 errormsg="Please select your state"
                 layout="horizontal"
               />
-
+              <FormInput
+                label="Postcode"
+                value={formData.postcode}
+                onChange={val => updateField('postcode', val ?? '')}
+                // options={POSTCODES}
+                layout="horizontal"
+                placeholder='Postcode'
+                required
+                error={isSubmitting && formData.postcode?.trim() === ''}
+                errormsg="Please enter your postcode"
+              />
               <div className="space-y-4">
                 <FormInput
                   label="Country"
@@ -359,7 +345,7 @@ export default function CreateOrderDialog({ onOpenChange, type, open, initialDat
                   </span>
                 </AccordionTrigger>
                 <AccordionContent className="px-5 pb-5">
-                  <p className="text-sm text-slate-400 font-medium italic">No address suggestions to display.</p>
+                  <p className="text-sm text-slate-400 font-medium">No address suggestions to display.</p>
                 </AccordionContent>
               </AccordionItem>
             </Accordion>

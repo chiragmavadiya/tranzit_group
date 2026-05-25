@@ -31,6 +31,7 @@ export interface QuoteCalculations {
   gst: number;
   totalSurcharges: number;
   margin?: number;
+  pickupCharge?: number;
   insurance?: boolean;
   insuranceCost?: number;
   grandTotal: number;

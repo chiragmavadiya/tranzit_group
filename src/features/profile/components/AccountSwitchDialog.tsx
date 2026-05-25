@@ -99,7 +99,7 @@ export function AccountSwitchDialog({ open, onOpenChange }: AccountSwitchDialogP
   ];
 
   const customHeader = (
-    <div className="flex items-center gap-2 py-1 pr-12 not-italic">
+    <div className="flex items-center gap-2 py-1 pr-12">
       <div className="flex items-center justify-center w-9 h-9 rounded-lg bg-primary/10 text-primary shrink-0">
         <ArrowLeftRight className="w-5 h-5" />
       </div>

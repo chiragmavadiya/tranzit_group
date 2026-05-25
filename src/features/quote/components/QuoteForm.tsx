@@ -18,7 +18,7 @@ export function QuoteForm({ locations, setLocations }: QuoteFormProps) {
     <div className="space-y-4">
       {/* Addresses Section */}
       <Card className="">
-        <CardHeader className="p-4 bg-transparent border-b">
+        <CardHeader className="p-4 bg-transparent border-b border-gray-100 dark:border-zinc-800">
           <CardTitle className=" inline-flex items-center gap-2 text-[15px] font-semibold text-slate-800 dark:text-zinc-100">
             <MapPin className="w-4 h-4 text-primary" />
             Addresses
@@ -34,9 +34,9 @@ export function QuoteForm({ locations, setLocations }: QuoteFormProps) {
                     sender: {
                       label: opt.formatted_address,
                       address1: opt.address1 || '',
-                      street_name: opt.street_name || '',
-                      street_number: opt.street_number || '',
-                      street_type: opt.street_type || '',
+                      street_name: opt.street || '',
+                      // street_number: opt.street_number || '',
+                      // street_type: opt.street_type || '',
                       suburb: opt.suburb || '',
                       state: opt.state || '',
                       postcode: opt.post_code || '',
@@ -75,9 +75,9 @@ export function QuoteForm({ locations, setLocations }: QuoteFormProps) {
                     receiver: {
                       label: opt.formatted_address,
                       address1: opt.address1 || '',
-                      street_name: opt.street_name || '',
-                      street_number: opt.street_number || '',
-                      street_type: opt.street_type || '',
+                      street_name: opt.street || '',
+                      // street_number: opt.street_number || '',
+                      // street_type: opt.street_type || '',
                       suburb: opt.suburb || '',
                       state: opt.state || '',
                       postcode: opt.post_code || '',

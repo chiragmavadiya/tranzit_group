@@ -1,5 +1,5 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { FileText, Percent, Mail } from "lucide-react";
+import { FileText, Percent, Mail, Truck } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { FormInput } from "@/features/orders/components/OrderFormUI";
 import type { QuoteCalculations } from "../types";
@@ -9,6 +9,8 @@ interface QuoteSummaryProps {
   isAdmin?: boolean;
   margin?: string;
   setMargin?: (val: string) => void;
+  pickupCharge?: string;
+  setPickupCharge?: (val: string) => void;
   onSendQuote?: () => void;
   isValid?: boolean;
   calculation?: QuoteCalculations
@@ -20,6 +22,8 @@ export function QuoteSummary({
   isAdmin = false,
   margin = '0',
   setMargin,
+  pickupCharge = '0',
+  setPickupCharge,
   onSendQuote,
   isValid = false
 }: QuoteSummaryProps) {
@@ -36,19 +40,35 @@ export function QuoteSummary({
         </CardTitle>
       </CardHeader>
       <CardContent className="pt-4 space-y-3">
-        {isAdmin && setMargin && (
-          <div className="p-4 bg-primary/5 dark:bg-primary/10 rounded-xl border border-primary/20 space-y-3 mb-2">
-            <div className="flex items-center gap-2">
-              <Percent className="w-3.5 h-3.5 text-primary" />
-              <span className="text-[12px] font-bold text-slate-700 dark:text-zinc-300 uppercase tracking-wider">Extra Margin (%)</span>
+        {isAdmin && setMargin && setPickupCharge && (
+          <div className="p-4 bg-primary/5 dark:bg-primary/10 rounded-xl border border-primary/20 grid grid-cols-2 gap-3 mb-2">
+            <div className="space-y-1.5">
+              <div className="flex items-center gap-2">
+                <Percent className="w-3.5 h-3.5 text-primary" />
+                <span className="text-[11px] font-bold text-slate-700 dark:text-zinc-300 uppercase tracking-wider">Extra Margin (%)</span>
+              </div>
+              <FormInput
+                placeholder="0"
+                value={margin}
+                onChange={setMargin}
+                type="number"
+                className="bg-white dark:bg-zinc-950 w-full"
+              />
             </div>
-            <FormInput
-              placeholder="0"
-              value={margin}
-              onChange={setMargin}
-              type="number"
-              className="bg-white dark:bg-zinc-950"
-            />
+
+            <div className="space-y-1.5">
+              <div className="flex items-center gap-2">
+                <Truck className="w-3.5 h-3.5 text-primary" />
+                <span className="text-[11px] font-bold text-slate-700 dark:text-zinc-300 uppercase tracking-wider">Pickup Charges ($)</span>
+              </div>
+              <FormInput
+                placeholder="0"
+                value={pickupCharge}
+                onChange={setPickupCharge}
+                type="number"
+                className="bg-white dark:bg-zinc-950 w-full"
+              />
+            </div>
           </div>
         )}
 
@@ -85,6 +105,13 @@ export function QuoteSummary({
           </div>
         )}
 
+        {isAdmin && calculation?.pickupCharge && Number(calculation?.pickupCharge) > 0 && (
+          <div className="flex justify-between items-center text-[13.5px]">
+            <span className="text-primary font-bold">Pickup Charges</span>
+            <span className="font-bold text-primary">{formatCurrency(calculation?.pickupCharge || 0)}</span>
+          </div>
+        )}
+
         <div className="h-px bg-slate-100 dark:bg-zinc-800 my-2" />
         <div className="flex justify-between items-center">
           <div className="flex flex-col">
@@ -105,7 +132,7 @@ export function QuoteSummary({
           </Button>
         )}
 
-        <p className="text-[11px] text-center text-slate-400 dark:text-zinc-500 italic py-1 border-t border-slate-50 dark:border-zinc-900">
+        <p className="text-[11px] text-center text-slate-400 dark:text-zinc-500 py-1 border-t border-slate-50 dark:border-zinc-900">
           Details will be confirmed on the booking screen.
         </p>
       </CardContent>

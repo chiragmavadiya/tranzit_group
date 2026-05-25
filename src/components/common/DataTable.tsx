@@ -275,14 +275,14 @@ const DataTableComponent = <T extends Record<string, any>>(props: DataTableProps
                 <TableHead
                   key={`${column.key}-${index}`}
                   className={cn(
-                    "h-12 text-[12px] font-bold text-gray-900 dark:text-zinc-100 uppercase tracking-wider px-5",
+                    "h-12 text-[14px] font-bold text-gray-900 dark:text-zinc-100 uppercase tracking-wider px-5",
                     column.sortable !== false && sortable && "cursor-pointer hover:bg-muted/50",
-                    column.sticky === 'left' && "sticky left-0 bg-background z-20",
-                    column.sticky === 'right' && "sticky right-0 bg-background z-20",
+                    // column.sticky === 'left' && "sticky left-0 bg-background z-20",
+                    // column.sticky === 'right' && "sticky right-0 bg-background z-20",
                     column.className,
                     column.noPrint && 'print:hidden'
                   )}
-                  style={{ width: column.width }}
+                  style={{ minWidth: column.width, width: column.width }}
                   onClick={() => column.sortable !== false && handleSort(column.key)}
                 >
                   <div className="flex items-center gap-2">
@@ -326,7 +326,7 @@ const DataTableComponent = <T extends Record<string, any>>(props: DataTableProps
                     onClick={() => onRowClick?.(row, index)}
                   >
                     {selectable && (
-                      <TableCell className="px-5 py-3.5 text-xs font-medium text-gray-700 dark:text-zinc-300">
+                      <TableCell className="px-5 py-3 text-sm font-medium text-gray-700 dark:text-zinc-300">
                         <Checkbox
                           checked={isSelected}
                           onCheckedChange={() => handleSelectRow(rowId)}
@@ -335,13 +335,13 @@ const DataTableComponent = <T extends Record<string, any>>(props: DataTableProps
                       </TableCell>
                     )}
 
-                    {columns.map((column, index) => (
+                    {columns.map((column, colIndex) => (
                       <TableCell
-                        key={`${column.key}-${rowId}-${index}`}
+                        key={`${column.key}-${rowId}-${colIndex}`}
                         className={cn(
-                          `px-5 py-3.5 text-xs font-medium text-gray-700 dark:text-zinc-300 whitespace-normal`,
-                          column.sticky === 'left' && "sticky left-0 bg-white",
-                          column.sticky === 'right' && "sticky right-0 bg-white",
+                          `px-5 py-3 text-sm  text-gray-800 dark:text-zinc-300 whitespace-normal capitalize`,
+                          // column.sticky === 'left' && "sticky left-0 bg-white",
+                          // column.sticky === 'right' && "sticky right-0 bg-white",
                           column.className,
                           cellClassName,
                           column.noPrint && 'print:hidden'

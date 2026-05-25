@@ -76,8 +76,8 @@ export default function AdminRoutes() {
                     <Route path="order-summary" element={withSuspense(<AuspostOrderSummaryPage />)} />
                     <Route path="undelivered" element={withSuspense(<UndeliveredParcelPage />)} />
                     <Route path="quotes">
-                        <Route index element={withSuspense(<QuoteList />)} />
-                        <Route path="create" element={withSuspense(<GetQuote />)} />
+                        <Route path="history" element={withSuspense(<QuoteList />)} />
+                        <Route index element={withSuspense(<GetQuote />)} />
                     </Route>
                     <Route path="profile" element={withSuspense(<ProfilePage />)} />
 

@@ -250,7 +250,7 @@ export function SummaryCard({ title, name, address, phone, isRight = false }: Su
     <div className={cn("space-y-2", isRight && "pl-8")}>
       <span className="text-[10px] font-bold text-primary uppercase tracking-widest block mb-2">{title}</span>
       <p className="text-lg font-bold text-slate-900 dark:text-zinc-100 leading-none">{name || '—'}</p>
-      <p className="border-l-2 border-slate-100 dark:border-zinc-800 pl-4 py-1 text-sm text-slate-500 dark:text-zinc-400 italic mt-3 leading-relaxed">{address || 'No address provided'}</p>
+      <p className="border-l-2 border-slate-100 dark:border-zinc-800 pl-4 py-1 text-sm text-slate-500 dark:text-zinc-400 mt-3 leading-relaxed">{address || 'No address provided'}</p>
       <p className="text-sm font-bold text-slate-400 dark:text-zinc-500 mt-3 tabular-nums">{phone || 'No phone provided'}</p>
     </div>
   );

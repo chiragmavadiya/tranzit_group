@@ -59,7 +59,8 @@
   --popover: oklch(1 0 0);
   --popover-foreground: oklch(0.145 0 0);
   /* --primary: oklch(0.205 0 0); */
-  --primary: #215090;
+  --primary: #142f54;
+  /* --primary: #215090; */
   /* --primary: #155dfc; */
   --primaryhover: #114384;
   --primary-foreground: oklch(0.985 0 0);
@@ -96,7 +97,7 @@
   --card-foreground: oklch(0.985 0 0);
   --popover: oklch(0.205 0 0);
   --popover-foreground: oklch(0.985 0 0);
-  --primary: #215090;
+  --primary: #2763b8;
   --primary-foreground: oklch(0.205 0 0);
   --secondary: oklch(0.269 0 0);
   --secondary-foreground: oklch(0.985 0 0);
@@ -191,7 +192,7 @@
 
 @layer components {
   .global-btn {
-    @apply gap-2 pt-[0px] bg-primary hover:bg-primary-hover text-white shadow-lg shadow-primary/20 dark:shadow-none transition-all active:scale-[0.98] font-semibold border-none px-4 h-8;
+    @apply gap-2 pt-[0px] bg-primary hover:bg-primary-hover text-white hover:shadow-lg shadow-primary/20 dark:shadow-none transition-all active:scale-[0.98] font-semibold border-none px-4 h-8;
   }
 
 

@@ -100,6 +100,7 @@ export const useLogout = () => {
         onSuccess: () => {
             // Clear all sensitive data and query cache on logout
             localStorage.clear();
+            sessionStorage.clear();
             queryClient.clear();
         },
     });

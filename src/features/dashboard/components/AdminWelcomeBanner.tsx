@@ -64,11 +64,11 @@ export function AdminWelcomeBanner({
 
         {/* Heading */}
         <h1 className="text-2xl md:text-3xl font-black text-slate-800 dark:text-white tracking-tight leading-tight">
-          Welcome back, <span className="text-transparent pr-1 bg-clip-text bg-linear-to-r from-primary to-primary/80 italic!">{userName}</span> 👋
+          Welcome back, <span className="text-transparent pr-1 bg-clip-text bg-linear-to-r from-primary to-primary/80">{userName}</span> 👋
         </h1>
 
         {/* Subtext */}
-        <p className="text-[15px] mb-3 md:text-[16px] leading-relaxed font-medium text-slate-600 dark:text-zinc-300 italic animate-in fade-in slide-in-from-bottom-4 duration-1000 max-w-lg mx-auto xl:mx-0">
+        <p className="text-[15px] mb-3 md:text-[16px] leading-relaxed font-medium text-slate-600 dark:text-zinc-300 animate-in fade-in slide-in-from-bottom-4 duration-1000 max-w-lg mx-auto xl:mx-0">
           Here's what's happening with your business today. You have <span className="font-bold text-slate-900 dark:text-zinc-200">{ordersCount} orders</span> this month and <span className="font-bold text-amber-600 dark:text-amber-400">{pendingInvoicesCount} pending invoices</span> that need attention.
         </p>
       </div>

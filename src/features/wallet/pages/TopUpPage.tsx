@@ -72,7 +72,7 @@ export default function TopUpPage() {
               <div className="relative">
                 <p className="text-[9px] font-black uppercase tracking-widest opacity-80">Total to Pay</p>
                 <p className="text-2xl font-black mt-0.5">${totalAmount}</p>
-                <p className="text-[9px] mt-3 opacity-70 font-medium italic">Instant wallet credit</p>
+                <p className="text-[9px] mt-3 opacity-70 font-medium">Instant wallet credit</p>
               </div>
             </div>
           </div>
@@ -104,7 +104,7 @@ export default function TopUpPage() {
                         <div className="flex justify-between items-center mb-4">
                           <div className="h-5 px-2 rounded bg-white dark:bg-zinc-800 border border-slate-100 dark:border-zinc-700 flex items-center justify-center shadow-xs">
                             {card.brand === 'visa' ? (
-                              <span className="font-black italic text-[9px] text-primary">VISA</span>
+                              <span className="font-black text-[9px] text-primary">VISA</span>
                             ) : (
                               <div className="flex scale-[0.4]">
                                 <div className="h-6 w-6 rounded-full bg-red-500"></div>
@@ -172,7 +172,7 @@ export default function TopUpPage() {
                       Complete Top Up - ${totalAmount}
                     </Button>
                     <div className="mt-4 flex justify-center items-center gap-4 opacity-30 grayscale">
-                      <span className="text-[8px] font-black italic tracking-[0.2em]">VISA</span>
+                      <span className="text-[8px] font-black tracking-[0.2em]">VISA</span>
                       <div className="h-2.5 w-px bg-slate-300 dark:bg-zinc-700"></div>
                       <div className="flex gap-1">
                         <div className="h-3 w-3 rounded-full bg-slate-400"></div>

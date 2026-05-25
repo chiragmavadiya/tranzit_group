@@ -25,7 +25,8 @@ import {
   BookOpen,
   FileBarChart,
   FileArchive,
-  LifeBuoy
+  LifeBuoy,
+  Globe
 } from 'lucide-react';
 import type { SidebarItem } from '../layout/types/Sidebar.types';
 
@@ -92,7 +93,7 @@ export const clientSidebarItems: SidebarItem[] = [
   { name: 'Enquiry', icon: MessageSquare, path: '/enquiry' },
   { name: 'Help Center', icon: HelpCircle, path: '/help-center' },
   { name: 'Parcel Report', icon: FileArchive, path: '/parcel-report' },
-  { name: 'Integrations', icon: Link, path: '/integrations' },
+  // { name: 'Integrations', icon: Link, path: '/integrations' },
   {
     name: 'Settings',
     icon: Settings,
@@ -102,15 +103,15 @@ export const clientSidebarItems: SidebarItem[] = [
       {
         title: 'Organization',
         items: [
-          { name: 'Account Details', path: '/settings/account' },
-          { name: 'Team Access', path: '/settings/team' },
+          { name: 'Account Details', path: '/settings/account', icon: User },
+          { name: 'Team Access', path: '/settings/team', icon: Users },
         ]
       },
       {
         title: 'Integrations',
         items: [
-          { name: 'Ecommerce', path: '/settings/ecommerce' },
-          { name: 'Carriers', path: '/settings/carriers' },
+          { name: 'Ecommerce', path: '/settings/ecommerce', icon: Globe },
+          { name: 'Carriers', path: '/settings/carriers', icon: Truck },
         ]
       },
     ]

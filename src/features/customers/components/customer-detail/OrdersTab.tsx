@@ -41,7 +41,7 @@ export const OrdersTab = ({ customerId }: OrdersTabProps) => {
         <Card className="bg-white dark:bg-zinc-900 shadow-lg border-none rounded-3xl overflow-hidden animate-in fade-in slide-in-from-left-4 duration-500">
             <DataTable
                 columns={[
-                    { key: 'order_number', header: 'Order Number', cell: (val) => <span className="font-bold text-primary uppercase tracking-widest italic underline cursor-pointer">{val}</span> },
+                    { key: 'order_number', header: 'Order Number', cell: (val) => <span className="font-bold text-primary uppercase tracking-widest underline cursor-pointer">{val}</span> },
                     { key: 'date', header: 'Date' },
                     { key: 'suburb', header: 'Suburb' },
                     { key: 'amount', header: 'Amount', cell: (val) => <span className="font-bold">${val}</span> },

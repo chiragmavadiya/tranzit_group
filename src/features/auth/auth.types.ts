@@ -28,8 +28,10 @@ export interface UserAddress {
     unit_number: string;
     street_number: string;
     street_name: string;
+    street: string;
     street_type: string;
     state: string;
+    city?: string;
     created_by: number | null;
     updated_by: number | null;
     created_at: string;

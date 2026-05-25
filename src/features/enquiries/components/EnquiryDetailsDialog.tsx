@@ -51,7 +51,7 @@ export function EnquiryDetailsDialog({ enquiryId, onClose }: EnquiryDetailsDialo
       {isLoading ? (
         <div className="flex flex-col items-center justify-center py-20 gap-3">
           <Loader2 className="w-8 h-8 animate-spin text-blue-600" />
-          <p className="text-sm text-slate-500 font-medium italic">Loading details...</p>
+          <p className="text-sm text-slate-500 font-medium">Loading details...</p>
         </div>
       ) : enquiry ? (
         <div className="flex flex-col gap-6">
@@ -92,7 +92,7 @@ export function EnquiryDetailsDialog({ enquiryId, onClose }: EnquiryDetailsDialo
                 {enquiry.attachments.map((file: any, index: number) => (
                   <a
                     key={index}
-                    href={`${import.meta.env.VITE_API_BASE_URL}/storage/app/public/${file}`}
+                    href={file}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="flex items-center gap-2 px-3 py-1.5 bg-slate-50 dark:bg-zinc-900 border border-slate-200 dark:border-zinc-800 rounded-md hover:border-blue-300 transition-colors"
@@ -103,7 +103,7 @@ export function EnquiryDetailsDialog({ enquiryId, onClose }: EnquiryDetailsDialo
                 ))}
               </div>
             ) : (
-              <p className="text-[13px] text-slate-400 font-medium italic">No attachments</p>
+              <p className="text-[13px] text-slate-400 font-medium">No attachments</p>
             )}
           </div>
 

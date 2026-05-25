@@ -2,10 +2,14 @@ import { NavLink } from "react-router-dom";
 import type { Order } from "./types";
 import type { Column } from "@/components/common/types/DataTable.types";
 
-import { Download, Eye, PackagePlus, Pencil, Trash } from "lucide-react";
+import { Download, Eye, PackagePlus, Trash } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { CustomTooltip } from "@/components/common/CustomTooltip";
 import { StatusBadge } from "./components/StatusBadge";
+import { formatDate } from "date-fns";
+import { formateCurrency } from "@/lib/utils";
+import Favicon from '@/assets/favicon.png';
+import { CustomerNameCell } from "./components/CustomerNameCell";
 
 export const getOrdersColumns = (
   role: string = "customer",
@@ -28,36 +32,55 @@ export const getOrdersColumns = (
 
     },
     {
-      header: 'CUSTOMER NAME',
+      header: orderType === 'new' ? 'ORDER DATE' : 'SHIPPED', key: 'consignment_date',
+      width: '200px',
+      cell: (value: string) => formatDate(value, 'dd/MM/yyyy hh:mm a')
+    },
+    {
+      header: 'CUSTOMER',
       key: 'customer_name',
+      width: '220px',
       cell: (value: string, row: Order) => (
-        <div className="flex justify-between">
-          {value}
-          <Pencil onClick={() => customerEditClick(row.order_number)} className="h-3 w-3 cursor-pointer text-primary hidden group-hover/row:block" />
-        </div>
+        <CustomerNameCell
+          value={value}
+          row={row}
+          orderType={orderType}
+          customerEditClick={customerEditClick}
+        />
       )
     },
     {
-      header: 'SUBURB', key: 'suburb'
+      header: 'SUBURB', key: 'suburb', width: '130px'
     },
     {
-      header: 'AMOUNT', key: 'amount'
+      header: 'CARRIER & PRODUCT', key: 'courier',
+      cell: (value: string, row: Order) => (
+        <div className="flex items-center gap-1">
+          {/* <img src={row?.courier_logo || 'https://api.tranzit.digisite.net/assets/img/couriers/direct-freight.png'} className="h-6" alt="" /> */}
+          <img src={row?.courier_logo || 'https://api.tranzit.digisite.net/assets/img/couriers/logo-auspost.png'} className="h-6" alt="" />
+          <span>{value}</span>
+        </div>
+      )
     },
     {
       header: 'STATUS', key: 'status', cell: (value: string) => <StatusBadge status={value === "Payment pending" ? "Courier not assign" : value} />
     },
     {
+      header: 'AMOUNT', key: 'amount', cell: (value: string) => formateCurrency(Number(value))
+    },
+    {
       header: 'PAYMENT STATUS', key: 'payment_status', cell: (value: string) => <StatusBadge status={value} />
     },
     {
-      header: 'COURIER', key: 'courier'
+      header: 'ORDER SOURCE', key: 'order_type',
+      cell: (value: string) => (
+        <div className="flex items-center gap-2">
+          <img src={Favicon} className="h-4 w-4" alt="" />
+          <span className="capitalize">{value}</span>
+        </div>
+      )
     },
-    {
-      header: 'ORDER TYPE', key: 'order_type'
-    },
-    {
-      header: 'ORDER DATE', key: 'consignment_date'
-    },
+
     {
       header: "",
       key: "order_number",

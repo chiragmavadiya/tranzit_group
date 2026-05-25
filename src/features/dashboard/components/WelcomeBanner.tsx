@@ -57,7 +57,7 @@ export function WelcomeBanner({ userName, description, buttons, imageSrc, classN
               <div className="animate-bounce hover:animate-spin transition-all duration-300">🚀</div>
             </div>
           </div>
-          <p className="max-w-[550px] text-[15px] mb-3 md:text-[16px] leading-relaxed font-medium text-slate-600 dark:text-zinc-300 italic animate-in fade-in slide-in-from-bottom-4 duration-500">
+          <p className="max-w-[550px] text-[15px] mb-3 md:text-[16px] leading-relaxed font-medium text-slate-600 dark:text-zinc-300 animate-in fade-in slide-in-from-bottom-4 duration-500">
             {description}
           </p>
           <div className="flex flex-wrap items-center justify-center md:justify-start gap-3 pt-2">

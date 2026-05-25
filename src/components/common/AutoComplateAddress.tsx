@@ -8,10 +8,7 @@ import { Search } from 'lucide-react';
 export interface AddressData {
     formatted_address: string;
     address1: string;
-    unit_number: string;
-    street_number: string;
-    street_name: string;
-    street_type: string;
+    street: string;
     suburb: string;
     state: string;
     post_code: string;
@@ -45,18 +42,14 @@ export const PlaceAutocomplete = ({ onPlaceSelect, ...rest }: PlaceAutocompleteP
     useEffect(() => {
         if (!placeAutocomplete) return;
 
-        placeAutocomplete.addListener('place_changed', () => {
+        const listener = placeAutocomplete.addListener('place_changed', () => {
             const place = placeAutocomplete.getPlace();
             if (!place.address_components) return;
-
             // 2. Map Google components to the fields in image_ed5179.png
             const address: AddressData = {
                 formatted_address: place.formatted_address || '',
                 address1: '',
-                unit_number: '',
-                street_number: '',
-                street_name: '',
-                street_type: '',
+                street: '',
                 suburb: '',
                 state: '',
                 post_code: '',
@@ -64,29 +57,37 @@ export const PlaceAutocomplete = ({ onPlaceSelect, ...rest }: PlaceAutocompleteP
                 latitude: place.geometry?.location?.lat() || null,
                 longitude: place.geometry?.location?.lng() || null,
             };
+            console.log(place.address_components, 'place.address_components')
 
+            let street_number = '';
+            let street_type = '';
+            let street_name = '';
             place.address_components.forEach((component: google.maps.GeocoderAddressComponent) => {
+                console.log(component, 'component');
+
                 const types = component.types;
                 const value = component.short_name;
 
-                if (types.includes('subpremise')) address.unit_number = value;
-                if (types.includes('street_number')) address.street_number = value;
+                if (types.includes('street_number')) street_number = value;
 
                 if (types.includes('route')) {
                     // Australia street logic: "George St" -> Name: George, Type: St
                     const parts = component.long_name.split(' ');
-                    address.street_type = parts.length > 1 ? parts.pop() || '' : '';
-                    address.street_name = parts.join(' ');
+                    street_type = parts.length > 1 ? parts.pop() || '' : '';
+                    street_name = parts.join(' ');
                 }
-                if (types.includes('country')) address.country = component.short_name;
+                if (types.includes('country')) address.country = component.long_name;
                 if (types.includes('locality')) address.suburb = value;
                 if (types.includes('administrative_area_level_1')) address.state = component.short_name; // e.g. NSW
                 if (types.includes('postal_code')) address.post_code = value;
-                address.address1 = `${address.street_number} ${address.street_name} ${address.street_type}`;
             });
-
+            address.street = `${street_number} ${street_name} ${street_type}`
+            address.address1 = address.street;
             onPlaceSelect(address);
         });
+        return () => {
+            google.maps.event.removeListener(listener);
+        };
     }, [onPlaceSelect, placeAutocomplete]);
 
     return (
@@ -98,7 +99,6 @@ export const PlaceAutocomplete = ({ onPlaceSelect, ...rest }: PlaceAutocompleteP
                 icon={Search}
                 {...rest}
             />
-
         </div>
     );
 };

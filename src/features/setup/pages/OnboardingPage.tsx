@@ -314,7 +314,7 @@ export default function OnboardingPage() {
                   />
                 </div>
                 <div className="pt-2">
-                  <p className="text-xs text-slate-400 dark:text-zinc-500 italic">
+                  <p className="text-xs text-slate-400 dark:text-zinc-500">
                     These details will be used for your invoices and shipping documents.
                   </p>
                 </div>
@@ -344,9 +344,10 @@ export default function OnboardingPage() {
                       label="Address Information"
                       onPlaceSelect={(opt) => {
                         handleChange('address', opt.formatted_address);
-                        handleChange('street_name', opt.street_name);
-                        handleChange('street_number', opt.street_number);
-                        handleChange('street_type', opt.street_type);
+                        handleChange('street', opt.street);
+                        // handleChange('street_name', opt.street_name);
+                        // handleChange('street_number', opt.street_number);
+                        // handleChange('street_type', opt.street_type);
                         handleChange('suburb', opt.suburb);
                         handleChange('state', opt.state);
                         handleChange('country', opt.country);
@@ -458,9 +459,10 @@ export default function OnboardingPage() {
                         label="Address Information"
                         onPlaceSelect={(opt) => {
                           handleChange('billing_address', opt.formatted_address);
-                          handleChange('billing_street_name', opt.street_name);
-                          handleChange('billing_street_number', opt.street_number);
-                          handleChange('billing_street_type', opt.street_type);
+                          handleChange('billing_street', opt.street);
+                          // handleChange('billing_street_name', opt.street_name);
+                          // handleChange('billing_street_number', opt.street_number);
+                          // handleChange('billing_street_type', opt.street_type);
                           handleChange('billing_suburb', opt.suburb);
                           handleChange('billing_state', opt.state);
                           handleChange('billing_country', opt.country);

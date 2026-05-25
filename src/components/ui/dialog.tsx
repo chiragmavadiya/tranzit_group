@@ -173,8 +173,8 @@ const CustomModel = ({ open, title, description, onOpenChange, children, onSubmi
         className={contentClass || "min-w-xl"}
         tabIndex={undefined}
       >
-        <DialogHeader className="border-b border-gray-100 dark:border-zinc-800 gap-0">
-          <DialogTitle className="my-0 mb-2 text-xl font-bold text-slate-900 dark:text-zinc-100 italic!">
+        <DialogHeader className="border-b pb-2 border-gray-200 dark:border-zinc-800 gap-0">
+          <DialogTitle className="my-0 mb-0 text-2xl font-bold text-slate-900 dark:text-zinc-100">
             {title}
           </DialogTitle>
           {description && (
@@ -188,7 +188,7 @@ const CustomModel = ({ open, title, description, onOpenChange, children, onSubmi
         </div>
         {
           showFooter && (
-            <DialogFooter className="gap-3 flex sm:justify-between p-4 border-t border-gray-100 dark:border-zinc-800 bg-gray-50/50 dark:bg-zinc-900/50">
+            <DialogFooter className="gap-3 flex sm:justify-between p-4 border-t border-gray-300 dark:border-zinc-800 bg-gray-50/50 dark:bg-zinc-900/50">
               <div>
                 {customFooter}
               </div>

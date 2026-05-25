@@ -98,7 +98,7 @@ export function ZohoConnectionCard({
 
           <div className="mt-4 flex gap-2 p-3 rounded-lg bg-primary/5 dark:bg-primary/10 border border-primary/20">
             <AlertCircle className="w-4 h-4 text-primary shrink-0 mt-0.5" />
-            <p className="mb-0 text-[10px] text-primary leading-relaxed italic">
+            <p className="mb-0 text-[10px] text-primary leading-relaxed">
               After approval, the refresh token is stored securely and used automatically for future synchronization.
             </p>
           </div>

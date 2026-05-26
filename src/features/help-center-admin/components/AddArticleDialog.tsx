@@ -98,7 +98,6 @@ interface ArticleFormProps {
 }
 
 const ArticleForm = ({ initialValues, onSubmit, ref }: ArticleFormProps & { ref: any }) => {
-  console.log(initialValues)
   const [formData, setFormData] = useState<HelpArticleFormData>({
     ...initialValues
   });

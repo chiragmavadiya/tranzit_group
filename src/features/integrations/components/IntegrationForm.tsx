@@ -49,7 +49,7 @@ export function IntegrationForm({ provider }: IntegrationFormProps) {
         const requiredFields: Record<string, string[]> = {
             auspost: ['api_key', 'api_password', 'base_url', 'account_number', 'account_label'],
             aramex: ['client_id', 'client_secret', 'account_name', 'account_label'],
-            mypostbusiness: ['merchant_token', 'base_url', 'account_label'],
+            mypostbusiness: ['merchant_token', 'base_url', 'account_label', 'account_number'],
             directfreight: ['token', 'account', 'site_id', 'base_url', 'consignment_token', 'account_label'],
             shopify: ['shop'],
             woocommerce: ['store_url', 'consumer_key', 'consumer_secret']
@@ -130,6 +130,7 @@ export function IntegrationForm({ provider }: IntegrationFormProps) {
                     <>
                         <FormInput label="Merchant Token" {...commonProps("merchant_token")} />
                         <FormInput label="Base URL" {...commonProps("base_url")} placeholder="https://digitalapi.auspost.com.au/test" />
+                        <FormInput label="Account Number" {...commonProps("account_number")} />
                         <FormInput label="Account Label" {...commonProps("account_label")} />
                     </>
                 );

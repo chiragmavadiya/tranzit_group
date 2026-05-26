@@ -1,6 +1,6 @@
-import React, { useEffect, useEffectEvent, useState } from 'react'
+import React, { memo, useEffect, useEffectEvent, useState } from 'react'
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card'
-import { Truck, AlertCircle, RefreshCw } from 'lucide-react'
+import { Truck, AlertCircle, RefreshCw, Copy, Check } from 'lucide-react'
 import { Badge } from '@/components/ui/badge'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
 import { useGetQuoteServices } from '@/features/quote/hooks/useQuote'
@@ -19,13 +19,23 @@ interface CarrierCardProps {
   orderType?: string
 }
 
-export const CarrierCard: React.FC<CarrierCardProps> = (props) => {
+export const CarrierCard: React.FC<CarrierCardProps> = memo((props) => {
   const { itemData, addresses, onQuoteChange, setCourierData, orderDetail, module, orderType = 'create' } = props
   const { role } = useAppSelector((state) => state.auth);
   const [selectedServiceId, setSelectedServiceId] = useState<string>('')
   const [couriers, setCouriers] = useState<any[]>([]);
   const [surchargesMap, setSurchargesMap] = useState<Record<string, any[]>>({});
   const [bestDeal, setBestDeal] = useState<string>('');
+  const [copiedTracking, setCopiedTracking] = useState(false);
+
+  const handleCopyTracking = (text: string) => {
+    navigator.clipboard.writeText(text);
+    setCopiedTracking(true);
+    showToast("Tracking number copied to clipboard", "success");
+    setTimeout(() => {
+      setCopiedTracking(false);
+    }, 2000);
+  };
 
   const { mutate: getServices, isPending: loading } = useGetQuoteServices(role);
 
@@ -130,11 +140,11 @@ export const CarrierCard: React.FC<CarrierCardProps> = (props) => {
 
   return (
     <Card className="border gap-0 border-gray-200 dark:border-zinc-800 overflow-hidden transition-colors duration-300">
-      <CardHeader className="flex flex-row items-center justify-between py-3 px-5 border-b border-gray-100 dark:border-zinc-800 bg-white dark:bg-zinc-900 transition-colors">
+      <CardHeader className="flex flex-row items-center justify-between py-3 px-4 border-b border-gray-100 dark:border-zinc-800 bg-slate-50 dark:bg-zinc-900 transition-colors">
         <div className="flex justify-between w-full items-center gap-2">
           <div className='flex items-center gap-2'>
             <Truck className="h-4 w-4 text-primary" />
-            <CardTitle className="text-sm font-bold text-gray-900 dark:text-zinc-100 tracking-wider">
+            <CardTitle className="text-base font-bold text-gray-900 dark:text-zinc-100 tracking-wider">
               SHIPMENT OPTIONS
             </CardTitle>
           </div>
@@ -142,7 +152,7 @@ export const CarrierCard: React.FC<CarrierCardProps> = (props) => {
         </div>
       </CardHeader>
 
-      <CardContent className="p-4 bg-gray-50/50 dark:bg-zinc-950">
+      <CardContent className="p-4 bg-white dark:bg-zinc-950">
         {orderType !== 'create' && orderType !== 'consign' && orderDetail ? (
           <div className="flex flex-col gap-3">
             <div className="relative flex flex-col p-4 rounded-xl border border-primary bg-primary/5 dark:bg-primary/10 shadow-sm">
@@ -165,8 +175,21 @@ export const CarrierCard: React.FC<CarrierCardProps> = (props) => {
                       {orderDetail.courier_details?.courier || 'Standard Delivery'}
                     </h4>
                     <div className="flex items-center gap-2 mt-1">
-                      <span className="text-[10px] font-bold text-gray-500 dark:text-zinc-400 uppercase">Tracking:</span>
-                      <span className="text-[10px] font-bold text-primary">{orderDetail.courier_details?.tracking_number || 'N/A'}</span>
+                      <span className="text-xs font-bold text-gray-500 dark:text-zinc-400 uppercase">Tracking:</span>
+                      <span className="text-xs font-bold text-primary">{orderDetail.courier_details?.tracking_number || 'N/A'}</span>
+                      {orderDetail.courier_details?.tracking_number && (
+                        <button
+                          onClick={() => handleCopyTracking(orderDetail.courier_details.tracking_number)}
+                          className="flex items-center justify-center p-0.5 rounded hover:bg-gray-100 dark:hover:bg-zinc-800 text-gray-400 hover:text-primary transition-all duration-150 focus:outline-none"
+                          title="Copy tracking number"
+                        >
+                          {copiedTracking ? (
+                            <Check className="h-3.5 w-3.5 text-emerald-500 animate-in fade-in duration-200" />
+                          ) : (
+                            <Copy className="h-3.5 w-3.5 transition-transform hover:scale-110 active:scale-95" />
+                          )}
+                        </button>
+                      )}
                     </div>
                   </div>
                 </div>
@@ -187,10 +210,10 @@ export const CarrierCard: React.FC<CarrierCardProps> = (props) => {
             Fetching available carriers...
           </div>
         ) : couriers.length === 0 ? (
-          <div className="py-8 h-34 flex flex-col items-center justify-center text-sm text-gray-500 font-medium gap-2">
+          <div className="py-8 h-36 flex flex-col items-center justify-center text-base text-gray-500 font-medium gap-2">
             <AlertCircle className="h-5 w-5 text-gray-400" />
             No shipment options available yet.<br />
-            <span className="text-xs">Please fill out item dimensions and complete both addresses.</span>
+            <span className="text-sm">Please fill out item dimensions and complete both addresses.</span>
           </div>
         ) : (
           <div className="flex flex-col gap-3">
@@ -334,4 +357,4 @@ export const CarrierCard: React.FC<CarrierCardProps> = (props) => {
       </CardContent>
     </Card>
   )
-}
+})

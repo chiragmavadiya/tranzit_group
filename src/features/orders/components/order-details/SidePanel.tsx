@@ -12,7 +12,7 @@ import { Shield, PenLine, CheckCircle2, Phone, Info, ShieldOff } from 'lucide-re
 import { Switch } from '@/components/ui/switch'
 import DatePicker from '@/components/common/DatePicker';
 import type { QuoteCalculations } from '@/features/quote/types';
-import { useMemo } from 'react';
+import { memo, useMemo } from 'react';
 import { CustomLabel } from '../OrderFormUI';
 import { cn } from '@/lib/utils';
 import { StatusBadge } from '../StatusBadge';
@@ -33,7 +33,7 @@ interface SidePanelProps {
   payment_status?: string;
 }
 
-export const SidePanel: React.FC<SidePanelProps> = ({ calculation, handleOptionalFieldsChange, insuranceSelected, signatureSelected, deliveryInstructions, pickupDate, setPickupDate, orderType, liability = false, liabilityMessage, payment_status }) => {
+export const SidePanel: React.FC<SidePanelProps> = memo(({ calculation, handleOptionalFieldsChange, insuranceSelected, signatureSelected, deliveryInstructions, pickupDate, setPickupDate, orderType, liability = false, liabilityMessage, payment_status }) => {
   const isCreate = useMemo(() => orderType === 'create' || orderType === 'create-menual' || orderType === 'consign', [orderType]);
   return (
     <div className="flex flex-col gap-4">
@@ -45,7 +45,7 @@ export const SidePanel: React.FC<SidePanelProps> = ({ calculation, handleOptiona
             <AccordionTrigger className="hover:no-underline py-3 px-0 [&>svg]:text-primary">
               <div className='flex justify-between w-full'>
 
-                <div className="text-sm font-bold text-gray-900 dark:text-zinc-100 tracking-wider">ORDER QUOTATION SUMMARY</div>
+                <div className="text-base font-bold text-gray-900 dark:text-zinc-100 tracking-wider">ORDER QUOTATION SUMMARY</div>
                 {payment_status && <StatusBadge status={payment_status} />}
               </div>
             </AccordionTrigger>
@@ -99,7 +99,7 @@ export const SidePanel: React.FC<SidePanelProps> = ({ calculation, handleOptiona
           <>
             <AccordionItem value="services" className="border border-gray-200 dark:border-zinc-800 rounded-xl bg-white dark:bg-zinc-950 shadow-xs px-5 border-b overflow-hidden transition-colors duration-300 [&>h3]:my-0">
               <AccordionTrigger className="hover:no-underline py-3 px-0 [&>svg]:text-primary">
-                <span className="text-sm font-bold text-gray-900 dark:text-zinc-100 tracking-wider">ADDITIONAL SERVICES</span>
+                <span className="text-base font-bold text-gray-900 dark:text-zinc-100 tracking-wider">ADDITIONAL SERVICES</span>
               </AccordionTrigger>
               <AccordionContent className="flex flex-col gap-5 pb-4 pt-1">
 
@@ -187,7 +187,7 @@ export const SidePanel: React.FC<SidePanelProps> = ({ calculation, handleOptiona
         {/* NOTES */}
         <AccordionItem value="notes" className="border border-gray-200 dark:border-zinc-800 rounded-xl bg-white dark:bg-zinc-950 shadow-xs px-5 border-b overflow-hidden transition-colors duration-300 [&>h3]:my-0">
           <AccordionTrigger className="hover:no-underline py-3 px-0 [&>svg]:text-primary items-center">
-            <span className="text-sm font-bold text-gray-900 dark:text-zinc-100 tracking-wider">Delivery Instructions(Printed on Label)</span>
+            <span className="text-base font-bold text-gray-900 dark:text-zinc-100 tracking-wider uppercase">Delivery Instructions(Printed on Label)</span>
           </AccordionTrigger>
           <AccordionContent className="flex flex-col gap-2 pb-4">
             {!isCreate ? (
@@ -325,13 +325,13 @@ export const SidePanel: React.FC<SidePanelProps> = ({ calculation, handleOptiona
                 liability ? "text-emerald-700 dark:text-emerald-400" : "text-slate-600 dark:text-zinc-400"
               )}>
                 <Shield className="h-4 w-4" />
-                <span className="text-sm font-bold tracking-wider uppercase">Liability Cover</span>
+                <span className="text-base font-bold tracking-wider uppercase">Liability Cover</span>
               </div>
             </AccordionTrigger>
             <AccordionContent className="pb-4 pt-1">
               <div className="flex flex-col gap-2">
                 <p className={cn(
-                  "text-[11px] font-medium leading-relaxed m-0",
+                  "text-xs font-medium leading-relaxed m-0",
                   liability ? "text-emerald-800 dark:text-emerald-300" : "text-slate-500 dark:text-zinc-400"
                 )}>
                   {liabilityMessage || (liability ? "This order is covered by our limited liability protection." : "This order is not covered by liability protection.")}
@@ -357,13 +357,13 @@ export const SidePanel: React.FC<SidePanelProps> = ({ calculation, handleOptiona
         {isCreate && (
           <AccordionItem value="support" className="border border-gray-200 dark:border-zinc-800 rounded-xl bg-white dark:bg-zinc-950 shadow-xs px-5 border-b overflow-hidden transition-colors duration-300 [&>h3]:my-0">
             <AccordionTrigger className="hover:no-underline py-3 px-0 [&>svg]:text-primary">
-              <span className="text-sm font-bold text-gray-900 dark:text-zinc-100 tracking-wider uppercase">Support & Reference</span>
+              <span className="text-base font-bold text-gray-900 dark:text-zinc-100 tracking-wider uppercase">Support & Reference</span>
             </AccordionTrigger>
             <AccordionContent className="flex flex-col gap-4 pb-4 mt-1">
               <div className="flex justify-between items-center text-[13px] p-3 bg-slate-50 dark:bg-zinc-900/50 rounded-lg border border-slate-100 dark:border-zinc-800 transition-colors">
                 <div className="flex items-center gap-2">
                   <Info className="h-4 w-4 text-primary" />
-                  <span className="text-gray-500 dark:text-zinc-400 font-bold uppercase text-[10px] tracking-widest">Cust Ref</span>
+                  <span className="text-gray-500 dark:text-zinc-400 font-bold uppercase text-xs tracking-widest">Cust Ref</span>
                 </div>
                 <span className="text-gray-900 dark:text-zinc-100 font-bold tracking-tight">SH000099</span>
               </div>
@@ -371,10 +371,10 @@ export const SidePanel: React.FC<SidePanelProps> = ({ calculation, handleOptiona
               <div className="flex flex-col gap-2 p-3 bg-primary/5 rounded-lg border border-primary/10 transition-colors">
                 <div className="flex items-center gap-2">
                   <Phone className="h-4 w-4 text-primary" />
-                  <span className="text-[10px] font-bold text-primary uppercase tracking-widest">Support Hotline</span>
+                  <span className="text-[12px] font-bold text-primary uppercase tracking-widest">Support Hotline</span>
                 </div>
                 <p className="text-sm font-bold text-gray-900 dark:text-zinc-100 my-0!">1300 347 397</p>
-                <p className="text-[11px] text-gray-500 dark:text-zinc-400 font-medium leading-relaxed m-0">
+                <p className="text-[12px] text-gray-500 dark:text-zinc-400 font-medium leading-relaxed m-0">
                   For enquiries or online support, contact our dedicated team.
                 </p>
               </div>
@@ -384,4 +384,4 @@ export const SidePanel: React.FC<SidePanelProps> = ({ calculation, handleOptiona
       </Accordion>
     </div>
   )
-}
+})

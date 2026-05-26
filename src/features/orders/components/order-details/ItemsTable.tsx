@@ -27,7 +27,7 @@ interface ItemsTableProps {
   customerId?: number
 }
 
-export const ItemsTable: React.FC<ItemsTableProps> = ({
+export const ItemsTable: React.FC<ItemsTableProps> = React.memo(({
   items,
   onUpdateItem,
   children,
@@ -63,23 +63,23 @@ export const ItemsTable: React.FC<ItemsTableProps> = ({
         ...currentData,
         item_id: selectedItem.id,
         item_name: selectedItem.item_name,
-        weight: 50,
-        length: 50,
-        width: 50,
-        height: 50,
+        weight: Number(selectedItem.weight || 0),
+        length: Number(selectedItem.length || 0),
+        width: Number(selectedItem.width || 0),
+        height: Number(selectedItem.height || 0),
       })
     }
   }
   return (
     <Accordion multiple defaultValue={['notes', 'services', 'summary', 'pickup_date']} className="flex flex-col gap-3">
 
-      {/* ORDER QUOTATION SUMMARY */}
-      <AccordionItem value="summary" className="border border-gray-200 dark:border-zinc-800 rounded-md bg-white dark:bg-zinc-950 shadow-xs px-5 border-b overflow-hidden transition-colors duration-300 [&>h3]:my-0">
-        <AccordionTrigger className="hover:no-underline py-3 px-0 [&>svg]:text-primary items-center">
+      {/* ORDER ITEMS */}
+      <AccordionItem value="summary" className="border border-gray-200 dark:border-zinc-800 rounded-md bg-white dark:bg-zinc-950 shadow-xs border-b overflow-hidden transition-colors duration-300 [&>h3]:my-0">
+        <AccordionTrigger className="hover:no-underline py-3 px-4 [&>svg]:text-primary items-center bg-slate-50">
           <div className="flex items-center w-full justify-between ">
             <div className="flex items-center gap-2 text-gray-600 dark:text-zinc-300">
               <Box className="w-5 h-5" />
-              <h3 className="my-0 text-base font-semibold text-gray-800 dark:text-zinc-100">Items {items.length > 0 && ` (${items.length})`}</h3>
+              <h3 className="my-0 text-base font-semibold text-gray-800 dark:text-zinc-100 uppercase">Items {items.length > 0 && ` (${items.length})`}</h3>
             </div>
             {isEditable && (
               <Button
@@ -104,7 +104,7 @@ export const ItemsTable: React.FC<ItemsTableProps> = ({
             )}
           </div>
         </AccordionTrigger>
-        <AccordionContent className="border-t border-gray-100 dark:border-zinc-800 flex flex-col gap-2 pb-4 pt-4">
+        <AccordionContent className="border-t px-4  border-gray-100 dark:border-zinc-800 flex flex-col gap-2 pb-4 pt-4">
 
           <div className="w-full flex flex-col gap-4">
             <div className="flex flex-col gap-4">
@@ -124,8 +124,8 @@ export const ItemsTable: React.FC<ItemsTableProps> = ({
                               <Package className="w-4 h-4" />
                             </div>
                             <div>
-                              <div className="text-[10px] font-bold text-gray-400 uppercase tracking-wider">Type</div>
-                              <div className="text-xs font-bold text-gray-900 dark:text-zinc-100">
+                              <div className="text-xs font-bold text-gray-400 uppercase tracking-wider">Type</div>
+                              <div className="text-sm font-bold text-gray-900 dark:text-zinc-100">
                                 {item.type === 'my_item' ? (
                                   predefinedItems.find(i => i.id.toString() === item.item_id?.toString())?.item_name || 'My Item'
                                 ) : 'Standard Parcel'}
@@ -139,8 +139,8 @@ export const ItemsTable: React.FC<ItemsTableProps> = ({
                               <Box className="w-4 h-4" />
                             </div>
                             <div>
-                              <div className="text-[10px] font-bold text-gray-400 uppercase tracking-wider">Qty</div>
-                              <div className="text-xs font-bold text-gray-900 dark:text-zinc-100">{item.quantity} Units</div>
+                              <div className="text-xs font-bold text-gray-400 uppercase tracking-wider">Qty</div>
+                              <div className="text-sm font-bold text-gray-900 dark:text-zinc-100">{item.quantity} Units</div>
                             </div>
                           </div>
 
@@ -150,8 +150,8 @@ export const ItemsTable: React.FC<ItemsTableProps> = ({
                               <Scale className="w-4 h-4" />
                             </div>
                             <div>
-                              <div className="text-[10px] font-bold text-gray-400 uppercase tracking-wider">Weight</div>
-                              <div className="text-xs font-bold text-gray-900 dark:text-zinc-100">{item.weight} kg</div>
+                              <div className="text-xs font-bold text-gray-400 uppercase tracking-wider">Weight</div>
+                              <div className="text-sm font-bold text-gray-900 dark:text-zinc-100">{item.weight} kg</div>
                             </div>
                           </div>
 
@@ -161,8 +161,8 @@ export const ItemsTable: React.FC<ItemsTableProps> = ({
                               <Ruler className="w-4 h-4" />
                             </div>
                             <div>
-                              <div className="text-[10px] font-bold text-gray-400 uppercase tracking-wider">Dimensions (L×W×H)</div>
-                              <div className="text-xs font-bold text-gray-900 dark:text-zinc-100">
+                              <div className="text-xs font-bold text-gray-400 uppercase tracking-wider">Dimensions (L×W×H)</div>
+                              <div className="text-sm font-bold text-gray-900 dark:text-zinc-100">
                                 {item.length} × {item.width} × {item.height} cm
                               </div>
                             </div>
@@ -172,7 +172,7 @@ export const ItemsTable: React.FC<ItemsTableProps> = ({
                         <div className={`flex items-end gap-3 pb-4 ${idx !== items.length - 1 ? 'border-b border-gray-100 dark:border-zinc-800' : ''}`}>
                           {/* Type Selection */}
                           <div className="flex flex-col gap-1 w-[180px] shrink-0">
-                            <Label className="text-[11px] font-bold text-gray-500 dark:text-zinc-400">Type</Label>
+                            <Label className="text-[12px] font-medium text-gray-600 dark:text-zinc-400">Type</Label>
                             <SelectComponent
                               value={item.type || 'box'}
                               onValueChange={(val) => onUpdateItem?.(idx, 'type', val!)}
@@ -187,7 +187,7 @@ export const ItemsTable: React.FC<ItemsTableProps> = ({
 
                           {/* Quantity */}
                           <div className="flex flex-col gap-1 w-[80px] shrink-0">
-                            <Label className="text-[11px] font-bold text-gray-500 dark:text-zinc-400">Quantity</Label>
+                            <Label className="text-[12px] font-medium text-gray-600 dark:text-zinc-400">Quantity</Label>
                             <Input
                               type="number"
                               value={item.quantity || ''}
@@ -201,7 +201,7 @@ export const ItemsTable: React.FC<ItemsTableProps> = ({
                           {/* Conditional Fields based on Type */}
                           {item.type === 'my_item' ? (
                             <div className="flex flex-col gap-1 flex-1">
-                              <Label className="text-[11px] font-bold text-gray-500 dark:text-zinc-400">Select Item</Label>
+                              <Label className="text-[12px] font-medium text-gray-600 dark:text-zinc-400">Select Item</Label>
                               <SelectComponent
                                 value={item.item_id?.toString() || ''}
                                 onValueChange={(val) => handlePredefinedItemSelect(idx, val!)}
@@ -213,7 +213,7 @@ export const ItemsTable: React.FC<ItemsTableProps> = ({
                           ) : (
                             <>
                               <div className="flex flex-col gap-1 flex-1">
-                                <Label className="text-[11px] font-bold text-gray-500 dark:text-zinc-400">Weight (kg)</Label>
+                                <Label className="text-[12px] font-medium text-gray-600 dark:text-zinc-400">Weight (kg)</Label>
                                 <Input
                                   type="number"
                                   value={item.weight || ''}
@@ -225,7 +225,7 @@ export const ItemsTable: React.FC<ItemsTableProps> = ({
                                 />
                               </div>
                               <div className="flex flex-col gap-1 flex-1">
-                                <Label className="text-[11px] font-bold text-gray-500 dark:text-zinc-400">Length (cm)</Label>
+                                <Label className="text-[12px] font-medium text-gray-600 dark:text-zinc-400">Length (cm)</Label>
                                 <Input
                                   type="number"
                                   value={item.length || ''}
@@ -236,7 +236,7 @@ export const ItemsTable: React.FC<ItemsTableProps> = ({
                                 />
                               </div>
                               <div className="flex flex-col gap-1 flex-1">
-                                <Label className="text-[11px] font-bold text-gray-500 dark:text-zinc-400">Width (cm)</Label>
+                                <Label className="text-[12px] font-medium text-gray-600 dark:text-zinc-400">Width (cm)</Label>
                                 <Input
                                   type="number"
                                   value={item.width || ''}
@@ -247,7 +247,7 @@ export const ItemsTable: React.FC<ItemsTableProps> = ({
                                 />
                               </div>
                               <div className="flex flex-col gap-1 flex-1">
-                                <Label className="text-[11px] font-bold text-gray-500 dark:text-zinc-400">Height (cm)</Label>
+                                <Label className="text-[12px] font-medium text-gray-600 dark:text-zinc-400">Height (cm)</Label>
                                 <Input
                                   type="number"
                                   value={item.height || ''}
@@ -285,4 +285,4 @@ export const ItemsTable: React.FC<ItemsTableProps> = ({
       </AccordionItem>
     </Accordion>
   )
-}
+});

@@ -104,7 +104,7 @@ export function InvoiceTable({
       key: 'amount',
       header: 'Total',
       cell: (_, row) => (
-        <div className="text-right font-medium text-gray-700 dark:text-zinc-300">
+        <div className="font-medium text-gray-700 dark:text-zinc-300">
           {formatCurrency(Number(row.total ?? row.amount ?? 0))}
         </div>
       )
@@ -126,7 +126,7 @@ export function InvoiceTable({
       cell: (_, row) => {
         const val = Number(row.till_date_paid ?? row.amount_paid ?? 0);
         return (
-          <div className={cn("text-right font-medium", val > 0 ? "text-emerald-600 dark:text-emerald-400" : "text-gray-400")}>
+          <div className={cn("font-medium", val > 0 ? "text-emerald-600 dark:text-emerald-400" : "text-gray-400")}>
             {formatCurrency(val)}
           </div>
         );
@@ -139,7 +139,7 @@ export function InvoiceTable({
       cell: (_, row) => {
         const val = Number(row.remaining_balance ?? row.balance ?? 0);
         return (
-          <div className={cn("text-right font-medium", val > 0 ? "text-rose-600 dark:text-rose-400" : "text-gray-400")}>
+          <div className={cn("font-medium", val > 0 ? "text-rose-600 dark:text-rose-400" : "text-gray-400")}>
             {formatCurrency(val)}
           </div>
         );

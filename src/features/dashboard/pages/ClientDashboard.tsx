@@ -13,10 +13,17 @@ import { NavLink } from "react-router-dom";
 import { useDashboardMetrics } from "../hooks/useDashboard";
 import type { DashboardOrder, CustomerMetrics } from "../types";
 import { useNavigate } from "react-router";
+import { ClientDashboardSkeleton } from "../components/DashboardSkeleton";
+
+
 
 export default function ClientDashboard() {
   const navigate = useNavigate();
   const { data: metricsData, isLoading } = useDashboardMetrics();
+
+  if (isLoading) {
+    return <ClientDashboardSkeleton />;
+  }
 
   // Real Data from API
   const metrics = metricsData?.data as CustomerMetrics;

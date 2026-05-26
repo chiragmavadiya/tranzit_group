@@ -57,13 +57,11 @@ export const PlaceAutocomplete = ({ onPlaceSelect, ...rest }: PlaceAutocompleteP
                 latitude: place.geometry?.location?.lat() || null,
                 longitude: place.geometry?.location?.lng() || null,
             };
-            console.log(place.address_components, 'place.address_components')
 
             let street_number = '';
             let street_type = '';
             let street_name = '';
             place.address_components.forEach((component: google.maps.GeocoderAddressComponent) => {
-                console.log(component, 'component');
 
                 const types = component.types;
                 const value = component.short_name;

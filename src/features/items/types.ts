@@ -4,6 +4,10 @@ export interface Item {
   item_name: string;
   item_cubic: number;
   status: string;
+  weight?: number;
+  length?: number;
+  width?: number;
+  height?: number;
 }
 
 export interface ItemDetails extends Item {

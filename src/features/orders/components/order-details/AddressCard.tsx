@@ -1,4 +1,4 @@
-import React from "react";
+import React, { memo } from "react";
 import { Pencil, CheckCircle2 } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -12,7 +12,7 @@ interface AddressCardProps {
   onEditClick?: () => void;
 }
 
-export const AddressCard: React.FC<AddressCardProps> = ({
+export const AddressCard: React.FC<AddressCardProps> = memo(({
   title,
   name,
   address,
@@ -53,4 +53,4 @@ export const AddressCard: React.FC<AddressCardProps> = ({
       </CardContent>
     </Card>
   );
-};
+});

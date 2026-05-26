@@ -12,7 +12,7 @@ export const StatusBadge = ({ status }: { status: string }) => {
         'Paid': 'bg-green-100 text-green-600 dark:bg-green-900/20 dark:text-green-400',
     };
     return (
-        <Badge variant="secondary" className={cn("px-2 py-0 h-5 text-[10px] font-bold border-none", variants[status] || variants.Draft)}>
+        <Badge variant="secondary" className={cn("px-2 py-0 h-6 text-[12px] leading-none font-bold border-none", variants[status] || variants.Draft)}>
             {status}
         </Badge>
     );

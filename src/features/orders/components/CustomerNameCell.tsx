@@ -18,10 +18,10 @@ export const CustomerNameCell = ({
 }: CustomerNameCellProps) => {
   const [open, setOpen] = useState(false);
 
-  if (orderType === 'printed') {
+  if (orderType !== 'new') {
     return (
       <div
-        // onMouseLeave={() => setOpen(false)}
+        onMouseLeave={() => setOpen(false)}
         className="w-full"
       >
         <Popover open={open} onOpenChange={setOpen}>
@@ -35,7 +35,7 @@ export const CustomerNameCell = ({
             </button>
           </PopoverTrigger>
           <PopoverContent
-            // onMouseLeave={() => setOpen(false)}
+            onMouseLeave={() => setOpen(false)}
             className="w-72 p-4 text-sm text-slate-700 dark:text-zinc-355 font-normal bg-white dark:bg-zinc-950 rounded-sm border border-gray-200 dark:border-zinc-800 shadow-md"
             align="start"
           >

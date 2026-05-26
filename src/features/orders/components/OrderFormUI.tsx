@@ -32,7 +32,7 @@ export const Required = () => {
 export const CustomLabel = ({ label, isHorizontal = false, required = false, className }: { label: ReactNode, isHorizontal?: boolean, required?: boolean, className?: string }) => {
   if (!label) return null;
   return (<Label className={cn(
-    "text-[12px] font-bold text-slate-700 dark:text-zinc-400 tracking-wide gap-0 mb-0.5",
+    "text-[14px] font-medium text-slate-700 dark:text-zinc-400 tracking-wide gap-0 mb-0.5",
     isHorizontal ? "h-fit leading-none" : "ml-0.5",
     className
   )}>
@@ -78,9 +78,9 @@ export const FormInput = memo(React.forwardRef<HTMLInputElement, FormInputProps>
           required={required}
         />
       )}
-      <div className="relative group">
+      <div className="relative group/input">
         {Icon && (
-          <div className={cn("absolute left-3", error ? 'top-2' : 'top-1/2 -translate-y-1/2', "text-gray-400 group-focus-within:text-primary transition-colors")}>
+          <div className={cn("absolute left-3", error ? 'top-2' : 'top-1/2 -translate-y-1/2', "text-gray-400 group-focus-within/input:text-primary transition-colors")}>
             <Icon className="w-4 h-4" />
           </div>
         )}
@@ -90,7 +90,7 @@ export const FormInput = memo(React.forwardRef<HTMLInputElement, FormInputProps>
           placeholder={placeholder}
           value={value}
           onChange={handleChange}
-          autoComplete="off"
+          autoComplete="nope"
           className={cn(
             "h-8 rounded-sm border-slate-200 dark:border-zinc-800 bg-white dark:bg-zinc-950 font-normal focus-visible:ring-0 focus-visible:ring-primary focus-visible:border-primary transition-all placeholder:text-muted-foreground placeholder:font-normal dark:placeholder:text-zinc-700 text-sm",
             Icon ? "pl-9" : "px-3",

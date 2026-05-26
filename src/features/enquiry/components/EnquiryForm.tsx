@@ -246,7 +246,7 @@ export function EnquiryForm() {
           error={isSubmited && formData.message === ''}
           errormsg='Please enter your message'
         />
-        <p className="text-[11px] text-gray-400 dark:text-zinc-500">
+        <p className="text-[12px] text-gray-400 dark:text-zinc-500">
           A member of support staff will respond as soon as possible.
         </p>
       </div>

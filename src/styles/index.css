@@ -341,6 +341,12 @@
 
 .pac-item {
   font-family: 'Geist Variable', sans-serif;
+  padding: 4px 8px;
+  font-size: 14px;
+}
+
+.pac-item-query {
+  font-size: 14px;
 }
 
 .pace .pace-progress {

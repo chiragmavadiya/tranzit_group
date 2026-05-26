@@ -109,10 +109,7 @@ export default function GetQuotePage() {
         address1: loc.address1 || loc.label || '',
         suburb: loc.suburb || '',
         state: loc.state || '',
-        street_name: loc.street_name || '',
-        unit_number: '',
-        street_number: loc.street_number || '',
-        street_type: loc.street_type || '',
+        street: loc.street || '',
         postcode: loc.postcode || '',
         country: loc.country || 'Australia',
         name: defaultName,
@@ -131,6 +128,7 @@ export default function GetQuotePage() {
 
     sessionStorage.setItem('quote_sender', JSON.stringify(senderData));
     sessionStorage.setItem('quote_receiver', JSON.stringify(receiverData));
+    localStorage.setItem('quote_receiver', JSON.stringify(receiverData));
     sessionStorage.setItem('quote_items', JSON.stringify(itemsData));
     sessionStorage.setItem('quote_courier', JSON.stringify(quoteData));
 
@@ -141,14 +139,16 @@ export default function GetQuotePage() {
     <>
       <div className="p-page-padding animate-in flex-1 fade-in duration-700 overflow-auto">
         <div className="flex flex-col gap-3">
-          <div className="flex items-center justify-end">
-            <Button
-              variant="outline"
-              onClick={() => navigate('/admin/quotes/history')}
-            >
-              <History className='w-4 h-4' />Quote History
-            </Button>
-          </div>
+          {isAdmin && (
+            <div className="flex items-center justify-end">
+              <Button
+                variant="outline"
+                onClick={() => navigate('/admin/quotes/history')}
+              >
+                <History className='w-4 h-4' />Quote History
+              </Button>
+            </div>
+          )}
 
           <div className="grid grid-cols-1 xl:grid-cols-12 gap-4 items-start">
             {/* Main Form Area */}
@@ -187,7 +187,7 @@ export default function GetQuotePage() {
                 setPickupCharge={setPickupCharge}
                 onSendQuote={() => setIsSendDialogOpen(true)}
                 isValid={isValid}
-                quoteData={quoteData}
+              // quoteData={quoteData}
               />
             </div>
           </div>

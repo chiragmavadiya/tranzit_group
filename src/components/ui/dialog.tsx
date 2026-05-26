@@ -189,7 +189,7 @@ const CustomModel = ({ open, title, description, onOpenChange, children, onSubmi
         {
           showFooter && (
             <DialogFooter className="gap-3 flex sm:justify-between p-4 border-t border-gray-300 dark:border-zinc-800 bg-gray-50/50 dark:bg-zinc-900/50">
-              <div>
+              <div className="flex items-center gap-2">
                 {customFooter}
               </div>
               <div className="flex items-center gap-2">

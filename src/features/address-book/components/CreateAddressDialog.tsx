@@ -78,16 +78,11 @@ export function CreateAddressDialog({
     setSubmited(true);
     if (
       formData.name.trim().length === 0 ||
-      formData.email.trim().length === 0 ||
-      formData.phone.trim().length === 0 ||
-      formData.company.trim().length === 0 ||
-      formData.building.trim().length === 0 ||
       formData.street.trim().length === 0 ||
       formData.suburb.trim().length === 0 ||
       formData.state.trim().length === 0 ||
       formData.postcode.trim().length === 0 ||
-      !formData.phone ||
-      formData.phone.trim().length === 0
+      formData.country.trim().length === 0
     ) {
       showToast("Please fill all the required fields", 'error');
       return;

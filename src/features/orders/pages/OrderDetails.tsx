@@ -1,5 +1,6 @@
 import React from 'react';
-import { Loader2, AlertTriangle, XCircle } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import { Loader2, AlertTriangle, XCircle, FileQuestion } from 'lucide-react';
 import { OrderHeader } from '@/features/orders/components/order-details/OrderHeader';
 import { AddressCard } from '@/features/orders/components/order-details/AddressCard';
 import { CarrierCard } from '@/features/orders/components/order-details/CarrierCard';
@@ -14,8 +15,159 @@ import { ConformationModal } from '@/components/common/ConformationModal';
 import { ConfirmContinue } from '@/features/orders/components/order-details/ConfirmContinue';
 import { ManualOrderDetails } from '@/features/orders/components/order-details/ManualOrderDetails';
 import { useOrderWorkflow } from '@/features/orders/hooks/useOrderWorkflow';
+import { Skeleton } from '@/components/ui/skeleton';
+
+const OrderDetailsSkeleton: React.FC = () => {
+  return (
+    <div className="p-page-padding overflow-y-auto flex-1 bg-white dark:bg-zinc-950 font-sans transition-colors duration-300">
+      {/* Header Skeleton */}
+      <div className="flex flex-col md:flex-row md:items-center justify-between pb-4 border-b border-gray-100 dark:border-zinc-800 gap-4">
+        <div className="space-y-3">
+          <div className="flex items-center gap-3">
+            <Skeleton className="h-8 w-20 rounded-md" /> {/* Back Button */}
+            <Skeleton className="h-8 w-40 rounded-md" /> {/* Order ID */}
+            <Skeleton className="h-6 w-24 rounded-full" /> {/* Country Tag */}
+          </div>
+          <div className="flex items-center gap-3">
+            <Skeleton className="h-5 w-16 rounded-md" /> {/* Manual badge */}
+            <Skeleton className="h-4 w-32 rounded-md" /> {/* Created X hours ago */}
+            <Skeleton className="h-6 w-20 rounded-full" /> {/* Printed Badge */}
+          </div>
+        </div>
+        <div className="flex items-center gap-3">
+          <Skeleton className="h-8 w-36 rounded-md" /> {/* Download Label */}
+          <Skeleton className="h-8 w-32 rounded-md" /> {/* Delete Order */}
+        </div>
+      </div>
+
+      {/* Main Grid Skeleton */}
+      <div className="mt-4 grid grid-cols-1 lg:grid-cols-[1fr_380px] gap-4 items-start">
+        {/* Left Column */}
+        <div className="flex flex-col gap-3">
+          {/* Sender Card Skeleton */}
+          <div className="border border-gray-200 dark:border-zinc-800 rounded-xl p-4 bg-white dark:bg-zinc-950 flex items-center gap-3">
+            <Skeleton className="h-4 w-16" /> {/* SENDER label */}
+            <Skeleton className="h-4 w-4 rounded-full" /> {/* CheckCircle icon */}
+            <Skeleton className="h-4 flex-1 max-w-lg" /> {/* Address line */}
+          </div>
+
+          {/* Receiver Card Skeleton */}
+          <div className="border border-gray-200 dark:border-zinc-800 rounded-xl p-4 bg-white dark:bg-zinc-950 flex items-center gap-3">
+            <Skeleton className="h-4 w-18" /> {/* RECEIVER label */}
+            <Skeleton className="h-4 w-4 rounded-full" /> {/* CheckCircle icon */}
+            <Skeleton className="h-4 flex-1 max-w-lg" /> {/* Address line */}
+          </div>
+
+          {/* Items Accordion Skeleton */}
+          <div className="border border-gray-200 dark:border-zinc-800 rounded-md bg-white dark:bg-zinc-950 overflow-hidden">
+            <div className="p-4 bg-slate-50 dark:bg-zinc-900/50 border-b border-gray-100 dark:border-zinc-800 flex justify-between items-center">
+              <div className="flex items-center gap-2">
+                <Skeleton className="h-5 w-5 rounded" /> {/* Box Icon placeholder */}
+                <Skeleton className="h-5 w-24" /> {/* ITEMS title */}
+              </div>
+              <Skeleton className="h-5 w-5 rounded" /> {/* Accordion chevron */}
+            </div>
+            <div className="p-4 space-y-4">
+              <div className="flex flex-wrap items-center gap-4 p-4 rounded-xl border border-gray-100 dark:border-zinc-800 bg-gray-50/50 dark:bg-zinc-900/30">
+                <Skeleton className="h-10 w-24 rounded-lg" /> {/* Standard parcel box info */}
+                <Skeleton className="h-10 w-20 rounded-lg" /> {/* QTY info */}
+                <Skeleton className="h-10 w-20 rounded-lg" /> {/* Weight info */}
+                <Skeleton className="h-10 w-44 rounded-lg" /> {/* Dimensions info */}
+              </div>
+            </div>
+          </div>
+
+          {/* Shipment Options (CarrierCard) Skeleton */}
+          <div className="border border-gray-200 dark:border-zinc-800 rounded-md bg-white dark:bg-zinc-950 overflow-hidden">
+            <div className="p-4 bg-slate-50 dark:bg-zinc-900/50 border-b border-gray-100 dark:border-zinc-800 flex justify-between items-center">
+              <div className="flex items-center gap-2">
+                <Skeleton className="h-4 w-4 rounded" />
+                <Skeleton className="h-4 w-44" /> {/* Shipment Options title */}
+              </div>
+            </div>
+            <div className="p-4">
+              <div className="border border-primary/10 bg-primary/5 dark:bg-primary/10 rounded-xl p-4 flex items-center justify-between">
+                <div className="flex items-center gap-4">
+                  <Skeleton className="h-12 w-12 rounded-lg" /> {/* Courier logo placeholder */}
+                  <div className="space-y-2">
+                    <Skeleton className="h-4 w-28" />
+                    <Skeleton className="h-3.5 w-36" />
+                  </div>
+                </div>
+                <div className="space-y-1 text-right">
+                  <Skeleton className="h-5 w-16 ml-auto" />
+                  <Skeleton className="h-3 w-20 ml-auto" />
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* History Card Skeleton */}
+          <div className="border border-gray-200 dark:border-zinc-800 rounded-md bg-white dark:bg-zinc-950 overflow-hidden">
+            <div className="p-4 bg-slate-50 dark:bg-zinc-900/50 border-b border-gray-100 dark:border-zinc-800 flex justify-between items-center">
+              <div className="flex items-center gap-2">
+                <Skeleton className="h-4 w-4 rounded" />
+                <Skeleton className="h-4 w-20" /> {/* HISTORY title */}
+              </div>
+              <Skeleton className="h-4 w-4 rounded" />
+            </div>
+            <div className="p-5 space-y-4">
+              {Array.from({ length: 4 }).map((_, idx) => (
+                <div key={idx} className="flex items-center justify-between">
+                  <div className="flex items-center gap-4 flex-1">
+                    <Skeleton className="h-4 w-4 rounded-full" />
+                    <Skeleton className="h-4 w-32" />
+                  </div>
+                  <Skeleton className="h-4 w-40" />
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        {/* Right Column (SidePanel) */}
+        <div className="flex flex-col gap-3">
+          {/* Order Quotation Summary Skeleton */}
+          <div className="border border-gray-200 dark:border-zinc-800 rounded-xl bg-white dark:bg-zinc-950 overflow-hidden p-5 space-y-4">
+            <div className="border-b border-slate-100 dark:border-zinc-800 pb-3 flex justify-between items-center">
+              <Skeleton className="h-5 w-52" />
+              <Skeleton className="h-6 w-12 rounded-full" />
+            </div>
+            <div className="space-y-3">
+              <div className="flex justify-between"><Skeleton className="h-4 w-20" /><Skeleton className="h-4 w-8" /></div>
+              <div className="flex justify-between"><Skeleton className="h-4 w-24" /><Skeleton className="h-4 w-12" /></div>
+              <div className="flex justify-between"><Skeleton className="h-4 w-20" /><Skeleton className="h-4 w-14" /></div>
+              <div className="h-px bg-slate-100 dark:bg-zinc-800" />
+              <div className="flex justify-between"><Skeleton className="h-4 w-28" /><Skeleton className="h-4 w-12" /></div>
+              <div className="flex justify-between"><Skeleton className="h-4 w-24" /><Skeleton className="h-4 w-12" /></div>
+              <div className="flex justify-between"><Skeleton className="h-4 w-16" /><Skeleton className="h-4 w-12" /></div>
+              <div className="h-px bg-slate-100 dark:bg-zinc-800" />
+              <div className="flex justify-between items-center pt-1">
+                <div className="space-y-1"><Skeleton className="h-5 w-16" /><Skeleton className="h-3 w-24" /></div>
+                <Skeleton className="h-8 w-24" />
+              </div>
+            </div>
+          </div>
+
+          {/* Delivery Instructions Skeleton */}
+          <div className="border border-gray-200 dark:border-zinc-800 rounded-xl bg-white dark:bg-zinc-950 overflow-hidden p-5 space-y-3">
+            <Skeleton className="h-5 w-48" />
+            <Skeleton className="h-10 w-full rounded-lg" />
+          </div>
+
+          {/* Liability Cover Skeleton */}
+          <div className="border border-gray-200 dark:border-zinc-800 rounded-xl bg-white dark:bg-zinc-950 overflow-hidden p-5 space-y-3">
+            <Skeleton className="h-5 w-32" />
+            <Skeleton className="h-12 w-full rounded-lg" />
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
 
 const OrderDetailsPage: React.FC = () => {
+  const navigate = useNavigate();
   const {
     orderType,
     orderID,
@@ -76,13 +228,30 @@ const OrderDetailsPage: React.FC = () => {
 
 
   if (isOrderLoading && orderType !== 'create' && orderType !== 'create-menual') {
+    return <OrderDetailsSkeleton />;
+  }
+
+  const isCreate = orderType === 'create' || orderType === 'create-menual';
+
+  if (!isCreate && !isOrderLoading && !orderDetail) {
     return (
-      <div className="flex items-center justify-center h-screen bg-white dark:bg-zinc-950">
-        <div className="flex flex-col items-center gap-4">
-          <Loader2 className="w-10 h-10 animate-spin text-primary" />
-          <span className="text-sm font-bold text-gray-500 animate-pulse uppercase tracking-widest">
-            Loading Order Details...
-          </span>
+      <div className="flex flex-col items-center justify-center h-[70vh] bg-white dark:bg-zinc-950 px-4 animate-in fade-in duration-300">
+        <div className="flex flex-col items-center max-w-md text-center bg-gray-50/50 dark:bg-zinc-900/30 border border-gray-100 dark:border-zinc-800/80 rounded-2xl p-8 shadow-sm">
+          <div className="h-16 w-16 rounded-full bg-primary/10 flex items-center justify-center text-primary mb-5">
+            <FileQuestion size={32} />
+          </div>
+          <h2 className="text-xl font-bold text-gray-900 dark:text-zinc-100 mb-2 uppercase tracking-wide">
+            Order Not Found
+          </h2>
+          <p className="text-sm text-gray-500 dark:text-zinc-400 mb-6 leading-relaxed">
+            We couldn't find the details for Order <span className="font-bold text-gray-800 dark:text-zinc-200">#{orderID}</span>. It may have been deleted or the ID is incorrect.
+          </p>
+          <Button
+            onClick={() => navigate(`${role === 'admin' ? '/admin' : ''}/orders`)}
+            className="w-full bg-primary hover:bg-primary-hover text-white font-bold text-xs uppercase h-8 shadow-md transition-all active:scale-[0.98]"
+          >
+            Back to Orders
+          </Button>
         </div>
       </div>
     );
@@ -96,6 +265,7 @@ const OrderDetailsPage: React.FC = () => {
           '--webkit-scrollbar-button-display': 'none',
         } as React.CSSProperties}
       >
+
         <OrderHeader
           orderID={orderID}
           orderType={orderType}
@@ -120,10 +290,10 @@ const OrderDetailsPage: React.FC = () => {
                 <AlertTriangle size={20} />
               </div>
               <div>
-                <h3 className="mt-0 mb-0 text-[12px] font-bold text-red-900 dark:text-red-100 uppercase tracking-wide">
+                <h3 className="mt-0 mb-0 text-[14px] font-bold text-red-900 dark:text-red-100 uppercase tracking-wide">
                   Manual Label Required
                 </h3>
-                <p className="mt-0 text-[11px] text-red-700 dark:text-red-300 mb-0 ">
+                <p className="mt-0 text-[14px] text-red-700 dark:text-red-300 mb-0 ">
                   The shipping label cannot be generated for this order at the moment, this order requires manual label
                   creation by admin.
                 </p>
@@ -139,21 +309,21 @@ const OrderDetailsPage: React.FC = () => {
                 <AlertTriangle size={20} />
               </div>
               <div>
-                <h3 className="my-0 text-[12px] font-bold text-amber-900 dark:text-amber-100 uppercase tracking-wider">
+                <h3 className="my-0 text-[14px] font-bold text-amber-900 dark:text-amber-100 uppercase tracking-wider">
                   Cancellation Request Pending
                 </h3>
-                <div className=" flex flex-wrap gap-x-6 gap-y-1 text-[11px] font-bold text-amber-700 dark:text-amber-400/80">
+                <div className=" flex flex-wrap gap-x-6 gap-y-1 text-[14px] font-bold text-amber-700 dark:text-amber-400/80">
                   <div className="flex items-center gap-1.5">
-                    <span className="opacity-80 font-medium">Requested By:</span>
-                    <span>{orderDetail?.cancel_request?.requested_by}</span>
+                    <span className="opacity-90 font-medium">Requested By:</span>
+                    <span className='uppercase'>{orderDetail?.cancel_request?.requested_by}</span>
                   </div>
                   <div className="flex items-center gap-1.5">
-                    <span className="opacity-80 font-medium">Date:</span>
+                    <span className="opacity-90 font-medium">Date:</span>
                     <span>{orderDetail?.cancel_request?.requested_at}</span>
                   </div>
                   <div className="flex items-center gap-1.5">
-                    <span className="opacity-80 font-medium">Est. Refund:</span>
-                    <span className="text-sm text-amber-900 dark:text-amber-200">
+                    <span className="opacity-90 font-medium">Est. Refund:</span>
+                    <span className="text-sm text-amber-800 dark:text-amber-200">
                       ${orderDetail?.cancel_request?.refund_amount.toFixed(2)}
                     </span>
                   </div>
@@ -182,7 +352,7 @@ const OrderDetailsPage: React.FC = () => {
             />
           )}
 
-          <div className="grid grid-cols-1 xl:grid-cols-[1fr_380px] gap-4 items-start">
+          <div className="grid grid-cols-1 lg:grid-cols-[1fr_380px] gap-4 items-start">
             <div className="flex flex-col gap-3 overflow-hidden">
               <AddressCard
                 title="SENDER"

@@ -4,7 +4,6 @@ import { useAppSelector } from '@/hooks/store.hooks';
 import { InvoiceStats } from '../components/InvoiceStats';
 import { InvoiceFilters } from '../components/InvoiceFilters';
 import { InvoiceTable } from '../components/InvoiceTable';
-import { CreateInvoiceDialog } from '../components/CreateInvoiceDialog';
 import { useAdminInvoices, useCustomerInvoices, useExportAdminInvoices, useExportCustomerInvoices, useDeleteAdminInvoice, useRemindAdminInvoice } from '../hooks/useInvoices';
 import { ConformationModal } from '@/components/common/ConformationModal';
 
@@ -13,7 +12,6 @@ export default function InvoicesPage() {
   const [pageSize, setPageSize] = useState(25);
   const [page, setPage] = useState(1);
   const [selectedCustomer, setSelectedCustomer] = useState('');
-  const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [invoiceToDelete, setInvoiceToDelete] = useState<number | null>(null);
 
   const { role } = useAppSelector((state) => state.auth);
@@ -93,11 +91,6 @@ export default function InvoicesPage() {
     setPage(1);
   }, []);
 
-  const handleInvoiceCreate = useCallback((data: any) => {
-    console.log('Invoice Created:', data);
-    setIsDialogOpen(false);
-  }, []);
-
   const handleView = useCallback((invoiceNumber: string) => {
     const path = isAdmin ? `/admin/invoices/${invoiceNumber}` : `/invoices/${invoiceNumber}`;
     navigate(path);
@@ -140,12 +133,6 @@ export default function InvoicesPage() {
           isAdmin={isAdmin}
         />
       </div>
-
-      <CreateInvoiceDialog
-        isOpen={isDialogOpen}
-        onOpenChange={setIsDialogOpen}
-        onSubmit={handleInvoiceCreate}
-      />
 
       <ConformationModal
         open={invoiceToDelete !== null}

@@ -129,12 +129,12 @@ export default function CreateOrderDialog({ onOpenChange, type, open, initialDat
       description={`Enter the ${type}'s address. You can lookup a customer's details saved in the address book to complete this section.`}
       contentClass='min-w-3xl'
       onSubmit={handleSubmit}
-      customFooter={<div className="flex items-center gap-2 pt-2">
+      customFooter={<div className="flex items-center gap-2">
         <Checkbox
           id="saveToAddressBook"
           checked={formData.saveToAddressBook}
           onCheckedChange={(checked) => updateField('saveToAddressBook', checked as boolean)}
-          className="data-[state=checked]:bg-primary data-[state=checked]:border-primary rounded-[4px]"
+        // className="data-[state=checked]:bg-primary data-[state=checked]:border-primary rounded-[4px]"
         />
         <label
           htmlFor="saveToAddressBook"

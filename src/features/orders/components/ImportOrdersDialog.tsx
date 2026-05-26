@@ -96,7 +96,7 @@ export function ImportOrdersDialog({
           variant="ghost"
           onClick={handleDownloadSample}
           disabled={isLoading}
-          className="text-[12px] cursor-pointer font-bold text-primary hover:text-primary-hover hover:bg-transparent px-0 transition-colors flex items-center gap-2 tracking-wider"
+          className="text-[14px] cursor-pointer font-bold text-primary hover:text-primary-hover hover:bg-transparent px-0 transition-colors flex items-center gap-2 tracking-wider"
         >
           <Download className="w-3.5 h-3.5" />
           <span className='leading-[100%]'>
@@ -105,7 +105,7 @@ export function ImportOrdersDialog({
         </Button>
       }
     >
-      <div className="space-y-4 py-2">
+      <div className="space-y-4">
         {isAdmin && (
           <div className="space-y-1.5">
             <FormSelect
@@ -161,7 +161,7 @@ export function ImportOrdersDialog({
               <div className="w-10 h-10 rounded-full bg-gray-50 dark:bg-zinc-800 flex items-center justify-center border border-gray-100 dark:border-zinc-700">
                 <Plus className="w-5 h-5 text-slate-400" />
               </div>
-              <span className="text-sm font-bold text-slate-600 dark:text-zinc-400 tracking-wide text-[11px]">Upload File</span>
+              <span className="text-sm font-bold text-slate-600 dark:text-zinc-400 tracking-wide text-[12px]">Upload File</span>
             </>
           )}
         </div>

@@ -16,7 +16,6 @@ import { useGlobalCouriers } from '@/features/courier-surcharge/hooks/useGlobalC
 import type { AddressData, WalletCheckResponse } from '../types';
 
 export const useOrderWorkflow = () => {
-  console.log('render......')
   const { orderType, orderID } = useParams<{ orderType: string; orderID: string }>();
   const { role, user } = useAppSelector((state) => state.auth);
   const navigate = useNavigate();
@@ -262,10 +261,11 @@ export const useOrderWorkflow = () => {
 
   const requiresManualLabel = useMemo(() => {
     if (orderType !== 'edit') return false;
+    const noTrackingNumber = !orderDetail?.courier_details?.tracking_number;
     const hasManyItems = calculation.totalItems > 4;
     const hasHeavyItem = itemsData?.some((item) => Number(item.weight) > 28);
-    return hasManyItems || hasHeavyItem;
-  }, [orderType, calculation.totalItems, itemsData]);
+    return hasManyItems || hasHeavyItem || noTrackingNumber;
+  }, [orderType, calculation.totalItems, itemsData, orderDetail?.courier_details?.tracking_number]);
 
   // Order Submission/Saving Flow
   const handleOnSave = useCallback((skipWalletCheckArg?: any) => {

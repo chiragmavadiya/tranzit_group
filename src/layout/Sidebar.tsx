@@ -201,7 +201,7 @@ export default function Sidebar({ isCollapsed, setIsCollapsed }: SidebarProps) {
                           </div>
                         </div>
                         {item.hasDropdown && (
-                          <ChevronDown className={`w-4 h-4 shrink-0 ml-2 transition-all duration-300 text-gray-400 dark:text-zinc-500 ${isCollapsed ? 'opacity-0' : 'opacity-100'} ${expandedItems.includes(item.name) ? 'rotate-180' : ''}`} />
+                          <ChevronDown className={`w-4 h-4 shrink-0 ml-2 transition-all duration-300 text-gray-400 dark:text-zinc-500 ${isCollapsed ? 'opacity-0' : 'opacity-100'} ${expandedItems.includes(item.name) ? 'rotate-360' : 'rotate-270'}`} />
                         )}
                       </>
                     );
@@ -215,7 +215,7 @@ export default function Sidebar({ isCollapsed, setIsCollapsed }: SidebarProps) {
                         key={sub.name}
                         to={sub.path}
                         className={({ isActive }) =>
-                          `block px-2 py-2 text-[13.5px] font-medium rounded-md transition-colors ${isActive ? 'text-primary font-bold' : 'text-gray-500 dark:text-zinc-400 hover:text-gray-900 dark:hover:text-zinc-100'
+                          `block px-2 py-2 text-[13px] font-medium rounded-md transition-colors ${isActive ? 'text-primary font-semibold' : 'text-gray-500 dark:text-zinc-400 hover:text-gray-900 dark:hover:text-zinc-100'
                           }`
                         }
                       >

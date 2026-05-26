@@ -136,7 +136,7 @@ export default function TopBar({ isCollapsed }: { isCollapsed?: boolean }) {
           // ]}
           content={
             <>
-              <div className="p-3 mb-2 bg-slate-50 dark:bg-zinc-950/50 rounded-xl flex items-center gap-3 border border-slate-100 dark:border-zinc-800/50">
+              <div className="p-3 mb-2 bg-slate-50 dark:bg-zinc-950/50 rounded-xl flex  gap-3 border border-slate-100 dark:border-zinc-800/50">
                 <div className="h-8 w-8 text-[11px] rounded-full bg-primary flex items-center justify-center text-white font-bold shadow-md">
                   {user?.first_name?.[0]}{user?.last_name?.[0]}
                 </div>

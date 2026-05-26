@@ -21,8 +21,10 @@ export const ConfirmContinue: React.FC<ConfirmContinueProps> = ({
 }) => {
   return (
     <div className="bg-white dark:bg-zinc-950 rounded-sm border border-gray-200 dark:border-zinc-800 p-5 flex flex-col gap-4 shadow-xs transition-colors duration-300">
-      <h3 className="my-0 text-sm font-bold text-gray-900 dark:text-zinc-100 uppercase tracking-wider">Confirm & Continue</h3>
-
+      <div className="border-b border-gray-200 dark:border-zinc-800 pb-2">
+        <h3 className="my-0 text-sm font-bold text-gray-900 dark:text-zinc-100 uppercase tracking-wider">Confirm & Continue</h3>
+        <p className="text-xs text-gray-500 dark:text-zinc-400 font-medium my-0">Please review and authorize the shipment details to finalize your order.</p>
+      </div>
       <div className="flex flex-col gap-3">
         <label className="flex items-start gap-3 rounded-[12px] transition-colors cursor-pointer">
           <Checkbox

@@ -43,7 +43,7 @@ export default function EnquiryPage() {
         {/* Sidebar Info */}
         <div className="lg:col-span-4 space-y-6">
           <div className="bg-white dark:bg-zinc-950 rounded-xl border border-gray-100 dark:border-zinc-800 shadow-sm p-6">
-            <h3 className="text-sm font-bold text-gray-900 dark:text-zinc-100 mb-6 mt-0 flex items-center gap-2">
+            <h3 className="text-base font-bold text-gray-900 dark:text-zinc-100 mb-6 mt-0 flex items-center gap-2">
               <HelpCircle className="w-4 h-4 text-primary" />
               Quick Support Info
             </h3>
@@ -54,8 +54,8 @@ export default function EnquiryPage() {
                   <Clock className="w-4 h-4 text-emerald-600" />
                 </div>
                 <div>
-                  <h4 className="text-xs font-semibold text-gray-900 dark:text-zinc-100 mb-1 leading-tight">Response Time</h4>
-                  <p className="text-[11px] text-gray-500 dark:text-zinc-400 mb-0">Our average response time is under 12 hours during business days.</p>
+                  <h4 className="text-sm font-semibold text-gray-900 dark:text-zinc-100 mb-1 leading-tight">Response Time</h4>
+                  <p className="text-[12px] text-gray-500 dark:text-zinc-400 mb-0">Our average response time is under 12 hours during business days.</p>
                 </div>
               </div>
 
@@ -64,8 +64,8 @@ export default function EnquiryPage() {
                   <ShieldCheck className="w-4 h-4 text-primary" />
                 </div>
                 <div>
-                  <h4 className="text-xs font-semibold text-gray-900 dark:text-zinc-100 mb-1 leading-tight">Priority Support</h4>
-                  <p className="text-[11px] text-gray-500 dark:text-zinc-400 mb-0">Enterprise customers receive priority response within 2 hours.</p>
+                  <h4 className="text-sm font-semibold text-gray-900 dark:text-zinc-100 mb-1 leading-tight">Priority Support</h4>
+                  <p className="text-[12px] text-gray-500 dark:text-zinc-400 mb-0">Enterprise customers receive priority response within 2 hours.</p>
                 </div>
               </div>
             </div>
@@ -76,8 +76,8 @@ export default function EnquiryPage() {
                 className="flex items-center justify-between p-3 rounded-xl bg-gray-50 dark:bg-zinc-900 group hover:bg-primary/5 dark:hover:bg-primary/10 transition-colors"
               >
                 <div className="flex flex-col">
-                  <span className="text-xs font-bold text-gray-900 dark:text-zinc-100 group-hover:text-primary transition-colors">Browse Help Center</span>
-                  <span className="text-[10px] text-gray-500 dark:text-zinc-400">Find instant answers to FAQs</span>
+                  <span className="text-sm font-bold text-gray-900 dark:text-zinc-100 group-hover:text-primary transition-colors">Browse Help Center</span>
+                  <span className="text-[12px] text-gray-500 dark:text-zinc-400">Find instant answers to FAQs</span>
                 </div>
                 <ExternalLink className="w-3 h-3 text-gray-400 group-hover:text-primary transition-colors" />
               </NavLink>
@@ -85,7 +85,7 @@ export default function EnquiryPage() {
           </div>
 
           <div className="px-2">
-            <p className="text-[10px] text-gray-400 dark:text-zinc-500 leading-relaxed">
+            <p className="text-[12px] text-gray-400 dark:text-zinc-500 leading-relaxed">
               By submitting this enquiry, you agree to our <span className="underline cursor-pointer">Support Terms</span> and understand that we may collect details to help resolve your issue.
             </p>
           </div>

@@ -2,7 +2,7 @@ import { NavLink } from "react-router-dom";
 import type { Order } from "./types";
 import type { Column } from "@/components/common/types/DataTable.types";
 
-import { Download, Eye, PackagePlus, Trash } from "lucide-react";
+import { Download, Eye, PackagePlus, Trash, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { CustomTooltip } from "@/components/common/CustomTooltip";
 import { StatusBadge } from "./components/StatusBadge";
@@ -18,6 +18,7 @@ export const getOrdersColumns = (
   customerEditClick: (id: string) => void,
   onDownloadLabel?: (orderId: string) => void,
   onCancelOrder?: (orderId: string) => void,
+  downloadingLabelId?: string | null,
 ): Column<Order>[] => [
     {
       header: 'ORDER #',
@@ -25,7 +26,7 @@ export const getOrdersColumns = (
       className: 'text-primary font-bold',
       // sticky: 'left',
       cell: (value: string) => (
-        <NavLink to={`${role === "admin" ? "/admin/orders/edit" : "/orders/edit"}/${value}`} className="font-bold text-primary underline">
+        <NavLink to={`${role === "admin" ? "/admin" : ""}/orders/${orderType === 'new' ? 'consign' : 'edit'}/${value}`} className="font-bold text-primary underline">
           {value}
         </NavLink>
       )
@@ -50,7 +51,7 @@ export const getOrdersColumns = (
       )
     },
     {
-      header: 'SUBURB', key: 'suburb', width: '130px'
+      header: 'SUBURB', key: 'suburb', width: '140px'
     },
     {
       header: 'CARRIER & PRODUCT', key: 'courier',
@@ -66,7 +67,7 @@ export const getOrdersColumns = (
       header: 'STATUS', key: 'status', cell: (value: string) => <StatusBadge status={value === "Payment pending" ? "Courier not assign" : value} />
     },
     {
-      header: 'AMOUNT', key: 'amount', cell: (value: string) => formateCurrency(Number(value))
+      header: 'AMOUNT', key: 'amount', cell: (value: string) => <span className="font-medium"> {formateCurrency(Number(value))}</span>
     },
     {
       header: 'PAYMENT STATUS', key: 'payment_status', cell: (value: string) => <StatusBadge status={value} />
@@ -110,14 +111,19 @@ export const getOrdersColumns = (
           )}
           {orderType === 'printed' && (
             <>
-              <CustomTooltip title="Download Label">
+              <CustomTooltip title={downloadingLabelId === value ? "Downloading..." : "Download Label"}>
                 <Button
                   onClick={() => onDownloadLabel?.(value)}
                   variant="ghost"
                   size="sm"
                   className="h-fit w-fit p-0 group/button"
+                  disabled={downloadingLabelId === value}
                 >
-                  <Download className="h-4 w-4 text-primary" />
+                  {downloadingLabelId === value ? (
+                    <Loader2 className="h-4 w-4 text-primary animate-spin" />
+                  ) : (
+                    <Download className="h-4 w-4 text-primary" />
+                  )}
                 </Button>
               </CustomTooltip>
               <CustomTooltip title="Cancel Order">

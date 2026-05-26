@@ -263,7 +263,7 @@ const DataTableComponent = <T extends Record<string, any>>(props: DataTableProps
           <TableHeader className={cn("bg-white dark:bg-zinc-950 sticky top-0 z-10 shadow-sm", headerClassName)}>
             <TableRow className="hover:bg-transparent border-b border-gray-100 dark:border-zinc-800">
               {selectable && (
-                <TableHead className="h-12 text-[14px] font-bold text-gray-900 dark:text-zinc-100 uppercase tracking-wider px-5">
+                <TableHead className="h-12 text-[14px] font-bold text-gray-900 dark:text-zinc-100 uppercase tracking-wider px-5 print:hidden">
                   <Checkbox
                     checked={currentSelectedRows.length === displayData.length && displayData.length > 0}
                     onCheckedChange={handleSelectAll}
@@ -326,7 +326,7 @@ const DataTableComponent = <T extends Record<string, any>>(props: DataTableProps
                     onClick={() => onRowClick?.(row, index)}
                   >
                     {selectable && (
-                      <TableCell className="px-5 py-3 text-sm font-medium text-gray-700 dark:text-zinc-300">
+                      <TableCell className="px-5 py-3 text-sm font-medium text-gray-700 dark:text-zinc-300 print:hidden">
                         <Checkbox
                           checked={isSelected}
                           onCheckedChange={() => handleSelectRow(rowId)}
@@ -342,6 +342,7 @@ const DataTableComponent = <T extends Record<string, any>>(props: DataTableProps
                           `px-5 py-3 text-sm  text-gray-800 dark:text-zinc-300 whitespace-normal capitalize`,
                           // column.sticky === 'left' && "sticky left-0 bg-white",
                           // column.sticky === 'right' && "sticky right-0 bg-white",
+                          isSelected && "font-semibold",
                           column.className,
                           cellClassName,
                           column.noPrint && 'print:hidden'

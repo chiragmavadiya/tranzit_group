@@ -1,6 +1,6 @@
-import React, { useState } from 'react'
+import React, { useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { ArrowLeft, Box, MapPin, Download, Loader2, PackagePlus, Trash2 } from 'lucide-react'
+import { ArrowLeft, Box, MapPin, Download, Loader2, PackagePlus, Trash2, Package } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 // import { DropdownUI } from '@/features/orders/components/OrderFormUI'
@@ -59,8 +59,12 @@ export const OrderHeader: React.FC<OrderHeaderProps> = ({
 
   const { data: customersData } = useCustomers({ pageSize: 1000 }, role === 'admin' && (orderType === 'create' || orderType === 'consign'));
 
+  const isCreate = useMemo(() => {
+    return orderType === 'create' || orderType === 'create-menual' || orderType === 'return'
+  }, [orderType])
+
   const handleBack = () => {
-    if (orderType !== 'create' && orderType !== 'create-menual') {
+    if (!isCreate) {
       navigate(`${role === 'admin' ? '/admin' : ''}/orders?tab=${localStorage.getItem('order_tab') || 'new'}`)
     } else {
       setShowConfirm(true)
@@ -107,8 +111,8 @@ export const OrderHeader: React.FC<OrderHeaderProps> = ({
 
           <div className="flex items-center gap-3">
             <div className="flex items-center gap-2 text-primary border-r border-gray-200 dark:border-zinc-800 pr-3">
-              <Box className="h-5 w-5 text-primary" />
-              <span className="text-xl font-bold text-gray-900 dark:text-zinc-100">{(orderType === 'create' || orderType === 'create-menual') ? 'NEW ORDER' : orderID}</span>
+              {orderType === 'return' ? <Package className="h-5 w-5 text-primary" /> : <Box className="h-5 w-5 text-primary" />}
+              <span className="text-xl font-bold text-gray-900 dark:text-zinc-100">{isCreate ? (orderType === 'return' ? 'RETURN ORDER' : 'NEW ORDER') : orderID}</span>
             </div>
             {/* <div className="flex items-center gap-2 px-0">
               <span className="text-xl font-bold text-gray-900 dark:text-zinc-100 tracking-tight">{orderType === 'create' ? 'NEW ORDER' : 'EDIT ORDER'}</span>
@@ -157,7 +161,7 @@ export const OrderHeader: React.FC<OrderHeaderProps> = ({
             </Button>
 
           )}
-          {orderType !== 'create' && orderType !== 'create-menual' && (
+          {orderType !== 'create' && orderType !== 'create-menual' && orderType !== 'return' && (
             <>
               {(orderDetail?.order_status_category !== 'new' && orderDetail?.order_status_category !== 'archived') && (
                 <Button
@@ -229,7 +233,7 @@ export const OrderHeader: React.FC<OrderHeaderProps> = ({
         </div>
       </div>
 
-      {orderType !== 'create' && orderType !== 'create-menual' && (<div className="flex flex-wrap items-center gap-x-6 gap-y-2 text-xs text-gray-500 dark:text-zinc-400 font-medium">
+      {!isCreate && (<div className="flex flex-wrap items-center gap-x-6 gap-y-2 text-xs text-gray-500 dark:text-zinc-400 font-medium">
         <Badge variant="secondary" className="bg-gray-100 dark:bg-zinc-800 text-gray-500 dark:text-zinc-400 border-none rounded-sm px-2 py-0 h-5 uppercase font-bold">
           {orderDetail?.order_type || 'NEW'}
         </Badge>

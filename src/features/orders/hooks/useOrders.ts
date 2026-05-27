@@ -8,8 +8,8 @@ import { showToast } from "@/components/ui/custom-toast";
  */
 export const useOrders = (params?: {
   status?: string;
-  start_date?: string;
-  end_date?: string;
+  start_date?: Date | undefined;
+  end_date?: Date | undefined;
   per_page?: number;
   page?: number;
   search?: string;

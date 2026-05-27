@@ -70,7 +70,7 @@ export const CarrierCard: React.FC<CarrierCardProps> = memo((props) => {
     }
   })
   useEffect(() => {
-    if (orderType !== 'create' && orderType !== 'consign') return;
+    if (orderType !== 'create' && orderType !== 'consign' && orderType !== 'return') return;
     // Check if we have valid items with dimensions > 0
     const isValidItems = itemData && itemData.length > 0 && itemData.every(item =>
       Number(item.height) > 0 && Number(item.width) > 0 && Number(item.length) > 0 && Number(item.weight) > 0 && Number(item.quantity) > 0

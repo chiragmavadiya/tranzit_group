@@ -1,6 +1,6 @@
 import { useState, useMemo, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { FormInput, FormSelect } from '@/features/orders/components/OrderFormUI';
+import { FormInput, FormSelect, FormTextarea } from '@/features/orders/components/OrderFormUI';
 import type { AddressData, CreateOrderDialogProps } from '@/features/orders/types';
 import { CustomModel } from '@/components/ui/dialog';
 import { showToast } from '@/components/ui/custom-toast';
@@ -265,6 +265,15 @@ export default function CreateOrderDialog({ onOpenChange, type, open, initialDat
                   onChange={val => updateField('building', val)}
                   layout="horizontal"
                   placeholder='Enter Building name'
+                />
+              </div>
+              <div className="space-y-4">
+                <FormTextarea
+                  label="Instruction"
+                  value={formData.instructions}
+                  onChange={val => updateField('instructions', val)}
+                  layout="horizontal"
+                  placeholder='Enter Instruction'
                 />
               </div>
             </div>

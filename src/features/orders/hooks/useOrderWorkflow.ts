@@ -15,6 +15,26 @@ import {
 import { useGlobalCouriers } from '@/features/courier-surcharge/hooks/useGlobalCouriers';
 import type { AddressData, WalletCheckResponse } from '../types';
 
+const initialAddressData = {
+  name: '',
+  email: '',
+  phone: '',
+  company: '',
+  building: '',
+  instructions: '',
+  address: '',
+  address1: '',
+  street: '',
+  suburb: '',
+  state: '',
+  city: '',
+  unit_number: '',
+  street_number: '',
+  postcode: '',
+  country: 'AUSTRALIA',
+  saveToAddressBook: false,
+}
+
 export const useOrderWorkflow = () => {
   const { orderType, orderID } = useParams<{ orderType: string; orderID: string }>();
   const { role, user } = useAppSelector((state) => state.auth);
@@ -30,7 +50,8 @@ export const useOrderWorkflow = () => {
   const { data: globalCouriers } = useGlobalCouriers(role === 'admin' && orderType === 'create-menual');
 
   const orderDetail = orderResponse?.data;
-  const isEditable = orderType === 'create' || orderType === 'consign' || orderType === 'create-menual';
+  const isEditable = orderType === 'create' || orderType === 'consign' || orderType === 'create-menual' || orderType === 'return';
+  const isCreate = orderType === 'create' || orderType === 'create-menual' || orderType === 'return';
 
   // State Management
   const [walletCheckOpen, setWalletCheckOpen] = useState(false);
@@ -39,42 +60,8 @@ export const useOrderWorkflow = () => {
   const [courierData, setCourierData] = useState<any>(null);
 
   const [addressData, setAddressData] = useState<{ sender: AddressData; receiver: AddressData }>(() => ({
-    sender: {
-      name: `${user?.first_name || ''} ${user?.last_name || ''}`.trim(),
-      phone: user?.office_number || '',
-      email: user?.email || '',
-      company: user?.company_name || '',
-      building: '',
-      instructions: '',
-      address: user?.addresses?.[0]?.address || '',
-      address1: user?.addresses?.[0]?.address || '',
-      street: user?.addresses?.[0]?.street_name || '',
-      suburb: user?.addresses?.[0]?.suburb || '',
-      state: user?.addresses?.[0]?.state || '',
-      city: user?.addresses?.[0]?.city || '',
-      postcode: user?.addresses?.[0]?.postcode || '',
-      country: 'AUSTRALIA',
-      saveToAddressBook: false,
-    },
-    receiver: {
-      name: '',
-      email: '',
-      phone: '',
-      company: '',
-      building: '',
-      instructions: '',
-      address: '',
-      address1: '',
-      street: '',
-      suburb: '',
-      state: '',
-      city: '',
-      unit_number: '',
-      street_number: '',
-      postcode: '',
-      country: 'AUSTRALIA',
-      saveToAddressBook: false,
-    },
+    sender: initialAddressData,
+    receiver: initialAddressData,
   }));
 
   const [manualOrderData, setManualOrderData] = useState({
@@ -87,11 +74,16 @@ export const useOrderWorkflow = () => {
   const [showItemCountModal, setShowItemCountModal] = useState(false);
 
   const initialDialogMode = useMemo(() => {
-    if ((orderType === 'create' || orderType === 'create-menual') && sessionStorage.getItem('address') === null && addressData.receiver.address1 === '') {
-      return 'receiver';
+    if (isCreate && sessionStorage.getItem('address') === null) {
+      if (orderType === 'return' && addressData.sender.address1 === '') {
+        return 'sender';
+      }
+      if (orderType !== 'return' && addressData.receiver.address1 === '') {
+        return 'receiver';
+      }
     }
     return null;
-  }, [addressData.receiver.address1, orderType]);
+  }, [addressData.receiver.address1, orderType, addressData.sender.address1, isCreate]);
 
   const [insuranceSelected, setInsuranceSelected] = useState<boolean>(false);
   const [signatureSelected, setSignatureSelected] = useState<boolean>(false);
@@ -130,11 +122,12 @@ export const useOrderWorkflow = () => {
 
   // Sync user profile sender address (Create Mode)
   useEffect(() => {
-    if (role === 'customer' && user && (orderType === 'create' || orderType === 'create-menual')) {
+    if (role === 'customer' && user && (orderType === 'create' || orderType === 'create-menual' || orderType === 'return')) {
+      const key = orderType === 'return' ? 'receiver' : 'sender';
       setAddressData((prev) => ({
         ...prev,
-        sender: {
-          ...prev.sender,
+        [key]: {
+          ...prev[key],
           email: user.email || '',
           phone: user.office_number || '',
           company: user.company_name || '',
@@ -233,9 +226,9 @@ export const useOrderWorkflow = () => {
     const totalWeight = itemsData?.reduce((acc, item) => acc + (Number(item.weight) * (Number(item.quantity) || 1)), 0) || 0;
 
     const volumetric = itemsData?.reduce((acc, item) => {
-      const w = Number(item.width) || 0;
-      const h = Number(item.height) || 0;
-      const l = Number(item.length) || 0;
+      const w = Number(item.width) || 1;
+      const h = Number(item.height) || 1;
+      const l = Number(item.length) || 1;
       const q = Number(item.quantity) || 1;
       return acc + ((w * h * l) / 1000000) * q;
     }, 0) || 0;
@@ -270,6 +263,7 @@ export const useOrderWorkflow = () => {
   // Order Submission/Saving Flow
   const handleOnSave = useCallback((skipWalletCheckArg?: any) => {
     const isValidItems = itemsData && itemsData.length > 0 && itemsData.every((item) =>
+      item.type !== 'box' ||
       Number(item.height) > 0 && Number(item.width) > 0 && Number(item.length) > 0 && Number(item.weight) > 0 && Number(item.quantity) > 0
     );
     const hasSenderAddress = Boolean(addressData?.sender?.address1);

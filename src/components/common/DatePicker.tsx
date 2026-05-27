@@ -11,6 +11,7 @@ const DatePicker = memo(({ date, setDate, label, className, placeholder = 'DD/MM
   const [open, setOpen] = useState<boolean>(false);
 
   const handleDateChange = (date: Date | undefined) => {
+    console.log(date, "date");
     setDate(date);
     setOpen(false);
   };

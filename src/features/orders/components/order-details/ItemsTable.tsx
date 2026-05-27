@@ -40,7 +40,7 @@ export const ItemsTable: React.FC<ItemsTableProps> = React.memo(({
   customerId,
 }) => {
   // const { orderType } = useParams<{ orderType?: string }>()
-  const isEditable = orderType === 'create' || orderType === 'create-menual' || orderType === 'consign'
+  const isEditable = orderType === 'create' || orderType === 'create-menual' || orderType === 'consign' || orderType === 'return'
   const { role } = useAppSelector((state) => state.auth);
 
   const { data: itemsResponse } = useItems({ per_page: 100, customer: customerId }, isEditable && (role !== 'admin' || !!customerId))
@@ -53,6 +53,14 @@ export const ItemsTable: React.FC<ItemsTableProps> = React.memo(({
     }))
   }, [predefinedItems])
 
+  const totalQuantity = useMemo(() => {
+    return items?.reduce((sum, item) => sum + (Number(item.quantity) || 0), 0) || 0;
+  }, [items]);
+
+  const totalWeight = useMemo(() => {
+    return items?.reduce((sum, item) => sum + ((Number(item.weight) || 0) * (Number(item.quantity) || 0)), 0) || 0;
+  }, [items]);
+
   const handlePredefinedItemSelect = (index: number, itemIdStr: string) => {
     if (!onFullUpdateItem) return;
 
@@ -63,10 +71,10 @@ export const ItemsTable: React.FC<ItemsTableProps> = React.memo(({
         ...currentData,
         item_id: selectedItem.id,
         item_name: selectedItem.item_name,
-        weight: Number(selectedItem.weight || 0),
-        length: Number(selectedItem.length || 0),
-        width: Number(selectedItem.width || 0),
-        height: Number(selectedItem.height || 0),
+        weight: Number(selectedItem.weight || 1),
+        length: Number(selectedItem.length || 1),
+        width: Number(selectedItem.width || 1),
+        height: Number(selectedItem.height || 1),
       })
     }
   }
@@ -75,11 +83,18 @@ export const ItemsTable: React.FC<ItemsTableProps> = React.memo(({
 
       {/* ORDER ITEMS */}
       <AccordionItem value="summary" className="border border-gray-200 dark:border-zinc-800 rounded-md bg-white dark:bg-zinc-950 shadow-xs border-b overflow-hidden transition-colors duration-300 [&>h3]:my-0">
-        <AccordionTrigger className="hover:no-underline py-3 px-4 [&>svg]:text-primary items-center bg-slate-50">
+        <AccordionTrigger className="hover:no-underline py-3 px-4 [&>svg]:text-primary items-center bg-slate-50 dark:bg-zinc-900 rounded-none">
           <div className="flex items-center w-full justify-between ">
             <div className="flex items-center gap-2 text-gray-600 dark:text-zinc-300">
               <Box className="w-5 h-5" />
-              <h3 className="my-0 text-base font-semibold text-gray-800 dark:text-zinc-100 uppercase">Items {items.length > 0 && ` (${items.length})`}</h3>
+              <h3 className="my-0 text-base font-semibold text-gray-800 dark:text-zinc-100 uppercase">Items {items.length > 0 && ` (${items.length})`}
+
+                {items.length > 0 && (
+                  <span className="inline-flex group-aria-expanded/accordion-trigger:hidden normal-case font-medium text-xs  dark:text-zinc-500 ml-2 pt-0.5">
+                    • {totalQuantity} {totalQuantity === 1 ? 'Parcel' : 'Parcels'} • Total Weight: {totalWeight.toFixed(2)} kg
+                  </span>
+                )}
+              </h3>
             </div>
             {isEditable && (
               <Button
@@ -117,7 +132,7 @@ export const ItemsTable: React.FC<ItemsTableProps> = React.memo(({
                   {items?.map((item, idx) => (
                     <React.Fragment key={idx}>
                       {!isEditable ? (
-                        <div className="flex flex-wrap items-center gap-y-4 gap-x-8 p-4 rounded-xl bg-gray-50/50 dark:bg-zinc-900/30 border border-gray-100 dark:border-zinc-800/50 hover:bg-gray-50 dark:hover:bg-zinc-900/50 transition-all duration-200">
+                        <div className="flex flex-wrap items-center gap-y-4 gap-x-8 p-3 rounded-md bg-gray-50/50 dark:bg-zinc-900/30 border border-gray-100 dark:border-zinc-800/50 hover:bg-gray-50 dark:hover:bg-zinc-900/50 transition-all duration-200">
                           {/* Item Type */}
                           <div className="flex items-center gap-3 min-w-[140px]">
                             <div className="p-2 rounded-lg bg-primary/10 text-primary">
@@ -275,6 +290,27 @@ export const ItemsTable: React.FC<ItemsTableProps> = React.memo(({
                     </React.Fragment>
                   ))}
                   {children}
+
+                  {/* Summary Row */}
+                  {items && items.length > 0 && (
+                    <div className="pt-4 border-t border-gray-100 dark:border-zinc-800/80 flex items-center justify-baseline gap-4 text-[13px] font-medium">
+                      <div className="flex items-center gap-1 text-gray-500 dark:text-zinc-400">
+                        <Box className="w-3.5 h-3.5 text-emerald-500 dark:text-emerald-400" />
+                        <span className='leading-none'>Total Qty:</span>
+                        <span className="leading-none font-semibold text-gray-950 dark:text-zinc-100">
+                          {totalQuantity} {totalQuantity === 1 ? 'Unit' : 'Units'}
+                        </span>
+                      </div>
+                      <div className="h-3 w-px bg-gray-200 dark:bg-zinc-800" />
+                      <div className="flex items-center gap-1 text-gray-500 dark:text-zinc-400">
+                        <Scale className="w-3.5 h-3.5 text-orange-500 dark:text-orange-400" />
+                        <span className='leading-none'>Total Weight:</span>
+                        <span className="leading-none font-semibold text-gray-950 dark:text-zinc-100">
+                          {totalWeight.toFixed(2)} kg
+                        </span>
+                      </div>
+                    </div>
+                  )}
                 </div>
               )}
             </div>

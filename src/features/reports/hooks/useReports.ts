@@ -4,11 +4,12 @@ import { QUERY_KEYS } from "@/constants/api.constants";
 import type { ReportFilters } from "../types";
 import { showToast } from "@/components/ui/custom-toast";
 
-export const useShipmentReport = (filters: ReportFilters) => {
+export const useShipmentReport = (filters: ReportFilters, enabled: boolean = true) => {
   return useQuery({
     queryKey: [...QUERY_KEYS.REPORTS.SHIPMENT, filters],
     queryFn: () => reportsService.getShipmentReport(filters),
     placeholderData: keepPreviousData,
+    enabled,
   });
 };
 
@@ -32,11 +33,12 @@ export const useExportShipmentReport = () => {
   });
 };
 
-export const useTransactionReport = (filters: ReportFilters) => {
+export const useTransactionReport = (filters: ReportFilters, enabled: boolean = true) => {
   return useQuery({
     queryKey: [...QUERY_KEYS.REPORTS.TRANSACTION, filters],
     queryFn: () => reportsService.getTransactionReport(filters),
     placeholderData: keepPreviousData,
+    enabled,
   });
 };
 
@@ -60,21 +62,23 @@ export const useExportTransactionReport = () => {
   });
 };
 
-export const useInvoiceReport = (filters: ReportFilters) => {
+export const useInvoiceReport = (filters: ReportFilters, enabled: boolean = true) => {
   return useQuery({
     queryKey: [...QUERY_KEYS.REPORTS.INVOICE, filters],
     queryFn: () => reportsService.getInvoiceReport(filters),
     placeholderData: keepPreviousData,
+    enabled,
   });
 };
 
 // Assuming export for invoice is not available based on prompt endpoints, skipping useExportInvoiceReport
 
-export const useParcelReport = (filters: ReportFilters, isAdmin: boolean = false) => {
+export const useParcelReport = (filters: ReportFilters, isAdmin: boolean = false, enabled: boolean = true) => {
   return useQuery({
     queryKey: [...QUERY_KEYS.REPORTS.PARCELS, filters, isAdmin],
     queryFn: () => reportsService.getParcelReport(filters, isAdmin),
     placeholderData: keepPreviousData,
+    enabled,
   });
 };
 

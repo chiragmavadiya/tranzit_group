@@ -31,7 +31,7 @@ export const GlobalSearch: React.FC<GlobalSearchProps> = ({
 
         if (orders?.length) {
             orders.forEach((o: any) => options.push({
-                value: `order-${o.id}`,
+                value: `order-${o.order_number}`,
                 label: o.order_number,
                 type: 'Order',
                 icon: ShoppingBag,

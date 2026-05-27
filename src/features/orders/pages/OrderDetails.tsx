@@ -231,7 +231,7 @@ const OrderDetailsPage: React.FC = () => {
     return <OrderDetailsSkeleton />;
   }
 
-  const isCreate = orderType === 'create' || orderType === 'create-menual';
+  const isCreate = orderType === 'create' || orderType === 'create-menual' || orderType === 'return';
 
   if (!isCreate && !isOrderLoading && !orderDetail) {
     return (
@@ -359,7 +359,7 @@ const OrderDetailsPage: React.FC = () => {
                 name={addressData.sender.name}
                 address={addressData.sender.address || ''}
                 email={addressData.sender.email}
-                editable={isEditable && role === 'admin'}
+                editable={isEditable && (role === 'admin' || orderType === 'return')}
                 onEditClick={() => onEditClick('sender')}
               />
 
@@ -368,7 +368,8 @@ const OrderDetailsPage: React.FC = () => {
                 name={addressData.receiver.name}
                 address={addressData.receiver.address || ''}
                 email={addressData.receiver.email}
-                editable={isEditable}
+                instruction={addressData.receiver.instructions || ''}
+                editable={isEditable && orderType !== 'return'}
                 onEditClick={() => onEditClick('receiver')}
               />
 
@@ -393,7 +394,7 @@ const OrderDetailsPage: React.FC = () => {
                   module="order"
                 />
               )}
-              {orderType !== 'create' && orderType !== 'create-menual' && (
+              {!isCreate && (
                 <HistoryCard history={orderDetail?.shipping_activity} />
               )}
 
@@ -423,6 +424,48 @@ const OrderDetailsPage: React.FC = () => {
               liabilityMessage={orderDetail?.limited_liability_cover?.message}
               liability={orderDetail?.limited_liability_cover?.covered || false}
               payment_status={orderDetail?.payment_status}
+              shipping_activity={[
+                {
+                  "id": 1,
+                  "status": "Order Placed",
+                  "label": "Order placed",
+                  "description": "Your order has been placed successfully.",
+                  "dateTime": "2026-05-27 10:15 AM",
+                  "completed": true
+                },
+                {
+                  "id": 2,
+                  "status": "Awaiting Shipment",
+                  "label": "Awaiting shipment",
+                  "description": "Order is being prepared for shipment.",
+                  "dateTime": "2026-05-27 02:40 PM",
+                  "completed": true
+                },
+                {
+                  "id": 3,
+                  "status": "Shipped",
+                  "label": "Shipped",
+                  "description": "Your package has been shipped.",
+                  "dateTime": "2026-05-28 09:20 AM",
+                  "completed": true
+                },
+                {
+                  "id": 4,
+                  "status": "In Transit",
+                  "label": "In transit",
+                  "description": "Shipment is currently moving to destination.",
+                  "dateTime": "2026-05-29 01:10 PM",
+                  "completed": false
+                },
+                {
+                  "id": 5,
+                  "status": "Delivered",
+                  "label": "Delivered",
+                  "description": "Package delivered successfully.",
+                  "dateTime": null,
+                  "completed": false
+                }
+              ]}
             />
           </div>
         </main>

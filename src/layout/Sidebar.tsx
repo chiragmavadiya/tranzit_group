@@ -6,9 +6,10 @@ import { Menu, ArrowLeft, ChevronDown } from 'lucide-react';
 import type { SidebarItem } from './types/Sidebar.types';
 import { adminSidebarItems, clientSidebarItems } from '../router/Navigation';
 import tranzit_logo from '@/assets/Tranzit_Logo.svg';
+import tranzit_logo_dark from '@/assets/Tranzit_Logo_dark.svg';
 import { CustomTooltip } from '@/components/common/CustomTooltip';
 import { useAppSelector } from '@/hooks/store.hooks';
-
+import { useTheme } from '@/app/providers/theme-provider';
 interface SidebarProps {
   isCollapsed: boolean;
   setIsCollapsed: (val: boolean) => void;
@@ -21,6 +22,8 @@ export default function Sidebar({ isCollapsed, setIsCollapsed }: SidebarProps) {
   const location = useLocation();
   const navigate = useNavigate();
   const sidebarItems = role === 'admin' ? adminSidebarItems : clientSidebarItems;
+  const { theme } = useTheme();
+  console.log(theme, 'theme')
 
   useEffect(() => {
     const matchingItem = sidebarItems.find(item => {
@@ -79,7 +82,7 @@ export default function Sidebar({ isCollapsed, setIsCollapsed }: SidebarProps) {
             </button>
             <div className="flex items-center">
               {/* brand logo */}
-              <img src={tranzit_logo} alt="Tranzit" className="h-10 dark:invert" />
+              <img src={theme === "dark" ? tranzit_logo_dark : tranzit_logo} alt="Tranzit" className="h-10" />
             </div>
           </div>
         )}

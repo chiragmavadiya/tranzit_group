@@ -55,6 +55,7 @@ export const getOrdersColumns = (
     },
     {
       header: 'CARRIER & PRODUCT', key: 'courier',
+      width: '220px',
       cell: (value: string, row: Order) => (
         <div className="flex items-center gap-1">
           {/* <img src={row?.courier_logo || 'https://api.tranzit.digisite.net/assets/img/couriers/direct-freight.png'} className="h-6" alt="" /> */}

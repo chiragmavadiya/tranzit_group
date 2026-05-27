@@ -8,7 +8,8 @@ import { DataTable } from '@/components/common/DataTable';
 import { getOrdersColumns } from '../column';
 import DatePicker from '@/components/common/DatePicker';
 import { Button } from '@/components/ui/button';
-import { Download, Plus, Loader2 } from 'lucide-react';
+import { Download, Plus, Loader2, ChevronDown, Package } from 'lucide-react';
+import { DropdownCustomMenu } from '@/components/ui/dropdown-menu';
 import { useAppSelector } from '@/hooks/store.hooks';
 import { showToast } from '@/components/ui/custom-toast';
 import { ImportOrdersDialog } from '../components/ImportOrdersDialog';
@@ -54,8 +55,8 @@ export default function OrdersPage() {
     per_page: pageSize,
     page: page,
     search: debouncedSearch || undefined,
-    start_date: appliedDateRange[0]?.toISOString(),
-    end_date: appliedDateRange[1]?.toISOString(),
+    start_date: appliedDateRange[0],
+    end_date: appliedDateRange[1],
   }), [activeTab, pageSize, page, debouncedSearch, appliedDateRange]);
 
   // Fetch orders data
@@ -91,6 +92,7 @@ export default function OrdersPage() {
   }, []);
 
   const handleApplyFilters = useCallback(() => {
+    console.log(dateRange, "dateRange")
     setAppliedDateRange(dateRange);
     setPage(1);
     setSelectedRows([]);
@@ -308,13 +310,38 @@ export default function OrdersPage() {
                 {importOrders.isPending ? <Loader2 className="w-4 h-4 animate-spin" /> : <Download className="w-4 h-4" />}
                 <span>{importOrders.isPending ? 'Importing...' : 'Import'}</span>
               </Button>
-              <Button
+              <DropdownCustomMenu
+                menus={[
+                  {
+                    label: "Create an order",
+                    onClick: () => navigate(`${role === 'admin' ? '/admin' : ''}/orders/create`),
+                    className: 'font-medium',
+                    icon: Plus,
+                  },
+                  {
+                    label: "Create a Return Order",
+                    onClick: () => navigate(`${role === 'admin' ? '/admin' : ''}/orders/return`),
+                    className: 'font-medium',
+                    icon: Package,
+                  }
+                ]}
+              >
+                <Button
+                  className="gap-2 bg-primary hover:bg-primary-hover text-white shadow-lg shadow-primary/20 dark:shadow-none transition-all active:scale-[0.98] font-semibold border-none px-4"
+                >
+                  <Plus className="w-4 h-4" />
+                  <span>Create Order</span>
+                  <ChevronDown className="w-4 h-4 ml-1 opacity-70" />
+                </Button>
+              </DropdownCustomMenu>
+              {/* DO NOT REMOVE THIS BUTTON */}
+              {/* <Button
                 onClick={() => navigate(`${role === 'admin' ? '/admin' : ''}/orders/create`)}
                 className="gap-2 bg-primary hover:bg-primary-hover text-white shadow-lg shadow-primary/20 dark:shadow-none transition-all active:scale-[0.98] font-semibold border-none px-4"
               >
                 <Plus className="w-4 h-4" />
                 <span>Create Order</span>
-              </Button>
+              </Button> */}
             </div>
           )}
         />

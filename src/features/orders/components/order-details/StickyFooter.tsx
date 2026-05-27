@@ -22,7 +22,7 @@ interface StickyFooterProps {
 }
 
 export const StickyFooter: React.FC<StickyFooterProps> = ({ orderType, onSave, saveLoading, onConsign }) => {
-  if (!['new', 'create', 'create-menual', 'consign'].includes(orderType || '')) return null;
+  if (!['new', 'create', 'create-menual', 'consign', 'return'].includes(orderType || '')) return null;
   return (
     <div className="sticky bottom-0 -left-5 right-20 bg-white dark:bg-zinc-950 border-t border-gray-200 dark:border-zinc-800 p-3 flex justify-center items-center gap-3 z-50 shadow-[0_-4px_10px_rgba(0,0,0,0.05)] dark:shadow-[0_-4px_10px_rgba(0,0,0,0.2)] transition-colors duration-300">
       {orderType === 'new' && (
@@ -53,7 +53,7 @@ export const StickyFooter: React.FC<StickyFooterProps> = ({ orderType, onSave, s
           </div>
         </>
       )}
-      {(orderType === 'create' || orderType === 'create-menual') && (
+      {(orderType === 'create' || orderType === 'create-menual' || orderType === 'return') && (
         <Button
           onClick={onSave}
           variant="default"

@@ -58,9 +58,9 @@ export const HistoryCard: React.FC<HistoryCardProps> = ({ history }) => {
             {displayHistory.map((item) => {
               const isExpanded = expandedItems[item.id]
               return (
-                <div key={item.id} className='py-2'>
+                <div key={item.id} className='py-2 hover:bg-gray-100/50 dark:hover:bg-zinc-900/50'>
                   <div
-                    className="flex items-center justify-between px-4 py-0 transition-colors hover:bg-gray-50/50 dark:hover:bg-zinc-900/50"
+                    className="flex items-center justify-between px-4 py-0 transition-colors"
                   >
                     <div className="flex items-center gap-4 flex-1">
                       <Button

@@ -10,6 +10,8 @@ import {
 } from '../constants';
 import { DataTable } from '@/components/common/DataTable';
 import type { ReportType, ReportFilters } from '../types';
+import { Button } from '@/components/ui/button';
+import DatePicker from '@/components/common/DatePicker';
 import {
   useShipmentReport,
   useTransactionReport,
@@ -47,10 +49,10 @@ export default function ReportsPage() {
   const exportParcel = useExportParcelReport();
 
   // Queries
-  const { data: shipmentData, isLoading: shipmentLoading } = useShipmentReport(filters);
-  const { data: transactionData, isLoading: transactionLoading } = useTransactionReport(filters);
-  const { data: invoiceData, isLoading: invoiceLoading } = useInvoiceReport(filters);
-  // const { data: parcelData, isLoading: parcelLoading } = useParcelReport(filters);
+  const { data: shipmentData, isLoading: shipmentLoading } = useShipmentReport(filters, activeTab === 'shipment');
+  const { data: transactionData, isLoading: transactionLoading } = useTransactionReport(filters, activeTab === 'transaction');
+  const { data: invoiceData, isLoading: invoiceLoading } = useInvoiceReport(filters, activeTab === 'invoice');
+  // const { data: parcelData, isLoading: parcelLoading } = useParcelReport(filters, false, activeTab === 'parcel');
 
   const [currentTab, setCurrentTab] = useState(activeTab);
 
@@ -59,9 +61,15 @@ export default function ReportsPage() {
     setPage(1);
   }
 
-  const handleApplyFilters = useCallback((start: Date | undefined, end: Date | undefined) => {
-    setStartDate(start);
-    setEndDate(end);
+  // const handleApplyFilters = useCallback(() => {
+  //   setStartDate(startDate);
+  //   setEndDate(endDate);
+  //   setPage(1);
+  // }, [startDate, endDate]);
+
+  const handleClearFilters = useCallback(() => {
+    setStartDate(undefined);
+    setEndDate(undefined);
     setPage(1);
   }, []);
 
@@ -135,20 +143,65 @@ export default function ReportsPage() {
     // exportParcel.isPending
   ]);
 
+  const customHeader = useMemo(() => {
+    return (
+      <div className='flex gap-2 items-center mr-2'>
+        <span className='text-sm font-medium'>From:</span>
+
+        <DatePicker
+          // label="Start Date"
+          date={startDate}
+          setDate={setStartDate}
+          className="w-[180px]"
+        />
+
+        <span className='text-sm font-medium'>To:</span>
+
+        <DatePicker
+          // label="End Date"
+          date={endDate}
+          setDate={setEndDate}
+          className="w-[180px]"
+        />
+        {/* 
+        <Button
+          onClick={handleApplyFilters}
+          variant="default"
+          size="sm"
+          className="h-8 p-3"
+        >
+          Apply
+        </Button> */}
+
+        {(startDate || endDate) && (<Button
+          onClick={handleClearFilters}
+          variant="destructive"
+          size="sm"
+          className="h-8 p-3 "
+        >
+          Clear
+        </Button>)}
+        <div className='border-l border-gray-300 h-6 ml-2' />
+      </div>
+    )
+  }, [startDate, endDate, handleClearFilters])
+
   return (
     <div className="flex flex-col flex-1 gap-2 p-page-padding min-h-0 overflow-auto animate-in fade-in slide-in-from-bottom-2 duration-500 bg-slate-50/30 dark:bg-zinc-950/30">
       <div className='rounded-xl shadow-sm flex-1 flex flex-col min-h-0 border border-gray-100 dark:border-zinc-800 bg-white dark:bg-zinc-950 overflow-hidden'>
         <ReportsHeader
           startDate={startDate}
           endDate={endDate}
-          setStartDate={setStartDate}
-          setEndDate={setEndDate}
-          onApply={handleApplyFilters}
+          // setStartDate={setStartDate}
+          // setEndDate={setEndDate}
+          // onApply={handleApplyFilters}
+          activeTab={activeTab}
         />
 
         <div className="flex-1 flex flex-col min-h-0">
           <DataTable
             key={activeTab}
+            // headerTitle={`${activeTab.charAt(0).toUpperCase() + activeTab.slice(1)} reports`}
             columns={columns as any}
             data={data as any}
             searchPlaceholder={`Search ${activeTab} reports...`}
@@ -164,6 +217,9 @@ export default function ReportsPage() {
             loading={isLoading}
             onExport={(format) => handleExport(format)}
             isExporting={isExporting}
+            // header={false}
+            customHeader={customHeader}
+            headerPosition='left'
           />
         </div>
       </div>

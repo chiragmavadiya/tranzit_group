@@ -12,6 +12,9 @@ export interface Column<T> {
   sticky?: 'left' | 'right';
   hidden?: boolean;
   noPrint?: boolean;
+  resizable?: boolean;
+  minWidth?: number;
+  maxWidth?: number;
 }
 
 export interface SortConfig {
@@ -49,6 +52,9 @@ export interface DataTableProps<T> {
   columnSettings?: boolean;
   defaultVisibleColumns?: string[];
   onColumnVisibilityChange?: (visibleColumns: string[]) => void;
+  // Resizing
+  resizable?: boolean;
+  persistenceId?: string;
   // Styling
   className?: string;
   tableClassName?: string;

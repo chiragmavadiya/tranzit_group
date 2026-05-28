@@ -111,6 +111,7 @@ export const API_ENDPOINTS = {
     },
     CUSTOMER_QUOTES: {
         SERVICES: "/customer/get-quote/services",
+        LOCALITIES_SEARCH: "/localities/search",
     },
     ADMIN_COURIER_SURCHARGES: {
         BASE: "/admin/courier-surcharges",
@@ -241,5 +242,8 @@ export const QUERY_KEYS = {
     },
     WALLET: {
         SUMMARY: ["wallet", "summary"],
+    },
+    LOCALITIES: {
+        SEARCH: (q: string) => ["localities", "search", q],
     }
 };

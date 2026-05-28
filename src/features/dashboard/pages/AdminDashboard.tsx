@@ -8,71 +8,73 @@ import {
   // LayoutDashboard,
   // Tag,
   TrendingDown,
-  BarChart3,
-  CreditCard
+  Truck,
+  ShoppingCart
 } from "lucide-react";
 import { useDashboardMetrics } from "../hooks/useDashboard";
 import type { AdminMetrics } from "../types";
 import { NavLink } from "react-router-dom";
-import { useState } from "react";
+import { useState, useMemo } from "react";
+import { format, subDays } from "date-fns";
 import { StatusCell } from "@/components/common";
+import { formatCurrency } from "@/features/orders/utils/order-details.utils";
 
 export default function AdminDashboard() {
-  const { data: metricsData, isLoading } = useDashboardMetrics();
+  const [activePeriod, setActivePeriod] = useState<string>('month');
+
+  // Temporary states for date pickers in Welcome Banner
+  const [tempStartDate, setTempStartDate] = useState<Date | undefined>(subDays(new Date(), 30));
+  const [tempEndDate, setTempEndDate] = useState<Date | undefined>(new Date());
+
+  // Applied states that trigger the query
+  const [appliedStartDate, setAppliedStartDate] = useState<Date | undefined>(subDays(new Date(), 30));
+  const [appliedEndDate, setAppliedEndDate] = useState<Date | undefined>(new Date());
+
+  const handleApply = () => {
+    setAppliedStartDate(tempStartDate);
+    setAppliedEndDate(tempEndDate);
+  };
+
+  const queryParams = useMemo(() => {
+    const params: Record<string, any> = {};
+    params.activePeriod = activePeriod;
+    if (activePeriod === 'all') {
+      if (appliedStartDate) {
+        const formatted = format(appliedStartDate, 'yyyy/MM/dd');
+        params.to_date_from = formatted;
+      }
+      if (appliedEndDate) {
+        const formatted = format(appliedEndDate, 'yyyy/MM/dd');
+        params.to_date_to = formatted;
+      }
+    }
+    return params;
+  }, [activePeriod, appliedStartDate, appliedEndDate]);
+
+  const { data: metricsData, isLoading } = useDashboardMetrics(queryParams);
 
   const metrics = metricsData?.data as AdminMetrics;
-  const [activePeriod, setActivePeriod] = useState<'all' | 'month' | 'year'>('month');
-
-  // Real Data from API
-  // const topStats = [
-  //   {
-  //     label: "Orders",
-  //     value: metrics?.statsByPeriod[activePeriod]?.orders,
-  //     icon: LayoutDashboard,
-  //     loading: isLoading
-  //   },
-  //   {
-  //     label: "Customers",
-  //     value: metrics?.statsByPeriod[activePeriod]?.customers,
-  //     icon: Users,
-  //     color: "bg-primary/10 text-primary",
-  //     loading: isLoading
-  //   },
-  //   {
-  //     label: "Invoice Pending",
-  //     value: metrics?.statsByPeriod[activePeriod]?.pendingInvoices,
-  //     icon: FileText,
-  //     color: "bg-orange-50 dark:bg-orange-900/20 text-orange-600 dark:text-orange-400",
-  //     loading: isLoading
-  //   },
-  //   {
-  //     label: "Labels Undelivered",
-  //     value: metrics?.statsByPeriod[activePeriod]?.undeliveredOrders,
-  //     icon: Tag,
-  //     color: "bg-green-50 dark:bg-green-900/20 text-green-600 dark:text-green-400",
-  //     loading: isLoading
-  //   },
-  // ];
 
   const secondaryStats = [
     {
       label: "Margin",
-      value: metrics?.financeByPeriod[activePeriod]?.margin || '0',
+      value: formatCurrency(metrics?.financeByPeriod[activePeriod]?.margin || 0),
       subValue: "Total Margin Amount",
       icon: TrendingDown,
-      loading: isLoading
+      loading: isLoading,
+      color: "bg-orange-50 dark:bg-orange-900/20 text-orange-600 dark:text-orange-400"
     },
     {
       label: "Orders",
-      value: metrics?.financeByPeriod[activePeriod]?.orderAmount || 0,
+      value: formatCurrency(metrics?.financeByPeriod[activePeriod]?.orderAmount || 0),
       subValue: "Total Order Amount",
-      icon: BarChart3,
+      icon: ShoppingCart,
       color: "bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400",
       loading: isLoading
     },
     {
       label: "Paid Invoices",
-      value: metrics?.financeByPeriod[activePeriod]?.paidInvoiceAmount || 0,
+      value: formatCurrency(metrics?.financeByPeriod[activePeriod]?.paidInvoiceAmount || 0),
       subValue: "Total Paid Invoices Amount",
       icon: FileText,
       color: "bg-green-50 dark:bg-green-900/20 text-green-600 dark:text-green-400",
@@ -83,7 +85,7 @@ export default function AdminDashboard() {
   const tertiaryStats = [
     {
       label: "Unpaid Invoices",
-      value: metrics?.financeByPeriod[activePeriod]?.unpaidInvoiceAmount || 0,
+      value: formatCurrency(metrics?.financeByPeriod[activePeriod]?.unpaidInvoiceAmount || 0),
       subValue: "Total Unpaid Invoices Amount",
       icon: FileText,
       color: "bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400",
@@ -91,10 +93,18 @@ export default function AdminDashboard() {
     },
     {
       label: "Invoices",
-      value: metrics?.financeByPeriod[activePeriod]?.invoiceAmount || 0,
+      value: formatCurrency(metrics?.financeByPeriod[activePeriod]?.invoiceAmount || 0),
       subValue: "Total Invoice Amount",
-      icon: CreditCard,
+      icon: FileText,
       color: "bg-orange-50 dark:bg-orange-900/20 text-orange-600 dark:text-orange-400",
+      loading: isLoading
+    },
+    {
+      label: "Total Pickup Charges",
+      value: formatCurrency(metrics?.financeByPeriod[activePeriod]?.pickupCharges || 0),
+      subValue: "Total Pickup Charges Amount",
+      icon: Truck,
+      color: "bg-primary/10 dark:bg-primary/20 text-primary dark:text-primary",
       loading: isLoading
     },
   ];
@@ -120,6 +130,11 @@ export default function AdminDashboard() {
             className="w-full"
             setActivePeriod={setActivePeriod}
             activePeriod={activePeriod}
+            startDate={tempStartDate}
+            setStartDate={setTempStartDate}
+            endDate={tempEndDate}
+            setEndDate={setTempEndDate}
+            onApply={handleApply}
           />
         </div>
         {/* <div className="lg:col-span-12 flex flex-col gap-6">

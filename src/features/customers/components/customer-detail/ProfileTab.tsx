@@ -1,9 +1,8 @@
-import { Users, CheckCircle2, Settings, FileText, Building2, Mail, Phone, MapPin, TrendingUp } from 'lucide-react';
+import { User, CreditCard, Contact, AtSign, Phone, MapPin } from 'lucide-react';
 import { Card, CardHeader, CardContent } from '@/components/ui/card';
-import { Separator } from '@/components/ui/separator';
-import { SectionHeader, DetailItem } from './Common';
 import { ActivityTimeline } from './ActivityTimeline';
 import { useCustomerProfile } from '../../hooks/useCustomers';
+import { cn } from '@/lib/utils';
 
 interface ProfileTabProps {
     customerId: string;
@@ -28,46 +27,112 @@ export const ProfileTab = ({ customerId }: ProfileTabProps) => {
     return (
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 animate-in fade-in slide-in-from-left-4 duration-500">
             {/* Left Column: Details */}
-            <div className="lg:col-span-4 flex flex-col gap-6">
-                <Card className="bg-white dark:bg-zinc-900 gap-1 overflow-hidden">
-                    <CardHeader className="p-4 border-b border-slate-100">
-                        <SectionHeader title="About" icon={Users} />
+            <div className="lg:col-span-6 flex flex-col gap-4">
+                {/* Basic Information Card */}
+                <Card className="bg-white dark:bg-zinc-950 rounded-xl border border-slate-150 dark:border-zinc-800 shadow-sm">
+                    <CardHeader className="flex flex-row items-center justify-between px-4 py-3  bg-gray-100">
+                        <div className="flex items-center gap-2">
+                            <User className="w-4.5 h-4.5 text-slate-600 dark:text-zinc-400" />
+                            <h3 className="my-0 text-base font-bold text-slate-900 dark:text-white">Basic Information</h3>
+                        </div>
                     </CardHeader>
-                    <CardContent className="flex flex-col gap-2 p-4">
-                        <DetailItem label="Full Name" value={customer.about.full_name} icon={Users} />
-                        <DetailItem label="Status" value={customer.about.status} icon={CheckCircle2} />
-                        <DetailItem label="Role" value={customer.about.role} icon={Settings} />
-                        <DetailItem label="GST" value={customer.about.gst?.toString() || 'N/A'} icon={FileText} />
-                        <DetailItem label="Business Name" value={customer.about.business_name} icon={Building2} />
+                    <CardContent className="p-5 pt-0">
+                        <div className="grid grid-cols-2 gap-y-4 gap-x-6">
+                            <div className="flex flex-col gap-0.5">
+                                <span className="text-xs font-medium text-slate-600 dark:text-zinc-500 ">Full Name</span>
+                                <span className="text-sm font-semibold text-slate-900 dark:text-white">{customer.about.full_name}</span>
+                            </div>
+                            <div className="flex flex-col gap-0.5">
+                                <span className="text-xs font-medium text-slate-600 dark:text-zinc-500 ">Business Name</span>
+                                <span className="text-sm font-semibold text-slate-900 dark:text-white">{customer.about.business_name || "N/A"}</span>
+                            </div>
+                            <div className="flex flex-col gap-0.5">
+                                <span className="text-xs font-medium text-slate-600 dark:text-zinc-500 ">GST Number</span>
+                                <span className="text-sm font-semibold text-slate-900 dark:text-white">{customer.about.gst?.toString() || 'N/A'}</span>
+                            </div>
+                            <div className="flex flex-col gap-0.5">
+                                <span className="text-xs font-medium text-slate-600 dark:text-zinc-500 ">Role</span>
+                                <span className="text-sm font-semibold text-slate-900 dark:text-white capitalize">{customer.about.role}</span>
+                            </div>
+                            <div className="flex flex-col gap-0.5 col-span-2">
+                                <span className="text-xs font-medium text-slate-600 dark:text-zinc-500 ">Status</span>
+                                <div className="flex items-center gap-1.5 text-sm font-semibold text-slate-900 dark:text-white">
+                                    <span className={cn("w-2 h-2 rounded-full", customer.about.status ? "bg-emerald-500" : "bg-red-500")} />
+                                    <span className='capitalize'>{customer.about.status}</span>
+                                </div>
+                            </div>
+                        </div>
+                    </CardContent>
+                </Card>
 
-                        <Separator className="my-2 bg-slate-50 dark:bg-zinc-800" />
-
-                        <SectionHeader title="Contacts" icon={Mail} />
-                        <DetailItem label="Contact" value={customer.contacts.contact} icon={Phone} />
-                        <DetailItem label="Email" value={customer.contacts.email} icon={Mail} />
-
-                        <Separator className="my-2 bg-slate-50 dark:bg-zinc-800" />
-
-                        <SectionHeader title="Pickup Address" icon={MapPin} />
-                        <DetailItem label="Address" value={customer.pickup_address.address} icon={MapPin} />
-                        <DetailItem label="Postcode" value={customer.pickup_address.post_code} icon={MapPin} />
-
-                        <Separator className="my-2 bg-slate-50 dark:bg-zinc-800" />
-
-                        <SectionHeader title="Charges & Markups" icon={TrendingUp} />
-                        <div className="space-y-4">
-                            {markups.map((m, i) => (
-                                <div key={i} className="flex flex-col gap-2 p-3 rounded-2xl bg-slate-50 dark:bg-zinc-950/50 border border-slate-100 dark:border-zinc-800">
-                                    <div className="flex items-center justify-between">
-                                        <span className="text-xs font-bold text-slate-900 dark:text-zinc-100">{m.title}</span>
-                                        <div className="flex items-center gap-1.5">
-                                            <div className="h-1.5 w-1.5 rounded-full bg-primary" />
-                                            <span className="text-[10px] font-black text-primary uppercase tracking-widest">${m.markup}</span>
-                                        </div>
+                {/* Contact Details Card */}
+                <Card className="bg-white dark:bg-zinc-950 rounded-xl border border-slate-150 dark:border-zinc-800 shadow-sm">
+                    <CardHeader className="flex flex-row items-center gap-2  px-4 py-3  bg-gray-100">
+                        <Contact className="w-4.5 h-4.5 text-slate-600 dark:text-zinc-400" />
+                        <h3 className="text-base my-0 font-bold text-slate-900 dark:text-white">Contact Details</h3>
+                    </CardHeader>
+                    <CardContent className="p-5 pt-0">
+                        <div className="flex flex-col gap-3">
+                            {/* Phone */}
+                            <div className='flex gap-4 w-full '>
+                                <div className="flex flex-1 items-center gap-3  rounded-md dark:border-zinc-800">
+                                    <div className="w-10 h-10 rounded-lg bg-white dark:bg-zinc-950 border border-slate-150 dark:border-zinc-800 flex items-center justify-center flex-shrink-0 text-slate-600 dark:text-zinc-400">
+                                        <Phone className="w-4 h-4" />
                                     </div>
-                                    <div className="flex items-center justify-between">
-                                        <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Pickup</span>
-                                        <span className="text-xs font-bold text-slate-600 dark:text-zinc-400">${m.pickup}</span>
+                                    <div className="flex flex-col">
+                                        <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Phone</span>
+                                        <span className="text-sm font-semibold text-slate-900 dark:text-white">{customer.contacts.contact || "N/A"}</span>
+                                    </div>
+                                </div>
+                                {/* Email */}
+                                <div className="flex flex-1 items-center gap-3  rounded-md dark:border-zinc-800">
+                                    <div className="w-10 h-10 rounded-lg bg-white dark:bg-zinc-950 border border-slate-150 dark:border-zinc-800 flex items-center justify-center flex-shrink-0 text-slate-600 dark:text-zinc-400">
+                                        <AtSign className="w-4 h-4" />
+                                    </div>
+                                    <div className="flex flex-col">
+                                        <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Email</span>
+                                        <span className="text-sm font-semibold text-slate-900 dark:text-white">{customer.contacts.email || "N/A"}</span>
+                                    </div>
+                                </div>
+                            </div>
+                            {/* Address */}
+                            <div className="flex items-center gap-3  rounded-md dark:border-zinc-800">
+                                <div className="w-10 h-10 rounded-lg bg-white dark:bg-zinc-950 border border-slate-150 dark:border-zinc-800 flex items-center justify-center flex-shrink-0 text-slate-600 dark:text-zinc-400">
+                                    <MapPin className="w-4 h-4" />
+                                </div>
+                                <div className="flex flex-col">
+                                    <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Address</span>
+                                    <span className="text-sm font-semibold text-slate-900 dark:text-white">
+                                        {customer.pickup_address.address
+                                            ? `${customer.pickup_address.address}, ${customer.pickup_address.post_code}`
+                                            : "No Address"}
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </CardContent>
+                </Card>
+
+                {/* Charges & Markups Card */}
+                <Card className="bg-white dark:bg-zinc-950 rounded-xl border border-slate-150 dark:border-zinc-800 shadow-sm">
+                    <CardHeader className="flex flex-row items-center gap-2 px-4 py-3  bg-gray-100">
+                        <CreditCard className="w-4.5 h-4.5 text-slate-600 dark:text-zinc-400" />
+                        <h3 className="text-base my-0  font-bold text-slate-900 dark:text-white">Charges & Markups</h3>
+                    </CardHeader>
+                    <CardContent className="p-5 pt-0">
+                        <div className="grid grid-cols-3 gap-3">
+                            {markups.map((m, i) => (
+                                <div key={i} className="p-3.5 rounded-xl bg-slate-50/80 dark:bg-zinc-900/50 border border-slate-100 dark:border-zinc-800 flex flex-col gap-2.5">
+                                    <span className="text-[14px] font-bold text-slate-600 dark:text-zinc-500 uppercase tracking-wider">{m.title}</span>
+                                    <div className="flex flex-col gap-1.5 text-sm">
+                                        <div className="flex justify-between items-center text-slate-600 dark:text-zinc-400">
+                                            <span>Markup:</span>
+                                            <span className="font-bold text-slate-900 dark:text-white">{Number(m.markup).toFixed(2)}%</span>
+                                        </div>
+                                        <div className="flex justify-between items-center text-slate-600 dark:text-zinc-400">
+                                            <span>Pickup:</span>
+                                            <span className="font-bold text-slate-900 dark:text-white">${Number(m.pickup).toFixed(2)}</span>
+                                        </div>
                                     </div>
                                 </div>
                             ))}
@@ -77,7 +142,7 @@ export const ProfileTab = ({ customerId }: ProfileTabProps) => {
             </div>
 
             {/* Right Column: Timeline */}
-            <div className="lg:col-span-8">
+            <div className="lg:col-span-6">
                 <ActivityTimeline activities={customer.activity_timeline} />
             </div>
         </div>

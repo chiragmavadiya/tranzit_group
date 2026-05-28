@@ -24,7 +24,6 @@ export const ordersService = {
         page?: number;
         search?: string;
     }): Promise<OrdersResponse> => {
-        console.log(params, "parms")
         const response = await api.get<OrdersResponse>(API_ENDPOINTS.ORDERS.LIST, { params });
         return response.data;
     },

@@ -1,15 +1,26 @@
-import { Users, CheckCircle2, MapPin, Calendar, Wallet, Edit3, UserMinus, RefreshCw, ShieldCheck, ChevronLeft, Loader2 } from 'lucide-react';
+import { CheckCircle2, MapPin, Calendar, Wallet, UserMinus, RefreshCw, ShieldCheck, ChevronLeft, Loader2, Pencil, Check } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import type { CustomerDetails } from '../../types';
 import { useVerifyCustomer, useZohoSyncCustomer, useToggleCustomerStatus } from '../../hooks/useCustomers';
 import { useNavigate } from 'react-router-dom';
 import { showToast } from '@/components/ui/custom-toast';
+import { cn, formateCurrency } from '@/lib/utils';
+import { format, parseISO } from 'date-fns';
 
 interface CustomerHeaderProps {
     customer: CustomerDetails;
     onEdit: () => void;
 }
+
+const getFormattedDate = (dateStr: string) => {
+    if (!dateStr) return '';
+    try {
+        return format(parseISO(dateStr), 'MMMM yyyy');
+    } catch {
+        return dateStr;
+    }
+};
 
 export const CustomerHeader = ({ customer, onEdit }: CustomerHeaderProps) => {
     const navigate = useNavigate();
@@ -40,102 +51,139 @@ export const CustomerHeader = ({ customer, onEdit }: CustomerHeaderProps) => {
         });
     };
 
-    return (
-        <div className="flex flex-col gap-4">
+    const isActive = customer.status === 'active';
 
-            <div className="relative overflow-hidden rounded-xl bg-white dark:bg-zinc-900 shadow-md border border-white/20 dark:border-zinc-800/50">
-                <div className="absolute top-0 right-0 p-8 opacity-5">
-                    <Users className="h-36 w-36 text-slate-900" />
-                </div>
-                <div className="flex flex-col md:flex-row items-center gap-8 p-4 relative z-10">
-                    <div className="relative">
-                        <div className="flex h-18 w-18 items-center justify-center rounded-[1.8rem] bg-primary text-2xl font-black text-white shadow-2xl shadow-primary/20">
-                            {fullName.slice(0, 2).toUpperCase()}
+    return (
+        <div className="flex flex-col gap-3">
+            <div>
+                <Button
+                    variant="ghost"
+                    size="sm"
+                    className="h-8 gap-1 p-0 hover:bg-transparent text-slate-500 hover:text-slate-900 dark:text-zinc-400 dark:hover:text-white text-xs font-semibold"
+                    onClick={() => navigate('/admin/customers')}
+                >
+                    <ChevronLeft className="h-4 w-4" />
+                    Back to Customers
+                </Button>
+            </div>
+
+            <div className="bg-white dark:bg-zinc-950 p-6 rounded-xl border border-slate-150 dark:border-zinc-800 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-6">
+                <div className="flex flex-col sm:flex-row items-center sm:items-start gap-5">
+                    {/* Avatar Container */}
+                    <div className="relative flex-shrink-0">
+                        <div className="w-20 h-20 rounded-xl overflow-hidden bg-slate-100 border border-slate-200 dark:border-zinc-800 dark:bg-zinc-900 flex items-center justify-center">
+                            <img
+                                className="w-full h-full object-cover"
+                                src={`https://ui-avatars.com/api/?format=svg&name=${encodeURIComponent(fullName)}&background=0F172A&color=ffffff&bold=true&size=128`}
+                                alt={fullName}
+                            />
                         </div>
                         {customer.is_verified && (
-                            <div className="absolute -bottom-2 -right-2 flex h-8 w-8 items-center justify-center rounded-full bg-white dark:bg-zinc-900 p-1 shadow-lg">
-                                <div className="flex h-full w-full items-center justify-center rounded-full bg-emerald-500 text-white">
-                                    <CheckCircle2 className="h-4 w-4" />
-                                </div>
+                            <div className="absolute -bottom-1.5 -right-1.5 flex h-6 w-6 items-center justify-center rounded-full bg-emerald-500 dark:bg-zinc-100 text-white dark:text-slate-900 border-2 border-white dark:border-zinc-950 shadow-md">
+                                <Check className="h-3.5 w-3.5 stroke-[3]" />
                             </div>
                         )}
                     </div>
 
-                    <div className="flex-1 flex flex-col items-center md:items-start gap-4">
-                        <div className="flex flex-col items-center md:items-start">
-                            <div className='flex gap-2'>
-                                <h1 className="text-2xl font-black tracking-tight text-slate-900 dark:text-white uppercase">{fullName}</h1>
-                                {customer.is_verified && (
-                                    <Badge variant="secondary" className="bg-emerald-50 text-emerald-600 dark:bg-emerald-500/10 dark:text-emerald-400 border-none font-black px-3 py-1 uppercase text-[10px] tracking-widest">
-                                        Verified
-                                    </Badge>
+                    {/* Customer Info */}
+                    <div className="flex-1 flex flex-col items-center sm:items-start gap-2 text-center sm:text-left">
+                        <div className="flex flex-col sm:flex-row items-center gap-2">
+                            <h1 className="text-2xl mt-1 mb-0 font-bold text-slate-900 dark:text-white leading-none">
+                                {fullName}
+                            </h1>
+                            <Badge
+                                variant="secondary"
+                                className={cn(
+                                    "font-medium border-none px-2.5 py-0.5 rounded-full text-xs leading-none capitalize",
+                                    isActive
+                                        ? "bg-emerald-100 text-emerald-800 dark:bg-emerald-950/40 dark:text-emerald-400"
+                                        : "bg-red-100 text-red-800 dark:bg-red-950/40 dark:text-red-400"
                                 )}
+                            >
+                                {isActive ? "Active Customer" : "Inactive Customer"}
+                            </Badge>
+                        </div>
+
+                        {/* Metadata Rows */}
+                        <div className="flex flex-wrap items-center justify-center sm:justify-start gap-x-4 gap-y-1 dark:text-zinc-400 text-sm">
+                            <div className="flex items-center gap-1 font-medium">
+                                <MapPin className="h-3.5 w-3.5 text-slate-400" />
+                                <span>{customer.address || "No Address"}</span>
                             </div>
-                            <div className="flex flex-wrap items-center gap-x-4 gap-y-1 mt-2">
-                                <div className="flex items-center gap-1.5 text-slate-500 dark:text-zinc-400">
-                                    <MapPin className="h-4 w-4" />
-                                    <span className="text-sm font-bold uppercase tracking-widest">{customer.address || "N/A"}</span>
-                                </div>
-                                <div className="flex items-center gap-1.5 text-slate-500 dark:text-zinc-400">
-                                    <Calendar className="h-4 w-4" />
-                                    <span className="text-xs font-bold uppercase tracking-widest">Joined {customer.join_date}</span>
-                                </div>
-                                <div className="flex items-center gap-1.5">
-                                    <Wallet className="h-4 w-4 text-emerald-500" />
-                                    <span className="text-xs font-black text-emerald-600 dark:text-emerald-400 uppercase tracking-widest">Balance: ${customer.wallet_balance}</span>
-                                </div>
+                            <div className="flex items-center gap-1">
+                                <Calendar className="h-3.5 w-3.5 text-slate-400" />
+                                <span>Joined {getFormattedDate(customer.join_date)}</span>
+                            </div>
+                        </div>
+
+                        {/* Wallet Balance Row */}
+                        <div className="flex items-center gap-1.5 mt-1">
+                            {/* <Wallet className="h-4 w-4 text-slate-700 dark:text-zinc-300" />
+                            <span className="text-sm font-bold text-slate-900 dark:text-white">
+                                ${Number(customer.wallet_balance).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                            </span> */}
+                            <div className="flex items-center gap-2 px-3 h-8 rounded-md bg-emerald-50 dark:bg-emerald-950/30 border border-emerald-200/50 dark:border-emerald-900/30 text-emerald-700 dark:text-emerald-400 text-xs font-bold shadow-sm transition-all duration-300 hover:bg-emerald-100/50 dark:hover:bg-emerald-950/50 cursor-default select-none">
+                                <Wallet className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
+                                <span>Balance: {formateCurrency(Number(customer.wallet_balance))}</span>
                             </div>
                         </div>
                     </div>
+                </div>
 
-                    <div className="flex flex-col items-end justify-center md:justify-end gap-3 max-w-md">
-                        <div>
-                            <Button variant={"outline"} onClick={() => navigate('/admin/customers')}>
-                                <ChevronLeft className='h-4 w-4 ' />
-                                Back
-                            </Button>
-                        </div>
-                        <div className='flex flex-wrap gap-3'>
-                            {!customer.is_verified && (
-                                <Button
-                                    variant="outline"
-                                    className="h-9 rounded-xl gap-2 border-emerald-100 hover:bg-emerald-50 text-emerald-600 dark:border-emerald-500/20 dark:hover:bg-emerald-500/10"
-                                    onClick={handleVerify}
-                                    disabled={isVerifying}
-                                >
-                                    {isVerifying ? <Loader2 className="h-4 w-4 animate-spin" /> : <ShieldCheck className="h-4 w-4" />}
-                                    Verify
-                                </Button>
-                            )}
+                {/* Actions Button Grid */}
+                <div className="flex flex-col gap-2 w-full md:w-auto sm:min-w-[240px]">
+                    <div className="flex items-center gap-2 w-full">
+                        {!customer.is_verified && (
                             <Button
                                 variant="outline"
-                                className="h-9 rounded-xl gap-2"
-                                onClick={handleZohoSync}
-                                disabled={isSyncing}
+                                className="flex-1 h-8 rounded-lg gap-1.5 border-emerald-100 hover:bg-emerald-50 text-emerald-600 dark:border-emerald-500/20 dark:hover:bg-emerald-500/10 text-xs font-semibold px-2"
+                                onClick={handleVerify}
+                                disabled={isVerifying}
                             >
-                                {isSyncing ? <Loader2 className="h-4 w-4 animate-spin" /> : <RefreshCw className="h-4 w-4" />}
-                                Zoho Sync
+                                {isVerifying ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <ShieldCheck className="h-3.5 w-3.5" />}
+                                Verify
                             </Button>
-                            <Button variant="outline" className="h-9 rounded-xl gap-2" onClick={onEdit}>
-                                <Edit3 className="h-4 w-4" />
-                                Edit
-                            </Button>
-                            <Button
-                                variant="destructive"
-                                className="h-9 rounded-xl gap-2 bg-slate-900 hover:bg-slate-800 dark:bg-zinc-100 dark:text-zinc-900 dark:hover:bg-zinc-200 border-none shadow-lg"
-                                onClick={handleToggleStatus}
-                                disabled={isToggling}
-                            >
-                                {isToggling ? <Loader2 className="h-4 w-4 animate-spin" /> : <UserMinus className="h-4 w-4" />}
-                                {customer.wallet_balance > 0 ? 'Deactivate' : 'Activate'}
-                            </Button>
-                        </div>
-
-
+                        )}
+                        <Button
+                            variant="outline"
+                            className="flex-1 h-8 rounded-lg gap-1.5 bg-indigo-50/50 hover:bg-indigo-50 text-indigo-600 border-indigo-100 hover:border-indigo-200 dark:bg-indigo-950/20 dark:text-indigo-400 dark:border-indigo-900/30 text-xs font-semibold px-2"
+                            onClick={handleZohoSync}
+                            disabled={isSyncing}
+                        >
+                            {isSyncing ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <RefreshCw className="h-3.5 w-3.5" />}
+                            Zoho Sync
+                        </Button>
+                        <Button
+                            variant="outline"
+                            className="flex-1 h-8 rounded-lg gap-1.5 border-slate-200 hover:bg-slate-50 dark:border-zinc-800 dark:hover:bg-zinc-900 text-xs font-semibold text-slate-700 dark:text-zinc-300 px-2"
+                            onClick={onEdit}
+                        >
+                            <Pencil className="h-3.5 w-3.5" />
+                            Edit
+                        </Button>
                     </div>
+                    <Button
+                        variant="destructive"
+                        className={cn(
+                            "w-full h-8 rounded-lg gap-1.5 text-xs font-semibold shadow-sm transition-colors border-transparent",
+                            isActive
+                                ? "bg-red-700 hover:bg-red-800 text-white"
+                                : "bg-emerald-600 hover:bg-emerald-700 text-white"
+                        )}
+                        onClick={handleToggleStatus}
+                        disabled={isToggling}
+                    >
+                        {isToggling ? (
+                            <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                        ) : isActive ? (
+                            <UserMinus className="h-3.5 w-3.5" />
+                        ) : (
+                            <CheckCircle2 className="h-3.5 w-3.5" />
+                        )}
+                        {isActive ? 'Deactivate' : 'Activate'}
+                    </Button>
                 </div>
             </div>
         </div>
     );
 };
-

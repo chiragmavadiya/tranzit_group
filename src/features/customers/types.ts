@@ -36,19 +36,19 @@ export interface CustomerFormData {
     business_name: string;
     gst_number: string;
     billing_address: string;
-    billing_street_name: string;
-    billing_street_number: string;
-    billing_street_type: string;
+    billing_street: string;
+    billing_city: string;
     billing_suburb: string;
     billing_state: string;
     billing_postcode: string;
+    billing_country: string;
     address: string;
-    street_name: string;
-    street_number: string;
-    street_type: string;
+    street: string;
+    city: string;
     suburb: string;
     state: string;
     postcode: string;
+    country: string;
     direct_freight_active: number;
     direct_freight_markup_charge: number;
     direct_freight_pickup_charge: number;
@@ -76,6 +76,7 @@ export interface CustomerDetails {
     total_credit: number;
     total_debit: number;
     total_margin: number;
+    status: string;
 }
 
 export interface CustomerDetailsResponse {

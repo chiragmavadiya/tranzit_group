@@ -1,6 +1,8 @@
 import type { ReportTab, ShipmentReport, TransactionReport, InvoiceReport, ParcelReport } from './types';
 import type { Column } from '@/components/common/types/DataTable.types';
 import { LinkCell } from '@/components/common/DataTableCells';
+import { StatusBadge } from '../orders/components/StatusBadge';
+import { NavLink } from 'react-router-dom';
 
 export const REPORT_TABS: ReportTab[] = [
   { id: 'shipment', label: 'Shipment', count: 9 },
@@ -10,16 +12,34 @@ export const REPORT_TABS: ReportTab[] = [
 ];
 
 export const SHIPMENT_COLUMNS: Column<ShipmentReport>[] = [
-  { key: 'order_number', header: 'ORDER #', sortable: true, searchable: true },
-  { key: 'parcel_type', header: 'PARCEL TYPE', sortable: true },
+  {
+    key: 'order_number', header: 'ORDER #',
+    cell: (value: string) => (
+      <NavLink to={`/orders/view/${value}`} className="font-bold text-primary underline">
+        {value}
+      </NavLink>
+    )
+  },
+  { key: 'parcel_type', header: 'PARCEL TYPE', sortable: true, cell: (value: string) => value === "box" ? "Parcel" : value },
   { key: 'description', header: 'DESCRIPTION' },
   { key: 'quantity', header: 'QTY', sortable: true },
   { key: 'weight', header: 'WEIGHT (KG)', sortable: true },
   { key: 'dimensions', header: 'DIMENSIONS (L X W X H)' },
   { key: 'tracking_number', header: 'TRACKING #', sortable: true, searchable: true },
-  { key: 'courier', header: 'COURIER', sortable: true, searchable: true },
-  { key: 'receiver_name', header: 'RECEIVER', sortable: true, searchable: true },
-  { key: 'status', header: 'STATUS', sortable: true },
+  {
+    key: 'courier', header: 'COURIER', sortable: true, searchable: true, width: '200px',
+    cell: (value: string, row: ShipmentReport) => (
+      <div className="flex items-center gap-1">
+        {/* <img src={row?.courier_logo || 'https://api.tranzit.digisite.net/assets/img/couriers/direct-freight.png'} className="h-6" alt="" /> */}
+        <img src={row?.courier_logo || 'https://api.tranzit.digisite.net/assets/img/couriers/logo-auspost.png'} className="h-6" alt="" />
+        <span>{value}</span>
+      </div>
+    )
+  },
+  { key: 'receiver_name', header: 'RECEIVER', sortable: true, searchable: true, width: '160px' },
+  { key: 'status', header: 'STATUS', sortable: true, cell: (value: string) => <StatusBadge status={value} /> },
+  { key: 'status', header: 'TRANSIT STATUS', sortable: true, cell: (value: string) => <StatusBadge status={value} /> },
+  { key: 'created_at', header: 'CREATE DATE', width: '200px' },
 ];
 
 export const TRANSACTION_COLUMNS: Column<TransactionReport>[] = [
@@ -46,12 +66,22 @@ export const PARCEL_COLUMNS: Column<ParcelReport>[] = [
     sortable: true,
     searchable: true,
     cell: (value, record) => (
-      <LinkCell value={value} className="font-bold" path={`/orders/${record.tranzit_group_order_number}`} />
+      <LinkCell value={value} className="font-bold" path={`/orders/view/${record.tranzit_group_order_number}`} />
     )
   },
-  { key: 'actual_parcel_tracking_number', header: 'ACTUAL PARCEL TRACKING NUMBER', sortable: true, searchable: true },
-  { key: 'parcel_status', header: 'PARCEL STATUS', sortable: true },
-  { key: 'courier', header: 'COURIER', sortable: true },
+  {
+    key: 'actual_parcel_tracking_number', header: 'ACTUAL PARCEL TRACKING NUMBER',
+  },
+  { key: 'parcel_status', header: 'PARCEL STATUS' },
+  {
+    key: 'courier', header: 'COURIER', width: '200px',
+    cell: (value: string, row: ParcelReport) => (
+      <div className="flex items-center gap-1">
+        <img src={row?.courier_logo || 'https://api.tranzit.digisite.net/assets/img/couriers/logo-auspost.png'} className="h-6" alt="" />
+        <span>{value}</span>
+      </div>
+    )
+  },
   { key: 'total', header: 'TOTAL', sortable: true },
   { key: 'create_date', header: 'CREATE DATE', sortable: true },
 ];

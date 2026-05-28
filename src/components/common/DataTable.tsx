@@ -1,6 +1,6 @@
-import { useState, memo, useRef } from 'react';
+import { useState, memo } from 'react';
 import type { ReactNode } from 'react'
-import { ArrowUp, ArrowDown, Search, Download, ClipboardCopy, FileText, Upload, File, Loader2 } from 'lucide-react';
+import { ArrowUp, ArrowDown, Search, Download, FileText, Upload, File, Loader2 } from 'lucide-react';
 import {
   Table,
   TableBody,
@@ -20,9 +20,6 @@ import type { Column, DataTableProps, SortConfig } from './types/DataTable.types
 import { Button } from '../ui/button';
 import { DropdownCustomMenu } from '../ui/dropdown-menu';
 import { FormInput } from '@/features/orders/components/OrderFormUI';
-
-// Column hooks
-import { useTableResize } from './hooks/useTableResize';
 
 const DataTableComponent = <T extends Record<string, any>>(props: DataTableProps<T>) => {
   const {
@@ -71,10 +68,7 @@ const DataTableComponent = <T extends Record<string, any>>(props: DataTableProps
     customFooter,
     onExport,
     isExporting,
-    exportable = true,
-    // Resizing
-    resizable = true,
-    persistenceId
+    exportable = true
   } = props;
   // Internal state for uncontrolled components
   const [internalSearch, setInternalSearch] = useState('');
@@ -85,21 +79,6 @@ const DataTableComponent = <T extends Record<string, any>>(props: DataTableProps
   const currentSearch = searchValue !== undefined ? searchValue : internalSearch;
   const currentSortConfig = sortConfig !== undefined ? sortConfig : internalSortConfig;
   const currentSelectedRows = selectedRows !== undefined ? selectedRows : internalSelectedRows;
-
-  // Table container ref for column resizing
-  const tableContainerRef = useRef<HTMLDivElement | null>(null);
-
-  // Column resizing hook
-  const {
-    startResize,
-    tableStyle,
-  } = useTableResize({
-    columns,
-    tableRef: tableContainerRef,
-    persistenceId,
-    resizable,
-  });
-
   // Get row identifier
   const getRowId = (row: T): string => {
     if (typeof rowKey === 'function') {
@@ -198,100 +177,94 @@ const DataTableComponent = <T extends Record<string, any>>(props: DataTableProps
 
   return (
     <div className={cn("flex flex-col group flex-1 min-h-0", className)}>
-      {header && (<div className={cn("flex w-full border-b bg-gray-50/50 dark:bg-transparent justify-between gap-4 p-4 print:hidden", headerClass)}>
-        <div className="flex flex-col justify-center">
-          <h1 className={`text-lg font-bold text-gray-800 dark:text-zinc-200 my-0`}>
-            {headerTitle}
-          </h1>
-          {headerDescription && (
-            <p className="text-sm text-gray-500 dark:text-zinc-400 mb-0">
-              {headerDescription}
-            </p>
-          )}
-        </div>
-        {/* Header with search and controls */}
-        {(searchable || customHeader) && (
-          <div className="flex items-center justify-between gap-4 relative">
-            <div className="flex items-center gap-2 ml-auto">
-              {headerPosition == 'left' && customHeader && (typeof customHeader === 'function' ? (customHeader as () => ReactNode)() : customHeader)}
-              {pagination && !pageSizeInFooter && (
-                <SelectComponent
-                  data={DEFAULT_PAGE_SIZES}
-                  value={paginationPageSize.toString()}
-                  placeholder="Select Page Size"
-                  className="w-[70px] h-8 text-xs font-bold"
-                  onValueChange={(value: string | null) => value && setPaginationPageSize(Number(value))}
-                />
-              )}
-              {searchable && (
-                <FormInput
-                  placeholder={searchPlaceholder}
-                  value={currentSearch}
-                  onChange={handleSearch}
-                  icon={Search}
-                  className="w-62 h-8"
-                />
-              )}
-              {exportable && (
-                <DropdownCustomMenu
-                  menus={[
-                    {
-                      label: "Print",
-                      onClick: () => window.print(),
-                      icon: Download,
-                    },
-                    {
-                      label: "CSV",
-                      onClick: onExport ? () => onExport('csv') : () => { },
-                      icon: File,
-                    },
-                    {
-                      label: "Excel",
-                      onClick: onExport ? () => onExport('excel') : () => { },
-                      icon: Upload,
-                    },
-                    {
-                      label: "PDF",
-                      onClick: onExport ? () => onExport('pdf') : () => { },
-                      icon: FileText,
-                    },
-                    {
-                      label: "Copy",
-                      onClick: () => { },
-                      icon: ClipboardCopy,
-                    },
-                  ]}
-                >
-                  <Button
-                    variant="outline"
-                    className="gap-2 border-gray-200 dark:border-zinc-800 hover:bg-gray-50 dark:hover:bg-zinc-800 font-medium text-slate-700 dark:text-zinc-300 transition-colors"
-                  >
-                    {isExporting && <Loader2 className="w-4 h-4 animate-spin" />}
-                    {!isExporting && <Upload className="w-4 h-4" />}
-                    <span>Export</span>
-                  </Button>
-                </DropdownCustomMenu>
-              )}
-              {headerPosition == 'right' && customHeader && (typeof customHeader === 'function' ? (customHeader as () => ReactNode)() : customHeader)}
-            </div>
+      {header && (
+        <div className={cn("flex w-full border-b bg-gray-50/50 dark:bg-transparent justify-between gap-4 p-4", headerClass)}>
+          <div className="flex flex-col justify-center">
+            <h1 className={`text-lg font-bold text-gray-800 dark:text-zinc-200 my-0`}>
+              {headerTitle}
+            </h1>
+            {headerDescription && (
+              <p className="text-sm text-gray-500 dark:text-zinc-400 mb-0">
+                {headerDescription}
+              </p>
+            )}
           </div>
-        )}
-      </div>)}
+          {/* Header with search and controls */}
+          {(searchable || customHeader) && (
+            <div className="flex items-center justify-between gap-4 relative print:hidden">
+              <div className="flex items-center gap-2 ml-auto">
+                {headerPosition == 'left' && customHeader && (typeof customHeader === 'function' ? (customHeader as () => ReactNode)() : customHeader)}
+                {pagination && !pageSizeInFooter && (
+                  <SelectComponent
+                    data={DEFAULT_PAGE_SIZES}
+                    value={paginationPageSize.toString()}
+                    placeholder="Select Page Size"
+                    className="w-[70px] h-8 text-xs font-bold"
+                    onValueChange={(value: string | null) => value && setPaginationPageSize(Number(value))}
+                  />
+                )}
+                {searchable && (
+                  <FormInput
+                    placeholder={searchPlaceholder}
+                    value={currentSearch}
+                    onChange={handleSearch}
+                    icon={Search}
+                    className="w-62 h-8"
+                  />
+                )}
+                {exportable && (
+                  <DropdownCustomMenu
+                    menus={[
+                      {
+                        label: "Print",
+                        onClick: () => window.print(),
+                        icon: Download,
+                      },
+                      {
+                        label: "CSV",
+                        onClick: onExport ? () => onExport('csv') : () => { },
+                        icon: File,
+                      },
+                      {
+                        label: "Excel",
+                        onClick: onExport ? () => onExport('excel') : () => { },
+                        icon: Upload,
+                      },
+                      {
+                        label: "PDF",
+                        onClick: onExport ? () => onExport('pdf') : () => { },
+                        icon: FileText,
+                      },
+                      // {
+                      //   label: "Copy",
+                      //   onClick: () => { },
+                      //   icon: ClipboardCopy,
+                      // },
+                    ]}
+                  >
+                    <Button
+                      variant="outline"
+                      className="gap-2 border-gray-200 dark:border-zinc-800 hover:bg-gray-50 dark:hover:bg-zinc-800 font-medium text-slate-700 dark:text-zinc-300 transition-colors"
+                    >
+                      {isExporting && <Loader2 className="w-4 h-4 animate-spin" />}
+                      {!isExporting && <Upload className="w-4 h-4" />}
+                      <span>Export</span>
+                    </Button>
+                  </DropdownCustomMenu>
+                )}
+                {headerPosition == 'right' && customHeader && (typeof customHeader === 'function' ? (customHeader as () => ReactNode)() : customHeader)}
+              </div>
+            </div>
+          )}
+        </div>)}
 
       {/* Table */}
-      <div
-        ref={tableContainerRef}
-        className={`flex-1 min-h-[200px] ${!loading ? 'overflow-auto' : ''}`}
-        style={tableStyle() as React.CSSProperties}
-      >
-        <Table
-          className={cn("min-w-full", tableClassName)}
-          style={{ tableLayout: resizable ? 'fixed' : 'auto' }}
-        >
+      <div className={`flex-1 min-h-[200px] ${!loading ? 'overflow-auto' : ''}`}>
+        <Table className={cn("min-w-full", tableClassName)}>
           <TableHeader className={cn("bg-white dark:bg-zinc-950 sticky top-0 z-10 shadow-sm", headerClassName)}>
             <TableRow className="hover:bg-transparent border-b border-gray-100 dark:border-zinc-800">
               {selectable && (
-                <TableHead className="h-12 text-[14px] font-bold text-gray-900 dark:text-zinc-100 uppercase tracking-wider px-5 print:hidden flex-shrink-0 w-[50px] min-w-[50px] max-w-[50px]">
+                <TableHead className="h-12 text-[14px] font-bold text-gray-900 dark:text-zinc-100 uppercase tracking-wider px-5 print:hidden">
                   <Checkbox
                     checked={currentSelectedRows.length === displayData.length && displayData.length > 0}
                     onCheckedChange={handleSelectAll}
@@ -303,35 +276,24 @@ const DataTableComponent = <T extends Record<string, any>>(props: DataTableProps
                 <TableHead
                   key={`${column.key}-${index}`}
                   className={cn(
-                    "h-12 text-[14px] font-bold text-gray-900 dark:text-zinc-100 uppercase tracking-wider px-5 relative select-none",
+                    "h-12 text-[14px] font-bold text-gray-900 dark:text-zinc-100 uppercase tracking-wider px-5",
                     column.sortable !== false && sortable && "cursor-pointer hover:bg-muted/50",
+                    // column.sticky === 'left' && "sticky left-0 bg-background z-20",
+                    // column.sticky === 'right' && "sticky right-0 bg-background z-20",
                     column.className,
                     column.noPrint && 'print:hidden'
                   )}
-                  style={{
-                    width: `var(--col-width-${column.key}, ${column.width || '150px'})`,
-                    minWidth: `var(--col-width-${column.key}, ${column.width || '150px'})`,
-                    maxWidth: `var(--col-width-${column.key}, ${column.width || '150px'})`,
-                  }}
+                  style={{ minWidth: column.width, width: column.width }}
                   onClick={() => column.sortable !== false && handleSort(column.key)}
                 >
                   <div className="flex items-center gap-2">
                     {column.header}
                     {sortable && column.sortable !== false && currentSortConfig.key === column.key && (
                       currentSortConfig.direction === 'asc'
-                        ? <ArrowUp className="w-4 h-4 text-primary" />
-                        : <ArrowDown className="w-4 h-4 text-primary" />
+                        ? <ArrowUp className="w-4 h-4" />
+                        : <ArrowDown className="w-4 h-4" />
                     )}
                   </div>
-                  {resizable && column.resizable !== false && column.key !== 'action' && (
-                    <div
-                      className="absolute top-0 right-0 h-full w-1.5 cursor-col-resize select-none touch-none hover:bg-primary/40 active:bg-primary transition-colors z-20"
-                      onMouseDown={(e) => {
-                        e.stopPropagation();
-                        startResize(e, column.key);
-                      }}
-                    />
-                  )}
                 </TableHead>
               ))}
             </TableRow>
@@ -365,7 +327,7 @@ const DataTableComponent = <T extends Record<string, any>>(props: DataTableProps
                     onClick={() => onRowClick?.(row, index)}
                   >
                     {selectable && (
-                      <TableCell className="px-5 py-3 text-sm font-medium text-gray-700 dark:text-zinc-300 print:hidden w-[50px] min-w-[50px] max-w-[50px]">
+                      <TableCell className="px-5 py-3 text-sm font-medium text-gray-700 dark:text-zinc-300 print:hidden">
                         <Checkbox
                           checked={isSelected}
                           onCheckedChange={() => handleSelectRow(rowId)}
@@ -378,17 +340,14 @@ const DataTableComponent = <T extends Record<string, any>>(props: DataTableProps
                       <TableCell
                         key={`${column.key}-${rowId}-${colIndex}`}
                         className={cn(
-                          `px-5 py-3 text-sm text-gray-800 dark:text-zinc-300 whitespace-normal capitalize`,
+                          `px-5 py-3 text-sm  text-gray-800 dark:text-zinc-300 whitespace-normal capitalize`,
+                          // column.sticky === 'left' && "sticky left-0 bg-white",
+                          // column.sticky === 'right' && "sticky right-0 bg-white",
                           isSelected && "font-semibold",
                           column.className,
                           cellClassName,
                           column.noPrint && 'print:hidden'
                         )}
-                        style={{
-                          width: `var(--col-width-${column.key}, ${column.width || '150px'})`,
-                          minWidth: `var(--col-width-${column.key}, ${column.width || '150px'})`,
-                          maxWidth: `var(--col-width-${column.key}, ${column.width || '150px'})`,
-                        }}
                       >
                         {renderCell(column, row, index)}
                       </TableCell>

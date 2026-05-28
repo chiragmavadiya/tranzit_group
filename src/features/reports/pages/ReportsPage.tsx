@@ -1,6 +1,6 @@
 import { useState, useCallback, useMemo } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import { format } from 'date-fns';
+import { format, subDays } from 'date-fns';
 import { ReportsHeader } from '../components/ReportsHeader';
 import {
   SHIPMENT_COLUMNS,
@@ -21,13 +21,27 @@ import {
   useExportTransactionReport,
   useExportParcelReport
 } from '../hooks/useReports';
+import useLocalStorage from '@/hooks/useSessionStorage';
 
 export default function ReportsPage() {
   const [searchParams] = useSearchParams();
   const activeTab = (searchParams.get('tab') as ReportType) || 'shipment';
 
-  const [startDate, setStartDate] = useState<Date | undefined>();
-  const [endDate, setEndDate] = useState<Date | undefined>();
+  const [startDateVal, setStartDate] = useLocalStorage<Date | undefined>('report_start_date', subDays(new Date(), 7));
+  const [endDateVal, setEndDate] = useLocalStorage<Date | undefined>('report_end_date', new Date());
+
+  const startDate = useMemo(() => {
+    if (!startDateVal) return undefined;
+    const d = new Date(startDateVal);
+    return isNaN(d.getTime()) ? undefined : d;
+  }, [startDateVal]);
+
+  const endDate = useMemo(() => {
+    if (!endDateVal) return undefined;
+    const d = new Date(endDateVal);
+    return isNaN(d.getTime()) ? undefined : d;
+  }, [endDateVal]);
+
   const [pageSize, setPageSize] = useState(25);
   const [page, setPage] = useState(1);
   const [search, setSearch] = useState('');
@@ -71,7 +85,7 @@ export default function ReportsPage() {
     setStartDate(undefined);
     setEndDate(undefined);
     setPage(1);
-  }, []);
+  }, [setStartDate, setEndDate, setPage]);
 
   const handleSearch = useCallback((val: string) => {
     setSearch(val);
@@ -184,7 +198,7 @@ export default function ReportsPage() {
         <div className='border-l border-gray-300 h-6 ml-2' />
       </div>
     )
-  }, [startDate, endDate, handleClearFilters])
+  }, [startDate, setStartDate, endDate, setEndDate, handleClearFilters])
 
   return (
     <div className="flex flex-col flex-1 gap-2 p-page-padding min-h-0 overflow-auto animate-in fade-in slide-in-from-bottom-2 duration-500 bg-slate-50/30 dark:bg-zinc-950/30">

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import { useAdminInvoicePayment } from '../hooks/useInvoices';
 import { CustomModel } from '@/components/ui/dialog';
@@ -8,9 +8,25 @@ interface AddPaymentDialogProps {
   isOpen: boolean;
   onOpenChange: (open: boolean) => void;
   invoiceId: string | number;
+  payment?: any;
 }
 
-export function AddPaymentDialog({ isOpen, onOpenChange, invoiceId }: AddPaymentDialogProps) {
+const formatToInputDate = (dateStr: string) => {
+  if (!dateStr) return new Date().toISOString().split('T')[0];
+  if (/^\d{2}\/\d{2}\/\d{4}$/.test(dateStr)) {
+    const [day, month, year] = dateStr.split('/');
+    return `${year}-${month}-${day}`;
+  }
+  try {
+    const d = new Date(dateStr);
+    if (isNaN(d.getTime())) return new Date().toISOString().split('T')[0];
+    return d.toISOString().split('T')[0];
+  } catch {
+    return new Date().toISOString().split('T')[0];
+  }
+};
+
+export function AddPaymentDialog({ isOpen, onOpenChange, invoiceId, payment }: AddPaymentDialogProps) {
   const queryClient = useQueryClient();
   const [formData, setFormData] = useState({
     payment_amount: '',
@@ -19,22 +35,18 @@ export function AddPaymentDialog({ isOpen, onOpenChange, invoiceId }: AddPayment
     internal_payment_note: ''
   });
 
-  const { add } = useAdminInvoicePayment();
+  const { add, update } = useAdminInvoicePayment();
 
-  const handleChange = (field: keyof typeof formData, value: string | number) => {
-    setFormData(prev => ({ ...prev, [field]: value }));
-  };
-
-  const handleSubmit = async () => {
-    add.mutate({
-      id: invoiceId,
-      data: formData
-    }, {
-      onSuccess: () => {
-        // Invalidate the invoice details query to trigger a refetch
-        queryClient.invalidateQueries({ queryKey: ['admin', 'invoices', 'details', Number(invoiceId)] });
-
-        onOpenChange(false);
+  useEffect(() => {
+    if (isOpen) {
+      if (payment) {
+        setFormData({
+          payment_amount: String(payment.amount || payment.payment_amount || ''),
+          payment_method: payment.payment_method || payment.method || 'Bank Transfer',
+          payment_date: formatToInputDate(payment.payment_date || payment.date),
+          internal_payment_note: payment.internal_payment_note || payment.note || ''
+        });
+      } else {
         setFormData({
           payment_amount: '',
           payment_method: 'Bank Transfer',
@@ -42,22 +54,57 @@ export function AddPaymentDialog({ isOpen, onOpenChange, invoiceId }: AddPayment
           internal_payment_note: ''
         });
       }
-    });
+    }
+  }, [isOpen, payment]);
+
+  const handleChange = (field: keyof typeof formData, value: string | number) => {
+    setFormData(prev => ({ ...prev, [field]: value }));
+  };
+
+  const handleSubmit = async () => {
+    if (payment) {
+      update.mutate({
+        invoiceId,
+        paymentId: payment.id,
+        data: formData
+      }, {
+        onSuccess: () => {
+          queryClient.invalidateQueries({ queryKey: ['admin', 'invoices', 'details', Number(invoiceId)] });
+          onOpenChange(false);
+        }
+      });
+    } else {
+      add.mutate({
+        id: invoiceId,
+        data: formData
+      }, {
+        onSuccess: () => {
+          queryClient.invalidateQueries({ queryKey: ['admin', 'invoices', 'details', Number(invoiceId)] });
+          onOpenChange(false);
+          setFormData({
+            payment_amount: '',
+            payment_method: 'Bank Transfer',
+            payment_date: new Date().toISOString().split('T')[0],
+            internal_payment_note: ''
+          });
+        }
+      });
+    }
   };
 
   if (!isOpen) return null;
 
   return (
     <CustomModel
-      title='Add Payment'
+      title={payment ? 'Edit Payment' : 'Add Payment'}
       open={isOpen}
       onOpenChange={onOpenChange}
       onSubmit={handleSubmit}
       onCancel={() => onOpenChange(false)}
-      isLoading={!!add.isPending}
-      submitText='Add Payment'
+      isLoading={!!(add.isPending || update.isPending)}
+      submitText={payment ? 'Update Payment' : 'Add Payment'}
     >
-      <form onSubmit={handleSubmit} className="flex flex-col gap-2 p-2">
+      <form onSubmit={(e) => { e.preventDefault(); handleSubmit(); }} className="flex flex-col gap-2 p-2">
         <div className="grid gap-3">
           <div className="grid gap-2">
             <FormInput

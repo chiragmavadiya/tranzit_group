@@ -3,37 +3,43 @@ import { cn } from "@/lib/utils";
 
 export const StatusBadge = ({ status }: { status: string }) => {
     const variants: Record<string, { bg: string; dot: string }> = {
-        'Printed': {
-            bg: 'bg-slate-50 text-slate-600 border-slate-200/80 dark:bg-zinc-900/40 dark:text-zinc-400 dark:border-zinc-800',
-            dot: 'bg-slate-400 dark:bg-zinc-500'
-        },
-        'Payment pending': {
-            bg: 'bg-amber-50/80 text-amber-700 border-amber-200 dark:bg-amber-950/20 dark:text-amber-400 dark:border-amber-900/30',
-            dot: 'bg-amber-500'
-        },
-        'Partial': {
-            bg: 'bg-orange-50 text-orange-700 border-orange-200 dark:bg-orange-950/20 dark:text-orange-400 dark:border-orange-900/30',
-            dot: 'bg-orange-500'
-        },
-        'Unpaid': {
-            bg: 'bg-red-50 text-red-600 border-red-200 dark:bg-red-950/20 dark:text-red-400 dark:border-red-900/30',
-            dot: 'bg-red-500'
-        },
-        'Courier not assign': {
-            bg: 'bg-red-50 text-red-600 border-red-200 dark:bg-red-950/20 dark:text-red-400 dark:border-red-900/30',
-            dot: 'bg-red-500'
-        },
-        'Draft': {
-            bg: 'bg-slate-50 text-slate-600 border-slate-200/80 dark:bg-zinc-900/40 dark:text-zinc-400 dark:border-zinc-800',
-            dot: 'bg-slate-400 dark:bg-zinc-500'
-        },
-        'Paid': {
+        'printed': {
+            // bg: 'bg-slate-50 text-slate-600 border-slate-200/80 dark:bg-zinc-900/40 dark:text-zinc-400 dark:border-zinc-800',
+            // dot: 'bg-slate-400 dark:bg-zinc-500'
             bg: 'bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-950/20 dark:text-emerald-400 dark:border-emerald-900/30',
             dot: 'bg-emerald-500'
         },
+        'payment pending': {
+            bg: 'bg-amber-50/80 text-amber-500 border-amber-200 dark:bg-amber-950/20 dark:text-amber-400 dark:border-amber-900/30',
+            dot: 'bg-amber-500'
+        },
+        'partial': {
+            bg: 'bg-orange-50 text-orange-700 border-orange-200 dark:bg-orange-950/20 dark:text-orange-400 dark:border-orange-900/30',
+            dot: 'bg-orange-500'
+        },
+        'unpaid': {
+            bg: 'bg-red-50 text-red-600 border-red-200 dark:bg-red-950/20 dark:text-red-400 dark:border-red-900/30',
+            dot: 'bg-red-500'
+        },
+        'courier not assign': {
+            bg: 'bg-red-50 text-red-600 border-red-200 dark:bg-red-950/20 dark:text-red-400 dark:border-red-900/30',
+            dot: 'bg-red-500'
+        },
+        'draft': {
+            bg: 'bg-slate-50 text-slate-600 border-slate-200/80 dark:bg-zinc-900/40 dark:text-zinc-400 dark:border-zinc-800',
+            dot: 'bg-slate-400 dark:bg-zinc-500'
+        },
+        'paid': {
+            bg: 'bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-950/20 dark:text-emerald-400 dark:border-emerald-900/30',
+            dot: 'bg-emerald-500'
+        },
+        'cancelled': {
+            bg: 'bg-red-50 text-red-600 border-red-200 dark:bg-red-950/20 dark:text-red-400 dark:border-red-900/30',
+            dot: 'bg-red-500'
+        },
     };
 
-    const variant = variants[status] || variants.Draft;
+    const variant = variants[status.toLowerCase()] || variants.draft;
 
     return (
         <Badge

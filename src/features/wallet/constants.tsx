@@ -7,55 +7,56 @@ import { Button } from '@/components/ui/button';
 export const TRANSACTION_STATUS_CONFIG = {
   credit: 'bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-400',
   debit: 'bg-red-100 text-red-800 dark:bg-red-900/20 dark:text-red-400',
+  refund: 'bg-blue-100 text-blue-800 dark:bg-blue-900/20 dark:text-blue-400',
 };
 
 export const getWalletColumns = (
   onDownload: (row: WalletTransaction) => void,
   isDownloadingId?: string | number | null
 ): Column<WalletTransaction>[] => [
-  {
-    key: 'transaction_type',
-    header: 'TRANSACTION TYPE',
-    sortable: true,
-    cell: (value: any) => <StatusCell value={value?.toLowerCase()} statusConfig={TRANSACTION_STATUS_CONFIG} />
-  },
-  {
-    key: 'amount',
-    header: 'AMOUNT',
-    sortable: true,
-    cell: (value: any) => {
-      const amount = typeof value === 'number' ? value : parseFloat(String(value).replace(/[^0-9.-]+/g, ""));
-      return <span className="font-semibold text-slate-900 dark:text-zinc-100">${amount.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>;
-    }
-  },
-  { key: 'reason', header: 'REASON', sortable: true },
-  { key: 'transaction_id', header: 'TRANSACTION ID', sortable: true },
-  { key: 'transaction_date_time', header: 'TRANSACTION DATE & TIME', sortable: true },
-  {
-    key: 'receipt',
-    header: 'PAYMENT RECEIPT',
-    className: 'text-center',
-    cell: (_: any, row: WalletTransaction) => {
-      const targetId = row.id || row.transaction_id;
-      const isDownloading = isDownloadingId === targetId;
-      return (
-        <Button
-          variant="ghost"
-          size="icon"
-          onClick={() => onDownload(row)}
-          disabled={isDownloading}
-          className="h-8 w-8 text-primary/70 hover:text-primary hover:bg-primary/10"
-        >
-          {isDownloading ? (
-            <span className="w-4 h-4 border-2 border-primary border-t-transparent rounded-full animate-spin"></span>
-          ) : (
-            <Download className="h-4 w-4" />
-          )}
-        </Button>
-      );
-    }
-  },
-];
+    {
+      key: 'transaction_type',
+      header: 'TRANSACTION TYPE',
+      sortable: true,
+      cell: (value: any) => <StatusCell value={value?.toLowerCase()} statusConfig={TRANSACTION_STATUS_CONFIG} />
+    },
+    {
+      key: 'amount',
+      header: 'AMOUNT',
+      sortable: true,
+      cell: (value: any) => {
+        const amount = typeof value === 'number' ? value : parseFloat(String(value).replace(/[^0-9.-]+/g, ""));
+        return <span className="font-semibold text-slate-900 dark:text-zinc-100">${amount.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>;
+      }
+    },
+    { key: 'reason', header: 'REASON', sortable: true },
+    { key: 'transaction_id', header: 'TRANSACTION ID', sortable: true },
+    { key: 'transaction_date_time', header: 'TRANSACTION DATE & TIME', sortable: true },
+    {
+      key: 'receipt',
+      header: 'PAYMENT RECEIPT',
+      className: 'text-center',
+      cell: (_: any, row: WalletTransaction) => {
+        const targetId = row.id || row.transaction_id;
+        const isDownloading = isDownloadingId === targetId;
+        return (
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => onDownload(row)}
+            disabled={isDownloading}
+            className="h-8 w-8 text-primary/70 hover:text-primary hover:bg-primary/10"
+          >
+            {isDownloading ? (
+              <span className="w-4 h-4 border-2 border-primary border-t-transparent rounded-full animate-spin"></span>
+            ) : (
+              <Download className="h-4 w-4" />
+            )}
+          </Button>
+        );
+      }
+    },
+  ];
 
 export const ADMIN_TOPUP_COLUMNS: Column<any>[] = [
   {

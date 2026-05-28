@@ -11,6 +11,7 @@ interface AddressCardProps {
   instruction?: string;
   editable?: boolean;
   onEditClick?: () => void;
+  phone?: string;
 }
 
 export const AddressCard: React.FC<AddressCardProps> = memo(({
@@ -21,6 +22,7 @@ export const AddressCard: React.FC<AddressCardProps> = memo(({
   instruction,
   editable = false,
   onEditClick,
+  phone,
 }) => {
 
   return (
@@ -44,6 +46,8 @@ export const AddressCard: React.FC<AddressCardProps> = memo(({
                 <span>{address}</span>
                 {email && <span className="px-1 text-slate-300 dark:text-zinc-700">|</span>}
                 {email && <span className="text-slate-600 dark:text-zinc-400">{email}</span>}
+                {phone && <span className="px-1 text-slate-300 dark:text-zinc-700">|</span>}
+                {phone && <span className="text-slate-600 dark:text-zinc-400">{phone}</span>}
               </div>
             </div>
           </div>

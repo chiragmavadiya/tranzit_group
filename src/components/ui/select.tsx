@@ -39,7 +39,7 @@ function SelectTrigger({
       data-slot="select-trigger"
       data-size={size}
       className={cn(
-        "relative flex w-fit items-center justify-between gap-1.5 rounded-lg border border-input bg-transparent py-2 pr-2 pl-2.5 text-sm whitespace-nowrap transition-colors outline-none select-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 disabled:cursor-not-allowed disabled:opacity-50 disabled:bg-input/50 aria-invalid:border-destructive aria-invalid:ring-3 aria-invalid:ring-destructive/20 data-placeholder:text-muted-foreground dark:data-placeholder:text-zinc-700 data-[size=default]:h-8 data-[size=sm]:h-7 data-[size=sm]:rounded-[min(var(--radius-md),10px)] *:data-[slot=select-value]:line-clamp-1 *:data-[slot=select-value]:flex *:data-[slot=select-value]:items-center *:data-[slot=select-value]:gap-1.5 dark:bg-input/30 dark:hover:bg-input/50 dark:aria-invalid:border-destructive/50 dark:aria-invalid:ring-destructive/40 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
+        "relative flex w-fit items-center justify-between gap-1.5 rounded-lg border border-input bg-transparent py-2 pr-2 pl-2.5 text-sm whitespace-nowrap transition-colors outline-none select-none focus-visible:border-ring focus-visible:ring-1 focus-visible:ring-ring/50 disabled:cursor-not-allowed disabled:opacity-50 disabled:bg-input/50 aria-invalid:border-destructive aria-invalid:ring-1 aria-invalid:ring-destructive/20 data-placeholder:text-muted-foreground dark:data-placeholder:text-zinc-700 data-[size=default]:h-8 data-[size=sm]:h-7 data-[size=sm]:rounded-[min(var(--radius-md),10px)] *:data-[slot=select-value]:line-clamp-1 *:data-[slot=select-value]:flex *:data-[slot=select-value]:items-center *:data-[slot=select-value]:gap-1.5 dark:bg-input/30 dark:hover:bg-input/50 dark:aria-invalid:border-destructive/50 dark:aria-invalid:ring-destructive/40 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
         className
       )}
       {...props}
@@ -185,21 +185,45 @@ function SelectScrollDownButton({
   )
 }
 
-function SelectComponent({ data, defaultValue, placeholder, className, value, onValueChange, allowClear = false, name, disabled }: { data: { label: string, value: string | number }[], defaultValue?: string, placeholder: string, className?: string, value?: string, onValueChange?: (value: string | null) => void, allowClear?: boolean, name?: string, disabled?: boolean }) {
+function SelectComponent({ data, defaultValue, placeholder, className, value, onValueChange, allowClear = false, name, disabled, searchable = true }: { data: { label: string, value: string | number }[], defaultValue?: string, placeholder: string, className?: string, value?: string, onValueChange?: (value: string | null) => void, allowClear?: boolean, name?: string, disabled?: boolean, searchable?: boolean }) {
+  const [searchQuery, setSearchQuery] = React.useState("");
+
+  const filteredData = React.useMemo(() => {
+    if (!searchable || !searchQuery) return data;
+    const lowerQuery = searchQuery.toLowerCase();
+    return data.filter((item) => String(item.label).toLowerCase().includes(lowerQuery));
+  }, [data, searchQuery, searchable]);
+
   return (
-    <Select name={name} defaultValue={defaultValue} value={value} onValueChange={onValueChange} items={data} disabled={disabled}>
+    <Select name={name} defaultValue={defaultValue} value={value} onValueChange={onValueChange} disabled={disabled} onOpenChange={(open) => { if (!open) setSearchQuery(""); }}>
       <div className="relative group">
         <SelectTrigger className={cn("w-full cursor-pointer text-xs h-10 rounded-sm border-gray-200 dark:border-zinc-800 dark:bg-zinc-900 transition-colors placeholder:text-slate-300 dark:placeholder:text-zinc-700", className)}>
           <SelectValue placeholder={placeholder} className="data-placeholder:font-normal data-placeholder:text-muted-foreground dark:placeholder:text-zinc-700" />
         </SelectTrigger>
-        {allowClear && !disabled && value && <X className="hidden h-3.5 w-3.5 group-hover:block absolute right-[14px] top-[50%] disabled:hidden  origin-center translate-y-[-50%] size-4 text-muted-foreground bg-white dark:bg-zinc-900 cursor-pointer" onClick={(e) => { console.log('cliecnk....'); e.preventDefault(); onValueChange?.('') }} />}
-        <SelectContent alignItemWithTrigger={false} align="start" className="min-w-min dark:bg-zinc-900 dark:border-zinc-800 p-1 rounded-md max-h-[220px]">
-          <SelectGroup>
-            {data.map((item) => (
-              <SelectItem key={item.value} value={item.value} className="h-7 text-xs font-medium data-highlighted:bg-primary/20 data-selected:bg-primary" >
-                {item.label}
-              </SelectItem>
-            ))}
+        {allowClear && !disabled && value && <X className="hidden h-3.5 w-3.5 group-hover:block absolute right-[14px] top-[50%] disabled:hidden origin-center translate-y-[-50%] size-4 text-muted-foreground bg-white dark:bg-zinc-900 cursor-pointer" onClick={(e) => { console.log('cliecnk....'); e.preventDefault(); onValueChange?.(''); }} />}
+        <SelectContent alignItemWithTrigger={false} align="start" className="min-w-min dark:bg-zinc-900 dark:border-zinc-800 p-1 rounded-md max-h-[220px] flex flex-col">
+          {searchable && (
+            <div className="px-1 py-1 pb-1.5 sticky top-0 bg-popover z-10 shrink-0">
+              <input
+                type="text"
+                placeholder="Search..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                onKeyDown={(e) => e.stopPropagation()}
+                className="w-full text-xs h-8 rounded-sm border border-gray-200 dark:border-zinc-800 bg-transparent px-2 outline-none focus:border-primary placeholder:text-muted-foreground"
+              />
+            </div>
+          )}
+          <SelectGroup className="overflow-y-auto flex-1 min-h-0">
+            {filteredData.length > 0 ? (
+              filteredData.map((item) => (
+                <SelectItem key={item.value} value={item.value} className="h-7 text-xs font-medium data-highlighted:bg-primary/20 data-selected:bg-primary">
+                  {item.label}
+                </SelectItem>
+              ))
+            ) : (
+              <div className="py-2 text-center text-xs text-muted-foreground">No results found.</div>
+            )}
           </SelectGroup>
         </SelectContent>
       </div>

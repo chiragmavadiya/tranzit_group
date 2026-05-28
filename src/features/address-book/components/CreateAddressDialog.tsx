@@ -8,7 +8,6 @@ import { useAddressBookDetails } from '../hooks/useAddressBook';
 import { PlaceAutocomplete } from '@/components/common/AutoComplateAddress';
 import { showToast } from '@/components/ui/custom-toast';
 // import { GlobalCourierSelect } from '@/features/courier-surcharge/components/GlobalCourierSelect';
-import { Checkbox } from '@/components/ui/checkbox';
 
 interface CreateAddressDialogProps {
   open: boolean;
@@ -52,8 +51,6 @@ export function CreateAddressDialog({
     instructions: '',
     default_carrier: '',
     default_code: '',
-    signature_required: false,
-
     address: '',
     company: '',
     building: '',
@@ -213,22 +210,6 @@ export function CreateAddressDialog({
                   errormsg="Please enter a code"
                   isFullWidth
                 />
-                <div className="flex items-center justify-end gap-2 pt-2">
-                  <Checkbox
-                    id="signature_required"
-                    checked={formData.signature_required}
-                    onCheckedChange={(checked) => handleChange('signature_required', checked as boolean)}
-                    className="data-[state=checked]:bg-primary data-[state=checked]:border-primary rounded-[4px]"
-                  />
-                  <label
-                    htmlFor="signature_required"
-                    className="text-[13px] font-semibold text-slate-700 dark:text-zinc-300 cursor-pointer select-none"
-                  >
-                    Signature Required
-                  </label>
-                </div>
-
-
               </div>
 
               {/* Right Column */}

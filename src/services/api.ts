@@ -20,9 +20,8 @@ api.interceptors.request.use(
             config.headers.Authorization = `Bearer ${tokenData}`;
         }
         const role = localStorage.getItem("user_role") || "customer";
-
         // Only prefix if the URL doesn't already have one
-        if (config.url && !config.url.startsWith('/admin') && !config.url.startsWith('/customer')) {
+        if (config.url && !config.url.startsWith('/admin') && !config.url.startsWith('/customer') && config.url !== '/localities/search') {
             config.url = `/${role}${config.url}`;
         }
 

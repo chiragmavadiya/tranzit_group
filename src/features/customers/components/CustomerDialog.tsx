@@ -17,6 +17,7 @@ import { STATES } from "../constants"
 import { useCreateCustomer, useUpdateCustomer, useCustomerEditDetails } from "../hooks/useCustomers"
 import { showToast } from "@/components/ui/custom-toast"
 import { PlaceAutocomplete } from "@/components/common/AutoComplateAddress"
+import { Checkbox } from "@/components/ui/checkbox"
 
 interface CustomerDialogProps {
   open: boolean
@@ -25,14 +26,6 @@ interface CustomerDialogProps {
 }
 
 const STATE_OPTIONS = STATES.map(s => ({ label: s, value: s }));
-const STREET_TYPES = [
-  { label: "Street", value: "St" },
-  { label: "Road", value: "Rd" },
-  { label: "Avenue", value: "Ave" },
-  { label: "Close", value: "Cl" },
-  { label: "Drive", value: "Dr" },
-  { label: "Highway", value: "Hwy" },
-];
 
 const INITIAL_FORM_DATA = {
   first_name: "",
@@ -42,19 +35,23 @@ const INITIAL_FORM_DATA = {
   business_name: "",
   gst_number: "",
   billing_address: "",
-  billing_street_name: "",
-  billing_street_number: "",
-  billing_street_type: "",
+  billing_street: "",
+  // billing_street_number: "",
+  // billing_street_type: "",
+  billing_city: "",
   billing_suburb: "",
   billing_state: "",
   billing_postcode: "",
+  billing_country: "",
   address: "",
-  street_name: "",
-  street_number: "",
-  street_type: "",
+  street: "",
+  // street_number: "",
+  // street_type: "",
   suburb: "",
   state: "",
+  city: "",
   postcode: "",
+  country: "",
   direct_freight_active: 0,
   direct_freight_markup_charge: 0,
   direct_freight_pickup_charge: 0,
@@ -78,15 +75,52 @@ export default function CustomerDialog({ open, onOpenChange, customerId }: Custo
   const { mutate: updateCustomer, isPending: isUpdating } = useUpdateCustomer();
   const { data: editData, isLoading: isLoadingDetails } = useCustomerEditDetails(customerId || "");
 
+  const [sameAsShipping, setSameAsShipping] = useState(false);
+
   useEffect(() => {
     if (isEdit && editData?.data) {
       setFormData(editData.data);
+      const data = editData.data;
+      const isSame =
+        data.billing_address === data.address &&
+        data.billing_street === data.street &&
+        // data.billing_street_number === data.street_number &&
+        // data.billing_street_type === data.street_type &&
+        data.billing_suburb === data.suburb &&
+        data.billing_state === data.state &&
+        data.billing_postcode === data.postcode &&
+        data.billing_city === data.city
+      setSameAsShipping(isSame);
     } else if (!isEdit && open) {
       setFormData(INITIAL_FORM_DATA);
-      // setErrors({});
       setSubmited(false);
+      setSameAsShipping(false);
     }
   }, [isEdit, editData, open]);
+
+  useEffect(() => {
+    if (sameAsShipping) {
+      setFormData((prev) => ({
+        ...prev,
+        billing_address: prev.address,
+        billing_street: (prev as any).street || "",
+        billing_city: prev.city,
+        billing_suburb: prev.suburb,
+        billing_state: prev.state,
+        billing_postcode: prev.postcode,
+        billing_country: (prev as any).country || "",
+      }));
+    }
+  }, [
+    sameAsShipping,
+    formData.address,
+    formData.street,
+    formData.city,
+    formData.suburb,
+    formData.state,
+    formData.postcode,
+    formData.country,
+  ]);
 
   const handleChange = (field: string, value: any) => {
     setFormData((prev) => ({ ...prev, [field]: value }))
@@ -101,19 +135,19 @@ export default function CustomerDialog({ open, onOpenChange, customerId }: Custo
       "business_name",
       "order_prefix",
       "billing_address",
-      "billing_street_name",
-      "billing_street_number",
-      "billing_street_type",
+      "billing_street",
+      "billing_city",
       "billing_suburb",
       "billing_state",
       "billing_postcode",
+      "billing_country",
       "address",
-      "street_name",
-      "street_number",
-      "street_type",
+      "street",
+      "city",
       "suburb",
       "state",
       "postcode",
+      "country",
     ];
 
     return requiredFields.every(
@@ -261,110 +295,7 @@ export default function CustomerDialog({ open, onOpenChange, customerId }: Custo
           />
         </div>
 
-        {/* Billing Address */}
         <div className="space-y-8 animate-in fade-in slide-in-from-right-4 duration-300">
-          <div className="">
-            <div className="flex items-center gap-2 border-b border-slate-50 dark:border-zinc-900 mb-4">
-              <Receipt className="w-4 h-4 text-primary" />
-              <h3 className="my-0 text-sm font-bold text-slate-900 dark:text-zinc-100">Billing Address</h3>
-            </div>
-            <div className="grid grid-cols-12 gap-x-4 gap-y-4">
-              {/* <FormInput
-                label="Full Address"
-                placeholder="Start typing address..."
-                isFullWidth
-                value={formData.billing_address}
-                onChange={(val) => handleChange("billing_address", val)}
-                required
-                error={submited && !formData.billing_address?.trim()}
-                errormsg="Please enter billing address"
-              /> */}
-              <div className="col-span-12">
-                <PlaceAutocomplete
-                  label="Address Information"
-                  onPlaceSelect={(opt) => {
-                    handleChange('billing_address', opt.formatted_address);
-                    handleChange('billing_street', opt.street);
-                    // handleChange('billing_street_name', opt.street_name);
-                    // handleChange('billing_street_number', opt.street_number);
-                    // handleChange('billing_street_type', opt.street_type);
-                    handleChange('billing_suburb', opt.suburb);
-                    handleChange('billing_state', opt.state);
-                    handleChange('billing_country', opt.country);
-                    handleChange('billing_postcode', opt.post_code);
-                  }}
-                  onChange={(value) => handleChange('billing_address', value)}
-                  error={submited && formData.billing_address?.trim() === ''}
-                  errormsg='Please enter your billing address'
-                  value={formData.billing_address}
-                  required
-                />
-              </div>
-
-              <FormInput
-                label="Street Name"
-                isHalf
-                placeholder="Main St"
-                value={formData.billing_street_name}
-                onChange={(val) => handleChange("billing_street_name", val)}
-                required
-                error={submited && !formData.billing_street_name?.trim()}
-                errormsg="Please enter street name"
-              />
-              <FormInput
-                label="Street Number"
-                isCompact
-                placeholder="123"
-                value={formData.billing_street_number}
-                onChange={(val) => handleChange("billing_street_number", val)}
-                required
-                error={submited && !formData.billing_street_number?.trim()}
-                errormsg="Please enter street number"
-              />
-
-              <FormSelect
-                label="Type"
-                isCompact
-                options={STREET_TYPES}
-                value={formData.billing_street_type}
-                onValueChange={(val) => handleChange("billing_street_type", val)}
-                required
-                error={submited && !formData.billing_street_type?.trim()}
-                errormsg="Please enter street type"
-              />
-              <FormInput
-                label="Suburb"
-                isCompact
-                placeholder="Suburb"
-                value={formData.billing_suburb}
-                onChange={(val) => handleChange("billing_suburb", val)}
-                required
-                error={submited && !formData.billing_suburb?.trim()}
-                errormsg="Please enter suburb"
-              />
-              <FormSelect
-                label="State"
-                isCompact
-                options={STATE_OPTIONS}
-                value={formData.billing_state}
-                onValueChange={(val) => handleChange("billing_state", val)}
-                required
-                error={submited && !formData.billing_state?.trim()}
-                errormsg="Please enter state"
-              />
-              <FormInput
-                label="Postcode"
-                isCompact
-                placeholder="3000"
-                value={formData.billing_postcode}
-                onChange={(val) => handleChange("billing_postcode", val)}
-                required
-                error={submited && !formData.billing_postcode?.trim()}
-                errormsg="Please enter postcode"
-              />
-            </div>
-          </div>
-
           {/* Shipping Address */}
           <div className="space-y-4 pt-2">
             <div className="flex items-center gap-2 border-b border-slate-50 dark:border-zinc-900 pb-2">
@@ -388,13 +319,11 @@ export default function CustomerDialog({ open, onOpenChange, customerId }: Custo
                   onPlaceSelect={(opt) => {
                     handleChange('address', opt.address1);
                     handleChange('street', opt.street);
-                    // handleChange('street_name', opt.street_name);
-                    // handleChange('street_number', opt.street_number);
-                    // handleChange('street_type', opt.street_type);
                     handleChange('suburb', opt.suburb);
                     handleChange('state', opt.state);
                     handleChange('country', opt.country);
                     handleChange('postcode', opt.post_code);
+                    handleChange('city', opt.suburb);
                   }}
                   onChange={(value) => handleChange('address', value)}
                   error={submited && formData.address?.trim() === ''}
@@ -404,34 +333,14 @@ export default function CustomerDialog({ open, onOpenChange, customerId }: Custo
                 />
               </div>
               <FormInput
-                label="Street #"
-                isCompact
-                placeholder="123"
-                value={formData.street_number}
-                onChange={(val) => handleChange("street_number", val)}
-                required
-                error={submited && !formData.street_number?.trim()}
-                errormsg="Please enter street number"
-              />
-              <FormInput
-                label="Street Name"
+                label="Street"
                 isHalf
-                placeholder="Main St"
-                value={formData.street_name}
-                onChange={(val) => handleChange("street_name", val)}
+                placeholder="e.g. 123 Main St"
+                value={formData.street}
+                onChange={(val) => handleChange("street", val)}
                 required
-                error={submited && !formData.street_name?.trim()}
-                errormsg="Please enter street name"
-              />
-              <FormSelect
-                label="Type"
-                isCompact
-                options={STREET_TYPES}
-                value={formData.street_type}
-                onValueChange={(val) => handleChange("street_type", val)}
-                required
-                error={submited && !formData.street_type?.trim()}
-                errormsg="Please enter street type"
+                error={submited && !formData.street?.trim()}
+                errormsg="Please enter street"
               />
               <FormInput
                 label="Suburb"
@@ -442,6 +351,16 @@ export default function CustomerDialog({ open, onOpenChange, customerId }: Custo
                 required
                 error={submited && !formData.suburb?.trim()}
                 errormsg="Please enter suburb"
+              />
+              <FormInput
+                label="City"
+                isCompact
+                placeholder="City"
+                value={formData.city}
+                onChange={(val) => handleChange("city", val)}
+                required
+                error={submited && !formData.city?.trim()}
+                errormsg="Please enter city"
               />
               <FormSelect
                 label="State"
@@ -463,11 +382,149 @@ export default function CustomerDialog({ open, onOpenChange, customerId }: Custo
                 error={submited && !formData.postcode?.trim()}
                 errormsg="Please enter postcode"
               />
+              <FormInput
+                label="Country"
+                isCompact
+                placeholder="Australia"
+                value={formData.country}
+                onChange={(val) => handleChange("country", val)}
+                required
+                error={submited && !formData.country?.trim()}
+                errormsg="Please enter country"
+              />
+            </div>
+          </div>
+
+          {/* Billing address */}
+          <div className="">
+            <div className="flex items-center justify-between border-b border-slate-50 dark:border-zinc-900 mb-4 pb-2">
+              <div className="flex items-center gap-2">
+                <Receipt className="w-4 h-4 text-primary" />
+                <h3 className="my-0 text-sm font-bold text-slate-900 dark:text-zinc-100">Billing Address</h3>
+              </div>
+              <div className="flex items-center gap-2">
+                <Checkbox
+                  id="same_as_shipping"
+                  checked={sameAsShipping}
+                  onCheckedChange={(checked) => setSameAsShipping(!!checked)}
+                />
+                <label
+                  htmlFor="same_as_shipping"
+                  className="text-xs font-semibold text-slate-700 dark:text-zinc-400 cursor-pointer select-none"
+                >
+                  Use the above address as your billing address
+                </label>
+              </div>
+            </div>
+            <div className="grid grid-cols-12 gap-x-4 gap-y-4">
+              {/* <FormInput
+                label="Full Address"
+                placeholder="Start typing address..."
+                isFullWidth
+                value={formData.billing_address}
+                onChange={(val) => handleChange("billing_address", val)}
+                required
+                error={submited && !formData.billing_address?.trim()}
+                errormsg="Please enter billing address"
+              /> */}
+              <div className="col-span-12">
+                <PlaceAutocomplete
+                  label="Address Information"
+                  onPlaceSelect={(opt) => {
+                    handleChange('billing_address', opt.formatted_address);
+                    handleChange('billing_street', opt.street);
+                    handleChange('billing_suburb', opt.suburb);
+                    handleChange('billing_state', opt.state);
+                    handleChange('billing_country', opt.country);
+                    handleChange('billing_postcode', opt.post_code);
+                    handleChange('billing_city', opt.suburb);
+                  }}
+                  onChange={(value) => handleChange('billing_address', value)}
+                  error={submited && formData.billing_address?.trim() === ''}
+                  errormsg='Please enter your billing address'
+                  value={formData.billing_address}
+                  required
+                  disabled={sameAsShipping}
+                />
+              </div>
+
+              <FormInput
+                label="Street"
+                isHalf
+                placeholder="e.g. 123 Main St"
+                value={formData.billing_street}
+                onChange={(val) => handleChange("billing_street", val)}
+                required
+                error={submited && !formData.billing_street?.trim()}
+                errormsg="Please enter street"
+                disabled={sameAsShipping}
+              />
+              <FormInput
+                label="Suburb"
+                isCompact
+                placeholder="Suburb"
+                value={formData.billing_suburb}
+                onChange={(val) => handleChange("billing_suburb", val)}
+                required
+                error={submited && !formData.billing_suburb?.trim()}
+                errormsg="Please enter suburb"
+                disabled={sameAsShipping}
+              />
+              <FormInput
+                label="City"
+                isCompact
+                placeholder="City"
+                value={formData.billing_city}
+                onChange={(val) => handleChange("billing_city", val)}
+                required
+                error={submited && !formData.billing_city?.trim()}
+                errormsg="Please enter city"
+                disabled={sameAsShipping}
+              />
+              <FormSelect
+                label="State"
+                isCompact
+                options={STATE_OPTIONS}
+                value={formData.billing_state}
+                onValueChange={(val) => handleChange("billing_state", val)}
+                required
+                error={submited && !formData.billing_state?.trim()}
+                errormsg="Please enter state"
+                disabled={sameAsShipping}
+              />
+              <FormInput
+                label="Postcode"
+                isCompact
+                placeholder="3000"
+                value={formData.billing_postcode}
+                onChange={(val) => handleChange("billing_postcode", val)}
+                required
+                error={submited && !formData.billing_postcode?.trim()}
+                errormsg="Please enter postcode"
+                disabled={sameAsShipping}
+              />
+              <FormInput
+                label="Country"
+                isCompact
+                placeholder="Australia"
+                value={formData.billing_country}
+                onChange={(val) => handleChange("billing_country", val)}
+                required
+                error={submited && !formData.billing_country?.trim()}
+                errormsg="Please enter country"
+                disabled={sameAsShipping}
+              />
             </div>
           </div>
         </div>
 
         <div className="space-y-4 animate-in fade-in slide-in-from-right-4 duration-300 pb-4">
+          <FormInput
+            label="Additional Above 5KG Weight Rate"
+            value=""
+            placeholder="Enter weight rate"
+            onChange={() => { }}
+          />
           <div className="grid grid-cols-1 gap-4">
             {/* Direct Freight */}
             <div className="p-4 rounded-2xl border border-slate-100 dark:border-zinc-800 bg-slate-50/50 dark:bg-zinc-900/50 space-y-4">

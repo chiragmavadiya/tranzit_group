@@ -44,7 +44,8 @@ export const useOrderWorkflow = () => {
   const { mutate: createOrder, isPending: saveLoading } = useCreateOrder();
   const { mutate: checkWallet, isPending: walletLoading } = useWalletCheck();
   const { data: orderResponse, isLoading: isOrderLoading } = useOrderDetails(orderID || '');
-  const { mutate: downloadLabel, isPending: isDownloadingLabel } = useDownloadLabel();
+  const { mutate: downloadLabel, isPending: isDownloadingLabel } = useDownloadLabel(false);
+  const { mutate: printLabel } = useDownloadLabel(true);
   const { mutate: cancelOrder, isPending: isCancelling } = useCancelOrder();
   const { mutate: consignOrder, isPending: isConsigning } = useConsignOrder(role === 'admin');
   const { data: globalCouriers } = useGlobalCouriers(role === 'admin' && orderType === 'create-menual');
@@ -90,8 +91,8 @@ export const useOrderWorkflow = () => {
   const [orderDialogMode, setOrderDialogMode] = useState<'sender' | 'receiver' | null>(initialDialogMode);
   const [deliveryInstructions, setDeliveryInstructions] = useState<string>('');
   const [isEdit, setIsEdit] = useState<boolean>(false);
-  const [termsAccepted, setTermsAccepted] = useState(false);
-  const [ratesAccepted, setRatesAccepted] = useState(false);
+  const [termsAccepted, setTermsAccepted] = useState(true);
+  const [ratesAccepted, setRatesAccepted] = useState(true);
   const [dangerousGoodsAccepted, setDangerousGoodsAccepted] = useState(false);
   const [pickupDate, setPickupDate] = useState<Date | undefined>(undefined);
   const [selectedCustomer, setSelectedCustomer] = useState<number>();
@@ -116,7 +117,7 @@ export const useOrderWorkflow = () => {
 
   const isValidConsignOrder = useCallback((orderStatus: string | undefined) => {
     if (orderStatus !== 'new' && orderType === 'consign') {
-      navigate(`${role === 'admin' ? '/admin' : ''}/orders/edit/${orderID}`);
+      navigate(`${role === 'admin' ? '/admin' : ''}/orders/view/${orderID}`);
     }
   }, [role, orderID, navigate, orderType]);
 
@@ -327,8 +328,11 @@ export const useOrderWorkflow = () => {
         onSuccess: (response) => {
           if (response.ok) {
             showToast('Orders Created successfully', 'success');
-            navigate(`${role === 'admin' ? '/admin' : ''}/orders/edit/${response.order_number}`);
+            navigate(`${role === 'admin' ? '/admin' : ''}/orders/view/${response.order_number}`);
             setWalletCheckOpen(false);
+            if (response.order_number) {
+              printLabel(response.order_number);
+            }
           } else {
             showToast(response.message || 'Failed to create orders', 'error');
           }
@@ -357,30 +361,7 @@ export const useOrderWorkflow = () => {
         showToast('Failed to create orders', 'error');
       },
     });
-  }, [
-    itemsData,
-    addressData,
-    role,
-    selectedCustomer,
-    pickupDate,
-    termsAccepted,
-    ratesAccepted,
-    dangerousGoodsAccepted,
-    courierData,
-    insuranceSelected,
-    signatureSelected,
-    deliveryInstructions,
-    quoteData?.courier,
-    walletCheckData,
-    calculation,
-    orderType,
-    manualOrderData.trackingNumber,
-    manualOrderData.courierId,
-    manualOrderData.amount,
-    checkWallet,
-    createOrder,
-    navigate,
-  ]);
+  }, [itemsData, addressData, role, selectedCustomer, pickupDate, termsAccepted, ratesAccepted, dangerousGoodsAccepted, calculation.totalItems, calculation.grandTotal, courierData, insuranceSelected, signatureSelected, deliveryInstructions, quoteData?.courier?.base, quoteData?.courier?.gst, quoteData?.courier?.price, quoteData?.courier?.freight_levy, walletCheckData?.wallet_balance, orderType, manualOrderData.trackingNumber, manualOrderData.courierId, manualOrderData.amount, checkWallet, createOrder, navigate, printLabel]);
 
   // Order Cancellation Flow
   const onCancelOrder = useCallback((manual: boolean = false) => {
@@ -467,7 +448,7 @@ export const useOrderWorkflow = () => {
         {
           onSuccess: () => {
             showToast('Order consigned successfully', 'success');
-            navigate(`${role === 'admin' ? '/admin' : ''}/orders/edit/${orderID}`);
+            navigate(`${role === 'admin' ? '/admin' : ''}/orders/view/${orderID}`);
           },
           onError: (err: any) => {
             showToast(err?.response?.data?.message || 'Failed to consign order', 'error');

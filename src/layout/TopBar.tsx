@@ -1,6 +1,6 @@
 "use client";
 
-import { LogOut, Sun, Moon, Monitor, Loader2, HelpCircle, User, ArrowLeftRight } from 'lucide-react';
+import { LogOut, Sun, Moon, Monitor, Loader2, HelpCircle, User, ArrowLeftRight, Wallet } from 'lucide-react';
 import { useNavigate, useLocation, useSearchParams } from 'react-router-dom';
 import DropdownCustomContent, {
   DropdownCustomMenu,
@@ -8,6 +8,8 @@ import DropdownCustomContent, {
   DropdownMenuSeparator,
 } from '@/components/ui/dropdown-menu';
 import { useTheme } from '@/app/providers/theme-provider';
+import tranzit_logo from '@/assets/Tranzit_Logo.svg';
+import tranzit_logo_dark from '@/assets/Tranzit_Logo_dark.svg';
 // import { OrdersTabs } from '@/features/orders/components/OrdersTabs';
 import type { TabType } from '@/features/orders/types';
 import { useAppSelector, useAppDispatch } from '@/hooks/store.hooks';
@@ -65,6 +67,9 @@ export default function TopBar({ isCollapsed }: { isCollapsed?: boolean }) {
   }
   return (
     <header className={`print:hidden h-16 bg-white dark:bg-zinc-950 border-b border-gray-200 dark:border-zinc-800 flex items-center justify-between px-6 fixed top-0 right-0 z-10 transition-[left] duration-300 ease-in-out ${isCollapsed ? 'left-[64px]' : 'left-[240px]'}`}>
+      <div className={`flex items-center transition-all duration-300 ease-in-out ${isCollapsed ? 'w-[120px] opacity-100 mr-4' : 'w-0 opacity-0 pointer-events-none overflow-hidden mr-0'}`}>
+        <img src={theme === "dark" ? tranzit_logo_dark : tranzit_logo} alt="Tranzit" className="h-15 max-w-none" />
+      </div>
       <div className='flex justify-center flex-1'>
         <Suspense fallback={null}>
           {(location.pathname === '/orders' || location.pathname === '/admin/orders') && (
@@ -105,13 +110,13 @@ export default function TopBar({ isCollapsed }: { isCollapsed?: boolean }) {
         </Suspense>
       </div>
       <div className="flex items-center gap-3">
+        {role === 'customer' && walletData?.data && (
+          <div className="flex items-center gap-2 px-3 h-8 rounded-md bg-emerald-50 dark:bg-emerald-950/30 border border-emerald-200/50 dark:border-emerald-900/30 text-emerald-700 dark:text-emerald-400 text-xs font-bold shadow-sm transition-all duration-300 hover:bg-emerald-100/50 dark:hover:bg-emerald-950/50 cursor-default select-none">
+            <Wallet className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
+            <span>Balance: {formateCurrency(Number(walletData.data.wallet_balance))}</span>
+          </div>
+        )}
         <div className="relative flex items-center">
-          {/* <Search className="absolute left-3 h-4 w-4" strokeWidth={2.5} />
-          <input
-            type="text"
-            placeholder="Search"
-            className="pl-9 pr-10 py-[7px] border border-gray-300 dark:border-zinc-700 bg-white dark:bg-zinc-900 text-gray-900 dark:text-zinc-100 rounded text-[13px] outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 "
-          /> */}
           <GlobalSearch />
         </div>
         <DropdownCustomMenu

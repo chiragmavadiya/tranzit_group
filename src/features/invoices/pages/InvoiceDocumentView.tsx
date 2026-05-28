@@ -21,16 +21,15 @@ import {
   useSendAdminInvoice,
   useRemindAdminInvoice,
   useZohoSyncAdminInvoice,
-  // useAdminInvoicePayment,
+  useAdminInvoicePayment,
   useUpdateAdminInvoice,
   useCreateCustomerInvoice,
   useCustomerInvoiceDetails
 } from '../hooks/useInvoices'
 import { Skeleton } from '@/components/ui/skeleton'
 import { AddPaymentDialog } from '../components/AddPaymentDialog'
-import { Badge } from '@/components/ui/badge'
-import { INVOICE_STATUS_COLORS } from '../constants'
-import { cn } from '@/lib/utils';
+import { ConformationModal } from '@/components/common/ConformationModal'
+import { showToast } from '@/components/ui/custom-toast'
 import type { InvoiceDocumentData } from '../types'
 
 
@@ -68,7 +67,7 @@ const InvoiceDocumentView: React.FC = () => {
     },
     "items": [{
       id: `1`,
-      type: "",
+      type: "custom",
       description: "",
       total_charge_credit: 0,
       order_number: "",
@@ -83,6 +82,10 @@ const InvoiceDocumentView: React.FC = () => {
   })
 
   const [isPaymentDialogOpen, setIsPaymentDialogOpen] = React.useState(false)
+  const [editingPayment, setEditingPayment] = useState<any>(null)
+  const [isDeletePaymentConfirmOpen, setIsDeletePaymentConfirmOpen] = React.useState(false)
+  const [paymentIdToDelete, setPaymentIdToDelete] = React.useState<string | number | null>(null)
+  const [isSendConfirmOpen, setIsSendConfirmOpen] = React.useState(false)
   // const [isEditItemsDialogOpen, setIsEditItemsDialogOpen] = React.useState(false)
 
   // Fetch Data
@@ -101,7 +104,31 @@ const InvoiceDocumentView: React.FC = () => {
   const remindMutation = useRemindAdminInvoice()
   const zohoSyncMutation = useZohoSyncAdminInvoice()
   const createMutation = useCreateCustomerInvoice()
-  // const paymentActions = useAdminInvoicePayment()
+  const paymentActions = useAdminInvoicePayment()
+
+  const handleEditPayment = useCallback((payment: any) => {
+    setEditingPayment(payment)
+    setIsPaymentDialogOpen(true)
+  }, [])
+
+  const handleDeletePayment = useCallback((paymentId: string | number) => {
+    setPaymentIdToDelete(paymentId)
+    setIsDeletePaymentConfirmOpen(true)
+  }, [])
+
+  const handleConfirmDeletePayment = useCallback(() => {
+    if (paymentIdToDelete) {
+      paymentActions.delete.mutate({
+        invoiceId: invoiceID!,
+        paymentId: paymentIdToDelete
+      }, {
+        onSuccess: () => {
+          setIsDeletePaymentConfirmOpen(false)
+          setPaymentIdToDelete(null)
+        }
+      })
+    }
+  }, [invoiceID, paymentIdToDelete, paymentActions.delete])
 
   const handleBack = useCallback(() => {
     navigate(isAdmin ? '/admin/invoices' : '/invoices')
@@ -111,9 +138,9 @@ const InvoiceDocumentView: React.FC = () => {
     if (invoiceID) downloadMutation.mutate(invoiceID)
   }, [invoiceID, downloadMutation])
 
-  const handleSend = useCallback(() => {
-    if (invoiceID) sendMutation.mutate(invoiceID)
-  }, [invoiceID, sendMutation])
+  // const handleSend = useCallback(() => {
+  //   if (invoiceID) sendMutation.mutate(invoiceID)
+  // }, [invoiceID, sendMutation])
 
   const handleRemind = useCallback(() => {
     if (invoiceID) remindMutation.mutate(invoiceID)
@@ -178,7 +205,7 @@ const InvoiceDocumentView: React.FC = () => {
         },
         "items": [{
           id: `1`,
-          type: "",
+          type: "custom",
           description: "",
           total_charge_credit: 0,
           order_number: "",
@@ -194,8 +221,38 @@ const InvoiceDocumentView: React.FC = () => {
     }
   }, [details, invoiceID, details?.status])
 
+  const validateInvoice = useCallback(() => {
+    if (invoiceID === 'create' && !invoiceData.customer?.id) {
+      showToast("Customer is required", "error")
+      return false
+    }
+
+    if (!invoiceData.items || invoiceData.items.length === 0) {
+      showToast("At least one item is required", "error")
+      return false
+    }
+
+    for (const item of invoiceData.items) {
+      const type = item.type?.toLowerCase()
+      if (type === 'order' && !String(item.order_number || '').trim()) {
+        showToast("Order number is required for order items", "error")
+        return false
+      }
+      if (type === 'custom' && !String(item.description || '').trim()) {
+        showToast("Description is required for custom items", "error")
+        return false
+      }
+      if (type === 'credit' && !String(item.description || '').trim()) {
+        showToast("Description is required for credit items", "error")
+        return false
+      }
+    }
+    return true
+  }, [invoiceData, invoiceID])
+
   const handleSave = useCallback(() => {
     if (!invoiceID) return
+    if (!validateInvoice()) return
     const payload = {
       invoice_number: invoiceData.invoice_number,
       invoice_date: invoiceData.issue_date,
@@ -229,7 +286,21 @@ const InvoiceDocumentView: React.FC = () => {
     } else {
       updateMutation.mutate({ id: invoiceID, data: payload })
     }
-  }, [invoiceID, invoiceData, createMutation, navigate, isAdmin, updateMutation])
+  }, [invoiceID, invoiceData, createMutation, navigate, isAdmin, updateMutation, validateInvoice])
+
+  const handleConfirmSend = useCallback(() => {
+    if (invoiceID) {
+      sendMutation.mutate(invoiceID, {
+        onSuccess: () => {
+          setIsSendConfirmOpen(false)
+        }
+      })
+    }
+  }, [invoiceID, sendMutation])
+
+  const handleSaveOnly = useCallback(() => {
+    handleSave()
+  }, [handleSave])
 
   if (isLoading) {
     return (
@@ -262,7 +333,7 @@ const InvoiceDocumentView: React.FC = () => {
 
       {/* Navigation Bar - Hidden on Print */}
       <div className="sticky top-0 z-10 w-full bg-white/80 dark:bg-zinc-900/80 backdrop-blur-md border-b border-slate-200 dark:border-zinc-800 px-6 py-4 flex items-center justify-between print:hidden">
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-2">
           <Button
             variant="ghost"
             onClick={handleBack}
@@ -273,9 +344,9 @@ const InvoiceDocumentView: React.FC = () => {
           </Button>
           <div className="h-6 w-px bg-slate-200 dark:bg-zinc-800 mx-2" />
           <span className="text-primary font-bold">#{invoiceData?.invoice_number}</span>
-          <Badge className={cn("px-3 py-1 font-bold border-none", INVOICE_STATUS_COLORS[invoiceData?.status as keyof typeof INVOICE_STATUS_COLORS])}>
+          {/* <Badge className={cn("px-3 py-1 font-bold border-none capitalize", INVOICE_STATUS_COLORS[invoiceData?.status as keyof typeof INVOICE_STATUS_COLORS])}>
             {invoiceData?.status}
-          </Badge>
+          </Badge> */}
         </div>
 
         <div className="flex items-center gap-2">
@@ -285,7 +356,10 @@ const InvoiceDocumentView: React.FC = () => {
                 <>
                   <Button
                     variant="outline"
-                    onClick={() => setIsPaymentDialogOpen(true)}
+                    onClick={() => {
+                      setEditingPayment(null)
+                      setIsPaymentDialogOpen(true)
+                    }}
                     className="h-8 flex items-center gap-2 border-slate-200 dark:border-zinc-800 font-bold text-emerald-600 hover:text-emerald-700 hover:bg-emerald-50 shadow-sm"
                   >
                     <CircleDollarSign className="h-4 w-4" />
@@ -313,7 +387,11 @@ const InvoiceDocumentView: React.FC = () => {
                   </Button>
                   <Button
                     variant="outline"
-                    onClick={handleSend}
+                    onClick={() => {
+                      if (validateInvoice()) {
+                        setIsSendConfirmOpen(true)
+                      }
+                    }}
                     disabled={sendMutation.isPending}
                     className="h-8 flex items-center gap-2 border-slate-200 dark:border-zinc-800 font-bold text-primary hover:text-primary-hover hover:bg-primary/5 shadow-sm"
                   >
@@ -357,6 +435,8 @@ const InvoiceDocumentView: React.FC = () => {
               onUpdateDate={handleUpdateDate}
               setInvoiceData={setInvoiceData}
               invoiceId={invoiceID!}
+              onEditPayment={handleEditPayment}
+              onDeletePayment={handleDeletePayment}
             />
           </div>
         </div>
@@ -366,6 +446,31 @@ const InvoiceDocumentView: React.FC = () => {
         isOpen={isPaymentDialogOpen}
         onOpenChange={setIsPaymentDialogOpen}
         invoiceId={invoiceID!}
+        payment={editingPayment}
+      />
+
+      <ConformationModal
+        open={isDeletePaymentConfirmOpen}
+        onOpenChange={setIsDeletePaymentConfirmOpen}
+        title="Delete Payment Transaction"
+        description="Are you sure you want to delete this payment transaction? This action cannot be undone."
+        confirmText="Delete"
+        confirmVariant="destructive"
+        onConfirm={handleConfirmDeletePayment}
+        loading={paymentActions.delete.isPending}
+      />
+
+      <ConformationModal
+        open={isSendConfirmOpen}
+        onOpenChange={setIsSendConfirmOpen}
+        title="Send Invoice"
+        description="Are you sure to send this PDF invoice to the customer?"
+        confirmText="Yes, Send"
+        cancelText="No, Save Only"
+        confirmVariant="default"
+        onConfirm={handleConfirmSend}
+        onCancel={handleSaveOnly}
+        loading={sendMutation.isPending}
       />
 
       {/* <CreateInvoiceDialog

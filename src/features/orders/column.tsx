@@ -2,8 +2,9 @@ import { NavLink } from "react-router-dom";
 import type { Order } from "./types";
 import type { Column } from "@/components/common/types/DataTable.types";
 
-import { Download, Eye, PackagePlus, Trash, Loader2 } from "lucide-react";
+import { Eye, Loader2, MoreVertical, Printer } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { DropdownCustomMenu } from "@/components/ui/dropdown-menu";
 import { CustomTooltip } from "@/components/common/CustomTooltip";
 import { StatusBadge } from "./components/StatusBadge";
 import { formatDate } from "date-fns";
@@ -19,127 +20,193 @@ export const getOrdersColumns = (
   onDownloadLabel?: (orderId: string) => void,
   onCancelOrder?: (orderId: string) => void,
   downloadingLabelId?: string | null,
-): Column<Order>[] => [
-    {
-      header: 'ORDER #',
-      key: 'order_number',
-      className: 'text-primary font-bold',
-      // sticky: 'left',
-      cell: (value: string) => (
-        <NavLink to={`${role === "admin" ? "/admin" : ""}/orders/${orderType === 'new' ? 'consign' : 'edit'}/${value}`} className="font-bold text-primary underline">
-          {value}
-        </NavLink>
-      )
+  fromCustomer: boolean = false,
+): Column<Order>[] => {
 
+  const printedAndShippedActions = (value: string) => [
+    {
+      label: "View order",
+      onClick: () => navigate(`${role === "admin" ? "/admin/orders/view" : "/orders/view"}/${value}`),
+      // icon: Eye,
     },
     {
-      header: orderType === 'new' ? 'ORDER DATE' : 'SHIPPED', key: 'consignment_date',
-      width: '200px',
-      cell: (value: string) => formatDate(value, 'dd/MM/yyyy hh:mm a')
+      label: "Download Label",
+      onClick: () => onDownloadLabel?.(value),
+      // icon: Download,
     },
     {
-      header: 'CUSTOMER',
-      key: 'customer_name',
-      width: '220px',
-      cell: (value: string, row: Order) => (
-        <CustomerNameCell
-          value={value}
-          row={row}
-          orderType={orderType}
-          customerEditClick={customerEditClick}
-        />
-      )
-    },
-    {
-      header: 'SUBURB', key: 'suburb', width: '140px'
-    },
-    {
-      header: 'CARRIER & PRODUCT', key: 'courier',
-      width: '220px',
-      cell: (value: string, row: Order) => (
-        <div className="flex items-center gap-1">
-          {/* <img src={row?.courier_logo || 'https://api.tranzit.digisite.net/assets/img/couriers/direct-freight.png'} className="h-6" alt="" /> */}
-          <img src={row?.courier_logo || 'https://api.tranzit.digisite.net/assets/img/couriers/logo-auspost.png'} className="h-6" alt="" />
-          <span>{value}</span>
-        </div>
-      )
-    },
-    {
-      header: 'STATUS', key: 'status', cell: (value: string) => <StatusBadge status={value === "Payment pending" ? "Courier not assign" : value} />
-    },
-    {
-      header: 'AMOUNT', key: 'amount', cell: (value: string) => <span className="font-medium"> {formateCurrency(Number(value))}</span>
-    },
-    {
-      header: 'PAYMENT STATUS', key: 'payment_status', cell: (value: string) => <StatusBadge status={value} />
-    },
-    {
-      header: 'ORDER SOURCE', key: 'order_type',
-      cell: (value: string) => (
-        <div className="flex items-center gap-2">
-          <img src={Favicon} className="h-4 w-4" alt="" />
-          <span className="capitalize">{value}</span>
-        </div>
-      )
-    },
-
-    {
-      header: "",
-      key: "order_number",
-      cell: (value: string) => (
-        <div className="flex gap-2" onClick={(e) => e.stopPropagation()}>
-          <CustomTooltip title="Preview Order">
-            <Button
-              onClick={() => navigate(`${role === "admin" ? "/admin/orders/edit" : "/orders/edit"}/${value}`)}
-              variant="ghost"
-              size="sm"
-              className="h-fit w-fit p-0"
-            >
-              <Eye className="h-4 w-4" />
-            </Button>
-          </CustomTooltip>
-          {orderType === 'new' && (
-            <CustomTooltip title="Consign Order">
-              <Button
-                onClick={() => navigate(`${role === "admin" ? "/admin/orders/consign" : "/orders/consign"}/${value}`)}
-                variant="ghost"
-                size="sm"
-                className="h-fit w-fit p-0"
-              >
-                <PackagePlus className="h-4 w-4" />
-              </Button>
-            </CustomTooltip>
-          )}
-          {orderType === 'printed' && (
-            <>
-              <CustomTooltip title={downloadingLabelId === value ? "Downloading..." : "Download Label"}>
-                <Button
-                  onClick={() => onDownloadLabel?.(value)}
-                  variant="ghost"
-                  size="sm"
-                  className="h-fit w-fit p-0 group/button"
-                  disabled={downloadingLabelId === value}
-                >
-                  {downloadingLabelId === value ? (
-                    <Loader2 className="h-4 w-4 text-primary animate-spin" />
-                  ) : (
-                    <Download className="h-4 w-4 text-primary" />
-                  )}
-                </Button>
-              </CustomTooltip>
-              <CustomTooltip title="Cancel Order">
-                <Button
-                  onClick={() => onCancelOrder?.(value)}
-                  variant="ghost"
-                  size="sm"
-                  className="h-fit w-fit p-0 group/button"
-                >
-                  <Trash className="h-4 w-4 group-hover/button:text-destructive" />
-                </Button>
-              </CustomTooltip>
-            </>
-          )}
-        </div>
-      )
+      label: "Archived order",
+      onClick: () => {
+        onCancelOrder?.(value);
+      },
+      // icon: Archive,
+      variant: "destructive" as const,
+      className: "text-red-600 dark:text-red-400 font-medium"
     }
-  ];
+  ]
+
+  const newActions = (value: string) => [
+    {
+      label: "View order",
+      onClick: () => navigate(`${role === "admin" ? "/admin/orders/view" : "/orders/view"}/${value}`),
+      // icon: Eye,
+    },
+    {
+      label: "Archive order",
+      onClick: () => { },
+      variant: "destructive" as const,
+      className: "text-red-600 dark:text-red-400 font-medium"
+    },
+  ]
+  return (
+    [
+      {
+        header: 'ORDER #',
+        key: 'order_number',
+        className: 'text-primary font-bold',
+        // sticky: 'left',
+        cell: (value: string) => (
+          <NavLink to={`${role === "admin" ? "/admin" : ""}/orders/${(orderType === 'new' && !fromCustomer) ? 'consign' : 'view'}/${value}`} className="font-bold text-primary underline">
+            {value}
+          </NavLink>
+        )
+
+      },
+      {
+        header: orderType === 'new' ? 'ORDER DATE' : 'SHIPPED', key: 'consignment_date',
+        width: '200px',
+        cell: (value: string) => formatDate(value, 'dd/MM/yyyy hh:mm a')
+      },
+      {
+        header: 'CUSTOMER',
+        key: 'customer_name',
+        width: '220px',
+        cell: (value: string, row: Order) => (
+          <CustomerNameCell
+            value={value}
+            row={row}
+            orderType={orderType}
+            customerEditClick={customerEditClick}
+            fromCustomer={fromCustomer}
+          />
+        )
+      },
+      {
+        header: 'SUBURB', key: 'suburb', width: '140px'
+      },
+      {
+        header: 'CARRIER & PRODUCT', key: 'courier',
+        width: '220px',
+        cell: (value: string, row: Order) => (
+          <div className="flex items-center gap-1">
+            {/* <img src={row?.courier_logo || 'https://api.tranzit.digisite.net/assets/img/couriers/direct-freight.png'} className="h-6" alt="" /> */}
+            <img src={row?.courier_logo || 'https://api.tranzit.digisite.net/assets/img/couriers/logo-auspost.png'} className="h-6" alt="" />
+            <span>{value}</span>
+          </div>
+        )
+      },
+      ...(orderType !== 'new' ? [{
+        header: orderType === 'shipped' || orderType === 'archived' || orderType === 'printed' ? 'TRANSIT STATUS' : 'STATUS', key: 'status', cell: (value: string) => <StatusBadge status={value === "Payment pending" ? "Courier not assign" : value} />
+      }] : []),
+      ...(orderType === 'archived' ? [{
+        header: 'ORDER STATUS', key: 'status', cell: (value: string) => <StatusBadge status={value === "Payment pending" ? "Courier not assign" : value} />
+      }] : []),
+      {
+        header: 'AMOUNT', key: 'amount', cell: (value: string) => <span className="font-medium"> {formateCurrency(Number(value))}</span>
+      },
+      ...(orderType !== 'shipped' ? [{
+        header: 'PAYMENT STATUS', key: 'payment_status', cell: (value: string) => <StatusBadge status={value} />
+      }] : []),
+      {
+        header: 'ORDER SOURCE', key: 'order_type',
+        cell: (value: string) => (
+          <div className="flex items-center gap-2">
+            <img src={Favicon} className="h-4 w-4" alt="" />
+            <span className="capitalize">{value}</span>
+          </div>
+        )
+      },
+
+      {
+        header: "",
+        key: "order_number",
+        cell: (value: string) => (
+          <div className="flex gap-2" onClick={(e) => e.stopPropagation()}>
+            {fromCustomer ? (
+              <>
+                <CustomTooltip title="View Order">
+
+                  <Button
+                    onClick={() => navigate(`${role === "admin" ? "/admin/orders/view" : "/orders/view"}/${value}`)}
+                    variant="ghost"
+                    size="sm"
+                    className="h-fit w-fit p-0"
+                  >
+                    <Eye className="h-4.5! w-4.5!" />
+                  </Button>
+                </CustomTooltip>
+              </>
+            ) : (<>
+
+              {(orderType === 'archived') && (
+                <CustomTooltip title="View Order">
+                  <Button
+                    onClick={() => navigate(`${role === "admin" ? "/admin/orders/view" : "/orders/view"}/${value}`)}
+                    variant="ghost"
+                    size="sm"
+                    className="h-fit w-fit p-0"
+                  >
+                    <Eye className="h-4.5! w-4.5!" />
+                  </Button>
+                </CustomTooltip>
+              )}
+              {orderType === 'new' && (
+                <>
+                  <Button className="h-9 px-6">
+                    <Printer className="h-4 w-4 mr-2" />
+                    Print
+                  </Button>
+                  <DropdownCustomMenu
+                    menus={newActions(value)}
+                    contentClassName="w-40"
+                  >
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="h-8 w-8 p-0"
+                    >
+                      {downloadingLabelId === value ? (
+                        <Loader2 className="h-5 w-5 text-primary animate-spin" />
+                      ) : (
+                        <MoreVertical className="h-4! w-4!" />
+                      )}
+                    </Button>
+                  </DropdownCustomMenu>
+                </>
+              )}
+              {(orderType === 'printed' || orderType === 'shipped') && (
+                <DropdownCustomMenu
+                  menus={printedAndShippedActions(value)}
+                  contentClassName="w-40"
+                >
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="h-8 w-8 p-0"
+                  >
+                    {downloadingLabelId === value ? (
+                      <Loader2 className="h-4 w-4 text-primary animate-spin" />
+                    ) : (
+                      <MoreVertical className="h-4 w-4" />
+                    )}
+                  </Button>
+                </DropdownCustomMenu>
+              )}
+            </>)
+            }
+          </div >
+        )
+      }
+    ]
+  )
+};

@@ -1,16 +1,13 @@
 import { useState } from 'react';
 
-const useLocalStorage = <T>(
+const useSessionStorage = <T>(
     key: string,
     initialValue: T
 ): [T, React.Dispatch<React.SetStateAction<T>>] => {
     const getStoredValue = (): T => {
         try {
-            const item = localStorage.getItem(key);
-
-            return item
-                ? JSON.parse(item)
-                : initialValue;
+            const item = sessionStorage.getItem(key);
+            return item !== null && item !== 'undefined' && item !== '{}' ? JSON.parse(item) : initialValue;
         } catch (error) {
             console.error(error);
             return initialValue;
@@ -31,7 +28,7 @@ const useLocalStorage = <T>(
 
             setStoredValue(valueToStore);
 
-            localStorage.setItem(
+            sessionStorage.setItem(
                 key,
                 JSON.stringify(valueToStore)
             );
@@ -43,4 +40,4 @@ const useLocalStorage = <T>(
     return [storedValue, setValue];
 };
 
-export default useLocalStorage;
+export default useSessionStorage;

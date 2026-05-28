@@ -164,20 +164,59 @@ export const useExportOrders = () => {
   });
 };
 
+// const printPdf = async () => {
+//   const response = await fetch('/api/pdf');
+
+//   const blob = await response.blob();
+
+//   const fileURL = URL.createObjectURL(blob);
+
+//   const printWindow = window.open(fileURL);
+
+//   printWindow.onload = () => {
+//     printWindow.print();
+//   };
+// };
+
 /**
  * Hook to download label
  */
-export const useDownloadLabel = () => {
+export const useDownloadLabel = (printAfterDownload: boolean = false) => {
   return useMutation({
     mutationFn: ordersService.downloadLabel,
     onSuccess: (blob, orderId) => {
       const url = window.URL.createObjectURL(blob);
-      const link = document.createElement('a');
-      link.href = url;
-      link.setAttribute('download', `label-${orderId}.pdf`);
-      document.body.appendChild(link);
-      link.click();
-      link.remove();
+
+      // const printWindow = window.open(url);
+      if (printAfterDownload) {
+
+        const iframe = document.createElement('iframe');
+
+        iframe.style.position = 'fixed';
+        iframe.style.right = '0';
+        iframe.style.bottom = '0';
+        iframe.style.width = '0';
+        iframe.style.height = '0';
+        iframe.style.border = '0';
+
+        iframe.src = url;
+
+        document.body.appendChild(iframe);
+
+        iframe.onload = () => {
+          iframe.contentWindow?.focus();
+          iframe.contentWindow?.print();
+        }
+      } else {
+        const link = document.createElement('a');
+        link.href = url;
+        link.setAttribute('download', `label-${orderId}.pdf`);
+        document.body.appendChild(link);
+        link.click();
+        link.remove();
+      }
+
+
     },
     onError: (error: any) => {
       showToast(error?.message || "Failed to download label", "error")

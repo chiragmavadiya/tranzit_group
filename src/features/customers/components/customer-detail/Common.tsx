@@ -31,17 +31,17 @@ export const TimelineItem = ({ item, isLast }: { item: ActivityItem, isLast: boo
     };
 
     return (
-        <div className="relative flex gap-4 pb-6">
+        <div className="relative flex gap-4 pb-2">
             {!isLast && (
                 <div className="absolute left-[5px] top-4 h-[calc(100%-16px)] w-[1px] bg-slate-100 dark:bg-zinc-800" />
             )}
             <div className="mt-1.5 flex h-2.5 w-2.5 shrink-0 items-center justify-center">
                 {getIcon()}
             </div>
-            <div className="flex flex-1 flex-col gap-1">
+            <div className="flex flex-1 flex-col gap-0">
                 <div className="flex items-center justify-between">
                     <h4 className="text-sm font-bold text-slate-900 dark:text-zinc-100">{item.title}</h4>
-                    <span className="text-[10px] font-medium text-slate-400 dark:text-zinc-500 uppercase tracking-wider">{item.timestamp}</span>
+                    <span className="text-xs font-medium text-slate-900 dark:text-zinc-500 uppercase tracking-wider">{item.timestamp}</span>
                 </div>
                 <p className="text-xs text-slate-500 dark:text-zinc-400 leading-relaxed max-w-[calc(100%-190px)]">{item.description}</p>
                 {item.invoiceNo && (

@@ -122,3 +122,13 @@ export interface QuoteFilters {
   per_page: number;
 }
 
+export interface Locality {
+  id?: number | string;
+  postcode: string;
+  locality: string;
+  state: string;
+  label: string
+}
+
+export type LocalitySearchResponse = Locality[];
+

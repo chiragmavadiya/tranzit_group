@@ -3,8 +3,9 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { MapPin } from "lucide-react";
 import type { QuoteLocation } from "../types";
-import { PlaceAutocomplete } from "@/components/common/AutoComplateAddress";
-import { memo } from "react";
+import { memo, useState, useMemo } from "react";
+import { AutoComplete } from "@/components/common";
+import { useSearchLocalities } from "../hooks/useQuote";
 
 interface QuoteFormProps {
   locations: {
@@ -13,6 +14,56 @@ interface QuoteFormProps {
   };
   setLocations: React.Dispatch<React.SetStateAction<{ sender: QuoteLocation | null; receiver: QuoteLocation | null }>>;
 }
+
+interface LocalityAutoCompleteProps {
+  label: string;
+  placeholder?: string;
+  value?: string;
+  onChange: (value: string) => void;
+  onSelect: (locality: { label: string; suburb: string; state: string; postcode: string }) => void;
+}
+
+const LocalityAutoComplete = memo(({ label, placeholder, value, onChange, onSelect }: LocalityAutoCompleteProps) => {
+  const [query, setQuery] = useState("");
+  const { data: localities } = useSearchLocalities(query, query.length >= 2);
+
+  const options = useMemo(() => {
+    if (!localities) return [];
+    return localities.map((item) => ({
+      value: String(item.id || `${item.locality}-${item.state}-${item.postcode}`),
+      label: item.label,
+      suburb: item.locality,
+      state: item.state,
+      postcode: item.postcode,
+    }));
+  }, [localities]);
+
+  return (
+    <AutoComplete
+      placeholder={placeholder}
+      options={options}
+      value={value}
+      label={label}
+      onChange={(val) => {
+        setQuery(val);
+        onChange(val);
+      }}
+      onSelect={(val) => {
+        const opt = options.find((o) => o.value === val);
+        if (opt) {
+          onSelect({
+            label: opt.label,
+            suburb: opt.suburb,
+            state: opt.state,
+            postcode: opt.postcode,
+          });
+        }
+      }}
+    />
+  );
+});
+
+LocalityAutoComplete.displayName = "LocalityAutoComplete";
 
 export const QuoteForm = memo(({ locations, setLocations }: QuoteFormProps) => {
   return (
@@ -28,25 +79,9 @@ export const QuoteForm = memo(({ locations, setLocations }: QuoteFormProps) => {
         <CardContent className="space-y-4">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-0.5">
-              <PlaceAutocomplete
-                onPlaceSelect={(opt) => {
-                  setLocations(prev => ({
-                    ...prev,
-                    sender: {
-                      label: opt.formatted_address,
-                      address1: opt.address1 || '',
-                      street: opt.street || '',
-                      // street_number: opt.street_number || '',
-                      // street_type: opt.street_type || '',
-                      suburb: opt.suburb || '',
-                      state: opt.state || '',
-                      postcode: opt.post_code || '',
-                      country: opt.country || ''
-                    }
-                  }));
-                }}
-                errormsg='Please enter an address'
-                label='Sender Location'
+              <LocalityAutoComplete
+                label="Sender Location"
+                placeholder="Start typing suburb or postcode"
                 value={locations.sender?.label}
                 onChange={(value) => {
                   setLocations(prev => ({
@@ -55,8 +90,6 @@ export const QuoteForm = memo(({ locations, setLocations }: QuoteFormProps) => {
                       label: value,
                       address1: '',
                       street: '',
-                      // street_number: opt.street_number || '',
-                      // street_type: opt.street_type || '',
                       suburb: '',
                       state: '',
                       postcode: '',
@@ -64,30 +97,27 @@ export const QuoteForm = memo(({ locations, setLocations }: QuoteFormProps) => {
                     }
                   }));
                 }}
-                className='rounded-none'
+                onSelect={(opt) => {
+                  setLocations(prev => ({
+                    ...prev,
+                    sender: {
+                      label: opt.label,
+                      address1: '',
+                      street: '',
+                      suburb: opt.suburb,
+                      state: opt.state,
+                      postcode: opt.postcode,
+                      country: 'AU'
+                    }
+                  }));
+                }}
               />
               <p className="text-xs mt-0 mb-2 text-slate-500 dark:text-zinc-500">Select by suburb or enter postcode to filter</p>
             </div>
             <div className="space-y-0.5">
-              <PlaceAutocomplete
-                onPlaceSelect={(opt) => {
-                  setLocations(prev => ({
-                    ...prev,
-                    receiver: {
-                      label: opt.formatted_address,
-                      address1: opt.address1 || '',
-                      street: opt.street || '',
-                      // street_number: opt.street_number || '',
-                      // street_type: opt.street_type || '',
-                      suburb: opt.suburb || '',
-                      state: opt.state || '',
-                      postcode: opt.post_code || '',
-                      country: opt.country || ''
-                    }
-                  }));
-                }}
-                errormsg='Please enter an address'
+              <LocalityAutoComplete
                 label="Receiver Location"
+                placeholder="Start typing suburb or postcode"
                 value={locations.receiver?.label}
                 onChange={(value) => {
                   setLocations(prev => ({
@@ -103,8 +133,22 @@ export const QuoteForm = memo(({ locations, setLocations }: QuoteFormProps) => {
                     }
                   }));
                 }}
+                onSelect={(opt) => {
+                  setLocations(prev => ({
+                    ...prev,
+                    receiver: {
+                      label: opt.label,
+                      address1: '',
+                      street: '',
+                      suburb: opt.suburb,
+                      state: opt.state,
+                      postcode: opt.postcode,
+                      country: 'AU'
+                    }
+                  }));
+                }}
               />
-              <p className="text-xs mt-0 mb-2 text-slate-500 dark:text-zinc-500">Select a suggestion from the dropdown to lock the locality.</p>
+              <p className="text-xs mt-0 mb-2 text-slate-500 dark:text-zinc-500">Select by suburb or enter postcode to filter</p>
             </div>
           </div>
         </CardContent>
@@ -112,3 +156,5 @@ export const QuoteForm = memo(({ locations, setLocations }: QuoteFormProps) => {
     </div>
   );
 });
+
+QuoteForm.displayName = "QuoteForm";

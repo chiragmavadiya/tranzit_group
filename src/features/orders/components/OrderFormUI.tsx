@@ -5,7 +5,6 @@ import { cn } from "@/lib/utils"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
-import SelectComponent from "@/components/ui/select"
 import { Checkbox } from "@/components/ui/checkbox"
 import {
   DropdownMenu,
@@ -22,6 +21,7 @@ import type {
   FormRadioProps,
   FormCheckboxProps
 } from "./types/OrderFormUI.types";
+import { SelectSearch } from "@/components/ui/combobox";
 
 export const Required = () => {
   return (
@@ -225,9 +225,9 @@ export const FormSelect = memo(({
         required={required}
       />
       <div>
-        <SelectComponent
+        <SelectSearch
           className={cn("w-full h-8 text-[13px] data-[size=default]:h-8 border-slate-200 rounded-sm dark:border-zinc-800 font-medium bg-white dark:bg-zinc-950 text-slate-900 dark:text-zinc-100 focus:ring-primary transition-all text-sm px-3 ", error ? "border-red-500 focus:border-red-500" : "", selectClassName)}
-          data={memoizedData}
+          options={memoizedData}
           // defaultValue="default"
           onValueChange={onValueChange}
           value={value}
@@ -236,6 +236,7 @@ export const FormSelect = memo(({
           disabled={disabled}
           allowClear={allowClear}
         />
+        {/* <SelectSearch options={memoizedData} /> */}
         {error ? <div className="text-red-500 text-[11px] w-full">{errormsg}</div> : null}
       </div>
     </div>

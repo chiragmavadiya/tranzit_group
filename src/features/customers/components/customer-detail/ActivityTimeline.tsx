@@ -9,8 +9,8 @@ interface ActivityTimelineProps {
 
 export const ActivityTimeline = ({ activities }: ActivityTimelineProps) => {
     return (
-        <Card className="bg-white dark:bg-zinc-900 overflow-hidden h-full">
-            <CardHeader className="p-4 pb-2 border-b border-slate-100 dark:border-zinc-800/50">
+        <Card className="bg-white dark:bg-zinc-950 rounded-xl border border-slate-150 dark:border-zinc-800 shadow-sm overflow-hidden h-full">
+            <CardHeader className="px-4 py-3  bg-gray-100 dark:border-zinc-800/50">
                 <SectionHeader title="Activity Timeline" icon={Activity} />
             </CardHeader>
             <CardContent className="pt-4">

@@ -16,8 +16,10 @@ import { ImportOrdersDialog } from '../components/ImportOrdersDialog';
 import { ConformationModal } from '@/components/common/ConformationModal';
 import CreateOrderDialog from '../components/CreateOrderDialog';
 import { useDebounce } from '@/hooks/useDebounce';
+import { FormSelect } from '../components/OrderFormUI';
+import { useCustomers } from '@/features/customers/hooks/useCustomers';
 
-export default function OrdersPage() {
+export default function OrdersPage({ fromCustomer, customerId }: { fromCustomer?: boolean, customerId?: string }) {
   const [searchParams] = useSearchParams();
   const activeTab = (searchParams.get('tab') as TabType) || 'new';
   const { role } = useAppSelector((state) => state.auth);
@@ -37,9 +39,11 @@ export default function OrdersPage() {
   const [showCancelModal, setShowCancelModal] = useState(false);
   const [orderToCancel, setOrderToCancel] = useState<string | null>(null);
   const [addressEditModal, setAddressEditModal] = useState<string>();
+  const [selectedCustomer, setSelectedCustomer] = useState<string | undefined>(undefined);
 
   const downloadLabelMutation = useDownloadLabel();
   const cancelOrderMutation = useCancelOrder();
+  const { data: customersData } = useCustomers({ pageSize: 1000 }, isAdmin);
 
 
   // Reset page when tab changes
@@ -57,7 +61,8 @@ export default function OrdersPage() {
     search: debouncedSearch || undefined,
     start_date: appliedDateRange[0],
     end_date: appliedDateRange[1],
-  }), [activeTab, pageSize, page, debouncedSearch, appliedDateRange]);
+    customer: selectedCustomer || customerId || undefined,
+  }), [activeTab, pageSize, page, debouncedSearch, appliedDateRange, selectedCustomer, customerId]);
 
   // Fetch orders data
   const { data: ordersData, isLoading } = useOrders(filters);
@@ -92,7 +97,6 @@ export default function OrdersPage() {
   }, []);
 
   const handleApplyFilters = useCallback(() => {
-    console.log(dateRange, "dateRange")
     setAppliedDateRange(dateRange);
     setPage(1);
     setSelectedRows([]);
@@ -204,77 +208,99 @@ export default function OrdersPage() {
     handleCustomerEdit,
     handleDownloadSingleLabel,
     handleCancelSingleOrderClick,
-    downloadingLabelId
-  ), [role, activeTab, navigate, handleCustomerEdit, handleDownloadSingleLabel, handleCancelSingleOrderClick, downloadingLabelId]);
+    downloadingLabelId,
+    fromCustomer
+  ), [role, activeTab, navigate, handleCustomerEdit, handleDownloadSingleLabel, handleCancelSingleOrderClick, downloadingLabelId, fromCustomer]);
 
   return (
-    <div className="p-page-padding flex-1 flex flex-col space-y-4 animate-in fade-in slide-in-from-bottom-2 duration-300 h-full overflow-hidden min-h-0 bg-white dark:bg-zinc-950">
+    <div className={`${fromCustomer ? "p-0" : "p-page-padding"} flex-1 flex flex-col space-y-4 animate-in fade-in slide-in-from-bottom-2 duration-300 h-full overflow-hidden min-h-0`}>
 
       <div className='rounded-lg shadow-sm flex-1 flex flex-col min-h-0 border border-gray-100 dark:border-zinc-800 bg-white dark:bg-zinc-950 '>
-        <div className="flex flex-wrap items-end justify-end gap-4 p-4 pb-0 bg-gray-50/50 dark:bg-zinc-950/50 print:hidden">
-          {selectedRows.length > 0 && (
-            <div className="flex items-center gap-2 mr-2 border-r border-gray-200 dark:border-zinc-800 pr-4">
-              <span className="text-xs text-slate-500 dark:text-zinc-400 font-medium mr-2 whitespace-nowrap">
-                {selectedRows.length} Selected
-              </span>
-              {activeTab === 'printed' && (
+        {!fromCustomer && (
+          <div className="flex flex-wrap items-end justify-end gap-4 p-4 pb-0 bg-gray-50/50 dark:bg-zinc-950/50 print:hidden">
+            {isAdmin && (
+              <FormSelect
+                label="Customer"
+                placeholder="Select Customer"
+                value={selectedCustomer || ''}
+                onValueChange={(val) => {
+                  const selectedCustomer = customersData?.data?.find((c: any) => c.id.toString() === val);
+                  if (selectedCustomer) {
+                    setSelectedCustomer(selectedCustomer.id.toString());
+                  } else {
+                    setSelectedCustomer(undefined);
+                  }
+                }}
+                options={customersData?.data?.map((c: any) => ({
+                  value: c.id.toString(),
+                  label: `${c.first_name} ${c.last_name}`
+                })) || []}
+              />
+            )}
+            {selectedRows.length > 0 && (
+              <div className="flex items-center gap-2 mr-2 border-r border-gray-200 dark:border-zinc-800 pr-4">
+                <span className="text-xs text-slate-500 dark:text-zinc-400 font-medium mr-2 whitespace-nowrap">
+                  {selectedRows.length} Selected
+                </span>
+                {activeTab === 'printed' && (
+                  <Button
+                    variant="default"
+                    size="sm"
+                    className="h-8 gap-2 bg-primary hover:bg-primary-hover text-white transition-colors font-semibold shadow-lg shadow-primary/20 dark:shadow-none"
+                    onClick={handleDownloadMultipleLabels}
+                    disabled={isDownloadingLabels || isCancellingOrders}
+                  >
+                    {isDownloadingLabels ? <Loader2 className="w-4 h-4 animate-spin" /> : <Download className="w-4 h-4" />}
+                    <span>Download Labels</span>
+                  </Button>
+                )}
                 <Button
-                  variant="default"
+                  variant="outline"
                   size="sm"
-                  className="h-8 gap-2 bg-primary hover:bg-primary-hover text-white transition-colors font-semibold shadow-lg shadow-primary/20 dark:shadow-none"
-                  onClick={handleDownloadMultipleLabels}
-                  disabled={isDownloadingLabels || isCancellingOrders}
+                  className="h-8 gap-2 border-red-200 dark:border-red-900/30 hover:border-red-300 hover:bg-red-50 dark:hover:bg-red-900/10 text-red-600 dark:text-red-400 transition-colors font-semibold"
+                  onClick={() => setShowCancelModal(true)}
+                  disabled={isCancellingOrders || isDownloadingLabels}
                 >
-                  {isDownloadingLabels ? <Loader2 className="w-4 h-4 animate-spin" /> : <Download className="w-4 h-4" />}
-                  <span>Download Labels</span>
+                  {isCancellingOrders ? <Loader2 className="w-4 h-4 animate-spin" /> : null}
+                  <span>Cancel Orders</span>
                 </Button>
-              )}
-              <Button
-                variant="outline"
-                size="sm"
-                className="h-8 gap-2 border-red-200 dark:border-red-900/30 hover:border-red-300 hover:bg-red-50 dark:hover:bg-red-900/10 text-red-600 dark:text-red-400 transition-colors font-semibold"
-                onClick={() => setShowCancelModal(true)}
-                disabled={isCancellingOrders || isDownloadingLabels}
-              >
-                {isCancellingOrders ? <Loader2 className="w-4 h-4 animate-spin" /> : null}
-                <span>Cancel Orders</span>
-              </Button>
 
-            </div>
-          )}
-          <DatePicker
-            label="Start Date"
-            date={dateRange[0]}
-            setDate={(value) => handleDateRangeChange(value, 'start')}
-          />
+              </div>
+            )}
+            <DatePicker
+              label="Start Date"
+              date={dateRange[0]}
+              setDate={(value) => handleDateRangeChange(value, 'start')}
+            />
 
-          <DatePicker
-            label="End Date"
-            date={dateRange[1]}
-            setDate={(value) => handleDateRangeChange(value, 'end')}
-          />
+            <DatePicker
+              label="End Date"
+              date={dateRange[1]}
+              setDate={(value) => handleDateRangeChange(value, 'end')}
+            />
 
-          <Button
-            onClick={handleApplyFilters}
-            variant="default"
-            size="sm"
-            className="h-8 p-3"
-          >
-            Apply
-          </Button>
-
-
-          {appliedDateRange[0] || appliedDateRange[1] ? (
             <Button
-              onClick={handleClearFilters}
-              variant="ghost"
+              onClick={handleApplyFilters}
+              variant="default"
               size="sm"
-              className="h-8 p-3 text-red-500 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/10"
+              className="h-8 p-3"
             >
-              Clear
+              Apply
             </Button>
-          ) : null}
-        </div>
+
+
+            {appliedDateRange[0] || appliedDateRange[1] ? (
+              <Button
+                onClick={handleClearFilters}
+                variant="ghost"
+                size="sm"
+                className="h-8 p-3 text-red-500 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/10"
+              >
+                Clear
+              </Button>
+            ) : null}
+          </div>
+        )}
 
         <DataTable
           columns={columns}
@@ -295,10 +321,11 @@ export default function OrdersPage() {
           onPageChange={setPage}
           onExport={handleExport}
           isExporting={exportOrders.isPending}
-          selectable
+          selectable={!fromCustomer}
           selectedRows={selectedRows}
           onSelectionChange={setSelectedRows}
-          customHeader={() => (
+          exportable={!fromCustomer}
+          customHeader={!fromCustomer && (() => (
             <div className="flex items-center justify-between gap-2">
 
               <Button
@@ -343,7 +370,7 @@ export default function OrdersPage() {
                 <span>Create Order</span>
               </Button> */}
             </div>
-          )}
+          ))}
         />
       </div>
       {
@@ -376,21 +403,34 @@ export default function OrdersPage() {
           <ConformationModal
             open={!!orderToCancel}
             onOpenChange={(open) => !open && setOrderToCancel(null)}
-            title="Cancel Order"
-            description={`Are you sure you want to cancel order ${orderToCancel}? This action cannot be undone.`}
+            title={activeTab === 'printed' || activeTab === 'shipped' ? "Archive Order" : "Cancel Order"}
+            description={activeTab === 'printed' || activeTab === 'shipped'
+              ? `Are you sure you want to archive order ${orderToCancel}? This action cannot be undone.`
+              : `Are you sure you want to cancel order ${orderToCancel}? This action cannot be undone.`}
             onConfirm={async () => {
               setIsCancellingOrders(true);
               try {
                 await cancelOrderMutation.mutateAsync({ orderId: orderToCancel, data: { manual: false } });
-                showToast(`Order ${orderToCancel} cancelled successfully.`, "success");
+                showToast(
+                  activeTab === 'printed' || activeTab === 'shipped'
+                    ? `Order ${orderToCancel} archived successfully.`
+                    : `Order ${orderToCancel} cancelled successfully.`,
+                  "success"
+                );
               } catch (err: any) {
-                showToast(err?.response?.data?.message || `Failed to cancel order ${orderToCancel}.`, "error");
+                showToast(
+                  err?.response?.data?.message ||
+                  (activeTab === 'printed' || activeTab === 'shipped'
+                    ? `Failed to archive order ${orderToCancel}.`
+                    : `Failed to cancel order ${orderToCancel}.`),
+                  "error"
+                );
               } finally {
                 setIsCancellingOrders(false);
                 setOrderToCancel(null);
               }
             }}
-            confirmText="Yes, Cancel"
+            confirmText={activeTab === 'printed' || activeTab === 'shipped' ? "Yes, Archive" : "Yes, Cancel"}
             cancelText="No, Keep"
             confirmVariant="destructive"
             loading={isCancellingOrders}

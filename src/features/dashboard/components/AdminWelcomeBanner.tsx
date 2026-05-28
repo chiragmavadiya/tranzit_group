@@ -1,5 +1,7 @@
 import { cn } from "@/lib/utils";
 import { ShoppingBag, Users, FileText, Tag, Sparkles } from "lucide-react";
+import DatePicker from "@/components/common/DatePicker";
+import { Button } from "@/components/ui/button";
 
 interface AdminWelcomeBannerProps {
   userName: string;
@@ -9,8 +11,13 @@ interface AdminWelcomeBannerProps {
   undeliveredOrders: number;
   periodLabels?: Record<string, string>;
   className?: string;
-  setActivePeriod: React.Dispatch<React.SetStateAction<"all" | "month" | "year">>;
-  activePeriod: "all" | "month" | "year";
+  setActivePeriod: (period: string) => void;
+  activePeriod: string;
+  startDate?: Date;
+  setStartDate?: (date: Date | undefined) => void;
+  endDate?: Date;
+  setEndDate?: (date: Date | undefined) => void;
+  onApply?: () => void;
 }
 
 export function AdminWelcomeBanner({
@@ -22,7 +29,12 @@ export function AdminWelcomeBanner({
   periodLabels,
   className,
   setActivePeriod,
-  activePeriod
+  activePeriod,
+  startDate,
+  setStartDate,
+  endDate,
+  setEndDate,
+  onApply
 }: AdminWelcomeBannerProps) {
   return (
     <div className={cn(
@@ -75,22 +87,52 @@ export function AdminWelcomeBanner({
 
       {/* Stats and Period Selector */}
       <div className="relative z-10 flex flex-col items-center xl:items-end gap-5 w-full xl:w-auto">
-        {/* Period Selector - Top Right */}
-        <div className="flex bg-slate-50 dark:bg-zinc-900/50 p-1 rounded-xl border border-slate-100 dark:border-zinc-800 shadow-sm">
-          {Object.keys(periodLabels || {}).map((key) => (
-            <button
-              key={key}
-              onClick={() => setActivePeriod(key as any)}
-              className={cn(
-                "px-4 py-1.5 text-[11px] font-bold rounded-lg transition-all duration-200",
-                activePeriod === key
-                  ? "text-primary bg-white dark:bg-zinc-800 shadow-sm ring-1 ring-slate-200 dark:ring-zinc-700"
-                  : "text-slate-500 hover:text-slate-700 dark:hover:text-zinc-300"
-              )}
-            >
-              {periodLabels?.[key]}
-            </button>
-          ))}
+        <div className="flex flex-col items-center gap-3">
+          {/* Period Selector - Top Right */}
+          <div className="flex bg-slate-50 dark:bg-zinc-900/50 p-1 rounded-xl border border-slate-100 dark:border-zinc-800 shadow-sm">
+            {Object.keys(periodLabels || {}).map((key) => (
+              <button
+                key={key}
+                onClick={() => setActivePeriod(key)}
+                className={cn(
+                  "px-4 py-1.5 text-[11px] font-bold rounded-lg transition-all duration-200",
+                  activePeriod === key
+                    ? "text-primary bg-white dark:bg-zinc-800 shadow-sm ring-1 ring-slate-200 dark:ring-zinc-700"
+                    : "text-slate-500 hover:text-slate-700 dark:hover:text-zinc-300"
+                )}
+              >
+                {periodLabels?.[key]}
+              </button>
+            ))}
+          </div>
+          {activePeriod === "all" && (
+            <div className="flex flex-wrap items-center gap-2 animate-in fade-in slide-in-from-right-4 duration-300">
+              <div className="flex items-center gap-1.5">
+                <span className="text-[10px] font-black uppercase tracking-wider text-slate-400 dark:text-zinc-500">From</span>
+                <DatePicker
+                  date={startDate}
+                  setDate={setStartDate || (() => { })}
+                  className="w-[125px] h-8 text-[12px]"
+                />
+              </div>
+              <div className="flex items-center gap-1.5">
+                <span className="text-[10px] font-black uppercase tracking-wider text-slate-400 dark:text-zinc-500">To</span>
+                <DatePicker
+                  date={endDate}
+                  setDate={setEndDate || (() => { })}
+                  className="w-[125px] h-8 text-[12px]"
+                  disabled={{ after: new Date() }}
+                />
+              </div>
+              <Button
+                onClick={onApply}
+                size="sm"
+                className="h-8 px-4 text-xs font-bold bg-primary hover:bg-primary/90 text-white rounded-md shadow-sm transition-all"
+              >
+                Apply
+              </Button>
+            </div>
+          )}
         </div>
 
         {/* Stats Badges - Bottom Row */}

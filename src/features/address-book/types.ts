@@ -26,7 +26,7 @@ export interface Address {
     instructions: string;
     default_carrier: string;
     default_code: string;
-    signature_required: boolean;
+    // signature_required?: boolean | undefined;
 
     company: string;
     building: string;
@@ -43,7 +43,7 @@ export interface AddressFormData {
     instructions: string;
     default_carrier: string;
     default_code: string;
-    signature_required: boolean;
+    // signature_required: boolean;
 
     address: string;
     company: string;

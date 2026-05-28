@@ -6,14 +6,13 @@ import {
   FileText,
   LayoutDashboard,
 } from "lucide-react";
-import { Badge } from "@/components/ui/badge";
-import { cn } from "@/lib/utils";
 import { NavLink } from "react-router-dom";
 
 import { useDashboardMetrics } from "../hooks/useDashboard";
 import type { DashboardOrder, CustomerMetrics } from "../types";
 import { useNavigate } from "react-router";
 import { ClientDashboardSkeleton } from "../components/DashboardSkeleton";
+import { StatusBadge } from "@/features/orders/components/StatusBadge";
 
 
 
@@ -49,26 +48,26 @@ export default function ClientDashboard() {
   ];
 
   const columns = [
-    { header: "ORDER NUMBER", key: "order_number" as keyof DashboardOrder, cell: (val: string) => val ? <NavLink replace to={`/orders/edit/${val}`} className="text-primary cursor-pointer font-bold hover:underline">{val}</NavLink> : '-' },
+    { header: "ORDER NUMBER", key: "order_number" as keyof DashboardOrder, cell: (val: string) => val ? <NavLink replace to={`/orders/view/${val}`} className="text-primary cursor-pointer font-bold hover:underline">{val}</NavLink> : '-' },
     { header: "SUBURB", key: "suburb" as keyof DashboardOrder },
     { header: "AMOUNT", key: "amount" as keyof DashboardOrder, cell: (val: unknown) => (typeof val === 'number' ? `$${val.toFixed(2)}` : (val as string)) as React.ReactNode },
     { header: "STATUS", key: "status" as keyof DashboardOrder, cell: (val: unknown) => <StatusBadge status={val as string} /> },
   ];
 
-  const StatusBadge = ({ status }: { status: string }) => {
-    const variants: Record<string, string> = {
-      'Printed': 'bg-slate-100 text-slate-600 dark:bg-zinc-800 dark:text-zinc-400',
-      'Payment Pending': 'bg-amber-100 text-amber-600 dark:bg-primary/10 dark:text-primary',
-      'Partial': 'bg-orange-50 text-orange-600 dark:bg-orange-900/20 dark:text-orange-400',
-      'Unpaid': 'bg-red-50 text-red-600 dark:bg-red-900/20 dark:text-red-400',
-      'Draft': 'bg-slate-100 text-slate-600 dark:bg-zinc-800 dark:text-zinc-400'
-    };
-    return (
-      <Badge variant="secondary" className={cn("px-2 py-0 h-5 text-[10px] font-bold border-none", variants[status] || variants.Draft)}>
-        {status}
-      </Badge>
-    );
-  };
+  // const StatusBadge = ({ status }: { status: string }) => {
+  //   const variants: Record<string, string> = {
+  //     'Printed': 'bg-slate-100 text-slate-600 dark:bg-zinc-800 dark:text-zinc-400',
+  //     'Payment Pending': 'bg-amber-100 text-amber-600 dark:bg-primary/10 dark:text-primary',
+  //     'Partial': 'bg-orange-50 text-orange-600 dark:bg-orange-900/20 dark:text-orange-400',
+  //     'Unpaid': 'bg-red-50 text-red-600 dark:bg-red-900/20 dark:text-red-400',
+  //     'Draft': 'bg-slate-100 text-slate-600 dark:bg-zinc-800 dark:text-zinc-400'
+  //   };
+  //   return (
+  //     <Badge variant="secondary" className={cn("px-2 py-0 h-5 text-[10px] font-bold border-none", variants[status] || variants.Draft)}>
+  //       {status}
+  //     </Badge>
+  //   );
+  // };
 
 
   return (
@@ -93,7 +92,7 @@ export default function ClientDashboard() {
             columns={columns}
           />
         </div>
-        <div className="xl:col-span-4 max-h-[550px]">
+        <div className="xl:col-span-4 max-h-[550px] print:hidden">
           {/* {isLoading ? (
             <div className="flex items-center justify-center h-full">
               <Loader2 className="h-8 w-8 text-primary animate-spin" />

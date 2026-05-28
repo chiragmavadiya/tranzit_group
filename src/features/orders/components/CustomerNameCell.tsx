@@ -8,15 +8,21 @@ interface CustomerNameCellProps {
   row: Order;
   orderType: string;
   customerEditClick: (id: string) => void;
+  fromCustomer: boolean;
 }
 
 export const CustomerNameCell = ({
   value,
   row,
   orderType,
-  customerEditClick
+  customerEditClick,
+  fromCustomer
 }: CustomerNameCellProps) => {
   const [open, setOpen] = useState(false);
+
+  if (fromCustomer) {
+    return <span className="truncate uppercase font-semibold">{value}</span>;
+  }
 
   if (orderType !== 'new') {
     return (

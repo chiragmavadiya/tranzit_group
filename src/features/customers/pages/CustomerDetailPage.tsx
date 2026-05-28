@@ -37,7 +37,7 @@ export default function CustomerDetailPage() {
     }
 
     return (
-        <div className="flex flex-col flex-1 gap-6 p-page-padding min-h-0 animate-in fade-in slide-in-from-bottom-4 duration-700 bg-slate-50/30 dark:bg-zinc-950/30 overflow-y-auto scrollbar-hide">
+        <div className="flex flex-col flex-1 gap-4 p-page-padding min-h-0 animate-in fade-in slide-in-from-bottom-4 duration-700 bg-slate-50/30 dark:bg-zinc-950/30 overflow-y-auto scrollbar-hide">
 
             <CustomerHeader
                 customer={customer as any}
@@ -47,11 +47,16 @@ export default function CustomerDetailPage() {
             {/* Note: Stats uses its own logic or requires more fields. Might need adjustment if stats endpoints are provided in future */}
             <CustomerStats />
 
-            <div className="flex flex-col gap-6 flex-1">
+            <div className="flex flex-col gap-4 flex-1">
                 <CustomerTabs activeTab={activeTab} onTabChange={setActiveTab} />
 
                 <div className="flex-1">
-                    {activeTab === 'Profile' && <ProfileTab customerId={id as string} />}
+                    {activeTab === 'Profile' && (
+                        <ProfileTab
+                            customerId={id as string}
+                        // onEdit={() => setIsEditDialogOpen(true)} 
+                        />
+                    )}
                     {activeTab === 'Orders' && <OrdersTab customerId={id as string} />}
                     {activeTab === 'Transaction' && <TransactionTab customerId={id as string} />}
                     {activeTab === 'Credit Application' && <CreditApplicationTab />}

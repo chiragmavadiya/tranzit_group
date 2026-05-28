@@ -2,6 +2,7 @@
 export type ReportType = 'shipment' | 'transaction' | 'invoice' | 'parcel';
 
 export interface ShipmentReport {
+  courier_logo?: string;
   parcel_id: number;
   order_number: string;
   parcel_type: string;
@@ -43,6 +44,7 @@ export interface ParcelReport {
   tranzit_group_order_number: string;
   actual_parcel_tracking_number: string;
   actual_australia_post_mailing_statement_no?: string;
+  courier_logo?: string;
   parcel_status: string | null;
   courier: string;
   pickup_charge?: number;

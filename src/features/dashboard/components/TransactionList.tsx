@@ -1,7 +1,7 @@
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import type { TransactionMetrics } from "../types";
-import { Wallet, Plus, MoreVertical } from "lucide-react";
+import { Wallet, MoreVertical } from "lucide-react";
 import { cn } from "@/lib/utils";
 import {
   DropdownCustomMenu
@@ -95,19 +95,25 @@ export function TransactionList({ transactions, className, loading }: Transactio
                   "w-10 h-10 rounded-xl flex items-center justify-center transition-transform group-hover:scale-105",
                   tx.transaction_type === 2 ? "bg-slate-50 dark:bg-zinc-900 text-slate-500" : "bg-primary/10 text-primary"
                 )}>
-                  {tx.transaction_type === 2 ? <Wallet className="w-5 h-5" /> : <Plus className="w-5 h-5" />}
+                  <Wallet className="w-5 h-5" />
                 </div>
                 <div className="flex flex-col min-w-0">
-                  <span className="text-[13px] font-bold text-gray-700 dark:text-zinc-200 leading-tight">
+                  <span className="text-sm font-bold text-gray-700 dark:text-zinc-200 leading-tight">
                     {tx.reason || tx.title}
                   </span>
-                  <span className="text-[11px] font-medium text-slate-400 dark:text-zinc-500 truncate">
-                    {tx.payment_method || tx.type || formattedDate(tx.created_at)}
+                  <span className="text-[11px] font-medium text-slate-400 dark:text-zinc-500 truncate flex items-center gap-1">
+                    {/* {(tx.user?.name || tx.user?.first_name || tx.username) && ( */}
+                    <>
+                      <span className="text-slate-500 text-sm dark:text-zinc-400 font-semibold">{tx.user?.name || tx.user?.first_name || tx.username || 'Demo User'}</span>
+                      <span className="text-slate-300 dark:text-zinc-600 px-0.5">•</span>
+                    </>
+                    {/* )} */}
+                    <span>{tx.payment_method || tx.type || formattedDate(tx.created_at)}</span>
                   </span>
                 </div>
               </div>
               <span className={cn(
-                "text-[13px] font-bold tabular-nums",
+                "text-sm font-bold tabular-nums",
                 tx.transaction_type === 2 ? "text-[#F35555]" : "text-[#10B981]"
               )}>
                 {tx.transaction_type === 2 ? '-' : '+'}${Math.abs(tx.amount).toFixed(2)}

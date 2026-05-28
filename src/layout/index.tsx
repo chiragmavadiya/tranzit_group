@@ -64,7 +64,7 @@ export default function Layout() {
       <Sidebar isCollapsed={isCollapsed} setIsCollapsed={setIsCollapsed} />
       <TopBar isCollapsed={isCollapsed} />
       <main className={`h-screen flex flex-col transition-[margin] duration-300 ease-in-out pt-16 z-0 relative print:ml-0 print:pt-0 print:h-auto ${isCollapsed ? 'ml-[64px]' : 'ml-[240px]'}`}>
-        <div className="mx-auto w-full flex-1 flex flex-col bg-slate-50/30 dark:bg-zinc-900/10 print:bg-transparent print:p-0 overflow-hidden min-h-0">
+        <div className="mx-auto w-full flex-1 flex flex-col bg-slate-100 dark:bg-zinc-900/10 print:bg-transparent print:p-0 overflow-hidden min-h-0">
           <Outlet />
         </div>
       </main>

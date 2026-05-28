@@ -1,8 +1,8 @@
 import { useState, useMemo } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Users, UserCheck, UserX, Plus } from 'lucide-react';
 import { DataTable } from '@/components/common/DataTable';
 import { StatCard } from '@/components/common/StatCard';
-import SelectComponent from '@/components/ui/select';
 import { Button } from '@/components/ui/button';
 import { SUBURBS, STATES } from '../constants';
 import { getCustomerColumns } from '../columns';
@@ -12,10 +12,12 @@ import { downloadFile } from '@/lib/utils';
 import { useDebounce } from '@/hooks/useDebounce';
 import { ConformationModal } from '@/components/common/ConformationModal';
 import { showToast } from '@/components/ui/custom-toast';
+import { FormSelect } from '@/features/orders/components/OrderFormUI';
+// import { FormSelect } from '@/features/orders/components/OrderFormUI';
 
 export default function CustomerPage() {
-    const [suburb, setSuburb] = useState('all');
-    const [state, setState] = useState('all');
+    const [suburb, setSuburb] = useState('');
+    const [state, setState] = useState('');
     const [search, setSearch] = useState('');
     const [pageSize, setPageSize] = useState(25);
     const [currentPage, setCurrentPage] = useState(1);
@@ -129,7 +131,8 @@ export default function CustomerPage() {
         setIsDialogOpen(true);
     };
 
-    const columns = useMemo(() => getCustomerColumns(handleEdit, handleDelete), []);
+    const navigate = useNavigate();
+    const columns = useMemo(() => getCustomerColumns(handleEdit, handleDelete, navigate), [navigate]);
 
     return (
         <div className="flex flex-col flex-1 gap-4 p-page-padding min-h-0 animate-in fade-in slide-in-from-bottom-2 duration-500 bg-slate-50/30 dark:bg-zinc-950/30">
@@ -148,20 +151,29 @@ export default function CustomerPage() {
 
             {/* Filter Section */}
             <div className="bg-white dark:bg-zinc-950 p-6 rounded-xl border border-gray-100 dark:border-zinc-800 shadow-sm space-y-4">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <SelectComponent
+                <div className="grid grid-cols-12 gap-4">
+                    {/* <FormSelect
                         data={suburbOptions}
                         value={suburb}
                         onValueChange={(val) => { setSuburb(val || 'all'); setCurrentPage(1); }}
                         placeholder="Select Suburb"
                         className="h-10 border-gray-200 dark:border-zinc-800"
+                    /> */}
+                    <FormSelect
+                        options={suburbOptions}
+                        value={suburb}
+                        onValueChange={(val) => { setSuburb(val || 'all'); setCurrentPage(1); }}
+                        placeholder="Select Suburb"
+                        // selectClassName="h-10 border-gray-200 dark:border-zinc-800"
+                        isHalf
                     />
-                    <SelectComponent
-                        data={stateOptions}
+                    <FormSelect
+                        options={stateOptions}
                         value={state}
+                        isHalf
                         onValueChange={(val) => { setState(val || 'all'); setCurrentPage(1); }}
                         placeholder="Select State"
-                        className="h-10 border-gray-200 dark:border-zinc-800"
+                    // className="h-10 border-gray-200 dark:border-zinc-800"
                     />
                 </div>
             </div>

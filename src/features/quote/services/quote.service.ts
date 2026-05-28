@@ -6,7 +6,8 @@ import type {
     QuoteFilters,
     GetQuoteServicesPayload,
     CreateQuotePayload,
-    ServiceRate
+    ServiceRate,
+    LocalitySearchResponse
 } from "../types";
 
 export interface QuoteListResponse {
@@ -54,6 +55,12 @@ export const quoteService = {
         const response = await api.get(API_ENDPOINTS.ADMIN_QUOTES.EXPORT, {
             params,
             responseType: 'blob',
+        });
+        return response.data;
+    },
+    searchLocalities: async (q: string): Promise<LocalitySearchResponse> => {
+        const response = await api.get<LocalitySearchResponse>(API_ENDPOINTS.CUSTOMER_QUOTES.LOCALITIES_SEARCH, {
+            params: { q }
         });
         return response.data;
     }

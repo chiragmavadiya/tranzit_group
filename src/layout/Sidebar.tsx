@@ -23,7 +23,6 @@ export default function Sidebar({ isCollapsed, setIsCollapsed }: SidebarProps) {
   const navigate = useNavigate();
   const sidebarItems = role === 'admin' ? adminSidebarItems : clientSidebarItems;
   const { theme } = useTheme();
-  console.log(theme, 'theme')
 
   useEffect(() => {
     const matchingItem = sidebarItems.find(item => {
@@ -76,13 +75,13 @@ export default function Sidebar({ isCollapsed, setIsCollapsed }: SidebarProps) {
       <div className="flex-1 overflow-y-auto overflow-x-hidden w-full no-scrollbar">
         {/* Main Menu Header */}
         {!activeSubmenu && (
-          <div className={`flex items-center justify-between h-16 ${isCollapsed ? 'px-4' : 'px-4'} sticky top-0 z-20 bg-white dark:bg-zinc-950`}>
+          <div className={`flex items-center h-16 px-4 sticky top-0 z-20 bg-white dark:bg-zinc-950 ${isCollapsed ? 'justify-center' : 'justify-between'}`}>
             <button onClick={() => setIsCollapsed(!isCollapsed)} className="p-2 hover:bg-gray-100 dark:hover:bg-zinc-900 rounded-md text-primary transition-colors">
               <Menu className="w-[22px] h-[22px]" strokeWidth={2.5} />
             </button>
-            <div className="flex items-center">
+            <div className={`flex items-center transition-all duration-300 ease-in-out ${isCollapsed ? 'w-0 opacity-0 pointer-events-none overflow-hidden' : 'w-auto opacity-100'}`}>
               {/* brand logo */}
-              <img src={theme === "dark" ? tranzit_logo_dark : tranzit_logo} alt="Tranzit" className="h-10" />
+              <img src={theme === "dark" ? tranzit_logo_dark : tranzit_logo} alt="Tranzit" className="h-15" />
             </div>
           </div>
         )}

@@ -25,7 +25,7 @@ export function WelcomeBanner({ userName, description, buttons, imageSrc, classN
     : "bg-gradient-to-br from-purple-50 via-pink-50 to-rose-50 dark:from-purple-900/10 dark:via-pink-900/5 dark:to-rose-900/5 border-purple-100/50 dark:border-purple-900/20";
 
   return (
-    <div className={cn("relative overflow-hidden rounded-2xl border p-6 shadow-xl", bgColors, className)}>
+    <div className={cn("relative overflow-hidden rounded-2xl border p-6 shadow-xl print:hidden", bgColors, className)}>
       {/* Animated Background Elements */}
       <div className="absolute inset-0 overflow-hidden">
         <div className="absolute top-4 left-4 w-20 h-20 bg-blue-200/30 dark:bg-blue-500/10 rounded-full animate-pulse"></div>

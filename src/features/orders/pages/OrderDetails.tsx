@@ -361,6 +361,7 @@ const OrderDetailsPage: React.FC = () => {
                 email={addressData.sender.email}
                 editable={isEditable && (role === 'admin' || orderType === 'return')}
                 onEditClick={() => onEditClick('sender')}
+                phone={addressData.sender.phone}
               />
 
               <AddressCard
@@ -371,6 +372,7 @@ const OrderDetailsPage: React.FC = () => {
                 instruction={addressData.receiver.instructions || ''}
                 editable={isEditable && orderType !== 'return'}
                 onEditClick={() => onEditClick('receiver')}
+                phone={addressData.receiver.phone}
               />
 
               <ItemsTable

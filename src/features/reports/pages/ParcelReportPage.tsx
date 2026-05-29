@@ -134,7 +134,7 @@ export default function ParcelReportPage() {
     <div className="flex flex-col flex-1 gap-6 p-page-padding min-h-0 animate-in fade-in slide-in-from-bottom-2 duration-500 bg-slate-50/30 dark:bg-zinc-950/30">
 
       {/* Summary Section */}
-      <div className="space-y-3">
+      <div className="space-y-3 print:hidden">
         <div className={`grid grid-cols-1 ${isAdmin ? 'md:grid-cols-5' : 'md:grid-cols-2'} gap-6`}>
           {stats.map((stat, idx) => (
             <StatCard key={idx} {...stat} className="shadow-sm border-gray-100 dark:border-zinc-800" contentClassName="py-4" />
@@ -144,7 +144,7 @@ export default function ParcelReportPage() {
 
 
       {/* Filter Section */}
-      <div className="bg-white dark:bg-zinc-950 p-5 rounded-xl border border-gray-100 dark:border-zinc-800 shadow-sm flex flex-col gap-4">
+      <div className="bg-white dark:bg-zinc-950 p-5 rounded-xl border border-gray-100 dark:border-zinc-800 shadow-sm flex flex-col gap-4 print:hidden">
         <div className="grid grid-cols-1 md:grid-cols-12 gap-4 items-end">
           <div className="md:col-span-3">
             <DatePicker

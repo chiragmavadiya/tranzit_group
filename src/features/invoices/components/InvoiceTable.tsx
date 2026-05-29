@@ -4,7 +4,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import type { Invoice } from '../types';
 import { INVOICE_STATUS_COLORS } from '../constants';
-import { cn } from '@/lib/utils';
+import { cn, formateCurrency } from '@/lib/utils';
 import { CustomTooltip } from '@/components/common/CustomTooltip';
 import { DataTable } from '@/components/common/DataTable';
 import type { Column } from '@/components/common/types/DataTable.types';
@@ -38,19 +38,13 @@ export function InvoiceTable({
   const { role } = useAppSelector((state) => state.auth);
   const navigate = useNavigate();
 
-  const formatCurrency = useCallback((amount: number) => {
-    return new Intl.NumberFormat('en-US', {
-      style: 'currency',
-      currency: 'USD',
-    }).format(amount);
-  }, []);
-
   const onAddInvoice = () => {
     // redirect to /createpage
     navigate('/admin/invoices/create');
   }
 
-  const renderStatus = useCallback((status: Invoice['status']) => {
+  const renderStatus = useCallback((val: Invoice['status']) => {
+    const status = val.toLowerCase() as Invoice['status']
     return (
       <Badge className={cn("px-3 py-0.5 rounded-md font-medium border-none shadow-none", INVOICE_STATUS_COLORS[status as keyof typeof INVOICE_STATUS_COLORS])}>
         {status}
@@ -70,16 +64,11 @@ export function InvoiceTable({
         </NavLink>
       )
     },
-    {
+    ...(role === 'admin' ? [{
       accessor: 'zoho_invoice_number',
       key: 'zoho_invoice_number',
       header: 'Zoho Invoice #',
-      // cell: (value) => (
-      //   <div className="text-gray-400">
-      //     {value || '-'}
-      //   </div>
-      // )
-    },
+    }] : []),
     {
       accessor: 'status',
       key: 'status',
@@ -105,7 +94,7 @@ export function InvoiceTable({
       header: 'Total',
       cell: (_, row) => (
         <div className="font-medium text-gray-700 dark:text-zinc-300">
-          {formatCurrency(Number(row.total ?? row.amount ?? 0))}
+          {formateCurrency(Number(row.total ?? row.amount ?? 0))}
         </div>
       )
     },
@@ -127,7 +116,7 @@ export function InvoiceTable({
         const val = Number(row.till_date_paid ?? row.amount_paid ?? 0);
         return (
           <div className={cn("font-medium", val > 0 ? "text-emerald-600 dark:text-emerald-400" : "text-gray-400")}>
-            {formatCurrency(val)}
+            {formateCurrency(val)}
           </div>
         );
       }
@@ -140,7 +129,7 @@ export function InvoiceTable({
         const val = Number(row.remaining_balance ?? row.balance ?? 0);
         return (
           <div className={cn("font-medium", val > 0 ? "text-rose-600 dark:text-rose-400" : "text-gray-400")}>
-            {formatCurrency(val)}
+            {formateCurrency(val)}
           </div>
         );
       }
@@ -215,7 +204,7 @@ export function InvoiceTable({
         );
       }
     },
-  ], [onEdit, onDelete, onView, onSend, formatCurrency, renderStatus, isAdmin, role]);
+  ], [onEdit, onDelete, onView, onSend, renderStatus, isAdmin, role]);
 
   const customHeader = () => {
     return (

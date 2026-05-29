@@ -162,11 +162,13 @@ const InvoiceDocumentView: React.FC = () => {
       const data = details?.data
       const itemsData = data.items?.map((item: any) => ({
         ...item,
-        id: Date.now() + Math.random()
+        id: item?.invoice_items_id
       }))
+      console.log(itemsData, 'itemsData')
       setInvoiceData({
         ...data,
         items: itemsData,
+        status: data.status?.toLowerCase(),
         customer: data.customer || {
           id: data.customer_id,
           first_name: data.customer_full_name?.split(' ')[0] || '',
@@ -265,6 +267,7 @@ const InvoiceDocumentView: React.FC = () => {
       zoho_invoice_number: invoiceData.zoho_invoice_number,
       customer_id: invoiceData.customer?.id,
       items: invoiceData.items?.map((item: any) => ({
+        id: item?.id || null,
         type: item.type?.toLowerCase(),
         description: item.description,
         total: Number(item.total || item.total_charge_credit || 0),
@@ -344,9 +347,6 @@ const InvoiceDocumentView: React.FC = () => {
           </Button>
           <div className="h-6 w-px bg-slate-200 dark:bg-zinc-800 mx-2" />
           <span className="text-primary font-bold">#{invoiceData?.invoice_number}</span>
-          {/* <Badge className={cn("px-3 py-1 font-bold border-none capitalize", INVOICE_STATUS_COLORS[invoiceData?.status as keyof typeof INVOICE_STATUS_COLORS])}>
-            {invoiceData?.status}
-          </Badge> */}
         </div>
 
         <div className="flex items-center gap-2">

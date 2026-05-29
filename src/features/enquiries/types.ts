@@ -1,4 +1,4 @@
-export type EnquiryStatus = 'Pending' | 'Resolved' | 'Closed';
+export type EnquiryStatus = 'pending' | 'resolved' | 'closed';
 
 export interface Enquiry {
   id: number;

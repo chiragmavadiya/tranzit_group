@@ -4,10 +4,11 @@ export interface Item {
   item_name: string;
   item_cubic: number;
   status: string;
-  weight?: number;
-  length?: number;
-  width?: number;
-  height?: number;
+  is_default: boolean;
+  item_weight?: number;
+  item_length?: number;
+  item_width?: number;
+  item_height?: number;
 }
 
 export interface ItemDetails extends Item {

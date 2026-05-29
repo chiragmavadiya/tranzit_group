@@ -313,6 +313,8 @@ export const SelectSearch = ({
     return options.find((opt) => String(opt.value) === String(value)) || null
   }, [options, value])
 
+  console.log(value, selectedOption)
+
   const defaultSelectedOption = React.useMemo(() => {
     if (defaultValue === undefined || defaultValue === null) return null
     return options.find((opt) => String(opt.value) === String(defaultValue)) || null

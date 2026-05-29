@@ -1,12 +1,20 @@
+import { useSearchParams } from 'react-router-dom';
 import { cn } from '@/lib/utils';
 import { CUSTOMER_TABS } from './constants';
 
-interface CustomerTabsProps {
-    activeTab: string;
-    onTabChange: (tab: string) => void;
-}
+export const CustomerTabs = () => {
+    const [searchParams, setSearchParams] = useSearchParams();
+    const tabParam = searchParams.get('customerTab');
+    const activeTab = CUSTOMER_TABS.find(t => t.toLowerCase() === tabParam?.toLowerCase()) || 'Profile';
 
-export const CustomerTabs = ({ activeTab, onTabChange }: CustomerTabsProps) => {
+    const onTabChange = (tab: string) => {
+        setSearchParams({ customerTab: tab });
+        // setSearchParams((prev) => {
+        //     prev.set('customerTab', tab);
+        //     return prev;
+        // });
+    };
+
     return (
         <div className="border-b border-slate-200 dark:border-zinc-800 w-full">
             <div className="flex items-center gap-3 overflow-x-auto scrollbar-hide">

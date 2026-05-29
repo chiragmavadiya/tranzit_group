@@ -159,6 +159,7 @@ export interface CustomerTransactionsResponse {
 }
 
 export interface CustomerInvoice {
+    id: number;
     invoice_number: string;
     invoice_date: string;
     invoice_due_date: string | null;

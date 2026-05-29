@@ -1,6 +1,6 @@
 import { useState, memo } from 'react';
 import type { ReactNode } from 'react'
-import { ArrowUp, ArrowDown, Search, Download, FileText, Upload, File, Loader2 } from 'lucide-react';
+import { ArrowUp, ArrowDown, Search, FileText, Upload, File, Loader2, Printer } from 'lucide-react';
 import {
   Table,
   TableBody,
@@ -11,7 +11,6 @@ import {
 } from '@/components/ui/table';
 import { Checkbox } from '@/components/ui/checkbox';
 import { cn, getNestedValue } from '@/lib/utils';
-import SelectComponent from '../ui/select';
 import { usePagination } from './hooks/usePagination';
 import { Pagination } from './Pagination';
 import { TableSkeleton } from './TableSkeleton';
@@ -19,7 +18,7 @@ import { DEFAULT_PAGE_SIZES } from '@/constants/global.constants';
 import type { Column, DataTableProps, SortConfig } from './types/DataTable.types';
 import { Button } from '../ui/button';
 import { DropdownCustomMenu } from '../ui/dropdown-menu';
-import { FormInput } from '@/features/orders/components/OrderFormUI';
+import { FormInput, FormSelect } from '@/features/orders/components/OrderFormUI';
 
 const DataTableComponent = <T extends Record<string, any>>(props: DataTableProps<T>) => {
   const {
@@ -68,7 +67,8 @@ const DataTableComponent = <T extends Record<string, any>>(props: DataTableProps
     customFooter,
     onExport,
     isExporting,
-    exportable = true
+    exportable = true,
+    print = true
   } = props;
   // Internal state for uncontrolled components
   const [internalSearch, setInternalSearch] = useState('');
@@ -178,7 +178,7 @@ const DataTableComponent = <T extends Record<string, any>>(props: DataTableProps
   return (
     <div className={cn("flex flex-col group flex-1 min-h-0", className)}>
       {header && (
-        <div className={cn("flex w-full border-b bg-gray-50/50 dark:bg-transparent justify-between gap-4 p-4", headerClass)}>
+        <div className={cn("flex w-full border-b justify-between gap-4 p-4", headerClass)}>
           <div className="flex flex-col justify-center">
             <h1 className={`text-lg font-bold text-gray-800 dark:text-zinc-200 my-0`}>
               {headerTitle}
@@ -195,13 +195,35 @@ const DataTableComponent = <T extends Record<string, any>>(props: DataTableProps
               <div className="flex items-center gap-2 ml-auto">
                 {headerPosition == 'left' && customHeader && (typeof customHeader === 'function' ? (customHeader as () => ReactNode)() : customHeader)}
                 {pagination && !pageSizeInFooter && (
-                  <SelectComponent
-                    data={DEFAULT_PAGE_SIZES}
-                    value={paginationPageSize.toString()}
-                    placeholder="Select Page Size"
-                    className="w-[70px] h-8 text-xs font-bold"
-                    onValueChange={(value: string | null) => value && setPaginationPageSize(Number(value))}
-                  />
+                  <>
+                    {/* <SelectComponent
+                      data={DEFAULT_PAGE_SIZES}
+                      value={paginationPageSize.toString()}
+                      placeholder="Select Page Size"
+                      className="w-[70px] h-8 text-xs font-bold"
+                      onValueChange={(value: string | null) => value && setPaginationPageSize(Number(value))}
+                    /> */}
+                    <FormSelect
+                      className='w-[70px] h-8 text-xs font-bold'
+                      value={pageSize.toString()}
+                      onValueChange={(value: string | null) => value && setPaginationPageSize(Number(value))}
+                      options={DEFAULT_PAGE_SIZES}
+                      placeholder="Select Page Size"
+                      allowClear={false}
+                    />
+                    {/* <FormSelect
+                      // label='Type'
+                      options={[
+                        { label: 'Parcel', value: 'box' },
+                        { label: 'My Items', value: 'my_item' }
+                      ]}
+                      value={pageSize.toString()}
+                      onValueChange={(value: string | null) => value && setPaginationPageSize(Number(value))}
+                      allowClear={false}
+                      className="h-8 text-sm font-medium"
+                      placeholder="Select Type"
+                    /> */}
+                  </>
                 )}
                 {searchable && (
                   <FormInput
@@ -215,11 +237,11 @@ const DataTableComponent = <T extends Record<string, any>>(props: DataTableProps
                 {exportable && (
                   <DropdownCustomMenu
                     menus={[
-                      {
+                      ...(print ? [{
                         label: "Print",
                         onClick: () => window.print(),
-                        icon: Download,
-                      },
+                        icon: Printer,
+                      }] : []),
                       {
                         label: "CSV",
                         onClick: onExport ? () => onExport('csv') : () => { },

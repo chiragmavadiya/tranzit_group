@@ -1,6 +1,7 @@
 import type { Column } from '@/components/common/types/DataTable.types';
 import type { CancelOrder } from './types';
 import { NavLink } from 'react-router-dom';
+import { formateCurrency } from '@/lib/utils';
 
 export const getCancelOrderColumns = (role: string): Column<CancelOrder>[] => [
     {
@@ -34,20 +35,20 @@ export const getCancelOrderColumns = (role: string): Column<CancelOrder>[] => [
     },
     {
         key: 'refund_amount',
-        header: 'REFUND',
+        header: 'AMOUNT',
         cell: (val: number) => (
             <span className="font-bold text-slate-900 dark:text-zinc-100">
-                ${val?.toFixed(2) || '0.00'}
+                {formateCurrency(val)}
             </span>
         )
     },
     {
         key: 'request_submitted_at',
         header: 'REQUESTED',
-        cell: (val: string, row) => (
+        cell: (val: string) => (
             <div className="flex flex-col">
                 <span className="text-slate-700 dark:text-zinc-300">{val}</span>
-                <span className="text-[10px] text-slate-500 dark:text-zinc-500 uppercase font-bold tracking-wider">By: {row.submitted_by}</span>
+                {/* <span className="text-[10px] text-slate-500 dark:text-zinc-500 uppercase font-bold tracking-wider">By: {row.submitted_by}</span> */}
             </div>
         )
     },

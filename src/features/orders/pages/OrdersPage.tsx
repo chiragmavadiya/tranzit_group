@@ -3,7 +3,7 @@
 import { useState, useMemo, useCallback, useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import type { TabType } from '@/features/orders/types';
-import { useOrders, useExportOrders, useImportOrders, useDownloadLabel, useCancelOrder } from '@/features/orders/hooks/useOrders';
+import { useOrders, useExportOrders, useImportOrders, useDownloadLabel, useCancelOrder, useArchiveOrder } from '@/features/orders/hooks/useOrders';
 import { DataTable } from '@/components/common/DataTable';
 import { getOrdersColumns } from '../column';
 import DatePicker from '@/components/common/DatePicker';
@@ -20,8 +20,8 @@ import { FormSelect } from '../components/OrderFormUI';
 import { useCustomers } from '@/features/customers/hooks/useCustomers';
 
 export default function OrdersPage({ fromCustomer, customerId }: { fromCustomer?: boolean, customerId?: string }) {
-  const [searchParams] = useSearchParams();
-  const activeTab = (searchParams.get('tab') as TabType) || 'new';
+  const [searchParams, setSearchParams] = useSearchParams();
+  const activeTab = (searchParams.get('tab')?.toLowerCase() as TabType) || 'new';
   const { role } = useAppSelector((state) => state.auth);
   const navigate = useNavigate();
   const isAdmin = role === 'admin';
@@ -39,10 +39,21 @@ export default function OrdersPage({ fromCustomer, customerId }: { fromCustomer?
   const [showCancelModal, setShowCancelModal] = useState(false);
   const [orderToCancel, setOrderToCancel] = useState<string | null>(null);
   const [addressEditModal, setAddressEditModal] = useState<string>();
-  const [selectedCustomer, setSelectedCustomer] = useState<string | undefined>(undefined);
+  const selectedCustomer = searchParams.get('customerId') || undefined;
+  const setSelectedCustomer = useCallback((val: string | undefined) => {
+    setSearchParams((prev) => {
+      if (val) {
+        prev.set('customerId', val);
+      } else {
+        prev.delete('customerId');
+      }
+      return prev;
+    });
+  }, [setSearchParams]);
 
   const downloadLabelMutation = useDownloadLabel();
   const cancelOrderMutation = useCancelOrder();
+  const archiveOrderMutation = useArchiveOrder();
   const { data: customersData } = useCustomers({ pageSize: 1000 }, isAdmin);
 
 
@@ -199,7 +210,12 @@ export default function OrdersPage({ fromCustomer, customerId }: { fromCustomer?
     setOrderToCancel(orderId);
   }, []);
 
+  const handleArchiveOrder = useCallback((orderId: string) => {
+    archiveOrderMutation.mutate(orderId);
+  }, [archiveOrderMutation]);
+
   const downloadingLabelId = downloadLabelMutation.isPending ? String(downloadLabelMutation.variables) : null;
+  const updateToArchiveId = archiveOrderMutation.isPending ? String(archiveOrderMutation.variables) : null;
 
   const columns = useMemo(() => getOrdersColumns(
     role,
@@ -209,8 +225,10 @@ export default function OrdersPage({ fromCustomer, customerId }: { fromCustomer?
     handleDownloadSingleLabel,
     handleCancelSingleOrderClick,
     downloadingLabelId,
-    fromCustomer
-  ), [role, activeTab, navigate, handleCustomerEdit, handleDownloadSingleLabel, handleCancelSingleOrderClick, downloadingLabelId, fromCustomer]);
+    fromCustomer,
+    handleArchiveOrder,
+    updateToArchiveId
+  ), [role, activeTab, navigate, handleCustomerEdit, handleDownloadSingleLabel, handleCancelSingleOrderClick, downloadingLabelId, fromCustomer, handleArchiveOrder, updateToArchiveId]);
 
   return (
     <div className={`${fromCustomer ? "p-0" : "p-page-padding"} flex-1 flex flex-col space-y-4 animate-in fade-in slide-in-from-bottom-2 duration-300 h-full overflow-hidden min-h-0`}>
@@ -442,10 +460,11 @@ export default function OrdersPage({ fromCustomer, customerId }: { fromCustomer?
           orderId={addressEditModal}
           open={!!addressEditModal}
           onOpenChange={() => setAddressEditModal('')}
-          type="customer"
+          type="receiver"
           onSubmit={() => { }}
           // initialData={{}}
           isEdit={true}
+          isUpdate={true}
         />
       )}
     </div>

@@ -21,27 +21,27 @@ export function QuoteDetailsDialog({ open, onOpenChange, quoteId }: QuoteDetails
             onOpenChange={onOpenChange}
             title={`Quote Details: ${details?.quote_summary?.quote_reference || ''}`}
             isLoading={isLoading}
-            contentClass="sm:max-w-[700px]"
+            contentClass="sm:max-w-[700px] pb-6"
             // onSubmit={() => { }}
             showFooter={false}
         >
             {details && (
-                <div className="flex flex-col gap-6 p-1 text-xs">
+                <div className="flex flex-col gap-6 p-1 text-sm">
                     <div className="grid grid-cols-2 gap-4 bg-slate-50 dark:bg-zinc-900/50 p-4 rounded-xl border border-slate-100 dark:border-zinc-800">
-                        <div className="flex flex-col gap-1">
-                            <span className="text-slate-500 uppercase font-bold tracking-wider">Reference</span>
+                        <div className="flex flex-col gap-0">
+                            <span className="text-slate-500 font-medium">Reference</span>
                             <span className="font-bold text-slate-900 dark:text-zinc-100">{details.quote_summary.quote_reference}</span>
                         </div>
-                        <div className="flex flex-col gap-1">
-                            <span className="text-slate-500 uppercase font-bold tracking-wider">Customer Email</span>
+                        <div className="flex flex-col gap-0">
+                            <span className="text-slate-500 font-medium">Customer Email</span>
                             <span className="font-bold text-slate-900 dark:text-zinc-100">{details.quote_summary.customer_email}</span>
                         </div>
-                        <div className="flex flex-col gap-1">
-                            <span className="text-slate-500 uppercase font-bold tracking-wider">Service</span>
+                        <div className="flex flex-col gap-0">
+                            <span className="text-slate-500 font-medium">Service</span>
                             <span className="font-bold text-slate-900 dark:text-zinc-100">{details.quote_summary.service}</span>
                         </div>
-                        <div className="flex flex-col gap-1">
-                            <span className="text-slate-500 uppercase font-bold tracking-wider">Total Amount</span>
+                        <div className="flex flex-col gap-0">
+                            <span className="text-slate-500 font-medium">Total Amount</span>
                             <span className="font-bold text-primary text-sm">${details.quote_summary.total_amount.toFixed(2)}</span>
                         </div>
                     </div>
@@ -49,11 +49,11 @@ export function QuoteDetailsDialog({ open, onOpenChange, quoteId }: QuoteDetails
                     <div className="grid grid-cols-2 gap-6">
                         <div className="flex flex-col gap-2">
                             <span className="text-[11px] font-extrabold text-slate-700 dark:text-zinc-400 uppercase tracking-widest border-b pb-1">Sender Address</span>
-                            <p className="text-slate-600 dark:text-zinc-400 leading-relaxed">{details.sender.address}</p>
+                            <p className="text-slate-800 font-medium dark:text-zinc-400 leading-relaxed">{details.sender.address}</p>
                         </div>
                         <div className="flex flex-col gap-2">
                             <span className="text-[11px] font-extrabold text-slate-700 dark:text-zinc-400 uppercase tracking-widest border-b pb-1">Receiver Address</span>
-                            <p className="text-slate-600 dark:text-zinc-400 leading-relaxed">{details.receiver.address}</p>
+                            <p className="text-slate-800 font-medium dark:text-zinc-400 leading-relaxed">{details.receiver.address}</p>
                         </div>
                     </div>
 
@@ -63,10 +63,10 @@ export function QuoteDetailsDialog({ open, onOpenChange, quoteId }: QuoteDetails
                             <Table>
                                 <TableHeader className="bg-slate-50 dark:bg-zinc-900">
                                     <TableRow>
-                                        <TableHead className="h-8 text-[10px] font-bold">TYPE</TableHead>
-                                        <TableHead className="h-8 text-[10px] font-bold text-center">QTY</TableHead>
-                                        <TableHead className="h-8 text-[10px] font-bold text-center">WEIGHT</TableHead>
-                                        <TableHead className="h-8 text-[10px] font-bold text-center">DIMENSIONS (L×W×H)</TableHead>
+                                        <TableHead className="h-8 text-xs font-bold">TYPE</TableHead>
+                                        <TableHead className="h-8 text-xs font-bold text-center">QTY</TableHead>
+                                        <TableHead className="h-8 text-xs font-bold text-center">WEIGHT</TableHead>
+                                        <TableHead className="h-8 text-xs font-bold text-center">DIMENSIONS (L×W×H)</TableHead>
                                     </TableRow>
                                 </TableHeader>
                                 <TableBody>
@@ -85,15 +85,15 @@ export function QuoteDetailsDialog({ open, onOpenChange, quoteId }: QuoteDetails
 
                     <div className="grid grid-cols-3 gap-4">
                         <div className="flex flex-col gap-1 border-l-2 border-slate-100 dark:border-zinc-800 pl-3">
-                            <span className="text-slate-500 uppercase font-bold tracking-wider">Margin</span>
+                            <span className="text-slate-500 uppercase font-medium tracking-wider">Margin</span>
                             <span className="font-bold">${details.margin_amount.toFixed(2)} ({details.margin_percent}%)</span>
                         </div>
                         <div className="flex flex-col gap-1 border-l-2 border-slate-100 dark:border-zinc-800 pl-3">
-                            <span className="text-slate-500 uppercase font-bold tracking-wider">Pickup Charge</span>
+                            <span className="text-slate-500 uppercase font-medium tracking-wider">Pickup Charge</span>
                             <span className="font-bold">${details.pickup_charge.toFixed(2)}</span>
                         </div>
                         <div className="flex flex-col gap-1 border-l-2 border-slate-100 dark:border-zinc-800 pl-3">
-                            <span className="text-slate-500 uppercase font-bold tracking-wider">Total Surcharge</span>
+                            <span className="text-slate-500 uppercase font-medium tracking-wider">Total Surcharge</span>
                             <span className="font-bold">${details.total_surcharge.toFixed(2)}</span>
                         </div>
                     </div>

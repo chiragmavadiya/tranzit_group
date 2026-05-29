@@ -5,6 +5,7 @@ import { showToast } from '@/components/ui/custom-toast';
 import { Button } from '@/components/ui/button';
 import { FormSelect } from './OrderFormUI';
 import { useCustomers } from '@/features/customers/hooks/useCustomers';
+import { useDownloadImportSample } from '../hooks/useOrders';
 
 interface ImportOrdersDialogProps {
   open: boolean;
@@ -26,6 +27,7 @@ export function ImportOrdersDialog({
   const [submitted, setSubmitted] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
+  const downloadSampleMutation = useDownloadImportSample();
 
   const { data: customersData } = useCustomers({ pageSize: 1000 }, isAdmin);
 
@@ -62,9 +64,7 @@ export function ImportOrdersDialog({
   };
 
   const handleDownloadSample = () => {
-    // Implement sample download logic or use a static URL
-    // window.open('/api/customer/orders/import/sample', '_blank');
-    showToast('Sample CSV download started', 'success');
+    downloadSampleMutation.mutate();
   };
 
   const clearFile = (e: React.MouseEvent) => {
@@ -95,12 +95,12 @@ export function ImportOrdersDialog({
         <Button
           variant="ghost"
           onClick={handleDownloadSample}
-          disabled={isLoading}
+          disabled={isLoading || downloadSampleMutation.isPending}
           className="text-[14px] cursor-pointer font-bold text-primary hover:text-primary-hover hover:bg-transparent px-0 transition-colors flex items-center gap-2 tracking-wider"
         >
           <Download className="w-3.5 h-3.5" />
           <span className='leading-[100%]'>
-            Download sample CSV
+            {downloadSampleMutation.isPending ? 'Downloading...' : 'Download sample CSV'}
           </span>
         </Button>
       }

@@ -24,6 +24,11 @@ export const CustomerNameCell = ({
     return <span className="truncate uppercase font-semibold">{value}</span>;
   }
 
+  const street = row.customer_full_address?.split(',')?.[0];
+  const suburbs = row.customer_full_address?.split(',')?.[1];
+  const state = row.customer_full_address?.split(',')?.[2];
+  const postcode = row.customer_full_address?.split(',')?.[3];
+
   if (orderType !== 'new') {
     return (
       <div
@@ -49,8 +54,8 @@ export const CustomerNameCell = ({
               <div className="flex items-start gap-3">
                 <MapPin className="w-4 h-4 text-primary/80 mt-0.5 shrink-0" />
                 <div className="flex flex-col">
-                  <span className="font-bold text-slate-900 dark:text-zinc-100 text-[14px] leading-tight">150 Palmers Road</span>
-                  <span className="text-slate-500 dark:text-zinc-400 text-[12px] mt-1 leading-normal">Truganina 3029, VIC, Australia</span>
+                  <span className="font-bold text-slate-900 dark:text-zinc-100 text-[14px] leading-tight">{street}</span>
+                  <span className="text-slate-500 dark:text-zinc-400 text-[12px] mt-1 leading-normal">{suburbs}, {state}, {postcode}</span>
                 </div>
               </div>
 
@@ -58,12 +63,12 @@ export const CustomerNameCell = ({
 
               <div className="flex items-center gap-3">
                 <Phone className="w-4 h-4 text-primary/80 shrink-0" />
-                <span className="font-medium">0412345687</span>
+                <span className="font-medium">{row.receiver_phone}</span>
               </div>
 
               <div className="flex items-center gap-3">
                 <Mail className="w-4 h-4 text-primary/80 shrink-0" />
-                <span className="font-medium">john@gmail.com</span>
+                <span className="font-medium">{row.receiver_email}</span>
               </div>
             </div>
           </PopoverContent>

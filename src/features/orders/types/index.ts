@@ -12,6 +12,10 @@ export interface Order {
   order_type: string;
   consignment_date: string;
   courier_logo?: string;
+  product_id?: string;
+  customer_full_address?: string;
+  receiver_email?: string;
+  receiver_phone?: string;
 }
 
 export type TabType = 'new' | 'printed' | 'shipped' | 'archived';
@@ -73,6 +77,7 @@ export interface CreateOrderDialogProps {
   onSubmit: (type: "sender" | "receiver" | "customer", data: AddressData) => void;
   isEdit: boolean;
   orderId?: string;
+  isUpdate?: boolean;
 }
 
 export interface WalletCheckDialogProps {

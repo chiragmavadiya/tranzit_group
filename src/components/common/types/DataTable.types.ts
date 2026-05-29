@@ -77,6 +77,8 @@ export interface DataTableProps<T> {
   onExport?: (type: "pdf" | "excel" | "print" | "csv") => void;
   isExporting?: boolean;
   exportable?: boolean;
+  print?: boolean;
+
 }
 
 // Common cell renderer types

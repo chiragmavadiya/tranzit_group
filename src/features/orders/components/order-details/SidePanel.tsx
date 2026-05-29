@@ -25,8 +25,6 @@ interface SidePanelProps {
   insuranceSelected: boolean;
   signatureSelected: boolean;
   deliveryInstructions: string;
-  pickupDate: Date | undefined;
-  setPickupDate: React.Dispatch<React.SetStateAction<Date | undefined>>;
   orderType?: string;
   calculation: QuoteCalculations
   liability: boolean;
@@ -39,10 +37,7 @@ export const SidePanel: React.FC<SidePanelProps> = memo(({
   calculation,
   handleOptionalFieldsChange,
   insuranceSelected,
-  // signatureSelected,
   deliveryInstructions,
-  // pickupDate,
-  // setPickupDate,
   orderType,
   liability = false,
   liabilityMessage,
@@ -89,18 +84,20 @@ export const SidePanel: React.FC<SidePanelProps> = memo(({
                     <span className="text-sm font-medium text-gray-500 dark:text-zinc-500">
                       No transit history available for this order.
                     </span>
-                    <button
+                    {/* <button
                       type="button"
                       className="flex items-center gap-1.5 text-[11px] font-bold text-gray-900 dark:text-zinc-100 hover:text-primary transition-colors uppercase tracking-wider h-8 px-3 border border-gray-200 dark:border-zinc-800 rounded-md hover:bg-gray-50 dark:hover:bg-zinc-900 transition-all duration-200"
                     >
                       <RotateCw className="w-3.5 h-3.5" />
                       Refresh Timeline
-                    </button>
+                    </button> */}
                   </div>
                 ) : (
                   timelineData.stages.map((stage, idx) => {
-                    const isActive = stage.id === timelineData.activeId;
-                    const dateTime = stage.dateTime || stage.updated_at || stage.date;
+                    const isActive = true;
+                    // const isActive = stage.id === timelineData.activeId;
+                    const dateTime = stage.dateTime || stage.updated_at || stage.date || stage.date_time;
+                    console.log(dateTime, '-', stage.date_time)
                     return (
                       <div key={stage.id} className="flex gap-4 items-start relative pb-6 last:pb-0">
                         {/* Left column for line */}
@@ -134,7 +131,7 @@ export const SidePanel: React.FC<SidePanelProps> = memo(({
                                 ? "font-bold text-primary dark:text-primary"
                                 : "font-medium text-gray-400 dark:text-zinc-600"
                             )}>
-                              {stage.label || stage.status}
+                              {stage.title || stage.status}
                             </span>
 
                             {/* Refresh button next to Delivered (index 0) */}

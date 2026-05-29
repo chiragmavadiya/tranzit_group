@@ -8,6 +8,8 @@ export const TRANSACTION_STATUS_CONFIG = {
   credit: 'bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-400',
   debit: 'bg-red-100 text-red-800 dark:bg-red-900/20 dark:text-red-400',
   refund: 'bg-blue-100 text-blue-800 dark:bg-blue-900/20 dark:text-blue-400',
+  success: 'bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-400',
+  failed: 'bg-red-100 text-red-800 dark:bg-red-900/20 dark:text-red-400',
 };
 
 export const getWalletColumns = (
@@ -75,7 +77,7 @@ export const ADMIN_TOPUP_COLUMNS: Column<any>[] = [
   { key: 'amount', header: 'AMOUNT', sortable: true },
   { key: 'reason', header: 'REASON', sortable: true },
   { key: 'transaction_id', header: 'TRANSACTION ID', sortable: true, noPrint: true },
-  { key: 'date', header: 'TRANSACTION DATE & TIME', sortable: true, noPrint: true },
+  { key: 'payment_date', header: 'TRANSACTION DATE & TIME', sortable: true, noPrint: true },
 ];
 
 export const TRANSACTION_TYPES = [

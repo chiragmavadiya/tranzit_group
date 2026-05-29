@@ -28,6 +28,9 @@ export const API_ENDPOINTS = {
         EXPORT: "/orders/export",
         CREATE_OWN_COURIER: "/customer/orders/create-own-courier",
         GET_QUOTE_SERVICES: "/customer/get-quote/services",
+        RECEIVER_ADDRESS: (id: string | number) => `/customer/orders/${id}/receiver-address`,
+        IMPORT_SAMPLE: "/customer/orders/import/sample",
+        ARCHIVE: (id: string | number) => `/customer/orders/${id}/archive`,
     },
     DASHBOARD: {
         METRICS: "/dashboard/metrics",
@@ -168,6 +171,7 @@ export const QUERY_KEYS = {
         DETAILS: (id: string | number) => ["orders", "details", id],
         PAYMENT_INFO: (id: string | number) => ["orders", "payment", id],
         COUNTS: (customer?: string | number) => ["orders", "counts", customer || "all"],
+        RECEIVER_ADDRESS: (id: string | number) => ["orders", "receiver-address", id],
     },
     DASHBOARD: {
         METRICS: ["dashboard", "metrics"],
@@ -175,6 +179,7 @@ export const QUERY_KEYS = {
     ITEMS: {
         LIST: ["items", "list"],
         DETAILS: (id: number | string) => ["items", "details", id],
+        DEFAULT: ["items", "default"],
     },
     ADDRESS_BOOK: {
         LIST: ["address-book", "list"],

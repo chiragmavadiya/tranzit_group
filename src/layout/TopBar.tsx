@@ -22,7 +22,7 @@ import type { BookPickupTabType } from '@/features/book-pickup/constants/book-pi
 import type { ReportType } from '@/features/reports/types';
 import { useLogout } from '@/features/auth/hooks/useAuth';
 import { GlobalSearch } from '@/features/search/components/GlobalSearch';
-import { lazy, Suspense, useState } from 'react';
+import { lazy, Suspense, useCallback, useState } from 'react';
 import { useWalletSummary } from '@/features/wallet/hooks/useWallet';
 import { AccountSwitchDialog } from '@/features/profile/components/AccountSwitchDialog';
 import { formateCurrency } from '@/lib/utils';
@@ -38,6 +38,7 @@ export default function TopBar({ isCollapsed }: { isCollapsed?: boolean }) {
   const navigate = useNavigate();
   const location = useLocation();
   const [searchParams, setSearchParams] = useSearchParams();
+
   const { theme, setTheme } = useTheme();
   const [isAccountSwitchOpen, setIsAccountSwitchOpen] = useState(false);
 
@@ -61,6 +62,12 @@ export default function TopBar({ isCollapsed }: { isCollapsed?: boolean }) {
     window.open('https://tranzitgroup.com.au/faq', '_blank');
   }
 
+  const handleTabChange = useCallback((tab: string) => {
+    setSearchParams(prev => {
+      prev.set('tab', tab);
+      return prev;
+    });
+  }, [setSearchParams]);
   const handleProfile = () => {
     // open new window
     navigate('/settings/account');
@@ -72,11 +79,12 @@ export default function TopBar({ isCollapsed }: { isCollapsed?: boolean }) {
       </div>
       <div className='flex justify-center flex-1'>
         <Suspense fallback={null}>
-          {(location.pathname === '/orders' || location.pathname === '/admin/orders') && (
+          {(location.pathname === '/orders' || location.pathname === '/admin/orders' || searchParams.get('customerTab') === 'Orders') && (
             <div className="h-16 ml-4">
               <OrdersTabs
                 activeTab={(searchParams.get('tab') as TabType) || 'new'}
-                onTabChange={(tab) => setSearchParams({ tab })}
+                onTabChange={handleTabChange}
+                customerId={searchParams.get('customerId') as string}
               />
             </div>
           )}
@@ -84,7 +92,7 @@ export default function TopBar({ isCollapsed }: { isCollapsed?: boolean }) {
             <div className="h-16 ml-4">
               <ReportsTabs
                 activeTab={(searchParams.get('tab') as ReportType) || 'shipment'}
-                onTabChange={(tab) => setSearchParams({ tab })}
+                onTabChange={handleTabChange}
                 className="h-full"
               />
             </div>
@@ -93,7 +101,7 @@ export default function TopBar({ isCollapsed }: { isCollapsed?: boolean }) {
             <div className="h-16 ml-4">
               <CancelOrderTabs
                 activeTab={(searchParams.get('tab') as CancelOrderTabType) || 'request'}
-                onTabChange={(tab) => setSearchParams({ tab })}
+                onTabChange={handleTabChange}
                 className="h-full"
               />
             </div>
@@ -102,7 +110,7 @@ export default function TopBar({ isCollapsed }: { isCollapsed?: boolean }) {
             <div className="h-16 ml-4">
               <BookPickupTabs
                 activeTab={(searchParams.get('tab') as BookPickupTabType) || 'new'}
-                onTabChange={(tab) => setSearchParams({ tab })}
+                onTabChange={handleTabChange}
                 className="h-full"
               />
             </div>

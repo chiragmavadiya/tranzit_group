@@ -65,7 +65,7 @@ export function AddPaymentDialog({ isOpen, onOpenChange, invoiceId, payment }: A
     if (payment) {
       update.mutate({
         invoiceId,
-        paymentId: payment.id,
+        paymentId: payment.payment_id,
         data: formData
       }, {
         onSuccess: () => {

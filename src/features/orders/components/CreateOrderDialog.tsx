@@ -11,9 +11,9 @@ import { STATES } from '@/constants';
 import { AutoComplete } from '@/components/common';
 import { useAddressBookSearch } from '@/features/address-book/hooks/useAddressBook';
 import { useDebounce } from '@/hooks/useDebounce';
-import { useOrderDetails } from '../hooks/useOrders';
+import { useOrderReceiverAddress, useUpdateOrderReceiverAddress } from '../hooks/useOrders';
 
-export default function CreateOrderDialog({ onOpenChange, type, open, initialData, onSubmit, isEdit, orderId }: CreateOrderDialogProps) {
+export default function CreateOrderDialog({ onOpenChange, type, open, initialData, onSubmit, isEdit, orderId, isUpdate }: CreateOrderDialogProps) {
   const navigate = useNavigate();
   const [formData, setFormData] = useState<AddressData>({
     email: "",
@@ -38,7 +38,8 @@ export default function CreateOrderDialog({ onOpenChange, type, open, initialDat
 
   const debouncedSearchAddress = useDebounce(searchAddress, 400);
   const { data: addressBookData } = useAddressBookSearch(debouncedSearchAddress);
-  const { data: orderResponse } = useOrderDetails(orderId || '')
+  const { data: orderResponse } = useOrderReceiverAddress(orderId || '');
+  const { mutateAsync: updateOrderReceiverAddress, isPending: isUpdatePending } = useUpdateOrderReceiverAddress();
   const options = useMemo(() => {
     if (!addressBookData?.data) return [];
     return addressBookData.data.map(({ value, label, data }) => ({
@@ -65,6 +66,22 @@ export default function CreateOrderDialog({ onOpenChange, type, open, initialDat
   const isEmailValid = (email: string) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
   const isPhoneValid = (phone: string) => /^(?:\+61|0)[2-478](?:[ -]?[0-9]){8}$/.test(phone.replace(/[\s-()]/g, ''));
 
+  const updatePayload = useMemo(() => ({
+    receiver_name: formData.name,
+    receiver_business_name: formData.company,
+    receiver_phone: formData.phone,
+    receiver_email: formData.email,
+    receiver_address: formData.address,
+    unit_number: formData.building,
+    street_number: '1',
+    street_name: formData.street,
+    street_type: '',
+    suburb: formData.suburb,
+    state: formData.state,
+    postcode: formData.postcode,
+    special_instructions: formData.instructions
+  }), [formData])
+
   const handleSubmit = async () => {
     setIsSubmitting(true);
     const { address1, country, name, postcode, state, street, suburb, phone, email } = formData;
@@ -82,9 +99,20 @@ export default function CreateOrderDialog({ onOpenChange, type, open, initialDat
       showToast("Please enter a valid Australian phone number", "error");
       return;
     }
-    onSubmit(type!, formData)
-    setIsSubmitting(false);
-    onOpenChange(false)
+    if (isUpdate) {
+      updateOrderReceiverAddress({
+        orderId: orderId as string,
+        data: updatePayload
+      }, {
+        onSuccess: () => {
+          onOpenChange(false)
+        }
+      })
+    } else {
+      onSubmit(type!, formData)
+      setIsSubmitting(false);
+      onOpenChange(false)
+    }
   };
 
   const handleCloseMenualy = (value: boolean) => {
@@ -103,20 +131,21 @@ export default function CreateOrderDialog({ onOpenChange, type, open, initialDat
   useEffect(() => {
     if (orderResponse?.data) {
       setFormData({
-        name: orderResponse?.data.receiver_details?.name,
-        email: orderResponse?.data.receiver_details.email,
-        phone: orderResponse?.data.receiver_details.mobile,
-        company: orderResponse?.data.receiver_details.company || '',
-        building: orderResponse?.data.receiver_details.address_detail.building || '',
-        instructions: orderResponse?.data.receiver_details.address_detail.instructions || '',
-        address: orderResponse?.data.receiver_details.address,
-        address1: orderResponse?.data.receiver_details.address_detail.address_line,
-        street: orderResponse?.data.receiver_details.address_detail.street || '',
-        suburb: orderResponse?.data.receiver_details.address_detail.suburb,
-        state: orderResponse?.data.receiver_details.address_detail.state,
-        city: orderResponse?.data.receiver_details.address_detail.city,
-        postcode: orderResponse?.data.receiver_details.address_detail.postcode,
-        country: orderResponse?.data.receiver_details?.address_detail?.country || 'Australia',
+        name: orderResponse?.data.receiver_name,
+        email: orderResponse?.data.receiver_email,
+        phone: orderResponse?.data.receiver_phone,
+        company: orderResponse?.data.receiver_business_name || '',
+        building: orderResponse?.data.receiver_building || '',
+        instructions: orderResponse?.data.special_instructions || '',
+
+        address: orderResponse?.data.receiver_address,
+        address1: orderResponse?.data.receiver_address,
+        street: orderResponse?.data.receiver_address || '',
+        suburb: orderResponse?.data.suburb,
+        state: orderResponse?.data.state,
+        city: orderResponse?.data.city,
+        postcode: orderResponse?.data.postcode,
+        country: orderResponse?.data.country || 'Australia',
         saveToAddressBook: false,
       });
     }
@@ -129,7 +158,7 @@ export default function CreateOrderDialog({ onOpenChange, type, open, initialDat
       description={`Enter the ${type}'s address. You can lookup a customer's details saved in the address book to complete this section.`}
       contentClass='min-w-3xl'
       onSubmit={handleSubmit}
-      customFooter={<div className="flex items-center gap-2">
+      customFooter={!orderId && <div className="flex items-center gap-2">
         <Checkbox
           id="saveToAddressBook"
           checked={formData.saveToAddressBook}
@@ -143,6 +172,8 @@ export default function CreateOrderDialog({ onOpenChange, type, open, initialDat
           Save contact to address book
         </label>
       </div>}
+      submitText={isUpdate ? 'Update' : 'Save'}
+      isLoading={isUpdatePending}
     >
       <div className="flex-1 overflow-y-auto p-4 pt-0 custom-scrollbar">
         <div className="space-y-5 max-w-5xl mx-auto">

@@ -97,4 +97,7 @@ export type OrderDetailData = {
     status: string
     shipping_activity: ShippingActivity[]
     cancel_request: CancelRequest | null
+    transit_timeline?: {
+        events: any[]
+    }
 }

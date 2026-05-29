@@ -15,6 +15,9 @@ export interface AddressData {
     latitude: number | null;
     longitude: number | null;
     country: string;
+    street_name?: string;
+    street_number?: string;
+    street_type?: string;
 }
 
 interface PlaceAutocompleteProps extends FormInputProps {
@@ -50,6 +53,9 @@ export const PlaceAutocomplete = ({ onPlaceSelect, ...rest }: PlaceAutocompleteP
                 formatted_address: place.formatted_address || '',
                 address1: '',
                 street: '',
+                street_name: '',
+                street_number: '',
+                street_type: '',
                 suburb: '',
                 state: '',
                 post_code: '',
@@ -58,28 +64,28 @@ export const PlaceAutocomplete = ({ onPlaceSelect, ...rest }: PlaceAutocompleteP
                 longitude: place.geometry?.location?.lng() || null,
             };
 
-            let street_number = '';
-            let street_type = '';
-            let street_name = '';
+            // let street_number = '';
+            // let street_type = '';
+            // let street_name = '';
             place.address_components.forEach((component: google.maps.GeocoderAddressComponent) => {
 
                 const types = component.types;
                 const value = component.short_name;
 
-                if (types.includes('street_number')) street_number = value;
+                if (types.includes('street_number')) address.street_number = value;
 
                 if (types.includes('route')) {
                     // Australia street logic: "George St" -> Name: George, Type: St
                     const parts = component.long_name.split(' ');
-                    street_type = parts.length > 1 ? parts.pop() || '' : '';
-                    street_name = parts.join(' ');
+                    address.street_type = parts.length > 1 ? parts.pop() || '' : '';
+                    address.street_name = parts.join(' ');
                 }
                 if (types.includes('country')) address.country = component.long_name;
                 if (types.includes('locality')) address.suburb = value;
                 if (types.includes('administrative_area_level_1')) address.state = component.short_name; // e.g. NSW
                 if (types.includes('postal_code')) address.post_code = value;
             });
-            address.street = `${street_number} ${street_name} ${street_type}`
+            address.street = `${address.street_number} ${address.street_name} ${address.street_type}`
             address.address1 = address.street;
             onPlaceSelect(address);
         });

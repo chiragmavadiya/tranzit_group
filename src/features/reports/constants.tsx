@@ -3,6 +3,7 @@ import type { Column } from '@/components/common/types/DataTable.types';
 import { LinkCell } from '@/components/common/DataTableCells';
 import { StatusBadge } from '../orders/components/StatusBadge';
 import { NavLink } from 'react-router-dom';
+import { formateCurrency } from '@/lib/utils';
 
 export const REPORT_TABS: ReportTab[] = [
   { id: 'shipment', label: 'Shipment', count: 9 },
@@ -100,7 +101,7 @@ export const ADMIN_PARCEL_COLUMNS: Column<ParcelReport>[] = [
     header: 'RECEIVER FULL ADDRESS',
     sortable: true,
     searchable: true,
-    cell: (val) => <span className="text-xs text-slate-500 max-w-[200px] inline-block">{val}</span>
+    cell: (val) => <span className="text-sm text-slate-600 max-w-[200px] inline-block">{val}</span>
   },
   {
     key: 'tranzit_group_order_number',
@@ -114,23 +115,30 @@ export const ADMIN_PARCEL_COLUMNS: Column<ParcelReport>[] = [
   { key: 'actual_parcel_tracking_number', header: 'ACTUAL PARCEL TRACKING NUMBER', sortable: true, searchable: true },
   { key: 'actual_australia_post_mailing_statement_no', header: 'ACTUAL AUSTRALIA POST MAILING STATEMENT NO', sortable: true },
   { key: 'parcel_status', header: 'PARCEL STATUS', sortable: true },
-  { key: 'courier', header: 'COURIER', sortable: true },
+  {
+    key: 'courier', header: 'COURIER', width: "220px",
+    cell: (val: string, row: ParcelReport) => (
+      <div className="flex items-center gap-1">
+        <img src={row?.courier_logo || 'https://api.tranzit.digisite.net/assets/img/couriers/logo-auspost.png'} className="h-6" alt="" />
+        <span>{val}</span>
+      </div>)
+  },
   {
     key: 'pickup_charge',
     header: 'PICKUP CHARGE',
     sortable: true,
-    cell: (val) => val ? `$${Number(val).toFixed(2)}` : '-'
+    cell: (val) => val ? formateCurrency(val) : '-'
   },
   {
     key: 'extra_surcharge',
     header: 'EXTRA SURCHARGE',
     sortable: true,
-    cell: (val) => val ? `$${Number(val).toFixed(2)}` : '$0.00'
+    cell: (val) => val ? formateCurrency(val) : '$0.00'
   },
   {
     key: 'tranzit_group_markup',
     header: 'TRANZIT GROUP MARKUP',
     sortable: true,
-    cell: (val) => val ? `$${Number(val).toFixed(2)}` : '$0.00'
+    cell: (val) => val ? formateCurrency(val) : '$0.00'
   },
 ];

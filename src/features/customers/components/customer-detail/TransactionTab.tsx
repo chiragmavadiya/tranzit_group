@@ -1,12 +1,11 @@
 import { useState } from 'react';
 import { Card } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
 import { DataTable } from '@/components/common/DataTable';
 import { useCustomerTransactions, useExportCustomerTransactions } from '../../hooks/useCustomers';
 import { downloadFile } from '@/lib/utils';
-import { Plus } from 'lucide-react';
 import { showToast } from '@/components/ui/custom-toast';
+import { TRANSACTION_STATUS_CONFIG } from '@/features/wallet/constants';
+import { StatusCell } from '@/components/common';
 
 interface TransactionTabProps {
     customerId: string;
@@ -46,8 +45,8 @@ export const TransactionTab = ({ customerId }: TransactionTabProps) => {
                 columns={[
                     { key: 'transaction_id', header: 'Transaction ID', cell: (val) => <span className="font-bold text-slate-600 dark:text-zinc-400">{val}</span> },
                     { key: 'amount', header: 'Amount', cell: (val) => <span className="font-bold text-slate-900 dark:text-zinc-100">${val}</span> },
-                    { key: 'payment_status', header: 'Payment Status', cell: (val) => <Badge variant="secondary" className="bg-emerald-50 text-emerald-600 dark:bg-emerald-500/10 dark:text-emerald-400 border-none font-black uppercase text-[10px] tracking-widest px-3 py-1">{val}</Badge> },
-                    { key: 'type', header: 'Type', cell: (val) => <Badge variant="secondary" className="bg-primary/10 text-primary border-none font-black uppercase text-[10px] tracking-widest px-3 py-1">{val}</Badge> },
+                    { key: 'payment_status', header: 'Payment Status', cell: (val) => <StatusCell value={val?.toLowerCase()} statusConfig={TRANSACTION_STATUS_CONFIG} /> },
+                    { key: 'type', header: 'Type', cell: (val) => <StatusCell value={val?.toLowerCase()} statusConfig={TRANSACTION_STATUS_CONFIG} /> },
                     { key: 'payment_date', header: 'Payment Date' },
                 ]}
                 data={transactions}
@@ -64,16 +63,8 @@ export const TransactionTab = ({ customerId }: TransactionTabProps) => {
                 exportable
                 isExporting={isExporting}
                 onExport={handleExport}
-                customHeader={
-                    <Button
-                        // onClick={onAddAddress}
-                        className="gap-2 bg-primary hover:bg-primary-hover text-white shadow-lg shadow-primary/20 dark:shadow-none transition-all active:scale-[0.98] font-semibold border-none px-4 h-8"
-                    >
-                        <Plus className="w-4 h-4" />
-                        <span className="text-xs uppercase tracking-wider font-bold">Add Top Up</span>
-                    </Button>
-                }
                 className='pb-3'
+                print={false}
             />
         </Card>
     );

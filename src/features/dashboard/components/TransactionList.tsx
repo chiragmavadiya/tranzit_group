@@ -102,12 +102,10 @@ export function TransactionList({ transactions, className, loading }: Transactio
                     {tx.reason || tx.title}
                   </span>
                   <span className="text-[11px] font-medium text-slate-400 dark:text-zinc-500 truncate flex items-center gap-1">
-                    {/* {(tx.user?.name || tx.user?.first_name || tx.username) && ( */}
                     <>
-                      <span className="text-slate-500 text-sm dark:text-zinc-400 font-semibold">{tx.user?.name || tx.user?.first_name || tx.username || 'Demo User'}</span>
+                      <span className="text-slate-500 text-sm dark:text-zinc-400 font-semibold">{tx.customer_name || ''}</span>
                       <span className="text-slate-300 dark:text-zinc-600 px-0.5">•</span>
                     </>
-                    {/* )} */}
                     <span>{tx.payment_method || tx.type || formattedDate(tx.created_at)}</span>
                   </span>
                 </div>

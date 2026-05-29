@@ -4,9 +4,9 @@ import type { EnquiryStatus } from '../types';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
 import { Mail, Loader2, Paperclip } from 'lucide-react';
-import SelectComponent from '@/components/ui/select';
 import { useAdminInquiryDetails, useUpdateInquiryStatus } from '@/features/enquiries/hooks/useEnquiries';
 import { NavLink } from 'react-router-dom';
+import { FormSelect } from '@/features/orders/components/OrderFormUI';
 
 interface EnquiryDetailsDialogProps {
   enquiryId: number | undefined;
@@ -16,13 +16,13 @@ interface EnquiryDetailsDialogProps {
 export function EnquiryDetailsDialog({ enquiryId, onClose }: EnquiryDetailsDialogProps) {
   const { data: detailsResponse, isLoading } = useAdminInquiryDetails(enquiryId || '');
   const { mutate: updateStatus, isPending: isUpdating } = useUpdateInquiryStatus();
-  const [currentStatus, setCurrentStatus] = useState<EnquiryStatus>('Pending');
+  const [currentStatus, setCurrentStatus] = useState<EnquiryStatus>('pending');
 
   const enquiry = detailsResponse?.data;
 
   useEffect(() => {
     if (enquiry) {
-      setCurrentStatus(enquiry.status);
+      setCurrentStatus(enquiry.status.toLowerCase() as EnquiryStatus);
     }
   }, [enquiry]);
 
@@ -57,36 +57,36 @@ export function EnquiryDetailsDialog({ enquiryId, onClose }: EnquiryDetailsDialo
         <div className="flex flex-col gap-6">
           <div className="grid grid-cols-2 gap-x-12 gap-y-4">
             <div className="space-y-1">
-              <Label className="mb-0 text-[11px] font-extrabold uppercase text-slate-700 tracking-wider">Customer</Label>
-              <p className="mb-1 mt-0 text-[13px] font-medium text-slate-500">{enquiry.customer}</p>
+              <Label className="mb-0 text-[12px] font-extrabold uppercase text-slate-700 tracking-wider">Customer</Label>
+              <p className="mb-1 mt-0 text-[14px] font-medium text-slate-500">{enquiry.customer}</p>
             </div>
             <div className="space-y-1">
-              <Label className="mb-0 text-[11px] font-extrabold uppercase text-slate-700 tracking-wider">Email</Label>
-              <p className="mb-1 mt-0 text-[13px] font-medium text-slate-500">{enquiry.email}</p>
+              <Label className="mb-0 text-[12px] font-extrabold uppercase text-slate-700 tracking-wider">Email</Label>
+              <p className="mb-1 mt-0 text-[14px] font-medium text-slate-500">{enquiry.email}</p>
             </div>
             <div className="space-y-1">
-              <Label className="mb-0 text-[11px] font-extrabold uppercase text-slate-700 tracking-wider">Issue Type</Label>
-              <p className="mb-1 mt-0 text-[13px] font-medium text-slate-500">{enquiry.issue_type}</p>
+              <Label className="mb-0 text-[12px] font-extrabold uppercase text-slate-700 tracking-wider">Issue Type</Label>
+              <p className="mb-1 mt-0 text-[14px] font-medium text-slate-500">{enquiry.issue_type}</p>
             </div>
             <div className="space-y-1">
-              <Label className="mb-0 text-[11px] font-extrabold uppercase text-slate-700 tracking-wider">Date</Label>
-              <p className="mb-1 mt-0 text-[13px] font-medium text-slate-500">{enquiry.date}</p>
+              <Label className="mb-0 text-[12px] font-extrabold uppercase text-slate-700 tracking-wider">Date</Label>
+              <p className="mb-1 mt-0 text-[14px] font-medium text-slate-500">{enquiry.date}</p>
             </div>
           </div>
 
           <div className="border-t border-slate-100 dark:border-zinc-800" />
 
           <div className="space-y-2">
-            <Label className="text-[11px] font-extrabold uppercase text-slate-700 tracking-wider">Message</Label>
+            <Label className="text-[12px] font-extrabold uppercase text-slate-700 tracking-wider">Message</Label>
             <div className="bg-[#e5e7eb] dark:bg-zinc-800 p-4 rounded-lg min-h-[60px]">
-              <p className="text-[13px] text-slate-600 dark:text-zinc-300 font-medium whitespace-pre-wrap">
+              <p className="text-[14px] text-slate-600 dark:text-zinc-300 font-medium whitespace-pre-wrap">
                 {enquiry.message || "No message provided."}
               </p>
             </div>
           </div>
 
           <div className="space-y-1">
-            <Label className="text-[11px] font-extrabold uppercase text-slate-700 tracking-wider">Attachments</Label>
+            <Label className="text-[12px] font-extrabold uppercase text-slate-700 tracking-wider">Attachments</Label>
             {enquiry.attachments && enquiry.attachments.length > 0 ? (
               <div className="flex flex-wrap gap-2 pt-1">
                 {enquiry.attachments.map((file: any, index: number) => (
@@ -123,7 +123,7 @@ export function EnquiryDetailsDialog({ enquiryId, onClose }: EnquiryDetailsDialo
             </NavLink>
 
             <div className="flex items-center gap-4">
-              <span className="text-[13px] font-medium text-slate-600">Change Status:</span>
+              <span className="text-[14px] font-medium text-slate-600">Change Status:</span>
               {/* <Select value={currentStatus} onValueChange={(val: EnquiryStatus) => setCurrentStatus(val || 'closed')}>
                 <SelectTrigger className="w-[140px] h-10 border-slate-200 dark:border-zinc-800">
                   <SelectValue placeholder="Status" />
@@ -134,8 +134,8 @@ export function EnquiryDetailsDialog({ enquiryId, onClose }: EnquiryDetailsDialo
                   <SelectItem value="closed">Closed</SelectItem>
                 </SelectContent>
               </Select> */}
-              <SelectComponent
-                data={[
+              <FormSelect
+                options={[
                   {
                     label: 'Pending',
                     value: 'pending'
@@ -151,7 +151,7 @@ export function EnquiryDetailsDialog({ enquiryId, onClose }: EnquiryDetailsDialo
                 ]}
                 value={currentStatus}
                 placeholder="Select Status"
-                className="w-30 h-8 text-xs font-bold"
+                className="w-40 h-8 text-sm font-bold"
                 onValueChange={(value: string | null) => setCurrentStatus(value as EnquiryStatus)}
               />
             </div>

@@ -114,3 +114,36 @@ export const useExportItems = () => {
     },
   });
 };
+
+/**
+ * Hook to set an item as default
+ */
+export const useSetDefaultItem = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (id: number | string) => itemsService.setDefault(id),
+    onSuccess: (response) => {
+      if (response.status) {
+        showToast(response.message || "Default item updated successfully", "success");
+        queryClient.invalidateQueries({ queryKey: QUERY_KEYS.ITEMS.LIST });
+      } else {
+        showToast(response.message || "Failed to set default item", "error");
+      }
+    },
+    onError: (error: any) => {
+      showToast(error.message || "An error occurred", "error");
+    },
+  });
+};
+
+/**
+ * Hook to fetch the default item details
+ */
+export const useDefaultItem = (enabled: boolean = true) => {
+  return useQuery({
+    queryKey: QUERY_KEYS.ITEMS.DEFAULT,
+    queryFn: () => itemsService.getDefault(),
+    enabled: !!enabled,
+  });
+};

@@ -156,4 +156,38 @@ export const ordersService = {
         const response = await api.get<OrderCountsResponse>(API_ENDPOINTS.ORDERS.COUNTS, { params });
         return response.data;
     },
+
+    /**
+     * Get receiver address for a specific order
+     */
+    getReceiverAddress: async (orderId: string | number): Promise<any> => {
+        const response = await api.get(API_ENDPOINTS.ORDERS.RECEIVER_ADDRESS(orderId));
+        return response.data;
+    },
+
+    /**
+     * Update receiver address for a specific order
+     */
+    updateReceiverAddress: async (orderId: string | number, data: any): Promise<any> => {
+        const response = await api.put(API_ENDPOINTS.ORDERS.RECEIVER_ADDRESS(orderId), data);
+        return response.data;
+    },
+
+    /**
+     * Download sample CSV for order import
+     */
+    downloadImportSample: async (): Promise<Blob> => {
+        const response = await api.get(API_ENDPOINTS.ORDERS.IMPORT_SAMPLE, {
+            responseType: "blob",
+        });
+        return response.data;
+    },
+
+    /**
+     * Archive an order
+     */
+    archiveOrder: async (orderId: string | number): Promise<any> => {
+        const response = await api.post(API_ENDPOINTS.ORDERS.ARCHIVE(orderId));
+        return response.data;
+    },
 };

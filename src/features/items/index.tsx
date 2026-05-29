@@ -14,11 +14,13 @@ import {
   useUpdateItem,
   useDeleteItem,
   useExportItems,
+  useSetDefaultItem,
 } from './hooks/useItems';
 import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
 
 import { useDebounce } from '@/hooks/useDebounce';
+import { CustomTooltip } from '@/components/common/CustomTooltip';
 
 export default function MyItemsPage() {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
@@ -41,6 +43,7 @@ export default function MyItemsPage() {
   const updateItemMutation = useUpdateItem();
   const deleteItemMutation = useDeleteItem();
   const exportItemsMutation = useExportItems();
+  const setDefaultItemMutation = useSetDefaultItem();
 
   const handleSearch = useCallback((search: string) => {
     setSearch(search);
@@ -119,22 +122,28 @@ export default function MyItemsPage() {
   // }, []);
 
   const columns = useMemo<Column<Item>[]>(() => [
-    // {
-    //   key: "select",
-    //   header: "",
-    //   cell: () => (
-    //     <Star className='h-4 w-4 text-amber-400 fill-amber-400' />
-    //   )
-    // },
     {
       key: "item_name",
       accessor: "item_name",
       header: "Item Name",
       sortable: true,
       searchable: true,
-      cell: (val, _, index) => (
+      cell: (val, row) => (
         <div className='flex items-center gap-3'>
-          <Star className={`h-4 w-4 ${index === 0 ? 'fill-amber-400 text-amber-400' : 'text-primary-400'}`} />
+          <CustomTooltip title={row.is_default ? "Default Item" : "Set as Default"}>
+            <button
+              onClick={() => {
+                if (!row.is_default) {
+                  setDefaultItemMutation.mutate(row.id);
+                }
+              }}
+              disabled={row.is_default || setDefaultItemMutation.isPending}
+              className={`p-0 bg-transparent border-none outline-none focus:outline-none transition-transform active:scale-95 ${row.is_default ? 'cursor-default' : 'cursor-pointer hover:scale-110'
+                }`}
+            >
+              <Star className={`h-4 w-4 ${row.is_default ? 'fill-amber-400 text-amber-400' : 'text-primary-400'}`} />
+            </button>
+          </CustomTooltip>
           <span className='text-xs font-medium'>{val}</span>
         </div>
       )
@@ -145,6 +154,12 @@ export default function MyItemsPage() {
       header: "Item Code",
       sortable: true,
       searchable: true,
+    },
+    {
+      key: "dimensions",
+      accessor: "dimensions",
+      header: "Dimensions",
+      cell: (_, row) => `${row.item_length} × ${row.item_width} × ${row.item_height}`
     },
     {
       key: "item_cubic",
@@ -172,17 +187,21 @@ export default function MyItemsPage() {
       className: "w-20 px-0 pr-3 print:hidden",
       cell: (_, row) => (
         <div className="flex items-center gap-4">
-          <Button variant="ghost" size="sm" className="p-0 hover:text-primary bg-transparent dark:hover:bg-transparent" onClick={() => handleEditItem(row)}>
-            <Pencil className='h-4 w-4' />
-          </Button>
-          <Button variant="ghost" size="sm" className="p-0 hover:text-red-600 bg-transparent dark:hover:bg-transparent" onClick={() => handleDeleteClick(row.id)}>
-            <Pencil className='h-4 w-4 hidden' /> {/* Hidden pencil to maintain spacing if needed */}
-            <Trash className='h-4 w-4' />
-          </Button>
+          <CustomTooltip title="Edit item">
+            <Button variant="ghost" size="sm" className="p-0 hover:text-primary bg-transparent dark:hover:bg-transparent" onClick={() => handleEditItem(row)}>
+              <Pencil className='h-4 w-4' />
+            </Button>
+          </CustomTooltip>
+
+          <CustomTooltip title="Delete item">
+            <Button variant="ghost" size="sm" className="p-0 hover:text-red-600 bg-transparent dark:hover:bg-transparent" onClick={() => handleDeleteClick(row.id)}>
+              <Trash className='h-4 w-4' />
+            </Button>
+          </CustomTooltip>
         </div>
       )
     }
-  ], [handleEditItem, handleDeleteClick]);
+  ], [handleEditItem, handleDeleteClick, setDefaultItemMutation]);
 
   return (
     <div className="flex flex-col flex-1 gap-2 p-page-padding min-h-0 animate-in fade-in slide-in-from-bottom-2 duration-500">

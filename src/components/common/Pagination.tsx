@@ -2,8 +2,9 @@ import React from 'react';
 import { Button } from '@/components/ui/button';
 import { ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import SelectComponent from '../ui/select';
+// import SelectComponent from '../ui/select';
 import { DEFAULT_PAGE_SIZES } from '@/constants/global.constants';
+import { FormSelect } from '@/features/orders/components/OrderFormUI';
 
 export interface PaginationProps {
   currentPage: number;
@@ -51,11 +52,18 @@ export const Pagination: React.FC<PaginationProps> = ({
       {pageSizeInFooter && (
         <div className="flex items-center gap-2">
           <span className="text-[13px] text-gray-500 dark:text-zinc-400">Page size:</span>
-          <SelectComponent
+          {/* <SelectComponent
             className='h-8 w-16'
             value={pageSize.toString()}
             onValueChange={(val) => val && onItemsPerPageChange(parseInt(val))}
             data={DEFAULT_PAGE_SIZES}
+            placeholder="Select view"
+          /> */}
+          <FormSelect
+            className='h-8 w-16'
+            value={pageSize.toString()}
+            onValueChange={(val) => val && onItemsPerPageChange(parseInt(val))}
+            options={DEFAULT_PAGE_SIZES}
             placeholder="Select view"
           />
         </div>

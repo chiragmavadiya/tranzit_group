@@ -1,9 +1,10 @@
 import { useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useSearchParams } from 'react-router-dom';
 import { Clock } from 'lucide-react';
 import { CustomerHeader } from '../components/customer-detail/CustomerHeader';
 import { CustomerStats } from '../components/customer-detail/CustomerStats';
 import { CustomerTabs } from '../components/customer-detail/CustomerTabs';
+import { CUSTOMER_TABS } from '../components/customer-detail/constants';
 import { ProfileTab } from '../components/customer-detail/ProfileTab';
 import { OrdersTab } from '../components/customer-detail/OrdersTab';
 import { TransactionTab } from '../components/customer-detail/TransactionTab';
@@ -14,7 +15,9 @@ import CustomerDialog from '../components/CustomerDialog';
 
 export default function CustomerDetailPage() {
     const { id } = useParams();
-    const [activeTab, setActiveTab] = useState('Profile');
+    const [searchParams] = useSearchParams();
+    const tabParam = searchParams.get('customerTab');
+    const activeTab = CUSTOMER_TABS.find(t => t.toLowerCase() === tabParam?.toLowerCase()) || 'Profile';
     const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
 
     const { data: response, isLoading } = useCustomerDetails(id as string);
@@ -48,7 +51,7 @@ export default function CustomerDetailPage() {
             <CustomerStats />
 
             <div className="flex flex-col gap-4 flex-1">
-                <CustomerTabs activeTab={activeTab} onTabChange={setActiveTab} />
+                <CustomerTabs />
 
                 <div className="flex-1">
                     {activeTab === 'Profile' && (

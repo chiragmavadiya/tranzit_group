@@ -9,12 +9,13 @@ interface OrdersTabsProps {
   activeTab: TabType;
   onTabChange: (tab: TabType) => void;
   className?: string;
+  customerId?: string;
 }
 
-export function OrdersTabs({ activeTab, onTabChange, className }: OrdersTabsProps) {
+export function OrdersTabs({ activeTab, onTabChange, className, customerId }: OrdersTabsProps) {
   const { role } = useAppSelector((state) => state.auth);
   // Fetch status counts from the counts API
-  const { data: countsData } = useOrderCounts(undefined, !!role);
+  const { data: countsData } = useOrderCounts(customerId, !!role);
 
   return (
     <nav className={cn("flex space-x-0 h-full items-end", className)} aria-label="Tabs">

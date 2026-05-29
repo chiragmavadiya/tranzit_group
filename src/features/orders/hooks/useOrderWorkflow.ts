@@ -1,6 +1,5 @@
-import { useCallback, useMemo, useState, useEffect } from 'react';
+import { useCallback, useMemo, useState, useEffect, useEffectEvent } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { format } from 'date-fns';
 import { useAppSelector } from '@/hooks/store.hooks';
 import { showToast } from '@/components/ui/custom-toast';
 import { useOrderItems } from './useOrderItems';
@@ -14,6 +13,7 @@ import {
 } from './useOrders';
 import { useGlobalCouriers } from '@/features/courier-surcharge/hooks/useGlobalCouriers';
 import type { AddressData, WalletCheckResponse } from '../types';
+import { useDefaultItem } from '@/features/items/hooks/useItems';
 
 const initialAddressData = {
   name: '',
@@ -54,6 +54,7 @@ export const useOrderWorkflow = () => {
   const isEditable = orderType === 'create' || orderType === 'consign' || orderType === 'create-menual' || orderType === 'return';
   const isCreate = orderType === 'create' || orderType === 'create-menual' || orderType === 'return';
 
+  const { data: defaultItem } = useDefaultItem(isCreate && (role !== 'admin'))
   // State Management
   const [walletCheckOpen, setWalletCheckOpen] = useState(false);
   const [walletCheckData, setWalletCheckData] = useState<WalletCheckResponse | null>(null);
@@ -94,7 +95,6 @@ export const useOrderWorkflow = () => {
   const [termsAccepted, setTermsAccepted] = useState(true);
   const [ratesAccepted, setRatesAccepted] = useState(true);
   const [dangerousGoodsAccepted, setDangerousGoodsAccepted] = useState(false);
-  const [pickupDate, setPickupDate] = useState<Date | undefined>(undefined);
   const [selectedCustomer, setSelectedCustomer] = useState<number>();
 
   const {
@@ -114,6 +114,31 @@ export const useOrderWorkflow = () => {
       height: 0,
     },
   ]);
+
+  const setDefaultItemData = useEffectEvent((data: any) => {
+    if ((itemsData.length === 1) || itemsData.length === 0) {
+      console.log("Default item set....2")
+      setItemsData([
+        {
+          // ...defaultItem.data,
+          weight: Number(data?.item_weight) || 0,
+          length: Number(data?.item_length) || 0,
+          width: Number(data?.item_width) || 0,
+          height: Number(data?.item_height) || 0,
+          quantity: 1,
+          type: 'box',
+        },
+      ]);
+    }
+  })
+  useEffect(() => {
+    if (defaultItem && (orderType === 'create' || orderType === 'create-menual' || orderType === 'return')) {
+      console.log("Default item set....")
+      setDefaultItemData(defaultItem.data)
+    }
+  }, [defaultItem, setItemsData, orderType]);
+
+  console.log(itemsData, 'itemsData')
 
   const isValidConsignOrder = useCallback((orderStatus: string | undefined) => {
     if (orderStatus !== 'new' && orderType === 'consign') {
@@ -280,13 +305,13 @@ export const useOrderWorkflow = () => {
       return;
     }
 
-    if (role === 'admin' && !pickupDate) {
-      showToast('Please select a pickup date.', 'error');
+    if (!termsAccepted || !ratesAccepted) {
+      showToast('You must accept all Terms & Conditions and Futile Pickup declarations.', 'error');
       return;
     }
 
-    if (!termsAccepted || !ratesAccepted || !dangerousGoodsAccepted) {
-      showToast('You must accept all Terms & Conditions, Dangerous Goods, and Futile Pickup declarations.', 'error');
+    if (!dangerousGoodsAccepted) {
+      showToast("Please confirm that this consignment does not contain dangerous goods", 'error');
       return;
     }
 
@@ -305,7 +330,6 @@ export const useOrderWorkflow = () => {
       },
       surcharges: [],
       delivery_instructions: deliveryInstructions,
-      pickup_date: pickupDate ? format(pickupDate, 'yyyy-MM-dd') : '',
       terms_and_conditions: termsAccepted,
       totals: {
         subtotal: quoteData?.courier?.base || 0,
@@ -326,7 +350,7 @@ export const useOrderWorkflow = () => {
     const executeCreateOrder = () => {
       createOrder(payload, {
         onSuccess: (response) => {
-          if (response.ok) {
+          if (response.status) {
             showToast('Orders Created successfully', 'success');
             navigate(`${role === 'admin' ? '/admin' : ''}/orders/view/${response.order_number}`);
             setWalletCheckOpen(false);
@@ -361,7 +385,7 @@ export const useOrderWorkflow = () => {
         showToast('Failed to create orders', 'error');
       },
     });
-  }, [itemsData, addressData, role, selectedCustomer, pickupDate, termsAccepted, ratesAccepted, dangerousGoodsAccepted, calculation.totalItems, calculation.grandTotal, courierData, insuranceSelected, signatureSelected, deliveryInstructions, quoteData?.courier?.base, quoteData?.courier?.gst, quoteData?.courier?.price, quoteData?.courier?.freight_levy, walletCheckData?.wallet_balance, orderType, manualOrderData.trackingNumber, manualOrderData.courierId, manualOrderData.amount, checkWallet, createOrder, navigate, printLabel]);
+  }, [itemsData, addressData, role, selectedCustomer, termsAccepted, ratesAccepted, dangerousGoodsAccepted, calculation.totalItems, calculation.grandTotal, courierData, insuranceSelected, signatureSelected, deliveryInstructions, quoteData?.courier?.base, quoteData?.courier?.gst, quoteData?.courier?.price, quoteData?.courier?.freight_levy, walletCheckData?.wallet_balance, orderType, manualOrderData.trackingNumber, manualOrderData.courierId, manualOrderData.amount, checkWallet, createOrder, navigate, printLabel]);
 
   // Order Cancellation Flow
   const onCancelOrder = useCallback((manual: boolean = false) => {
@@ -427,7 +451,6 @@ export const useOrderWorkflow = () => {
       },
       surcharges: [],
       delivery_instructions: deliveryInstructions,
-      pickup_date: pickupDate ? format(pickupDate, 'yyyy-MM-dd') : '',
       terms_and_conditions: termsAccepted,
       totals: {
         subtotal: quoteData?.courier?.base || calculation.servicePrice,
@@ -469,7 +492,6 @@ export const useOrderWorkflow = () => {
     insuranceSelected,
     signatureSelected,
     deliveryInstructions,
-    pickupDate,
     quoteData?.courier,
     calculation,
     orderType,
@@ -597,8 +619,6 @@ export const useOrderWorkflow = () => {
     setRatesAccepted,
     dangerousGoodsAccepted,
     setDangerousGoodsAccepted,
-    pickupDate,
-    setPickupDate,
     selectedCustomer,
     setSelectedCustomer,
     itemsData,

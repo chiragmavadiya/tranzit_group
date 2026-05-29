@@ -1,7 +1,7 @@
 import React, { useMemo } from 'react'
 import { Box, Plus, Trash2, Package, Scale, Ruler } from 'lucide-react'
 import { Button } from '@/components/ui/button'
-import SelectComponent from '@/components/ui/select'
+// import SelectComponent from '@/components/ui/select'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import type { ItemData } from '@/features/orders/types'
@@ -13,6 +13,7 @@ import {
   AccordionTrigger,
 } from '@/components/ui/accordion'
 import { useAppSelector } from '@/hooks/store.hooks'
+import { FormSelect } from '../OrderFormUI'
 
 interface ItemsTableProps {
   items: ItemData[]
@@ -71,10 +72,10 @@ export const ItemsTable: React.FC<ItemsTableProps> = React.memo(({
         ...currentData,
         item_id: selectedItem.id,
         item_name: selectedItem.item_name,
-        weight: Number(selectedItem.weight || 1),
-        length: Number(selectedItem.length || 1),
-        width: Number(selectedItem.width || 1),
-        height: Number(selectedItem.height || 1),
+        weight: Number(selectedItem.item_weight || 1),
+        length: Number(selectedItem.item_length || 1),
+        width: Number(selectedItem.item_width || 1),
+        height: Number(selectedItem.item_height || 1),
       })
     }
   }
@@ -188,7 +189,7 @@ export const ItemsTable: React.FC<ItemsTableProps> = React.memo(({
                           {/* Type Selection */}
                           <div className="flex flex-col gap-1 w-[180px] shrink-0">
                             <Label className="text-[12px] font-medium text-gray-600 dark:text-zinc-400">Type</Label>
-                            <SelectComponent
+                            {/* <SelectComponent
                               value={item.type || 'box'}
                               onValueChange={(val) => onUpdateItem?.(idx, 'type', val!)}
                               data={[
@@ -197,6 +198,18 @@ export const ItemsTable: React.FC<ItemsTableProps> = React.memo(({
                               ]}
                               placeholder="Select Type"
                               className="h-8 text-sm font-medium"
+                            /> */}
+                            <FormSelect
+                              // label='Type'
+                              options={[
+                                { label: 'Parcel', value: 'box' },
+                                { label: 'My Items', value: 'my_item' }
+                              ]}
+                              value={item.type || 'box'}
+                              onValueChange={(val) => onUpdateItem?.(idx, 'type', val!)}
+                              allowClear={false}
+                              className="h-8 text-sm font-medium"
+                              placeholder="Select Type"
                             />
                           </div>
 
@@ -217,12 +230,21 @@ export const ItemsTable: React.FC<ItemsTableProps> = React.memo(({
                           {item.type === 'my_item' ? (
                             <div className="flex flex-col gap-1 flex-1">
                               <Label className="text-[12px] font-medium text-gray-600 dark:text-zinc-400">Select Item</Label>
-                              <SelectComponent
+                              {/* <SelectComponent
                                 value={item.item_id?.toString() || ''}
                                 onValueChange={(val) => handlePredefinedItemSelect(idx, val!)}
                                 data={predefinedItemsOptions}
                                 placeholder="Select a predefined item"
                                 className="h-8 text-sm font-medium"
+                              /> */}
+                              <FormSelect
+                                // label='Type'
+                                options={predefinedItemsOptions}
+                                value={item.item_id?.toString() || ''}
+                                onValueChange={(val) => handlePredefinedItemSelect(idx, val!)}
+                                allowClear={false}
+                                className="h-8 text-sm font-medium"
+                                placeholder="Select a predefined item"
                               />
                             </div>
                           ) : (

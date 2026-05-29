@@ -235,3 +235,71 @@ export const useOrderCounts = (customerId?: string | number, enabled: boolean = 
   });
 };
 
+/**
+ * Hook to fetch receiver address for a specific order
+ */
+export const useOrderReceiverAddress = (orderId: string | number, enabled: boolean = true) => {
+  return useQuery({
+    queryKey: QUERY_KEYS.ORDERS.RECEIVER_ADDRESS(orderId),
+    queryFn: () => ordersService.getReceiverAddress(orderId),
+    enabled: !!orderId && enabled,
+  });
+};
+
+/**
+ * Hook to update receiver address for a specific order
+ */
+export const useUpdateOrderReceiverAddress = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ orderId, data }: { orderId: string | number; data: any }) =>
+      ordersService.updateReceiverAddress(orderId, data),
+    onSuccess: (_, { orderId }) => {
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.ORDERS.RECEIVER_ADDRESS(orderId) });
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.ORDERS.DETAILS(orderId) });
+    },
+    onError: (error: any) => {
+      showToast(error?.message || "Failed to update receiver address", "error")
+    }
+  });
+};
+
+/**
+ * Hook to download sample CSV for order import
+ */
+export const useDownloadImportSample = () => {
+  return useMutation({
+    mutationFn: ordersService.downloadImportSample,
+    onSuccess: (blob) => {
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.setAttribute('download', 'orders_import_sample.csv');
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      showToast('Sample CSV downloaded successfully', 'success');
+    },
+    onError: (error: any) => {
+      showToast(error?.message || "Failed to download sample CSV", "error");
+    }
+  });
+};
+
+/**
+ * Hook to archive an order
+ */
+export const useArchiveOrder = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ordersService.archiveOrder,
+    onSuccess: () => {
+      showToast('Order archived successfully', 'success');
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.ORDERS.LIST });
+    },
+    onError: (error: any) => {
+      showToast(error?.message || "Failed to archive order", "error");
+    }
+  });
+};
+

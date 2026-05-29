@@ -37,11 +37,11 @@ export const ARTICLE_COLUMNS = (
       sortable: true,
       cell: (val) => {
         let variant: "default" | "secondary" | "destructive" | "outline" = "secondary";
-        if (val === 'Published') variant = "default";
+        if (val === 'Published') variant = "outline";
         if (val === 'Archived') variant = "destructive";
 
         return (
-          <Badge variant={variant} className="font-bold text-[10px] uppercase tracking-wider h-5 px-2">
+          <Badge variant={variant} className="tracking-wider h-5 px-2">
             {val as string}
           </Badge>
         );

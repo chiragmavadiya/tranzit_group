@@ -1,13 +1,13 @@
 import type { InvoiceStatus } from '../types';
 
 export const INVOICE_STATUS_COLORS: Record<InvoiceStatus, string> = {
-  Paid: 'bg-emerald-100 text-emerald-700 dark:bg-emerald-500/10 dark:text-emerald-400',
-  Partial: 'bg-orange-100 text-orange-700 dark:bg-orange-500/10 dark:text-orange-400',
-  Draft: 'bg-slate-100 text-slate-700 dark:bg-slate-500/10 dark:text-slate-400',
-  Pending: 'bg-red-100 text-red-700 dark:bg-red-500/10 dark:text-red-400',
-  Unpaid: 'bg-red-100 text-red-700 dark:bg-red-500/10 dark:text-red-400',
-  Send: 'bg-slate-100 text-slate-700 dark:bg-slate-500/10 dark:text-slate-400',
-  Overdue: 'bg-red-100 text-red-700 dark:bg-red-500/10 dark:text-red-400',
+  paid: 'bg-emerald-100 text-emerald-700 dark:bg-emerald-500/10 dark:text-emerald-400',
+  partial: 'bg-orange-100 text-orange-700 dark:bg-orange-500/10 dark:text-orange-400',
+  draft: 'bg-slate-100 text-slate-700 dark:bg-slate-500/10 dark:text-slate-400',
+  pending: 'bg-red-100 text-red-700 dark:bg-red-500/10 dark:text-red-400',
+  unpaid: 'bg-red-100 text-red-700 dark:bg-red-500/10 dark:text-red-400',
+  send: 'bg-slate-100 text-slate-700 dark:bg-slate-500/10 dark:text-slate-400',
+  overdue: 'bg-red-100 text-red-700 dark:bg-red-500/10 dark:text-red-400',
 };
 
 export const TERMS_CONDITIONS = [

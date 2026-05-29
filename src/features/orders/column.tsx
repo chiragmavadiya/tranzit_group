@@ -18,9 +18,11 @@ export const getOrdersColumns = (
   navigate: any,
   customerEditClick: (id: string) => void,
   onDownloadLabel?: (orderId: string) => void,
-  onCancelOrder?: (orderId: string) => void,
+  _onCancelOrder?: (orderId: string) => void,
   downloadingLabelId?: string | null,
   fromCustomer: boolean = false,
+  onArchiveOrder?: (orderId: string) => void,
+  updateToArchiveId?: string | null
 ): Column<Order>[] => {
 
   const printedAndShippedActions = (value: string) => [
@@ -37,7 +39,7 @@ export const getOrdersColumns = (
     {
       label: "Archived order",
       onClick: () => {
-        onCancelOrder?.(value);
+        onArchiveOrder?.(value);
       },
       // icon: Archive,
       variant: "destructive" as const,
@@ -53,7 +55,9 @@ export const getOrdersColumns = (
     },
     {
       label: "Archive order",
-      onClick: () => { },
+      onClick: () => {
+        onArchiveOrder?.(value);
+      },
       variant: "destructive" as const,
       className: "text-red-600 dark:text-red-400 font-medium"
     },
@@ -100,17 +104,26 @@ export const getOrdersColumns = (
         cell: (value: string, row: Order) => (
           <div className="flex items-center gap-1">
             {/* <img src={row?.courier_logo || 'https://api.tranzit.digisite.net/assets/img/couriers/direct-freight.png'} className="h-6" alt="" /> */}
-            <img src={row?.courier_logo || 'https://api.tranzit.digisite.net/assets/img/couriers/logo-auspost.png'} className="h-6" alt="" />
-            <span>{value}</span>
+            <div>
+              <img src={row?.courier_logo || 'https://api.tranzit.digisite.net/assets/img/couriers/logo-auspost.png'} className="h-6" alt="" />
+            </div>
+            <div className="flex flex-col">
+              <span className="font-medium">{value}</span>
+              {row.product_id && <span className="font-normal text-sm">Product - {row.product_id}</span>}
+            </div>
           </div>
         )
       },
-      ...(orderType !== 'new' ? [{
-        header: orderType === 'shipped' || orderType === 'archived' || orderType === 'printed' ? 'TRANSIT STATUS' : 'STATUS', key: 'status', cell: (value: string) => <StatusBadge status={value === "Payment pending" ? "Courier not assign" : value} />
+
+      ...(orderType === 'new' ? [{
+        header: 'STATUS', key: 'status', cell: (value: string) => <StatusBadge status={value === "Payment pending" ? "Courier not assign" : value} />
       }] : []),
-      ...(orderType === 'archived' ? [{
-        header: 'ORDER STATUS', key: 'status', cell: (value: string) => <StatusBadge status={value === "Payment pending" ? "Courier not assign" : value} />
+      ...((orderType == 'archived' || orderType === 'shipped') ? [{
+        header: 'TRANSIT STATUS', key: 'tracking_status', cell: (value: string) => <StatusBadge status={value} />
       }] : []),
+      // ...(orderType === 'archived' ? [{
+      //   header: 'ORDER STATUS', key: 'status', cell: (value: string) => <StatusBadge status={value === "Payment pending" ? "Courier not assign" : value} />
+      // }] : []),
       {
         header: 'AMOUNT', key: 'amount', cell: (value: string) => <span className="font-medium"> {formateCurrency(Number(value))}</span>
       },
@@ -194,7 +207,7 @@ export const getOrdersColumns = (
                     size="sm"
                     className="h-8 w-8 p-0"
                   >
-                    {downloadingLabelId === value ? (
+                    {(downloadingLabelId === value || updateToArchiveId === value) ? (
                       <Loader2 className="h-4 w-4 text-primary animate-spin" />
                     ) : (
                       <MoreVertical className="h-4 w-4" />

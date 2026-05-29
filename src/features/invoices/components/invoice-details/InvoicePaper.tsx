@@ -316,10 +316,8 @@ export const InvoicePaper: React.FC<InvoicePaperProps> = ({
                 options={[
                   { value: 'draft', label: 'Draft' },
                   { value: 'send', label: 'Send' },
-                  { value: 'pending', label: 'Pending' },
                   { value: 'unpaid', label: 'Unpaid' },
                   { value: 'partial', label: 'Partial' },
-                  { value: 'overdue', label: 'Overdue' },
                   { value: 'paid', label: 'Paid' },
                 ]}
                 className="w-full space-y-1 col-span-1"
@@ -630,7 +628,7 @@ export const InvoicePaper: React.FC<InvoicePaperProps> = ({
                               <Button
                                 variant="outline"
                                 size="sm"
-                                onClick={() => onDeletePayment?.(p.id)}
+                                onClick={() => onDeletePayment?.(p.payment_id)}
                                 className="h-7 text-sm font-bold text-red-600 bg-white border border-red-200 rounded px-3 hover:bg-red-50 transition-colors cursor-pointer"
                               >
                                 Delete

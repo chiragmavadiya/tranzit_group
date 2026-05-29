@@ -3,6 +3,7 @@ import type { GenericOption } from '../enquiry/types';
 export const CHARGE_BASIS_OPTIONS: GenericOption[] = [
   { label: 'Per Consignment', value: 'per_consignment' },
   { label: 'Per Pallet', value: 'per_pallet' },
+  { label: 'Per Item', value: 'per_item' },
   { label: 'Per KG', value: 'per_kg' },
 ];
 

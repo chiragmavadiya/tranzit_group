@@ -3,7 +3,6 @@ import {
   MessageSquare,
   HelpCircle,
   Clock,
-  ShieldCheck,
   ExternalLink
 } from 'lucide-react';
 import { NavLink } from 'react-router-dom';
@@ -59,7 +58,7 @@ export default function EnquiryPage() {
                 </div>
               </div>
 
-              <div className="flex gap-4">
+              {/* <div className="flex gap-4">
                 <div className="w-8 h-8 rounded-lg bg-primary/5 dark:bg-primary/10 flex items-center justify-center shrink-0">
                   <ShieldCheck className="w-4 h-4 text-primary" />
                 </div>
@@ -67,7 +66,7 @@ export default function EnquiryPage() {
                   <h4 className="text-sm font-semibold text-gray-900 dark:text-zinc-100 mb-1 leading-tight">Priority Support</h4>
                   <p className="text-[12px] text-gray-500 dark:text-zinc-400 mb-0">Enterprise customers receive priority response within 2 hours.</p>
                 </div>
-              </div>
+              </div> */}
             </div>
 
             <div className="mt-6 pt-6 border-t border-gray-100 dark:border-zinc-800">

@@ -93,6 +93,7 @@ export const API_ENDPOINTS = {
         ORDERS_EXPORT: (id: string | number) => `/admin/customers/${id}/orders/export`,
         TRANSACTION_EXPORT: (id: string | number) => `/admin/customers/${id}/transaction/export`,
         INVOICE_EXPORT: (id: string | number) => `/admin/customers/${id}/invoice/export`,
+        INTEGRATIONS: (id: string | number) => `/admin/customers/${id}/integrations`,
     },
     ADMIN_ACTIVITIES: {
         BASE: "/admin/activities",
@@ -215,6 +216,7 @@ export const QUERY_KEYS = {
         ORDERS: (id: string | number) => ["admin", "customers", "orders", id],
         TRANSACTION: (id: string | number) => ["admin", "customers", "transaction", id],
         INVOICE: (id: string | number) => ["admin", "customers", "invoice", id],
+        INTEGRATIONS: (id: string | number) => ["admin", "customers", "integrations", id],
     },
     ADMIN_ACTIVITIES: {
         LIST: ["admin", "activities", "list"],

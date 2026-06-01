@@ -5,7 +5,7 @@ import type { Item, ItemFormData } from './types';
 import { DataTable } from '@/components/common/DataTable';
 import type { Column } from '@/components/common/types/DataTable.types';
 import { Button } from '@/components/ui/button';
-import { Pencil, Star, Trash } from 'lucide-react';
+import { Pencil, Star, Trash, Loader2 } from 'lucide-react';
 import { ConformationModal } from '@/components/common/ConformationModal';
 
 import {
@@ -141,7 +141,11 @@ export default function MyItemsPage() {
               className={`p-0 bg-transparent border-none outline-none focus:outline-none transition-transform active:scale-95 ${row.is_default ? 'cursor-default' : 'cursor-pointer hover:scale-110'
                 }`}
             >
-              <Star className={`h-4 w-4 ${row.is_default ? 'fill-amber-400 text-amber-400' : 'text-primary-400'}`} />
+              {setDefaultItemMutation.isPending && setDefaultItemMutation.variables === row.id ? (
+                <Loader2 className="h-4! w-4! animate-spin" />
+              ) : (
+                <Star className={`h-4 w-4 ${row.is_default ? 'fill-amber-400 text-amber-400' : 'text-primary-400'}`} />
+              )}
             </button>
           </CustomTooltip>
           <span className='text-xs font-medium'>{val}</span>

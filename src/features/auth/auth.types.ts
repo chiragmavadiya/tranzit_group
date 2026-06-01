@@ -37,6 +37,7 @@ export interface UserAddress {
     created_at: string;
     updated_at: string;
     deleted_at: string | null;
+    country?: string;
 }
 
 export interface User {

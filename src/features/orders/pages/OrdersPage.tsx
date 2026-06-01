@@ -38,6 +38,7 @@ export default function OrdersPage({ fromCustomer, customerId }: { fromCustomer?
   const [isCancellingOrders, setIsCancellingOrders] = useState(false);
   const [showCancelModal, setShowCancelModal] = useState(false);
   const [orderToCancel, setOrderToCancel] = useState<string | null>(null);
+  const [orderToArchive, setOrderToArchive] = useState<string | null>(null);
   const [addressEditModal, setAddressEditModal] = useState<string>();
   const selectedCustomer = searchParams.get('customerId') || undefined;
   const setSelectedCustomer = useCallback((val: string | undefined) => {
@@ -211,8 +212,8 @@ export default function OrdersPage({ fromCustomer, customerId }: { fromCustomer?
   }, []);
 
   const handleArchiveOrder = useCallback((orderId: string) => {
-    archiveOrderMutation.mutate(orderId);
-  }, [archiveOrderMutation]);
+    setOrderToArchive(orderId);
+  }, []);
 
   const downloadingLabelId = downloadLabelMutation.isPending ? String(downloadLabelMutation.variables) : null;
   const updateToArchiveId = archiveOrderMutation.isPending ? String(archiveOrderMutation.variables) : null;
@@ -452,6 +453,27 @@ export default function OrdersPage({ fromCustomer, customerId }: { fromCustomer?
             cancelText="No, Keep"
             confirmVariant="destructive"
             loading={isCancellingOrders}
+          />
+        )
+      }
+      {
+        orderToArchive && (
+          <ConformationModal
+            open={!!orderToArchive}
+            onOpenChange={(open) => !open && setOrderToArchive(null)}
+            title="Archive Order"
+            description={`Are you sure you want to archive order ${orderToArchive}? This action cannot be undone.`}
+            onConfirm={() => {
+              archiveOrderMutation.mutate(orderToArchive, {
+                onSettled: () => {
+                  setOrderToArchive(null);
+                }
+              });
+            }}
+            confirmText="Yes, Archive"
+            cancelText="No, Keep"
+            confirmVariant="destructive"
+            loading={archiveOrderMutation.isPending}
           />
         )
       }

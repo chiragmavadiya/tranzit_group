@@ -1,7 +1,6 @@
-import React, { useState } from 'react';
-import { Plus, Loader2, CheckCircle2, Truck, Settings2, Link2Off, RefreshCw } from 'lucide-react';
+import { useCallback, useState } from 'react';
+import { Loader2, CheckCircle2, Truck, Settings2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { DataTable } from '@/components/common/DataTable';
 import { Drawer } from '@/components/ui/drawer';
 import { FormInput } from '@/features/orders/components/OrderFormUI';
 import { Badge } from '@/components/ui/badge';
@@ -9,13 +8,13 @@ import { Stepper } from '@/components/ui/stepper';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useQueryClient } from '@tanstack/react-query';
 import {
-  useIntegrationStatus,
   useConnectIntegration,
-  useSyncIntegration,
-  useDisconnectIntegration
+  useDisconnectIntegration,
+  useIntegrationsList,
+  useIntegrationStatusMutation
 } from '@/features/integrations/hooks/useIntegrations';
 import { showToast } from '@/components/ui/custom-toast';
-import { CustomTooltip } from '@/components/common/CustomTooltip';
+import RenderIntegrationSection from '@/features/integrations/components/RenderIntegrationSection';
 
 const carriers = [
   { id: 'auspost', name: 'Australia Post', icon: Truck, status: 'available' },
@@ -38,194 +37,91 @@ export default function CarrierIntegrationsPage() {
   const [submitted, setSubmitted] = useState(false);
 
   // Fetch status of the individual courier integrations
-  const auspostStatus = useIntegrationStatus('auspost');
-  const aramexStatus = useIntegrationStatus('aramex');
-  const mypostStatus = useIntegrationStatus('mypostbusiness');
-  const directStatus = useIntegrationStatus('directfreight');
+  const { data: listResponse, isLoading: listLoading } = useIntegrationsList();
+  // Fetch status of the individual courier integrations
+  const { mutate: getIntegrationStatus, isPending: statusLoading, variables: statusVariables } = useIntegrationStatusMutation()
+  // const auspostStatus = useIntegrationStatus('auspost');
+  // const aramexStatus = useIntegrationStatus('aramex');
+  // const mypostStatus = useIntegrationStatus('mypostbusiness');
+  // const directStatus = useIntegrationStatus('directfreight');
 
   const connectMutation = useConnectIntegration();
-  const syncMutation = useSyncIntegration();
   const disconnectMutation = useDisconnectIntegration();
 
-  // Combine query loading states
-  const loadingList =
-    auspostStatus.isLoading ||
-    aramexStatus.isLoading ||
-    mypostStatus.isLoading ||
-    directStatus.isLoading;
+  // const integrationsData = React.useMemo(() => {
+  //   const list = [];
+  //   const apData = auspostStatus.data?.data;
+  //   const axData = aramexStatus.data?.data;
+  //   const mpData = mypostStatus.data?.data;
+  //   const dfData = directStatus.data?.data;
 
-  const integrationsData = React.useMemo(() => {
-    const list = [];
-    const apData = auspostStatus.data?.data;
-    const axData = aramexStatus.data?.data;
-    const mpData = mypostStatus.data?.data;
-    const dfData = directStatus.data?.data;
+  //   if (apData?.connected) {
+  //     list.push({
+  //       id: 'auspost',
+  //       carrier: 'Australia Post',
+  //       account: apData.account_number || 'Connected',
+  //       status: 'Active',
+  //       lastSync: apData.last_synced_at || 'Never',
+  //       logo: Truck,
+  //       raw: apData
+  //     });
+  //   }
 
-    if (apData?.connected) {
-      list.push({
-        id: 'auspost',
-        carrier: 'Australia Post',
-        account: apData.account_number || 'Connected',
-        status: 'Active',
-        lastSync: apData.last_synced_at || 'Never',
-        logo: Truck,
-        raw: apData
-      });
-    }
+  //   if (axData?.connected) {
+  //     list.push({
+  //       id: 'aramex',
+  //       carrier: 'Aramex',
+  //       account: axData.account_name || 'Connected',
+  //       status: 'Active',
+  //       lastSync: axData.last_synced_at || 'Never',
+  //       logo: Truck,
+  //       raw: axData
+  //     });
+  //   }
 
-    if (axData?.connected) {
-      list.push({
-        id: 'aramex',
-        carrier: 'Aramex',
-        account: axData.account_name || 'Connected',
-        status: 'Active',
-        lastSync: axData.last_synced_at || 'Never',
-        logo: Truck,
-        raw: axData
-      });
-    }
+  //   if (mpData?.connected) {
+  //     list.push({
+  //       id: 'mypostbusiness',
+  //       carrier: 'MyPost Business',
+  //       account: mpData.account_label || 'Connected',
+  //       status: 'Active',
+  //       lastSync: mpData.last_synced_at || 'Never',
+  //       logo: Truck,
+  //       raw: mpData
+  //     });
+  //   }
 
-    if (mpData?.connected) {
-      list.push({
-        id: 'mypostbusiness',
-        carrier: 'MyPost Business',
-        account: mpData.account_label || 'Connected',
-        status: 'Active',
-        lastSync: mpData.last_synced_at || 'Never',
-        logo: Truck,
-        raw: mpData
-      });
-    }
+  //   if (dfData?.connected) {
+  //     list.push({
+  //       id: 'directfreight',
+  //       carrier: 'Direct Freight',
+  //       account: dfData.account || 'Connected',
+  //       status: 'Active',
+  //       lastSync: dfData.last_synced_at || 'Never',
+  //       logo: Truck,
+  //       raw: dfData
+  //     });
+  //   }
 
-    if (dfData?.connected) {
-      list.push({
-        id: 'directfreight',
-        carrier: 'Direct Freight',
-        account: dfData.account || 'Connected',
-        status: 'Active',
-        lastSync: dfData.last_synced_at || 'Never',
-        logo: Truck,
-        raw: dfData
-      });
-    }
-
-    return list;
-  }, [auspostStatus.data, aramexStatus.data, mypostStatus.data, directStatus.data]);
-
-  const handleSync = (providerId: string) => {
-    syncMutation.mutate(providerId);
-  };
+  //   return list;
+  // }, [auspostStatus.data, aramexStatus.data, mypostStatus.data, directStatus.data]);
 
   const handleEdit = (providerId: string) => {
-    const provider = integrationsData.find(item => item.id === providerId);
-    if (provider) {
-      setSelectedCarrier(providerId);
-      setFormData(provider.raw || {});
-      setSubmitted(false);
-      setErrors({});
-      setCurrentStep(1); // Go straight to Configure step
-      setIsAddOpen(true);
-    }
+    getIntegrationStatus(providerId, {
+      onSuccess: (response) => {
+        setSelectedCarrier(providerId);
+        setFormData(response.data || {});
+        setSubmitted(false);
+        setErrors({});
+        setCurrentStep(1); // Go straight to Configure step
+        setIsAddOpen(true);
+      },
+    });
+    // const provider = integrationsData.find(item => item.id === providerId);
+    // if (provider) {
+
+    // }
   };
-
-  const handleDisconnect = (providerId: string) => {
-    if (window.confirm(`Are you sure you want to disconnect ${providerId}?`)) {
-      disconnectMutation.mutate(providerId, {
-        onSuccess: () => {
-          queryClient.invalidateQueries({ queryKey: ["integration-status", providerId] });
-        }
-      });
-    }
-  };
-
-  const columns = [
-    {
-      header: 'Carrier',
-      key: 'carrier',
-      cell: (_: any, row: any) => {
-        const Icon = row.logo;
-        return (
-          <div className="flex items-center gap-3">
-            <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center">
-              <Icon className="w-4 h-4 text-primary" />
-            </div>
-            <span className="font-semibold text-gray-900 dark:text-zinc-100">{row.carrier}</span>
-          </div>
-        );
-      }
-    },
-    {
-      header: 'Account #',
-      key: 'account',
-      cell: (val: string) => <span className="text-gray-500 dark:text-zinc-400 font-medium">{val}</span>
-    },
-    {
-      header: 'Status',
-      key: 'status',
-      cell: (val: string) => (
-        <Badge className={val === 'Active' ? 'bg-emerald-100 text-emerald-700 hover:bg-emerald-100 dark:bg-emerald-950/30 dark:text-emerald-400' : 'bg-amber-100 text-amber-700 hover:bg-amber-100 dark:bg-amber-950/30 dark:text-amber-400'}>
-          {val}
-        </Badge>
-      )
-    },
-    {
-      header: 'Last Sync',
-      key: 'lastSync',
-    },
-    {
-      header: 'Actions',
-      key: 'actions',
-      cell: (_: any, row: any) => (
-        <div className="flex items-center gap-2">
-          <CustomTooltip title="Sync">
-
-            <Button
-              variant="ghost"
-              size="icon-sm"
-              className="h-8 w-8 text-slate-400 hover:text-primary"
-              onClick={() => handleSync(row.id)}
-              disabled={syncMutation.isPending && syncMutation.variables === row.id}
-            >
-              {syncMutation.isPending && syncMutation.variables === row.id ? (
-                <Loader2 className="w-4 h-4 animate-spin" />
-              ) : (
-                <RefreshCw className="w-4 h-4" />
-              )}
-            </Button>
-          </CustomTooltip>
-
-          <CustomTooltip title="Edit Settings">
-
-            <Button
-              variant="ghost"
-              size="icon-sm"
-              className="h-8 w-8 text-slate-400 hover:text-slate-900 dark:hover:text-white"
-              onClick={() => handleEdit(row.id)}
-            >
-              <Settings2 className="w-4 h-4" />
-            </Button>
-          </CustomTooltip>
-
-          <CustomTooltip title="Disconnect">
-            <Button
-              variant="ghost"
-              size="icon-sm"
-              className="h-8 w-8 text-red-400 hover:text-red-600"
-              onClick={() => handleDisconnect(row.id)}
-              disabled={disconnectMutation.isPending && disconnectMutation.variables === row.id}
-            >
-              {disconnectMutation.isPending && disconnectMutation.variables === row.id ? (
-                <Loader2 className="w-4 h-4 animate-spin" />
-              ) : (
-                <Link2Off className="w-4 h-4" />
-              )}
-            </Button>
-          </CustomTooltip>
-
-        </div>
-      )
-    }
-  ];
 
   const validateForm = () => {
     const newErrors: Record<string, string> = {};
@@ -247,6 +143,14 @@ export default function CarrierIntegrationsPage() {
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
+
+  const onConnect = useCallback((providerId: string) => {
+    setSelectedCarrier(providerId);
+    setSubmitted(false);
+    setErrors({});
+    setCurrentStep(1); // Go straight to Configure step
+    setIsAddOpen(true);
+  }, [])
 
   const handleConnect = () => {
     setSubmitted(true);
@@ -353,55 +257,36 @@ export default function CarrierIntegrationsPage() {
 
   return (
     <div className="flex flex-col gap-6 h-full">
-      <div className="bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-800 rounded-xl shadow-sm overflow-hidden flex flex-col flex-1">
-        {!integrationsData || integrationsData.length === 0 || loadingList ? (
-          <div className="flex flex-col flex-1">
-            {/* Header */}
-            <div className="flex justify-between items-center border-b border-gray-100 dark:border-zinc-800 p-4">
-              <div className="flex flex-col">
-                <h1 className="text-lg font-bold text-gray-800 dark:text-zinc-200 my-0">Carrier Integrations</h1>
-                <p className="text-sm text-gray-500 dark:text-zinc-400 mb-0">Manage your shipping carriers and service connections.</p>
-              </div>
-              <Button onClick={() => setIsAddOpen(true)} className="h-8 bg-primary hover:bg-primary/90 text-white gap-2 rounded-sm">
-                <Plus className="w-4 h-4" />
-                Add Carrier
-              </Button>
-            </div>
+      <div className="bg-white p-4 dark:bg-zinc-900 border border-gray-200 dark:border-zinc-800 rounded-xl shadow-sm overflow-hidden flex flex-col flex-1">
+        <div className="flex flex-col gap-1 mb-3">
+          <h1 className="text-2xl flex items-center gap-2 font-bold text-slate-900 dark:text-zinc-100 my-0">
+            <Truck className="w-6 h-6 text-primary" />
+            Courier Integrations
+          </h1>
+          <p className="text-sm text-slate-500 dark:text-zinc-400 mb-2">Connect your shipping couriers to streamline your workflow.</p>
+        </div>
 
-            {/* Centered Empty State Box */}
-            <div className="flex-1 flex items-center justify-center p-8 bg-gray-50/30 dark:bg-zinc-950/20">
-              <div className="bg-white dark:bg-zinc-900 border border-gray-100 dark:border-zinc-800 p-10 rounded-2xl shadow-[0_4px_20px_rgba(0,0,0,0.03)] dark:shadow-none text-center flex flex-col items-center max-w-sm w-full gap-5">
-                <div className="w-12 h-12 rounded-xl bg-primary/5 dark:bg-primary/10 flex items-center justify-center text-primary">
-                  <Truck className="w-6 h-6" />
-                </div>
-                <p className="text-xs text-slate-500 dark:text-zinc-400 font-medium leading-relaxed max-w-[280px]">
-                  Our platform integrates with all your stores and marketplaces and with your favorite couriers. So you can batch orders, print labels, and send tracking to your customers in fewer clicks than ever.
-                </p>
-                <Button onClick={() => setIsAddOpen(true)} className="h-8 bg-primary hover:bg-primary/90 text-white font-semibold text-[13px] px-6 rounded-sm">
-                  Click to connect your first channel
-                </Button>
-              </div>
-            </div>
-          </div>
-        ) : (
-          <DataTable
-            data={integrationsData}
-            columns={columns}
-            headerTitle="Carrier Integrations"
-            headerDescription="Manage your shipping carriers and service connections."
-            searchable
-            searchPlaceholder="Search carriers..."
-            className='pb-3'
-            totalItems={integrationsData.length}
-            loading={loadingList}
-            customHeader={
-              <Button onClick={() => setIsAddOpen(true)} className="h-8 bg-primary hover:bg-primary/90 text-white gap-2 rounded-sm">
-                <Plus className="w-4 h-4" />
-                Add Carrier
-              </Button>
-            }
+        <div className="flex flex-col gap-10">
+          <RenderIntegrationSection
+            // title="Courier Integrations"
+            // Icon={Truck}
+            data={listResponse?.data?.courier_integrations}
+            disconnectMutation={disconnectMutation}
+            onConnect={onConnect}
+            onConfigure={handleEdit}
+            isLoading={listLoading}
+            configLoadingProvider={statusLoading ? statusVariables : undefined}
           />
-        )}
+          {/* <RenderIntegrationSection
+            title="E-commerce Integrations"
+            Icon={ShoppingCart}
+            data={listResponse?.data?.ecommerce_connections}
+            disconnectMutation={disconnectMutation}
+            onConnect={onConnect}
+            isLoading={listLoading}
+            configLoadingProvider={statusLoading ? statusVariables : undefined}
+          /> */}
+        </div>
       </div>
 
       <Drawer
@@ -520,6 +405,6 @@ export default function CarrierIntegrationsPage() {
           </div>
         </div>
       </Drawer>
-    </div>
+    </div >
   );
 }

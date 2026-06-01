@@ -24,7 +24,7 @@ import {
   Box,
   BookOpen,
   FileBarChart,
-  FileArchive,
+  // FileArchive,
   LifeBuoy,
   Globe
 } from 'lucide-react';
@@ -87,13 +87,14 @@ export const clientSidebarItems: SidebarItem[] = [
     hasDropdown: true,
     subItems: [
       { name: 'All Report', path: '/reports' },
+      { name: 'Parcel Report', path: '/parcel-report' },
     ]
   },
   { name: 'Invoices', icon: FileText, path: '/invoices' },
   { name: 'Enquiry', icon: MessageSquare, path: '/enquiry' },
-  { name: 'Help Center', icon: HelpCircle, path: '/help-center' },
-  { name: 'Parcel Report', icon: FileArchive, path: '/parcel-report' },
-  // { name: 'Integrations', icon: Link, path: '/integrations' },
+  // { name: 'Help Center', icon: HelpCircle, path: '/help-center' }, // NEED TO CHECK CODE
+  // { name: 'Parcel Report', icon: FileArchive, path: '/parcel-report' },
+  { name: 'Integrations', icon: Link, path: '/integrations' },
   {
     name: 'Settings',
     icon: Settings,

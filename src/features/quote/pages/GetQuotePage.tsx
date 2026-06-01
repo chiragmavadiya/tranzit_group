@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { QuoteForm } from '../components/QuoteForm';
 import { QuoteSummary } from '../components/QuoteSummary';
@@ -12,10 +12,12 @@ import { useOrderItems } from '@/features/orders/hooks/useOrderItems';
 import { CarrierCard } from '@/features/orders/components/order-details/CarrierCard';
 import { Button } from '@/components/ui/button';
 import { History } from 'lucide-react';
+import { useDefaultItem } from '@/features/items/hooks/useItems';
 
 export default function GetQuotePage() {
   const { role } = useAppSelector((state) => state.auth);
   const isAdmin = role === 'admin';
+  const { data: defaultItem } = useDefaultItem(role !== 'admin')
   const [margin, setMargin] = useState<string>('0');
   const [pickupCharge, setPickupCharge] = useState<string>('0');
   const [isSendDialogOpen, setIsSendDialogOpen] = useState(false);
@@ -27,6 +29,7 @@ export default function GetQuotePage() {
     fullUpdateItem,
     addItem,
     removeItem,
+    setItemsData
   } = useOrderItems([
     {
       type: "box",
@@ -73,67 +76,30 @@ export default function GetQuotePage() {
     );
   }, [locations, itemsData]);
 
-  // const canCreateOrder = useMemo(() => {
-  //   return isValid && quoteData?.courier;
-  // }, [isValid, quoteData]);
+  const canCreateOrder = useMemo(() => {
+    return isValid && quoteData?.courier;
+  }, [isValid, quoteData]);
 
-  // const handleCreateOrder = () => {
-  //   const mapLocationToAddress = (
-  //     loc: QuoteLocation | null,
-  //     defaultName = '',
-  //     defaultEmail = '',
-  //     defaultPhone = '',
-  //     defaultCompany = ''
-  //   ) => {
-  //     if (!loc) return {
-  //       email: defaultEmail,
-  //       phone: defaultPhone,
-  //       company: defaultCompany,
-  //       address: '',
-  //       address1: '',
-  //       suburb: '',
-  //       state: '',
-  //       street_name: '',
-  //       unit_number: '',
-  //       street_number: '',
-  //       postcode: '',
-  //       country: '',
-  //       name: defaultName,
-  //       saveToAddressBook: false,
-  //     };
-  //     return {
-  //       email: defaultEmail,
-  //       phone: defaultPhone,
-  //       company: defaultCompany,
-  //       address: loc.label || '',
-  //       address1: loc.address1 || loc.label || '',
-  //       suburb: loc.suburb || '',
-  //       state: loc.state || '',
-  //       street: loc.street || '',
-  //       postcode: loc.postcode || '',
-  //       country: loc.country || 'Australia',
-  //       name: defaultName,
-  //       saveToAddressBook: false,
-  //     };
-  //   };
+  const handleCreateOrder = () => {
+    sessionStorage.setItem('quote_items', JSON.stringify(itemsData));
+    sessionStorage.setItem('quote_courier', JSON.stringify(quoteData));
 
-  //   const senderData = mapLocationToAddress(
-  //     locations.sender,
-  //     `${user?.first_name || ''} ${user?.last_name || ''}`.trim(),
-  //     user?.email || '',
-  //     user?.office_number || '',
-  //     user?.company_name || ''
-  //   );
-  //   const receiverData = mapLocationToAddress(locations.receiver);
+    navigate('/orders/create');
+  };
 
-  //   sessionStorage.setItem('quote_sender', JSON.stringify(senderData));
-  //   sessionStorage.setItem('quote_receiver', JSON.stringify(receiverData));
-  //   localStorage.setItem('quote_receiver', JSON.stringify(receiverData));
-  //   sessionStorage.setItem('quote_items', JSON.stringify(itemsData));
-  //   sessionStorage.setItem('quote_courier', JSON.stringify(quoteData));
+  useEffect(() => {
+    if (defaultItem?.data) {
+      setItemsData([{
+        type: "box",
+        quantity: 1,
+        weight: defaultItem.data.item_weight!,
+        length: defaultItem.data.item_length!,
+        width: defaultItem.data.item_width!,
+        height: defaultItem.data.item_height!
+      }])
+    }
+  }, [defaultItem, setItemsData])
 
-  //   navigate('/orders/create');
-  // };
 
   return (
     <>
@@ -208,7 +174,7 @@ export default function GetQuotePage() {
         )}
 
       </div>
-      {/* {canCreateOrder && (
+      {canCreateOrder && (
         <div className="sticky bottom-0 -left-5 right-20 bg-white dark:bg-zinc-950 border-t border-gray-200 dark:border-zinc-800 p-3 flex justify-center items-center gap-3 z-50 shadow-[0_-4px_10px_rgba(0,0,0,0.05)] dark:shadow-[0_-4px_10px_rgba(0,0,0,0.2)] transition-colors duration-300">
           <Button
             onClick={handleCreateOrder}
@@ -218,7 +184,7 @@ export default function GetQuotePage() {
             Create Order
           </Button>
         </div>
-      )} */}
+      )}
     </>
   );
 }

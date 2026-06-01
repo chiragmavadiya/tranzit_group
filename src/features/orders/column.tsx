@@ -7,7 +7,6 @@ import { Button } from "@/components/ui/button";
 import { DropdownCustomMenu } from "@/components/ui/dropdown-menu";
 import { CustomTooltip } from "@/components/common/CustomTooltip";
 import { StatusBadge } from "./components/StatusBadge";
-import { formatDate } from "date-fns";
 import { formateCurrency } from "@/lib/utils";
 import Favicon from '@/assets/favicon.png';
 import { CustomerNameCell } from "./components/CustomerNameCell";
@@ -79,7 +78,7 @@ export const getOrdersColumns = (
       {
         header: orderType === 'new' ? 'ORDER DATE' : 'SHIPPED', key: 'consignment_date',
         width: '200px',
-        cell: (value: string) => formatDate(value, 'dd/MM/yyyy hh:mm a')
+        cell: (value: string) => value
       },
       {
         header: 'CUSTOMER',
@@ -105,10 +104,10 @@ export const getOrdersColumns = (
           <div className="flex items-center gap-1">
             {/* <img src={row?.courier_logo || 'https://api.tranzit.digisite.net/assets/img/couriers/direct-freight.png'} className="h-6" alt="" /> */}
             <div>
-              <img src={row?.courier_logo || 'https://api.tranzit.digisite.net/assets/img/couriers/logo-auspost.png'} className="h-6" alt="" />
+              <img src={row?.courier_logo} className="h-6" alt="" />
             </div>
             <div className="flex flex-col">
-              <span className="font-medium">{value}</span>
+              <span className="font-medium">{value !== 'unknown' ? value : '-'}</span>
               {row.product_id && <span className="font-normal text-sm">Product - {row.product_id}</span>}
             </div>
           </div>
@@ -121,9 +120,9 @@ export const getOrdersColumns = (
       ...((orderType == 'archived' || orderType === 'shipped') ? [{
         header: 'TRANSIT STATUS', key: 'tracking_status', cell: (value: string) => <StatusBadge status={value} />
       }] : []),
-      // ...(orderType === 'archived' ? [{
-      //   header: 'ORDER STATUS', key: 'status', cell: (value: string) => <StatusBadge status={value === "Payment pending" ? "Courier not assign" : value} />
-      // }] : []),
+      ...(orderType === 'archived' ? [{
+        header: 'ORDER STATUS', key: 'status', cell: (value: string) => <StatusBadge status={value === "Payment pending" ? "Courier not assign" : value} />
+      }] : []),
       {
         header: 'AMOUNT', key: 'amount', cell: (value: string) => <span className="font-medium"> {formateCurrency(Number(value))}</span>
       },

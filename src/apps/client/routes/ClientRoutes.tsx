@@ -3,6 +3,7 @@ import ProtectedRoute from "@/router/ProtectedRoute";
 import { lazy, Suspense } from "react";
 import Layout from "@/layout";
 import { Loader2 } from "lucide-react";
+import IntegrationsPage from "@/features/integrations/pages/IntegrationPage";
 
 // Lazy load page components
 const Dashboard = lazy(() => import('@/features/dashboard/pages/Dashboard'));
@@ -19,13 +20,12 @@ const InvoiceDetails = lazy(() => import('@/features/invoices/pages/InvoiceDocum
 const Reports = lazy(() => import('@/features/reports'));
 const ParcelReport = lazy(() => import('@/features/reports/pages/ParcelReportPage'));
 const Enquiry = lazy(() => import('@/features/enquiry'));
-// const HelpCenter = lazy(() => import('@/features/help-center/pages/HelpCenterPage'));
-const HelpCenterArticle = lazy(() => import('@/features/help-center/pages/HelpCenterArticlePage'));
+// const HelpCenterArticle = lazy(() => import('@/features/help-center/pages/HelpCenterArticlePage'));
 const Transactions = lazy(() => import('@/features/wallet/pages/TransactionsPage'));
 const TopUp = lazy(() => import('@/features/wallet/pages/TopUpPage'));
-const IntegrationsLayout = lazy(() => import('@/features/integrations/components/IntegrationsLayout'));
-const IntegrationDetails = lazy(() => import('@/features/integrations/pages/IntegrationDetailsPage'));
-const HelpCenterLayout = lazy(() => import('@/features/help-center/components/HelpCenterLayout'));
+// const IntegrationsLayout = lazy(() => import('@/features/integrations/components/IntegrationsLayout'));
+// const IntegrationDetails = lazy(() => import('@/features/integrations/pages/IntegrationDetailsPage'));
+// const HelpCenterLayout = lazy(() => import('@/features/help-center/components/HelpCenterLayout'));
 const CustomerSettingsLayout = lazy(() => import('@/features/customer-settings/components/CustomerSettingsLayout'));
 const AccountSettingsPage = lazy(() => import('@/features/customer-settings/pages/AccountSettingsPage'));
 const TeamAccessPage = lazy(() => import('@/features/customer-settings/pages/TeamAccessPage'));
@@ -60,9 +60,9 @@ export default function ClientRoutes() {
           <Route path="search" element={withSuspense(<Search />)} />
           <Route path="items" element={withSuspense(<MyItems />)} />
           <Route path="address-book" element={withSuspense(<AddressBook />)} />
-          <Route path="integrations" element={withSuspense(<IntegrationsLayout />)}>
+          {/* <Route path="integrations" element={withSuspense(<IntegrationsLayout />)}>
             <Route path=":providerId" element={withSuspense(<IntegrationDetails />)} />
-          </Route>
+          </Route> */}
           <Route path="wallet">
             <Route path="transactions" element={withSuspense(<Transactions />)} />
             <Route path="top-up" element={withSuspense(<TopUp />)} />
@@ -75,11 +75,10 @@ export default function ClientRoutes() {
           <Route path="reports" element={withSuspense(<Reports />)} />
           <Route path="parcel-report" element={withSuspense(<ParcelReport />)} />
           <Route path="enquiry" element={withSuspense(<Enquiry />)} />
-          <Route path="help-center" element={withSuspense(<HelpCenterLayout />)}>
-            {/* <Route index element={<HelpCenter />} /> */}
+          {/* <Route path="help-center" element={withSuspense(<HelpCenterLayout />)}>
             <Route path=":slug" element={withSuspense(<HelpCenterArticle />)} />
-          </Route>
-
+          </Route> */}
+          <Route path="integrations" element={<IntegrationsPage />} />
           <Route path="settings" element={withSuspense(<CustomerSettingsLayout />)}>
             <Route index element={<Navigate to="account" replace />} />
             <Route path="account" element={withSuspense(<AccountSettingsPage />)} />

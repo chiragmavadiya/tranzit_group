@@ -17,6 +17,12 @@ export const useIntegrationStatus = (provider: string, enabled = true) => {
     });
 };
 
+export const useIntegrationStatusMutation = () => {
+    return useMutation({
+        mutationFn: (provider: string) => integrationService.getStatus(provider)
+    });
+};
+
 export const useConnectIntegration = () => {
     const queryClient = useQueryClient();
     return useMutation({
@@ -27,9 +33,9 @@ export const useConnectIntegration = () => {
             return integrationService.connect(provider, data);
         },
         onSuccess: (_, variables) => {
-            // queryClient.invalidateQueries({ queryKey: ["integrations"] });
+            queryClient.invalidateQueries({ queryKey: ["integrations"] });
             queryClient.invalidateQueries({ queryKey: ["integration-status", variables.provider] });
-            // showToast("Integration settings updated successfully!", "success");
+            showToast("Integration settings updated successfully!", "success");
         },
         onError: (error: any) => {
             showToast(error.message || "Failed to connect", "error");

@@ -11,6 +11,7 @@ import type {
     CustomerTransactionsResponse,
     CustomerInvoicesResponse,
     CustomerStatsResponse,
+    CustomerIntegrationResponse,
 } from "../types";
 
 export const customerService = {
@@ -206,5 +207,13 @@ export const customerService = {
 
         const filename = `invoices_${new Date().getTime()}.${format}`;
         return { blob: response.data, filename };
+    },
+
+    /**
+     * Get customer integrations
+     */
+    getIntegrations: async (id: number | string): Promise<CustomerIntegrationResponse> => {
+        const response = await api.get<any>(API_ENDPOINTS.ADMIN_CUSTOMERS.INTEGRATIONS(id));
+        return response.data;
     },
 };

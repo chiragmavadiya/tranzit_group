@@ -442,6 +442,7 @@ const OrderDetailsPage: React.FC = () => {
         onSave={handleOnSave}
         saveLoading={saveLoading || walletLoading}
         onConsign={handleConsign}
+        isConsigning={isConsigning}
       />
       {walletCheckOpen && walletCheckData && (
         <WalletCheckDialog

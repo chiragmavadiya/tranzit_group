@@ -20,8 +20,8 @@ const IntegrationsLayout: React.FC = () => {
 
     const data = listResponse?.data
     const connectedProviders = React.useMemo(() => data ? [
-        ...Object.keys(data.ecommerce_connections || {}).filter(key => data.ecommerce_connections[key]),
-        ...Object.keys(data.courier_integrations || {}).filter(key => data.courier_integrations[key])
+        ...Object.keys(data.ecommerce_connections || {}).filter(key => data.ecommerce_connections[key as keyof typeof data.ecommerce_connections]),
+        ...Object.keys(data.courier_integrations || {}).filter(key => data.courier_integrations[key as keyof typeof data.courier_integrations])
     ] : [], [data])
 
     const currentProvider = React.useMemo(() =>

@@ -1,6 +1,5 @@
 import { useState } from 'react';
 import { useParams, useSearchParams } from 'react-router-dom';
-import { Clock } from 'lucide-react';
 import { CustomerHeader } from '../components/customer-detail/CustomerHeader';
 import { CustomerStats } from '../components/customer-detail/CustomerStats';
 import { CustomerTabs } from '../components/customer-detail/CustomerTabs';
@@ -12,6 +11,7 @@ import { CreditApplicationTab } from '../components/customer-detail/CreditApplic
 import { InvoiceManagementTab } from '../components/customer-detail/InvoiceManagementTab';
 import { useCustomerDetails } from '../hooks/useCustomers';
 import CustomerDialog from '../components/CustomerDialog';
+import { CustomerIntegrationTab } from '../components/customer-detail/CustomerIntegrationTab';
 
 export default function CustomerDetailPage() {
     const { id } = useParams();
@@ -64,20 +64,7 @@ export default function CustomerDetailPage() {
                     {activeTab === 'Transaction' && <TransactionTab customerId={id as string} />}
                     {activeTab === 'Credit Application' && <CreditApplicationTab />}
                     {activeTab === 'Invoice Management' && <InvoiceManagementTab customerId={id as string} />}
-
-                    {activeTab === 'Integration' && (
-                        <div className="flex h-64 items-center justify-center rounded-3xl bg-white dark:bg-zinc-900 shadow-lg border border-white dark:border-zinc-800 animate-in fade-in zoom-in-95 duration-500">
-                            <div className="flex flex-col items-center gap-4 text-center">
-                                <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-orange-50 dark:bg-orange-500/10 text-orange-500">
-                                    <Clock className="h-8 w-8" />
-                                </div>
-                                <div className="flex flex-col">
-                                    <h3 className="text-sm font-black uppercase tracking-widest text-slate-900 dark:text-white">Content Coming Soon</h3>
-                                    <p className="text-xs text-slate-400 uppercase tracking-[0.2em] mt-1">This section is currently under development</p>
-                                </div>
-                            </div>
-                        </div>
-                    )}
+                    {activeTab === 'Integration' && <CustomerIntegrationTab customerId={id as string} />}
                 </div>
             </div>
 

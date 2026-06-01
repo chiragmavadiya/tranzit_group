@@ -1,3 +1,5 @@
+import type { CustomerIntegration } from "../customers/types";
+
 export interface IntegrationData {
     courier?: string;
     connected: boolean;
@@ -25,50 +27,20 @@ export interface IntegrationResponse {
     data: IntegrationData;
 }
 
-export interface IntegrationListItem {
-    id: number;
-    name: string;
-    provider: string;
-    connected: boolean;
-    logo?: string;
-    type: 'courier' | 'ecommerce';
+export interface IntegrationsResponse {
+    status: boolean;
+    message: string;
+    data: {
+        courier_integrations: CustomerIntegration[];
+        ecommerce_connections: CustomerIntegration[];
+    };
 }
 
-export type IntegrationProvider = 'auspost' | 'aramex' | 'mypostbusiness' | 'directfreight' | 'shopify' | 'woocommerce';
 
-export interface AusPostConnectData {
-    api_key: string;
-    api_password: string;
-    base_url: string;
-    account_number: string;
-    account_label: string;
-}
 
-export interface AramexConnectData {
-    client_id: string;
-    client_secret: string;
-    account_name: string;
-    account_label: string;
-}
 
-export interface MyPostBusinessConnectData {
-    merchant_token: string;
-    base_url: string;
-    account_label: string;
-}
 
-export interface DirectFreightConnectData {
-    token: string;
-    account: string;
-    site_id: string;
-    base_url: string;
-    consignment_token: string;
-    account_label: string;
-}
 
-export interface ShopifyConnectData {
-    shop: string;
-}
 
 export interface WooCommerceConnectData {
     store_url: string;

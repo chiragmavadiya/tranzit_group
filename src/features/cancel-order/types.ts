@@ -11,6 +11,7 @@ export interface CancelOrder {
     processed_at: string | null;
     processed_by: string;
     status: string;
+    courier_logo_url: string;
 }
 
 export interface CancelOrderSummary {

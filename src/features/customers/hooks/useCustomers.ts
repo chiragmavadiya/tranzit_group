@@ -169,3 +169,11 @@ export const useExportCustomerInvoices = () => {
     });
 };
 
+export const useCustomerIntegrations = (id: number | string) => {
+    return useQuery({
+        queryKey: QUERY_KEYS.ADMIN_CUSTOMERS.INTEGRATIONS(id),
+        queryFn: () => customerService.getIntegrations(id),
+        enabled: !!id,
+    });
+};
+

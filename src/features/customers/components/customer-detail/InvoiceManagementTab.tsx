@@ -7,7 +7,7 @@ import { StatCard } from '@/components/common/StatCard';
 import { useCustomerInvoices, useExportCustomerInvoices } from '../../hooks/useCustomers';
 import { downloadFile } from '@/lib/utils';
 import { showToast } from '@/components/ui/custom-toast';
-import { NavLink } from 'react-router-dom';
+import { NavLink, useNavigate } from 'react-router-dom';
 import { INVOICE_STATUS_COLORS } from '@/features/invoices/constants';
 import { useAppSelector } from '@/hooks/store.hooks';
 import { useDownloadAdminInvoice, useDownloadCustomerInvoice } from '@/features/invoices/hooks/useInvoices';
@@ -20,6 +20,7 @@ interface InvoiceManagementTabProps {
 export const InvoiceManagementTab = ({ customerId }: InvoiceManagementTabProps) => {
     const { role } = useAppSelector((state) => state.auth);
     const isAdmin = role === 'admin';
+    const navigate = useNavigate();
 
     const downloadAdminInvoice = useDownloadAdminInvoice();
     const downloadCustomerInvoice = useDownloadCustomerInvoice();
@@ -84,7 +85,7 @@ export const InvoiceManagementTab = ({ customerId }: InvoiceManagementTabProps) 
             <Card className="bg-white dark:bg-zinc-900 border-none shadow-md overflow-hidden">
                 <DataTable
                     columns={[
-                        { key: 'invoice_number', header: 'Invoice No.', cell: (val) => <NavLink to={`/admin/invoices/${val}`} className="font-bold hover:underline">#{val}</NavLink> },
+                        { key: 'invoice_number', header: 'Invoice No.', cell: (val, row) => <NavLink to={`/admin/invoices/${row.id}`} className="font-bold hover:underline">#{val}</NavLink> },
                         {
                             key: 'status',
                             header: 'STATUS',
@@ -106,7 +107,7 @@ export const InvoiceManagementTab = ({ customerId }: InvoiceManagementTabProps) 
                                 return (
                                     <div className="flex items-center gap-2">
                                         <CustomTooltip title="View Invoice">
-                                            <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
+                                            <Button variant="ghost" size="sm" className="h-8 w-8 p-0" onClick={() => navigate(`/admin/invoices/${row.id}`)} >
                                                 <Eye className="h-4! w-4! " />
                                             </Button>
                                         </CustomTooltip>

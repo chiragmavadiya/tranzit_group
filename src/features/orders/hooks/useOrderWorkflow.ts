@@ -472,6 +472,9 @@ export const useOrderWorkflow = () => {
           onSuccess: () => {
             showToast('Order consigned successfully', 'success');
             navigate(`${role === 'admin' ? '/admin' : ''}/orders/view/${orderID}`);
+            if (orderID) {
+              printLabel(orderID);
+            }
           },
           onError: (err: any) => {
             showToast(err?.response?.data?.message || 'Failed to consign order', 'error');
@@ -479,28 +482,7 @@ export const useOrderWorkflow = () => {
         }
       );
     }
-  }, [
-    termsAccepted,
-    ratesAccepted,
-    dangerousGoodsAccepted,
-    selectedCustomer,
-    orderDetail?.sender_details?.customer_id,
-    addressData.sender,
-    addressData.receiver,
-    itemsData,
-    courierData,
-    insuranceSelected,
-    signatureSelected,
-    deliveryInstructions,
-    quoteData?.courier,
-    calculation,
-    orderType,
-    manualOrderData,
-    orderID,
-    consignOrder,
-    navigate,
-    role,
-  ]);
+  }, [termsAccepted, ratesAccepted, dangerousGoodsAccepted, selectedCustomer, orderDetail?.sender_details?.customer_id, addressData.sender.name, addressData.sender.company, addressData.sender.phone, addressData.sender.email, addressData.sender.address1, addressData.sender.suburb, addressData.sender.state, addressData.sender.postcode, addressData.sender.country, addressData.receiver.name, addressData.receiver.company, addressData.receiver.phone, addressData.receiver.email, addressData.receiver.address1, addressData.receiver.suburb, addressData.receiver.state, addressData.receiver.postcode, addressData.receiver.country, itemsData, courierData, insuranceSelected, signatureSelected, deliveryInstructions, quoteData?.courier?.base, quoteData?.courier?.gst, quoteData?.courier?.price, calculation.servicePrice, calculation.gst, calculation.grandTotal, orderType, manualOrderData.trackingNumber, manualOrderData.courierId, manualOrderData.amount, orderID, consignOrder, navigate, role, printLabel]);
 
   useEffect(() => {
     const savedAddressStr = sessionStorage.getItem('address');
@@ -535,10 +517,10 @@ export const useOrderWorkflow = () => {
 
     const qSender = sessionStorage.getItem('quote_sender');
     const qReceiver = sessionStorage.getItem('quote_receiver');
-    const qItems = sessionStorage.getItem('quote_items');
+    // const qItems = sessionStorage.getItem('quote_items');
     const qCourier = sessionStorage.getItem('quote_courier');
 
-    if (qSender || qReceiver || qItems || qCourier) {
+    if (qSender || qReceiver || qCourier) {
       try {
         if (qSender && qReceiver) {
           setAddressData(prev => ({
@@ -547,9 +529,9 @@ export const useOrderWorkflow = () => {
             receiver: JSON.parse(qReceiver),
           }));
         }
-        if (qItems) {
-          setItemsData(JSON.parse(qItems));
-        }
+        // if (qItems) {
+        //   setItemsData(JSON.parse(qItems));
+        // }
         if (qCourier) {
           const parsedCourier = JSON.parse(qCourier);
           setQuoteData(parsedCourier);
@@ -574,7 +556,7 @@ export const useOrderWorkflow = () => {
       sessionStorage.removeItem('address')
       sessionStorage.removeItem('quote_sender')
       sessionStorage.removeItem('quote_receiver')
-      sessionStorage.removeItem('quote_items')
+      // sessionStorage.removeItem('quote_items')
     }
   }, [setItemsData, setQuoteData, setCourierData]);
 

@@ -31,8 +31,7 @@ export const SHIPMENT_COLUMNS: Column<ShipmentReport>[] = [
     key: 'courier', header: 'COURIER', sortable: true, searchable: true, width: '200px',
     cell: (value: string, row: ShipmentReport) => (
       <div className="flex items-center gap-1">
-        {/* <img src={row?.courier_logo || 'https://api.tranzit.digisite.net/assets/img/couriers/direct-freight.png'} className="h-6" alt="" /> */}
-        <img src={row?.courier_logo || 'https://api.tranzit.digisite.net/assets/img/couriers/logo-auspost.png'} className="h-6" alt="" />
+        <img src={row?.courier_logo_url} className="h-6" alt="" />
         <span>{value}</span>
       </div>
     )
@@ -78,7 +77,7 @@ export const PARCEL_COLUMNS: Column<ParcelReport>[] = [
     key: 'courier', header: 'COURIER', width: '200px',
     cell: (value: string, row: ParcelReport) => (
       <div className="flex items-center gap-1">
-        <img src={row?.courier_logo || 'https://api.tranzit.digisite.net/assets/img/couriers/logo-auspost.png'} className="h-6" alt="" />
+        <img src={row?.courier_logo_url} className="h-6" alt="" />
         <span>{value}</span>
       </div>
     )
@@ -119,7 +118,7 @@ export const ADMIN_PARCEL_COLUMNS: Column<ParcelReport>[] = [
     key: 'courier', header: 'COURIER', width: "220px",
     cell: (val: string, row: ParcelReport) => (
       <div className="flex items-center gap-1">
-        <img src={row?.courier_logo || 'https://api.tranzit.digisite.net/assets/img/couriers/logo-auspost.png'} className="h-6" alt="" />
+        <img src={row?.courier_logo_url} className="h-6" alt="" />
         <span>{val}</span>
       </div>)
   },

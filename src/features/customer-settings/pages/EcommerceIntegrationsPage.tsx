@@ -1,7 +1,6 @@
-import React, { useState } from 'react';
-import { Plus, ShoppingCart, Loader2, CheckCircle2, Box, Store, Settings2, Link2Off, RefreshCw } from 'lucide-react';
+import React, { useState, useCallback } from 'react';
+import { ShoppingCart, Loader2, CheckCircle2, Box, Store, Settings2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { DataTable } from '@/components/common/DataTable';
 import { Drawer } from '@/components/ui/drawer';
 import { FormInput, FormSelect } from '@/features/orders/components/OrderFormUI';
 import { Badge } from '@/components/ui/badge';
@@ -9,12 +8,13 @@ import { Stepper } from '@/components/ui/stepper';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useQueryClient } from '@tanstack/react-query';
 import {
-  useIntegrationStatus,
   useConnectIntegration,
-  useSyncIntegration,
-  useDisconnectIntegration
+  useDisconnectIntegration,
+  useIntegrationsList,
+  useIntegrationStatusMutation
 } from '@/features/integrations/hooks/useIntegrations';
 import { showToast } from '@/components/ui/custom-toast';
+import RenderIntegrationSection from '@/features/integrations/components/RenderIntegrationSection';
 
 const platforms = [
   { id: 'shopify', name: 'Shopify', icon: ShoppingCart, status: 'available' },
@@ -33,166 +33,27 @@ export default function EcommerceIntegrationsPage() {
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [submitted, setSubmitted] = useState(false);
 
-  // Fetch status of the individual platforms to build the table
-  const shopifyStatus = useIntegrationStatus('shopify');
-  const woocommerceStatus = useIntegrationStatus('woocommerce');
-  const ebayStatus = useIntegrationStatus('ebay');
+  // Fetch e-commerce integrations list
+  const { data: listResponse, isLoading: listLoading } = useIntegrationsList();
+
+  // Fetch status mutation for config loading
+  const { mutate: getIntegrationStatus, isPending: statusLoading, variables: statusVariables } = useIntegrationStatusMutation();
 
   const connectMutation = useConnectIntegration();
-  const syncMutation = useSyncIntegration();
   const disconnectMutation = useDisconnectIntegration();
 
-  // Combine query status values
-  const loadingList = shopifyStatus.isLoading || woocommerceStatus.isLoading || ebayStatus.isLoading;
-
-  const integrationsData = React.useMemo(() => {
-    const list = [];
-    const shData = shopifyStatus.data?.data;
-    // const wcData = woocommerceStatus.data?.data;
-    const ebData = ebayStatus.data?.data;
-
-    if (shData?.connected) {
-      list.push({
-        id: 'shopify',
-        platform: 'Shopify',
-        account: shData.shop_domain || 'Connected',
-        status: 'Connected',
-        lastSync: shData.last_synced_at || 'Never',
-        logo: ShoppingCart,
-        raw: shData
-      });
-    }
-
-    // if (wcData?.connected) {
-    //   list.push({
-    //     id: 'woocommerce',
-    //     platform: 'WooCommerce',
-    //     account: wcData.store_url || 'Connected',
-    //     status: 'Connected',
-    //     lastSync: wcData.last_synced_at || 'Never',
-    //     logo: Store,
-    //     raw: wcData
-    //   });
-    // }
-
-    if (ebData?.connected) {
-      list.push({
-        id: 'ebay',
-        platform: 'eBay',
-        account: ebData.account_label || 'Connected',
-        status: 'Connected',
-        lastSync: ebData.last_synced_at || 'Never',
-        logo: Box,
-        raw: ebData
-      });
-    }
-
-    return list;
-  }, [shopifyStatus.data, ebayStatus.data]);
-
-  const handleSync = (providerId: string) => {
-    syncMutation.mutate(providerId);
-  };
-
   const handleEdit = (providerId: string) => {
-    const provider = integrationsData.find(item => item.id === providerId);
-    if (provider) {
-      setSelectedPlatform(providerId);
-      setFormData(provider.raw || {});
-      setSubmitted(false);
-      setErrors({});
-      setCurrentStep(1); // Go straight to Configure step
-      setIsAddOpen(true);
-    }
+    getIntegrationStatus(providerId, {
+      onSuccess: (response) => {
+        setSelectedPlatform(providerId);
+        setFormData(response.data || {});
+        setSubmitted(false);
+        setErrors({});
+        setCurrentStep(1); // Go straight to Configure step
+        setIsAddOpen(true);
+      },
+    });
   };
-
-  const handleDisconnect = (providerId: string) => {
-    if (window.confirm(`Are you sure you want to disconnect ${providerId}?`)) {
-      disconnectMutation.mutate(providerId, {
-        onSuccess: () => {
-          queryClient.invalidateQueries({ queryKey: ["integration-status", providerId] });
-        }
-      });
-    }
-  };
-
-  const columns = [
-    {
-      header: 'Platform',
-      key: 'platform',
-      cell: (_: any, row: any) => {
-        const Icon = row.logo;
-        return (
-          <div className="flex items-center gap-3">
-            <div className="w-8 h-8 rounded-full bg-gray-100 dark:bg-zinc-800 flex items-center justify-center">
-              <Icon className="w-4 h-4 text-gray-700 dark:text-zinc-300" />
-            </div>
-            <span className="font-semibold text-gray-900 dark:text-zinc-100">{row.platform}</span>
-          </div>
-        );
-      }
-    },
-    {
-      header: 'Connected Account',
-      key: 'account',
-      cell: (val: string) => <span className="text-gray-500 dark:text-zinc-400">{val}</span>
-    },
-    {
-      header: 'Status',
-      key: 'status',
-      cell: (val: string) => (
-        <Badge className={val === 'Connected' ? 'bg-emerald-100 text-emerald-700 hover:bg-emerald-100 dark:bg-emerald-950/30 dark:text-emerald-400' : 'bg-red-100 text-red-700 hover:bg-red-100 dark:bg-red-950/30 dark:text-red-400'}>
-          {val}
-        </Badge>
-      )
-    },
-    {
-      header: 'Last Sync',
-      key: 'lastSync',
-    },
-    {
-      header: 'Actions',
-      key: 'actions',
-      cell: (_: any, row: any) => (
-        <div className="flex items-center gap-2">
-          <Button
-            variant="ghost"
-            size="icon-sm"
-            className="h-8 w-8 text-slate-400 hover:text-primary"
-            onClick={() => handleSync(row.id)}
-            disabled={syncMutation.isPending && syncMutation.variables === row.id}
-          >
-            {syncMutation.isPending && syncMutation.variables === row.id ? (
-              <Loader2 className="w-4 h-4 animate-spin" />
-            ) : (
-              <RefreshCw className="w-4 h-4" />
-            )}
-          </Button>
-          <Button
-            variant="ghost"
-            size="icon-sm"
-            className="h-8 w-8 text-slate-400 hover:text-slate-900 dark:hover:text-white"
-            onClick={() => handleEdit(row.id)}
-          >
-            <Settings2 className="w-4 h-4" />
-          </Button>
-          <Button
-            variant="ghost"
-            size="icon-sm"
-            className="h-8 w-8 text-red-400 hover:text-red-600"
-            onClick={() => handleDisconnect(row.id)}
-            disabled={disconnectMutation.isPending && disconnectMutation.variables === row.id}
-          >
-            {disconnectMutation.isPending && disconnectMutation.variables === row.id ? (
-              <Loader2 className="w-4 h-4 animate-spin" />
-            ) : (
-              <Link2Off className="w-4 h-4" />
-            )}
-          </Button>
-        </div>
-      )
-    }
-  ];
 
   const validateForm = () => {
     const newErrors: Record<string, string> = {};
@@ -213,6 +74,14 @@ export default function EcommerceIntegrationsPage() {
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
+
+  const onConnect = useCallback((providerId: string) => {
+    setSelectedPlatform(providerId);
+    setSubmitted(false);
+    setErrors({});
+    setCurrentStep(1); // Go straight to Configure step
+    setIsAddOpen(true);
+  }, []);
 
   const handleConnect = () => {
     setSubmitted(true);
@@ -272,19 +141,20 @@ export default function EcommerceIntegrationsPage() {
       onChange: (val: any) => handleInputChange(val, name),
       required: true,
       error: submitted && !!errors[name],
-      errormsg: errors[name]
+      errormsg: errors[name],
+      isHalf: true
     });
 
     switch (selectedPlatform) {
       case 'shopify':
         return (
-          <div className="space-y-4">
+          <div className="grid grid-cols-12 gap-x-4 gap-y-3.5">
             <FormInput label="Shop Domain" {...commonProps("shop")} placeholder="your-store.myshopify.com" />
           </div>
         );
       case 'woocommerce':
         return (
-          <div className="space-y-4">
+          <div className="grid grid-cols-12 gap-x-4 gap-y-3.5">
             <FormInput label="Store URL" {...commonProps("store_url")} placeholder="https://your-store.com" />
             <FormInput label="Consumer Key" {...commonProps("consumer_key")} />
             <FormInput label="Consumer Secret" {...commonProps("consumer_secret")} type="password" />
@@ -292,18 +162,19 @@ export default function EcommerceIntegrationsPage() {
         );
       case 'ebay':
         return (
-          <div className="space-y-4">
+          <div className="grid grid-cols-12 gap-x-4 gap-y-3.5">
             <FormSelect
               label="Marketplace Region"
               options={[{ label: 'Australia', value: 'au' }, { label: 'US', value: 'us' }]}
               value={formData.region || ''}
               onValueChange={(val) => handleInputChange(val, "region")}
+              isHalf={true}
             />
           </div>
         );
       default:
         return (
-          <div className="py-10 text-center">
+          <div className="py-10 text-center col-span-12">
             <p className="text-slate-500">Configuration is coming soon.</p>
           </div>
         );
@@ -312,57 +183,28 @@ export default function EcommerceIntegrationsPage() {
 
   return (
     <div className="flex flex-col gap-6 h-full">
-      {integrationsData.length === 0 && !loadingList ? (
-        <div className="flex flex-col flex-1">
-          {/* Header */}
-          {/* <div className="flex justify-between items-center border-b border-gray-100 dark:border-zinc-800 p-4">
-              <div className="flex flex-col">
-                <h1 className="text-lg font-bold text-gray-800 dark:text-zinc-200 my-0">Ecommerce Integrations</h1>
-                <p className="text-sm text-gray-500 dark:text-zinc-400 mb-0">Connect your online stores to automatically sync orders.</p>
-              </div>
-              <Button onClick={() => setIsAddOpen(true)} className="h-8 bg-primary hover:bg-primary/90 text-white gap-2 rounded-sm">
-                <Plus className="w-4 h-4" />
-                Add Integration
-              </Button>
-            </div> */}
-
-          {/* Centered Empty State Box */}
-          <div className="flex-1 flex items-center justify-center p-8 bg-gray-50/30 dark:bg-zinc-950/20">
-            <div className="bg-white dark:bg-zinc-900 border border-gray-100 dark:border-zinc-800 p-10 rounded-2xl shadow-[0_4px_20px_rgba(0,0,0,0.03)] dark:shadow-none text-center flex flex-col items-center max-w-sm w-full gap-5">
-              <div className="w-12 h-12 rounded-xl bg-primary/5 dark:bg-primary/10 flex items-center justify-center text-primary">
-                <Store className="w-6 h-6" />
-              </div>
-              <p className="text-xs text-slate-500 dark:text-zinc-400 font-medium leading-relaxed max-w-[280px]">
-                Our platform integrates with all your stores and marketplaces and with your favorite couriers. So you can batch orders, print labels, and send tracking to your customers in fewer clicks than ever.
-              </p>
-              <Button onClick={() => setIsAddOpen(true)} className="h-8 bg-primary hover:bg-primary/90 text-white font-semibold text-[13px] px-6 rounded-sm">
-                Click to connect your first Ecommerce Store
-              </Button>
-            </div>
-          </div>
+      <div className="bg-white p-4 dark:bg-zinc-900 border border-gray-200 dark:border-zinc-800 rounded-xl shadow-sm overflow-hidden flex flex-col flex-1">
+        <div className="flex flex-col gap-1 mb-3">
+          <h1 className="text-2xl font-bold flex items-center gap-2 text-slate-900 dark:text-zinc-100 my-0">
+            <ShoppingCart className="w-6 h-6 text-primary" />
+            E-commerce Integrations
+          </h1>
+          <p className="text-sm text-slate-500 dark:text-zinc-400 mb-2">Connect your e-commerce stores to streamline your workflow.</p>
         </div>
-      ) : (
-        <div className="bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-800 rounded-xl shadow-sm overflow-hidden flex flex-col flex-1">
 
-          <DataTable
-            data={integrationsData}
-            columns={columns}
-            headerTitle="Ecommerce Integrations"
-            headerDescription="Connect your online stores to automatically sync orders."
-            searchable
-            searchPlaceholder="Search integrations..."
-            className='pb-3'
-            totalItems={integrationsData.length}
-            loading={loadingList}
-            customHeader={
-              <Button onClick={() => setIsAddOpen(true)} className="h-8 bg-primary hover:bg-primary/90 text-white gap-2 rounded-sm">
-                <Plus className="w-4 h-4" />
-                Add Integration
-              </Button>
-            }
+        <div className="flex flex-col gap-10">
+          <RenderIntegrationSection
+            // title="E-commerce Integrations"
+            // Icon={ShoppingCart}
+            data={listResponse?.data?.ecommerce_connections}
+            disconnectMutation={disconnectMutation}
+            onConnect={onConnect}
+            onConfigure={handleEdit}
+            isLoading={listLoading}
+            configLoadingProvider={statusLoading ? statusVariables : undefined}
           />
         </div>
-      )}
+      </div>
 
       <Drawer
         open={isAddOpen}
@@ -452,7 +294,7 @@ export default function EcommerceIntegrationsPage() {
                   initial={{ opacity: 0, x: -10 }}
                   animate={{ opacity: 1, x: 0 }}
                   exit={{ opacity: 0, x: 10 }}
-                  className="space-y-6 max-w-md mx-auto"
+                  className="space-y-6 max-w-lg mx-auto"
                 >
                   <div className="text-center mb-6">
                     <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-3">

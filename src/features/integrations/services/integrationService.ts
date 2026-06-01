@@ -1,6 +1,7 @@
 import { api } from "@/services/api";
 import type {
     IntegrationResponse,
+    IntegrationsResponse,
     // AusPostConnectData,
     // AramexConnectData,
     // MyPostBusinessConnectData,
@@ -12,7 +13,7 @@ import type {
 export const integrationService = {
     getIntegrations: async () => {
         const response = await api.get("/integrations");
-        return response.data;
+        return response.data as IntegrationsResponse;
     },
 
     getStatus: async (provider: string) => {

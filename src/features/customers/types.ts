@@ -202,3 +202,19 @@ export interface CustomerStatsResponse {
     data: CustomerStats;
 }
 
+export interface CustomerIntegration {
+    slug: string;
+    name: string;
+    description: string;
+    connected: boolean;
+    logo_url: string;
+}
+
+export interface CustomerIntegrationResponse {
+    status: boolean;
+    message: string;
+    data: {
+        courier_integrations: CustomerIntegration[];
+        ecommerce_connections: CustomerIntegration[];
+    };
+}

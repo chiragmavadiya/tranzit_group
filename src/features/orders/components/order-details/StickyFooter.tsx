@@ -18,9 +18,10 @@ interface StickyFooterProps {
   onSave?: () => void
   saveLoading: boolean
   onConsign?: () => void
+  isConsigning: boolean
 }
 
-export const StickyFooter: React.FC<StickyFooterProps> = ({ orderType, onSave, saveLoading, onConsign }) => {
+export const StickyFooter: React.FC<StickyFooterProps> = ({ orderType, onSave, saveLoading, onConsign, isConsigning }) => {
   if (!['new', 'create', 'create-menual', 'consign', 'return'].includes(orderType || '')) return null;
   return (
     <div className="sticky bottom-0 -left-5 right-20 bg-white dark:bg-zinc-950 border-t border-gray-200 dark:border-zinc-800 p-3 flex justify-center items-center gap-3 z-50 shadow-[0_-4px_10px_rgba(0,0,0,0.05)] dark:shadow-[0_-4px_10px_rgba(0,0,0,0.2)] transition-colors duration-300">
@@ -71,10 +72,10 @@ export const StickyFooter: React.FC<StickyFooterProps> = ({ orderType, onSave, s
         <Button
           onClick={onConsign}
           variant="default"
-          disabled={saveLoading}
+          disabled={saveLoading || isConsigning}
           className={`flex items-center gap-2 h-8 px-6 uppercase text-xs font-bold transition-all bg-primary hover:bg-primary-hover text-white shadow-sm`}
         >
-          {saveLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
+          {saveLoading || isConsigning ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
           Consign order
         </Button>
       )}

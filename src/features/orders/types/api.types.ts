@@ -27,7 +27,7 @@ export interface CreateOrderRequest {
         street_name?: string;
         street_number?: string;
     };
-    parcels: Array<{
+    parcels?: Array<{
         type: string;
         quantity: number;
         weight: number;
@@ -35,7 +35,7 @@ export interface CreateOrderRequest {
         width: number;
         height: number;
     }>;
-    service: {
+    service?: {
         courier: number;
         product_id: string;
         product_type: string;
@@ -43,11 +43,10 @@ export interface CreateOrderRequest {
         cover_limited_liability: number;
         signature_required: number;
     };
-    surcharges: any[];
+    surcharges?: any[];
     delivery_instructions?: string;
-    pickup_date: string;
-    terms_and_conditions: boolean;
-    totals: {
+    terms_and_conditions?: boolean;
+    totals?: {
         subtotal: number;
         gst: number;
         total: number;
@@ -65,6 +64,9 @@ export interface CreateOrderResponse {
     success?: boolean;
     message?: string
     status?: boolean
+    data?: {
+        order_number: string;
+    }
 }
 
 export interface QuoteServicesRequest {

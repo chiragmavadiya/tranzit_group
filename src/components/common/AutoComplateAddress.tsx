@@ -8,6 +8,7 @@ import { Search } from 'lucide-react';
 export interface AddressData {
     formatted_address: string;
     address1: string;
+    unit_number: string;
     street: string;
     suburb: string;
     state: string;
@@ -34,7 +35,13 @@ export const PlaceAutocomplete = ({ onPlaceSelect, ...rest }: PlaceAutocompleteP
         if (!places || !inputRef.current) return;
 
         const options = {
-            fields: ['address_components', 'geometry', 'formatted_address'],
+            // fields: ['address_components', 'geometry', 'formatted_address'],
+            fields: [
+                'address_components',
+                'formatted_address',
+                'geometry',
+                'name'
+            ],
             componentRestrictions: { country: 'au' }
         };
 
@@ -47,15 +54,16 @@ export const PlaceAutocomplete = ({ onPlaceSelect, ...rest }: PlaceAutocompleteP
 
         const listener = placeAutocomplete.addListener('place_changed', () => {
             const place = placeAutocomplete.getPlace();
+            console.log(place, 'place')
             if (!place.address_components) return;
             // 2. Map Google components to the fields in image_ed5179.png
             const address: AddressData = {
                 formatted_address: place.formatted_address || '',
                 address1: '',
+                unit_number: '',
                 street: '',
-                street_name: '',
                 street_number: '',
-                street_type: '',
+                street_name: '',
                 suburb: '',
                 state: '',
                 post_code: '',
@@ -71,6 +79,7 @@ export const PlaceAutocomplete = ({ onPlaceSelect, ...rest }: PlaceAutocompleteP
 
                 const types = component.types;
                 const value = component.short_name;
+                if (types.includes('subpremise')) address.unit_number = value;
 
                 if (types.includes('street_number')) address.street_number = value;
 

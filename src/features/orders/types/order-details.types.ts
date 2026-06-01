@@ -59,7 +59,7 @@ export type OrderDetailData = {
             country: string,
             street_name: string,
             street_number: string,
-            city: string,
+            unit_number: string,
             street?: string,
             building?: string,
             instructions?: string
@@ -83,7 +83,8 @@ export type OrderDetailData = {
             city: string,
             street?: string,
             building?: string,
-            instructions?: string
+            instructions?: string,
+            unit_number: string,
         }
         company?: string,
     }

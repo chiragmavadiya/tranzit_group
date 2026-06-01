@@ -45,18 +45,21 @@ export function CreateAddressDialog({
   isLoading = false,
 }: CreateAddressDialogProps) {
   const [formData, setFormData] = useState<AddressFormData>({
-    name: '',
+    contact_person: '',
     email: '',
     phone: '',
-    instructions: '',
+    special_instructions: '',
     default_carrier: '',
-    default_code: '',
-    address: '',
+    code: '',
     company: '',
+    address_information: '',
+    address: '',
     building: '',
-    street: '',
+    unit_number: '',
+    street_number: '',
+    street_name: '',
+    street_type: '',
     suburb: '',
-    city: '',
     state: '',
     postcode: '',
     country: 'Australia',
@@ -74,8 +77,8 @@ export function CreateAddressDialog({
     e.preventDefault();
     setSubmited(true);
     if (
-      formData.name.trim().length === 0 ||
-      formData.street.trim().length === 0 ||
+      formData.contact_person.trim().length === 0 ||
+      formData.address.trim().length === 0 ||
       formData.suburb.trim().length === 0 ||
       formData.state.trim().length === 0 ||
       formData.postcode.trim().length === 0 ||
@@ -120,16 +123,20 @@ export function CreateAddressDialog({
               <div className="flex-1 relative flex items-center">
                 <PlaceAutocomplete
                   onPlaceSelect={(opt) => {
-                    handleChange('address', opt.formatted_address);
-                    handleChange('street', opt.street);
+                    handleChange('address_information', opt.formatted_address);
+                    handleChange('unit_number', opt.unit_number);
+                    handleChange('address', opt.street);
+                    handleChange('street_number', opt.street_number);
+                    handleChange('street_name', opt.street_name);
+                    handleChange('street_type', opt.street_type);
                     handleChange('suburb', opt.suburb);
                     handleChange('state', opt.state);
                     handleChange('postcode', opt.post_code);
                   }}
-                  onChange={(value) => handleChange('address', value)}
-                  error={submited && formData.address?.trim() === ''}
-                  errormsg='Please enter an address'
-                  value={formData.address}
+                  onChange={(value) => handleChange('address_information', value)}
+                  // error={submited && formData.address_information?.trim() === ''}
+                  // errormsg='Please enter an address'
+                  value={formData.address_information}
                 />
               </div>
             </div>
@@ -140,11 +147,11 @@ export function CreateAddressDialog({
                 <FormInput
                   layout="horizontal"
                   label="Contact Person"
-                  value={formData.name}
-                  onChange={(val) => handleChange('name', val)}
+                  value={formData.contact_person}
+                  onChange={(val) => handleChange('contact_person', val)}
                   placeholder="Full name"
                   required
-                  error={submited && formData.name.length < 1}
+                  error={submited && formData.contact_person.length < 1}
                   errormsg="Please enter contact person name"
                   isFullWidth
                 />
@@ -173,8 +180,8 @@ export function CreateAddressDialog({
                 <FormTextarea
                   layout="horizontal"
                   label="Special Instructions"
-                  value={formData.instructions || ''}
-                  onChange={(val) => handleChange('instructions', val)}
+                  value={formData.special_instructions || ''}
+                  onChange={(val) => handleChange('special_instructions', val)}
                   placeholder="instructions..."
                   rows={3}
                   isFullWidth
@@ -202,11 +209,11 @@ export function CreateAddressDialog({
                 <FormInput
                   layout="horizontal"
                   label="Code"
-                  value={formData.default_code}
-                  onChange={(val) => handleChange('default_code', val)}
+                  value={formData.code}
+                  onChange={(val) => handleChange('code', val)}
                   placeholder="Enter code"
                   required
-                  error={submited && formData.default_code.length < 1}
+                  error={submited && formData.code.length < 1}
                   errormsg="Please enter a code"
                   isFullWidth
                 />
@@ -224,20 +231,20 @@ export function CreateAddressDialog({
                 />
                 <FormInput
                   layout="horizontal"
-                  label="Building"
-                  value={formData.building || ''}
-                  onChange={(val) => handleChange('building', val)}
+                  label="Unit Number"
+                  value={formData.unit_number || ''}
+                  onChange={(val) => handleChange('unit_number', val)}
                   placeholder="e.g. 1234"
                   isFullWidth
                 />
                 <FormInput
                   layout="horizontal"
                   label="Street"
-                  value={formData.street || ''}
-                  onChange={(val) => handleChange('street', val)}
+                  value={formData.address || ''}
+                  onChange={(val) => handleChange('address', val)}
                   placeholder="e.g. George"
                   required
-                  error={submited && formData.street.length < 1}
+                  error={submited && formData.address.length < 1}
                   errormsg="Please enter the street"
                   isFullWidth
                 />
@@ -250,17 +257,6 @@ export function CreateAddressDialog({
                   required
                   error={submited && formData.suburb.length < 1}
                   errormsg="Please enter the suburb"
-                  isFullWidth
-                />
-                <FormInput
-                  layout="horizontal"
-                  label="City"
-                  value={formData.city || ''}
-                  onChange={(val) => handleChange('city', val)}
-                  placeholder="e.g. Sydney"
-                  // required
-                  // error={submited && formData.city.length < 1}
-                  // errormsg="Please enter the city"
                   isFullWidth
                 />
                 <FormSelect

@@ -40,9 +40,10 @@ export interface AddressData {
 
   address1?: string;
   address?: string;
-  street: string;
+  unit_number: string;
+  street_number: string;
+  street_name: string;
   suburb: string;
-  city: string;
   state: string;
   postcode: string;
   country: string;

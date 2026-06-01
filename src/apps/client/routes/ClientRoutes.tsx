@@ -3,7 +3,7 @@ import ProtectedRoute from "@/router/ProtectedRoute";
 import { lazy, Suspense } from "react";
 import Layout from "@/layout";
 import { Loader2 } from "lucide-react";
-import IntegrationsPage from "@/features/integrations/pages/IntegrationPage";
+// import IntegrationsPage from "@/features/integrations/pages/IntegrationPage";
 
 // Lazy load page components
 const Dashboard = lazy(() => import('@/features/dashboard/pages/Dashboard'));
@@ -78,7 +78,7 @@ export default function ClientRoutes() {
           {/* <Route path="help-center" element={withSuspense(<HelpCenterLayout />)}>
             <Route path=":slug" element={withSuspense(<HelpCenterArticle />)} />
           </Route> */}
-          <Route path="integrations" element={<IntegrationsPage />} />
+          {/* <Route path="integrations" element={<IntegrationsPage />} /> */}
           <Route path="settings" element={withSuspense(<CustomerSettingsLayout />)}>
             <Route index element={<Navigate to="account" replace />} />
             <Route path="account" element={withSuspense(<AccountSettingsPage />)} />

@@ -94,7 +94,7 @@ export const clientSidebarItems: SidebarItem[] = [
   { name: 'Enquiry', icon: MessageSquare, path: '/enquiry' },
   // { name: 'Help Center', icon: HelpCircle, path: '/help-center' }, // NEED TO CHECK CODE
   // { name: 'Parcel Report', icon: FileArchive, path: '/parcel-report' },
-  { name: 'Integrations', icon: Link, path: '/integrations' },
+  // { name: 'Integrations', icon: Link, path: '/integrations' },
   {
     name: 'Settings',
     icon: Settings,

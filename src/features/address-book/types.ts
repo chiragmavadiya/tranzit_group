@@ -8,6 +8,7 @@ export interface Address {
     phone: string;
     special_instructions: string;
     address: string;
+    address_information: string;
     unit_number: string;
     street_number: string;
     street_name: string;
@@ -37,20 +38,22 @@ export interface Address {
 
 export interface AddressFormData {
     id?: number | string;
-    name: string;
+    contact_person: string;
     email: string;
     phone: string;
-    instructions: string;
+    special_instructions: string;
     default_carrier: string;
-    default_code: string;
+    code: string;
+    building: string;
     // signature_required: boolean;
-
+    address_information: string;
     address: string;
     company: string;
-    building: string;
-    street: string;
+    unit_number: string;
+    street_name: string;
+    street_number: string;
+    street_type: string;
     suburb: string;
-    city: string;
     state: string;
     postcode: string;
     country: string;
@@ -105,14 +108,15 @@ export interface SearchAddressBookListResponse {
             receiver_phone: string;
             receiver_email: string;
             receiver_address: string;
-            street_name: string;
-            street_number: string;
             street_type: string;
             suburb: string;
             state: string;
             postcode: string;
             latitude: string;
             longitude: string;
+            unit_number: string;
+            street_name: string;
+            street_number: string;
         };
     }[];
 }

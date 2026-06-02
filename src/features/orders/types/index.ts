@@ -12,10 +12,12 @@ export interface Order {
   order_type: string;
   consignment_date: string;
   courier_logo?: string;
+  courier_logo_url?: string;
   product_id?: string;
   customer_full_address?: string;
   receiver_email?: string;
   receiver_phone?: string;
+  order_source_icon?: string;
 }
 
 export type TabType = 'new' | 'printed' | 'shipped' | 'archived';
@@ -40,6 +42,7 @@ export interface AddressData {
 
   address1?: string;
   address?: string;
+  address_info: string;
   unit_number: string;
   street_number: string;
   street_name: string;

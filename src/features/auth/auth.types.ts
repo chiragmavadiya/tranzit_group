@@ -166,3 +166,24 @@ export interface GenericResponse {
     status: boolean;
     message: string;
 }
+
+export interface EmailVerifyRequest {
+    customerId: string | number;
+    token: string;
+    expires: string;
+    signature: string;
+}
+
+export interface EmailVerifyResponse {
+    status: boolean;
+    message: string;
+    user: {
+        id: number;
+        first_name: string;
+        last_name: string;
+        email: string;
+    };
+    token: string;
+}
+
+

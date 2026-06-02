@@ -53,6 +53,7 @@ export type OrderDetailData = {
         address: string
         address_detail: {
             address_line: string,
+            address_info: string,
             suburb: string,
             state: string,
             postcode: string,
@@ -73,6 +74,7 @@ export type OrderDetailData = {
         address: string
         address_detail: {
             address_line: string,
+            address_info: string,
             suburb: string,
             state: string,
             postcode: string,

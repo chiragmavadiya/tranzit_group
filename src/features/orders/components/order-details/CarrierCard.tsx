@@ -233,7 +233,7 @@ export const CarrierCard: React.FC<CarrierCardProps> = memo((props) => {
           </div>
         ) : (
           <div className="grid grid-cols-12 gap-3">
-            <div className={`col-span-${module !== 'quote' ? '8' : '12'} flex flex-col gap-3`}>
+            <div className={`${module !== 'quote' ? 'col-span-8' : 'col-span-12'} flex flex-col gap-3`}>
               {couriers.map((courier) => {
                 const serviceId = courier.product_id + courier.courierCode;
 

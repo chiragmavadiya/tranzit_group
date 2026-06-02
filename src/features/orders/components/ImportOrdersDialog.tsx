@@ -15,13 +15,13 @@ interface ImportOrdersDialogProps {
   isAdmin?: boolean;
 }
 
-export function ImportOrdersDialog({
+const ImportOrdersDialog = ({
   open,
   onOpenChange,
   onImport,
   isLoading,
   isAdmin = false,
-}: ImportOrdersDialogProps) {
+}: ImportOrdersDialogProps) => {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [selectedCustomer, setSelectedCustomer] = useState<string>('');
   const [submitted, setSubmitted] = useState(false);
@@ -181,3 +181,5 @@ export function ImportOrdersDialog({
     </CustomModel>
   );
 }
+
+export default ImportOrdersDialog;

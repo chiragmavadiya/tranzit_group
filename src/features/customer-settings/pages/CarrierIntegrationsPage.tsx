@@ -128,7 +128,7 @@ export default function CarrierIntegrationsPage() {
     const requiredFields: Record<string, string[]> = {
       auspost: ['api_key', 'api_password', 'base_url', 'account_number', 'account_label'],
       aramex: ['client_id', 'client_secret', 'account_name', 'account_label'],
-      mypostbusiness: ['merchant_token', 'base_url', 'account_label', 'account_number'],
+      mypostbusiness: ['merchant_token', 'account_label'],
       directfreight: ['token', 'account', 'site_id', 'base_url', 'consignment_token', 'account_label']
     };
 
@@ -231,7 +231,7 @@ export default function CarrierIntegrationsPage() {
           <div className="grid grid-cols-12 gap-x-4 gap-y-3.5">
             <FormInput label="Merchant Token" {...commonProps("merchant_token")} />
             <FormInput label="Base URL" {...commonProps("base_url")} placeholder="https://digitalapi.auspost.com.au/test" />
-            <FormInput label="Account Number" {...commonProps("account_number")} />
+            {/* <FormInput label="Account Number" {...commonProps("account_number")} /> */}
             <FormInput label="Account Label" {...commonProps("account_label")} />
           </div>
         );

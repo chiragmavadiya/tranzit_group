@@ -8,7 +8,7 @@ export interface Address {
     phone: string;
     special_instructions: string;
     address: string;
-    address_information: string;
+    address_info: string;
     unit_number: string;
     street_number: string;
     street_name: string;
@@ -46,7 +46,7 @@ export interface AddressFormData {
     code: string;
     building: string;
     // signature_required: boolean;
-    address_information: string;
+    address_info: string;
     address: string;
     company: string;
     unit_number: string;

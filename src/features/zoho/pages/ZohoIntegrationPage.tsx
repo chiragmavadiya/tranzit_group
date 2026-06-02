@@ -34,11 +34,7 @@ export default function ZohoIntegrationPage() {
         scopes: config.scopes || '',
         defaultCountry: config.default_country || ''
       });
-      // If we have credentials, we can assume it's "connected" in terms of config existence
-      // The actual OAuth status might be different, but for UI purposes:
-      if (config.client_id && config.client_secret) {
-        setIsConnected(true);
-      }
+      setIsConnected(config.connection_status !== 'disconnected');
     }
   }, [configResponse]);
 

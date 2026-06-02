@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Loader2, AlertTriangle, XCircle, FileQuestion } from 'lucide-react';
 import { OrderHeader } from '@/features/orders/components/order-details/OrderHeader';
@@ -16,6 +16,7 @@ import { ConfirmContinue } from '@/features/orders/components/order-details/Conf
 import { ManualOrderDetails } from '@/features/orders/components/order-details/ManualOrderDetails';
 import { useOrderWorkflow } from '@/features/orders/hooks/useOrderWorkflow';
 import { Skeleton } from '@/components/ui/skeleton';
+import { showToast } from '@/components/ui/custom-toast';
 
 const OrderDetailsSkeleton: React.FC = () => {
   return (
@@ -186,6 +187,7 @@ const OrderDetailsPage: React.FC = () => {
     walletCheckData,
     quoteData,
     setQuoteData,
+    courierData,
     setCourierData,
     addressData,
     manualOrderData,
@@ -224,6 +226,42 @@ const OrderDetailsPage: React.FC = () => {
     downloadLabel,
   } = useOrderWorkflow();
 
+  const [showConsignConfirm, setShowConsignConfirm] = useState(false);
+
+  const getDisplayCourierName = () => {
+    const rawName = quoteData?.courier?.carrier || orderDetail?.courier_details?.courier || courierData?.courier || '';
+    if (!rawName) return '';
+    if (rawName === 'auspost') return 'Australia Post';
+    if (rawName === 'direct-freight') return 'Direct Freight Express';
+    if (rawName === 'aramex') return 'Aramex';
+    return rawName
+      .split('-')
+      .map((word: string) => word.charAt(0).toUpperCase() + word.slice(1))
+      .join(' ');
+  };
+
+  const handleConsignClick = () => {
+    if (!termsAccepted || !ratesAccepted || !dangerousGoodsAccepted) {
+      showToast('You must accept all Terms & Conditions, Dangerous Goods, and Futile Pickup declarations.', 'error');
+      return;
+    }
+
+    const courierName = getDisplayCourierName();
+    if (!courierName) {
+      handleConsign();
+      return;
+    }
+
+    const courierNameLower = courierName.toLowerCase();
+    const isTranzit = courierNameLower.includes('tranzit') || courierNameLower.includes('transit') || courierNameLower.includes('transite');
+
+    if (!isTranzit) {
+      setShowConsignConfirm(true);
+    } else {
+      handleConsign();
+    }
+  };
+
 
   if (isOrderLoading && orderType !== 'create' && orderType !== 'create-menual') {
     return <OrderDetailsSkeleton />;
@@ -255,6 +293,7 @@ const OrderDetailsPage: React.FC = () => {
     );
   }
 
+  console.log(addressData, 'addressData')
   return (
     <>
       <div
@@ -355,7 +394,7 @@ const OrderDetailsPage: React.FC = () => {
               <AddressCard
                 title="SENDER"
                 name={addressData.sender.name}
-                address={addressData.sender.address || ''}
+                address={addressData.sender.address_info || ''}
                 email={addressData.sender.email}
                 editable={isEditable && (role === 'admin' || orderType === 'return')}
                 onEditClick={() => onEditClick('sender')}
@@ -365,7 +404,7 @@ const OrderDetailsPage: React.FC = () => {
               <AddressCard
                 title="RECEIVER"
                 name={addressData.receiver.name}
-                address={addressData.receiver.address || ''}
+                address={addressData.receiver.address_info || ''}
                 email={addressData.receiver.email}
                 instruction={addressData.receiver.instructions || ''}
                 editable={isEditable && orderType !== 'return'}
@@ -441,7 +480,7 @@ const OrderDetailsPage: React.FC = () => {
         orderType={orderType}
         onSave={handleOnSave}
         saveLoading={saveLoading || walletLoading}
-        onConsign={handleConsign}
+        onConsign={handleConsignClick}
         isConsigning={isConsigning}
       />
       {walletCheckOpen && walletCheckData && (
@@ -474,6 +513,30 @@ const OrderDetailsPage: React.FC = () => {
         cancelText="Cancel"
         className="sm:max-w-[500px]"
       />
+      {showConsignConfirm && (
+        <ConformationModal
+          open={showConsignConfirm}
+          onOpenChange={setShowConsignConfirm}
+          title="Confirm carrier"
+          description={
+            <div className="space-y-4 pt-2">
+              <p className="text-sm text-slate-600 dark:text-zinc-400">
+                You're about to create this shipment using your connected <strong className="font-bold text-slate-800 dark:text-zinc-200">{getDisplayCourierName()}</strong> account.
+              </p>
+              <p className="text-sm text-slate-500 dark:text-zinc-400">
+                Shipping charges will be billed according to your {getDisplayCourierName()} account and contract setup.
+              </p>
+            </div>
+          }
+          onConfirm={() => {
+            setShowConsignConfirm(false);
+            handleConsign();
+          }}
+          confirmText={`Continue with ${getDisplayCourierName()}`}
+          cancelText="Cancel"
+          className='sm:max-w-[500px]'
+        />
+      )}
     </>
   );
 };

@@ -133,17 +133,18 @@ export default function InvoicesPage() {
           isAdmin={isAdmin}
         />
       </div>
-
-      <ConformationModal
-        open={invoiceToDelete !== null}
-        onOpenChange={(open) => !open && setInvoiceToDelete(null)}
-        title="Delete Invoice"
-        description="Are you sure you want to delete this invoice? This action cannot be undone."
-        onConfirm={handleConfirmDelete}
-        confirmText="Delete"
-        confirmVariant="destructive"
-        loading={deleteMutation.isPending}
-      />
+      {invoiceToDelete !== null && (
+        <ConformationModal
+          open={invoiceToDelete !== null}
+          onOpenChange={(open) => !open && setInvoiceToDelete(null)}
+          title="Delete Invoice"
+          description="Are you sure you want to delete this invoice? This action cannot be undone."
+          onConfirm={handleConfirmDelete}
+          confirmText="Delete"
+          confirmVariant="destructive"
+          loading={deleteMutation.isPending}
+        />
+      )}
     </div>
   );
 }

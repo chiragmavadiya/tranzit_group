@@ -15,6 +15,7 @@ import { useGlobalCouriers } from '@/features/courier-surcharge/hooks/useGlobalC
 import type { AddressData, WalletCheckResponse } from '../types';
 import { useDefaultItem } from '@/features/items/hooks/useItems';
 
+// address1 = street
 const initialAddressData = {
   name: '',
   email: '',
@@ -22,7 +23,7 @@ const initialAddressData = {
   company: '',
   building: '',
   instructions: '',
-  address: '',
+  address_info: '',
   address1: '',
   street_name: '',
   street_number: '',
@@ -156,7 +157,7 @@ export const useOrderWorkflow = () => {
           email: user.email || '',
           phone: user.office_number || '',
           company: user.company_name || '',
-          address: user.addresses?.[0]?.address || '',
+          address_info: user.addresses?.[0]?.address || '',
           address1: user.addresses?.[0]?.address || '',
           suburb: user.addresses?.[0]?.suburb || '',
           state: user.addresses?.[0]?.state || '',
@@ -172,40 +173,42 @@ export const useOrderWorkflow = () => {
   // Sync existing order details (Edit/Consign Mode)
   useEffect(() => {
     if (orderDetail && orderType !== 'create' && orderType !== 'create-menual') {
+      const senderDetail = orderDetail.sender_details;
+      const receiverDetail = orderDetail.receiver_details;
       setAddressData({
         sender: {
-          name: orderDetail.sender_details?.name || '',
-          email: orderDetail.sender_details?.email || '',
-          phone: orderDetail.sender_details?.mobile || '',
-          company: orderDetail.sender_details?.company || '',
-          building: orderDetail.sender_details?.address_detail?.building || '',
-          instructions: orderDetail.sender_details?.address_detail?.instructions || '',
-          address1: orderDetail.sender_details?.address_detail?.address_line || '',
-          address: orderDetail.sender_details?.address || '',
-          suburb: orderDetail.sender_details?.address_detail?.suburb || '',
-          street_name: orderDetail.sender_details?.address_detail?.street_name || '',
-          street_number: orderDetail.sender_details?.address_detail?.street_number || '',
-          unit_number: orderDetail.sender_details?.address_detail?.unit_number || '',
-          state: orderDetail.sender_details?.address_detail?.state || '',
-          postcode: orderDetail.sender_details?.address_detail?.postcode || '',
+          name: senderDetail?.name || '',
+          email: senderDetail?.email || '',
+          phone: senderDetail?.mobile || '',
+          company: senderDetail?.company || '',
+          building: senderDetail?.address_detail?.building || '',
+          instructions: senderDetail?.address_detail?.instructions || '',
+          address1: senderDetail?.address_detail?.address_line || '',
+          address_info: senderDetail?.address_detail?.address_info || senderDetail?.address || '',
+          suburb: senderDetail?.address_detail?.suburb || '',
+          street_name: senderDetail?.address_detail?.street_name || '',
+          street_number: senderDetail?.address_detail?.street_number || '',
+          unit_number: senderDetail?.address_detail?.unit_number || '',
+          state: senderDetail?.address_detail?.state || '',
+          postcode: senderDetail?.address_detail?.postcode || '',
           country: 'Australia',
           saveToAddressBook: false,
         },
         receiver: {
-          name: orderDetail.receiver_details?.name || '',
-          email: orderDetail.receiver_details?.email || '',
-          phone: orderDetail.receiver_details?.mobile || '',
-          company: orderDetail.receiver_details?.company || '',
-          building: orderDetail.receiver_details?.address_detail?.building || '',
-          instructions: orderDetail.receiver_details?.address_detail?.instructions || '',
-          address1: orderDetail.receiver_details?.address_detail?.address_line || '',
-          address: orderDetail.receiver_details?.address || '',
-          suburb: orderDetail.receiver_details?.address_detail?.suburb || '',
-          street_name: orderDetail.receiver_details?.address_detail?.street_name || '',
-          street_number: orderDetail.receiver_details?.address_detail?.street_number || '',
-          unit_number: orderDetail.receiver_details?.address_detail?.unit_number || '',
-          state: orderDetail.receiver_details?.address_detail?.state || '',
-          postcode: orderDetail.receiver_details?.address_detail?.postcode || '',
+          name: receiverDetail?.name || '',
+          email: receiverDetail?.email || '',
+          phone: receiverDetail?.mobile || '',
+          company: receiverDetail?.company || '',
+          building: receiverDetail?.address_detail?.building || '',
+          instructions: receiverDetail?.address_detail?.instructions || '',
+          address1: receiverDetail?.address_detail?.address_line || '',
+          address_info: receiverDetail?.address_detail?.address_info || '',
+          suburb: receiverDetail?.address_detail?.suburb || '',
+          street_name: receiverDetail?.address_detail?.street_name || '',
+          street_number: receiverDetail?.address_detail?.street_number || '',
+          unit_number: receiverDetail?.address_detail?.unit_number || '',
+          state: receiverDetail?.address_detail?.state || '',
+          postcode: receiverDetail?.address_detail?.postcode || '',
           country: 'Australia',
           saveToAddressBook: false,
         },
@@ -353,10 +356,10 @@ export const useOrderWorkflow = () => {
         onSuccess: (response) => {
           if (response.status) {
             showToast('Orders Created successfully', 'success');
-            navigate(`${role === 'admin' ? '/admin' : ''}/orders/view/${response.order_number}`);
+            navigate(`${role === 'admin' ? '/admin' : ''}/orders/view/${response?.data?.order_number}`);
             setWalletCheckOpen(false);
-            if (response.order_number) {
-              printLabel(response.order_number);
+            if (response?.data?.order_number) {
+              printLabel(response?.data?.order_number);
             }
           } else {
             showToast(response.message || 'Failed to create orders', 'error');
@@ -490,18 +493,17 @@ export const useOrderWorkflow = () => {
     if (savedAddressStr) {
       try {
         const savedAddr = JSON.parse(savedAddressStr);
-        const splitAddress = savedAddr.address.split(',');
         setAddressData(prev => ({
           ...prev,
           receiver: {
             name: savedAddr.contact_person || '',
             email: savedAddr.email || '',
             phone: savedAddr.phone || '',
-            company: savedAddr.company || '',
+            company: savedAddr.business_name || '',
             building: savedAddr.building || '',
             instructions: savedAddr.instructions || '',
-            address: savedAddr.address || '',
-            address1: splitAddress[0] || '',
+            address_info: savedAddr.address_info || '',
+            address1: savedAddr.address || '',
             street_name: savedAddr.street_name || '',
             street_number: savedAddr.street_number || '',
             unit_number: savedAddr.unit_number || '',

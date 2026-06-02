@@ -23,7 +23,7 @@ export const getOrdersColumns = (
   onArchiveOrder?: (orderId: string) => void,
   updateToArchiveId?: string | null
 ): Column<Order>[] => {
-
+  console.log(Favicon, 'Favicon');
   const printedAndShippedActions = (value: string) => [
     {
       label: "View order",
@@ -102,9 +102,8 @@ export const getOrdersColumns = (
         width: '220px',
         cell: (value: string, row: Order) => (
           <div className="flex items-center gap-1">
-            {/* <img src={row?.courier_logo || 'https://api.tranzit.digisite.net/assets/img/couriers/direct-freight.png'} className="h-6" alt="" /> */}
             <div>
-              <img src={row?.courier_logo} className="h-6" alt="" />
+              <img src={row?.courier_logo || row?.courier_logo_url} className="h-6" alt="" />
             </div>
             <div className="flex flex-col">
               <span className="font-medium">{value !== 'unknown' ? value : '-'}</span>
@@ -131,9 +130,9 @@ export const getOrdersColumns = (
       }] : []),
       {
         header: 'ORDER SOURCE', key: 'order_type',
-        cell: (value: string) => (
+        cell: (value: string, row: Order) => (
           <div className="flex items-center gap-2">
-            <img src={Favicon} className="h-4 w-4" alt="" />
+            <img src={row?.order_source_icon || Favicon} className="h-4 w-4" alt="" />
             <span className="capitalize">{value}</span>
           </div>
         )

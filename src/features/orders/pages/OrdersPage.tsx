@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo, useCallback, useEffect } from 'react';
+import { useState, useMemo, useCallback, useEffect, lazy, Suspense } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import type { TabType } from '@/features/orders/types';
 import { useOrders, useExportOrders, useImportOrders, useDownloadLabel, useCancelOrder, useArchiveOrder } from '@/features/orders/hooks/useOrders';
@@ -12,12 +12,15 @@ import { Download, Plus, Loader2, ChevronDown, Package } from 'lucide-react';
 import { DropdownCustomMenu } from '@/components/ui/dropdown-menu';
 import { useAppSelector } from '@/hooks/store.hooks';
 import { showToast } from '@/components/ui/custom-toast';
-import { ImportOrdersDialog } from '../components/ImportOrdersDialog';
+// import { ImportOrdersDialog } from '../components/ImportOrdersDialog';
 import { ConformationModal } from '@/components/common/ConformationModal';
-import CreateOrderDialog from '../components/CreateOrderDialog';
+// import CreateOrderDialog from '../components/CreateOrderDialog';
 import { useDebounce } from '@/hooks/useDebounce';
 import { FormSelect } from '../components/OrderFormUI';
 import { useCustomers } from '@/features/customers/hooks/useCustomers';
+
+const ImportOrdersDialog = lazy(() => import('@/features/orders/components/ImportOrdersDialog'));
+const CreateOrderDialog = lazy(() => import('@/features/orders/components/CreateOrderDialog'));
 
 export default function OrdersPage({ fromCustomer, customerId }: { fromCustomer?: boolean, customerId?: string }) {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -394,13 +397,16 @@ export default function OrdersPage({ fromCustomer, customerId }: { fromCustomer?
       </div>
       {
         isImportDialogOpen && (
-          <ImportOrdersDialog
-            open={isImportDialogOpen}
-            onOpenChange={setIsImportDialogOpen}
-            onImport={handleImportOrders}
-            isLoading={importOrders.isPending}
-            isAdmin={isAdmin}
-          />)
+          <Suspense fallback={null}>
+            <ImportOrdersDialog
+              open={isImportDialogOpen}
+              onOpenChange={setIsImportDialogOpen}
+              onImport={handleImportOrders}
+              isLoading={importOrders.isPending}
+              isAdmin={isAdmin}
+            />
+          </Suspense>
+        )
       }
       {
         showCancelModal && (
@@ -478,16 +484,18 @@ export default function OrdersPage({ fromCustomer, customerId }: { fromCustomer?
         )
       }
       {addressEditModal && (
-        <CreateOrderDialog
-          orderId={addressEditModal}
-          open={!!addressEditModal}
-          onOpenChange={() => setAddressEditModal('')}
-          type="receiver"
-          onSubmit={() => { }}
-          // initialData={{}}
-          isEdit={true}
-          isUpdate={true}
-        />
+        <Suspense fallback={null}>
+          <CreateOrderDialog
+            orderId={addressEditModal}
+            open={!!addressEditModal}
+            onOpenChange={() => setAddressEditModal('')}
+            type="receiver"
+            onSubmit={() => { }}
+            // initialData={{}}
+            isEdit={true}
+            isUpdate={true}
+          />
+        </Suspense>
       )}
     </div>
   );

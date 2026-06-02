@@ -6,6 +6,7 @@ export interface ZohoConfig {
     accounts_base_url: string;
     default_country: string;
     scopes: string;
+    connection_status?: string;
 }
 
 export interface ZohoRedirectResponse {

@@ -2,7 +2,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useCallback } from "react";
 import { authService } from "@/features/auth/services/auth.service";
 import { QUERY_KEYS } from "@/constants/api.constants";
-import type { ForgotPasswordRequest, LoginRequest, RegisterRequest, OnboardingRequest, ResetPasswordRequest } from "@/features/auth/auth.types";
+import type { ForgotPasswordRequest, LoginRequest, RegisterRequest, OnboardingRequest, ResetPasswordRequest, EmailVerifyRequest } from "@/features/auth/auth.types";
 
 /**
  * Hook for customer login
@@ -70,6 +70,15 @@ export const useOnboarding = () => {
 export const useVerifyEmail = () => {
     return useMutation({
         mutationFn: useCallback((token: string) => authService.verifyEmail(token), []),
+    });
+};
+
+/**
+ * Hook to verify email with signature (GET request)
+ */
+export const useEmailVerify = () => {
+    return useMutation({
+        mutationFn: useCallback((data: EmailVerifyRequest) => authService.emailVerify(data), []),
     });
 };
 

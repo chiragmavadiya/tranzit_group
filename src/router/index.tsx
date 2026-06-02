@@ -38,7 +38,7 @@ const PageLoader = () => (
 );
 
 export const AppRouter = () => {
-  const { isAuthenticated } = useAppSelector((state) => state.auth);
+  const { isAuthenticated, userID, token } = useAppSelector((state) => state.auth);
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
   const location = useLocation();
@@ -55,10 +55,11 @@ export const AppRouter = () => {
 
       // Redirect to onboarding if required
       if (userData.next_step === 'onboarding' && location.pathname !== '/on-board') {
-        navigate('/on-board');
+        console.log("Navigate to onBoard.......")
+        navigate('/on-board/' + userID + '/' + token);
       }
     }
-  }, [userData, dispatch, navigate, location.pathname]);
+  }, [userData, dispatch, navigate, location.pathname, userID, token]);
 
   // if (isLoading) return <PageLoader />;
 

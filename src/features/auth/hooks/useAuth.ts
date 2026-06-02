@@ -40,8 +40,8 @@ export const useRegister = () => {
         mutationFn: useCallback((data: RegisterRequest) => authService.register(data), []),
         onSuccess: (data) => {
             // Save token to localStorage
-            if (data?.data?.accessToken) {
-                localStorage.setItem("auth_token", data.data.accessToken);
+            if (data?.token) {
+                localStorage.setItem("auth_token", data.token);
             }
             // Invalidate verification status
             queryClient.invalidateQueries({ queryKey: QUERY_KEYS.AUTH.VERIFICATION_STATUS });

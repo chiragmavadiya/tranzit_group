@@ -18,7 +18,7 @@ import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import brandLogo from '@/assets/Tranzit_Logo.svg';
 import { showToast } from '@/components/ui/custom-toast';
 import { PlaceAutocomplete } from '@/components/common/AutoComplateAddress';
-import { STATES } from '@/constants';
+import { STATES, PRIVACY_POLICY_URL, TERMS_CONDITIONS_URL } from '@/constants';
 
 const SectionHeader = ({ title, icon: Icon, children }: { title: string, icon: any, children?: React.ReactNode }) => (
   <div className="flex items-center justify-between pb-3 border-b border-slate-50 dark:border-zinc-800/50 mb-6">
@@ -134,6 +134,7 @@ export default function OnboardingPage() {
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
+    console.log("HANDLE SUBMIT")
     e.preventDefault();
     setIsSubmitted(true);
     if (!validateForm()) {
@@ -162,6 +163,7 @@ export default function OnboardingPage() {
         if (response.status) {
           dispatch(setNextStep(''));
           showToast("Onboarding completed successfully", "success");
+          console.log("Redirect to order page")
           navigate('/orders');
         } else {
           showToast(response.message || "Failed to complete onboarding", "error");
@@ -201,6 +203,18 @@ export default function OnboardingPage() {
     }
   })
   useEffect(() => {
+    if (user) {
+      setFormData((prev) => {
+        return {
+          ...prev,
+          email: user.email,
+          first_name: user.first_name,
+          last_name: user.last_name,
+        }
+      })
+    }
+  }, [user])
+  useEffect(() => {
     verifyEmailApiCall()
   }, [])
 
@@ -233,7 +247,7 @@ export default function OnboardingPage() {
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-64 p-2 rounded-2xl dark:bg-zinc-900 border-slate-200 dark:border-zinc-800 shadow-2xl z-50">
               <div className="p-3 mb-2 bg-slate-50 dark:bg-zinc-950/50 rounded-xl flex items-center gap-3 border border-slate-100 dark:border-zinc-800/50">
-                <div className="h-10 w-10 rounded-full bg-primary flex items-center justify-center text-white font-bold shadow-lg shadow-primary/20 flex-shrink-0">
+                <div className="h-10 w-10 rounded-full bg-primary uppercase flex items-center justify-center text-white font-bold shadow-lg shadow-primary/20 flex-shrink-0">
                   {formData?.first_name?.[0]}{formData?.last_name?.[0]}
                 </div>
                 <div className="flex flex-col min-w-0">
@@ -259,7 +273,7 @@ export default function OnboardingPage() {
 
       <form onSubmit={handleSubmit} className="flex-1 flex flex-col min-h-0">
         <main className="flex-1 overflow-y-auto">
-          <div className="max-w-full sm:max-w-xl md:max-w-3xl lg:max-w-5xl xl:max-w-7xl 2xl:max-w-360 mx-auto w-full p-6 space-y-4 animate-in fade-in slide-in-from-top-4 duration-700">
+          <div className="max-w-full sm:max-w-xl md:max-w-3xl lg:max-w-5xl xl:max-w-7xl 2xl:max-w-400 mx-auto w-full p-6 space-y-4 animate-in fade-in slide-in-from-top-4 duration-700">
             {/* Banner */}
             <div className="bg-primary/5 border border-primary/20 p-5 rounded-2xl flex items-center gap-4 shadow-sm">
               <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary text-white shadow-lg shadow-primary/20">
@@ -608,7 +622,15 @@ export default function OnboardingPage() {
                   />
                   <div className="space-y-1">
                     <Label htmlFor="agree_privacy" className="text-sm text-slate-900 dark:text-zinc-200 font-bold cursor-pointer">
-                      Privacy Policy
+                      <a
+                        href={PRIVACY_POLICY_URL}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="hover:underline hover:text-primary transition-colors inline-flex items-center"
+                        onClick={(e) => e.stopPropagation()}
+                      >
+                        Privacy Policy
+                      </a>
                     </Label>
                     <p className="text-xs text-slate-500 mb-0">I agree to the processing of my personal data.</p>
                   </div>
@@ -622,23 +644,17 @@ export default function OnboardingPage() {
                   />
                   <div className="space-y-1">
                     <Label htmlFor="accept_terms" className="text-sm text-slate-900 dark:text-zinc-200 font-bold cursor-pointer">
-                      Terms & Conditions
+                      <a
+                        href={TERMS_CONDITIONS_URL}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="hover:underline hover:text-primary transition-colors inline-flex items-center"
+                        onClick={(e) => e.stopPropagation()}
+                      >
+                        Terms & Conditions
+                      </a>
                     </Label>
                     <p className="text-xs text-slate-500 mb-0">I accept the Tranzit Group platform terms.</p>
-                  </div>
-                </div>
-                <div className="flex items-start space-x-3 p-1">
-                  <Checkbox
-                    id="accept_terms"
-                    checked={formData.accept_terms}
-                    onCheckedChange={(val) => handleChange('accept_terms', val)}
-                    className="mt-[3px]"
-                  />
-                  <div className="space-y-1">
-                    {/* <Label htmlFor="accept_terms" className="text-sm text-slate-900 dark:text-zinc-200 font-bold cursor-pointer">
-                      Send me product updates and news (optional).
-                    </Label> */}
-                    <p className="text-sm text-slate-600 dark:text-zinc-400 mb-0">Send me product updates and news (optional).</p>
                   </div>
                 </div>
               </div>

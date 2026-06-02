@@ -70,10 +70,6 @@ export default function Sidebar({ isCollapsed, setIsCollapsed }: SidebarProps) {
 
   const currentSubmenuData = sidebarItems.find(i => i.name === activeSubmenu);
 
-  useEffect(() => {
-    console.log('Sidebar Render');
-  }, []);
-
   return (
     <aside className={`print:hidden h-screen bg-white dark:bg-zinc-950 border-r border-gray-200 dark:border-zinc-800 flex flex-col justify-between fixed top-0 left-0 z-20 transition-[width] duration-500 ease-in-out ${isCollapsed ? 'w-[64px]' : 'w-[240px]'}`}>
       <div className="flex-1 overflow-y-auto overflow-x-hidden w-full no-scrollbar">

@@ -103,7 +103,6 @@ export const GlobalSearch: React.FC<GlobalSearchProps> = ({
         }
 
     };
-    console.log(searchQuery, 'searchQuery')
     return (
         <div className='h-8'>
             <AutoComplete

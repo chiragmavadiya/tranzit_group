@@ -293,7 +293,6 @@ const OrderDetailsPage: React.FC = () => {
     );
   }
 
-  console.log(addressData, 'addressData')
   return (
     <>
       <div

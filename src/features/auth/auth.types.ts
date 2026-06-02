@@ -98,6 +98,7 @@ export interface RegisterRequest {
 export interface RegisterResponse {
     status: boolean;
     data: User
+    token: string;
 }
 
 export interface ForgotPasswordRequest {

@@ -164,7 +164,6 @@ const InvoiceDocumentView: React.FC = () => {
         ...item,
         id: item?.invoice_items_id
       }))
-      console.log(itemsData, 'itemsData')
       setInvoiceData({
         ...data,
         items: itemsData,

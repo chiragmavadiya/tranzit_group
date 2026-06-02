@@ -25,7 +25,6 @@ export default function VerifyEmail() {
         onSuccess: (response) => {
           if (response.status) {
             showToast("Email verified successfully", "success");
-            navigate("/setup");
           } else {
             showToast(response.message || "Verification failed", "error");
           }

@@ -23,7 +23,6 @@ export const getOrdersColumns = (
   onArchiveOrder?: (orderId: string) => void,
   updateToArchiveId?: string | null
 ): Column<Order>[] => {
-  console.log(Favicon, 'Favicon');
   const printedAndShippedActions = (value: string) => [
     {
       label: "View order",

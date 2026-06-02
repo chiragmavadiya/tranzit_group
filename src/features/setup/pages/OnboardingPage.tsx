@@ -8,7 +8,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { logout, setNextStep } from '@/features/auth/authSlice';
+import { logout } from '@/features/auth/authSlice';
 import { useOnboarding, useLogout, useEmailVerify } from '@/features/auth/hooks/useAuth';
 import { FormInput, FormSelect } from '@/features/orders/components/OrderFormUI';
 import { useAppDispatch, useAppSelector } from '@/hooks/store.hooks';
@@ -161,7 +161,6 @@ export default function OnboardingPage() {
     onboardingMutation.mutate(payload, {
       onSuccess: (response) => {
         if (response.status) {
-          dispatch(setNextStep(''));
           showToast("Onboarding completed successfully", "success");
           console.log("Redirect to order page")
           navigate('/orders');

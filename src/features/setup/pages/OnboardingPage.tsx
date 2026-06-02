@@ -490,121 +490,112 @@ export default function OnboardingPage() {
               </div>
 
               {/* Billing Address Card (Conditional) */}
-              {formData.hasBillingAddress ? (
-                <div className="bg-white dark:bg-zinc-900 p-6 rounded-3xl border border-slate-100 dark:border-zinc-800 shadow-lg shadow-slate-200/40 dark:shadow-none space-y-4 animate-in slide-in-from-right-4 duration-500">
-                  <SectionHeader title="Billing Address Details" icon={CreditCard} />
+              <div className="bg-white dark:bg-zinc-900 p-6 rounded-3xl border border-slate-100 dark:border-zinc-800 shadow-lg shadow-slate-200/40 dark:shadow-none space-y-4 animate-in slide-in-from-right-4 duration-500">
+                <SectionHeader title="Billing Address Details" icon={CreditCard} />
 
-                  <div className="space-y-4">
-                    <div>
-                      <PlaceAutocomplete
-                        label="Address Information"
-                        onPlaceSelect={(opt) => {
-                          handleChange('billing_address_info', opt.formatted_address);
-                          handleChange('billing_address', opt.address1);
-                          handleChange('billing_unit_number', opt.unit_number);
-                          handleChange('billing_street_name', opt.street_name);
-                          handleChange('billing_street_number', opt.street_number);
-                          handleChange('billing_street_type', opt.street_type);
-                          handleChange('billing_suburb', opt.suburb);
-                          handleChange('billing_state', opt.state);
-                          handleChange('billing_country', opt.country);
-                          handleChange('billing_postcode', opt.post_code);
-                        }}
-                        onChange={(value) => handleChange('billing_address_info', value)}
-                        error={isSubmitted && formData.billing_address_info?.trim() === ''}
-                        errormsg='Please enter your billing address'
-                        value={formData.billing_address_info}
-                        required
-                      />
-                    </div>
+                <div className="space-y-4">
+                  <div>
+                    <PlaceAutocomplete
+                      label="Address Information"
+                      onPlaceSelect={(opt) => {
+                        handleChange('billing_address_info', opt.formatted_address);
+                        handleChange('billing_address', opt.address1);
+                        handleChange('billing_unit_number', opt.unit_number);
+                        handleChange('billing_street_name', opt.street_name);
+                        handleChange('billing_street_number', opt.street_number);
+                        handleChange('billing_street_type', opt.street_type);
+                        handleChange('billing_suburb', opt.suburb);
+                        handleChange('billing_state', opt.state);
+                        handleChange('billing_country', opt.country);
+                        handleChange('billing_postcode', opt.post_code);
+                      }}
+                      onChange={(value) => handleChange('billing_address_info', value)}
+                      error={isSubmitted && formData.billing_address_info?.trim() === ''}
+                      errormsg='Please enter your billing address'
+                      value={formData.billing_address_info}
+                      required
+                      disabled={!formData.hasBillingAddress}
+                    />
+                  </div>
 
-                    <div className="grid grid-cols-12 gap-5">
+                  <div className="grid grid-cols-12 gap-5">
+                    <FormInput
+                      isHalf
+                      label="Billing Unit Number"
+                      placeholder="Optional"
+                      value={formData.billing_unit_number}
+                      onChange={(val) => handleChange('billing_unit_number', val)}
+                      disabled={!formData.hasBillingAddress}
+                    />
+                    <FormInput
+                      isHalf
+                      label="Billing Street"
+                      placeholder="Enter Street"
+                      value={formData.billing_address}
+                      onChange={(val) => handleChange('billing_address', val)}
+                      required
+                      error={isSubmitted && formData.billing_address?.trim() === ''}
+                      errormsg="Please enter your street"
+                      disabled={!formData.hasBillingAddress}
+                    />
+                  </div>
+
+                  <div className="grid grid-cols-12 gap-5">
+                    <div className="col-span-12 md:col-span-3">
                       <FormInput
-                        isHalf
-                        label="Billing Unit Number"
-                        placeholder="Optional"
-                        value={formData.billing_unit_number}
-                        onChange={(val) => handleChange('billing_unit_number', val)}
-                      />
-                      <FormInput
-                        isHalf
-                        label="Billing Street"
-                        placeholder="Enter Street"
-                        value={formData.billing_address}
-                        onChange={(val) => handleChange('billing_address', val)}
+                        isFullWidth
+                        label="Suburb"
+                        placeholder="Sydney"
+                        value={formData.billing_suburb}
+                        onChange={(val) => handleChange('billing_suburb', val)}
                         required
-                        error={isSubmitted && formData.billing_address?.trim() === ''}
-                        errormsg="Please enter your street"
+                        error={isSubmitted && formData.billing_suburb?.trim() === ''}
+                        errormsg="Please enter your suburb"
+                        disabled={!formData.hasBillingAddress}
+                      />
+                    </div>
+                    <div className="col-span-12 md:col-span-3">
+                      <FormSelect
+                        label="State"
+                        options={STATES}
+                        value={formData.billing_state}
+                        onValueChange={(val) => handleChange('state', val)}
+                        required
+                        error={isSubmitted && formData.billing_state?.trim() === ''}
+                        errormsg="Please select your state"
+                        disabled={!formData.hasBillingAddress}
+                      />
+                    </div>
+                    <div className="col-span-12 md:col-span-3">
+                      <FormInput
+                        isFullWidth
+                        label="Postcode"
+                        placeholder="2000"
+                        value={formData.billing_postcode}
+                        onChange={(val) => handleChange('billing_postcode', val)}
+                        required
+                        error={isSubmitted && formData.billing_postcode?.trim() === ''}
+                        errormsg="Please enter your postcode"
+                        disabled={!formData.hasBillingAddress}
+                      />
+                    </div>
+                    <div className="col-span-12 md:col-span-3">
+                      <FormInput
+                        isFullWidth
+                        label="Country"
+                        placeholder="Australia"
+                        value={formData.billing_country}
+                        onChange={(val) => handleChange('billing_country', val)}
+                        required
+                        error={isSubmitted && formData.billing_country?.trim() === ''}
+                        errormsg="Please enter your country"
+                        disabled={!formData.hasBillingAddress}
                       />
                     </div>
 
-                    <div className="grid grid-cols-12 gap-5">
-                      <div className="col-span-12 md:col-span-3">
-                        <FormInput
-                          isFullWidth
-                          label="Suburb"
-                          placeholder="Sydney"
-                          value={formData.billing_suburb}
-                          onChange={(val) => handleChange('billing_suburb', val)}
-                          required
-                          error={isSubmitted && formData.billing_suburb?.trim() === ''}
-                          errormsg="Please enter your suburb"
-                        />
-                      </div>
-                      <div className="col-span-12 md:col-span-3">
-                        <FormSelect
-                          label="State"
-                          options={STATES}
-                          value={formData.billing_state}
-                          onValueChange={(val) => handleChange('state', val)}
-                          required
-                          error={isSubmitted && formData.billing_state?.trim() === ''}
-                          errormsg="Please select your state"
-                        />
-                      </div>
-                      <div className="col-span-12 md:col-span-3">
-                        <FormInput
-                          isFullWidth
-                          label="Postcode"
-                          placeholder="2000"
-                          value={formData.billing_postcode}
-                          onChange={(val) => handleChange('billing_postcode', val)}
-                          required
-                          error={isSubmitted && formData.billing_postcode?.trim() === ''}
-                          errormsg="Please enter your postcode"
-                        />
-                      </div>
-                      <div className="col-span-12 md:col-span-3">
-                        <FormInput
-                          isFullWidth
-                          label="Country"
-                          placeholder="Australia"
-                          value={formData.billing_country}
-                          onChange={(val) => handleChange('billing_country', val)}
-                          required
-                          error={isSubmitted && formData.billing_country?.trim() === ''}
-                          errormsg="Please enter your country"
-                        />
-                      </div>
-
-                    </div>
                   </div>
                 </div>
-              ) : (
-                /* Improved Placeholder when billing is same */
-                // <div className="bg-slate-50/50 dark:bg-zinc-950/30 p-8 rounded-3xl border border-dashed border-slate-200 dark:border-zinc-800 flex flex-col items-center justify-center text-center space-y-4 h-full min-h-[400px]">
-                //   <div className="h-16 w-16 rounded-full bg-white dark:bg-zinc-900 flex items-center justify-center shadow-sm">
-                //     <CreditCard className="w-8 h-8 text-slate-300 dark:text-zinc-700" />
-                //   </div>
-                //   <div className="max-w-[280px]">
-                //     <p className="text-sm font-bold text-slate-600 dark:text-zinc-400">Billing Synchronized</p>
-                //     <p className="text-xs text-slate-400 dark:text-zinc-500 mt-2 leading-relaxed">
-                //       Your billing details are currently set to match your business address. Uncheck the box to provide a separate billing location.
-                //     </p>
-                //   </div>
-                // </div>
-                <></>
-              )}
+              </div>
             </div>
 
             {/* Row 3: Terms & Conditions (Non-sticky part) */}

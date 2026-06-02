@@ -13,7 +13,7 @@ import { useOnboarding, useLogout, useEmailVerify } from '@/features/auth/hooks/
 import { FormInput, FormSelect } from '@/features/orders/components/OrderFormUI';
 import { useAppDispatch, useAppSelector } from '@/hooks/store.hooks';
 import { AlertCircle, LogOut, Loader2, User, Building2, MapPin, CreditCard, ChevronDown } from 'lucide-react';
-import { useEffect, useRef, useState, useEffectEvent } from 'react';
+import { useEffect, useState, useEffectEvent } from 'react';
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import brandLogo from '@/assets/Tranzit_Logo.svg';
 import { showToast } from '@/components/ui/custom-toast';

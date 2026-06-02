@@ -13,7 +13,7 @@ import { useOnboarding, useLogout, useEmailVerify } from '@/features/auth/hooks/
 import { FormInput, FormSelect } from '@/features/orders/components/OrderFormUI';
 import { useAppDispatch, useAppSelector } from '@/hooks/store.hooks';
 import { AlertCircle, LogOut, Loader2, User, Building2, MapPin, CreditCard, ChevronDown } from 'lucide-react';
-import { useEffect, useRef, useState, useEffectEvent } from 'react';
+import { useEffect, useState, useEffectEvent } from 'react';
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import brandLogo from '@/assets/Tranzit_Logo.svg';
 import { showToast } from '@/components/ui/custom-toast';
@@ -38,12 +38,10 @@ export default function OnboardingPage() {
   const { user } = useAppSelector(state => state.auth);
   const { customerId, token } = useParams();
   const [searchParams] = useSearchParams();
-  const mount = useRef(false);
 
   const expires = searchParams.get('expires');
   const signature = searchParams.get('signature');
 
-  console.log(customerId, 'customer id', token, 'token', expires, 'expires', signature, 'signature', 'onboard....')
   const onboardingMutation = useOnboarding();
   const emailVerifyMutation = useEmailVerify();
 
@@ -176,7 +174,7 @@ export default function OnboardingPage() {
   };
 
   const verifyEmailApiCall = useEffectEvent(() => {
-    if (customerId && token && expires && signature && mount.current) {
+    if (customerId && token && expires && signature) {
       emailVerifyMutation.mutate({ customerId, token, expires, signature }, {
         onSuccess: (response) => {
           if (response.status) {
@@ -203,10 +201,6 @@ export default function OnboardingPage() {
     }
   })
   useEffect(() => {
-    if (!mount.current) {
-      mount.current = true;
-      return;
-    }
     verifyEmailApiCall()
   }, [])
 

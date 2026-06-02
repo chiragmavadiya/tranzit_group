@@ -44,23 +44,25 @@ export const AppRouter = () => {
   const location = useLocation();
 
   // Fetch user details if authenticated
-  const { data: userData } = useGetUserDetails(isAuthenticated);
+  const { data: userData, isPending } = useGetUserDetails(isAuthenticated);
 
   useEffect(() => {
-    if (userData?.user) {
+    if (userData?.user && !isPending) {
       dispatch(setUser({
         user: userData.user,
         next_step: userData.next_step
       }));
 
-      console.log(userData.next_step)
+      console.log(userData.next_step, 'NEXT STEP..')
       // Redirect to onboarding if required
       if (userData.next_step === 'onboarding' && location.pathname !== '/on-board') {
         console.log("Navigate to onBoard.......123")
         navigate('/on-board/' + userID + '/' + token);
+      } else {
+        navigate('/orders')
       }
     }
-  }, [userData, dispatch, navigate, location.pathname, userID, token]);
+  }, [userData, dispatch, navigate, location.pathname, userID, token, isPending]);
 
   // if (isLoading) return <PageLoader />;
 

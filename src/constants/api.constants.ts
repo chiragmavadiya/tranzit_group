@@ -7,6 +7,7 @@ export const API_ENDPOINTS = {
         RESEND_VERIFICATION: "/customer/auth/email/resend",
         VERIFICATION_STATUS: "/customer/auth/verification-status",
         VERIFY_EMAIL: "/customer/auth/verify-email",
+        EMAIL_VERIFY: (customerId: string | number, token: string) => `/customer/auth/email/verify/${customerId}/${token}`,
         ONBOARDING: "/customer/onboarding",
         LOGOUT: "/auth/logout",
         USER_DETAILS: "/auth/me",

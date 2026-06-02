@@ -9,16 +9,16 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { logout, setNextStep } from '@/features/auth/authSlice';
-import { useOnboarding, useLogout } from '@/features/auth/hooks/useAuth';
+import { useOnboarding, useLogout, useEmailVerify } from '@/features/auth/hooks/useAuth';
 import { FormInput, FormSelect } from '@/features/orders/components/OrderFormUI';
 import { useAppDispatch, useAppSelector } from '@/hooks/store.hooks';
 import { AlertCircle, LogOut, Loader2, User, Building2, MapPin, CreditCard, ChevronDown } from 'lucide-react';
-import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useEffect, useRef, useState, useEffectEvent } from 'react';
+import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import brandLogo from '@/assets/Tranzit_Logo.svg';
 import { showToast } from '@/components/ui/custom-toast';
 import { PlaceAutocomplete } from '@/components/common/AutoComplateAddress';
-import { STATES, STREET_TYPES } from '@/constants';
+import { STATES } from '@/constants';
 
 const SectionHeader = ({ title, icon: Icon, children }: { title: string, icon: any, children?: React.ReactNode }) => (
   <div className="flex items-center justify-between pb-3 border-b border-slate-50 dark:border-zinc-800/50 mb-6">
@@ -36,7 +36,17 @@ export default function OnboardingPage() {
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
   const { user } = useAppSelector(state => state.auth);
+  const { customerId, token } = useParams();
+  const [searchParams] = useSearchParams();
+  const mount = useRef(false);
+
+  const expires = searchParams.get('expires');
+  const signature = searchParams.get('signature');
+
+  console.log(customerId, 'customer id', token, 'token', expires, 'expires', signature, 'signature', 'onboard....')
   const onboardingMutation = useOnboarding();
+  const emailVerifyMutation = useEmailVerify();
+
   const logoutMutation = useLogout();
   const [isSubmitted, setIsSubmitted] = useState(false);
 
@@ -50,6 +60,7 @@ export default function OnboardingPage() {
     business_name: "",
     gst_number: "",
     // Address
+    address_info: "",
     address: "",
     unit_number: "",
     street_number: "",
@@ -58,9 +69,10 @@ export default function OnboardingPage() {
     suburb: "",
     state: "",
     postcode: "",
-    country: "",
+    country: "Australia",
     hasBillingAddress: true,
     // Billing Address
+    billing_address_info: "",
     billing_address: "",
     billing_unit_number: "",
     billing_street_number: "",
@@ -69,6 +81,7 @@ export default function OnboardingPage() {
     billing_suburb: "",
     billing_state: "",
     billing_postcode: "",
+    billing_country: "Australia",
     // Consents
     agree_privacy: false,
     accept_terms: false,
@@ -162,6 +175,42 @@ export default function OnboardingPage() {
     });
   };
 
+  const verifyEmailApiCall = useEffectEvent(() => {
+    if (customerId && token && expires && signature && mount.current) {
+      emailVerifyMutation.mutate({ customerId, token, expires, signature }, {
+        onSuccess: (response) => {
+          if (response.status) {
+            showToast("Email verified successfully", "success");
+            localStorage.setItem("auth_userID", JSON.stringify(response.user.id));
+            localStorage.setItem("user_role", "customer");
+            localStorage.setItem("auth_token", response.token);
+            setFormData((prev) => {
+              return {
+                ...prev,
+                email: response.user.email,
+                first_name: response.user.first_name,
+                last_name: response.user.last_name,
+              }
+            })
+          } else {
+            showToast(response.message || "Failed to verify email", "error");
+          }
+        },
+        onError: (error: any) => {
+          showToast(error.message || "An error occurred while verifying email", "error");
+        }
+      });
+    }
+  })
+  useEffect(() => {
+    if (!mount.current) {
+      mount.current = true;
+      return;
+    }
+    verifyEmailApiCall()
+  }, [])
+
+
   return (
     <div className="h-screen bg-[#F8FAFC] dark:bg-zinc-950 flex flex-col overflow-hidden">
       <header className="h-16 bg-white dark:bg-zinc-900 border-b border-slate-200 dark:border-zinc-800 flex items-center justify-between px-8 sticky top-0 z-30 shadow-[0_1px_2px_rgba(0,0,0,0.03)]">
@@ -179,15 +228,11 @@ export default function OnboardingPage() {
                 className="h-10 px-2 sm:px-4 flex items-center gap-2 sm:gap-3 hover:bg-slate-50 dark:hover:bg-zinc-800 transition-all group rounded-xl"
               >
                 <div className="flex flex-col items-end hidden sm:flex">
-                  <span className="text-xs font-bold text-slate-900 dark:text-zinc-100">{user?.email}</span>
+                  <span className="text-xs font-bold text-slate-900 dark:text-zinc-100">{formData.email}</span>
                   <span className="text-[10px] text-slate-500 dark:text-zinc-500 font-medium">Customer Account</span>
                 </div>
                 <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center border border-primary/20 transition-transform group-hover:scale-105 overflow-hidden">
-                  {user?.image ? (
-                    <img src={user.image} alt="Avatar" className="h-full w-full object-cover" />
-                  ) : (
-                    <User className="h-4 w-4 text-primary" />
-                  )}
+                  <User className="h-4 w-4 text-primary" />
                 </div>
                 <ChevronDown className="h-4 w-4 text-slate-400 transition-transform duration-200 group-data-[state=open]:rotate-180" />
               </Button>
@@ -195,11 +240,11 @@ export default function OnboardingPage() {
             <DropdownMenuContent align="end" className="w-64 p-2 rounded-2xl dark:bg-zinc-900 border-slate-200 dark:border-zinc-800 shadow-2xl z-50">
               <div className="p-3 mb-2 bg-slate-50 dark:bg-zinc-950/50 rounded-xl flex items-center gap-3 border border-slate-100 dark:border-zinc-800/50">
                 <div className="h-10 w-10 rounded-full bg-primary flex items-center justify-center text-white font-bold shadow-lg shadow-primary/20 flex-shrink-0">
-                  {user?.first_name?.[0]}{user?.last_name?.[0]}
+                  {formData?.first_name?.[0]}{formData?.last_name?.[0]}
                 </div>
                 <div className="flex flex-col min-w-0">
-                  <span className="text-sm font-bold text-slate-900 dark:text-zinc-100 truncate">{user?.first_name} {user?.last_name}</span>
-                  <span className="text-xs text-slate-500 dark:text-zinc-500 truncate">{user?.email}</span>
+                  <span className="text-sm font-bold text-slate-900 dark:text-zinc-100 truncate">{formData?.first_name} {formData?.last_name}</span>
+                  <span className="text-xs text-slate-500 dark:text-zinc-500 truncate">{formData?.email}</span>
                 </div>
               </div>
               <DropdownMenuSeparator className="bg-slate-100 dark:bg-zinc-800" />
@@ -220,7 +265,7 @@ export default function OnboardingPage() {
 
       <form onSubmit={handleSubmit} className="flex-1 flex flex-col min-h-0">
         <main className="flex-1 overflow-y-auto">
-          <div className="max-w-7xl mx-auto w-full p-6 space-y-4 animate-in fade-in slide-in-from-top-4 duration-700">
+          <div className="max-w-full sm:max-w-xl md:max-w-3xl lg:max-w-5xl xl:max-w-7xl 2xl:max-w-360 mx-auto w-full p-6 space-y-4 animate-in fade-in slide-in-from-top-4 duration-700">
             {/* Banner */}
             <div className="bg-primary/5 border border-primary/20 p-5 rounded-2xl flex items-center gap-4 shadow-sm">
               <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary text-white shadow-lg shadow-primary/20">
@@ -343,71 +388,45 @@ export default function OnboardingPage() {
                     <PlaceAutocomplete
                       label="Address Information"
                       onPlaceSelect={(opt) => {
-                        handleChange('address', opt.formatted_address);
-                        handleChange('street', opt.street);
-                        // handleChange('street_name', opt.street_name);
-                        // handleChange('street_number', opt.street_number);
-                        // handleChange('street_type', opt.street_type);
+                        handleChange('address_info', opt.formatted_address);
+                        handleChange('address', opt.address1);
+                        handleChange('unit_number', opt.unit_number);
+                        handleChange('street_name', opt.street_name);
+                        handleChange('street_number', opt.street_number);
+                        handleChange('street_type', opt.street_type);
                         handleChange('suburb', opt.suburb);
                         handleChange('state', opt.state);
                         handleChange('country', opt.country);
                         handleChange('postcode', opt.post_code);
                       }}
-                      onChange={(value) => handleChange('address', value)}
-                      error={isSubmitted && formData.address?.trim() === ''}
+                      onChange={(value) => handleChange('address_info', value)}
+                      error={isSubmitted && formData.address_info?.trim() === ''}
                       errormsg='Please enter your address'
-                      value={formData.address}
+                      value={formData.address_info}
                       required
                     />
                   </div>
                   <div className="grid grid-cols-12  gap-5">
                     <FormInput
                       isHalf
-                      label="Unit / Suite"
+                      label="Unit Number"
                       placeholder="Optional"
                       value={formData.unit_number}
                       onChange={(val) => handleChange('unit_number', val)}
                     />
                     <FormInput
                       isHalf
-                      label="Street Number"
+                      label="Street"
                       placeholder="e.g. 123"
-                      value={formData.street_number}
-                      onChange={(val) => handleChange('street_number', val)}
+                      value={formData.address}
+                      onChange={(val) => handleChange('address', val)}
                       required
-                      error={isSubmitted && formData.street_number?.trim() === ''}
-                      errormsg="Please enter your street number"
+                      error={isSubmitted && formData.address?.trim() === ''}
+                      errormsg="Please enter your street"
                     />
                   </div>
-
                   <div className="grid grid-cols-12 gap-5">
-                    <div className="col-span-12 md:col-span-8">
-                      <FormInput
-                        isFullWidth
-                        label="Street Name"
-                        placeholder="Main St"
-                        value={formData.street_name}
-                        onChange={(val) => handleChange('street_name', val)}
-                        required
-                        error={isSubmitted && formData.street_name?.trim() === ''}
-                        errormsg="Please enter your street name"
-                      />
-                    </div>
-                    <div className="col-span-12 md:col-span-4">
-                      <FormSelect
-                        label="Type"
-                        options={STREET_TYPES}
-                        value={formData.street_type}
-                        onValueChange={(val) => handleChange('street_type', val)}
-                        required
-                        error={isSubmitted && formData.street_type?.trim() === ''}
-                        errormsg="Please select your street type"
-                      />
-                    </div>
-                  </div>
-
-                  <div className="grid grid-cols-12 gap-5">
-                    <div className="col-span-12 md:col-span-4">
+                    <div className="col-span-12 md:col-span-3">
                       <FormInput
                         isFullWidth
                         label="Suburb"
@@ -419,7 +438,7 @@ export default function OnboardingPage() {
                         errormsg="Please enter your suburb"
                       />
                     </div>
-                    <div className="col-span-12 md:col-span-4">
+                    <div className="col-span-12 md:col-span-3">
                       <FormSelect
                         label="State"
                         options={STATES}
@@ -430,7 +449,7 @@ export default function OnboardingPage() {
                         errormsg="Please select your state"
                       />
                     </div>
-                    <div className="col-span-12 md:col-span-4">
+                    <div className="col-span-12 md:col-span-3">
                       <FormInput
                         isFullWidth
                         label="Postcode"
@@ -440,6 +459,18 @@ export default function OnboardingPage() {
                         required
                         error={isSubmitted && formData.postcode?.trim() === ''}
                         errormsg="Please enter your postcode"
+                      />
+                    </div>
+                    <div className="col-span-12 md:col-span-3">
+                      <FormInput
+                        isFullWidth
+                        label="Country"
+                        placeholder="Australia"
+                        value={formData.country}
+                        onChange={(val) => handleChange('country', val)}
+                        required
+                        error={isSubmitted && formData.country?.trim() === ''}
+                        errormsg="Please enter your country"
                       />
                     </div>
                   </div>
@@ -458,20 +489,21 @@ export default function OnboardingPage() {
                       <PlaceAutocomplete
                         label="Address Information"
                         onPlaceSelect={(opt) => {
-                          handleChange('billing_address', opt.formatted_address);
-                          handleChange('billing_street', opt.street);
-                          // handleChange('billing_street_name', opt.street_name);
-                          // handleChange('billing_street_number', opt.street_number);
-                          // handleChange('billing_street_type', opt.street_type);
+                          handleChange('billing_address_info', opt.formatted_address);
+                          handleChange('billing_address', opt.address1);
+                          handleChange('billing_unit_number', opt.unit_number);
+                          handleChange('billing_street_name', opt.street_name);
+                          handleChange('billing_street_number', opt.street_number);
+                          handleChange('billing_street_type', opt.street_type);
                           handleChange('billing_suburb', opt.suburb);
                           handleChange('billing_state', opt.state);
                           handleChange('billing_country', opt.country);
                           handleChange('billing_postcode', opt.post_code);
                         }}
-                        onChange={(value) => handleChange('billing_address', value)}
-                        error={isSubmitted && formData.billing_address?.trim() === ''}
+                        onChange={(value) => handleChange('billing_address_info', value)}
+                        error={isSubmitted && formData.billing_address_info?.trim() === ''}
                         errormsg='Please enter your billing address'
-                        value={formData.billing_address}
+                        value={formData.billing_address_info}
                         required
                       />
                     </div>
@@ -479,51 +511,25 @@ export default function OnboardingPage() {
                     <div className="grid grid-cols-12 gap-5">
                       <FormInput
                         isHalf
-                        label="Billing Unit"
+                        label="Billing Unit Number"
                         placeholder="Optional"
                         value={formData.billing_unit_number}
                         onChange={(val) => handleChange('billing_unit_number', val)}
                       />
                       <FormInput
                         isHalf
-                        label="Billing Street #"
-                        placeholder="123"
-                        value={formData.billing_street_number}
-                        onChange={(val) => handleChange('billing_street_number', val)}
+                        label="Billing Street"
+                        placeholder="Enter Street"
+                        value={formData.billing_address}
+                        onChange={(val) => handleChange('billing_address', val)}
                         required
-                        error={isSubmitted && formData.billing_street_number?.trim() === ''}
-                        errormsg="Please enter your street number"
+                        error={isSubmitted && formData.billing_address?.trim() === ''}
+                        errormsg="Please enter your street"
                       />
                     </div>
 
                     <div className="grid grid-cols-12 gap-5">
-                      <div className="col-span-12 md:col-span-8">
-                        <FormInput
-                          isFullWidth
-                          label="Street Name"
-                          placeholder="Main St"
-                          value={formData.billing_street_name}
-                          onChange={(val) => handleChange('billing_street_name', val)}
-                          required
-                          error={isSubmitted && formData.billing_street_name?.trim() === ''}
-                          errormsg="Please enter your street name"
-                        />
-                      </div>
-                      <div className="col-span-12 md:col-span-4">
-                        <FormSelect
-                          label="Type"
-                          options={STREET_TYPES}
-                          value={formData.billing_street_type}
-                          onValueChange={(val) => handleChange('billing_street_type', val)}
-                          required
-                          error={isSubmitted && formData.billing_street_type?.trim() === ''}
-                          errormsg="Please select your street type"
-                        />
-                      </div>
-                    </div>
-
-                    <div className="grid grid-cols-12 gap-5">
-                      <div className="col-span-12 md:col-span-4">
+                      <div className="col-span-12 md:col-span-3">
                         <FormInput
                           isFullWidth
                           label="Suburb"
@@ -535,7 +541,7 @@ export default function OnboardingPage() {
                           errormsg="Please enter your suburb"
                         />
                       </div>
-                      <div className="col-span-12 md:col-span-4">
+                      <div className="col-span-12 md:col-span-3">
                         <FormSelect
                           label="State"
                           options={STATES}
@@ -546,7 +552,7 @@ export default function OnboardingPage() {
                           errormsg="Please select your state"
                         />
                       </div>
-                      <div className="col-span-12 md:col-span-4">
+                      <div className="col-span-12 md:col-span-3">
                         <FormInput
                           isFullWidth
                           label="Postcode"
@@ -558,6 +564,19 @@ export default function OnboardingPage() {
                           errormsg="Please enter your postcode"
                         />
                       </div>
+                      <div className="col-span-12 md:col-span-3">
+                        <FormInput
+                          isFullWidth
+                          label="Country"
+                          placeholder="Australia"
+                          value={formData.billing_country}
+                          onChange={(val) => handleChange('billing_country', val)}
+                          required
+                          error={isSubmitted && formData.billing_country?.trim() === ''}
+                          errormsg="Please enter your country"
+                        />
+                      </div>
+
                     </div>
                   </div>
                 </div>
@@ -635,7 +654,7 @@ export default function OnboardingPage() {
 
         {/* Sticky Bottom Bar */}
         <div className="sticky bottom-0 left-0 right-0 bg-white/80 dark:bg-zinc-950/80 backdrop-blur-md border-t border-slate-200 dark:border-zinc-800 px-8 py-4 z-40 shadow-[0_-4px_20px_rgba(0,0,0,0.03)]">
-          <div className="max-w-7xl mx-auto flex items-center justify-between gap-6">
+          <div className="max-w-full sm:max-w-xl md:max-w-3xl lg:max-w-5xl xl:max-w-7xl 2xl:max-w-360 mx-auto flex items-center justify-between gap-6 w-full">
             <div className="hidden lg:flex items-center gap-3 text-slate-600 dark:text-slate-400">
               <span className="text-xs font-bold tracking-wide">You can edit these later in Profile</span>
             </div>

@@ -21,7 +21,7 @@ export default function CreateOrderDialog({ onOpenChange, type, open, initialDat
     email: "",
     phone: "",
     company: "",
-    address: "",
+    address_info: "",
     address1: "",
     unit_number: "",
     street_number: "",
@@ -204,11 +204,11 @@ export default function CreateOrderDialog({ onOpenChange, type, open, initialDat
         company: orderResponse?.data.receiver_business_name || '',
         building: orderResponse?.data.receiver_building || '',
         instructions: orderResponse?.data.special_instructions || '',
-        address: orderResponse?.data.receiver_address,
+        address_info: orderResponse?.data.address_info,
         address1: orderResponse?.data.receiver_address,
-        unit_number: orderResponse?.data.receiver_unit_number || '',
-        street_name: orderResponse?.data.receiver_street_name || '',
-        street_number: orderResponse?.data.receiver_street_number || '',
+        unit_number: orderResponse?.data.unit_number || '',
+        street_name: orderResponse?.data.street_name || '',
+        street_number: orderResponse?.data.street_number || '',
         suburb: orderResponse?.data.suburb,
         state: orderResponse?.data.state,
         postcode: orderResponse?.data.postcode,
@@ -271,7 +271,7 @@ export default function CreateOrderDialog({ onOpenChange, type, open, initialDat
               {activeLookup === 'address' ? (
                 <PlaceAutocomplete
                   onPlaceSelect={(opt) => {
-                    updateField('address', opt.formatted_address);
+                    updateField('address_info', opt.formatted_address);
                     updateField('address1', opt.street);
                     updateField('suburb', opt.suburb);
                     updateField('unit_number', opt.unit_number);
@@ -281,8 +281,8 @@ export default function CreateOrderDialog({ onOpenChange, type, open, initialDat
                     updateField('postcode', opt.post_code);
                     updateField('country', opt.country);
                   }}
-                  onChange={(value) => { updateField('address', value!); updateField('address1', value!) }}
-                  value={formData.address}
+                  onChange={(value) => { updateField('address_info', value!); }}
+                  value={formData.address_info}
                   inputClassName='rounded-none'
                 />
               ) : (
@@ -299,7 +299,7 @@ export default function CreateOrderDialog({ onOpenChange, type, open, initialDat
                       updateField('name', option.name);
                       updateField('phone', option.phone);
                       updateField('email', option.email);
-                      updateField('address', option.address);
+                      updateField('address_info', option.address);
                       updateField('address1', option.address1);
                       updateField('unit_number', option.unit_number);
                       updateField('street_name', option.street_name!);
@@ -383,6 +383,13 @@ export default function CreateOrderDialog({ onOpenChange, type, open, initialDat
 
             {/* Right Column */}
             <div className="col-span-12 md:col-span-6 space-y-2">
+              <FormInput
+                label="Unit number"
+                value={formData.unit_number}
+                onChange={val => updateField('unit_number', val)}
+                layout="horizontal"
+                placeholder='Enter Unit Number'
+              />
               <FormInput
                 label="Street"
                 value={formData.address1}

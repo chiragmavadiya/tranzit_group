@@ -52,7 +52,7 @@ export function CreateAddressDialog({
     default_carrier: '',
     code: '',
     company: '',
-    address_information: '',
+    address_info: '',
     address: '',
     building: '',
     unit_number: '',
@@ -123,7 +123,7 @@ export function CreateAddressDialog({
               <div className="flex-1 relative flex items-center">
                 <PlaceAutocomplete
                   onPlaceSelect={(opt) => {
-                    handleChange('address_information', opt.formatted_address);
+                    handleChange('address_info', opt.formatted_address);
                     handleChange('unit_number', opt.unit_number);
                     handleChange('address', opt.street);
                     handleChange('street_number', opt.street_number);
@@ -133,10 +133,10 @@ export function CreateAddressDialog({
                     handleChange('state', opt.state);
                     handleChange('postcode', opt.post_code);
                   }}
-                  onChange={(value) => handleChange('address_information', value)}
+                  onChange={(value) => handleChange('address_info', value)}
                   // error={submited && formData.address_information?.trim() === ''}
                   // errormsg='Please enter an address'
-                  value={formData.address_information}
+                  value={formData.address_info}
                 />
               </div>
             </div>
@@ -285,7 +285,7 @@ export function CreateAddressDialog({
                 <FormInput
                   layout="horizontal"
                   label="Country"
-                  value={formData.country || ''}
+                  value={formData.country || 'Australia'}
                   onChange={(val) => handleChange('country', val)}
                   placeholder="e.g. Australia"
                   required

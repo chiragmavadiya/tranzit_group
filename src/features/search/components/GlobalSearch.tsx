@@ -35,7 +35,7 @@ export const GlobalSearch: React.FC<GlobalSearchProps> = ({
                 label: o.order_number,
                 type: 'Order',
                 icon: ShoppingBag,
-                order_type: o.order_type || 'new'
+                order_type: o.order_type || 'view'
             }));
         }
 
@@ -86,7 +86,9 @@ export const GlobalSearch: React.FC<GlobalSearchProps> = ({
         const option = searchOptions.find(opt => opt.value === value);
 
         const prefix = isAdmin ? '/admin' : '';
-
+        setTimeout(() => {
+            setSearchQuery("");
+        }, 0);
         if (type === 'order') {
             const orderType = option?.order_type || 'new';
             navigate(`${prefix}/orders/${orderType}/${id}`);
@@ -100,9 +102,8 @@ export const GlobalSearch: React.FC<GlobalSearchProps> = ({
             navigate(`${prefix}/customers/${option?.id || id}`);
         }
 
-        setSearchQuery("");
     };
-
+    console.log(searchQuery, 'searchQuery')
     return (
         <div className='h-8'>
             <AutoComplete

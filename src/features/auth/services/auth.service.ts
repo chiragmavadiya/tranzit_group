@@ -9,7 +9,9 @@ import type {
     LoginResponse,
     ForgotPasswordRequest,
     OnboardingRequest,
-    ResetPasswordRequest
+    ResetPasswordRequest,
+    EmailVerifyRequest,
+    EmailVerifyResponse
 } from "@/features/auth/auth.types";
 // role can be admin or customer 
 
@@ -60,6 +62,23 @@ export const authService = {
      */
     verifyEmail: async (token: string): Promise<GenericResponse> => {
         const response = await api.post<GenericResponse>(API_ENDPOINTS.AUTH.VERIFY_EMAIL, { token });
+        return response.data;
+    },
+
+    /**
+     * Verify email with customer ID, token, expires, and signature
+     */
+    emailVerify: async (params: EmailVerifyRequest): Promise<EmailVerifyResponse> => {
+        const { customerId, token, expires, signature } = params;
+        const response = await api.get<EmailVerifyResponse>(
+            API_ENDPOINTS.AUTH.EMAIL_VERIFY(customerId, token),
+            {
+                params: {
+                    expires,
+                    signature,
+                },
+            }
+        );
         return response.data;
     },
 

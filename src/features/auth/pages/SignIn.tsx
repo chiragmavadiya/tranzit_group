@@ -75,7 +75,7 @@ export default function SignIn({ role = "customer" }: { role?: string }) {
 
   return (
     <>
-      <div className="flex flex-col items-center text-center space-y-2 mb-8 w-md">
+      <div className="flex flex-col items-center text-center space-y-2 mb-8 w-md animate-in fade-in slide-in-from-top-8 duration-800">
         <div className="flex items-center space-x-2 pb-2">
           <img src={brandlogo} alt="Logo" className="h-16 w-auto" />
         </div>
@@ -88,7 +88,7 @@ export default function SignIn({ role = "customer" }: { role?: string }) {
         </p>
       </div>
 
-      <form onSubmit={handleSubmit} className="space-y-5 max-w-sm w-full">
+      <form onSubmit={handleSubmit} className="space-y-5 max-w-sm w-full animate-in fade-in slide-in-from-top-8 duration-800">
         <div className="space-y-1">
           <Label htmlFor="email" className="text-[13px] font-bold text-slate-700 dark:text-slate-300 ml-1">Email ID</Label>
           <Input
@@ -97,6 +97,7 @@ export default function SignIn({ role = "customer" }: { role?: string }) {
             placeholder="name@example.com"
             type="email"
             autoCapitalize="none"
+            autoFocus
             autoComplete="off"
             autoCorrect="off"
             className="bg-white dark:bg-zinc-900 border-slate-200 dark:border-zinc-800 focus:border-primary transition-all h-11"

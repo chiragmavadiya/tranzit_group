@@ -8,7 +8,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { logout } from '@/features/auth/authSlice';
+import { logout, setNextStep } from '@/features/auth/authSlice';
 import { useOnboarding, useLogout, useEmailVerify } from '@/features/auth/hooks/useAuth';
 import { FormInput, FormSelect } from '@/features/orders/components/OrderFormUI';
 import { useAppDispatch, useAppSelector } from '@/hooks/store.hooks';
@@ -162,8 +162,11 @@ export default function OnboardingPage() {
       onSuccess: (response) => {
         if (response.status) {
           showToast("Onboarding completed successfully", "success");
-          console.log("Redirect to order page")
-          navigate('/orders');
+          dispatch(setNextStep('dashboard'));
+          console.log("Redirect to order page 1")
+          setTimeout(() => {
+            navigate('/orders');
+          }, 100);
         } else {
           showToast(response.message || "Failed to complete onboarding", "error");
         }

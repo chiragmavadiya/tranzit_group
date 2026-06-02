@@ -15,7 +15,7 @@ export default function ProtectedRoute({ role: requiredRole }: { role: string })
     if (userRole === 'admin') {
       return <Navigate to="/admin/orders" replace />;
     } else {
-      console.log("Redirect to order page ...")
+      console.log("Redirect to order page ... 2")
       return <Navigate to="/orders" replace />;
     }
   }

@@ -44,7 +44,7 @@ export const AppRouter = () => {
   const location = useLocation();
 
   // Fetch user details if authenticated
-  const { data: userData, isPending } = useGetUserDetails(isAuthenticated);
+  const { data: userData, isLoading, isPending } = useGetUserDetails(isAuthenticated);
 
   useEffect(() => {
     if (userData?.user && !isPending) {
@@ -55,16 +55,16 @@ export const AppRouter = () => {
 
       console.log(userData.next_step, 'NEXT STEP..')
       // Redirect to onboarding if required
-      if (userData.next_step === 'onboarding' && location.pathname !== '/on-board') {
+      if ((userData.next_step === 'onboarding' || userData.next_step === 'verify_email') && !location.pathname.includes('/on-board')) {
         console.log("Navigate to onBoard.......123")
         navigate('/on-board/' + userID + '/' + token);
-      } else {
+      } else if (userData.next_step === 'dashboard') {
         navigate('/orders')
       }
     }
   }, [userData, dispatch, navigate, location.pathname, userID, token, isPending]);
 
-  // if (isLoading) return <PageLoader />;
+  if (isLoading) return <PageLoader />;
 
   return (
     <Suspense fallback={<PageLoader />}>

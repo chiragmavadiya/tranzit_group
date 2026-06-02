@@ -38,12 +38,10 @@ export default function OnboardingPage() {
   const { user } = useAppSelector(state => state.auth);
   const { customerId, token } = useParams();
   const [searchParams] = useSearchParams();
-  const mount = useRef(false);
 
   const expires = searchParams.get('expires');
   const signature = searchParams.get('signature');
 
-  console.log(customerId, 'customer id', token, 'token', expires, 'expires', signature, 'signature', 'onboard....')
   const onboardingMutation = useOnboarding();
   const emailVerifyMutation = useEmailVerify();
 
@@ -176,7 +174,7 @@ export default function OnboardingPage() {
   };
 
   const verifyEmailApiCall = useEffectEvent(() => {
-    if (customerId && token && expires && signature && mount.current) {
+    if (customerId && token && expires && signature) {
       emailVerifyMutation.mutate({ customerId, token, expires, signature }, {
         onSuccess: (response) => {
           if (response.status) {
@@ -203,10 +201,6 @@ export default function OnboardingPage() {
     }
   })
   useEffect(() => {
-    if (!mount.current) {
-      mount.current = true;
-      return;
-    }
     verifyEmailApiCall()
   }, [])
 

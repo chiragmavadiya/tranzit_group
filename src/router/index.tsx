@@ -38,7 +38,7 @@ const PageLoader = () => (
 );
 
 export const AppRouter = () => {
-  const { isAuthenticated, userID, token } = useAppSelector((state) => state.auth);
+  const { isAuthenticated, userID, token, next_step } = useAppSelector((state) => state.auth);
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
   const location = useLocation();
@@ -46,23 +46,28 @@ export const AppRouter = () => {
   // Fetch user details if authenticated
   const { data: userData, isLoading, isPending } = useGetUserDetails(isAuthenticated);
 
+  // Sync user details to Redux when query data updates
   useEffect(() => {
     if (userData?.user && !isPending) {
       dispatch(setUser({
         user: userData.user,
         next_step: userData.next_step
       }));
+    }
+  }, [userData, isPending, dispatch]);
 
-      console.log(userData.next_step, 'NEXT STEP..')
-      // Redirect to onboarding if required
-      if ((userData.next_step === 'onboarding' || userData.next_step === 'verify_email') && !location.pathname.includes('/on-board')) {
-        console.log("Navigate to onBoard.......123")
+  // Handle redirects based on next_step state and location.pathname
+  useEffect(() => {
+    if (isAuthenticated) {
+      console.log(next_step, 'NEXT STEP IN ROUTER REDIRECT..');
+      if ((next_step === 'onboarding' || next_step === 'verify_email') && !location.pathname.includes('/on-board')) {
+        console.log("Navigate to onBoard.......123");
         navigate('/on-board/' + userID + '/' + token);
-      } else if (userData.next_step === 'dashboard') {
-        navigate('/orders')
+      } else if (next_step === 'dashboard' && location.pathname.includes('/on-board')) {
+        navigate('/orders');
       }
     }
-  }, [userData, dispatch, navigate, location.pathname, userID, token, isPending]);
+  }, [next_step, location.pathname, isAuthenticated, userID, token, navigate]);
 
   if (isLoading) return <PageLoader />;
 

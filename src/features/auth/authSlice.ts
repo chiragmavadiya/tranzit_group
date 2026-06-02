@@ -36,6 +36,12 @@ const authSlice = createSlice({
             const { user, next_step } = action.payload;
             state.user = user;
             state.userID = user.id;
+            state.isAuthenticated = true;
+            const role = user.roles?.[0]?.name;
+            if (role) {
+                state.role = role;
+                localStorage.setItem("user_role", role);
+            }
             if (next_step !== undefined) state.next_step = next_step;
         },
         setNextStep: (state, action: PayloadAction<string>) => {

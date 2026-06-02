@@ -97,7 +97,6 @@ export const SidePanel: React.FC<SidePanelProps> = memo(({
                     const isActive = true;
                     // const isActive = stage.id === timelineData.activeId;
                     const dateTime = stage.dateTime || stage.updated_at || stage.date || stage.date_time;
-                    console.log(dateTime, '-', stage.date_time)
                     return (
                       <div key={stage.id} className="flex gap-4 items-start relative pb-6 last:pb-0">
                         {/* Left column for line */}

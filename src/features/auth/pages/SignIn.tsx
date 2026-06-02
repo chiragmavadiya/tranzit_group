@@ -49,7 +49,7 @@ export default function SignIn({ role = "customer" }: { role?: string }) {
             next_step: response.next_step
           }));
           if (response.next_step === 'onboarding') {
-            navigate("/on-board");
+            navigate("/on-board" + '/' + response.user.id + '/' + response.token);
             return;
           }
           if (role === 'admin') {
@@ -62,7 +62,7 @@ export default function SignIn({ role = "customer" }: { role?: string }) {
         }
       },
       onError: (error) => {
-        showToast("Invalid credentials", 'error')
+        showToast(error.message || "Invalid credentials", 'error')
         console.error('Login error:', error);
       }
     });

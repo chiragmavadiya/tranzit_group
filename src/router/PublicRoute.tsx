@@ -10,6 +10,8 @@ export default function PublicRoute() {
     if (role === 'admin') {
       return <Navigate to="/admin/orders" replace />;
     } else {
+      console.log("Navigate to Ordes page.......")
+
       return <Navigate to="/orders" replace />;
     }
   }

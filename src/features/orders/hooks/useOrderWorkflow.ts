@@ -117,7 +117,6 @@ export const useOrderWorkflow = () => {
 
   const setDefaultItemData = useEffectEvent((data: any) => {
     if ((itemsData.length === 1) || itemsData.length === 0) {
-      console.log("Default item set....2")
       setItemsData([
         {
           // ...defaultItem.data,
@@ -133,12 +132,9 @@ export const useOrderWorkflow = () => {
   })
   useEffect(() => {
     if (defaultItem && (orderType === 'create' || orderType === 'create-menual' || orderType === 'return')) {
-      console.log("Default item set....")
       setDefaultItemData(defaultItem.data)
     }
   }, [defaultItem, setItemsData, orderType]);
-
-  console.log(itemsData, 'itemsData')
 
   const isValidConsignOrder = useCallback((orderStatus: string | undefined) => {
     if (orderStatus !== 'new' && orderType === 'consign') {

@@ -53,9 +53,10 @@ export const AppRouter = () => {
         next_step: userData.next_step
       }));
 
+      console.log(userData.next_step)
       // Redirect to onboarding if required
       if (userData.next_step === 'onboarding' && location.pathname !== '/on-board') {
-        console.log("Navigate to onBoard.......")
+        console.log("Navigate to onBoard.......123")
         navigate('/on-board/' + userID + '/' + token);
       }
     }

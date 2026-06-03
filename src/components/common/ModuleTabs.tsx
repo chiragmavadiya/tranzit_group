@@ -5,11 +5,13 @@ const ModuleTabs = ({
     onTabChange,
     isActive,
     count,
+    tabKey
 }: {
     tab: string;
     onTabChange: (tab: string) => void;
     isActive: boolean;
     count: number;
+    tabKey?: string;
 }) => {
     return (
         <button
@@ -21,7 +23,7 @@ const ModuleTabs = ({
                     : "border-transparent text-gray-500 dark:text-zinc-400 hover:text-gray-700 dark:hover:text-zinc-200 "
             )}
         >
-            {tab}
+            {tabKey || tab}
             {typeof count === 'number' && (
                 <div className={cn(
                     "px-2 text-[10px] leading-none h-4 flex items-center justify-center rounded-full font-medium transition-all duration-300",

@@ -195,35 +195,14 @@ const DataTableComponent = <T extends Record<string, any>>(props: DataTableProps
               <div className="flex items-center gap-2 ml-auto">
                 {headerPosition == 'left' && customHeader && (typeof customHeader === 'function' ? (customHeader as () => ReactNode)() : customHeader)}
                 {pagination && !pageSizeInFooter && (
-                  <>
-                    {/* <SelectComponent
-                      data={DEFAULT_PAGE_SIZES}
-                      value={paginationPageSize.toString()}
-                      placeholder="Select Page Size"
-                      className="w-[70px] h-8 text-xs font-bold"
-                      onValueChange={(value: string | null) => value && setPaginationPageSize(Number(value))}
-                    /> */}
-                    <FormSelect
-                      className='w-[70px] h-8 text-xs font-bold'
-                      value={pageSize.toString()}
-                      onValueChange={(value: string | null) => value && setPaginationPageSize(Number(value))}
-                      options={DEFAULT_PAGE_SIZES}
-                      placeholder="Select Page Size"
-                      allowClear={false}
-                    />
-                    {/* <FormSelect
-                      // label='Type'
-                      options={[
-                        { label: 'Parcel', value: 'box' },
-                        { label: 'My Items', value: 'my_item' }
-                      ]}
-                      value={pageSize.toString()}
-                      onValueChange={(value: string | null) => value && setPaginationPageSize(Number(value))}
-                      allowClear={false}
-                      className="h-8 text-sm font-medium"
-                      placeholder="Select Type"
-                    /> */}
-                  </>
+                  <FormSelect
+                    className='w-[90px] h-8 text-xs font-bold'
+                    value={pageSize.toString()}
+                    onValueChange={(value: string | null) => value && setPaginationPageSize(Number(value))}
+                    options={DEFAULT_PAGE_SIZES}
+                    placeholder="Select Page Size"
+                    allowClear={false}
+                  />
                 )}
                 {searchable && (
                   <FormInput

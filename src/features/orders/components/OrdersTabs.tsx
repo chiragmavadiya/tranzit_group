@@ -12,6 +12,13 @@ interface OrdersTabsProps {
   customerId?: string;
 }
 
+const tabsMap: Record<string, string> = {
+  new: 'Pending',
+  printed: 'Label Printed',
+  shipped: 'Dispatched',
+  archived: 'Archived',
+};
+
 export function OrdersTabs({ activeTab, onTabChange, className, customerId }: OrdersTabsProps) {
   const { role } = useAppSelector((state) => state.auth);
   // Fetch status counts from the counts API
@@ -28,6 +35,7 @@ export function OrdersTabs({ activeTab, onTabChange, className, customerId }: Or
           <ModuleTabs
             key={tab}
             tab={tab}
+            tabKey={tabsMap[tab]}
             onTabChange={(tabStr) => onTabChange(tabStr.toLowerCase() as TabType)}
             isActive={isActive}
             count={Number(count)}

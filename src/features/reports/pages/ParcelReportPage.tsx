@@ -15,14 +15,16 @@ import {
 } from '../hooks/useReports';
 import { FormSelect } from '@/features/orders/components/OrderFormUI';
 import { Input } from '@/components/ui/input';
-import { useLocation } from 'react-router-dom';
 import DatePicker from '@/components/common/DatePicker';
 import { useCustomers } from '@/features/customers/hooks/useCustomers';
 import { showToast } from '@/components/ui/custom-toast';
+import { useAppSelector } from '@/hooks/store.hooks';
 
 export default function ParcelReportPage() {
-  const location = useLocation();
-  const isAdmin = location.pathname.includes('/admin');
+  // const location = useLocation();
+  // const isAdmin = location.pathname.includes('/admin');
+  const { role } = useAppSelector((state) => state.auth);
+  const isAdmin = role === "admin";
 
   const [startDate, setStartDate] = useState<Date | undefined>();
   const [endDate, setEndDate] = useState<Date | undefined>();
@@ -49,7 +51,7 @@ export default function ParcelReportPage() {
 
   const { data, isLoading } = useParcelReport(filters, isAdmin);
   const exportMutation = useExportParcelReport(isAdmin);
-  const { data: customersData } = useCustomers({ pageSize: 1000 });
+  const { data: customersData } = useCustomers({ pageSize: 1000 }, isAdmin);
 
   const { mutate: uploadDirectFreight, isPending: isUploadingDF } = useUploadDirectFreightInvoice();
   const { mutate: uploadAusPost, isPending: isUploadingAP } = useUploadAusPostInvoice();
@@ -131,121 +133,167 @@ export default function ParcelReportPage() {
   };
 
   return (
-    <div className="flex flex-col flex-1 gap-6 p-page-padding min-h-0 animate-in fade-in slide-in-from-bottom-2 duration-500 bg-slate-50/30 dark:bg-zinc-950/30">
+    <div className="flex flex-col flex-1 gap-4 p-page-padding min-h-0 animate-in fade-in slide-in-from-bottom-2 duration-500 bg-slate-50/30 dark:bg-zinc-950/30">
 
-      {/* Summary Section */}
-      <div className="space-y-3 print:hidden">
-        <div className={`grid grid-cols-1 ${isAdmin ? 'md:grid-cols-5' : 'md:grid-cols-2'} gap-6`}>
-          {stats.map((stat, idx) => (
-            <StatCard key={idx} {...stat} className="shadow-sm border-gray-100 dark:border-zinc-800" contentClassName="py-4" />
-          ))}
-        </div>
-      </div>
-
-
-      {/* Filter Section */}
-      <div className="bg-white dark:bg-zinc-950 p-5 rounded-xl border border-gray-100 dark:border-zinc-800 shadow-sm flex flex-col gap-4 print:hidden">
-        <div className="grid grid-cols-1 md:grid-cols-12 gap-4 items-end">
-          <div className="md:col-span-3">
-            <DatePicker
-              label="From Date"
-              date={startDate}
-              setDate={setStartDate}
-              placeholder="Start Date"
-            />
-          </div>
-          <div className="md:col-span-3">
-            <DatePicker
-              label="To Date"
-              date={endDate}
-              setDate={setEndDate}
-              placeholder="End Date"
-            />
-          </div>
-
-          {isAdmin && (
-            <div className="md:col-span-3">
-              <FormSelect
-                label="Customer"
-                placeholder="Select Customer"
-                value={selectedCustomer}
-                onValueChange={(val) => setSelectedCustomer(val || '')}
-                options={customersData?.data?.map((c: any) => ({
-                  value: c.id.toString(),
-                  label: `${c.first_name} ${c.last_name}`
-                })) || []}
+      {/* Summary & Filter Section */}
+      {!isAdmin ? (
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 print:hidden items-stretch">
+          {/* Left 50% - Both Stat Cards */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            {stats.map((stat, idx) => (
+              <StatCard
+                key={idx}
+                {...stat}
+                className="shadow-sm border-gray-100 dark:border-zinc-800 h-full"
+                contentClassName="py-4"
               />
-            </div>
-          )}
-
-          <div className={`flex gap-2 ${isAdmin ? 'md:col-span-3' : 'md:col-span-3'}`}>
-            <Button
-              onClick={handleReset}
-              variant="outline"
-            // size="sm"
-            // className="h-8 flex-1 border-slate-200 dark:border-zinc-800 text-slate-500 dark:text-zinc-400 font-bold uppercase tracking-widest text-[10px] bg-white dark:bg-zinc-950"
-            >
-              Reset
-            </Button>
+            ))}
           </div>
-        </div>
 
-        {isAdmin && (
-          <div className="grid grid-cols-1 md:grid-cols-12 gap-4 items-end pt-4 border-t border-gray-50 dark:border-zinc-900/50">
-            <div className="md:col-span-3">
-              <FormSelect
-                label="Invoice Type"
-                value={invoiceType}
-                onValueChange={(val) => setInvoiceType(val || '')}
-                options={[
-                  { label: 'Direct Freight', value: 'direct_freight' },
-                  { label: 'Auspost', value: 'auspost' },
-                ]}
-                placeholder="Select type"
-                className="w-full space-y-0"
-              />
-            </div>
-
-            <div className="md:col-span-9 flex flex-col">
-              <label className="text-[11px] font-extrabold text-slate-700 dark:text-zinc-400 uppercase tracking-wider mb-1 ml-0.5">Upload Invoice (PDF)</label>
-              <div className="flex gap-2">
-                <div className="relative flex-1">
-                  <Input
-                    type="file"
-                    className="hidden"
-                    id="invoice-upload"
-                    onChange={(e) => setSelectedFile(e.target.files?.[0] || null)}
-                    accept=".pdf"
-                  />
-                  <div className="flex h-8 items-center border border-slate-200 dark:border-zinc-800 rounded-md overflow-hidden bg-white dark:bg-zinc-950">
-                    <label htmlFor="invoice-upload" className="bg-slate-50 dark:bg-zinc-900 px-3 h-full flex items-center text-[10px] font-bold text-slate-500 dark:text-zinc-400 border-r border-slate-200 dark:border-zinc-800 cursor-pointer hover:bg-slate-100 dark:hover:bg-zinc-800 transition-colors uppercase tracking-tight">
-                      Choose file
-                    </label>
-                    <span className="px-3 text-[12px] text-slate-700 truncate flex-1 font-medium">
-                      {selectedFile ? selectedFile.name : 'No file chosen'}
-                    </span>
-                  </div>
-                </div>
+          {/* Right 50% - Date Filter */}
+          <div className="bg-white dark:bg-zinc-950 p-4 rounded-sm border border-gray-100 dark:border-zinc-800 shadow-sm flex flex-col justify-center">
+            <div className="grid grid-cols-1 sm:grid-cols-12 gap-4 items-end">
+              <div className="sm:col-span-5">
+                <DatePicker
+                  label="From Date"
+                  date={startDate}
+                  setDate={setStartDate}
+                  placeholder="Start Date"
+                />
+              </div>
+              <div className="sm:col-span-5">
+                <DatePicker
+                  label="To Date"
+                  date={endDate}
+                  setDate={setEndDate}
+                  placeholder="End Date"
+                />
+              </div>
+              <div className="sm:col-span-2">
                 <Button
-                  onClick={handleFileUpload}
-                  disabled={!selectedFile || !invoiceType || isUploading}
-                  className="h-8 bg-slate-400 hover:bg-slate-500 dark:bg-zinc-700 dark:hover:bg-zinc-600 text-white font-bold uppercase tracking-widest text-[10px] px-4 shadow-sm transition-all min-w-[140px]"
+                  onClick={handleReset}
+                  variant="outline"
+                  className="w-full h-8 border-slate-200 dark:border-zinc-800 text-slate-500 dark:text-zinc-400 font-bold uppercase tracking-widest text-[10px] bg-white dark:bg-zinc-950 hover:bg-slate-50 dark:hover:bg-zinc-900"
                 >
-                  {isUploading ? (
-                    <Loader2 className="h-3 w-3 mr-2 animate-spin" />
-                  ) : (
-                    <Upload className="h-3 w-3 mr-2" />
-                  )}
-                  Upload Invoice
+                  Reset
                 </Button>
               </div>
             </div>
           </div>
-        )}
-      </div>
+        </div>
+      ) : (
+        <>
+          {/* Summary Section */}
+          <div className="space-y-3 print:hidden">
+            <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
+              {stats.map((stat, idx) => (
+                <StatCard key={idx} {...stat} className="shadow-sm border-gray-100 dark:border-zinc-800" contentClassName="py-4" />
+              ))}
+            </div>
+          </div>
+
+          {/* Filter Section */}
+          <div className="bg-white dark:bg-zinc-950 p-5 rounded-sm border border-gray-100 dark:border-zinc-800 shadow-sm flex flex-col print:hidden">
+            <div className="grid grid-cols-1 md:grid-cols-12 gap-4 items-end">
+              <div className="md:col-span-3">
+                <DatePicker
+                  label="From Date"
+                  date={startDate}
+                  setDate={setStartDate}
+                  placeholder="Start Date"
+                />
+              </div>
+              <div className="md:col-span-3">
+                <DatePicker
+                  label="To Date"
+                  date={endDate}
+                  setDate={setEndDate}
+                  placeholder="End Date"
+                />
+              </div>
+
+              <div className="md:col-span-3">
+                <FormSelect
+                  label="Customer"
+                  placeholder="Select Customer"
+                  value={selectedCustomer}
+                  onValueChange={(val) => setSelectedCustomer(val || '')}
+                  options={customersData?.data?.map((c: any) => ({
+                    value: c.id.toString(),
+                    label: `${c.first_name} ${c.last_name}`
+                  })) || []}
+                />
+              </div>
+
+              <div className="md:col-span-3 flex gap-2">
+                <Button
+                  onClick={handleReset}
+                  variant="outline"
+                  className="w-full h-8 border-slate-200 dark:border-zinc-800 text-slate-500 dark:text-zinc-400 font-bold uppercase tracking-widest text-[10px] bg-white dark:bg-zinc-950 hover:bg-slate-50 dark:hover:bg-zinc-900"
+                >
+                  Reset
+                </Button>
+              </div>
+            </div>
+
+            {isAdmin && (
+              <div className="grid grid-cols-1 md:grid-cols-12 gap-4 items-end pt-4 border-t border-gray-50 dark:border-zinc-900/50">
+                <div className="md:col-span-3">
+                  <FormSelect
+                    label="Invoice Type"
+                    value={invoiceType}
+                    onValueChange={(val) => setInvoiceType(val || '')}
+                    options={[
+                      { label: 'Direct Freight', value: 'direct_freight' },
+                      { label: 'Auspost', value: 'auspost' },
+                    ]}
+                    placeholder="Select type"
+                    className="w-full space-y-0"
+                  />
+                </div>
+
+                <div className="md:col-span-9 flex flex-col">
+                  <label className="text-[11px] font-extrabold text-slate-700 dark:text-zinc-400 uppercase tracking-wider mb-1 ml-0.5">Upload Invoice (PDF)</label>
+                  <div className="flex gap-2">
+                    <div className="relative flex-1">
+                      <Input
+                        type="file"
+                        className="hidden"
+                        id="invoice-upload"
+                        onChange={(e) => setSelectedFile(e.target.files?.[0] || null)}
+                        accept=".pdf"
+                      />
+                      <div className="flex h-8 items-center border border-slate-200 dark:border-zinc-800 rounded-md overflow-hidden bg-white dark:bg-zinc-950">
+                        <label htmlFor="invoice-upload" className="bg-slate-50 dark:bg-zinc-900 px-3 h-full flex items-center text-[10px] font-bold text-slate-500 dark:text-zinc-400 border-r border-slate-200 dark:border-zinc-800 cursor-pointer hover:bg-slate-100 dark:hover:bg-zinc-900 transition-colors uppercase tracking-tight">
+                          Choose file
+                        </label>
+                        <span className="px-3 text-[12px] text-slate-700 truncate flex-1 font-medium">
+                          {selectedFile ? selectedFile.name : 'No file chosen'}
+                        </span>
+                      </div>
+                    </div>
+                    <Button
+                      onClick={handleFileUpload}
+                      disabled={!selectedFile || !invoiceType || isUploading}
+                      className="h-8 bg-slate-400 hover:bg-slate-500 dark:bg-zinc-700 dark:hover:bg-zinc-600 text-white font-bold uppercase tracking-widest text-[10px] px-4 shadow-sm transition-all min-w-[140px]"
+                    >
+                      {isUploading ? (
+                        <Loader2 className="h-3 w-3 mr-2 animate-spin" />
+                      ) : (
+                        <Upload className="h-3 w-3 mr-2" />
+                      )}
+                      Upload Invoice
+                    </Button>
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+        </>
+      )}
 
       {/* Table Section */}
-      <div className='rounded-xl min-h-[300px] shadow-md flex-1 flex flex-col min-h-0 border border-gray-100 dark:border-zinc-800 bg-white dark:bg-zinc-950 overflow-hidden'>
+      <div className='rounded-lg min-h-[300px] shadow-md flex-1 flex flex-col border border-gray-100 dark:border-zinc-800 bg-white dark:bg-zinc-950 overflow-hidden'>
         <DataTable
           columns={(isAdmin ? ADMIN_PARCEL_COLUMNS : PARCEL_COLUMNS) as any}
           data={data?.data || []}

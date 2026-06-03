@@ -71,7 +71,7 @@ export default function CarrierIntegrationsPage() {
   };
 
   return (
-    <div className="flex flex-col gap-6 min-h-[calc(100vh-120px)] bg-white p-4 dark:bg-zinc-900 border border-gray-200 dark:border-zinc-800 rounded-sm shadow-sm">
+    <div className="flex flex-col gap-6 min-h-[calc(100vh-120px)] bg-white p-page-padding dark:bg-zinc-900 border border-gray-200 dark:border-zinc-800 rounded-sm shadow-sm">
       <div className=" flex flex-col flex-1">
         <div className="flex flex-col gap-1 mb-3">
           <h1 className="text-2xl flex items-center gap-2 font-bold text-slate-900 dark:text-zinc-100 my-0">

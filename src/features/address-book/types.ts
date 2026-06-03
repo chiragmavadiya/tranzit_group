@@ -48,7 +48,7 @@ export interface AddressFormData {
     // signature_required: boolean;
     address_info: string;
     address: string;
-    company: string;
+    business_name: string;
     unit_number: string;
     street_name: string;
     street_number: string;

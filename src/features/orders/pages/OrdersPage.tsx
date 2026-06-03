@@ -8,8 +8,12 @@ import { DataTable } from '@/components/common/DataTable';
 import { getOrdersColumns } from '../column';
 import DatePicker from '@/components/common/DatePicker';
 import { Button } from '@/components/ui/button';
-import { Download, Plus, Loader2, ChevronDown, Package } from 'lucide-react';
-import { DropdownCustomMenu } from '@/components/ui/dropdown-menu';
+import {
+  Download, Plus, Loader2,
+  // ChevronDown,
+  // Package
+} from 'lucide-react';
+// import { DropdownCustomMenu } from '@/components/ui/dropdown-menu';
 import { useAppSelector } from '@/hooks/store.hooks';
 import { showToast } from '@/components/ui/custom-toast';
 // import { ImportOrdersDialog } from '../components/ImportOrdersDialog';
@@ -359,7 +363,7 @@ export default function OrdersPage({ fromCustomer, customerId }: { fromCustomer?
                 {importOrders.isPending ? <Loader2 className="w-4 h-4 animate-spin" /> : <Download className="w-4 h-4" />}
                 <span>{importOrders.isPending ? 'Importing...' : 'Import'}</span>
               </Button>
-              <DropdownCustomMenu
+              {/* <DropdownCustomMenu
                 menus={[
                   {
                     label: "Create an order",
@@ -374,15 +378,16 @@ export default function OrdersPage({ fromCustomer, customerId }: { fromCustomer?
                     icon: Package,
                   }
                 ]}
+              > */}
+              <Button
+                className="gap-2 bg-primary hover:bg-primary-hover text-white shadow-lg shadow-primary/20 dark:shadow-none transition-all active:scale-[0.98] font-semibold border-none px-4"
+                onClick={() => navigate(`${role === 'admin' ? '/admin' : ''}/orders/create`)}
               >
-                <Button
-                  className="gap-2 bg-primary hover:bg-primary-hover text-white shadow-lg shadow-primary/20 dark:shadow-none transition-all active:scale-[0.98] font-semibold border-none px-4"
-                >
-                  <Plus className="w-4 h-4" />
-                  <span>Create Order</span>
-                  <ChevronDown className="w-4 h-4 ml-1 opacity-70" />
-                </Button>
-              </DropdownCustomMenu>
+                <Plus className="w-4 h-4" />
+                <span>Create Order</span>
+                {/* <ChevronDown className="w-4 h-4 ml-1 opacity-70" /> */}
+              </Button>
+              {/* </DropdownCustomMenu> */}
               {/* DO NOT REMOVE THIS BUTTON */}
               {/* <Button
                 onClick={() => navigate(`${role === 'admin' ? '/admin' : ''}/orders/create`)}

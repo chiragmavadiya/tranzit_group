@@ -293,6 +293,7 @@ export default function CreateOrderDialog({ onOpenChange, type, open, initialDat
                   onChange={(value) => { setSearchAddress(value!); }}
                   value={searchAddress}
                   onSearch={(value) => setSearchAddress(value)}
+                  shouldFilter={false}
                   onSelect={(value) => {
                     const option = options.find((opt) => opt.value === value);
                     if (option) {

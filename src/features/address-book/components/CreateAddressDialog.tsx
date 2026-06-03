@@ -51,7 +51,7 @@ export function CreateAddressDialog({
     special_instructions: '',
     default_carrier: '',
     code: '',
-    company: '',
+    business_name: '',
     address_info: '',
     address: '',
     building: '',
@@ -75,6 +75,7 @@ export function CreateAddressDialog({
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    console.log(formData.country)
     setSubmited(true);
     if (
       formData.contact_person.trim().length === 0 ||
@@ -94,7 +95,7 @@ export function CreateAddressDialog({
   useEffect(() => {
     if (!open || !detailsData?.data) return;
     const data = detailsData.data;
-    setFormData({ ...data })
+    setFormData({ ...data, country: 'Australia' })
   }, [open, detailsData])
 
   return (
@@ -224,8 +225,8 @@ export function CreateAddressDialog({
                 <FormInput
                   layout="horizontal"
                   label="Company Name"
-                  value={formData.company || ''}
-                  onChange={(val) => handleChange('company', val)}
+                  value={formData.business_name || ''}
+                  onChange={(val) => handleChange('business_name', val)}
                   placeholder="Company name"
                   isFullWidth
                 />

@@ -96,6 +96,14 @@ export const API_ENDPOINTS = {
         INVOICE_EXPORT: (id: string | number) => `/admin/customers/${id}/invoice/export`,
         INTEGRATIONS: (id: string | number) => `/admin/customers/${id}/integrations`,
     },
+    ADMIN_STAFF: {
+        BASE: "/admin/staff",
+        FORM_OPTIONS: "/admin/staff/form-options",
+        COUNTS: "/admin/staff/counts",
+        EXPORT: "/admin/staff/export",
+        DETAILS: (id: string | number) => `/admin/staff/${id}`,
+        TOGGLE_STATUS: (id: string | number) => `/admin/staff/${id}/toggle-status`,
+    },
     ADMIN_ACTIVITIES: {
         BASE: "/admin/activities",
     },
@@ -234,6 +242,12 @@ export const QUERY_KEYS = {
         TRANSACTION: (id: string | number) => ["admin", "customers", "transaction", id],
         INVOICE: (id: string | number) => ["admin", "customers", "invoice", id],
         INTEGRATIONS: (id: string | number) => ["admin", "customers", "integrations", id],
+    },
+    ADMIN_STAFF: {
+        LIST: ["admin", "staff", "list"],
+        FORM_OPTIONS: ["admin", "staff", "form-options"],
+        COUNTS: ["admin", "staff", "counts"],
+        DETAILS: (id: string | number) => ["admin", "staff", "details", id],
     },
     ADMIN_ACTIVITIES: {
         LIST: ["admin", "activities", "list"],

@@ -286,6 +286,8 @@ export const useOrderWorkflow = () => {
     return hasManyItems || hasHeavyItem || noTrackingNumber;
   }, [orderType, calculation.totalItems, itemsData, orderDetail?.courier_details?.tracking_number]);
 
+  console.log(addressData, 'addressData')
+
   // Order Submission/Saving Flow
   const handleOnSave = useCallback((skipWalletCheckArg?: any) => {
     const isValidItems = itemsData && itemsData.length > 0 && itemsData.every((item) =>

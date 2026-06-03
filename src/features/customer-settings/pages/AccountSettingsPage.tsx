@@ -10,6 +10,7 @@ import { PlaceAutocomplete } from '@/components/common/AutoComplateAddress';
 import { useAppSelector } from '@/hooks/store.hooks';
 import SubscriptionPlanModal from '../components/SubscriptionPlanModal';
 import { CreateAddressDialog } from '@/features/address-book/components/CreateAddressDialog';
+import { STATES } from '@/constants';
 
 const cardVariants = {
   hidden: { opacity: 0, y: 20 },
@@ -115,15 +116,6 @@ export default function AccountSettingsPage() {
     setBackupData({ ...formData });
     setIsEditingProfile(true);
   };
-
-  const stateOptions = [
-    { label: 'Victoria', value: 'Victoria' },
-    { label: 'New South Wales', value: 'New South Wales' },
-    { label: 'Queensland', value: 'Queensland' },
-    { label: 'Western Australia', value: 'Western Australia' },
-    { label: 'South Australia', value: 'South Australia' },
-    { label: 'Tasmania', value: 'Tasmania' },
-  ];
 
   useEffect(() => {
     if (user) {
@@ -293,7 +285,7 @@ export default function AccountSettingsPage() {
                 <FormSelect
                   label="State"
                   required
-                  options={stateOptions}
+                  options={STATES}
                   disabled={!isEditingProfile}
                   value={formData.state}
                   onValueChange={(val) => handleInputChange(val, 'state')}

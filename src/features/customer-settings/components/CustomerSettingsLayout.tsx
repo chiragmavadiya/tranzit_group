@@ -23,7 +23,7 @@ export default function CustomerSettingsLayout() {
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.4, delay: 0.1 }}
-          className="w-full"
+          className="w-full h-[calc(100vh-120px)]"
         >
           <Outlet />
         </motion.div>

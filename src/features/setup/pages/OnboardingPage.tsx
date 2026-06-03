@@ -387,8 +387,8 @@ export default function OnboardingPage() {
                       checked={!formData.hasBillingAddress}
                       onCheckedChange={(val) => handleChange('hasBillingAddress', !val)}
                     />
-                    <Label htmlFor="billing_same" className="text-[11px] font-bold text-slate-600 dark:text-zinc-400 cursor-pointer tracking-wider">
-                      Same for Billing
+                    <Label htmlFor="billing_same" className="text-[12px] font-bold text-slate-600 dark:text-zinc-400 cursor-pointer tracking-wild">
+                      Use Business Address as Billing Address
                     </Label>
                   </div>
                 </SectionHeader>
@@ -510,7 +510,7 @@ export default function OnboardingPage() {
                         handleChange('billing_postcode', opt.post_code);
                       }}
                       onChange={(value) => handleChange('billing_address_info', value)}
-                      error={isSubmitted && formData.billing_address_info?.trim() === ''}
+                      error={isSubmitted && formData.hasBillingAddress && formData.billing_address_info?.trim() === ''}
                       errormsg='Please enter your billing address'
                       value={formData.billing_address_info}
                       required
@@ -534,7 +534,7 @@ export default function OnboardingPage() {
                       value={formData.billing_address}
                       onChange={(val) => handleChange('billing_address', val)}
                       required
-                      error={isSubmitted && formData.billing_address?.trim() === ''}
+                      error={isSubmitted && formData.hasBillingAddress && formData.billing_address?.trim() === ''}
                       errormsg="Please enter your street"
                       disabled={!formData.hasBillingAddress}
                     />
@@ -549,7 +549,7 @@ export default function OnboardingPage() {
                         value={formData.billing_suburb}
                         onChange={(val) => handleChange('billing_suburb', val)}
                         required
-                        error={isSubmitted && formData.billing_suburb?.trim() === ''}
+                        error={isSubmitted && formData.hasBillingAddress && formData.billing_suburb?.trim() === ''}
                         errormsg="Please enter your suburb"
                         disabled={!formData.hasBillingAddress}
                       />
@@ -561,7 +561,7 @@ export default function OnboardingPage() {
                         value={formData.billing_state}
                         onValueChange={(val) => handleChange('state', val)}
                         required
-                        error={isSubmitted && formData.billing_state?.trim() === ''}
+                        error={isSubmitted && formData.hasBillingAddress && formData.billing_state?.trim() === ''}
                         errormsg="Please select your state"
                         disabled={!formData.hasBillingAddress}
                       />
@@ -574,7 +574,7 @@ export default function OnboardingPage() {
                         value={formData.billing_postcode}
                         onChange={(val) => handleChange('billing_postcode', val)}
                         required
-                        error={isSubmitted && formData.billing_postcode?.trim() === ''}
+                        error={isSubmitted && formData.hasBillingAddress && formData.billing_postcode?.trim() === ''}
                         errormsg="Please enter your postcode"
                         disabled={!formData.hasBillingAddress}
                       />
@@ -587,7 +587,7 @@ export default function OnboardingPage() {
                         value={formData.billing_country}
                         onChange={(val) => handleChange('billing_country', val)}
                         required
-                        error={isSubmitted && formData.billing_country?.trim() === ''}
+                        error={isSubmitted && formData.hasBillingAddress && formData.billing_country?.trim() === ''}
                         errormsg="Please enter your country"
                         disabled={!formData.hasBillingAddress}
                       />

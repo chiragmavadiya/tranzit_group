@@ -160,6 +160,22 @@ export const API_ENDPOINTS = {
     WALLET: {
         SUMMARY: "/customer/wallet",
         RECEIPT: (transactionId: string | number) => `/customer/wallet/transactions/${transactionId}/receipt`,
+    },
+    INTEGRATIONS: {
+        BASE: "/integrations",
+        DETAILS: (provider: string) => `/integrations/${provider}`,
+        CONNECT: (provider: string) => `/integrations/${provider}/connect`,
+        DISCONNECT: (provider: string) => `/integrations/${provider}/disconnect`,
+        SYNC: (provider: string) => `/integrations/${provider}/sync`,
+        AUTO_FULFILLMENT: "/integrations/shopify/auto-fulfillment",
+        SAVE_WOOCOMMERCE: "/integrations/woocommerce/save",
+        PRODUCTS_STATUS: (provider: string) => `/integrations/${provider}/products/status`,
+        ADVANCED_SETTINGS: (provider: string) => `/integrations/${provider}/advanced-settings`,
+        PRODUCTS: (provider: string) => `/integrations/${provider}/products`,
+        MANUAL_PRODUCTS: (provider: string) => `/integrations/${provider}/products/manual`,
+        MANUAL_PRODUCT_DETAILS: (provider: string, productCode: string) => `/integrations/${provider}/products/${productCode}`,
+        PATCH_PRODUCT_STATUS: (provider: string, productCode: string) => `/integrations/${provider}/products/${productCode}/status`,
+        DELIVERY_PREFERENCES: "/integrations/tranzit-group/delivery-preferences",
     }
 };
 
@@ -253,5 +269,12 @@ export const QUERY_KEYS = {
     },
     LOCALITIES: {
         SEARCH: (q: string) => ["localities", "search", q],
+    },
+    INTEGRATIONS: {
+        LIST: ["integrations"],
+        STATUS: (provider: string) => ["integration-status", provider],
+        MANUAL_PRODUCTS: (provider: string) => ["manual-products", provider],
+        PRODUCTS: (provider: string) => ["products", provider],
+        DELIVERY_PREFERENCES: ["delivery-preferences"],
     }
 };

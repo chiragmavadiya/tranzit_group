@@ -365,7 +365,7 @@ export const SelectSearch = ({
       />
       <ComboboxContent
         align="start"
-        className="min-w-min dark:bg-zinc-900 dark:border-zinc-800 p-1 rounded-md max-h-[220px] flex flex-col"
+        className="max-w-max dark:bg-zinc-900 dark:border-zinc-800 p-1 rounded-md max-h-[220px] flex flex-col"
       >
         <ComboboxEmpty className="py-2 text-center text-xs text-muted-foreground">
           No results found.
@@ -375,7 +375,7 @@ export const SelectSearch = ({
             <ComboboxItem
               key={item.value}
               value={item}
-              className="h-7 text-sm font-medium data-highlighted:bg-primary/20 data-selected:bg-primary"
+              className="min-h-7 word-break text-sm font-medium data-highlighted:bg-primary/20 data-selected:bg-primary"
             >
               {item.label}
             </ComboboxItem>

@@ -38,7 +38,7 @@ export const SHIPMENT_COLUMNS: Column<ShipmentReport>[] = [
   },
   { key: 'receiver_name', header: 'RECEIVER', sortable: true, searchable: true, width: '160px' },
   { key: 'status', header: 'STATUS', sortable: true, cell: (value: string) => <StatusBadge status={value} /> },
-  { key: 'status', header: 'TRANSIT STATUS', sortable: true, cell: (value: string) => <StatusBadge status={value} /> },
+  { key: 'tracking_status', header: 'TRANSIT STATUS', sortable: true, cell: (value: string) => <StatusBadge status={value} /> },
   { key: 'created_at', header: 'CREATE DATE', width: '200px' },
 ];
 

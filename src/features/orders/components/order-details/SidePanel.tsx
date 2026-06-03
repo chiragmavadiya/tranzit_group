@@ -8,7 +8,7 @@ import {
 // import SelectComponent from '@/components/ui/select'
 // import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
-import { Shield, CheckCircle2, ShieldOff, RotateCw } from 'lucide-react'
+import { Shield, CheckCircle2, ShieldOff } from 'lucide-react'
 // import { Switch } from '@/components/ui/switch'
 // import DatePicker from '@/components/common/DatePicker';
 import type { QuoteCalculations } from '@/features/quote/types';
@@ -104,7 +104,7 @@ export const SidePanel: React.FC<SidePanelProps> = memo(({
                           <div className="absolute left-[9px] top-2 bottom-0 w-[2px] z-0">
                             <div className={cn(
                               "h-full w-full",
-                              stage.completed ? "bg-primary dark:bg-primary" : "bg-gray-100 dark:bg-zinc-800"
+                              !stage.completed ? "bg-primary dark:bg-primary" : "bg-gray-100 dark:bg-zinc-800"
                             )} />
                           </div>
                         )}
@@ -112,11 +112,11 @@ export const SidePanel: React.FC<SidePanelProps> = memo(({
                         {/* Circle */}
                         <div className={cn(
                           "relative w-5 h-5 rounded-full border-2 flex items-center justify-center bg-white dark:bg-zinc-950 transition-all duration-300 z-10 ",
-                          stage.completed
+                          !stage.completed
                             ? "border-primary dark:border-[#1b7a58]"
                             : "border-gray-200 dark:border-zinc-800"
                         )}>
-                          {stage.completed && (
+                          {!stage.completed && (
                             <div className="w-2 h-2 rounded-full bg-[#0f4431] dark:bg-[#1b7a58]" />
                           )}
                         </div>
@@ -126,7 +126,7 @@ export const SidePanel: React.FC<SidePanelProps> = memo(({
                           <div className="flex justify-between items-start w-full">
                             <span className={cn(
                               "text-sm transition-colors duration-300 leading-none",
-                              stage.completed
+                              !stage.completed
                                 ? "font-bold text-primary dark:text-primary"
                                 : "font-medium text-gray-400 dark:text-zinc-600"
                             )}>
@@ -134,7 +134,7 @@ export const SidePanel: React.FC<SidePanelProps> = memo(({
                             </span>
 
                             {/* Refresh button next to Delivered (index 0) */}
-                            {idx === 0 && (
+                            {/* {idx === 0 && (
                               <button
                                 type="button"
                                 className="flex items-center gap-1.5 text-[11px] font-bold text-gray-900 dark:text-zinc-100 hover:text-primary transition-colors uppercase tracking-wider h-5"
@@ -142,10 +142,10 @@ export const SidePanel: React.FC<SidePanelProps> = memo(({
                                 <RotateCw className={"w-3.5 h-3.5"} />
                                 REFRESH
                               </button>
-                            )}
+                            )} */}
                           </div>
 
-                          {stage.description && stage.completed && (
+                          {stage.description && !stage.completed && (
                             <span className="text-xs text-gray-500 dark:text-zinc-400 mt-0.5">
                               {stage.description}
                             </span>

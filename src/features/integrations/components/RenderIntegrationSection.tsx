@@ -69,7 +69,7 @@ const RenderIntegrationSection = ({
                                             <img src={provider.logo_url} alt={provider.name} className="h-full w-full object-contain" />
                                         </div>
                                         <Badge variant={isConnected ? "default" : "secondary"} className={cn(
-                                            "font-semibold text-[12px] uppercase leading-none tracking-wider flex items-center justify-center",
+                                            "font-semibold text-[12px] pt-1 uppercase leading-100 tracking-wider flex items-center justify-center",
                                             isConnected ? "bg-emerald-50 text-emerald-600 border-emerald-100 dark:bg-emerald-900/20 dark:text-emerald-400 dark:border-emerald-900/30" : "bg-slate-50 text-slate-400 border-slate-100 dark:bg-zinc-900 dark:text-zinc-500 dark:border-zinc-800"
                                         )}>
                                             {isConnected ? "Connected" : "Not Connected"}

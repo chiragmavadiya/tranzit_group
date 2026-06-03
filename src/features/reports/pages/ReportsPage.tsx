@@ -223,7 +223,7 @@ export default function ReportsPage() {
             searchValue={search}
             pageSize={pageSize}
             onPageSizeChange={handlePageSizeChange}
-            pageSizeInFooter
+            // pageSizeInFooter
             className="pb-3"
             totalItems={total}
             currentPage={page}

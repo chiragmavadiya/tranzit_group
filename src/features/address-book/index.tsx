@@ -183,7 +183,6 @@ export default function AddressBookPage() {
           searchValue={search}
           pageSize={pageSize}
           onPageSizeChange={handlePageSizeChange}
-          pageSizeInFooter
           customHeader={<AddressBookHeader onAddAddress={handleAddAddress} />}
           headerTitle='My Address Book'
           headerDescription="Manage your saved addresses, contact persons, and business details."

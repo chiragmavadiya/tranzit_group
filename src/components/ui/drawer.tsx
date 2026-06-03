@@ -59,11 +59,11 @@ export function Drawer({
             <div className="flex flex-col h-full">
               <div className="flex items-start justify-between px-6 py-5 border-b border-gray-100 dark:border-zinc-800">
                 <div className="flex flex-col gap-1">
-                  <h2 className="text-xl font-bold text-gray-900 dark:text-zinc-100">
+                  <h2 className="my-0 text-xl font-bold text-gray-900 dark:text-zinc-100">
                     {title}
                   </h2>
                   {description && (
-                    <p className="text-sm text-gray-500 dark:text-zinc-400">
+                    <p className="my-0 text-sm text-gray-500 dark:text-zinc-400">
                       {description}
                     </p>
                   )}

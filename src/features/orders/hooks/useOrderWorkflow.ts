@@ -153,10 +153,11 @@ export const useOrderWorkflow = () => {
           email: user.email || '',
           phone: user.office_number || '',
           company: user.company_name || '',
-          address_info: user.addresses?.[0]?.address || '',
+          address_info: user.addresses?.[0]?.address_info || user.addresses?.[0]?.address || '',
           address1: user.addresses?.[0]?.address || '',
           suburb: user.addresses?.[0]?.suburb || '',
           state: user.addresses?.[0]?.state || '',
+          unit_number: user.addresses?.[0]?.unit_number || '',
           street_name: user.addresses?.[0]?.street_name || '',
           street_number: user.addresses?.[0]?.street_number || '',
           postcode: user.addresses?.[0]?.postcode || '',
@@ -354,9 +355,9 @@ export const useOrderWorkflow = () => {
         onSuccess: (response) => {
           if (response.status) {
             showToast('Orders Created successfully', 'success');
-            navigate(`${role === 'admin' ? '/admin' : ''}/orders/view/${response?.data?.order_number}`);
+            navigate(`${role === 'admin' ? '/admin' : ''}/orders/${response?.data?.order_status_category !== 'new' ? 'view' : 'consign'}/${response?.data?.order_number}`);
             setWalletCheckOpen(false);
-            if (response?.data?.order_number) {
+            if (response?.data?.order_number && response?.data?.order_status_category !== 'new') {
               printLabel(response?.data?.order_number);
             }
           } else {

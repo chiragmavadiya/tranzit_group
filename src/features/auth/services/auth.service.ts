@@ -11,7 +11,8 @@ import type {
     OnboardingRequest,
     ResetPasswordRequest,
     EmailVerifyRequest,
-    EmailVerifyResponse
+    EmailVerifyResponse,
+    OnboardResponse
 } from "@/features/auth/auth.types";
 // role can be admin or customer 
 
@@ -24,6 +25,7 @@ export const authService = {
             ? API_ENDPOINTS.AUTH.ADMIN_LOGIN
             : API_ENDPOINTS.AUTH.CUSTOMER_LOGIN;
         const response = await api.post<LoginResponse>(endpoint, data);
+        console.log(response, 'response.data')
         return response.data;
     },
     /**
@@ -44,8 +46,8 @@ export const authService = {
     /**
      * Resend verification email
      */
-    resendVerification: async (): Promise<GenericResponse> => {
-        const response = await api.post<GenericResponse>(API_ENDPOINTS.AUTH.RESEND_VERIFICATION);
+    resendVerification: async (token: string): Promise<GenericResponse> => {
+        const response = await api.post<GenericResponse>(API_ENDPOINTS.AUTH.RESEND_VERIFICATION, { token });
         return response.data;
     },
 
@@ -85,8 +87,8 @@ export const authService = {
     /**
      * Submit onboarding data
      */
-    submitOnboarding: async (data: OnboardingRequest): Promise<GenericResponse> => {
-        const response = await api.put<GenericResponse>(API_ENDPOINTS.AUTH.ONBOARDING, data);
+    submitOnboarding: async (data: OnboardingRequest): Promise<OnboardResponse> => {
+        const response = await api.put<OnboardResponse>(API_ENDPOINTS.AUTH.ONBOARDING, data);
         return response.data;
     },
 

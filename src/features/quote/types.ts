@@ -123,11 +123,11 @@ export interface QuoteFilters {
 }
 
 export interface Locality {
-  id?: number | string;
   postcode: string;
-  locality: string;
   state: string;
   label: string
+  value: string
+  suburb: string;
 }
 
 export type LocalitySearchResponse = Locality[];

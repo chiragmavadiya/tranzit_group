@@ -10,6 +10,7 @@ import DatePicker from '@/components/common/DatePicker';
 import { Button } from '@/components/ui/button';
 import {
   Download, Plus, Loader2,
+  Zap,
   // ChevronDown,
   // Package
 } from 'lucide-react';
@@ -290,7 +291,18 @@ export default function OrdersPage({ fromCustomer, customerId }: { fromCustomer?
                   {isCancellingOrders ? <Loader2 className="w-4 h-4 animate-spin" /> : null}
                   <span>Cancel Orders</span>
                 </Button>
-
+                {activeTab === 'printed' && (
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="h-8 gap-2"
+                    onClick={handleDownloadMultipleLabels}
+                    disabled={isDownloadingLabels || isCancellingOrders}
+                  >
+                    {isDownloadingLabels ? <Loader2 className="w-4 h-4 animate-spin" /> : <Zap className="w-4 h-4" />}
+                    <span>Manifest orders ({selectedRows.length})</span>
+                  </Button>
+                )}
               </div>
             )}
             <DatePicker
@@ -497,7 +509,7 @@ export default function OrdersPage({ fromCustomer, customerId }: { fromCustomer?
             type="receiver"
             onSubmit={() => { }}
             // initialData={{}}
-            isEdit={true}
+            isEdit={false}
             isUpdate={true}
           />
         </Suspense>

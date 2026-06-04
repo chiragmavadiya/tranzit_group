@@ -8,13 +8,13 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { PlaceAutocomplete } from '@/components/common/AutoComplateAddress';
 import { cn } from '@/lib/utils';
 import { STATES } from '@/constants';
-import { AutoComplete } from '@/components/common';
+import AutoComplete from '@/components/common/AutoComplate2';
 import { useAddressBookSearch } from '@/features/address-book/hooks/useAddressBook';
 import { useDebounce } from '@/hooks/useDebounce';
 import { useCreateOrder, useOrderReceiverAddress, useUpdateOrderReceiverAddress } from '../hooks/useOrders';
 import { useAppSelector } from '@/hooks/store.hooks';
 
-export default function CreateOrderDialog({ onOpenChange, type, open, initialData, isEdit, orderId, isUpdate }: CreateOrderDialogProps) {
+export default function CreateOrderDialog({ onOpenChange, type, open, initialData, isEdit, onSubmit, orderId, isUpdate }: CreateOrderDialogProps) {
   const navigate = useNavigate();
   const { role, user } = useAppSelector((state) => state.auth);
   const [formData, setFormData] = useState<AddressData>({
@@ -75,8 +75,10 @@ export default function CreateOrderDialog({ onOpenChange, type, open, initialDat
     receiver_business_name: formData.company,
     receiver_phone: formData.phone,
     receiver_email: formData.email,
-    receiver_address: formData.address,
+    receiver_address: formData.address1,
     unit_number: formData.building,
+    address_info: formData.address_info,
+    address: formData.address1,
     street_number: formData.street_number,
     street_name: formData.street_name,
     suburb: formData.suburb,
@@ -165,13 +167,20 @@ export default function CreateOrderDialog({ onOpenChange, type, open, initialDat
       showToast("Please enter a valid Australian phone number", "error");
       return;
     }
-    if (isUpdate) {
+    // if (isEdit) {
+
+    //   onSubmit(type!, formData)
+    //   setIsSubmitting(false);
+    //   onOpenChange(false)
+    // } else
+    if (isEdit || isUpdate) {
       updateOrderReceiverAddress({
         orderId: orderId as string,
         data: updatePayload
       }, {
         onSuccess: () => {
-          onOpenChange(false)
+          onSubmit(type!, formData);
+          onOpenChange(false);
         }
       })
     } else {
@@ -183,7 +192,7 @@ export default function CreateOrderDialog({ onOpenChange, type, open, initialDat
   };
 
   const handleCloseMenualy = (value: boolean) => {
-    if (!value && isEdit) {
+    if (!value && isEdit || isUpdate) {
       onOpenChange(false)
       return
     }

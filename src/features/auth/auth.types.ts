@@ -21,6 +21,7 @@ export interface UserAddress {
     parent_customer_id: number | null;
     label: string | null;
     address: string;
+    address_info: string;
     suburb: string;
     postcode: string;
     latitude: string | null;
@@ -168,6 +169,14 @@ export interface GenericResponse {
     message: string;
 }
 
+export interface OnboardResponse {
+    status: boolean;
+    data: {
+        user_id: number;
+    };
+    message: string;
+}
+
 export interface EmailVerifyRequest {
     customerId: string | number;
     token: string;
@@ -184,6 +193,7 @@ export interface EmailVerifyResponse {
         last_name: string;
         email: string;
     };
+    onboarding_complete: number;
     token: string;
 }
 

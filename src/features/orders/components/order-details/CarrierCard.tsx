@@ -29,8 +29,8 @@ export const CarrierCard: React.FC<CarrierCardProps> = memo((props) => {
   const [selectedSurchargesMap, setSelectedSurchargesMap] = useState<Record<string, string[]>>({});
   const [bestDeal, setBestDeal] = useState<string>('');
   const [copiedTracking, setCopiedTracking] = useState(false);
-  const [authorityToLeave, setAuthorityToLeave] = useState<boolean>(false);
-  const [signatureRequired, setSignatureRequired] = useState<boolean>(false);
+  // const [authorityToLeave, setAuthorityToLeave] = useState<boolean>(false);
+  // const [signatureRequired, setSignatureRequired] = useState<boolean>(false);
 
   const handleCopyTracking = (text: string) => {
     navigator.clipboard.writeText(text);
@@ -61,9 +61,9 @@ export const CarrierCard: React.FC<CarrierCardProps> = memo((props) => {
     }
     if (data.services && data.services.length > 0) {
       const getServiceTotalPrice = (service: any) => {
-        const surcharges = data.surcharges?.[service.courierCode] || [];
-        const totalSurcharges = surcharges.reduce((acc: number, curr: any) => acc + curr.amount, 0);
-        return service.price + totalSurcharges;
+        // const surcharges = data.surcharges?.[service.courierCode] || [];
+        // const totalSurcharges = surcharges.reduce((acc: number, curr: any) => acc + curr.amount, 0);
+        return service.price;
       };
       const minItem = data.services.reduce((min: any, curr: any) =>
         getServiceTotalPrice(curr) < getServiceTotalPrice(min) ? curr : min
@@ -141,8 +141,8 @@ export const CarrierCard: React.FC<CarrierCardProps> = memo((props) => {
           surcharges: activeSurcharges,
           totalSurcharges,
           totalPrice,
-          authorityToLeave,
-          signatureRequired
+          // authorityToLeave,
+          // signatureRequired
         });
         setCourierData?.({
           courier: selectedCourier.carrier_id,
@@ -152,7 +152,7 @@ export const CarrierCard: React.FC<CarrierCardProps> = memo((props) => {
         })
       }
     }
-  }, [selectedServiceId, couriers, surchargesMap, selectedSurchargesMap, onQuoteChange, setCourierData, authorityToLeave, signatureRequired])
+  }, [selectedServiceId, couriers, surchargesMap, selectedSurchargesMap, onQuoteChange, setCourierData])
 
   return (
     <Card className="border gap-0 border-gray-200 dark:border-zinc-800 overflow-hidden transition-colors duration-300">
@@ -233,7 +233,7 @@ export const CarrierCard: React.FC<CarrierCardProps> = memo((props) => {
           </div>
         ) : (
           <div className="grid grid-cols-12 gap-3">
-            <div className={`${module !== 'quote' ? 'col-span-8' : 'col-span-12'} flex flex-col gap-3`}>
+            <div className={`${module !== 'quote' ? 'col-span-12' : 'col-span-12'} flex flex-col gap-3`}>
               {couriers.map((courier) => {
                 const serviceId = courier.product_id + courier.courierCode;
 
@@ -366,7 +366,7 @@ export const CarrierCard: React.FC<CarrierCardProps> = memo((props) => {
                 )
               })}
             </div>
-            {selectedServiceId && module !== 'quote' && (
+            {/* {selectedServiceId && module !== 'quote' && (
               <div className="col-span-4 flex flex-col gap-2dark:border-zinc-800 sticky top-0">
                 <div className="text-[11px] font-bold text-gray-500 dark:text-zinc-400 uppercase tracking-wider">
                   OPTIONS
@@ -389,7 +389,7 @@ export const CarrierCard: React.FC<CarrierCardProps> = memo((props) => {
                   </label>
                 </div>
               </div>
-            )}
+            )} */}
           </div>
         )}
       </CardContent>

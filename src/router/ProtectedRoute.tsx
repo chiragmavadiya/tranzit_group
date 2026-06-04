@@ -5,7 +5,7 @@ export default function ProtectedRoute({ role: requiredRole }: { role: string })
   const { isAuthenticated, role: userRole, next_step } = useAppSelector((state) => state.auth);
 
   // If the user isn't authenticated, redirect to the signin page
-  if (!isAuthenticated) {
+  if (!isAuthenticated && !localStorage.getItem('auth_token') && next_step !== 'verify_email') {
     return <Navigate to="/login" replace />;
   }
 
@@ -15,7 +15,6 @@ export default function ProtectedRoute({ role: requiredRole }: { role: string })
     if (userRole === 'admin') {
       return <Navigate to="/admin/orders" replace />;
     } else {
-      console.log("Redirect to order page ... 2")
       return <Navigate to="/orders" replace />;
     }
   }

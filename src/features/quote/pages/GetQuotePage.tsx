@@ -104,17 +104,23 @@ export default function GetQuotePage() {
   return (
     <>
       <div className="p-page-padding animate-in flex-1 fade-in duration-700 overflow-auto">
-        <div className="flex flex-col gap-3">
-          {isAdmin && (
-            <div className="flex items-center justify-end">
+        <div className="flex flex-col gap-4">
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+            <div>
+              <h1 className="my-0 text-2xl font-bold tracking-tight text-slate-900 dark:text-zinc-100">Get Quote</h1>
+              <p className="my-0 text-sm text-slate-500 dark:text-zinc-400 mt-1">Estimate shipping costs, compare carrier services, and create orders.</p>
+            </div>
+            {isAdmin && (
               <Button
                 variant="outline"
                 onClick={() => navigate('/admin/quotes/history')}
+                className="gap-2 border-slate-200 dark:border-zinc-800 h-8 font-bold text-[13px]"
               >
-                <History className='w-4 h-4' />Quote History
+                <History className="w-4 h-4" />
+                Quote History
               </Button>
-            </div>
-          )}
+            )}
+          </div>
 
           <div className="grid grid-cols-1 xl:grid-cols-12 gap-4 items-start">
             {/* Main Form Area */}

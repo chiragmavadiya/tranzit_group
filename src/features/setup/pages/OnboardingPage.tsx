@@ -8,7 +8,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { logout, setNextStep } from '@/features/auth/authSlice';
+import { logout } from '@/features/auth/authSlice';
 import { useOnboarding, useLogout, useEmailVerify } from '@/features/auth/hooks/useAuth';
 import { FormInput, FormSelect } from '@/features/orders/components/OrderFormUI';
 import { useAppDispatch, useAppSelector } from '@/hooks/store.hooks';
@@ -87,6 +87,14 @@ export default function OnboardingPage() {
   });
 
   const handleChange = (field: string, value: any) => {
+    if (field === 'business_name' && value && value.length > 32) {
+      showToast("Business name cannot be longer than 32 characters", "error");
+      return
+    }
+    if (field === 'gst_number' && value && value.length > 11) {
+      showToast("ABN / ACN cannot be longer than 11 characters", "error");
+      return
+    }
     setFormData(prev => ({ ...prev, [field]: value }));
   };
 
@@ -111,10 +119,6 @@ export default function OnboardingPage() {
       if (!formData[field as keyof typeof formData]) return false;
     }
 
-    if (!/^\d{10}$/.test(formData.mobile.replace(/\s/g, ''))) {
-      showToast("Invalid mobile number", "error");
-      return false;
-    };
     if (!/^\d{4}$/.test(formData.postcode)) return false;
 
     if (formData.hasBillingAddress) {
@@ -137,6 +141,10 @@ export default function OnboardingPage() {
     console.log("HANDLE SUBMIT")
     e.preventDefault();
     setIsSubmitted(true);
+    if (!/^\d{10}$/.test(formData.mobile.replace(/\s/g, ''))) {
+      showToast("Invalid mobile number", "error");
+      return false;
+    };
     if (!validateForm()) {
       showToast("Please fill in all required fields correctly", "error");
       return
@@ -162,7 +170,7 @@ export default function OnboardingPage() {
       onSuccess: (response) => {
         if (response.status) {
           showToast("Onboarding completed successfully", "success");
-          dispatch(setNextStep('dashboard'));
+          // dispatch(setCredentials({ userID: response?.data?.user_id, token: token || '', role: 'customer', next_step: 'dashboard' }));
           console.log("Redirect to order page 1")
           setTimeout(() => {
             navigate('/orders');
@@ -182,10 +190,14 @@ export default function OnboardingPage() {
       emailVerifyMutation.mutate({ customerId, token, expires, signature }, {
         onSuccess: (response) => {
           if (response.status) {
-            showToast("Email verified successfully", "success");
             localStorage.setItem("auth_userID", JSON.stringify(response.user.id));
             localStorage.setItem("user_role", "customer");
             localStorage.setItem("auth_token", response.token);
+            if (response.onboarding_complete === 1) {
+              navigate('/orders')
+              return;
+            }
+            showToast("Email verified successfully", "success");
             setFormData((prev) => {
               return {
                 ...prev,
@@ -216,9 +228,40 @@ export default function OnboardingPage() {
       })
     }
   }, [user])
+
   useEffect(() => {
     verifyEmailApiCall()
   }, [])
+
+  useEffect(() => {
+    if (!formData.hasBillingAddress) {
+      setFormData((prev) => ({
+        ...prev,
+        billing_address_info: formData.address_info,
+        billing_address: formData.address,
+        billing_unit_number: formData.unit_number,
+        billing_street_number: formData.street_number,
+        billing_street_name: formData.street_name,
+        billing_street_type: formData.street_type,
+        billing_suburb: formData.suburb,
+        billing_state: formData.state,
+        billing_postcode: formData.postcode,
+      }));
+    }
+  }, [
+    formData.hasBillingAddress,
+    formData.address,
+    formData.suburb,
+    formData.state,
+    formData.postcode,
+    formData.country,
+    formData.street_number,
+    formData.street_name,
+    formData.street_type,
+    formData.unit_number,
+    formData.address_info,
+  ]);
+
 
 
   return (
@@ -349,7 +392,7 @@ export default function OnboardingPage() {
 
                   <FormInput
                     label="Business Name"
-                    placeholder="e.g. Digisite Pty Ltd"
+                    placeholder="ABC Pty Ltd"
                     value={formData.business_name}
                     onChange={(val) => handleChange('business_name', val)}
                     required
@@ -358,8 +401,8 @@ export default function OnboardingPage() {
                     errormsg="Please enter your business name"
                   />
                   <FormInput
-                    label="GST Number"
-                    placeholder="ABN / GST"
+                    label="ABN / ACN"
+                    placeholder="ABN / ACN"
                     value={formData.gst_number}
                     onChange={(val) => handleChange('gst_number', val)}
                     required
@@ -380,7 +423,7 @@ export default function OnboardingPage() {
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 items-start">
               {/* Business Address Card */}
               <div className="bg-white dark:bg-zinc-900 p-6 rounded-3xl border border-slate-100 dark:border-zinc-800 shadow-lg shadow-slate-200/40 dark:shadow-none space-y-4">
-                <SectionHeader title="Business Address" icon={MapPin}>
+                <SectionHeader title="Pickup Address" icon={MapPin}>
                   <div className="flex items-center space-x-2.5 px-3 py-1.5 bg-slate-50 dark:bg-zinc-950/30 rounded-lg border border-slate-100 dark:border-zinc-800/50 cursor-pointer hover:bg-slate-100/50 transition-colors">
                     <Checkbox
                       id="billing_same"
@@ -388,7 +431,7 @@ export default function OnboardingPage() {
                       onCheckedChange={(val) => handleChange('hasBillingAddress', !val)}
                     />
                     <Label htmlFor="billing_same" className="text-[12px] font-bold text-slate-600 dark:text-zinc-400 cursor-pointer tracking-wild">
-                      Use Business Address as Billing Address
+                      Use Pickup Address as Billing Address
                     </Label>
                   </div>
                 </SectionHeader>
@@ -622,7 +665,7 @@ export default function OnboardingPage() {
                         className="hover:underline hover:text-primary transition-colors inline-flex items-center"
                         onClick={(e) => e.stopPropagation()}
                       >
-                        Privacy Policy
+                        Privacy Policy<span className="text-destructive ml-[2px] mt-[-4px]">*</span>
                       </a>
                     </Label>
                     <p className="text-xs text-slate-500 mb-0">I agree to the processing of my personal data.</p>
@@ -644,7 +687,7 @@ export default function OnboardingPage() {
                         className="hover:underline hover:text-primary transition-colors inline-flex items-center"
                         onClick={(e) => e.stopPropagation()}
                       >
-                        Terms & Conditions
+                        Terms & Conditions<span className="text-destructive ml-[2px] mt-[-4px]">*</span>
                       </a>
                     </Label>
                     <p className="text-xs text-slate-500 mb-0">I accept the Tranzit Group platform terms.</p>

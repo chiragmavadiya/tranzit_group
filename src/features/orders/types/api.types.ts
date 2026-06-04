@@ -66,6 +66,7 @@ export interface CreateOrderResponse {
     status?: boolean
     data?: {
         order_number: string;
+        order_status_category: string;
     }
 }
 

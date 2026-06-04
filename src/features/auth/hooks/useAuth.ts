@@ -15,7 +15,7 @@ export const useLogin = (role: string) => {
         onSuccess: (data) => {
             // Save token to localStorage
             if (data?.token) {
-                localStorage.setItem("auth_token", JSON.stringify(data.token));
+                localStorage.setItem("auth_token", data.token);
             }
             // redirect to order page
             // window.location.href = "/orders";
@@ -41,7 +41,7 @@ export const useRegister = () => {
         onSuccess: (data) => {
             // Save token to localStorage
             if (data?.token) {
-                localStorage.setItem("auth_token", data.token);
+                localStorage.setItem("user_auth_token", data.token);
             }
             // Invalidate verification status
             queryClient.invalidateQueries({ queryKey: QUERY_KEYS.AUTH.VERIFICATION_STATUS });
@@ -59,7 +59,7 @@ export const useOnboarding = () => {
         mutationFn: useCallback((data: OnboardingRequest) => authService.submitOnboarding(data), []),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: QUERY_KEYS.AUTH.VERIFICATION_STATUS });
-            
+
             // Instantly update the user details cache to next_step: 'dashboard' to avoid routing race conditions
             queryClient.setQueryData(QUERY_KEYS.AUTH.USER_DETAILS, (oldData: any) => {
                 if (!oldData) return oldData;
@@ -97,7 +97,7 @@ export const useEmailVerify = () => {
  */
 export const useResendVerification = () => {
     return useMutation({
-        mutationFn: useCallback(() => authService.resendVerification(), []),
+        mutationFn: useCallback((token: string) => authService.resendVerification(token), []),
     });
 };
 

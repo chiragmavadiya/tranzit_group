@@ -4,7 +4,7 @@ import { ShoppingBag, FileText, MapPin, Box, Users } from 'lucide-react';
 import { useAppSelector } from '@/hooks/store.hooks';
 import { useDebounce } from '@/hooks/useDebounce';
 import { useGlobalSearch } from '../hooks/useSearch';
-import AutoComplete from '@/components/common/AutoComplate';
+import AutoComplete from '@/components/common/AutoComplate2';
 
 interface GlobalSearchProps {
     className?: string;
@@ -12,7 +12,7 @@ interface GlobalSearchProps {
 }
 
 export const GlobalSearch: React.FC<GlobalSearchProps> = ({
-    className = "min-w-[300px] h-9",
+    className = "min-w-[300px] h-7",
     placeholder = "Search orders, invoices..."
 }) => {
     const navigate = useNavigate();

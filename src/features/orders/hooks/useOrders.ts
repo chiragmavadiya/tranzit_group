@@ -255,8 +255,8 @@ export const useUpdateOrderReceiverAddress = () => {
     mutationFn: ({ orderId, data }: { orderId: string | number; data: any }) =>
       ordersService.updateReceiverAddress(orderId, data),
     onSuccess: (_, { orderId }) => {
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.ORDERS.LIST });
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.ORDERS.RECEIVER_ADDRESS(orderId) });
-      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.ORDERS.DETAILS(orderId) });
     },
     onError: (error: any) => {
       showToast(error?.message || "Failed to update receiver address", "error")

@@ -70,6 +70,7 @@ export const PlaceAutocomplete = ({ onPlaceSelect, ...rest }: PlaceAutocompleteP
                 latitude: place.geometry?.location?.lat() || null,
                 longitude: place.geometry?.location?.lng() || null,
             };
+            console.log(place, 'place')
 
             // let street_number = '';
             // let street_type = '';
@@ -86,7 +87,7 @@ export const PlaceAutocomplete = ({ onPlaceSelect, ...rest }: PlaceAutocompleteP
                     // Australia street logic: "George St" -> Name: George, Type: St
                     const parts = component.long_name.split(' ');
                     address.street_type = parts.length > 1 ? parts.pop() || '' : '';
-                    address.street_name = parts.join(' ');
+                    address.street_name = component.long_name;
                 }
                 if (types.includes('country')) address.country = component.long_name;
                 if (types.includes('locality')) address.suburb = value;

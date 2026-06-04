@@ -23,7 +23,7 @@ function Command({
     <CommandPrimitive
       data-slot="command"
       className={cn(
-        "flex size-full flex-col overflow-hidden rounded-xl! bg-popover p-1 text-popover-foreground",
+        "flex size-full flex-col overflow-hidden rounded-sm bg-popover p-1 text-popover-foreground",
         className
       )}
       {...props}
@@ -69,17 +69,18 @@ function CommandInput({
   ...props
 }: React.ComponentProps<typeof CommandPrimitive.Input>) {
   return (
-    <div data-slot="command-input-wrapper" className="p-1 pb-0">
-      <InputGroup className="h-8! rounded-lg! border-input/30 bg-input/30 shadow-none! *:data-[slot=input-group-addon]:pl-2!">
+    <div data-slot="command-input-wrapper" className="p-0">
+      <InputGroup className="h-8! rounded-sm border-slate-200 dark:border-zinc-800 bg-white dark:bg-zinc-950 font-normal focus-visible:ring-0 group-focus-visible/command:ring-primary group-focus-visible/command:border-primary transition-all placeholder:text-muted-foreground placeholder:font-normal dark:placeholder:text-zinc-700 text-sm *:data-[slot=input-group-addon]:pl-[11px]">
         <CommandPrimitive.Input
           data-slot="command-input"
           className={cn(
-            "w-full text-sm outline-hidden disabled:cursor-not-allowed disabled:opacity-50",
+            "w-full text-sm outline-hidden disabled:cursor-not-allowed disabled:opacity-50 ",
+            // "border-slate-200 rounded-sm dark:border-zinc-800 bg-white dark:bg-zinc-950 font-normal group-focus-visible/command:ring-0 focus-visible:ring-primary group-focus-visible/command:border-primary transition-all placeholder:text-muted-foreground placeholder:font-normal dark:placeholder:text-zinc-700 text-sm",
             className
           )}
           {...props}
         />
-        <InputGroupAddon>
+        <InputGroupAddon className="">
           <SearchIcon className="size-4 shrink-0 opacity-50" />
         </InputGroupAddon>
       </InputGroup>

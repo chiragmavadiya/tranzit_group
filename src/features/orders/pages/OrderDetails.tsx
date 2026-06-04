@@ -472,6 +472,8 @@ const OrderDetailsPage: React.FC = () => {
             onSubmit={handleAddressSubmit}
             initialData={addressData[orderDialogMode]}
             isEdit={isEdit}
+            orderId={orderID}
+
           />
         )}
       </div>

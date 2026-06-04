@@ -58,6 +58,15 @@ export default function SignIn({ role = "customer" }: { role?: string }) {
             navigate("/orders");
           }
         } else {
+          if (response.next_step === 'verify_email') {
+            sessionStorage.setItem("verify-email-payloads", JSON.stringify({
+              user: response.user,
+              token: response.token,
+              email: data.email
+            }));
+            navigate("/verify-email");
+            return;
+          }
           showToast(response?.message, 'error')
         }
       },

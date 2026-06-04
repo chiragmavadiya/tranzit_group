@@ -39,13 +39,15 @@ export default function AccountSettingsPage() {
     phone: '',
     companyName: '',
     abn: '',
+    address_info: '',
     address: '',
-    // streetNumber: '',
-    street: '',
-    // streetType: '',
+    unit_number: '',
+    street_number: '',
+    street_name: '',
+    street_type: '',
     suburb: '',
     state: '',
-    postcode: '3810',
+    postcode: '',
   });
   const [backupData, setBackupData] = useState({ ...formData });
   const [passwordData, setPasswordData] = useState({
@@ -126,11 +128,12 @@ export default function AccountSettingsPage() {
         phone: user.personal_mobile || '',
         companyName: user.business_name || '',
         abn: '',
+        address_info: user.addresses[0]?.address_info || '',
         address: user.addresses[0]?.address || '',
-        // streetNumber: user.addresses[0]?.street_number || '',
-        // streetName: user.addresses[0]?.street_name || '',
-        // streetType: user.addresses[0]?.street_type || '',
-        street: user.addresses[0]?.street || '',
+        unit_number: user.addresses[0]?.unit_number || '',
+        street_number: user.addresses[0]?.street_number || '',
+        street_name: user.addresses[0]?.street_name || '',
+        street_type: user.addresses[0]?.street_type || '',
         suburb: user.addresses[0]?.suburb || '',
         state: user.addresses[0]?.state || '',
         postcode: user.addresses[0]?.postcode || '',
@@ -242,16 +245,17 @@ export default function AccountSettingsPage() {
                   inputClassName="w-full col-span-12"
                   isFullWidth
                   disabled={!isEditingProfile}
-                  value={formData.address}
+                  value={formData.address_info}
                   onChange={(val) => handleInputChange(val, 'address')}
                   onPlaceSelect={(opt) => {
                     setFormData(prev => ({
                       ...prev,
-                      address: opt.formatted_address || opt.address1,
-                      // streetNumber: opt.street_number || '',
-                      // streetName: opt.street_name || '',
-                      // streetType: opt.street_type || '',
-                      street: opt.street || '',
+                      address_info: opt.formatted_address,
+                      address: opt.address1,
+                      unit_number: opt.unit_number || '',
+                      street_number: opt.street_number || '',
+                      street_name: opt.street_name || '',
+                      street_type: opt.street_type || '',
                       suburb: opt.suburb,
                       state: opt.state,
                       postcode: opt.post_code,
@@ -260,14 +264,23 @@ export default function AccountSettingsPage() {
                 />
               </div>
 
-              {/* Row 5: streetNumber, streetName, streetType */}
-              <div className="col-span-3">
+
+              <div className="col-span-4">
                 <FormInput
-                  label="Street Number"
+                  label="Unit Number"
                   required
                   disabled={!isEditingProfile}
-                  value={formData.street}
-                  onChange={(val) => handleInputChange(val, 'street')}
+                  value={formData.unit_number}
+                  onChange={(val) => handleInputChange(val, 'unit_number')}
+                />
+              </div>
+              <div className="col-span-4">
+                <FormInput
+                  label="Street"
+                  required
+                  disabled={!isEditingProfile}
+                  value={formData.address}
+                  onChange={(val) => handleInputChange(val, 'address')}
                 />
               </div>
 
@@ -281,7 +294,7 @@ export default function AccountSettingsPage() {
                   onChange={(val) => handleInputChange(val, 'suburb')}
                 />
               </div>
-              <div className="col-span-4">
+              <div className="col-span-6">
                 <FormSelect
                   label="State"
                   required
@@ -291,7 +304,7 @@ export default function AccountSettingsPage() {
                   onValueChange={(val) => handleInputChange(val, 'state')}
                 />
               </div>
-              <div className="col-span-4">
+              <div className="col-span-6">
                 <FormInput
                   label="Postcode"
                   required

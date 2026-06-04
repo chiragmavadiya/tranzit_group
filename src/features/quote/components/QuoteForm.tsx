@@ -4,7 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { MapPin } from "lucide-react";
 import type { QuoteLocation } from "../types";
 import { memo, useState, useMemo } from "react";
-import { AutoComplete } from "@/components/common";
+import AutoComplete from "@/components/common/AutoComplate2";
 import { useSearchLocalities } from "../hooks/useQuote";
 
 interface QuoteFormProps {
@@ -30,9 +30,9 @@ const LocalityAutoComplete = memo(({ label, placeholder, value, onChange, onSele
   const options = useMemo(() => {
     if (!localities) return [];
     return localities.map((item) => ({
-      value: String(item.id || `${item.locality}-${item.state}-${item.postcode}`),
+      value: item.value,
       label: item.label,
-      suburb: item.locality,
+      suburb: item.suburb,
       state: item.state,
       postcode: item.postcode,
     }));

@@ -468,9 +468,6 @@ export default function CustomerDialog({ open, onOpenChange, customerId }: Custo
                 placeholder="e.g. 123"
                 value={formData.billing_unit_number}
                 onChange={(val) => handleChange("billing_unit_number", val)}
-                required
-                error={submited && !formData.billing_unit_number?.trim()}
-                errormsg="Please enter unit number"
                 disabled={sameAsShipping}
               />
 

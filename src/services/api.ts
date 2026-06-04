@@ -15,7 +15,7 @@ export const api = axios.create({
 // Request Interceptor
 api.interceptors.request.use(
     (config: InternalAxiosRequestConfig) => {
-        const tokenData = localStorage.getItem("auth_token");
+        const tokenData = localStorage.getItem("auth_token") || localStorage.getItem("user_auth_token");
         if (tokenData && config.headers) {
             config.headers.Authorization = `Bearer ${tokenData}`;
         }
@@ -40,6 +40,10 @@ api.interceptors.response.use(
     (error: AxiosError) => {
         const data = error.response?.data as any;
         const message = data?.message || error.message || "An error occurred";
+        if (data?.next_step === 'verify_email') {
+            // navigate("/verify-email" + '/' + data.user.id + '/' + data.token);
+            return Promise.reject(data);
+        }
 
         // Update error message to use the server-side message if it exists
         error.message = message;

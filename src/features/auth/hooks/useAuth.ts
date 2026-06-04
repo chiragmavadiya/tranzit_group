@@ -15,7 +15,7 @@ export const useLogin = (role: string) => {
         onSuccess: (data) => {
             // Save token to localStorage
             if (data?.token) {
-                localStorage.setItem("auth_token", data.token);
+                localStorage.setItem(data.next_step === 'verify_email' ? "user_auth_token" : "auth_token", data.token);
             }
             // redirect to order page
             // window.location.href = "/orders";

@@ -56,6 +56,7 @@ const authSlice = createSlice({
             localStorage.removeItem("auth_token");
             localStorage.removeItem("auth_userID");
             localStorage.removeItem("user_role");
+            sessionStorage.removeItem("verify-email-payloads");
         },
     },
 });

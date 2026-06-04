@@ -430,6 +430,7 @@ const OrderDetailsPage: React.FC = () => {
                   orderDetail={orderDetail}
                   orderType={orderType!}
                   module="order"
+                // initialSelectedCourierId={courierData?.product_id + courierData?.courier_code}
                 />
               )}
               {!isCreate && (

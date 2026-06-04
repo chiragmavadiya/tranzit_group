@@ -15,6 +15,7 @@ import { useCreateOrder, useOrderReceiverAddress, useUpdateOrderReceiverAddress 
 import { useAppSelector } from '@/hooks/store.hooks';
 
 export default function CreateOrderDialog({ onOpenChange, type, open, initialData, isEdit, onSubmit, orderId, isUpdate }: CreateOrderDialogProps) {
+  console.log(initialData, 'initialData')
   const navigate = useNavigate();
   const { role, user } = useAppSelector((state) => state.auth);
   const [formData, setFormData] = useState<AddressData>({
@@ -41,7 +42,7 @@ export default function CreateOrderDialog({ onOpenChange, type, open, initialDat
 
   const debouncedSearchAddress = useDebounce(searchAddress, 400);
   const { data: addressBookData } = useAddressBookSearch(debouncedSearchAddress);
-  const { data: orderResponse } = useOrderReceiverAddress(orderId || '');
+  const { data: orderResponse } = useOrderReceiverAddress((!initialData && orderId) || '');
   const { mutate: createOrder, isPending: saveLoading } = useCreateOrder();
   const { mutateAsync: updateOrderReceiverAddress, isPending: isUpdatePending } = useUpdateOrderReceiverAddress();
   const options = useMemo(() => {
@@ -63,13 +64,14 @@ export default function CreateOrderDialog({ onOpenChange, type, open, initialDat
       country: "AUSTRALIA",
     }));
   }, [addressBookData]);
+
   const updateField = (field: keyof AddressData, value: string | boolean | number | string[]) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
   };
 
   const isEmailValid = (email: string) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
   const isPhoneValid = (phone: string) => /^(?:\+61|0)[2-478](?:[ -]?[0-9]){8}$/.test(phone.replace(/[\s-()]/g, ''));
-
+  console.log(formData, 'formData....')
   const updatePayload = useMemo(() => ({
     receiver_name: formData.name,
     receiver_business_name: formData.company,
@@ -118,7 +120,7 @@ export default function CreateOrderDialog({ onOpenChange, type, open, initialDat
         height: item.height || 0
       })) : undefined,
       service: service ? {
-        courier: service.courier_id,
+        courier: service.carrier_id,
         product_id: service.product_id,
         product_type: service.product_type,
         shipment_summary: service.shipment_summary,

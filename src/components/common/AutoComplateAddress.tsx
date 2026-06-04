@@ -94,7 +94,7 @@ export const PlaceAutocomplete = ({ onPlaceSelect, ...rest }: PlaceAutocompleteP
                 if (types.includes('administrative_area_level_1')) address.state = component.short_name; // e.g. NSW
                 if (types.includes('postal_code')) address.post_code = value;
             });
-            address.street = `${address.street_number} ${address.street_name} ${address.street_type}`
+            address.street = `${address.street_number} ${address.street_name}`
             address.address1 = address.street;
             onPlaceSelect(address);
         });

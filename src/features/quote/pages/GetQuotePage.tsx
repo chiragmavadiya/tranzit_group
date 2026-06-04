@@ -55,7 +55,7 @@ export default function GetQuotePage() {
       const h = Number(item.height) || 0;
       const l = Number(item.length) || 0;
       const q = Number(item.quantity) || 1;
-      return acc + ((w * h * l) / 1000000) * q;
+      return acc + ((w * h * l) / 5000) * q;
     }, 0) || 0;
 
     const servicePrice = quoteData?.courier?.base || quoteData?.subtotal || 0;

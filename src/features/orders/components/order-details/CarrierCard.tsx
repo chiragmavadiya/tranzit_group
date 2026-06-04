@@ -18,12 +18,13 @@ interface CarrierCardProps {
   orderDetail?: any;
   module?: string;
   orderType?: string
+  initialSelectedCourierId?: string
 }
 
 export const CarrierCard: React.FC<CarrierCardProps> = memo((props) => {
-  const { itemData, addresses, onQuoteChange, setCourierData, orderDetail, module, orderType = 'create' } = props
+  const { itemData, addresses, onQuoteChange, setCourierData, orderDetail, module, orderType = 'create', initialSelectedCourierId = '' } = props
   const { role } = useAppSelector((state) => state.auth);
-  const [selectedServiceId, setSelectedServiceId] = useState<string>('')
+  const [selectedServiceId, setSelectedServiceId] = useState<string>(initialSelectedCourierId)
   const [couriers, setCouriers] = useState<any[]>([]);
   const [surchargesMap, setSurchargesMap] = useState<Record<string, any[]>>({});
   const [selectedSurchargesMap, setSelectedSurchargesMap] = useState<Record<string, string[]>>({});
@@ -145,6 +146,7 @@ export const CarrierCard: React.FC<CarrierCardProps> = memo((props) => {
           // signatureRequired
         });
         setCourierData?.({
+          courierCode: selectedCourier.courierCode,
           courier: selectedCourier.carrier_id,
           product_id: selectedCourier.product_id,
           product_type: selectedCourier.product_type,

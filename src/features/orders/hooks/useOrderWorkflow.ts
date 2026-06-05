@@ -131,7 +131,6 @@ export const useOrderWorkflow = () => {
     }
   })
   useEffect(() => {
-    console.log(defaultItem)
     if (defaultItem && (orderType === 'create' || orderType === 'create-menual' || orderType === 'return')) {
       setDefaultItemData(defaultItem.data)
     }

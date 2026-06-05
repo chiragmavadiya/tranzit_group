@@ -75,7 +75,6 @@ export function CreateAddressDialog({
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    console.log(formData.country)
     setSubmited(true);
     if (
       formData.contact_person.trim().length === 0 ||

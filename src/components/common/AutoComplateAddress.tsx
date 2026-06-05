@@ -70,7 +70,6 @@ export const PlaceAutocomplete = ({ onPlaceSelect, ...rest }: PlaceAutocompleteP
                 latitude: place.geometry?.location?.lat() || null,
                 longitude: place.geometry?.location?.lng() || null,
             };
-            console.log(place, 'place')
 
             // let street_number = '';
             // let street_type = '';

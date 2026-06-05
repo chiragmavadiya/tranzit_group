@@ -59,9 +59,7 @@ export const AppRouter = () => {
   // Handle redirects based on next_step state and location.pathname
   useEffect(() => {
     if (isAuthenticated) {
-      console.log(next_step, 'NEXT STEP IN ROUTER REDIRECT..');
       if ((next_step === 'onboarding' || next_step === 'verify_email') && !location.pathname.includes('/on-board')) {
-        console.log("Navigate to onBoard.......123");
         navigate('/on-board/' + userID + '/' + token);
       } else if (next_step === 'dashboard' && location.pathname.includes('/on-board')) {
         navigate('/orders');

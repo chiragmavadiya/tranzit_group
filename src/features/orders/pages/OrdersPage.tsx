@@ -359,7 +359,7 @@ export default function OrdersPage({ fromCustomer, customerId }: { fromCustomer?
           onPageChange={setPage}
           onExport={handleExport}
           isExporting={exportOrders.isPending}
-          // selectable={!fromCustomer}
+          selectable={!fromCustomer}
           selectedRows={selectedRows}
           onSelectionChange={setSelectedRows}
           exportable={!fromCustomer}

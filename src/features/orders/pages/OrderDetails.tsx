@@ -394,17 +394,17 @@ const OrderDetailsPage: React.FC = () => {
               <AddressCard
                 title="SENDER"
                 name={addressData.sender.name}
-                address={addressData.sender.address_info || ''}
+                address={addressData.sender.address_info || addressData.sender.address || ''}
                 email={addressData.sender.email}
                 editable={isEditable && (role === 'admin' || orderType === 'return')}
                 onEditClick={() => onEditClick('sender')}
                 phone={addressData.sender.phone}
               />
-
+              {console.log(addressData.receiver, 'addressData.receiver')}
               <AddressCard
                 title="RECEIVER"
                 name={addressData.receiver.name}
-                address={addressData.receiver.address_info || ''}
+                address={addressData.receiver.address_info || addressData.receiver.address1 || ''}
                 email={addressData.receiver.email}
                 instruction={addressData.receiver.instructions || ''}
                 editable={isEditable && orderType !== 'return'}
@@ -430,7 +430,7 @@ const OrderDetailsPage: React.FC = () => {
                   orderDetail={orderDetail}
                   orderType={orderType!}
                   module="order"
-                  initialSelectedCourierId={orderDetail?.courier_details?.product_id || '' + (orderDetail?.courier_details?.courier_code)}
+                  initialSelectedCourierId={orderDetail?.courier_details && `${orderDetail?.courier_details?.product_id || ''}${orderDetail?.courier_details?.courier_code || ''}`}
                 />
               )}
               {!isCreate && (

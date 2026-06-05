@@ -25,7 +25,6 @@ export const authService = {
             ? API_ENDPOINTS.AUTH.ADMIN_LOGIN
             : API_ENDPOINTS.AUTH.CUSTOMER_LOGIN;
         const response = await api.post<LoginResponse>(endpoint, data);
-        console.log(response, 'response.data')
         return response.data;
     },
     /**

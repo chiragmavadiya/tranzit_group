@@ -21,7 +21,7 @@ const WalletCheckDialog: React.FC<WalletCheckDialogProps> = ({
             title="Wallet Balance Check"
             description="Please review your wallet balance before proceeding with the order."
             contentClass="sm:max-w-xl"
-            submitText={isPending ? "Processing..." : isInsufficient ? "Continue to Payment" : "Consign Order"}
+            submitText={isPending ? "Processing..." : isInsufficient ? "Continue" : "Consign Order"}
             cancelText="Cancel"
             onSubmit={onConfirm}
 

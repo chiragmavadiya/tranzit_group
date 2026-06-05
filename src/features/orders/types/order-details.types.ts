@@ -44,6 +44,8 @@ export type OrderDetailData = {
         courier: string
         tracking_number: string
         customer_reference: string
+        product_id: string
+        courier_code: string
     }
     sender_details: {
         name: string

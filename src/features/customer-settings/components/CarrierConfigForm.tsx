@@ -55,31 +55,98 @@ const CARRIER_TIPS: Record<string, { title: string; description: React.ReactNode
 //   email_tracking_notification: "Notify customer of delivery milestones.",
 // };
 
-const GUIDE_STEPS: Record<string, string[]> = {
-  auspost: [
-    "Visit the Australia Post Developer Center and sign in with your business credentials.",
-    "Create a new 'Project' for LogisticsPro and request access to the 'Shipping & Tracking API'.",
-    "Copy your API Key and API Secret from the 'Credentials' tab.",
-    "Locate your 10-digit Account Number on your monthly billing statement."
-  ],
-  aramex: [
-    "Visit the Aramex Connect portal and sign in.",
-    "Navigate to Administration -> API Keys to generate your authorization keys.",
-    "Copy your Client ID, Client Secret, and Account Name.",
-    "Enter these credentials along with an Account Label in the Connection Details section."
-  ],
-  mypostbusiness: [
-    "Visit the MyPost Business Portal and log in.",
-    "Go to Account Settings -> Platform Partners.",
-    "Register your platform or integration to obtain your unique Merchant Token.",
-    "Copy and paste the Merchant Token into the Connection Details section."
-  ],
-  directfreight: [
-    "Visit the Direct Freight Express developer portal.",
-    "Navigate to the Developer Centre to generate your API credentials.",
-    "Request your Token, Client Account, Site ID, and Consignment Token.",
-    "Enter these details to configure live pricing and shipping label generation."
-  ]
+const GUIDE_TIPS: Record<string, { title: string; content: React.ReactNode }> = {
+  auspost: {
+    title: "API Credentials",
+    content: (
+      <div className="space-y-4 text-left">
+        <div className="space-y-1">
+          <h4 className="text-sm font-bold text-slate-800 dark:text-zinc-200">API Credentials</h4>
+          <p className="text-[13px] text-slate-500 dark:text-slate-400 leading-relaxed">
+            Enter your Auspost API credentials to connect your account securely.
+          </p>
+        </div>
+        <div className="space-y-1">
+          <h4 className="text-sm font-bold text-slate-800 dark:text-zinc-200">Secure Storage</h4>
+          <p className="text-[13px] text-slate-500 dark:text-slate-400 leading-relaxed">
+            Your credentials are encrypted and stored securely.
+          </p>
+        </div>
+        <div className="space-y-1">
+          <h4 className="text-sm font-bold text-slate-800 dark:text-zinc-200">Shipment Management</h4>
+          <p className="text-[13px] text-slate-500 dark:text-slate-400 leading-relaxed">
+            Create and manage Auspost shipments directly from the portal.
+          </p>
+        </div>
+      </div>
+    )
+  },
+  aramex: {
+    title: "Setting up Aramex as a courier",
+    content: (
+      <div className="space-y-3.5 text-[13px] text-slate-500 dark:text-slate-400 leading-relaxed text-left">
+        <p>
+          To set up Aramex, you firstly need to create your API Key and secret by logging into Aramex,{' '}
+          <a
+            href="https://identity.aramexconnect.com.au/Account/Login"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-primary hover:underline font-semibold"
+          >
+            click here
+          </a>.
+        </p>
+        <p>
+          After you have logged in, please navigate to <strong>Administration → API Keys → Create Key</strong>
+        </p>
+        <p>
+          Once you have your Client ID and Secret, save the form. We verify the keys with Aramex and, when their API returns it, show your organisation name on this page.
+        </p>
+        <p>
+          Enter your Client ID and Client Secret
+        </p>
+        <p>
+          <a
+            href="https://www.aramex.com.au/tools/integrations/business-api/"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-primary hover:underline font-semibold"
+          >
+            See more detailed instructions on how to get set up.
+          </a>
+        </p>
+      </div>
+    )
+  },
+  directfreight: {
+    title: "API Credentials",
+    content: (
+      <div className="text-[13px] text-slate-500 dark:text-slate-400 leading-relaxed text-left">
+        <p>
+          Enter your Direct Freight API credentials to enable shipment creation and tracking directly from the portal.
+        </p>
+      </div>
+    )
+  },
+  mypostbusiness: {
+    title: "API Credentials Guide",
+    content: (
+      <div className="space-y-2 text-[13px] text-slate-500 dark:text-slate-400 leading-relaxed text-left">
+        <p>
+          Visit the MyPost Business Portal and log in.
+        </p>
+        <p>
+          Go to Account Settings &gt; Platform Partners.
+        </p>
+        <p>
+          Register your platform or integration to obtain your unique Merchant Token.
+        </p>
+        <p>
+          Copy and paste the Merchant Token into the Connection Details section.
+        </p>
+      </div>
+    )
+  }
 };
 
 interface CarrierConfigTipProps {
@@ -87,37 +154,20 @@ interface CarrierConfigTipProps {
 }
 
 function CarrierConfigTip({ selectedCarrier }: CarrierConfigTipProps) {
-  const steps = GUIDE_STEPS[selectedCarrier] || [];
+  const tip = GUIDE_TIPS[selectedCarrier];
+  if (!tip) return null;
+
   return (
     <div className="w-full bg-linear-to-r from-blue-50/70 via-indigo-50/40 to-blue-50/70 dark:from-blue-950/20 dark:via-indigo-950/10 dark:to-blue-950/20 border border-blue-100/50 dark:border-blue-900/30 rounded-sm p-3.5 shadow-sm ">
       <div className='flex items-center mb-4 gap-3'>
-
         <div className="bg-primary/10 dark:bg-blue-900/50 p-1.5 rounded-md text-primary dark:text-blue-400 shrink-0">
           <Info className="w-4 h-4" />
         </div>
-        <span className="text-base font-bold text-slate-800 dark:text-zinc-200 block">API Credentials Guide</span>
+        <span className="text-base font-bold text-slate-800 dark:text-zinc-200 block">{tip.title}</span>
       </div>
       <div className="space-y-0.5">
-        {/* <span className="text-sm text-slate-600 dark:text-zinc-400 leading-normal block">
-          {description}
-        </span> */}
-        <div className="space-y-0">
-          {steps.map((step, idx) => (
-            <div key={idx} className="flex gap-3 text-sm leading-relaxed text-slate-500 dark:text-slate-400">
-              <span className="bg-primary/10 dark:bg-blue-900/50 text-primary dark:text-blue-400 w-5 h-5 flex items-center justify-center rounded-full text-[10px] font-bold shrink-0 mt-0.5">
-                {idx + 1}
-              </span>
-              <p>{step}</p>
-            </div>
-          ))}
-        </div>
+        {tip.content}
       </div>
-      {/* <div className="flex items-center gap-2">
-        <Info className="w-5 h-5 text-blue-400" />
-        <h3 className="text-sm font-bold tracking-wider uppercase text-slate-300">API Credentials Guide</h3>
-      </div> */}
-
-
     </div>
   );
 }
@@ -127,14 +177,15 @@ interface CarrierConfigFormProps {
   initialValues?: any;
   onSubmit: (data: any) => void;
   isLoading?: boolean;
-  layout?: 'drawer' | 'page';
+  isConnected?: boolean;
 }
 
 export default function CarrierConfigForm({
   selectedCarrier,
   initialValues = {},
   onSubmit,
-  isLoading = false
+  isLoading = false,
+  isConnected
 }: CarrierConfigFormProps) {
   const [formData, setFormData] = useState<any>({});
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -474,6 +525,7 @@ export default function CarrierConfigForm({
                         id={`setting-${setting.key}`}
                         checked={setting.value}
                         onCheckedChange={(checked) => handleAdvancedSettingChange(setting.key, !!checked)}
+                        disabled={!isConnected}
                       />
                       <label
                         htmlFor={`setting-${setting.key}`}
@@ -508,17 +560,19 @@ export default function CarrierConfigForm({
               })}
             </div>
 
-            <div className='flex mt-6'>
-              <Button
-                type="button"
-                className='h-8 text-sm rounded-sm px-5 font-semibold'
-                onClick={handleAdvancedSettingsSave}
-                disabled={updateSettingsMut.isPending}
-              >
-                {updateSettingsMut.isPending ? <Loader2 className="w-3.5 h-3.5 animate-spin mr-2" /> : null}
-                Save Settings
-              </Button>
-            </div>
+            {isConnected && (
+              <div className='flex mt-6'>
+                <Button
+                  type="button"
+                  className='h-8 text-sm rounded-sm px-5 font-semibold'
+                  onClick={handleAdvancedSettingsSave}
+                  disabled={updateSettingsMut.isPending || !isConnected}
+                >
+                  {updateSettingsMut.isPending ? <Loader2 className="w-3.5 h-3.5 animate-spin mr-2" /> : null}
+                  Save Settings
+                </Button>
+              </div>
+            )}
           </div>
         )}
 
@@ -550,17 +604,19 @@ export default function CarrierConfigForm({
                       className="mb-0"
                     />
                   </div>
-                  <Button
-                    type="button"
-                    variant="outline"
-                    className="h-8 text-sm px-4 font-semibold shrink-0"
-                    onClick={() => {
-                      setIsAddingNewProduct(true);
-                      setNewProductForm({ product_name: '', product_code: '', enabled: false, manual: true });
-                    }}
-                  >
-                    Add Product
-                  </Button>
+                  {isConnected && (
+                    <Button
+                      type="button"
+                      variant="outline"
+                      className="h-8 text-sm px-4 font-semibold shrink-0"
+                      onClick={() => {
+                        setIsAddingNewProduct(true);
+                        setNewProductForm({ product_name: '', product_code: '', enabled: false, manual: true });
+                      }}
+                    >
+                      Add Product
+                    </Button>
+                  )}
                 </div>
               </div>
               <div className="border border-gray-100 dark:border-zinc-800 rounded-lg overflow-hidden">
@@ -679,7 +735,7 @@ export default function CarrierConfigForm({
                                     <Checkbox
                                       checked={editingProductForm.enabled}
                                       onCheckedChange={(checked) => setEditingProductForm(prev => ({ ...prev, enabled: !!checked }))}
-                                      disabled={updateManualProductMut.isPending}
+                                      disabled={updateManualProductMut.isPending || !isConnected}
                                     />
                                   </div>
                                 </td>
@@ -727,7 +783,7 @@ export default function CarrierConfigForm({
                                   <Checkbox
                                     checked={product.enabled}
                                     onCheckedChange={(checked) => handleProductToggle(product.product_code, !!checked)}
-                                    disabled={isManual && (updateManualProductMut.isPending || deleteManualProductMut.isPending)}
+                                    disabled={(isManual && (updateManualProductMut.isPending || deleteManualProductMut.isPending)) || !isConnected}
                                   />
                                 </div>
                               </td>

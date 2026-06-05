@@ -131,6 +131,7 @@ export const useOrderWorkflow = () => {
     }
   })
   useEffect(() => {
+    console.log(defaultItem)
     if (defaultItem && (orderType === 'create' || orderType === 'create-menual' || orderType === 'return')) {
       setDefaultItemData(defaultItem.data)
     }
@@ -621,5 +622,6 @@ export const useOrderWorkflow = () => {
     onCancelOrder,
     handleConsign,
     downloadLabel,
+    hasDefaultItemAndCourier: defaultItem?.data ? false : false, // NEED TO IMPROVE WHEN DEFAULT CARRIER GETS INTRODUCED
   };
 };

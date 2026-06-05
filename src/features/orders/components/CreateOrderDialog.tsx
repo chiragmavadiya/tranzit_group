@@ -14,8 +14,7 @@ import { useDebounce } from '@/hooks/useDebounce';
 import { useCreateOrder, useOrderReceiverAddress, useUpdateOrderReceiverAddress } from '../hooks/useOrders';
 import { useAppSelector } from '@/hooks/store.hooks';
 
-export default function CreateOrderDialog({ onOpenChange, type, open, initialData, isEdit, onSubmit, orderId, isUpdate }: CreateOrderDialogProps) {
-  console.log(initialData, 'initialData')
+export default function CreateOrderDialog({ onOpenChange, type, open, initialData, isEdit, onSubmit, orderId, hasDefaultItemAndCourier }: CreateOrderDialogProps) {
   const navigate = useNavigate();
   const { role, user } = useAppSelector((state) => state.auth);
   const [formData, setFormData] = useState<AddressData>({
@@ -155,7 +154,7 @@ export default function CreateOrderDialog({ onOpenChange, type, open, initialDat
   const handleSubmit = async () => {
     setIsSubmitting(true);
     const { address1, country, name, postcode, state, suburb, phone, email } = formData;
-    if (!name || !address1 || !suburb || !state || !postcode || !country) {
+    if (!name || !address1 || !suburb || !state || !postcode || !country || !email || !phone) {
       showToast("Please fill in all required fields", "error");
       return;
     }
@@ -175,7 +174,7 @@ export default function CreateOrderDialog({ onOpenChange, type, open, initialDat
     //   setIsSubmitting(false);
     //   onOpenChange(false)
     // } else
-    if (isEdit || isUpdate) {
+    if (isEdit) {
       updateOrderReceiverAddress({
         orderId: orderId as string,
         data: updatePayload
@@ -185,16 +184,18 @@ export default function CreateOrderDialog({ onOpenChange, type, open, initialDat
           onOpenChange(false);
         }
       })
-    } else {
+    } else if (hasDefaultItemAndCourier) {
       executeCreateOrder()
-      // onSubmit(type!, formData)
-      // setIsSubmitting(false);
-      // onOpenChange(false)
+    } else {
+      onSubmit(type!, formData)
+      setIsSubmitting(false);
+      onOpenChange(false)
+
     }
   };
 
   const handleCloseMenualy = (value: boolean) => {
-    if (!value && isEdit || isUpdate) {
+    if (!value && isEdit) {
       onOpenChange(false)
       return
     }
@@ -251,7 +252,7 @@ export default function CreateOrderDialog({ onOpenChange, type, open, initialDat
           Save contact to address book
         </label>
       </div>}
-      submitText={isUpdate ? 'Update' : 'Save'}
+      submitText={isEdit ? 'Update' : 'Save'}
       isLoading={isUpdatePending || saveLoading}
     >
       <div className="flex-1 overflow-y-auto p-4 pt-0 custom-scrollbar">
@@ -350,9 +351,9 @@ export default function CreateOrderDialog({ onOpenChange, type, open, initialDat
                 onChange={val => updateField('email', val)}
                 layout="horizontal"
                 placeholder="Enter Email"
-              // required
-              // error={isSubmitting && (!formData.email?.trim() || !isEmailValid(formData.email))}
-              // errormsg={!formData.email?.trim() ? "Please enter your email" : "Please enter a valid email address"}
+                required
+                error={isSubmitting && (!formData.email?.trim() || !isEmailValid(formData.email))}
+                errormsg={!formData.email?.trim() ? "Please enter your email" : "Please enter a valid email address"}
               />
               <FormInput
                 label="Phone"
@@ -360,9 +361,9 @@ export default function CreateOrderDialog({ onOpenChange, type, open, initialDat
                 onChange={val => updateField('phone', val)}
                 layout="horizontal"
                 placeholder="Enter Phone"
-              // required
-              // error={isSubmitting && (!formData.phone?.trim() || !isPhoneValid(formData.phone))}
-              // errormsg={!formData.phone?.trim() ? "Please enter your phone" : "Please enter a valid phone number"}
+                required
+                error={isSubmitting && (!formData.phone?.trim() || !isPhoneValid(formData.phone))}
+                errormsg={!formData.phone?.trim() ? "Please enter your phone" : "Please enter a valid phone number"}
               />
               <div className="space-y-4">
                 <FormInput

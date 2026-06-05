@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { ArrowLeft, Link2Off, Loader2 } from 'lucide-react';
-import { useQueryClient } from '@tanstack/react-query';
+// import { useQueryClient } from '@tanstack/react-query';
 import {
   useConnectIntegration,
   useDisconnectIntegration,
@@ -16,7 +16,7 @@ import { cn } from '@/lib/utils';
 export default function CarrierConfigPage() {
   const navigate = useNavigate();
   const { slug } = useParams<{ slug: string }>();
-  const queryClient = useQueryClient();
+  // const queryClient = useQueryClient();
   const [isLoading, setIsLoading] = useState(false);
   const [formData, setFormData] = useState<any>({});
   const [fetchingData, setFetchingData] = useState(true);
@@ -33,6 +33,7 @@ export default function CarrierConfigPage() {
   );
   const logoUrl = carrierIntegration?.logo_url;
   const carrierName = carrierIntegration?.name || currentSlug;
+  const isConnected = formData?.connected ?? carrierIntegration?.connected;
 
   useEffect(() => {
     setFetchingData(true);
@@ -52,8 +53,11 @@ export default function CarrierConfigPage() {
     connectMutation.mutate({ provider: currentSlug, data }, {
       onSuccess: () => {
         setIsLoading(false);
-        queryClient.invalidateQueries({ queryKey: ["integration-status", currentSlug] });
-        navigate('/settings/carriers');
+        getIntegrationStatus(currentSlug, {
+          onSuccess: (response) => {
+            setFormData(response.data || {});
+          }
+        });
       },
       onError: () => {
         setIsLoading(false);
@@ -64,8 +68,13 @@ export default function CarrierConfigPage() {
   const handleDisconnect = () => {
     disconnectMutation.mutate(currentSlug, {
       onSuccess: () => {
-        queryClient.invalidateQueries({ queryKey: ["integration-status", currentSlug] });
-        navigate('/settings/carriers');
+        // queryClient.invalidateQueries({ queryKey: ["integration-status", currentSlug] });
+        getIntegrationStatus(currentSlug, {
+          onSuccess: (response) => {
+            setFormData(response.data || {});
+          }
+        });
+        // navigate('/settings/carriers');
       }
     });
   };
@@ -73,7 +82,7 @@ export default function CarrierConfigPage() {
   return (
     <div className="rounded-sm shadow-sm flex flex-col gap-6 min-h-[calc(100vh-120px)]">
       {/* Top Header Bar */}
-      <div className='min-h-[calc(100vh-120px)] bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-800 p-page-padding rounded-sm flex flex-col flex-1'>
+      <div className='min-h-[calc(100vh-120px)] bg-white dark:bg-zinc-900 border border-gray-250 dark:border-zinc-800 p-page-padding rounded-sm flex flex-col flex-1'>
         <div className="flex flex-col gap-4 pb-4 border-b border-gray-100 dark:border-zinc-800">
           <div className="flex items-center justify-between">
             <Button
@@ -86,7 +95,7 @@ export default function CarrierConfigPage() {
               Back
             </Button>
 
-            {carrierIntegration?.connected && (
+            {isConnected && (
               <Button
                 variant="outline"
                 size="sm"
@@ -122,15 +131,15 @@ export default function CarrierConfigPage() {
                     Configure {carrierName}
                   </h1>
                   <Badge
-                    variant={carrierIntegration?.connected ? "default" : "secondary"}
+                    variant={isConnected ? "default" : "secondary"}
                     className={cn(
                       "font-semibold text-[11px] uppercase leading-none tracking-wider py-1 px-2.5 rounded-full border shrink-0 mt-0.5",
-                      carrierIntegration?.connected
+                      isConnected
                         ? "bg-emerald-50 text-emerald-600 border-emerald-100 dark:bg-emerald-900/20 dark:text-emerald-400 dark:border-emerald-900/30"
                         : "bg-slate-50 text-slate-400 border-slate-100 dark:bg-zinc-900 dark:text-zinc-500 dark:border-zinc-800"
                     )}
                   >
-                    {carrierIntegration?.connected ? "Connected" : "Not Connected"}
+                    {isConnected ? "Connected" : "Not Connected"}
                   </Badge>
                 </div>
                 <p className="my-0 text-sm text-slate-500 dark:text-zinc-400 leading-normal mt-1">
@@ -152,6 +161,7 @@ export default function CarrierConfigPage() {
             initialValues={formData}
             onSubmit={handleConnect}
             isLoading={isLoading}
+            isConnected={isConnected}
           />
         )}
       </div>

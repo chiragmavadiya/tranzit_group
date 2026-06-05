@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect, useMemo } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { Loader2 } from 'lucide-react';
 import { CustomModel, } from '@/components/ui/dialog';
 import { Switch } from '@/components/ui/switch';
@@ -39,13 +39,13 @@ export function CreateItemDialog({
     setFormData((prev) => ({ ...prev, [field]: value }));
   }, []);
 
-  const calculatedVolume = useMemo(() => {
-    const l = Number(formData.item_length)
-    const w = Number(formData.item_width)
-    const h = Number(formData.item_height)
-    if (!l || !w || !h) return ""
-    return (l * w * h / 1000000).toFixed(3) // cm³ → m³
-  }, [formData.item_length, formData.item_width, formData.item_height])
+  // const calculatedVolume = useMemo(() => {
+  //   const l = Number(formData.item_length)
+  //   const w = Number(formData.item_width)
+  //   const h = Number(formData.item_height)
+  //   if (!l || !w || !h) return ""
+  //   return ((l * w * h * 250) / 1000000).toFixed(3) // cm³ → m³
+  // }, [formData.item_length, formData.item_width, formData.item_height])
 
   const handleSubmit = useCallback((e?: React.FormEvent) => {
     if (e) e.preventDefault();
@@ -56,12 +56,12 @@ export function CreateItemDialog({
     }
     const submissionData = {
       ...formData,
-      item_cubic: Number(calculatedVolume),
+      // item_cubic: Number(calculatedVolume),
       is_default: formData.is_default ? "on" : "off"
     } as ItemFormData;
 
     onSubmit(submissionData);
-  }, [formData, onSubmit, calculatedVolume]);
+  }, [formData, onSubmit]);
 
 
 
@@ -196,10 +196,11 @@ export function CreateItemDialog({
                 <FormInput
                   type="number"
                   step="0.0001"
-                  label="Item Cubic (Volume m³)"
-                  value={calculatedVolume}
-                  readOnly
-                  disabled
+                  label="Item Cubic"
+                  value={formData.item_cubic || ''}
+                  // readOnly
+                  // disabled
+                  min={0}
                   onChange={(val) => handleChange('item_cubic', Number(val))}
                   placeholder="0.0000"
                 // required

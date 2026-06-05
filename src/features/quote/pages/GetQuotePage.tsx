@@ -48,14 +48,15 @@ export default function GetQuotePage() {
   const [quoteData, setQuoteData] = useState<any>({});
 
   const calculation = useMemo(() => {
-    const totalItems = itemsData?.reduce((acc, item) => acc + (Number(item.quantity) || 1), 0) || 0;
+    // const totalItems = itemsData?.reduce((acc, item) => acc + (Number(item.quantity) || 1), 0) || 0;
+    const totalItems = itemsData?.length;
     const totalWeight = itemsData?.reduce((acc, item) => acc + (Number(item.weight) * (Number(item.quantity) || 1)), 0) || 0;
     const volumetric = itemsData?.reduce((acc, item) => {
       const w = Number(item.width) || 0;
       const h = Number(item.height) || 0;
       const l = Number(item.length) || 0;
       const q = Number(item.quantity) || 1;
-      return acc + ((w * h * l) / 5000) * q;
+      return acc + ((w * h * l * 250) / 1000000) * q;
     }, 0) || 0;
 
     const servicePrice = quoteData?.courier?.base || quoteData?.subtotal || 0;

@@ -45,6 +45,10 @@ const ImportOrdersDialog = ({
         showToast('Please select a valid CSV file', 'error');
         return;
       }
+      if (file.size > 5 * 1024 * 1024) {
+        showToast('File size must be less than 5MB', 'error');
+        return;
+      }
       setSelectedFile(file);
     }
   };
@@ -161,7 +165,10 @@ const ImportOrdersDialog = ({
               <div className="w-10 h-10 rounded-full bg-gray-50 dark:bg-zinc-800 flex items-center justify-center border border-gray-100 dark:border-zinc-700">
                 <Plus className="w-5 h-5 text-slate-400" />
               </div>
-              <span className="text-sm font-bold text-slate-600 dark:text-zinc-400 tracking-wide text-[12px]">Upload File</span>
+              <div className="flex flex-col items-center gap-1">
+                <span className="text-sm font-bold text-slate-600 dark:text-zinc-400 tracking-wide text-[12px]">Upload File</span>
+                <span className="text-[11px] text-slate-400 dark:text-zinc-500 font-medium">CSV up to 5MB</span>
+              </div>
             </>
           )}
         </div>

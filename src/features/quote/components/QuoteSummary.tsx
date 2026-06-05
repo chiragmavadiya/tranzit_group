@@ -97,19 +97,19 @@ export const QuoteSummary = memo(({
           <span className="font-semibold text-slate-700 dark:text-zinc-200">{formatCurrency(calculation?.totalSurcharges || 0)}</span>
         </div>
 
-        {isAdmin && calculation?.margin && Number(calculation?.margin) > 0 && (
+        {isAdmin && calculation?.margin && (Number(calculation?.margin) > 0) ? (
           <div className="flex justify-between items-center text-sm">
             <span className="text-primary font-bold">Admin Margin</span>
             <span className="font-bold text-primary">{formatCurrency(calculation?.margin || 0)}</span>
           </div>
-        )}
+        ) : null}
 
-        {isAdmin && calculation?.pickupCharge && Number(calculation?.pickupCharge) > 0 && (
+        {isAdmin && calculation?.pickupCharge && (Number(calculation?.pickupCharge) > 0) ? (
           <div className="flex justify-between items-center text-sm">
             <span className="text-primary font-bold">Pickup Charges</span>
             <span className="font-bold text-primary">{formatCurrency(calculation?.pickupCharge || 0)}</span>
           </div>
-        )}
+        ) : null}
 
         <div className="h-px bg-slate-100 dark:bg-zinc-800 my-2" />
         <div className="flex justify-between items-center">

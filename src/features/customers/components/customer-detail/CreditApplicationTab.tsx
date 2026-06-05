@@ -8,11 +8,11 @@ import { useState } from 'react';
 
 export const CreditApplicationTab = () => {
     const [formData, setFormData] = useState({
-        registeredName: 'Shikhar',
-        acn: '78454541545455',
-        abn: '12345678945',
-        tradingAs: 'SHIKHAR DIGISITE',
-        businessType: 'Sole Trader'
+        registeredName: '',
+        acn: '',
+        abn: '',
+        tradingAs: '',
+        businessType: ''
     });
 
     return (

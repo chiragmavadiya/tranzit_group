@@ -91,7 +91,7 @@ export default function Sidebar({ isCollapsed, setIsCollapsed }: SidebarProps) {
           <div className="flex flex-col pt-2 animate-in slide-in-from-left-4 duration-300">
             <button
               onClick={handleBackToMainMenu}
-              className="flex items-center gap-2 px-4 py-2 text-[13px] text-gray-500 dark:text-zinc-400 hover:text-gray-900 dark:hover:text-zinc-100 transition-colors"
+              className="flex items-center cursor-pointer gap-2 px-4 py-2 text-[13px] text-gray-500 dark:text-zinc-400 hover:text-gray-900 dark:hover:text-zinc-100 transition-colors"
             >
               <ArrowLeft className="w-4 h-4" />
               <span>Back to main menu</span>

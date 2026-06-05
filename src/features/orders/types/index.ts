@@ -82,6 +82,7 @@ export interface CreateOrderDialogProps {
   isEdit: boolean;
   orderId?: string;
   isUpdate?: boolean;
+  hasDefaultItemAndCourier?: boolean;
 }
 
 export interface WalletCheckDialogProps {

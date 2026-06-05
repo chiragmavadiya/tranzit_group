@@ -224,6 +224,7 @@ const OrderDetailsPage: React.FC = () => {
     onCancelOrder,
     handleConsign,
     downloadLabel,
+    hasDefaultItemAndCourier,
   } = useOrderWorkflow();
 
   const [showConsignConfirm, setShowConsignConfirm] = useState(false);
@@ -420,7 +421,6 @@ const OrderDetailsPage: React.FC = () => {
                 orderType={orderType}
                 customerId={selectedCustomer}
               />
-
               {orderType !== 'create-menual' && (
                 <CarrierCard
                   itemData={itemsData}
@@ -430,6 +430,7 @@ const OrderDetailsPage: React.FC = () => {
                   orderDetail={orderDetail}
                   orderType={orderType!}
                   module="order"
+                  initialSelectedCourierId={orderDetail?.courier_details?.product_id || '' + (orderDetail?.courier_details?.courier_code)}
                 />
               )}
               {!isCreate && (
@@ -473,6 +474,7 @@ const OrderDetailsPage: React.FC = () => {
             initialData={addressData[orderDialogMode]}
             isEdit={isEdit}
             orderId={orderID}
+            hasDefaultItemAndCourier={hasDefaultItemAndCourier}
 
           />
         )}

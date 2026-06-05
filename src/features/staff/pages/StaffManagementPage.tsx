@@ -263,21 +263,21 @@ export default function StaffManagementPage() {
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 print:hidden">
         <StatCard
           label="Total Users"
-          value={totalUsers.toString()}
+          value={totalUsers || 0}
           icon={Users}
           color="bg-blue-50 dark:bg-blue-900/20 text-blue-500"
           className='py-1'
         />
         <StatCard
           label="Active Users"
-          value={activeUsers.toString()}
+          value={activeUsers || 0}
           icon={UserCheck}
           color="bg-green-50 dark:bg-green-900/20 text-green-500"
           className='py-1'
         />
         <StatCard
           label="Inactive Users"
-          value={pendingUsers.toString()}
+          value={pendingUsers || 0}
           icon={UserSearch}
           color="bg-orange-50 dark:bg-orange-900/20 text-orange-500"
           className='py-1'

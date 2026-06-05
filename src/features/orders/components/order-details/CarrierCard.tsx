@@ -18,12 +18,13 @@ interface CarrierCardProps {
   orderDetail?: any;
   module?: string;
   orderType?: string
+  initialSelectedCourierId?: string
 }
 
 export const CarrierCard: React.FC<CarrierCardProps> = memo((props) => {
-  const { itemData, addresses, onQuoteChange, setCourierData, orderDetail, module, orderType = 'create' } = props
+  const { itemData, addresses, onQuoteChange, setCourierData, orderDetail, module, orderType = 'create', initialSelectedCourierId = '' } = props
   const { role } = useAppSelector((state) => state.auth);
-  const [selectedServiceId, setSelectedServiceId] = useState<string>('')
+  const [selectedServiceId, setSelectedServiceId] = useState<string>(initialSelectedCourierId || '')
   const [couriers, setCouriers] = useState<any[]>([]);
   const [surchargesMap, setSurchargesMap] = useState<Record<string, any[]>>({});
   const [selectedSurchargesMap, setSelectedSurchargesMap] = useState<Record<string, string[]>>({});
@@ -31,7 +32,7 @@ export const CarrierCard: React.FC<CarrierCardProps> = memo((props) => {
   const [copiedTracking, setCopiedTracking] = useState(false);
   // const [authorityToLeave, setAuthorityToLeave] = useState<boolean>(false);
   // const [signatureRequired, setSignatureRequired] = useState<boolean>(false);
-
+  console.log(initialSelectedCourierId, 'initialSelectedCourierId')
   const handleCopyTracking = (text: string) => {
     navigator.clipboard.writeText(text);
     setCopiedTracking(true);
@@ -69,6 +70,10 @@ export const CarrierCard: React.FC<CarrierCardProps> = memo((props) => {
         getServiceTotalPrice(curr) < getServiceTotalPrice(min) ? curr : min
       );
       setBestDeal(minItem.product_id || minItem.courierCode || '');
+      if (initialSelectedCourierId) {
+        setSelectedServiceId(initialSelectedCourierId);
+        return;
+      }
       const selectedFromQuote = sessionStorage.getItem('quote_courier');
       if (selectedFromQuote) {
         const courier = JSON.parse(selectedFromQuote);
@@ -145,6 +150,7 @@ export const CarrierCard: React.FC<CarrierCardProps> = memo((props) => {
           // signatureRequired
         });
         setCourierData?.({
+          courierCode: selectedCourier.courierCode,
           courier: selectedCourier.carrier_id,
           product_id: selectedCourier.product_id,
           product_type: selectedCourier.product_type,
@@ -240,7 +246,7 @@ export const CarrierCard: React.FC<CarrierCardProps> = memo((props) => {
                 // Map additional charges by courierCode
                 const courierSurcharges = surchargesMap[courier.courierCode] || [];
                 const selectedNames = selectedSurchargesMap[courier.courierCode] ?? [];
-
+                console.log(initialSelectedCourierId, 'initialSelectedCourierId', serviceId, 'serviceId')
                 const isSelected = selectedServiceId === serviceId
 
                 if (courier.success === false) {

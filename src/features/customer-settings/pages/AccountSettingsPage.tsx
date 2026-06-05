@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
-import { User, Edit2, Trash2, Map } from 'lucide-react';
+import { Edit2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { FormInput, FormSelect } from '@/features/orders/components/OrderFormUI';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
@@ -9,8 +9,9 @@ import { showToast } from '@/components/ui/custom-toast';
 import { PlaceAutocomplete } from '@/components/common/AutoComplateAddress';
 import { useAppSelector } from '@/hooks/store.hooks';
 import SubscriptionPlanModal from '../components/SubscriptionPlanModal';
-import { CreateAddressDialog } from '@/features/address-book/components/CreateAddressDialog';
 import { STATES } from '@/constants';
+// import { CreateAddressDialog } from '@/features/address-book/components/CreateAddressDialog';
+// import { STATES } from '@/constants';
 
 const cardVariants = {
   hidden: { opacity: 0, y: 20 },
@@ -60,8 +61,8 @@ export default function AccountSettingsPage() {
     newPassword: '',
     confirmPassword: '',
   });
-  const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const [editingAddressId, setEditingAddressId] = useState<string | null>(null);
+  // const [isDialogOpen, setIsDialogOpen] = useState(false);
+  // const [editingAddressId, setEditingAddressId] = useState<string | null>(null);
 
 
 
@@ -365,8 +366,7 @@ export default function AccountSettingsPage() {
           </Card>
         </motion.div>
 
-        {/* Sender Address Card */}
-        <motion.div custom={3} initial="hidden" animate="visible" variants={cardVariants} className="flex">
+        {/* <motion.div custom={3} initial="hidden" animate="visible" variants={cardVariants} className="flex">
           <Card className="flex flex-col w-full transition-shadow duration-300 border-gray-200/60">
             <CardHeader className="flex flex-row items-center justify-between px-6 py-4 border-b border-gray-100 dark:border-zinc-800 bg-slate-50/30 dark:bg-zinc-950 space-y-0 rounded-t-md">
               <CardTitle className="text-[15px] font-medium text-gray-800 dark:text-zinc-200">Sender Address</CardTitle>
@@ -384,13 +384,11 @@ export default function AccountSettingsPage() {
             <CardContent className="p-0 flex-1">
               <div className='space-y-4 p-4 pt-0'>
                 <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between hover:bg-gray-50/50 dark:hover:bg-zinc-900/50 transition-colors gap-4 sm:gap-0">
-                  {/* Left: User/Name */}
                   <div className="flex items-center gap-2 min-w-[120px]">
                     <User className="w-4 h-4 text-slate-400" />
                     <span className="text-[11px] font-medium bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-300 px-2 py-0.5 rounded-sm">Test</span>
                   </div>
 
-                  {/* Middle: Address & Default Badge */}
                   <div className="flex items-center gap-2 flex-1 justify-center text-center">
                     <Map className="w-4 h-4 text-[#5D6B98] shrink-0" />
                     <span className="text-[13px] font-medium text-[#5D6B98] uppercase tracking-wide">
@@ -399,7 +397,6 @@ export default function AccountSettingsPage() {
                     <span className="text-[10px] font-medium bg-orange-100 text-orange-600 px-2 py-0.5 rounded-sm ml-2 shrink-0">default</span>
                   </div>
 
-                  {/* Right: Actions */}
                   <div className="flex items-center gap-3 min-w-[80px] justify-end">
                     <button className="text-blue-500 cursor-pointer hover:text-blue-600 transition-colors" onClick={() => {
                       setEditingAddressId('');
@@ -414,13 +411,11 @@ export default function AccountSettingsPage() {
                   </div>
                 </div>
                 <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between hover:bg-gray-50/50 dark:hover:bg-zinc-900/50 transition-colors gap-4 sm:gap-0">
-                  {/* Left: User/Name */}
                   <div className="flex items-center gap-2 min-w-[120px]">
                     <User className="w-4 h-4 text-slate-400" />
                     <span className="text-[11px] font-medium bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-300 px-2 py-0.5 rounded-sm">Test</span>
                   </div>
 
-                  {/* Middle: Address & Default Badge */}
                   <div className="flex items-center gap-2 flex-1 justify-center text-center">
                     <Map className="w-4 h-4 text-[#5D6B98] shrink-0" />
                     <span className="text-[13px] font-medium text-[#5D6B98] uppercase tracking-wide">
@@ -429,7 +424,6 @@ export default function AccountSettingsPage() {
                     <span className="text-[10px] font-medium bg-orange-100 text-orange-600 px-2 py-0.5 rounded-sm ml-2 shrink-0">default</span>
                   </div>
 
-                  {/* Right: Actions */}
                   <div className="flex items-center gap-3 min-w-[80px] justify-end">
                     <button className="text-blue-500 cursor-pointer hover:text-blue-600 transition-colors" onClick={() => {
                       setEditingAddressId('');
@@ -446,7 +440,7 @@ export default function AccountSettingsPage() {
               </div>
             </CardContent>
           </Card>
-        </motion.div>
+        </motion.div> */}
 
       </div>
 
@@ -515,7 +509,7 @@ export default function AccountSettingsPage() {
           onOpenChange={setIsPlanModalOpen}
         />
       )}
-
+      {/* 
       {isDialogOpen && (
 
         <CreateAddressDialog
@@ -526,7 +520,7 @@ export default function AccountSettingsPage() {
           editingAddressId={editingAddressId}
           isLoading={false}
         />
-      )}
+      )} */}
     </div>
   );
 }

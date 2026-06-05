@@ -2,7 +2,7 @@ import type { Column } from '@/components/common/types/DataTable.types';
 import type { HelpArticle } from './types';
 import { Button } from '@/components/ui/button';
 import { Pencil, Trash2 } from 'lucide-react';
-import { format } from 'date-fns';
+// import { format } from 'date-fns';
 import { Badge } from '@/components/ui/badge';
 
 export const ARTICLE_COLUMNS = (
@@ -53,7 +53,7 @@ export const ARTICLE_COLUMNS = (
       sortable: true,
       cell: (val) => (
         <span className="text-slate-500 dark:text-zinc-500 font-medium">
-          {val ? format(new Date(val as string), "dd MMM yyyy, hh:mm a") : 'N/A'}
+          {val || 'N/A'}
         </span>
       ),
     },

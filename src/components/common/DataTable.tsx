@@ -279,7 +279,7 @@ const DataTableComponent = <T extends Record<string, any>>(props: DataTableProps
                   className={cn(
                     "h-12 text-[14px] font-bold text-gray-900 dark:text-zinc-100 uppercase tracking-wider px-5",
                     column.sortable !== false && sortable && "cursor-pointer hover:bg-muted/50",
-                    // column.sticky === 'left' && "sticky left-0 bg-background z-20",
+                    column.sticky === 'left' && "sticky left-0 bg-background z-20 border-r border-muted-foreground",
                     // column.sticky === 'right' && "sticky right-0 bg-background z-20",
                     column.className,
                     column.noPrint && 'print:hidden'
@@ -342,7 +342,7 @@ const DataTableComponent = <T extends Record<string, any>>(props: DataTableProps
                         key={`${column.key}-${rowId}-${colIndex}`}
                         className={cn(
                           `px-5 py-3 text-sm  text-gray-800 dark:text-zinc-300 whitespace-normal capitalize`,
-                          // column.sticky === 'left' && "sticky left-0 bg-white",
+                          column.sticky === 'left' && "sticky left-0 bg-red-200  border-r border-muted-foreground",
                           // column.sticky === 'right' && "sticky right-0 bg-white",
                           isSelected && "font-semibold",
                           column.className,

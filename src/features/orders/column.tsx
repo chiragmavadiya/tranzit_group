@@ -66,7 +66,7 @@ export const getOrdersColumns = (
         header: 'ORDER #',
         key: 'order_number',
         className: 'text-primary font-bold',
-        // sticky: 'left',
+        sticky: 'left',
         cell: (value: string) => (
           <NavLink to={`${role === "admin" ? "/admin" : ""}/orders/${(orderType === 'new' && !fromCustomer) ? 'consign' : 'view'}/${value}`} className="font-bold text-primary underline">
             {value}

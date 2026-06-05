@@ -17,7 +17,7 @@ export const getOrdersColumns = (
   navigate: any,
   customerEditClick: (id: string) => void,
   onDownloadLabel?: (orderId: string) => void,
-  _onCancelOrder?: (orderId: string) => void,
+  onCancelOrder?: (orderId: string) => void,
   downloadingLabelId?: string | null,
   fromCustomer: boolean = false,
   onArchiveOrder?: (orderId: string) => void,
@@ -52,6 +52,14 @@ export const getOrdersColumns = (
       // icon: Eye,
     },
     {
+      label: "Cancel order",
+      onClick: () => {
+        onCancelOrder?.(value);
+      },
+      // variant: "destructive" as const,
+      className: "font-medium hover:text"
+    },
+    {
       label: "Archive order",
       onClick: () => {
         onArchiveOrder?.(value);
@@ -59,6 +67,7 @@ export const getOrdersColumns = (
       variant: "destructive" as const,
       className: "text-red-600 dark:text-red-400 font-medium"
     },
+
   ]
   return (
     [
@@ -140,6 +149,7 @@ export const getOrdersColumns = (
       {
         header: "",
         key: "order_number",
+        sticky: 'right',
         cell: (value: string) => (
           <div className="flex gap-2" onClick={(e) => e.stopPropagation()}>
             {fromCustomer ? (

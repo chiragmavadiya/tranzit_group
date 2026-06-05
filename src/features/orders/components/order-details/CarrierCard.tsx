@@ -22,7 +22,7 @@ interface CarrierCardProps {
 }
 
 export const CarrierCard: React.FC<CarrierCardProps> = memo((props) => {
-  const { itemData, addresses, onQuoteChange, setCourierData, orderDetail, module, orderType = 'create', initialSelectedCourierId = '' } = props
+  const { itemData, addresses, onQuoteChange, setCourierData, orderDetail, module, orderType = 'create', initialSelectedCourierId = null } = props
   const { role } = useAppSelector((state) => state.auth);
   const [selectedServiceId, setSelectedServiceId] = useState<string>(initialSelectedCourierId || '')
   const [couriers, setCouriers] = useState<any[]>([]);
@@ -32,7 +32,7 @@ export const CarrierCard: React.FC<CarrierCardProps> = memo((props) => {
   const [copiedTracking, setCopiedTracking] = useState(false);
   // const [authorityToLeave, setAuthorityToLeave] = useState<boolean>(false);
   // const [signatureRequired, setSignatureRequired] = useState<boolean>(false);
-  console.log(initialSelectedCourierId, 'initialSelectedCourierId')
+  console.log(initialSelectedCourierId, 'initialSelectedCourierId 123')
   const handleCopyTracking = (text: string) => {
     navigator.clipboard.writeText(text);
     setCopiedTracking(true);
@@ -70,15 +70,19 @@ export const CarrierCard: React.FC<CarrierCardProps> = memo((props) => {
         getServiceTotalPrice(curr) < getServiceTotalPrice(min) ? curr : min
       );
       setBestDeal(minItem.product_id || minItem.courierCode || '');
-      if (initialSelectedCourierId) {
+      if (initialSelectedCourierId !== undefined && initialSelectedCourierId !== null && initialSelectedCourierId !== '') {
+        console.log("set service 1", initialSelectedCourierId, initialSelectedCourierId !== undefined && initialSelectedCourierId !== null && initialSelectedCourierId !== '')
         setSelectedServiceId(initialSelectedCourierId);
         return;
       }
+      console.log("set service 2")
       const selectedFromQuote = sessionStorage.getItem('quote_courier');
       if (selectedFromQuote) {
+        console.log("set service 3")
         const courier = JSON.parse(selectedFromQuote);
         setSelectedServiceId(courier.courier.product_id + courier.courier.courierCode || '');
       } else if (!selectedServiceId) {
+        console.log("set service 4")
         setSelectedServiceId(minItem.product_id + minItem.courierCode || '');
       }
       // if (!selectedServiceId)
@@ -273,7 +277,7 @@ export const CarrierCard: React.FC<CarrierCardProps> = memo((props) => {
                     onClick={() => setSelectedServiceId(serviceId)}
                     className={`relative flex flex-col p-4 rounded-xl border-2 cursor-pointer transition-all duration-200 ${isSelected
                       ? 'border-primary bg-primary/5 dark:bg-primary/10'
-                      : 'border-transparent bg-white dark:bg-zinc-900 hover:border-gray-200 dark:hover:border-zinc-700 shadow-sm'
+                      : 'border-slate-200 border! bg-white dark:bg-zinc-900 hover:border-gray-200 dark:hover:border-zinc-700 shadow-sm'
                       }`}
                   >
                     {/* Recommended Badge (Example logic: lowest price) */}

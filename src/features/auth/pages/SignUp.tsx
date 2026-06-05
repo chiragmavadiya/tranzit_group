@@ -59,7 +59,6 @@ export default function SignUp() {
 
   const isValid = useMemo(() => Object.keys(errors).length === 0, [errors]);
 
-  console.log(errors)
   const updateValue = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value, type, checked } = e.target;
     setData((prev) => ({

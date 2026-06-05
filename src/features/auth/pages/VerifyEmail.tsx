@@ -68,7 +68,7 @@ export default function VerifyEmail() {
       }
     });
   };
-  console.log("render verify email")
+
   return (
     <>
       <div className="flex flex-col items-center text-center space-y-2 mb-8">
@@ -113,7 +113,6 @@ export default function VerifyEmail() {
           variant={'ghost'}
           className="text-[14px] cursor-pointer mt-0"
           onClick={() => {
-            console.log("logout");
             handleLogout();
           }}
           disabled={logoutMutation.isPending}

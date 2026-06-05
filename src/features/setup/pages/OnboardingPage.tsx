@@ -138,7 +138,6 @@ export default function OnboardingPage() {
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
-    console.log("HANDLE SUBMIT")
     e.preventDefault();
     setIsSubmitted(true);
     if (!/^\d{10}$/.test(formData.mobile.replace(/\s/g, ''))) {
@@ -171,7 +170,6 @@ export default function OnboardingPage() {
         if (response.status) {
           showToast("Onboarding completed successfully", "success");
           // dispatch(setCredentials({ userID: response?.data?.user_id, token: token || '', role: 'customer', next_step: 'dashboard' }));
-          console.log("Redirect to order page 1")
           setTimeout(() => {
             navigate('/orders');
           }, 100);

@@ -400,7 +400,6 @@ const OrderDetailsPage: React.FC = () => {
                 onEditClick={() => onEditClick('sender')}
                 phone={addressData.sender.phone}
               />
-              {console.log(addressData.receiver, 'addressData.receiver')}
               <AddressCard
                 title="RECEIVER"
                 name={addressData.receiver.name}

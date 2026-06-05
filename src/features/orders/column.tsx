@@ -111,10 +111,10 @@ export const getOrdersColumns = (
         cell: (value: string, row: Order) => (
           <div className="flex items-center gap-1">
             <div>
-              <img src={row?.courier_logo || row?.courier_logo_url} className="h-6" alt="" />
+              <img src={row?.courier_logo || row?.courier_logo_url} className="h-6" alt="-" />
             </div>
             <div className="flex flex-col">
-              <span className="font-medium">{value !== 'unknown' ? value : '-'}</span>
+              <span className="font-medium">{value || '-'}</span>
               {row.product_id && <span className="font-normal text-sm">Product - {row.product_id}</span>}
             </div>
           </div>

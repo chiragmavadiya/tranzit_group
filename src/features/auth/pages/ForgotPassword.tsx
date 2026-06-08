@@ -23,7 +23,7 @@ export default function ForgotPassword() {
           <img src={brandlogo} alt="Logo" className="h-16 w-auto" />
         </div>
 
-        <h2 className="text-2xl font-black tracking-tight text-slate-900 dark:text-white">
+        <h2 className="text-2xl font-black text-slate-900 dark:text-white">
           Reset Password
         </h2>
         <p className="text-sm font-medium text-slate-500 dark:text-slate-400">

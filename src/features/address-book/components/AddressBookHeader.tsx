@@ -16,7 +16,7 @@ export function AddressBookHeader({ onAddAddress }: AddressBookHeaderProps) {
           className="global-btn"
         >
           <Plus className="w-4 h-4" />
-          <span className="text-xs uppercase tracking-wider font-bold">Add Address</span>
+          <span className="text-xs uppercase tracking-wide font-bold">Add Address</span>
         </Button>
       </div>
     </div>

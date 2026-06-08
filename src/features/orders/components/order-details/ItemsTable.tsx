@@ -1,5 +1,5 @@
 import React, { useMemo } from 'react'
-import { Box, Plus, Trash2, Package, Scale, Ruler } from 'lucide-react'
+import { Box, Plus, Trash2, Package, Scale, Ruler, Weight } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 // import SelectComponent from '@/components/ui/select'
 import { Input } from '@/components/ui/input'
@@ -62,6 +62,10 @@ export const ItemsTable: React.FC<ItemsTableProps> = React.memo(({
     return items?.reduce((sum, item) => sum + ((Number(item.weight) || 0) * (Number(item.quantity) || 0)), 0) || 0;
   }, [items]);
 
+  const totalVolumetricWeight = useMemo(() => {
+    return items?.reduce((sum, item) => sum + (((Number(item.length) || 0) * (Number(item.width) || 0) * (Number(item.height) || 0) * 250) / 1000000), 0) || 0;
+  }, [items]);
+
   const handlePredefinedItemSelect = (index: number, itemIdStr: string) => {
     if (!onFullUpdateItem) return;
 
@@ -88,11 +92,11 @@ export const ItemsTable: React.FC<ItemsTableProps> = React.memo(({
           <div className="flex items-center w-full justify-between ">
             <div className="flex items-center gap-2 text-gray-600 dark:text-zinc-300">
               <Box className="w-5 h-5" />
-              <h3 className="my-0 text-base font-semibold text-gray-800 dark:text-zinc-100 uppercase">Items {items.length > 0 && ` (${items.length})`}
+              <h3 className="my-0 text-base font-semibold text-gray-900 dark:text-zinc-100 uppercase ">Parcel Details {items.length > 0 && ` (${items.length})`}
 
                 {items.length > 0 && (
-                  <span className="inline-flex group-aria-expanded/accordion-trigger:hidden normal-case font-medium text-xs  dark:text-zinc-500 ml-2 pt-0.5">
-                    • {totalQuantity} {totalQuantity === 1 ? 'Parcel' : 'Parcels'} • Total Weight: {totalWeight.toFixed(2)} kg
+                  <span className="inline-flex group-aria-expanded/accordion-trigger:hidden normal-case font-medium text-xs  dark:text-zinc-500 ml-2 pt-0.5 leading-relaxed">
+                    • {totalQuantity} {totalQuantity === 1 ? 'Parcel' : 'Parcels'} • Total Weight: {totalWeight.toFixed(2)} kg • Total Volumetric Weight: {totalVolumetricWeight.toFixed(2)} kg
                   </span>
                 )}
               </h3>
@@ -115,7 +119,7 @@ export const ItemsTable: React.FC<ItemsTableProps> = React.memo(({
                 className="hidden group-aria-expanded/accordion-trigger:flex h-8 mr-3 gap-1.5 text-[12px] border-slate-200 pt-px dark:border-zinc-800 hover:bg-slate-50 dark:hover:bg-zinc-900 font-medium"
               >
                 <Plus className="w-3.5 h-3.5" />
-                Add item
+                Add Parcel
               </Button>
             )}
           </div>
@@ -140,7 +144,7 @@ export const ItemsTable: React.FC<ItemsTableProps> = React.memo(({
                               <Package className="w-4 h-4" />
                             </div>
                             <div>
-                              <div className="text-xs font-bold text-gray-400 uppercase tracking-wider">Type</div>
+                              <div className="text-xs font-bold text-gray-400 uppercase tracking-wider">Packing Type</div>
                               <div className="text-sm font-bold text-gray-900 dark:text-zinc-100">
                                 {item.type === 'my_item' ? (
                                   predefinedItems.find(i => i.id.toString() === item.item_id?.toString())?.item_name || 'My Item'
@@ -188,7 +192,7 @@ export const ItemsTable: React.FC<ItemsTableProps> = React.memo(({
                         <div className={`flex items-end gap-3 pb-4 ${idx !== items.length - 1 ? 'border-b border-gray-100 dark:border-zinc-800' : ''}`}>
                           {/* Type Selection */}
                           <div className="flex flex-col gap-1 w-[180px] shrink-0">
-                            <Label className="text-[12px] font-medium text-gray-600 dark:text-zinc-400">Type</Label>
+                            <Label className="text-[12px] font-medium text-gray-600 dark:text-zinc-400">Packing Type</Label>
                             {/* <SelectComponent
                               value={item.type || 'box'}
                               onValueChange={(val) => onUpdateItem?.(idx, 'type', val!)}
@@ -203,6 +207,7 @@ export const ItemsTable: React.FC<ItemsTableProps> = React.memo(({
                               // label='Type'
                               options={[
                                 { label: 'Parcel', value: 'box' },
+                                { label: 'Pallet', value: 'pallet' },
                                 { label: 'My Items', value: 'my_item' }
                               ]}
                               value={item.type || 'box'}
@@ -318,7 +323,7 @@ export const ItemsTable: React.FC<ItemsTableProps> = React.memo(({
                     <div className="pt-4 border-t border-gray-100 dark:border-zinc-800/80 flex items-center justify-baseline gap-4 text-[13px] font-medium">
                       <div className="flex items-center gap-1 text-gray-500 dark:text-zinc-400">
                         <Box className="w-3.5 h-3.5 text-emerald-500 dark:text-emerald-400" />
-                        <span className='leading-none'>Total Qty:</span>
+                        <span className='leading-none'>Total Quantity:</span>
                         <span className="leading-none font-semibold text-gray-950 dark:text-zinc-100">
                           {totalQuantity} {totalQuantity === 1 ? 'Unit' : 'Units'}
                         </span>
@@ -329,6 +334,13 @@ export const ItemsTable: React.FC<ItemsTableProps> = React.memo(({
                         <span className='leading-none'>Total Weight:</span>
                         <span className="leading-none font-semibold text-gray-950 dark:text-zinc-100">
                           {totalWeight.toFixed(2)} kg
+                        </span>
+                      </div>
+                      <div className="flex items-center gap-1 text-gray-500 dark:text-zinc-400">
+                        <Weight className="w-3.5 h-3.5 text-orange-500 dark:text-orange-400" />
+                        <span className='leading-none'>Total Volumetric Weight:</span>
+                        <span className="leading-none font-semibold text-gray-950 dark:text-zinc-100">
+                          {totalVolumetricWeight.toFixed(2)} kg
                         </span>
                       </div>
                     </div>

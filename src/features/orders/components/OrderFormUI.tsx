@@ -67,7 +67,7 @@ export const FormInput = memo(React.forwardRef<HTMLInputElement, FormInputProps>
 
   return (
     <div className={cn(
-      isHorizontal ? "grid grid-cols-[120px_1fr] items-center gap-4" : "space-y-0",
+      isHorizontal ? "grid grid-cols-[160px_1fr] items-center gap-4" : "space-y-0",
       isFullWidth ? "col-span-12" : isHalf ? "col-span-12 md:col-span-6" : isCompact ? "col-span-6 md:col-span-3" : "col-span-12 md:col-span-6",
       className
     )}>
@@ -90,6 +90,7 @@ export const FormInput = memo(React.forwardRef<HTMLInputElement, FormInputProps>
           placeholder={placeholder}
           value={value}
           onChange={handleChange}
+          autoFocus={false}
           autoComplete="nope"
           className={cn(
             "h-8 rounded-sm border-slate-200 dark:border-zinc-800 bg-white dark:bg-zinc-950 font-normal focus-visible:ring-0 focus-visible:ring-primary focus-visible:border-primary transition-all placeholder:text-muted-foreground placeholder:font-normal dark:placeholder:text-zinc-700 text-sm",
@@ -139,12 +140,12 @@ export function FormTextarea({
   const isHorizontal = useMemo(() => layout === 'horizontal', [layout]);
 
   const handleChange = useCallback((e: React.ChangeEvent<HTMLTextAreaElement>) => {
-    onChange(e.target.value, e.target.name || '');
+    onChange?.(e.target.value, e.target.name || '');
   }, [onChange]);
 
   return (
     <div className={cn(
-      isHorizontal ? "grid grid-cols-[120px_1fr] items-start gap-4" : "space-y-2",
+      isHorizontal ? "grid grid-cols-[160px_1fr] items-start gap-4" : "space-y-2",
       isFullWidth ? "col-span-12" : "col-span-12 md:col-span-6"
     )}>
       {/* <Label className={cn(
@@ -208,7 +209,7 @@ export const FormSelect = memo(({
 
   return (
     <div className={cn(
-      isHorizontal ? "grid grid-cols-[120px_1fr] items-center gap-4" : "space-y-1",
+      isHorizontal ? "grid grid-cols-[160px_1fr] items-center gap-4" : "space-y-1",
       isHalf ? "col-span-12 md:col-span-6" : isCompact ? "col-span-6 md:col-span-3" : "col-span-12 md:col-span-6",
       className
     )}>
@@ -249,7 +250,7 @@ FormSelect.displayName = 'FormSelect';
 export function SummaryCard({ title, name, address, phone, isRight = false }: SummaryCardProps) {
   return (
     <div className={cn("space-y-2", isRight && "pl-8")}>
-      <span className="text-[10px] font-bold text-primary uppercase tracking-widest block mb-2">{title}</span>
+      <span className="text-[10px] font-bold text-primary uppercase tracking-wide block mb-2">{title}</span>
       <p className="text-lg font-bold text-slate-900 dark:text-zinc-100 leading-none">{name || '—'}</p>
       <p className="border-l-2 border-slate-100 dark:border-zinc-800 pl-4 py-1 text-sm text-slate-500 dark:text-zinc-400 mt-3 leading-relaxed">{address || 'No address provided'}</p>
       <p className="text-sm font-bold text-slate-400 dark:text-zinc-500 mt-3 tabular-nums">{phone || 'No phone provided'}</p>

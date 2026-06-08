@@ -69,8 +69,8 @@ export const QuoteForm = memo(({ locations, setLocations }: QuoteFormProps) => {
   return (
     <div className="space-y-4">
       {/* Addresses Section */}
-      <Card className="border-gray-200 ">
-        <CardHeader className="p-4 border-b border-gray-100 dark:border-zinc-800 bg-slate-50" >
+      <Card className="border-gray-200">
+        <CardHeader className="p-4 border-b border-gray-100 dark:border-zinc-800 " >
           <CardTitle className=" inline-flex items-center gap-2 text-base font-semibold text-slate-800 dark:text-zinc-100">
             <MapPin className="w-4 h-4 text-primary" />
             Addresses

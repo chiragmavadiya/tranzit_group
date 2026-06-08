@@ -37,7 +37,6 @@ export interface AddressData {
   email: string;
   phone: string;
   company: string;
-  building: string;
   instructions: string;
 
   address1?: string;
@@ -83,6 +82,7 @@ export interface CreateOrderDialogProps {
   orderId?: string;
   isUpdate?: boolean;
   hasDefaultItemAndCourier?: boolean;
+  orderType?: string;
 }
 
 export interface WalletCheckDialogProps {

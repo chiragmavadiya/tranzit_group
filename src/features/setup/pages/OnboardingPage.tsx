@@ -26,7 +26,7 @@ const SectionHeader = ({ title, icon: Icon, children }: { title: string, icon: a
       <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary/10 text-primary">
         <Icon className="h-4 w-4" />
       </div>
-      <h3 className="text-sm font-bold text-slate-900 dark:text-zinc-100 uppercase tracking-widest my-0">{title}</h3>
+      <h3 className="text-sm font-bold text-slate-900 dark:text-zinc-100 uppercase tracking-wide my-0">{title}</h3>
     </div>
     {children}
   </div>
@@ -58,6 +58,7 @@ export default function OnboardingPage() {
     business_name: "",
     gst_number: "",
     // Address
+    addressSelected: false,
     address_info: "",
     address: "",
     unit_number: "",
@@ -70,6 +71,7 @@ export default function OnboardingPage() {
     country: "Australia",
     hasBillingAddress: true,
     // Billing Address
+    billingAddressSelected: false,
     billing_address_info: "",
     billing_address: "",
     billing_unit_number: "",
@@ -268,7 +270,7 @@ export default function OnboardingPage() {
         <div className="flex items-center gap-5">
           <img src={brandLogo} alt="Logo" className="h-9 w-auto" />
           <div className="h-7 w-px bg-slate-200 dark:bg-slate-800 hidden sm:block" />
-          <h2 className="text-xs font-black text-slate-800 dark:text-zinc-200 uppercase tracking-[0.15em] hidden sm:block my-0">Account Setup</h2>
+          <h2 className="text-xs font-black text-slate-800 dark:text-zinc-200 uppercase tracking-wider hidden sm:block my-0">Set up your Tranzit Group account</h2>
         </div>
 
         <div className="flex items-center gap-4">
@@ -325,7 +327,7 @@ export default function OnboardingPage() {
               <div className="flex flex-col">
                 <span className="text-base text-slate-900 dark:text-zinc-100 font-bold">Complete your business profile</span>
                 <span className="text-sm text-slate-500 dark:text-zinc-400">
-                  Provide your details to unlock full access to our shipping platform and competitive rates.
+                  Tell us about your business so we can prepare your shipping profile, courier access, invoices and pickup details.
                 </span>
               </div>
             </div>
@@ -421,18 +423,7 @@ export default function OnboardingPage() {
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 items-start">
               {/* Business Address Card */}
               <div className="bg-white dark:bg-zinc-900 p-6 rounded-3xl border border-slate-100 dark:border-zinc-800 shadow-lg shadow-slate-200/40 dark:shadow-none space-y-4">
-                <SectionHeader title="Pickup Address" icon={MapPin}>
-                  <div className="flex items-center space-x-2.5 px-3 py-1.5 bg-slate-50 dark:bg-zinc-950/30 rounded-lg border border-slate-100 dark:border-zinc-800/50 cursor-pointer hover:bg-slate-100/50 transition-colors">
-                    <Checkbox
-                      id="billing_same"
-                      checked={!formData.hasBillingAddress}
-                      onCheckedChange={(val) => handleChange('hasBillingAddress', !val)}
-                    />
-                    <Label htmlFor="billing_same" className="text-[12px] font-bold text-slate-600 dark:text-zinc-400 cursor-pointer tracking-wild">
-                      Use Pickup Address as Billing Address
-                    </Label>
-                  </div>
-                </SectionHeader>
+                <SectionHeader title="Pickup Address" icon={MapPin} />
 
                 <div className="space-y-4">
                   <div>
@@ -449,10 +440,12 @@ export default function OnboardingPage() {
                         handleChange('state', opt.state);
                         handleChange('country', opt.country);
                         handleChange('postcode', opt.post_code);
+                        handleChange('addressSelected', true);
                       }}
                       onChange={(value) => handleChange('address_info', value)}
                       error={isSubmitted && formData.address_info?.trim() === ''}
                       errormsg='Please enter your address'
+                      placeholder='Search your address'
                       value={formData.address_info}
                       required
                     />
@@ -461,18 +454,20 @@ export default function OnboardingPage() {
                     <FormInput
                       isHalf
                       label="Unit Number"
-                      placeholder="Optional"
+                      placeholder="Enter your unit number"
                       value={formData.unit_number}
                       onChange={(val) => handleChange('unit_number', val)}
+                      disabled={formData.addressSelected}
                     />
                     <FormInput
                       isHalf
                       label="Street"
-                      placeholder="e.g. 123"
+                      placeholder="Street address"
                       value={formData.address}
                       onChange={(val) => handleChange('address', val)}
                       required
                       error={isSubmitted && formData.address?.trim() === ''}
+                      disabled={formData.addressSelected}
                       errormsg="Please enter your street"
                     />
                   </div>
@@ -487,6 +482,7 @@ export default function OnboardingPage() {
                         required
                         error={isSubmitted && formData.suburb?.trim() === ''}
                         errormsg="Please enter your suburb"
+                        disabled={formData.addressSelected}
                       />
                     </div>
                     <div className="col-span-12 md:col-span-3">
@@ -498,6 +494,8 @@ export default function OnboardingPage() {
                         required
                         error={isSubmitted && formData.state?.trim() === ''}
                         errormsg="Please select your state"
+                        placeholder='Select state'
+                        disabled={formData.addressSelected}
                       />
                     </div>
                     <div className="col-span-12 md:col-span-3">
@@ -510,6 +508,7 @@ export default function OnboardingPage() {
                         required
                         error={isSubmitted && formData.postcode?.trim() === ''}
                         errormsg="Please enter your postcode"
+                        disabled={formData.addressSelected}
                       />
                     </div>
                     <div className="col-span-12 md:col-span-3">
@@ -518,10 +517,11 @@ export default function OnboardingPage() {
                         label="Country"
                         placeholder="Australia"
                         value={formData.country}
-                        onChange={(val) => handleChange('country', val)}
-                        required
-                        error={isSubmitted && formData.country?.trim() === ''}
-                        errormsg="Please enter your country"
+                        // onChange={(val) => handleChange('country', val)}
+                        // required
+                        // error={isSubmitted && formData.country?.trim() === ''}
+                        // errormsg="Please enter your country"
+                        disabled
                       />
                     </div>
                   </div>
@@ -532,7 +532,18 @@ export default function OnboardingPage() {
 
               {/* Billing Address Card (Conditional) */}
               <div className="bg-white dark:bg-zinc-900 p-6 rounded-3xl border border-slate-100 dark:border-zinc-800 shadow-lg shadow-slate-200/40 dark:shadow-none space-y-4 animate-in slide-in-from-right-4 duration-500">
-                <SectionHeader title="Billing Address Details" icon={CreditCard} />
+                <SectionHeader title="Billing Address Details" icon={CreditCard}>
+                  <div className="flex items-center space-x-2.5 px-3 py-1.5 bg-slate-50 dark:bg-zinc-950/30 rounded-lg border border-slate-100 dark:border-zinc-800/50 cursor-pointer hover:bg-slate-100/50 transition-colors">
+                    <Checkbox
+                      id="billing_same"
+                      checked={!formData.hasBillingAddress}
+                      onCheckedChange={(val) => handleChange('hasBillingAddress', !val)}
+                    />
+                    <Label htmlFor="billing_same" className="text-[12px] font-bold text-slate-600 dark:text-zinc-400 cursor-pointer tracking-wider">
+                      Same as pickup address
+                    </Label>
+                  </div>
+                </SectionHeader>
 
                 <div className="space-y-4">
                   <div>
@@ -549,11 +560,13 @@ export default function OnboardingPage() {
                         handleChange('billing_state', opt.state);
                         handleChange('billing_country', opt.country);
                         handleChange('billing_postcode', opt.post_code);
+                        handleChange('billingAddressSelected', true);
                       }}
                       onChange={(value) => handleChange('billing_address_info', value)}
                       error={isSubmitted && formData.hasBillingAddress && formData.billing_address_info?.trim() === ''}
                       errormsg='Please enter your billing address'
                       value={formData.billing_address_info}
+                      placeholder='Search your address'
                       required
                       disabled={!formData.hasBillingAddress}
                     />
@@ -563,21 +576,21 @@ export default function OnboardingPage() {
                     <FormInput
                       isHalf
                       label="Billing Unit Number"
-                      placeholder="Optional"
+                      placeholder="Enter your unit number"
                       value={formData.billing_unit_number}
                       onChange={(val) => handleChange('billing_unit_number', val)}
-                      disabled={!formData.hasBillingAddress}
+                      disabled={!formData.hasBillingAddress || formData.billingAddressSelected}
                     />
                     <FormInput
                       isHalf
                       label="Billing Street"
-                      placeholder="Enter Street"
+                      placeholder="Street address"
                       value={formData.billing_address}
                       onChange={(val) => handleChange('billing_address', val)}
                       required
                       error={isSubmitted && formData.hasBillingAddress && formData.billing_address?.trim() === ''}
                       errormsg="Please enter your street"
-                      disabled={!formData.hasBillingAddress}
+                      disabled={!formData.hasBillingAddress || formData.billingAddressSelected}
                     />
                   </div>
 
@@ -592,7 +605,7 @@ export default function OnboardingPage() {
                         required
                         error={isSubmitted && formData.hasBillingAddress && formData.billing_suburb?.trim() === ''}
                         errormsg="Please enter your suburb"
-                        disabled={!formData.hasBillingAddress}
+                        disabled={!formData.hasBillingAddress || formData.billingAddressSelected}
                       />
                     </div>
                     <div className="col-span-12 md:col-span-3">
@@ -600,11 +613,11 @@ export default function OnboardingPage() {
                         label="State"
                         options={STATES}
                         value={formData.billing_state}
-                        onValueChange={(val) => handleChange('state', val)}
+                        onValueChange={(val) => handleChange('billing_state', val)}
                         required
                         error={isSubmitted && formData.hasBillingAddress && formData.billing_state?.trim() === ''}
                         errormsg="Please select your state"
-                        disabled={!formData.hasBillingAddress}
+                        disabled={!formData.hasBillingAddress || formData.billingAddressSelected}
                       />
                     </div>
                     <div className="col-span-12 md:col-span-3">
@@ -617,7 +630,7 @@ export default function OnboardingPage() {
                         required
                         error={isSubmitted && formData.hasBillingAddress && formData.billing_postcode?.trim() === ''}
                         errormsg="Please enter your postcode"
-                        disabled={!formData.hasBillingAddress}
+                        disabled={!formData.hasBillingAddress || formData.billingAddressSelected}
                       />
                     </div>
                     <div className="col-span-12 md:col-span-3">
@@ -630,7 +643,7 @@ export default function OnboardingPage() {
                         required
                         error={isSubmitted && formData.hasBillingAddress && formData.billing_country?.trim() === ''}
                         errormsg="Please enter your country"
-                        disabled={!formData.hasBillingAddress}
+                        disabled={!formData.hasBillingAddress || formData.billingAddressSelected}
                       />
                     </div>
 
@@ -643,7 +656,7 @@ export default function OnboardingPage() {
             <div className="pt-2 space-y-2">
               {/* <SectionHeader title="Terms & Activation" icon={ShieldCheck} /> */}
               <p className="text-sm text-slate-600 dark:text-zinc-400 leading-relaxed font-medium max-w-3xl">
-                Final step: Review and accept the platform policies to activate your shipping account. By clicking the button, you confirm that all provided business and address information is correct.
+                <span className="font-bold text-slate-900 dark:text-zinc-100">Review and accept:</span>  Before we activate your account, please confirm your business details are correct and accept our platform policies
               </p>
 
               <div className="grid grid-cols-1 gap-3 pt-2">
@@ -655,18 +668,20 @@ export default function OnboardingPage() {
                     className="mt-[3px]"
                   />
                   <div className="space-y-1">
-                    <Label htmlFor="agree_privacy" className="text-sm text-slate-900 dark:text-zinc-200 font-bold cursor-pointer">
+                    <Label htmlFor="agree_privacy" className="text-sm gap-1 text-slate-700 font-bold cursor-pointer">
+                      I agree to the
                       <a
                         href={PRIVACY_POLICY_URL}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="hover:underline hover:text-primary transition-colors inline-flex items-center"
+                        className="text-slate-900 dark:text-zinc-200 hover:underline hover:text-primary transition-colors inline-flex items-center"
                         onClick={(e) => e.stopPropagation()}
                       >
-                        Privacy Policy<span className="text-destructive ml-[2px] mt-[-4px]">*</span>
+                        Privacy Policy
                       </a>
+                      {/* I agree to the Privacy Policy */}
                     </Label>
-                    <p className="text-xs text-slate-500 mb-0">I agree to the processing of my personal data.</p>
+                    {/* <p className="text-xs text-slate-500 mb-0">I agree to the processing of my personal data.</p> */}
                   </div>
                 </div>
                 <div className="flex items-start space-x-3 p-1">
@@ -677,7 +692,8 @@ export default function OnboardingPage() {
                     className="mt-[3px]"
                   />
                   <div className="space-y-1">
-                    <Label htmlFor="accept_terms" className="text-sm text-slate-900 dark:text-zinc-200 font-bold cursor-pointer">
+                    <Label htmlFor="accept_terms" className="text-sm gap-1 text-slate-900 dark:text-zinc-200 font-bold cursor-pointer">
+                      I agree to the
                       <a
                         href={TERMS_CONDITIONS_URL}
                         target="_blank"
@@ -685,10 +701,9 @@ export default function OnboardingPage() {
                         className="hover:underline hover:text-primary transition-colors inline-flex items-center"
                         onClick={(e) => e.stopPropagation()}
                       >
-                        Terms & Conditions<span className="text-destructive ml-[2px] mt-[-4px]">*</span>
+                        Terms & Conditions
                       </a>
                     </Label>
-                    <p className="text-xs text-slate-500 mb-0">I accept the Tranzit Group platform terms.</p>
                   </div>
                 </div>
               </div>
@@ -700,7 +715,7 @@ export default function OnboardingPage() {
         <div className="sticky bottom-0 left-0 right-0 bg-white/80 dark:bg-zinc-950/80 backdrop-blur-md border-t border-slate-200 dark:border-zinc-800 px-8 py-4 z-40 shadow-[0_-4px_20px_rgba(0,0,0,0.03)]">
           <div className="max-w-full sm:max-w-xl md:max-w-3xl lg:max-w-5xl xl:max-w-7xl 2xl:max-w-360 mx-auto flex items-center justify-between gap-6 w-full">
             <div className="hidden lg:flex items-center gap-3 text-slate-600 dark:text-slate-400">
-              <span className="text-xs font-bold tracking-wide">You can edit these later in Profile</span>
+              <span className="text-xs font-bold tracking-wide">You can update these details later in Profile.</span>
             </div>
 
             <div className="flex items-center gap-4 w-full lg:w-auto">
@@ -708,14 +723,14 @@ export default function OnboardingPage() {
                 disabled={onboardingMutation.isPending}
                 className="px-6"
                 onClick={handleSubmit}
-              // className="flex-1 lg:flex-none  bg-blue-600 hover:bg-blue-700 text-white font-black text-xs uppercase tracking-widest rounded-md shadow-lg shadow-blue-500/20 transition-all hover:scale-[1.02] active:scale-[0.98] border-none"
+              // className="flex-1 lg:flex-none  bg-blue-600 hover:bg-blue-700 text-white font-black text-xs uppercase tracking-wide rounded-md shadow-lg shadow-blue-500/20 transition-all hover:scale-[1.02] active:scale-[0.98] border-none"
               >
                 {onboardingMutation.isPending ? (
                   <div className="flex items-center gap-2">
                     <Loader2 className="w-4 h-4 animate-spin" />
-                    <span>Saving...</span>
+                    <span>Completing setup</span>
                   </div>
-                ) : "Save"}
+                ) : "Complete setup"}
               </Button>
             </div>
           </div>

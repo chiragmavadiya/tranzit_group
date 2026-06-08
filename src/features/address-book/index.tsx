@@ -100,7 +100,7 @@ export default function AddressBookPage() {
   }, [exportMutation, search]);
 
   const createOrder = useCallback((addr: Address) => {
-    sessionStorage.setItem('address', JSON.stringify(addr));
+    sessionStorage.setItem('address', JSON.stringify({ ...addr, country: 'Australia' }));
     navigate('/orders/create');
   }, [navigate]);
 
@@ -124,6 +124,13 @@ export default function AddressBookPage() {
       header: "CONTACT PERSON",
       sortable: true,
       searchable: true,
+      cell: (value: string, row: Address) => {
+        return (
+          <div className='cursor-pointer hover:text-primary' onClick={() => handleEditAddress(row)}>
+            <span className="text-sm font-semibold uppercase text-gray-900 dark:text-white">{value}</span>
+          </div>
+        );
+      }
     },
     {
       key: "business_name",
@@ -135,9 +142,12 @@ export default function AddressBookPage() {
     {
       key: "email",
       accessor: "email",
-      header: "EMAIL ID",
-      sortable: true,
-      searchable: true,
+      header: "EMAIL",
+      cell: (value: string) => {
+        return (
+          <span className="">{value}</span>
+        );
+      }
     },
     {
       key: "phone",

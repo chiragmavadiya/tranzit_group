@@ -17,6 +17,18 @@ export const generateUniqueId = () => {
   return Date.now().toString().slice(-10);
 };
 
+export const getFileName = (response: any) => {
+  const contentDisposition = response.headers['content-disposition'];
+
+  const filename = contentDisposition
+    ? contentDisposition
+      .split('filename=')[1]
+      .replace(/['"]/g, '')
+    : `customer-orders-${new Date().getTime()}.pdf`;
+
+  return filename;
+};
+
 export const downloadFile = (blob: Blob, filename: string) => {
   const url = window.URL.createObjectURL(blob);
   const link = document.createElement('a');

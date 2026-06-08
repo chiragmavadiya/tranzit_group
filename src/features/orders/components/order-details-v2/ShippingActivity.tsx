@@ -48,7 +48,7 @@ export const ShippingActivity = ({ activity }: { activity: ShippingActivityType[
                                     {milestone.description}
                                 </p>
                                 <div className="mt-1 flex items-center gap-2">
-                                    <span className="text-[11px] font-bold uppercase tracking-widest text-slate-400">
+                                    <span className="text-[11px] font-bold uppercase tracking-wide text-slate-400">
                                         {milestone.date_time}
                                     </span>
                                     {isLast && (

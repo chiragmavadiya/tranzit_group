@@ -62,7 +62,7 @@ export function AuthLayout({ children }: AuthLayoutProps) {
   ];
 
   return (
-    <div className="grid min-h-screen grid-cols-1 lg:grid-cols-10">
+    <div className="grid min-h-screen grid-cols-1 lg:grid-cols-12">
       {/* Left Column (Brand/Info) */}
       <div className="relative hidden lg:flex flex-col justify-between p-12 lg:p-16 text-white overflow-hidden lg:col-span-6">
         {/* Background Image */}
@@ -79,7 +79,7 @@ export function AuthLayout({ children }: AuthLayoutProps) {
         <div className="relative z-10 flex flex-col justify-between h-full">
           <div>
             {/* Title */}
-            <h1 className="text-4xl font-extrabold tracking-tight text-white lg:text-5xl leading-tight max-w-xl">
+            <h1 className="text-4xl font-extrabold text-white lg:text-5xl leading-tight max-w-xl">
               Shipping automation that just works
             </h1>
             {/* Description */}
@@ -95,7 +95,7 @@ export function AuthLayout({ children }: AuthLayoutProps) {
                     {feature.icon}
                   </div>
                   <div className="flex flex-col">
-                    <span className="text-[11px] font-semibold uppercase tracking-wider text-slate-300">
+                    <span className="text-[11px] font-semibold uppercase tracking-wide text-slate-300">
                       {feature.label}
                     </span>
                     <span className="text-sm font-bold text-white mt-1">
@@ -109,7 +109,7 @@ export function AuthLayout({ children }: AuthLayoutProps) {
 
           {/* Pro Tip Card */}
           <div className="relative mt-12 rounded-lg border-l-4 border-[#f59e0b] bg-white/5 p-6 backdrop-blur-sm max-w-xl border border-white/5">
-            <span className="text-[11px] font-black uppercase tracking-wider text-[#f59e0b]">
+            <span className="text-[11px] font-black uppercase tracking-wide text-[#f59e0b]">
               Pro Tip
             </span>
             <p className="mt-2 text-sm text-slate-200 leading-relaxed">
@@ -120,8 +120,8 @@ export function AuthLayout({ children }: AuthLayoutProps) {
       </div>
 
       {/* Right Column (Form) */}
-      <div className="flex flex-col items-center justify-center p-8 sm:p-12 lg:p-16 bg-white dark:bg-zinc-950 lg:col-span-4">
-        <div className="mx-auto flex w-full flex-col justify-center items-center space-y-8 max-w-xl">
+      <div className="flex flex-col items-center justify-center p-8 sm:p-12 lg:p-16 bg-white dark:bg-zinc-950 lg:col-span-6">
+        <div className="mx-auto flex w-full flex-col justify-center items-center space-y-8 max-w-3xl">
           {children}
         </div>
       </div>

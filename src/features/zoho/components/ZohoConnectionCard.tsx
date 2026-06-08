@@ -74,7 +74,7 @@ export function ZohoConnectionCard({
 
         <div className="pt-4 border-t border-slate-100 dark:border-zinc-900">
           <div className="flex items-center justify-between mb-4">
-            <span className="text-xs font-bold text-slate-500 uppercase tracking-widest">Status</span>
+            <span className="text-xs font-bold text-slate-500 uppercase tracking-wide">Status</span>
             <div className={cn(
               "flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-bold tracking-wider leading-[100%]",
               !isConnected
@@ -91,7 +91,7 @@ export function ZohoConnectionCard({
           <Button
             onClick={onStartOAuth}
             disabled={!clientId}
-            className="w-full h-10 bg-slate-900 hover:bg-slate-800 dark:bg-zinc-100 dark:hover:bg-zinc-200 dark:text-zinc-950 font-bold uppercase tracking-widest text-[11px] shadow-lg shadow-slate-200 dark:shadow-none transition-all hover:-translate-y-0.5 active:translate-y-0"
+            className="w-full h-10 bg-slate-900 hover:bg-slate-800 dark:bg-zinc-100 dark:hover:bg-zinc-200 dark:text-zinc-950 font-bold uppercase tracking-wide text-[11px] shadow-lg shadow-slate-200 dark:shadow-none transition-all hover:-translate-y-0.5 active:translate-y-0"
           >
             Start OAuth Grant
           </Button>

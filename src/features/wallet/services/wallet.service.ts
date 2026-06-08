@@ -1,6 +1,7 @@
 import { api } from "@/services/api";
 import { API_ENDPOINTS } from "@/constants/api.constants";
 import type { AdminTopupParams, AdminTopupResponse, WalletTransactionsParams, WalletTransactionsResponse, WalletExportParams, WalletSummaryResponse } from "../types";
+import { getFileName } from "@/lib/utils";
 
 export const walletService = {
   getAdminTopups: async (params?: AdminTopupParams): Promise<AdminTopupResponse> => {
@@ -32,17 +33,8 @@ export const walletService = {
       responseType: 'blob'
     });
 
-    // Extract filename from Content-Disposition header
-    const disposition = response.headers['content-disposition'];
-    let filename = `wallet-transactions_${new Date().getTime()}.${params.format}`;
-
-    if (disposition && disposition.indexOf('filename=') !== -1) {
-      const filenameRegex = /filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/;
-      const matches = filenameRegex.exec(disposition);
-      if (matches != null && matches[1]) {
-        filename = matches[1].replace(/['"]/g, '');
-      }
-    }
+    const format = params.format === "pdf" ? "pdf" : params.format === "csv" ? "csv" : "xls";
+    const filename = getFileName(response) || `wallet-transactions_${new Date().getTime()}.${format}`;
 
     return { blob: response.data, filename };
   },

@@ -1,6 +1,6 @@
 import React from 'react';
 import { CustomModel } from '@/components/ui/dialog';
-import { Wallet, Info, ArrowRight } from 'lucide-react';
+import { Wallet, Info } from 'lucide-react';
 import type { WalletCheckDialogProps } from '@/features/orders/types';
 import { cn } from '@/lib/utils';
 
@@ -49,34 +49,30 @@ const WalletCheckDialog: React.FC<WalletCheckDialogProps> = ({
                     <div className="h-px bg-slate-100 dark:bg-zinc-800 w-full" />
 
                     <div className="flex justify-between items-center px-2">
-                        <span className="text-sm font-medium text-slate-600 dark:text-zinc-400">Remaining Balance</span>
+                        <span className="text-sm font-medium text-slate-600 dark:text-zinc-400">
+                            {isInsufficient ? 'Amount Required' : 'Remaining Balance'}
+                        </span>
                         <span className={cn(
                             "text-sm font-bold",
                             isInsufficient ? "text-red-500" : "text-emerald-500"
                         )}>
-                            ${(walletBalance - orderTotal).toFixed(2)}
+                            {isInsufficient ? `${(orderTotal - walletBalance).toFixed(2)}` : `${(walletBalance - orderTotal).toFixed(2)}`}
                         </span>
                     </div>
                 </div>
 
-                {isInsufficient && (
+                {isInsufficient ? (
                     <div className="p-3 bg-amber-50 dark:bg-amber-900/20 border border-amber-100 dark:border-amber-900/30 rounded-lg flex gap-3">
                         <Info className="w-5 h-5 text-amber-600 shrink-0" />
-                        <p className="text-xs font-medium text-amber-700 dark:text-amber-400">
-                            Your wallet balance is insufficient for this order. You can still proceed if you have an alternative payment method enabled.
+                        <p className="text-[13px] font-medium text-amber-700 dark:text-amber-400">
+                            Your wallet balance is insufficient for this order. Please contact Tranzit Group support team at <a href="mailto:support@tranzitgroup.com.au" className='text-primary font-bold hover:underline'>support@tranzitgroup.com.au</a>
                         </p>
                     </div>
-                )}
-
-                <div className="flex flex-col gap-2">
-                    <div className="flex items-center gap-2 text-[10px] font-bold text-slate-400 uppercase tracking-widest">
-                        <span>Check Details</span>
-                        <ArrowRight className="w-3 h-3" />
-                    </div>
-                    <p className="text-xs text-slate-500 dark:text-zinc-500 leading-relaxed">
-                        By confirming, you agree to deduct the order amount from your wallet balance. If the balance is insufficient, the remaining amount will be handled based on your account settings.
+                ) : (
+                    <p className='text-sm text-slate-500 dark:text-zinc-400'>
+                        This will create the consignment and immediately debit your wallet. A label will be queued automatically.
                     </p>
-                </div>
+                )}
             </div>
         </CustomModel>
     );

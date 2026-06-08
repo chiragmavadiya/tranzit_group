@@ -120,7 +120,7 @@ export default function SignUp() {
       <form onSubmit={handleSubmit} className="space-y-3">
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
           <div className="space-y-1">
-            <Label htmlFor="firstName" className="text-slate-700 dark:text-slate-300 font-semibold text-xs uppercase tracking-wider">
+            <Label htmlFor="firstName" className="text-slate-700 dark:text-slate-300 font-semibold text-xs uppercase tracking-wide">
               First name <span className="text-red-500">*</span>
             </Label>
             <Input
@@ -135,7 +135,7 @@ export default function SignUp() {
             />
           </div>
           <div className="space-y-1">
-            <Label htmlFor="lastName" className="text-slate-700 dark:text-slate-300 font-semibold text-xs uppercase tracking-wider">
+            <Label htmlFor="lastName" className="text-slate-700 dark:text-slate-300 font-semibold text-xs uppercase tracking-wide">
               Last name <span className="text-red-500">*</span>
             </Label>
             <Input
@@ -152,7 +152,7 @@ export default function SignUp() {
         </div>
 
         <div className="space-y-1">
-          <Label htmlFor="email" className="text-slate-700 dark:text-slate-300 font-semibold text-xs uppercase tracking-wider">
+          <Label htmlFor="email" className="text-slate-700 dark:text-slate-300 font-semibold text-xs uppercase tracking-wide">
             Email address <span className="text-red-500">*</span>
           </Label>
           <Input
@@ -194,7 +194,7 @@ export default function SignUp() {
         </div> */}
 
         <div className="space-y-1">
-          <Label htmlFor="password" className="text-slate-700 dark:text-slate-300 font-semibold text-xs uppercase tracking-wider">
+          <Label htmlFor="password" className="text-slate-700 dark:text-slate-300 font-semibold text-xs uppercase tracking-wide">
             Password <span className="text-red-500">*</span>
           </Label>
           <PasswordInput
@@ -211,7 +211,7 @@ export default function SignUp() {
         </div>
 
         <div className="space-y-1">
-          <Label htmlFor="confirmPassword" className="text-slate-700 dark:text-slate-300 font-semibold text-xs uppercase tracking-wider">
+          <Label htmlFor="confirmPassword" className="text-slate-700 dark:text-slate-300 font-semibold text-xs uppercase tracking-wide">
             Confirm your password <span className="text-red-500">*</span>
           </Label>
           <PasswordInput

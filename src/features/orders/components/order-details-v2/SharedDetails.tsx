@@ -49,7 +49,7 @@ export const DetailBlock = ({
     <div className="space-y-1">
         <p
             className={cn(
-                'text-xs font-medium tracking-widest text-muted-foreground',
+                'text-xs font-medium tracking-wide text-muted-foreground',
                 labelClassName
             )}
         >

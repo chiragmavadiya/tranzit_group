@@ -6,6 +6,8 @@ import { downloadFile } from '@/lib/utils';
 import { showToast } from '@/components/ui/custom-toast';
 import { TRANSACTION_STATUS_CONFIG } from '@/features/wallet/constants';
 import { StatusCell } from '@/components/common';
+import { Button } from '@/components/ui/button';
+import { CreditDebitWalletDialog } from './CreditDebitWalletDialog';
 
 interface TransactionTabProps {
     customerId: string;
@@ -15,6 +17,7 @@ export const TransactionTab = ({ customerId }: TransactionTabProps) => {
     const [page, setPage] = useState(1);
     const [pageSize, setPageSize] = useState(25);
     const [search, setSearch] = useState('');
+    const [isTopUpOpen, setIsTopUpOpen] = useState(false);
 
     const { data: response, isLoading } = useCustomerTransactions(customerId, { page, per_page: pageSize, search });
     const transactions = response?.data || [];
@@ -65,8 +68,20 @@ export const TransactionTab = ({ customerId }: TransactionTabProps) => {
                 onExport={handleExport}
                 className='pb-3'
                 print={false}
+                customHeader={(
+                    <Button onClick={() => setIsTopUpOpen(true)}>
+                        + Top up
+                    </Button>
+                )}
+            />
+
+            <CreditDebitWalletDialog
+                isOpen={isTopUpOpen}
+                onOpenChange={setIsTopUpOpen}
+                customerId={customerId}
             />
         </Card>
     );
 };
+
 

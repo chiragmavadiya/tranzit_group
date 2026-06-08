@@ -324,7 +324,7 @@ const InvoiceDocumentView: React.FC = () => {
   if (!invoiceData && !isLoading && invoiceID !== 'create') {
     return (
       <div className="flex flex-col items-center justify-center h-[80vh] gap-4">
-        <h2 className="text-2xl font-bold text-gray-500 uppercase tracking-widest">Invoice not found</h2>
+        <h2 className="text-2xl font-bold text-gray-500 uppercase tracking-wide">Invoice not found</h2>
         <Button onClick={handleBack} variant="outline" className="font-bold">GO BACK</Button>
       </div>
     )

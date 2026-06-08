@@ -13,6 +13,7 @@ import type {
     CustomerStatsResponse,
     CustomerIntegrationResponse,
 } from "../types";
+import { getFileName } from "@/lib/utils";
 
 export const customerService = {
     /**
@@ -136,16 +137,8 @@ export const customerService = {
             responseType: 'blob',
         });
 
-        const disposition = response.headers['content-disposition'];
-        let filename = `customers_export_${new Date().getTime()}.${format}`;
-
-        if (disposition && disposition.indexOf('filename=') !== -1) {
-            const filenameRegex = /filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/;
-            const matches = filenameRegex.exec(disposition);
-            if (matches != null && matches[1]) {
-                filename = matches[1].replace(/['"]/g, '');
-            }
-        }
+        const _format = format === 'csv' ? 'csv' : format === 'excel' ? 'xlsx' : 'pdf';
+        const filename = getFileName(response) || `Admin_Customers_Export_${new Date().getTime()}.${_format}`;
 
         return { blob: response.data, filename };
     },
@@ -216,4 +209,20 @@ export const customerService = {
         const response = await api.get<any>(API_ENDPOINTS.ADMIN_CUSTOMERS.INTEGRATIONS(id));
         return response.data;
     },
+
+    /**
+     * Add transaction to customer wallet
+     */
+    addTransaction: async (id: number | string, data: any): Promise<any> => {
+        const response = await api.post(API_ENDPOINTS.ADMIN_CUSTOMERS.WALLET_TOP_UP, null, {
+            params: {
+                customer_id: id,
+                amount: data.amount,
+                description: data.description,
+                transaction_type: data.transaction_type
+            }
+        });
+        return response.data;
+    },
 };
+

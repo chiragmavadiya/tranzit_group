@@ -114,7 +114,7 @@ export default function AdminTopUpPage() {
           <div className="lg:col-span-4 flex gap-3">
             <Button
               variant="outline"
-              className="h-8 max-w-42 flex-1 border-slate-200 dark:border-zinc-800 text-slate-500 dark:text-zinc-400 font-bold uppercase tracking-widest text-[10px]"
+              className="h-8 max-w-42 flex-1 border-slate-200 dark:border-zinc-800 text-slate-500 dark:text-zinc-400 font-bold uppercase tracking-wide text-[10px]"
               onClick={() => {
                 setSearch('');
                 setTransactionType('');

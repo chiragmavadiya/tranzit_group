@@ -48,17 +48,17 @@ export function QuoteDetailsDialog({ open, onOpenChange, quoteId }: QuoteDetails
 
                     <div className="grid grid-cols-2 gap-6">
                         <div className="flex flex-col gap-2">
-                            <span className="text-[11px] font-extrabold text-slate-700 dark:text-zinc-400 uppercase tracking-widest border-b pb-1">Sender Address</span>
+                            <span className="text-[11px] font-extrabold text-slate-700 dark:text-zinc-400 uppercase tracking-wide border-b pb-1">Sender Address</span>
                             <p className="text-slate-800 font-medium dark:text-zinc-400 leading-relaxed">{details.sender.address}</p>
                         </div>
                         <div className="flex flex-col gap-2">
-                            <span className="text-[11px] font-extrabold text-slate-700 dark:text-zinc-400 uppercase tracking-widest border-b pb-1">Receiver Address</span>
+                            <span className="text-[11px] font-extrabold text-slate-700 dark:text-zinc-400 uppercase tracking-wide border-b pb-1">Receiver Address</span>
                             <p className="text-slate-800 font-medium dark:text-zinc-400 leading-relaxed">{details.receiver.address}</p>
                         </div>
                     </div>
 
                     <div className="flex flex-col gap-3">
-                        <span className="text-[11px] font-extrabold text-slate-700 dark:text-zinc-400 uppercase tracking-widest border-b pb-1">Item Details</span>
+                        <span className="text-[11px] font-extrabold text-slate-700 dark:text-zinc-400 uppercase tracking-wide border-b pb-1">Item Details</span>
                         <div className="rounded-lg border border-slate-100 dark:border-zinc-800 overflow-hidden">
                             <Table>
                                 <TableHeader className="bg-slate-50 dark:bg-zinc-900">

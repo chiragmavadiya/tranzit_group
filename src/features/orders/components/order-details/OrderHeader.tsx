@@ -1,6 +1,6 @@
 import React, { useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { ArrowLeft, Box, MapPin, Download, Loader2, PackagePlus, Trash2, Package } from 'lucide-react'
+import { ArrowLeft, Box, Download, Loader2, PackagePlus, Trash2, Package } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 // import { DropdownUI } from '@/features/orders/components/OrderFormUI'
@@ -103,24 +103,24 @@ export const OrderHeader: React.FC<OrderHeaderProps> = ({
             // variant="ghost"
             size="sm"
             onClick={handleBack}
-            className="flex items-center gap-2 bg-primary text-white hover:bg-primary-hover px-4 rounded-md h-9"
+            className="flex items-center gap-2 leading-relaxed bg-primary text-white hover:bg-primary-hover px-4 rounded-md h-9"
           >
             <ArrowLeft className="h-4 w-4" />
-            BACK
+            Back to Orders
           </Button>
 
           <div className="flex items-center gap-3">
-            <div className="flex items-center gap-2 text-primary border-r border-gray-200 dark:border-zinc-800 pr-3">
+            <div className="flex items-center gap-2 text-primary">
               {orderType === 'return' ? <Package className="h-5 w-5 text-primary" /> : <Box className="h-5 w-5 text-primary" />}
-              <span className="text-xl font-bold text-gray-900 dark:text-zinc-100">{isCreate ? (orderType === 'return' ? 'RETURN ORDER' : 'NEW ORDER') : orderID}</span>
+              <span className="text-xl font-bold text-gray-900 dark:text-zinc-100">{isCreate ? (orderType === 'return' ? 'RETURN ORDER' : 'CREATE NEW ORDER') : orderID}</span>
             </div>
             {/* <div className="flex items-center gap-2 px-0">
               <span className="text-xl font-bold text-gray-900 dark:text-zinc-100 tracking-tight">{orderType === 'create' ? 'NEW ORDER' : 'EDIT ORDER'}</span>
             </div> */}
-            <div className="flex items-center gap-1 text-primary font-medium">
+            {/* <div className="flex items-center gap-1 text-primary font-medium">
               <MapPin className="h-4 w-4" />
               <span className="text-sm">AUSTRALIA</span>
-            </div>
+            </div> */}
           </div>
         </div>
 

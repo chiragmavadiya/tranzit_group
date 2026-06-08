@@ -117,7 +117,7 @@ export function ZohoSettingsCard({
           <Button
             onClick={onSave}
             disabled={isLoading}
-          // className="h-10 px-8 bg-blue-600 hover:bg-blue-700 text-white font-bold uppercase tracking-widest text-[11px] shadow-lg shadow-blue-500/20 transition-all hover:scale-[1.02] active:scale-100"
+          // className="h-10 px-8 bg-blue-600 hover:bg-blue-700 text-white font-bold uppercase tracking-wide text-[11px] shadow-lg shadow-blue-500/20 transition-all hover:scale-[1.02] active:scale-100"
           >
             {isLoading ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Save className="w-4 h-4 mr-2" />}
             {isLoading ? "Saving..." : "Save Settings"}

@@ -32,18 +32,18 @@ export default function TopUpPage() {
           <div className="lg:col-span-4 space-y-4">
             <div className="bg-white dark:bg-zinc-900 rounded-xl border border-slate-100 dark:border-zinc-800 shadow-sm overflow-hidden">
               <div className="p-4 border-b border-slate-50 dark:border-zinc-800 bg-slate-50/50 dark:bg-zinc-900/50">
-                <h2 className="text-[11px] font-black text-slate-800 dark:text-zinc-100 uppercase tracking-widest">Account Summary</h2>
+                <h2 className="text-[11px] font-black text-slate-800 dark:text-zinc-100 uppercase tracking-wide">Account Summary</h2>
               </div>
               <div className="p-4 space-y-4">
                 <div className="p-3 rounded-xl bg-primary/5 dark:bg-primary/10 border border-primary/20 flex flex-col items-center justify-center text-center py-6">
-                  <p className="text-[9px] text-slate-400 uppercase tracking-widest font-black mb-1">Available Balance</p>
+                  <p className="text-[9px] text-slate-400 uppercase tracking-wide font-black mb-1">Available Balance</p>
                   <p className="text-3xl font-black text-primary">${walletBalance}</p>
                 </div>
 
                 <div className="space-y-3">
                   <div className="flex items-center gap-2">
                     <span className="h-1.5 w-1.5 rounded-full bg-primary"></span>
-                    <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Enter Amount</label>
+                    <label className="text-[10px] font-black text-slate-500 uppercase tracking-wide">Enter Amount</label>
                   </div>
                   <div className="relative group">
                     <div className="absolute left-3.5 top-1/2 -translate-y-1/2">
@@ -70,7 +70,7 @@ export default function TopUpPage() {
             <div className="bg-primary rounded-xl p-5 text-white shadow-lg shadow-primary/20 relative overflow-hidden group">
               <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -mr-16 -mt-16 blur-2xl group-hover:scale-110 transition-transform duration-700"></div>
               <div className="relative">
-                <p className="text-[9px] font-black uppercase tracking-widest opacity-80">Total to Pay</p>
+                <p className="text-[9px] font-black uppercase tracking-wide opacity-80">Total to Pay</p>
                 <p className="text-2xl font-black mt-0.5">${totalAmount}</p>
                 <p className="text-[9px] mt-3 opacity-70 font-medium">Instant wallet credit</p>
               </div>
@@ -81,16 +81,16 @@ export default function TopUpPage() {
           <div className="lg:col-span-8 space-y-4">
             <div className="bg-white dark:bg-zinc-900 rounded-xl border border-slate-100 dark:border-zinc-800 shadow-sm overflow-hidden h-full">
               <div className="p-4 border-b border-slate-50 dark:border-zinc-800 flex justify-between items-center bg-slate-50/50 dark:bg-zinc-900/50">
-                <h2 className="text-[11px] font-black text-slate-800 dark:text-zinc-100 uppercase tracking-widest">Payment Details</h2>
+                <h2 className="text-[11px] font-black text-slate-800 dark:text-zinc-100 uppercase tracking-wide">Payment Details</h2>
                 <div className="flex gap-2">
                   <div className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse mt-0.5"></div>
-                  <span className="text-[9px] font-bold text-emerald-600 uppercase tracking-widest">Secure Connection</span>
+                  <span className="text-[9px] font-bold text-emerald-600 uppercase tracking-wide">Secure Connection</span>
                 </div>
               </div>
 
               <div className="p-6 space-y-6">
                 <div className="space-y-3">
-                  <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Saved Methods</p>
+                  <p className="text-[9px] font-black text-slate-400 uppercase tracking-wide">Saved Methods</p>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                     {savedCards.map((card) => (
                       <div
@@ -119,7 +119,7 @@ export default function TopUpPage() {
                         </div>
 
                         <div>
-                          <p className={`text-xs font-mono font-bold tracking-widest ${selectedCard === card.id ? 'text-primary' : 'text-slate-600 dark:text-zinc-400'}`}>
+                          <p className={`text-xs font-mono font-bold tracking-wide ${selectedCard === card.id ? 'text-primary' : 'text-slate-600 dark:text-zinc-400'}`}>
                             ••••  ••••  ••••  {card.last4}
                           </p>
                           <div className="flex justify-between items-end mt-3">
@@ -133,33 +133,33 @@ export default function TopUpPage() {
                 </div>
 
                 <div className="space-y-4 pt-4 border-t border-slate-50 dark:border-zinc-800">
-                  <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Add New Card</p>
+                  <p className="text-[9px] font-black text-slate-400 uppercase tracking-wide">Add New Card</p>
 
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-x-4 gap-y-3">
                     <div className="space-y-1">
-                      <label className="text-[9px] font-black text-slate-500 uppercase tracking-widest ml-1">Card Holder Name</label>
+                      <label className="text-[9px] font-black text-slate-500 uppercase tracking-wide ml-1">Card Holder Name</label>
                       <Input placeholder="Enter full name" className="h-9 text-[11px] rounded-lg bg-slate-50/50 dark:bg-zinc-950 border-slate-100 dark:border-zinc-800 focus-visible:bg-white dark:focus-visible:bg-zinc-900" />
                     </div>
                     <div className="space-y-1">
-                      <label className="text-[9px] font-black text-slate-500 uppercase tracking-widest ml-1">Card Number</label>
+                      <label className="text-[9px] font-black text-slate-500 uppercase tracking-wide ml-1">Card Number</label>
                       <div className="relative">
                         <CreditCard className="absolute left-3 top-1/2 -translate-y-1/2 h-3 w-3 text-slate-400" />
                         <Input placeholder="0000 0000 0000 0000" className="pl-8.5 h-9 text-[11px] rounded-lg bg-slate-50/50 dark:bg-zinc-950 border-slate-100 dark:border-zinc-800 focus-visible:bg-white dark:focus-visible:bg-zinc-900" />
                       </div>
                     </div>
                     <div className="space-y-1">
-                      <label className="text-[9px] font-black text-slate-500 uppercase tracking-widest ml-1">Expiry Date</label>
+                      <label className="text-[9px] font-black text-slate-500 uppercase tracking-wide ml-1">Expiry Date</label>
                       <Input placeholder="MM / YY" className="h-9 text-[11px] rounded-lg bg-slate-50/50 dark:bg-zinc-950 border-slate-100 dark:border-zinc-800 focus-visible:bg-white dark:focus-visible:bg-zinc-900" />
                     </div>
                     <div className="space-y-1">
-                      <label className="text-[9px] font-black text-slate-500 uppercase tracking-widest ml-1">Security Code (CVC)</label>
+                      <label className="text-[9px] font-black text-slate-500 uppercase tracking-wide ml-1">Security Code (CVC)</label>
                       <Input placeholder="123" className="h-9 text-[11px] rounded-lg bg-slate-50/50 dark:bg-zinc-950 border-slate-100 dark:border-zinc-800 focus-visible:bg-white dark:focus-visible:bg-zinc-900" />
                     </div>
                   </div>
 
                   <div className="flex items-center space-x-2 py-1.5 px-2.5 rounded-lg bg-slate-50 dark:bg-zinc-800/50 w-fit">
                     <Checkbox id="save-card" className="h-3.5 w-3.5 border-slate-300" />
-                    <label htmlFor="save-card" className="text-[9px] text-slate-500 cursor-pointer font-black uppercase tracking-widest select-none">
+                    <label htmlFor="save-card" className="text-[9px] text-slate-500 cursor-pointer font-black uppercase tracking-wide select-none">
                       Save for future use
                     </label>
                   </div>

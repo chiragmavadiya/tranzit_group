@@ -84,7 +84,7 @@ export const CreditApplicationTab = () => {
                                     )}>
                                         {formData.businessType === type && <div className="h-1.5 w-1.5 rounded-full bg-white dark:bg-zinc-950" />}
                                     </div>
-                                    <span className="text-[11px] font-black uppercase tracking-widest text-slate-600 dark:text-zinc-400 group-hover:text-slate-900 dark:group-hover:text-white transition-colors">{type}</span>
+                                    <span className="text-[11px] font-black uppercase tracking-wide text-slate-600 dark:text-zinc-400 group-hover:text-slate-900 dark:group-hover:text-white transition-colors">{type}</span>
                                 </div>
                             ))}
                         </div>

@@ -32,7 +32,7 @@ export const QuoteSummary = memo(({
 
   return (
     <Card className="sticky top-20 p-0 gap-0 shadow-sm border-slate-200 dark:border-zinc-800 bg-white dark:bg-zinc-950 overflow-hidden">
-      <CardHeader className="bg-slate-50 dark:bg-zinc-900/50 rounded-t-lg py-4 border-b border-slate-100 dark:border-zinc-800">
+      <CardHeader className="rounded-t-lg py-4 border-b border-slate-100 dark:border-zinc-800">
         <CardTitle className="inline-flex items-center gap-2 text-base font-semibold text-primary">
           <FileText className="w-4 h-4" />
           {isAdmin ? 'Admin Quote Summary' : 'Quote Summary'}

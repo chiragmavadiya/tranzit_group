@@ -1,6 +1,6 @@
 export interface Address {
     id: number;
-    code: string;
+    customer_reference: string;
     contact_person: string;
     business_name: string;
     additional_details: string;
@@ -43,7 +43,7 @@ export interface AddressFormData {
     phone: string;
     special_instructions: string;
     default_carrier: string;
-    code: string;
+    customer_reference: string;
     building: string;
     // signature_required: boolean;
     address_info: string;

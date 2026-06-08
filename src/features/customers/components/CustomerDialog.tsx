@@ -232,7 +232,7 @@ export default function CustomerDialog({ open, onOpenChange, customerId }: Custo
           <div className="absolute inset-0 z-50 flex items-center justify-center bg-white/60 dark:bg-zinc-900/60 backdrop-blur-[1px]">
             <div className="flex flex-col items-center gap-2">
               <Loader2 className="h-8 w-8 text-primary animate-spin" />
-              <p className="text-xs font-bold text-slate-500 uppercase tracking-widest">Loading customer details...</p>
+              <p className="text-xs font-bold text-slate-500 uppercase tracking-wide">Loading customer details...</p>
             </div>
           </div>
         )}

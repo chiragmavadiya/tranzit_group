@@ -33,7 +33,6 @@ export const PlaceAutocomplete = ({ onPlaceSelect, ...rest }: PlaceAutocompleteP
 
     useEffect(() => {
         if (!places || !inputRef.current) return;
-
         const options = {
             // fields: ['address_components', 'geometry', 'formatted_address'],
             fields: [
@@ -51,7 +50,6 @@ export const PlaceAutocomplete = ({ onPlaceSelect, ...rest }: PlaceAutocompleteP
 
     useEffect(() => {
         if (!placeAutocomplete) return;
-
         const listener = placeAutocomplete.addListener('place_changed', () => {
             const place = placeAutocomplete.getPlace();
             if (!place.address_components) return;
@@ -106,9 +104,10 @@ export const PlaceAutocomplete = ({ onPlaceSelect, ...rest }: PlaceAutocompleteP
         <div className="autocomplete-container w-full">
             <FormInput
                 ref={inputRef}
-                placeholder="Start typing address..."
+                placeholder="Search street address"
                 className="address-input"
                 icon={Search}
+                autoFocus={false}
                 {...rest}
             />
         </div>

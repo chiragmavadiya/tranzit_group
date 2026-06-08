@@ -213,7 +213,7 @@ const DataTableComponent = <T extends Record<string, any>>(props: DataTableProps
                     className="w-62 h-8"
                   />
                 )}
-                {exportable && (
+                {exportable && data.length > 0 && (
                   <DropdownCustomMenu
                     menus={[
                       ...(print ? [{
@@ -265,7 +265,7 @@ const DataTableComponent = <T extends Record<string, any>>(props: DataTableProps
           <TableHeader className={cn("bg-white dark:bg-zinc-950 sticky top-0 z-10 shadow-sm", headerClassName)}>
             <TableRow className="hover:bg-transparent border-b border-gray-100 dark:border-zinc-800">
               {selectable && (
-                <TableHead className="sticky left-0 bg-background h-12 text-[14px] font-bold text-gray-900 dark:text-zinc-100 uppercase tracking-wider px-5 pr-3! print:hidden">
+                <TableHead className="sticky left-0 bg-background h-12 text-[14px] font-bold text-gray-900 dark:text-zinc-100 uppercase tracking-wide px-5 pr-3! print:hidden">
                   <Checkbox
                     checked={currentSelectedRows.length === displayData.length && displayData.length > 0}
                     onCheckedChange={handleSelectAll}
@@ -277,11 +277,11 @@ const DataTableComponent = <T extends Record<string, any>>(props: DataTableProps
                 <TableHead
                   key={`${column.key}-${index}`}
                   className={cn(
-                    "h-12 text-[14px] font-bold text-gray-900 dark:text-zinc-100 uppercase tracking-wider px-5",
+                    "h-12 text-[14px] font-bold text-gray-900 dark:text-zinc-100 uppercase tracking-wide px-5",
                     column.sortable !== false && sortable && "cursor-pointer hover:bg-muted/50",
                     column.sticky === 'left' && "sticky left-8 bg-background z-20 shadow-[inset_-1px_0_0_0_#ebe6e7]",
                     column.sticky === 'left' ? selectable ? 'left-[48px]' : 'left-0' : '',
-                    column.sticky === 'right' && "sticky right-0 bg-background z-20 shadow-[inset_-1px_0_0_0_#ebe6e7]",
+                    column.sticky === 'right' && "sticky right-0 bg-background z-20 shadow-[inset_1px_0_0_0_#ebe6e7]",
                     column.className,
                     column.noPrint && 'print:hidden'
                   )}
@@ -342,7 +342,7 @@ const DataTableComponent = <T extends Record<string, any>>(props: DataTableProps
                       <TableCell
                         key={`${column.key}-${rowId}-${colIndex}`}
                         className={cn(
-                          `px-5 py-3 text-sm  text-gray-800 dark:text-zinc-300 whitespace-normal capitalize`,
+                          `px-5 py-3 text-sm  text-gray-800 dark:text-zinc-300 whitespace-normal`,
                           column.sticky === 'left' && "sticky left-0 bg-white shadow-[inset_-1px_0_0_0_#ebe6e7]",
                           column.sticky === 'left' ? selectable ? 'left-[48px]' : 'left-0' : '',
 

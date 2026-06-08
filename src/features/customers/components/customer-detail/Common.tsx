@@ -6,7 +6,7 @@ export const SectionHeader = ({ title, icon: Icon }: { title: string, icon: any 
         <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary/10 text-primary">
             <Icon className="h-4 w-4" />
         </div>
-        <h3 className="text-sm font-bold text-slate-900 dark:text-zinc-100 uppercase tracking-widest my-0">{title}</h3>
+        <h3 className="text-sm font-bold text-slate-900 dark:text-zinc-100 uppercase tracking-wide my-0">{title}</h3>
     </div>
 );
 
@@ -47,7 +47,7 @@ export const TimelineItem = ({ item, isLast }: { item: ActivityItem, isLast: boo
                 {item.invoiceNo && (
                     <div className="mt-2 inline-flex items-center gap-2 rounded-lg bg-slate-50 dark:bg-zinc-900/50 p-2 border border-slate-100 dark:border-zinc-800 w-fit">
                         <FileText className="h-3 w-3 text-slate-400" />
-                        <span className="text-[10px] font-bold text-slate-600 dark:text-zinc-400 uppercase tracking-widest">Invoice {item.invoiceNo}</span>
+                        <span className="text-[10px] font-bold text-slate-600 dark:text-zinc-400 uppercase tracking-wide">Invoice {item.invoiceNo}</span>
                     </div>
                 )}
             </div>

@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button"
 import { Loader2, XIcon } from "lucide-react"
 
 function Dialog({ ...props }: DialogPrimitive.Root.Props) {
-  return <DialogPrimitive.Root data-slot="dialog" {...props} />
+  return <DialogPrimitive.Root data-slot="dialog" {...props} modal={false} />
 }
 
 function DialogTrigger({ ...props }: DialogPrimitive.Trigger.Props) {
@@ -55,6 +55,7 @@ function DialogContent({
           className
         )}
         {...props}
+      // initialFocus={false}
       >
         {children}
         {showCloseButton && (
@@ -168,7 +169,7 @@ const CustomModel = ({ open, title, description, onOpenChange, children, onSubmi
     onOpenChange(false)
   }
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
+    <Dialog open={open} onOpenChange={onOpenChange} modal={false}>
       <DialogContent
         className={contentClass || "min-w-xl"}
         tabIndex={undefined}

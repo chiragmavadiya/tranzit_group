@@ -32,7 +32,7 @@ export const AddressCard: React.FC<AddressCardProps> = memo(({
         <div className="flex items-center justify-between p-4 py-2">
           <div className="flex items-center gap-3 min-h-8">
             {/* Section Label */}
-            <span className="text-base font-bold uppercase tracking-wider text-slate-800 dark:text-zinc-400">
+            <span className="text-base font-bold uppercase tracking-wide text-slate-800 dark:text-zinc-400">
               {title}
             </span>
 

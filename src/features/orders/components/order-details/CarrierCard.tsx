@@ -30,9 +30,9 @@ export const CarrierCard: React.FC<CarrierCardProps> = memo((props) => {
   const [selectedSurchargesMap, setSelectedSurchargesMap] = useState<Record<string, string[]>>({});
   const [bestDeal, setBestDeal] = useState<string>('');
   const [copiedTracking, setCopiedTracking] = useState(false);
+
   // const [authorityToLeave, setAuthorityToLeave] = useState<boolean>(false);
   // const [signatureRequired, setSignatureRequired] = useState<boolean>(false);
-  console.log(initialSelectedCourierId, 'initialSelectedCourierId 123')
   const handleCopyTracking = (text: string) => {
     navigator.clipboard.writeText(text);
     setCopiedTracking(true);
@@ -51,6 +51,7 @@ export const CarrierCard: React.FC<CarrierCardProps> = memo((props) => {
   };
 
   const handleServiceSuccess = useEffectEvent((data: any) => {
+
     setCouriers(data.services || []);
     setSurchargesMap(data.surcharges || {});
     if (data.surcharges) {
@@ -69,26 +70,26 @@ export const CarrierCard: React.FC<CarrierCardProps> = memo((props) => {
       const minItem = data.services.reduce((min: any, curr: any) =>
         getServiceTotalPrice(curr) < getServiceTotalPrice(min) ? curr : min
       );
-      setBestDeal(minItem.product_id || minItem.courierCode || '');
+      setBestDeal(minItem.courierCode + (minItem.product_id || '') || '');
       if (initialSelectedCourierId !== undefined && initialSelectedCourierId !== null && initialSelectedCourierId !== '') {
-        console.log("set service 1", initialSelectedCourierId, initialSelectedCourierId !== undefined && initialSelectedCourierId !== null && initialSelectedCourierId !== '')
         setSelectedServiceId(initialSelectedCourierId);
         return;
       }
-      console.log("set service 2")
       const selectedFromQuote = sessionStorage.getItem('quote_courier');
       if (selectedFromQuote) {
-        console.log("set service 3")
         const courier = JSON.parse(selectedFromQuote);
-        setSelectedServiceId(courier.courier.product_id + courier.courier.courierCode || '');
+        setSelectedServiceId(courier.courier.courierCode + (courier.courier.product_id || '') || '');
       } else if (!selectedServiceId) {
-        console.log("set service 4")
-        setSelectedServiceId(minItem.product_id + minItem.courierCode || '');
+        setSelectedServiceId((prev) => {
+          if (prev !== '') return prev;
+          return minItem.courierCode + (minItem.product_id || '') || '';
+        });
       }
       // if (!selectedServiceId)
       //   setSelectedServiceId(minItem.product_id || minItem.courierCode || '');
     }
   })
+  console.log(selectedServiceId, 'selectedServiceId')
   useEffect(() => {
     if (orderType !== 'create' && orderType !== 'consign' && orderType !== 'return') return;
     // Check if we have valid items with dimensions > 0
@@ -138,7 +139,7 @@ export const CarrierCard: React.FC<CarrierCardProps> = memo((props) => {
 
   useEffect(() => {
     if (couriers.length > 0 && selectedServiceId) {
-      const selectedCourier = couriers.find((c) => (c.product_id + c.courierCode) === selectedServiceId);
+      const selectedCourier = couriers.find((c) => (c.courierCode + (c.product_id || '')) === selectedServiceId);
       if (selectedCourier) {
         const courierSurcharges = surchargesMap[selectedCourier.courierCode] || [];
         const selectedNames = selectedSurchargesMap[selectedCourier.courierCode] ?? [];
@@ -159,10 +160,15 @@ export const CarrierCard: React.FC<CarrierCardProps> = memo((props) => {
           product_id: selectedCourier.product_id,
           product_type: selectedCourier.product_type,
           shipment_summary: selectedCourier.shipment_summary,
+          is_own: selectedCourier.is_own_courier
         })
       }
     }
   }, [selectedServiceId, couriers, surchargesMap, selectedSurchargesMap, onQuoteChange, setCourierData])
+
+  // console.log(initialSelectedCourierId, 'initialSelectedCourierId')
+  // console.log(selectedServiceId, 'selectedServiceId')
+  // console.log(bestDeal, 'bestDeal')
 
   return (
     <Card className="border gap-0 border-gray-200 dark:border-zinc-800 overflow-hidden transition-colors duration-300">
@@ -223,7 +229,7 @@ export const CarrierCard: React.FC<CarrierCardProps> = memo((props) => {
                   <div className="text-lg font-black text-gray-900 dark:text-zinc-100 tracking-tighter">
                     ${orderDetail.order_details?.total?.toFixed(2) || '0.00'}
                   </div>
-                  <div className="text-[10px] font-bold text-gray-500 dark:text-zinc-400 uppercase tracking-widest mt-0.5">
+                  <div className="text-[10px] font-bold text-gray-500 dark:text-zinc-400 uppercase tracking-wide mt-0.5">
                     Total Inc. GST
                   </div>
                 </div>
@@ -245,12 +251,11 @@ export const CarrierCard: React.FC<CarrierCardProps> = memo((props) => {
           <div className="grid grid-cols-12 gap-3">
             <div className={`${module !== 'quote' ? 'col-span-12' : 'col-span-12'} flex flex-col gap-3`}>
               {couriers.map((courier) => {
-                const serviceId = courier.product_id + courier.courierCode;
+                const serviceId = courier.courierCode + (courier.product_id || '') || '';
 
                 // Map additional charges by courierCode
                 const courierSurcharges = surchargesMap[courier.courierCode] || [];
                 const selectedNames = selectedSurchargesMap[courier.courierCode] ?? [];
-                console.log(initialSelectedCourierId, 'initialSelectedCourierId', serviceId, 'serviceId')
                 const isSelected = selectedServiceId === serviceId
 
                 if (courier.success === false) {
@@ -314,19 +319,27 @@ export const CarrierCard: React.FC<CarrierCardProps> = memo((props) => {
                         <div className="flex flex-col">
                           <span className="font-bold text-gray-900 dark:text-zinc-100 text-sm">
                             {courier.carrier}
+
                           </span>
                           <span className="text-xs text-gray-500 dark:text-zinc-400 font-medium mt-0.5">
-                            {courier.service_name || courier.service_code || 'Standard Delivery'}
+                            {courier.product_type || courier.service_name || courier.service_code || 'Standard Delivery'}
                             {courier.estimate_delivery_date && ` • ETA: ${courier.estimate_delivery_date}`}
                           </span>
                         </div>
+                        {serviceId === selectedServiceId && (
+                          <Badge className="leading-100 font-bold px-2 py-0.5 shadow-sm">
+                            Selected
+                          </Badge>
+                        )}
                       </div>
 
                       {/* Right Side: Pricing */}
-                      <div className="flex flex-col items-end justify-center">
-                        <span className="text-lg font-bold text-gray-900 dark:text-zinc-100">
-                          ${courier.price.toFixed(2)}
-                        </span>
+                      <div className='flex gap-4 items-center'>
+                        <div className="flex flex-col items-end justify-center">
+                          <span className="text-lg font-bold text-gray-900 dark:text-zinc-100">
+                            ${courier.price.toFixed(2)}
+                          </span>
+                        </div>
                       </div>
                     </div>
 

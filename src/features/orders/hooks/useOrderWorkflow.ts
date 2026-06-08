@@ -31,7 +31,7 @@ const initialAddressData = {
   state: '',
   unit_number: '',
   postcode: '',
-  country: 'AUSTRALIA',
+  country: 'Australia',
   saveToAddressBook: false,
 }
 
@@ -178,7 +178,6 @@ export const useOrderWorkflow = () => {
           email: senderDetail?.email || '',
           phone: senderDetail?.mobile || '',
           company: senderDetail?.company || '',
-          building: senderDetail?.address_detail?.building || '',
           instructions: senderDetail?.address_detail?.instructions || '',
           address1: senderDetail?.address_detail?.address_line || '',
           address_info: senderDetail?.address_detail?.address_info || senderDetail?.address || '',
@@ -196,7 +195,6 @@ export const useOrderWorkflow = () => {
           email: receiverDetail?.email || '',
           phone: receiverDetail?.mobile || '',
           company: receiverDetail?.company || '',
-          building: receiverDetail?.address_detail?.building || '',
           instructions: receiverDetail?.address_detail?.instructions || '',
           address1: receiverDetail?.address_detail?.address_line || '',
           address_info: receiverDetail?.address_detail?.address_info || '',
@@ -257,9 +255,8 @@ export const useOrderWorkflow = () => {
       const h = Number(item.height) || 1;
       const l = Number(item.length) || 1;
       const q = Number(item.quantity) || 1;
-      return acc + ((w * h * l) / 1000000) * q;
+      return acc + ((w * h * l * 250) / 1000000) * q;
     }, 0) || 0;
-
     const servicePrice = quoteData?.courier?.base || quoteData?.subtotal || 0;
     const gst = quoteData?.courier?.gst || quoteData?.tax || 0;
     const totalSurcharges = quoteData?.totalSurcharges || 0;
@@ -286,8 +283,6 @@ export const useOrderWorkflow = () => {
     const hasHeavyItem = itemsData?.some((item) => Number(item.weight) > 28);
     return hasManyItems || hasHeavyItem || noTrackingNumber;
   }, [orderType, calculation.totalItems, itemsData, orderDetail?.courier_details?.tracking_number]);
-
-  console.log(addressData, 'addressData')
 
   // Order Submission/Saving Flow
   const handleOnSave = useCallback((skipWalletCheckArg?: any) => {
@@ -331,7 +326,7 @@ export const useOrderWorkflow = () => {
         cover_limited_liability: insuranceSelected ? 1 : 0,
         signature_required: signatureSelected ? 1 : 0,
       },
-      surcharges: [],
+      surcharges: quoteData?.surcharges || [],
       delivery_instructions: deliveryInstructions,
       terms_and_conditions: termsAccepted,
       totals: {
@@ -340,7 +335,7 @@ export const useOrderWorkflow = () => {
         total: quoteData?.courier?.price || 0,
         freight_levy: quoteData?.courier?.freight_levy || 0,
       },
-      capture: role === 'admin' || (walletCheckData?.wallet_balance ?? 0) > calculation.grandTotal,
+      capture: role === 'admin' || !skipWalletCheckArg || (walletCheckData?.wallet_balance ?? 0) > calculation.grandTotal,
       save_address: addressData?.receiver?.saveToAddressBook ? 1 : 0,
       customer_id: selectedCustomer || undefined,
       ...(orderType === 'create-menual' ? {
@@ -365,12 +360,13 @@ export const useOrderWorkflow = () => {
           }
         },
         onError: (err: any) => {
+          console.log(err, 'error from order create ')
           showToast(err?.response?.data?.message || 'Failed to create orders', 'error');
         },
       });
     };
 
-    if (skipWalletCheckArg === true || role === 'admin') {
+    if (skipWalletCheckArg === true || role === 'admin' || courierData?.is_own) {
       executeCreateOrder();
       return;
     }
@@ -388,7 +384,7 @@ export const useOrderWorkflow = () => {
         showToast('Failed to create orders', 'error');
       },
     });
-  }, [itemsData, addressData, role, selectedCustomer, termsAccepted, ratesAccepted, dangerousGoodsAccepted, calculation.totalItems, calculation.grandTotal, courierData, insuranceSelected, signatureSelected, deliveryInstructions, quoteData?.courier?.base, quoteData?.courier?.gst, quoteData?.courier?.price, quoteData?.courier?.freight_levy, walletCheckData?.wallet_balance, orderType, manualOrderData.trackingNumber, manualOrderData.courierId, manualOrderData.amount, checkWallet, createOrder, navigate, printLabel]);
+  }, [itemsData, addressData, role, selectedCustomer, termsAccepted, ratesAccepted, dangerousGoodsAccepted, calculation.totalItems, calculation.grandTotal, courierData, insuranceSelected, signatureSelected, deliveryInstructions, quoteData?.courier?.base, quoteData?.courier?.gst, quoteData?.courier?.price, quoteData?.courier?.freight_levy, quoteData?.surcharges, walletCheckData?.wallet_balance, orderType, manualOrderData.trackingNumber, manualOrderData.courierId, manualOrderData.amount, checkWallet, createOrder, navigate, printLabel]);
 
   // Order Cancellation Flow
   const onCancelOrder = useCallback((manual: boolean = false) => {
@@ -452,7 +448,7 @@ export const useOrderWorkflow = () => {
         cover_limited_liability: insuranceSelected ? 1 : 0,
         signature_required: signatureSelected ? 1 : 0,
       },
-      surcharges: [],
+      surcharges: quoteData?.surcharges || [],
       delivery_instructions: deliveryInstructions,
       terms_and_conditions: termsAccepted,
       totals: {
@@ -485,7 +481,7 @@ export const useOrderWorkflow = () => {
         }
       );
     }
-  }, [termsAccepted, ratesAccepted, dangerousGoodsAccepted, selectedCustomer, orderDetail?.sender_details?.customer_id, addressData.sender.name, addressData.sender.company, addressData.sender.phone, addressData.sender.email, addressData.sender.address1, addressData.sender.suburb, addressData.sender.state, addressData.sender.postcode, addressData.sender.country, addressData.receiver.name, addressData.receiver.company, addressData.receiver.phone, addressData.receiver.email, addressData.receiver.address1, addressData.receiver.suburb, addressData.receiver.state, addressData.receiver.postcode, addressData.receiver.country, itemsData, courierData, insuranceSelected, signatureSelected, deliveryInstructions, quoteData?.courier?.base, quoteData?.courier?.gst, quoteData?.courier?.price, calculation.servicePrice, calculation.gst, calculation.grandTotal, orderType, manualOrderData.trackingNumber, manualOrderData.courierId, manualOrderData.amount, orderID, consignOrder, navigate, role, printLabel]);
+  }, [termsAccepted, ratesAccepted, dangerousGoodsAccepted, selectedCustomer, orderDetail?.sender_details?.customer_id, addressData.sender.name, addressData.sender.company, addressData.sender.phone, addressData.sender.email, addressData.sender.address1, addressData.sender.suburb, addressData.sender.state, addressData.sender.postcode, addressData.sender.country, addressData.receiver.name, addressData.receiver.company, addressData.receiver.phone, addressData.receiver.email, addressData.receiver.address1, addressData.receiver.suburb, addressData.receiver.state, addressData.receiver.postcode, addressData.receiver.country, itemsData, courierData, insuranceSelected, signatureSelected, deliveryInstructions, quoteData?.courier?.base, quoteData?.courier?.gst, quoteData?.courier?.price, quoteData?.surcharges, calculation.servicePrice, calculation.gst, calculation.grandTotal, orderType, manualOrderData.trackingNumber, manualOrderData.courierId, manualOrderData.amount, orderID, consignOrder, navigate, role, printLabel]);
 
   useEffect(() => {
     const savedAddressStr = sessionStorage.getItem('address');

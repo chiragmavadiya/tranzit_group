@@ -59,70 +59,78 @@ const RenderIntegrationSection = ({
                         </Card>
                     ))
                 ) : (
-                    data?.map((provider) => {
-                        const isConnected = provider.connected;
-                        return (
-                            <Card key={provider.slug} className="py-4 group relative overflow-hidden transition-all hover:shadow-md border-slate-200 dark:border-zinc-800 bg-white dark:bg-zinc-950">
-                                <CardHeader className="pb-4 bg-transparent">
-                                    <div className="flex justify-between items-start">
-                                        <div className="w-12 h-12 rounded-xl flex items-center justify-center mb-3 group-hover:scale-110 transition-transform">
-                                            <img src={provider.logo_url} alt={provider.name} className="h-full w-full object-contain" />
+                    <>
+                        {data?.map((provider) => {
+                            const isConnected = provider.connected;
+                            return (
+                                <Card key={provider.slug} className="py-4 group relative overflow-hidden transition-all hover:shadow-md border-slate-200 dark:border-zinc-800 bg-white dark:bg-zinc-950">
+                                    <CardHeader className="pb-4 bg-transparent">
+                                        <div className="flex justify-between items-start">
+                                            <div className="w-12 h-12 rounded-xl flex items-center justify-center mb-3 group-hover:scale-110 transition-transform">
+                                                <img src={provider.logo_url} alt={provider.name} className="h-full w-full object-contain" />
+                                            </div>
+                                            <Badge variant={isConnected ? "default" : "secondary"} className={cn(
+                                                "font-semibold text-[12px] pt-1 uppercase leading-100 tracking-wider flex items-center justify-center",
+                                                isConnected ? "bg-emerald-50 text-emerald-600 border-emerald-100 dark:bg-emerald-900/20 dark:text-emerald-400 dark:border-emerald-900/30" : "bg-slate-50 text-slate-400 border-slate-100 dark:bg-zinc-900 dark:text-zinc-500 dark:border-zinc-800"
+                                            )}>
+                                                {isConnected ? "Connected" : "Not Connected"}
+                                            </Badge>
                                         </div>
-                                        <Badge variant={isConnected ? "default" : "secondary"} className={cn(
-                                            "font-semibold text-[12px] pt-1 uppercase leading-100 tracking-wider flex items-center justify-center",
-                                            isConnected ? "bg-emerald-50 text-emerald-600 border-emerald-100 dark:bg-emerald-900/20 dark:text-emerald-400 dark:border-emerald-900/30" : "bg-slate-50 text-slate-400 border-slate-100 dark:bg-zinc-900 dark:text-zinc-500 dark:border-zinc-800"
-                                        )}>
-                                            {isConnected ? "Connected" : "Not Connected"}
-                                        </Badge>
-                                    </div>
-                                    <CardTitle className="text-base font-bold text-slate-900 dark:text-zinc-100">{provider.name}</CardTitle>
-                                    <CardDescription className="text-xs text-slate-500 dark:text-zinc-400 line-clamp-2 min-h-[32px]">
-                                        {provider.description}
-                                    </CardDescription>
-                                </CardHeader>
-                                {!fromCustomer && (
-                                    <CardContent className="pt-0 flex gap-2">
-                                        {isConnected ? (
-                                            <>
+                                        <CardTitle className="text-base font-bold text-slate-900 dark:text-zinc-100">{provider.name}</CardTitle>
+                                        <CardDescription className="text-xs text-slate-500 dark:text-zinc-400 line-clamp-2 min-h-[32px]">
+                                            {provider.description}
+                                        </CardDescription>
+                                    </CardHeader>
+                                    {!fromCustomer && (
+                                        <CardContent className="pt-0 flex gap-2">
+                                            {isConnected ? (
+                                                <>
+                                                    <Button
+                                                        variant="outline"
+                                                        size="sm"
+                                                        className="flex-1 h-8 leading-none text-xs font-bold border-slate-200 dark:border-zinc-800"
+                                                        onClick={() => onConfigure?.(provider.slug)}
+                                                        disabled={configLoadingProvider === provider.slug}
+                                                    >
+                                                        {configLoadingProvider === provider.slug ? (
+                                                            <Loader2 className="w-3.5 h-3.5 mr-1.5 animate-spin" />
+                                                        ) : (
+                                                            <Settings2 className="w-3.5 h-3.5 mr-1.5" />
+                                                        )}
+                                                        Configurations
+                                                    </Button>
+                                                    <Button
+                                                        variant="ghost"
+                                                        size="sm"
+                                                        className="h-8 text-red-500 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-950/20 px-2"
+                                                        onClick={() => disconnectMutation.mutate(provider.slug)}
+                                                        disabled={disconnectMutation.isPending && disconnectMutation.variables === provider.slug}
+                                                    >
+                                                        {disconnectMutation.isPending && disconnectMutation.variables === provider.slug ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Link2Off className="w-3.5 h-3.5" />}
+                                                        Disconnect
+                                                    </Button>
+                                                </>
+                                            ) : (
                                                 <Button
-                                                    variant="outline"
-                                                    size="sm"
-                                                    className="flex-1 h-8 leading-none text-xs font-bold border-slate-200 dark:border-zinc-800"
-                                                    onClick={() => onConfigure?.(provider.slug)}
-                                                    disabled={configLoadingProvider === provider.slug}
+                                                    className="w-full h-8 text-xs leading-none font-bold text-white transition-all shadow-sm active:scale-[0.98]"
+                                                    onClick={() => onConnect?.(provider.slug)}
                                                 >
-                                                    {configLoadingProvider === provider.slug ? (
-                                                        <Loader2 className="w-3.5 h-3.5 mr-1.5 animate-spin" />
-                                                    ) : (
-                                                        <Settings2 className="w-3.5 h-3.5 mr-1.5" />
-                                                    )}
-                                                    Configurations
+                                                    <Link2 className="w-3.5 h-3.5 mr-1.5" />
+                                                    Connect
                                                 </Button>
-                                                <Button
-                                                    variant="ghost"
-                                                    size="sm"
-                                                    className="h-8 text-red-500 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-950/20 px-2"
-                                                    onClick={() => disconnectMutation.mutate(provider.slug)}
-                                                    disabled={disconnectMutation.isPending && disconnectMutation.variables === provider.slug}
-                                                >
-                                                    {disconnectMutation.isPending && disconnectMutation.variables === provider.slug ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Link2Off className="w-3.5 h-3.5" />}
-                                                    Disconnect
-                                                </Button>
-                                            </>
-                                        ) : (
-                                            <Button
-                                                className="w-full h-8 text-xs leading-none font-bold text-white transition-all shadow-sm active:scale-[0.98]"
-                                                onClick={() => onConnect?.(provider.slug)}
-                                            >
-                                                <Link2 className="w-3.5 h-3.5 mr-1.5" />
-                                                Connect
-                                            </Button>
-                                        )}
-                                    </CardContent>
-                                )}
-                            </Card>
-                        );
-                    })
+                                            )}
+                                        </CardContent>
+                                    )}
+                                </Card>
+                            );
+                        })}
+
+                        {!isLoading && data?.length === 0 && (
+                            <div className="col-span-12 h-20 flex items-center justify-center">
+                                <p className="text-gray-500 dark:text-gray-400">No {title} found</p>
+                            </div>
+                        )}
+                    </>
                 )}
             </div>
         </div>

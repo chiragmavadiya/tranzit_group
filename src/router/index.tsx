@@ -7,6 +7,7 @@ import ClientRoutes from '@/apps/client/routes/ClientRoutes';
 import { useAppDispatch, useAppSelector } from '@/hooks/store.hooks';
 import { useGetUserDetails } from '@/features/auth/hooks/useAuth';
 import { setUser } from '@/features/auth/authSlice';
+// import SubscriptionPlanModal from '@/features/customer-settings/components/SubscriptionPlanModal';
 
 // Lazy load page components
 const SignIn = lazy(() => import('@/features/auth/pages/SignIn'));
@@ -45,6 +46,7 @@ export const AppRouter = () => {
 
   // Fetch user details if authenticated
   const { data: userData, isLoading, isPending } = useGetUserDetails(isAuthenticated);
+  // const [showSubscriptionModal, setShowSubscriptionModal] = useState(false);
 
   // Sync user details to Redux when query data updates
   useEffect(() => {
@@ -53,6 +55,9 @@ export const AppRouter = () => {
         user: userData.user,
         next_step: userData.next_step
       }));
+      // if (userData.next_step !== 'subscription_plan' && userData.user.roles[0]?.name !== 'admin') {
+      //   setShowSubscriptionModal(true);
+      // }
     }
   }, [userData, isPending, dispatch]);
 
@@ -85,6 +90,10 @@ export const AppRouter = () => {
         <Route path="/admin/*" element={<AdminRoutes />} />
         <Route path="/*" element={<ClientRoutes />} />
       </Routes>
+      {/* <SubscriptionPlanModal
+        open={showSubscriptionModal}
+        onOpenChange={setShowSubscriptionModal}
+      /> */}
     </Suspense>
   );
 };

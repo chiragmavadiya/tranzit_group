@@ -56,7 +56,7 @@ export interface AdminTopupResponse {
 }
 
 export interface WalletExportParams {
-  format: 'pdf';
+  format: 'pdf' | 'csv' | 'excel';
   search?: string;
   transaction_type?: string | number;
 }

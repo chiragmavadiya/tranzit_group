@@ -173,7 +173,7 @@ export default function ParcelReportPage() {
                 <Button
                   onClick={handleReset}
                   variant="outline"
-                  className="w-full h-8 border-slate-200 dark:border-zinc-800 text-slate-500 dark:text-zinc-400 font-bold uppercase tracking-widest text-[10px] bg-white dark:bg-zinc-950 hover:bg-slate-50 dark:hover:bg-zinc-900"
+                  className="w-full h-8 border-slate-200 dark:border-zinc-800 text-slate-500 dark:text-zinc-400 font-bold uppercase tracking-wide text-[10px] bg-white dark:bg-zinc-950 hover:bg-slate-50 dark:hover:bg-zinc-900"
                 >
                   Reset
                 </Button>
@@ -229,7 +229,7 @@ export default function ParcelReportPage() {
                 <Button
                   onClick={handleReset}
                   variant="outline"
-                  className="w-full h-8 border-slate-200 dark:border-zinc-800 text-slate-500 dark:text-zinc-400 font-bold uppercase tracking-widest text-[10px] bg-white dark:bg-zinc-950 hover:bg-slate-50 dark:hover:bg-zinc-900"
+                  className="w-full h-8 border-slate-200 dark:border-zinc-800 text-slate-500 dark:text-zinc-400 font-bold uppercase tracking-wide text-[10px] bg-white dark:bg-zinc-950 hover:bg-slate-50 dark:hover:bg-zinc-900"
                 >
                   Reset
                 </Button>
@@ -275,7 +275,7 @@ export default function ParcelReportPage() {
                     <Button
                       onClick={handleFileUpload}
                       disabled={!selectedFile || !invoiceType || isUploading}
-                      className="h-8 bg-slate-400 hover:bg-slate-500 dark:bg-zinc-700 dark:hover:bg-zinc-600 text-white font-bold uppercase tracking-widest text-[10px] px-4 shadow-sm transition-all min-w-[140px]"
+                      className="h-8 bg-slate-400 hover:bg-slate-500 dark:bg-zinc-700 dark:hover:bg-zinc-600 text-white font-bold uppercase tracking-wide text-[10px] px-4 shadow-sm transition-all min-w-[140px]"
                     >
                       {isUploading ? (
                         <Loader2 className="h-3 w-3 mr-2 animate-spin" />

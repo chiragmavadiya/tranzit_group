@@ -123,7 +123,7 @@ export function TransactionList({ transactions, className, loading }: Transactio
               <div className="w-12 h-12 rounded-full bg-slate-50 dark:bg-zinc-900 flex items-center justify-center mb-3">
                 <Wallet className="w-6 h-6 text-slate-300" />
               </div>
-              <p className="text-xs font-bold text-slate-400 uppercase tracking-widest">No transactions found</p>
+              <p className="text-xs font-bold text-slate-400 uppercase tracking-wide">No transactions found</p>
             </div>
           )}
         </div>

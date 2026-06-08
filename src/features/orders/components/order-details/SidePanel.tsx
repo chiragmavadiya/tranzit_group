@@ -75,7 +75,7 @@ export const SidePanel: React.FC<SidePanelProps> = memo(({
         {!isCreate && (
           <AccordionItem value="timeline" className="border border-gray-200 dark:border-zinc-800 rounded-xl bg-white dark:bg-zinc-950 shadow-xs px-5 border-b overflow-hidden transition-colors duration-300 [&>h3]:my-0">
             <AccordionTrigger className="hover:no-underline py-3 px-0 [&>svg]:text-primary">
-              <span className="text-base font-bold text-gray-900 dark:text-zinc-100 tracking-wider uppercase">Transit Timeline</span>
+              <span className="text-base font-bold text-gray-900 dark:text-zinc-100 tracking-wide uppercase">Transit Timeline</span>
             </AccordionTrigger>
             <AccordionContent className="pb-4 pt-1">
               <div className="flex flex-col pl-1 pt-2">
@@ -171,8 +171,8 @@ export const SidePanel: React.FC<SidePanelProps> = memo(({
           <AccordionItem value="summary" className="border border-gray-200 dark:border-zinc-800 rounded-xl bg-white dark:bg-zinc-950 shadow-xs px-5 border-b overflow-hidden transition-colors duration-300 [&>h3]:my-0">
             <AccordionTrigger className="hover:no-underline py-3 px-0 [&>svg]:text-primary">
               <div className="flex flex-wrap items-center gap-2.5 w-full text-left pr-6">
-                <span className="text-base font-bold text-gray-900 dark:text-zinc-100 tracking-wider">
-                  ORDER QUOTATION SUMMARY
+                <span className="text-base font-bold text-gray-900 dark:text-zinc-100 tracking-wide">
+                  Quote Summary
                 </span>
                 {payment_status && <StatusBadge status={payment_status} />}
               </div>
@@ -181,22 +181,22 @@ export const SidePanel: React.FC<SidePanelProps> = memo(({
 
 
               <div className="flex justify-between items-center text-sm">
-                <span className="text-gray-500 dark:text-zinc-400 font-medium">Total Items</span>
+                <span className="text-gray-500 dark:text-zinc-400 font-medium">Items</span>
                 <span className="font-bold text-gray-900 dark:text-zinc-100">{calculation?.totalItems}</span>
               </div>
               <div className="flex justify-between items-center text-sm">
-                <span className="text-gray-500 dark:text-zinc-400 font-medium">Total Weight</span>
+                <span className="text-gray-500 dark:text-zinc-400 font-medium">Dead weight</span>
                 <span className="font-bold text-gray-900 dark:text-zinc-100">{calculation?.totalWeight?.toFixed(2)} kg</span>
               </div>
               <div className="flex justify-between items-center text-sm">
-                <span className="text-gray-500 dark:text-zinc-400 font-medium">Volumetric</span>
-                <span className="font-bold text-gray-900 dark:text-zinc-100">{calculation?.volumetric?.toFixed(3)} m³</span>
+                <span className="text-gray-500 dark:text-zinc-400 font-medium">Volumetric Weight</span>
+                <span className="font-bold text-gray-900 dark:text-zinc-100">{calculation?.volumetric?.toFixed(2)} kg</span>
               </div>
 
               <div className="border-t border-gray-100 dark:border-zinc-800 my-1"></div>
 
               <div className="flex justify-between items-center text-sm">
-                <span className="text-gray-500 dark:text-zinc-400 font-medium">Service (Inc. F.L)</span>
+                <span className="text-gray-500 dark:text-zinc-400 font-medium">Shipping Services</span>
                 <span className="font-bold text-gray-900 dark:text-zinc-100">${calculation?.servicePrice?.toFixed(2)}</span>
               </div>
               <div className="flex justify-between items-center text-sm">
@@ -215,7 +215,7 @@ export const SidePanel: React.FC<SidePanelProps> = memo(({
               </div>
 
               <div className="border-t border-gray-100 dark:border-zinc-800 my-1 pt-2 flex justify-between items-center">
-                <span className="text-base text-gray-900 dark:text-zinc-100 font-bold">Total inc GST & F.L</span>
+                <span className="text-base text-gray-900 dark:text-zinc-100 font-bold">Total Payable</span>
                 <span className="text-base font-bold text-primary">${calculation?.grandTotal?.toFixed(2)}</span>
               </div>
 
@@ -229,7 +229,7 @@ export const SidePanel: React.FC<SidePanelProps> = memo(({
           <>
             <AccordionItem value="services" className="border border-gray-200 dark:border-zinc-800 rounded-xl bg-destructive/10 dark:bg-zinc-950 shadow-xs px-5 border-b overflow-hidden transition-colors duration-300 [&>h3]:my-0">
               <AccordionTrigger className="hover:no-underline py-3 px-0 [&>svg]:text-primary">
-                <span className="text-base font-bold text-gray-900 dark:text-zinc-100 tracking-wider uppercase">liability protection</span>
+                <span className="text-base font-bold text-gray-900 dark:text-zinc-100 tracking-wide">Liability Cover</span>
               </AccordionTrigger>
               <AccordionContent className="flex flex-col gap-5 pb-4 pt-1">
 
@@ -237,10 +237,10 @@ export const SidePanel: React.FC<SidePanelProps> = memo(({
                 <div className="flex flex-col gap-3">
 
                   <div className="text-xs font-medium text-gray-600 dark:text-zinc-400 flex flex-col gap-1">
-                    <span className='text-destructive/80'>This consignment is currently not covered by any limited liability protection.</span>
-                    <span className="font-semibold text-gray-800 dark:text-zinc-200">
+                    <span className='text-destructive/80'>This consignment is not currently covered by limited liability cover.</span>
+                    {/* <span className="font-semibold text-gray-800 dark:text-zinc-200">
                       Would you like to add limited liability cover of up to $100 per consignment?*
-                    </span>
+                    </span> */}
                   </div>
                   <RadioGroup
                     value={insuranceSelected ? "yes" : "no"}
@@ -251,13 +251,13 @@ export const SidePanel: React.FC<SidePanelProps> = memo(({
                     <div className="flex items-center gap-2">
                       <RadioGroupItem value="yes" id="insurance-yes" className="destructive" />
                       <label htmlFor="insurance-yes" className="text-xs font-semibold text-gray-700 dark:text-zinc-300 cursor-pointer select-none">
-                        Yes, add cover for $6.00 AUD
+                        Yes, Add cover up to $100 - $6.00
                       </label>
                     </div>
                     <div className="flex items-center gap-2">
                       <RadioGroupItem value="no" id="insurance-no" />
                       <label htmlFor="insurance-no" className="text-xs font-semibold text-gray-700 dark:text-zinc-300 cursor-pointer select-none">
-                        No, I don’t need cover
+                        No cover required
                       </label>
                     </div>
                   </RadioGroup>
@@ -269,7 +269,7 @@ export const SidePanel: React.FC<SidePanelProps> = memo(({
         {/* NOTES */}
         <AccordionItem value="notes" className="border border-gray-200 dark:border-zinc-800 rounded-xl bg-white dark:bg-zinc-950 shadow-xs px-5 border-b overflow-hidden transition-colors duration-300 [&>h3]:my-0">
           <AccordionTrigger className="hover:no-underline py-3 px-0 [&>svg]:text-primary items-center">
-            <span className="text-base font-bold text-gray-900 dark:text-zinc-100 tracking-wider uppercase">Delivery Instructions (Printed on Label)</span>
+            <span className="text-base font-bold text-gray-900 dark:text-zinc-100 tracking-wider uppercase">Delivery Instructions</span>
           </AccordionTrigger>
           <AccordionContent className="flex flex-col gap-2 pb-4">
             {!isCreate ? (
@@ -277,12 +277,15 @@ export const SidePanel: React.FC<SidePanelProps> = memo(({
                 {deliveryInstructions || "No delivery instructions provided."}
               </div>
             ) : (
-              <Textarea
-                className="min-h-[100px] border-gray-200 dark:border-zinc-800 text-xs text-gray-700 dark:text-zinc-300 focus:border-primary focus:ring-0 focus-visible:ring-0 transition-all duration-200 shadow-none font-medium"
-                placeholder="Add your notes here..."
-                value={deliveryInstructions}
-                onChange={(e) => handleOptionalFieldsChange('delivery_instructions', e.target.value)}
-              />
+              <>
+                <span className="text-xs text-gray-500 dark:text-zinc-400 font-medium">These notes may appear on the courier label or delivery instructions</span>
+                <Textarea
+                  className="min-h-[100px] border-gray-200 dark:border-zinc-800 text-xs text-gray-700 dark:text-zinc-300 focus:border-primary focus:ring-0 focus-visible:ring-0 transition-all duration-200 shadow-none font-medium"
+                  placeholder=" e.g. Leave at reception, call before delivery, loading dock access"
+                  value={deliveryInstructions}
+                  onChange={(e) => handleOptionalFieldsChange('delivery_instructions', e.target.value)}
+                />
+              </>
             )}
           </AccordionContent>
         </AccordionItem>
@@ -319,12 +322,12 @@ export const SidePanel: React.FC<SidePanelProps> = memo(({
                   {liability ? (
                     <>
                       <CheckCircle2 className="h-3.5 w-3.5 text-emerald-600" />
-                      <span className="text-[10px] font-bold text-emerald-700 dark:text-emerald-400 uppercase tracking-widest">Active Coverage</span>
+                      <span className="text-[10px] font-bold text-emerald-700 dark:text-emerald-400 uppercase tracking-wide">Active Coverage</span>
                     </>
                   ) : (
                     <>
                       <ShieldOff className="h-3.5 w-3.5 text-slate-400" />
-                      <span className="text-[10px] font-bold text-slate-500 dark:text-zinc-500 uppercase tracking-widest">No Coverage</span>
+                      <span className="text-[10px] font-bold text-slate-500 dark:text-zinc-500 uppercase tracking-wide">No Coverage</span>
                     </>
                   )}
                 </div>

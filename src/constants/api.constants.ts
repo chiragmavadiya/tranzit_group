@@ -95,6 +95,7 @@ export const API_ENDPOINTS = {
         TRANSACTION_EXPORT: (id: string | number) => `/admin/customers/${id}/transaction/export`,
         INVOICE_EXPORT: (id: string | number) => `/admin/customers/${id}/invoice/export`,
         INTEGRATIONS: (id: string | number) => `/admin/customers/${id}/integrations`,
+        WALLET_TOP_UP: "/admin/wallet/top-up",
     },
     ADMIN_STAFF: {
         BASE: "/admin/staff",

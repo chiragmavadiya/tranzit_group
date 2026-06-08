@@ -76,7 +76,7 @@ export default function ResetPassword() {
           <img src={brandlogo} alt="Logo" className="h-16 w-auto" />
         </div>
 
-        <h2 className="text-2xl mt-0 font-black tracking-tight text-slate-900 dark:text-white">
+        <h2 className="text-2xl mt-0 font-black text-slate-900 dark:text-white">
           Set a new password
         </h2>
       </div>

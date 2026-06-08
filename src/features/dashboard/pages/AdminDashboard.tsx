@@ -139,7 +139,7 @@ export default function AdminDashboard() {
         </div>
         {/* <div className="lg:col-span-12 flex flex-col gap-6">
           <div className="flex items-center justify-between">
-            <h2 className="text-sm font-bold text-slate-400 uppercase tracking-widest">Statistics</h2>
+            <h2 className="text-sm font-bold text-slate-400 uppercase tracking-wide">Statistics</h2>
             <div className="flex bg-slate-100 dark:bg-zinc-800 p-1 rounded-lg">
               {Object.keys(metrics?.periodLabels || {}).map((key) => (
                 <button key={key} onClick={() => setActivePeriod(key as any)} className={`px-3 py-1 text-[11px] font-bold rounded-md hover:bg-white dark:hover:bg-zinc-700 transition-all ${activePeriod === key ? 'text-primary bg-primary/10' : 'text-slate-500'}`}>

@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { NavLink, useLocation, useNavigate } from 'react-router-dom';
-import { Menu, ArrowLeft, ChevronDown } from 'lucide-react';
+import { Menu, ArrowLeft, ChevronDown, X } from 'lucide-react';
 import type { SidebarItem } from './types/Sidebar.types';
 import { adminSidebarItems, clientSidebarItems } from '../router/Navigation';
 import tranzit_logo from '@/assets/Tranzit_Logo.svg';
@@ -10,12 +10,23 @@ import tranzit_logo_dark from '@/assets/Tranzit_Logo_dark.svg';
 import { CustomTooltip } from '@/components/common/CustomTooltip';
 import { useAppSelector } from '@/hooks/store.hooks';
 import { useTheme } from '@/app/providers/theme-provider';
+import { cn } from '@/lib/utils';
+
 interface SidebarProps {
   isCollapsed: boolean;
   setIsCollapsed: (val: boolean) => void;
+  isMobile?: boolean;
+  isMobileSidebarOpen?: boolean;
+  setIsMobileSidebarOpen?: (val: boolean) => void;
 }
 
-export default function Sidebar({ isCollapsed, setIsCollapsed }: SidebarProps) {
+export default function Sidebar({
+  isCollapsed,
+  setIsCollapsed,
+  isMobile = false,
+  isMobileSidebarOpen = false,
+  setIsMobileSidebarOpen = () => { }
+}: SidebarProps) {
   const [activeSubmenu, setActiveSubmenu] = useState<string | null>(null);
   const [expandedItems, setExpandedItems] = useState<string[]>([]);
   const { role } = useAppSelector((state) => state.auth);
@@ -71,15 +82,29 @@ export default function Sidebar({ isCollapsed, setIsCollapsed }: SidebarProps) {
   const currentSubmenuData = sidebarItems.find(i => i.name === activeSubmenu);
 
   return (
-    <aside className={`print:hidden h-screen bg-white dark:bg-zinc-950 border-r border-gray-200 dark:border-zinc-800 flex flex-col justify-between fixed top-0 left-0 z-20 transition-[width] duration-500 ease-in-out ${isCollapsed ? 'w-[64px]' : 'w-[240px]'}`}>
+    <aside className={cn(
+      "print:hidden h-screen bg-white dark:bg-zinc-950 border-r border-gray-200 dark:border-zinc-800 flex flex-col justify-between fixed top-0 left-0 transition-all duration-300 ease-in-out z-20",
+      isMobile
+        ? "w-[240px] z-50 shadow-2xl"
+        : "z-20",
+      isMobile
+        ? (isMobileSidebarOpen ? "translate-x-0" : "-translate-x-full")
+        : "translate-x-0",
+      !isMobile && (isCollapsed ? "w-[64px]" : "w-[240px]")
+    )}>
       <div className="flex-1 overflow-y-auto overflow-x-hidden w-full no-scrollbar">
         {/* Main Menu Header */}
         {!activeSubmenu && (
-          <div className={`flex items-center h-16 px-4 sticky top-0 z-20 bg-white dark:bg-zinc-950 ${isCollapsed ? 'justify-center' : 'justify-between'}`}>
-            <button onClick={() => setIsCollapsed(!isCollapsed)} className="p-2 hover:bg-gray-100 dark:hover:bg-zinc-900 rounded-md text-primary transition-colors">
-              <Menu className="w-[22px] h-[22px]" strokeWidth={2.5} />
+          <div className={`flex items-center h-16 px-4 sticky top-0 z-20 bg-white dark:bg-zinc-950 ${isMobile ? 'justify-between' : (isCollapsed ? 'justify-center' : 'justify-between')
+            }`}>
+            <button
+              onClick={() => isMobile ? setIsMobileSidebarOpen(false) : setIsCollapsed(!isCollapsed)}
+              className="p-2 hover:bg-gray-100 dark:hover:bg-zinc-900 rounded-md text-primary transition-colors"
+            >
+              {isMobile ? <X className="w-[22px] h-[22px]" /> : <Menu className="w-[22px] h-[22px]" strokeWidth={2.5} />}
             </button>
-            <div className={`flex items-center transition-all duration-300 ease-in-out ${isCollapsed ? 'w-0 opacity-0 pointer-events-none overflow-hidden' : 'w-auto opacity-100'}`}>
+            <div className={`flex items-center transition-all duration-300 ease-in-out ${isMobile ? 'w-auto opacity-100' : (isCollapsed ? 'w-0 opacity-0 pointer-events-none overflow-hidden' : 'w-auto opacity-100')
+              }`}>
               {/* brand logo */}
               <img src={theme === "dark" ? tranzit_logo_dark : tranzit_logo} alt="Tranzit" className="h-15" />
             </div>
@@ -87,7 +112,7 @@ export default function Sidebar({ isCollapsed, setIsCollapsed }: SidebarProps) {
         )}
 
         {/* Submenu Header (e.g. Settings) */}
-        {activeSubmenu && !isCollapsed && (
+        {activeSubmenu && (!isCollapsed || isMobile) && (
           <div className="flex flex-col pt-2 animate-in slide-in-from-left-4 duration-300">
             <button
               onClick={handleBackToMainMenu}
@@ -101,18 +126,18 @@ export default function Sidebar({ isCollapsed, setIsCollapsed }: SidebarProps) {
                 {currentSubmenuData?.icon && <currentSubmenuData.icon className="w-6 h-6 text-primary" />}
                 <h2 className="my-0 text-xl font-bold tracking-tight text-slate-900 dark:text-zinc-100">{activeSubmenu}</h2>
               </div>
-              <ChevronDown className="w-5 h-5 text-primary rotate-180" />
+              {/* <ChevronDown className="w-5 h-5 text-primary rotate-180" /> */}
             </div>
           </div>
         )}
 
         <nav className="px-2 mt-1 space-y-0.5 pb-2">
-          {activeSubmenu && !isCollapsed ? (
+          {activeSubmenu && (!isCollapsed || isMobile) ? (
             // Render Submenu Groups (Settings)
             <div className="space-y-6 pt-4 animate-in fade-in duration-500">
               {currentSubmenuData?.subGroups?.map((group) => (
                 <div key={group.title} className="space-y-2">
-                  <h3 className="px-4 text-[11px] font-bold tracking-widest text-gray-400 uppercase">
+                  <h3 className="px-4 text-[11px] font-bold tracking-wide text-gray-400 uppercase">
                     {group.title}
                   </h3>
                   <div className="space-y-0.5">
@@ -203,14 +228,14 @@ export default function Sidebar({ isCollapsed, setIsCollapsed }: SidebarProps) {
                           </div>
                         </div>
                         {item.hasDropdown && (
-                          <ChevronDown className={`w-4 h-4 shrink-0 ml-2 transition-all duration-300 text-gray-400 dark:text-zinc-500 ${isCollapsed ? 'opacity-0' : 'opacity-100'} ${expandedItems.includes(item.name) ? 'rotate-360' : 'rotate-270'}`} />
+                          <ChevronDown className={`w-4 h-4 shrink-0 ml-2 transition-all duration-300 text-gray-400 dark:text-zinc-500 ${(isCollapsed && !isMobile) ? 'opacity-0' : 'opacity-100'} ${expandedItems.includes(item.name) ? 'rotate-360' : 'rotate-270'}`} />
                         )}
                       </>
                     );
                   }}
                 </NavLink>
                 {/* Sub-items for Analytics (and others) */}
-                {!isCollapsed && expandedItems.includes(item.name) && item.subItems && (
+                {(!isCollapsed || isMobile) && expandedItems.includes(item.name) && item.subItems && (
                   <div className="ml-9 mt-1 space-y-1 animate-in slide-in-from-top-2 duration-200">
                     {item.subItems.map((sub) => (
                       <NavLink

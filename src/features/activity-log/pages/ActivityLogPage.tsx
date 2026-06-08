@@ -68,7 +68,7 @@ export default function ActivityLogPage() {
                         onClick={handleReset}
                         variant="ghost"
                         size="sm"
-                        className="h-9 text-slate-500 hover:text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-500/10 font-bold uppercase tracking-widest text-[10px] gap-2 px-3 transition-all"
+                        className="h-9 text-slate-500 hover:text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-500/10 font-bold uppercase tracking-wide text-[10px] gap-2 px-3 transition-all"
                     >
                         <XCircle className="w-3.5 h-3.5" />
                         Clear Filters

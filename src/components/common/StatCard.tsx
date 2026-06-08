@@ -28,11 +28,11 @@ export const StatCard = memo(({ label, value, icon: Icon, subValue, color, class
     <Card className={cn("border ring-0 shadow-md border-gray-200 dark:border-zinc-800 rounded-xl bg-white dark:bg-zinc-950 transition-colors duration-300 hover:-translate-y- hover:border-primary/50", className)}>
       <CardContent className={cn("p-5 flex items-center justify-between gap-4", contentClassName)}>
         <div className="flex flex-col min-w-0">
-          <span className="text-[11px] font-bold text-slate-500 dark:text-zinc-500 uppercase tracking-widest leading-tight">
+          <span className="text-[11px] font-bold text-slate-500 dark:text-zinc-500 uppercase tracking-wide leading-tight">
             {label}
           </span>
           <div className="flex items-baseline gap-2">
-            <span className="text-xl font-black text-gray-900 dark:text-white tracking-tight">
+            <span className="text-xl font-black text-gray-900 dark:text-white">
               {value}
             </span>
             {subValue && (

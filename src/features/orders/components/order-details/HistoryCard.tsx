@@ -39,7 +39,7 @@ export const HistoryCard: React.FC<HistoryCardProps> = ({ history }) => {
       >
         <div className="flex items-center gap-2">
           <History className="h-4 w-4 text-primary" />
-          <CardTitle className="text-base font-bold text-gray-900 dark:text-zinc-100 tracking-wider">
+          <CardTitle className="text-base font-bold text-gray-900 dark:text-zinc-100 tracking-wide">
             HISTORY
           </CardTitle>
         </div>

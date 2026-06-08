@@ -177,3 +177,18 @@ export const useCustomerIntegrations = (id: number | string) => {
     });
 };
 
+export const useCreateCustomerTransaction = () => {
+    const queryClient = useQueryClient();
+
+    return useMutation({
+        mutationFn: ({ id, data }: { id: number | string; data: any }) => customerService.addTransaction(id, data),
+        onSuccess: (_, variables) => {
+            queryClient.invalidateQueries({ queryKey: QUERY_KEYS.ADMIN_CUSTOMERS.TRANSACTION(variables.id) });
+            queryClient.invalidateQueries({ queryKey: QUERY_KEYS.ADMIN_CUSTOMERS.DETAILS(variables.id) });
+            queryClient.invalidateQueries({ queryKey: QUERY_KEYS.ADMIN_CUSTOMERS.PROFILE(variables.id) });
+            queryClient.invalidateQueries({ queryKey: ["admin", "topups"] });
+        },
+    });
+};
+
+

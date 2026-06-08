@@ -14,7 +14,7 @@ import { useDebounce } from '@/hooks/useDebounce';
 import { useCreateOrder, useOrderReceiverAddress, useUpdateOrderReceiverAddress } from '../hooks/useOrders';
 import { useAppSelector } from '@/hooks/store.hooks';
 
-export default function CreateOrderDialog({ onOpenChange, type, open, initialData, isEdit, onSubmit, orderId, hasDefaultItemAndCourier }: CreateOrderDialogProps) {
+export default function CreateOrderDialog({ onOpenChange, type, open, initialData, isEdit, onSubmit, orderId, hasDefaultItemAndCourier, orderType }: CreateOrderDialogProps) {
   const navigate = useNavigate();
   const { role, user } = useAppSelector((state) => state.auth);
   const [formData, setFormData] = useState<AddressData>({
@@ -28,10 +28,9 @@ export default function CreateOrderDialog({ onOpenChange, type, open, initialDat
     street_name: "",
     suburb: "",
     state: "",
-    building: "",
     instructions: "",
     postcode: "",
-    country: "AUSTRALIA",
+    country: "Australia",
     name: "",
     saveToAddressBook: false
   });
@@ -60,7 +59,7 @@ export default function CreateOrderDialog({ onOpenChange, type, open, initialDat
       suburb: data.suburb,
       state: data.state,
       postcode: data.postcode,
-      country: "AUSTRALIA",
+      country: "Australia",
     }));
   }, [addressBookData]);
 
@@ -70,14 +69,14 @@ export default function CreateOrderDialog({ onOpenChange, type, open, initialDat
 
   const isEmailValid = (email: string) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
   const isPhoneValid = (phone: string) => /^(?:\+61|0)[2-478](?:[ -]?[0-9]){8}$/.test(phone.replace(/[\s-()]/g, ''));
-  console.log(formData, 'formData....')
+
   const updatePayload = useMemo(() => ({
     receiver_name: formData.name,
     receiver_business_name: formData.company,
     receiver_phone: formData.phone,
     receiver_email: formData.email,
     receiver_address: formData.address1,
-    unit_number: formData.building,
+    unit_number: formData.unit_number,
     address_info: formData.address_info,
     address: formData.address1,
     street_number: formData.street_number,
@@ -105,7 +104,7 @@ export default function CreateOrderDialog({ onOpenChange, type, open, initialDat
         street_number: user.addresses?.[0]?.street_number || '',
         postcode: user.addresses?.[0]?.postcode || '',
         name: `${user.first_name || ''} ${user.last_name || ''}`.trim(),
-        country: user.addresses?.[0]?.country || 'AUSTRALIA',
+        country: user.addresses?.[0]?.country || 'Australia',
       },
       receiver: {
         ...formData
@@ -126,6 +125,7 @@ export default function CreateOrderDialog({ onOpenChange, type, open, initialDat
         cover_limited_liability: 0,
         signature_required: 0,
       } : undefined,
+      surcharges: JSON.parse(sessionStorage.getItem('quote_courier') || '{}')?.surcharges || [],
       capture: false
     }
     sessionStorage.removeItem('quote_courier')
@@ -154,7 +154,7 @@ export default function CreateOrderDialog({ onOpenChange, type, open, initialDat
   const handleSubmit = async () => {
     setIsSubmitting(true);
     const { address1, country, name, postcode, state, suburb, phone, email } = formData;
-    if (!name || !address1 || !suburb || !state || !postcode || !country || !email || !phone) {
+    if (!name || !address1 || !suburb || !state || !postcode || !country) {
       showToast("Please fill in all required fields", "error");
       return;
     }
@@ -168,13 +168,12 @@ export default function CreateOrderDialog({ onOpenChange, type, open, initialDat
       showToast("Please enter a valid Australian phone number", "error");
       return;
     }
-    // if (isEdit) {
 
-    //   onSubmit(type!, formData)
-    //   setIsSubmitting(false);
-    //   onOpenChange(false)
-    // } else
-    if (isEdit) {
+    if (orderType === 'create' && hasDefaultItemAndCourier && !isEdit) {
+      executeCreateOrder()
+      return;
+    }
+    if (isEdit && orderType !== 'create') {
       updateOrderReceiverAddress({
         orderId: orderId as string,
         data: updatePayload
@@ -184,8 +183,6 @@ export default function CreateOrderDialog({ onOpenChange, type, open, initialDat
           onOpenChange(false);
         }
       })
-    } else if (hasDefaultItemAndCourier) {
-      executeCreateOrder()
     } else {
       onSubmit(type!, formData)
       setIsSubmitting(false);
@@ -214,7 +211,6 @@ export default function CreateOrderDialog({ onOpenChange, type, open, initialDat
         email: orderResponse?.data.receiver_email,
         phone: orderResponse?.data.receiver_phone,
         company: orderResponse?.data.receiver_business_name || '',
-        building: orderResponse?.data.receiver_building || '',
         instructions: orderResponse?.data.special_instructions || '',
         address_info: orderResponse?.data.address_info,
         address1: orderResponse?.data.receiver_address,
@@ -234,9 +230,10 @@ export default function CreateOrderDialog({ onOpenChange, type, open, initialDat
     <CustomModel
       open={open}
       onOpenChange={handleCloseMenualy}
-      title={`${type === 'receiver' ? 'Receiver' : 'Sender'} address`}
-      description={`Enter the ${type}'s address. You can lookup a customer's details saved in the address book to complete this section.`}
-      contentClass='min-w-3xl'
+      title={`Add ${type === 'receiver' ? 'Receiver' : 'Sender'} Detail`}
+      // description={`Enter the ${type}'s address. You can lookup a customer's details saved in the address book to complete this section.`}
+      description={`Search your address book or enter the ${type}'s  delivery detail for this order.`}
+      contentClass='min-w-4xl'
       onSubmit={handleSubmit}
       customFooter={!orderId && <div className="flex items-center gap-2">
         <Checkbox
@@ -252,7 +249,7 @@ export default function CreateOrderDialog({ onOpenChange, type, open, initialDat
           Save contact to address book
         </label>
       </div>}
-      submitText={isEdit ? 'Update' : 'Save'}
+      submitText={isEdit ? 'Update' : 'Continue'}
       isLoading={isUpdatePending || saveLoading}
     >
       <div className="flex-1 overflow-y-auto p-4 pt-0 custom-scrollbar">
@@ -263,7 +260,7 @@ export default function CreateOrderDialog({ onOpenChange, type, open, initialDat
               <button
                 onClick={() => setActiveLookup('contact')}
                 className={cn(
-                  "px-6 py-2 text-[12px] font-bold tracking-wide transition-colors border-r border-primary",
+                  "px-6 py-2 text-[12px] font-bold tracking-wide transition-colors border-r border-primary flex items-center",
                   activeLookup === 'contact' ? "bg-primary text-white" : "bg-white dark:bg-zinc-950 text-primary"
                 )}
               >
@@ -272,7 +269,7 @@ export default function CreateOrderDialog({ onOpenChange, type, open, initialDat
               <button
                 onClick={() => setActiveLookup('address')}
                 className={cn(
-                  "px-6 py-2 text-[12px] font-bold tracking-wide transition-colors",
+                  "px-6 py-2 text-[12px] font-bold tracking-wide transition-colors flex items-center",
                   activeLookup === 'address' ? "bg-primary text-white" : "bg-white dark:bg-zinc-950 text-primary"
                 )}
               >
@@ -351,9 +348,9 @@ export default function CreateOrderDialog({ onOpenChange, type, open, initialDat
                 onChange={val => updateField('email', val)}
                 layout="horizontal"
                 placeholder="Enter Email"
-                required
-                error={isSubmitting && (!formData.email?.trim() || !isEmailValid(formData.email))}
-                errormsg={!formData.email?.trim() ? "Please enter your email" : "Please enter a valid email address"}
+              // required
+              // error={isSubmitting && (!formData.email?.trim() || !isEmailValid(formData.email))}
+              // errormsg={!formData.email?.trim() ? "Please enter your email" : "Please enter a valid email address"}
               />
               <FormInput
                 label="Phone"
@@ -361,9 +358,9 @@ export default function CreateOrderDialog({ onOpenChange, type, open, initialDat
                 onChange={val => updateField('phone', val)}
                 layout="horizontal"
                 placeholder="Enter Phone"
-                required
-                error={isSubmitting && (!formData.phone?.trim() || !isPhoneValid(formData.phone))}
-                errormsg={!formData.phone?.trim() ? "Please enter your phone" : "Please enter a valid phone number"}
+              // required
+              // error={isSubmitting && (!formData.phone?.trim() || !isPhoneValid(formData.phone))}
+              // errormsg={!formData.phone?.trim() ? "Please enter your phone" : "Please enter a valid phone number"}
               />
               <div className="space-y-4">
                 <FormInput
@@ -374,7 +371,7 @@ export default function CreateOrderDialog({ onOpenChange, type, open, initialDat
                   placeholder='Enter Company name'
                 />
               </div>
-              <div className="space-y-4">
+              {/* <div className="space-y-4">
                 <FormInput
                   label="Building"
                   value={formData.building}
@@ -382,7 +379,7 @@ export default function CreateOrderDialog({ onOpenChange, type, open, initialDat
                   layout="horizontal"
                   placeholder='Enter Building name'
                 />
-              </div>
+              </div> */}
               <div className="space-y-4">
                 <FormTextarea
                   label="Instruction"
@@ -449,12 +446,13 @@ export default function CreateOrderDialog({ onOpenChange, type, open, initialDat
                 <FormInput
                   label="Country"
                   value={formData.country}
-                  onChange={val => updateField('country', val)}
+                  // onChange={val => updateField('country', val)}
                   layout="horizontal"
                   placeholder='Enter Country Name'
-                  required
-                  error={isSubmitting && formData.country?.trim() === ''}
-                  errormsg="Please enter your country"
+                  disabled
+                // required
+                // error={isSubmitting && formData.country?.trim() === ''}
+                // errormsg="Please enter your country"
                 />
               </div>
             </div>
@@ -465,7 +463,7 @@ export default function CreateOrderDialog({ onOpenChange, type, open, initialDat
             <Accordion className="w-full border border-slate-200 dark:border-zinc-800 rounded-md bg-white dark:bg-zinc-950/50 shadow-sm overflow-hidden">
               <AccordionItem value="validation" className="border-none [&>h3]:my-0">
                 <AccordionTrigger className="px-5 py-3 hover:no-underline flex justify-between items-center group">
-                  <span className="text-[11px] font-extrabold text-slate-800 dark:text-zinc-300 uppercase tracking-widest leading-none">
+                  <span className="text-[11px] font-extrabold text-slate-800 dark:text-zinc-300 uppercase tracking-wide leading-none">
                     ADDRESS VALIDATION
                   </span>
                 </AccordionTrigger>

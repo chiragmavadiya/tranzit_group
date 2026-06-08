@@ -201,7 +201,7 @@ export const InvoicePaper: React.FC<InvoicePaperProps> = ({
 
         {/* Center Column (Partition 2) */}
         <div className="flex justify-center min-h-[160px]">
-          <h1 className="my-0 text-4xl font-black text-primary dark:text-white uppercase tracking-[0.1em]">TAX INVOICE</h1>
+          <h1 className="my-0 text-4xl font-black text-primary dark:text-white uppercase tracking-wide">TAX INVOICE</h1>
         </div>
 
         {/* Right Column (Partition 3) */}

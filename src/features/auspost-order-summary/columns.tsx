@@ -6,7 +6,7 @@ export const AUSPOST_COLUMNS: Column<AuspostOrder>[] = [
     key: 'order_number',
     header: 'ORDER NUMBER',
     sortable: true,
-    cell: (val) => <span className="font-bold text-slate-900 dark:text-zinc-100 text-[12px] tracking-tight">{val}</span>
+    cell: (val) => <span className="font-bold text-slate-900 dark:text-zinc-100 text-[12px]">{val}</span>
   },
   {
     key: 'customer_name',

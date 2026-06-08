@@ -1,6 +1,7 @@
 import { api } from '@/services/api';
 import { API_ENDPOINTS } from '@/constants/api.constants';
 import type { PaginatedInvoicesResponse, Invoice } from '../types';
+import { getFileName } from '@/lib/utils';
 
 export const invoicesService = {
   getCustomerInvoices: async (params?: { search?: string; page?: number; per_page?: number }): Promise<PaginatedInvoicesResponse> => {
@@ -99,7 +100,8 @@ export const invoicesService = {
       params,
       responseType: 'blob',
     });
-    const filename = `Admin_Invoices_Export_${new Date().getTime()}.${params.format}`;
+    const format = params.format === 'csv' ? 'csv' : params.format === 'excel' ? 'xlsx' : 'pdf';
+    const filename = getFileName(response) || `Admin_Invoices_Export_${new Date().getTime()}.${format}`;
     return { blob: response.data, filename };
   }
 };

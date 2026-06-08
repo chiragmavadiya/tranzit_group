@@ -11,6 +11,7 @@ import type {
     OrderCountsResponse
 } from "../types/api.types";
 import type { OrderDetailData } from "../types/order-details.types";
+import { getFileName } from "@/lib/utils";
 
 export const ordersService = {
     /**
@@ -133,7 +134,7 @@ export const ordersService = {
             responseType: "blob",
         });
 
-        const filename = `orders_${new Date().getTime()}.${params.format}`;
+        const filename = getFileName(response) || `customer-orders-${new Date().getTime()}.${params.format}`;
 
         return { blob: response.data, filename };
     },

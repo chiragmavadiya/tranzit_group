@@ -39,7 +39,7 @@ export const CustomerNameCell = ({
           <PopoverTrigger className="w-full">
             <button
               onClick={() => setOpen(prev => !prev)}
-              className="w-full px-0 transition-all duration-250 py-1 border border-transparent group-hover/row:px-1.5 group-hover/row:border-gray-200 group-hover/row:bg-white rounded-sm dark:hover:bg-zinc-900 flex items-center justify-between hover:text-primary outline-none cursor-pointer text-slate-800 dark:text-zinc-200"
+              className="w-full px-0 transition-all duration-250 py-1 border border-transparent group-hover/row:px-1.5 group-hover/row:border-gray-200 dark:group-hover/row:border-zinc-800 group-hover/row:bg-white dark:group-hover/row:bg-zinc-900 rounded-sm flex items-center justify-between hover:text-primary outline-none cursor-pointer text-slate-800 dark:text-zinc-200"
             >
               <span className="truncate uppercase font-semibold">{value}</span>
               <ChevronDown className="w-3.5 h-3.5 hidden group-hover/row:block text-slate-400 dark:text-zinc-500 shrink-0 ml-1" />
@@ -47,7 +47,7 @@ export const CustomerNameCell = ({
           </PopoverTrigger>
           <PopoverContent
             onMouseLeave={() => setOpen(false)}
-            className="w-72 p-4 text-sm text-slate-700 dark:text-zinc-355 font-normal bg-white dark:bg-zinc-950 rounded-sm border border-gray-200 dark:border-zinc-800 shadow-md"
+            className="w-72 p-4 text-sm text-slate-700 dark:text-zinc-300 font-normal bg-white dark:bg-zinc-950 rounded-sm border border-gray-200 dark:border-zinc-800 shadow-md"
             align="start"
           >
             <div className="flex flex-col gap-3">
@@ -78,7 +78,7 @@ export const CustomerNameCell = ({
   }
 
   return (
-    <div className="flex justify-between items-center truncate uppercase font-semibold py-1 px-0 transition-all duration-250 border border-transparent group-hover/row:px-1.5 group-hover/row:border-gray-200 group-hover/row:bg-white rounded-sm dark:hover:bg-zinc-900">
+    <div className="flex justify-between items-center truncate uppercase font-semibold py-1 px-0 transition-all duration-250 border border-transparent group-hover/row:px-1.5 group-hover/row:border-gray-200 dark:group-hover/row:border-zinc-800 group-hover/row:bg-white dark:group-hover/row:bg-zinc-900 rounded-sm text-slate-800 dark:text-zinc-200">
       {value}
       <Pencil onClick={() => customerEditClick(row.order_number)} className="h-3 w-3 cursor-pointer text-primary hidden group-hover/row:block" />
     </div>

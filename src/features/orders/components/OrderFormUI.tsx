@@ -93,10 +93,10 @@ export const FormInput = memo(React.forwardRef<HTMLInputElement, FormInputProps>
           autoFocus={false}
           autoComplete="nope"
           className={cn(
-            "h-8 rounded-sm border-slate-200 dark:border-zinc-800 bg-white dark:bg-zinc-950 font-normal focus-visible:ring-0 focus-visible:ring-primary focus-visible:border-primary transition-all placeholder:text-muted-foreground placeholder:font-normal dark:placeholder:text-zinc-700 text-sm",
+            "h-8 rounded-sm border-slate-200 dark:border-zinc-800 bg-white dark:bg-zinc-950 font-normal focus-visible:ring-0 focus-visible:ring-primary dark:focus-visible:ring-primary focus-visible:border-primary dark:focus-visible:border-primary transition-all placeholder:text-muted-foreground placeholder:font-normal dark:placeholder:text-zinc-700 text-sm",
             Icon ? "pl-9" : "px-3",
             type === 'password' ? "pr-10" : "",
-            error ? "border-red-500 focus-visible:border-red-500" : "",
+            error ? "border-red-500 dark:border-red-500 focus-visible:border-red-500 dark:focus-visible:border-red-500" : "",
             inputClassName,
           )}
           disabled={disabled}
@@ -166,8 +166,8 @@ export function FormTextarea({
         onChange={handleChange}
         rows={rows}
         className={cn(
-          "rounded-sm shadow-none border-slate-200 dark:border-zinc-800 bg-white dark:bg-zinc-950 font-medium focus-visible:ring-0 focus-visible:ring-primary focus-visible:border-primary transition-all placeholder:text-muted-foreground placeholder:font-normal dark:placeholder:text-zinc-700 text-sm resize-none px-3 py-2",
-          error ? "border-red-500 focus-visible:border-red-500" : ""
+          "rounded-sm shadow-none border-slate-200 dark:border-zinc-800 bg-white dark:bg-zinc-950 font-medium focus-visible:ring-0 focus-visible:ring-primary dark:focus-visible:ring-primary focus-visible:border-primary dark:focus-visible:border-primary transition-all placeholder:text-muted-foreground placeholder:font-normal dark:placeholder:text-zinc-700 text-sm resize-none px-3 py-2",
+          error ? "border-red-500 dark:border-red-500 focus-visible:border-red-500 dark:focus-visible:border-red-500" : ""
         )}
       />
       {error ? <div className="text-red-500 text-[11px] w-full">{errormsg}</div> : null}
@@ -227,7 +227,7 @@ export const FormSelect = memo(({
       />
       <div>
         <SelectSearch
-          className={cn("w-full h-8 text-[13px] data-[size=default]:h-8 border-slate-200 rounded-sm dark:border-zinc-800 font-medium bg-white dark:bg-zinc-950 text-slate-900 dark:text-zinc-100 focus:ring-primary transition-all text-sm px-3 ", error ? "border-red-500 focus:border-red-500" : "", selectClassName)}
+          className={cn("w-full h-8 text-[13px] data-[size=default]:h-8 border-slate-200 rounded-sm dark:border-zinc-800 font-medium bg-white dark:bg-zinc-950 text-slate-900 dark:text-zinc-100 focus:ring-primary dark:focus:ring-primary focus:border-primary dark:focus:border-primary transition-all text-sm px-3 ", error ? "border-red-500 dark:border-red-500 focus:border-red-500 dark:focus:border-red-500" : "", selectClassName)}
           options={memoizedData}
           // defaultValue="default"
           onValueChange={onValueChange}

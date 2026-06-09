@@ -265,7 +265,7 @@ const DataTableComponent = <T extends Record<string, any>>(props: DataTableProps
           <TableHeader className={cn("bg-white dark:bg-zinc-950 sticky top-0 z-10 shadow-sm", headerClassName)}>
             <TableRow className="hover:bg-transparent border-b border-gray-100 dark:border-zinc-800">
               {selectable && (
-                <TableHead className="sticky left-0 bg-background h-12 text-[14px] font-bold text-gray-900 dark:text-zinc-100 uppercase tracking-wide px-5 pr-3! print:hidden">
+                <TableHead className="sticky left-0 bg-white dark:bg-zinc-950 h-12 text-[14px] font-bold text-gray-900 dark:text-zinc-100 uppercase tracking-wide px-5 pr-3! print:hidden border-b border-gray-100 dark:border-zinc-800">
                   <Checkbox
                     checked={currentSelectedRows.length === displayData.length && displayData.length > 0}
                     onCheckedChange={handleSelectAll}
@@ -279,9 +279,9 @@ const DataTableComponent = <T extends Record<string, any>>(props: DataTableProps
                   className={cn(
                     "h-12 text-[14px] font-bold text-gray-900 dark:text-zinc-100 uppercase tracking-wide px-5",
                     column.sortable !== false && sortable && "cursor-pointer hover:bg-muted/50",
-                    column.sticky === 'left' && "sticky left-8 bg-background z-20 shadow-[inset_-1px_0_0_0_#ebe6e7]",
+                    column.sticky === 'left' && "sticky bg-white dark:bg-zinc-950 z-20 shadow-[inset_-1px_0_0_0_#ebe6e7] dark:shadow-[inset_-1px_0_0_0_#27272a]",
                     column.sticky === 'left' ? selectable ? 'left-[48px]' : 'left-0' : '',
-                    column.sticky === 'right' && "sticky right-0 bg-background z-20 shadow-[inset_1px_0_0_0_#ebe6e7]",
+                    column.sticky === 'right' && "sticky right-0 bg-white dark:bg-zinc-950 z-20 shadow-[inset_1px_0_0_0_#ebe6e7] dark:shadow-[inset_1px_0_0_0_#27272a]",
                     column.className,
                     column.noPrint && 'print:hidden'
                   )}
@@ -321,15 +321,22 @@ const DataTableComponent = <T extends Record<string, any>>(props: DataTableProps
                   <TableRow
                     key={rowId}
                     className={cn(
-                      "group/row bg-white dark:bg-zinc-950 hover:bg-primary/5 dark:hover:bg-primary/10 border-b border-gray-100 dark:border-zinc-800 transition-colors",
-                      isSelected && "bg-muted",
+                      "group/row border-b border-gray-100 dark:border-zinc-800 transition-colors",
+                      isSelected
+                        ? "bg-slate-100 dark:bg-zinc-900"
+                        : "bg-white dark:bg-zinc-950 hover:bg-primary/5 dark:hover:bg-primary/10",
                       onRowClick && "cursor-pointer",
                       typeof rowClassName === 'function' ? rowClassName(row, index) : rowClassName
                     )}
                     onClick={() => onRowClick?.(row, index)}
                   >
                     {selectable && (
-                      <TableCell className="sticky left-0 bg-background px-5 py-3 text-sm font-medium text-gray-700 dark:text-zinc-300 print:hidden">
+                      <TableCell className={cn(
+                        "sticky left-0 px-5 py-3 text-sm font-medium text-gray-700 dark:text-zinc-300 print:hidden transition-colors",
+                        isSelected
+                          ? "bg-slate-100 dark:bg-zinc-900"
+                          : "bg-white dark:bg-zinc-950 group-hover/row:bg-slate-50 dark:group-hover/row:bg-zinc-900/50"
+                      )}>
                         <Checkbox
                           checked={isSelected}
                           onCheckedChange={() => handleSelectRow(rowId)}
@@ -342,11 +349,21 @@ const DataTableComponent = <T extends Record<string, any>>(props: DataTableProps
                       <TableCell
                         key={`${column.key}-${rowId}-${colIndex}`}
                         className={cn(
-                          `px-5 py-3 text-sm  text-gray-800 dark:text-zinc-300 whitespace-normal`,
-                          column.sticky === 'left' && "sticky left-0 bg-white shadow-[inset_-1px_0_0_0_#ebe6e7]",
+                          `px-5 py-3 text-sm text-gray-800 dark:text-zinc-300 whitespace-normal transition-colors`,
+                          column.sticky === 'left' && cn(
+                            "sticky left-0 shadow-[inset_-1px_0_0_0_#ebe6e7] dark:shadow-[inset_-1px_0_0_0_#27272a]",
+                            isSelected
+                              ? "bg-slate-100 dark:bg-zinc-900"
+                              : "bg-white dark:bg-zinc-950 group-hover/row:bg-slate-50 dark:group-hover/row:bg-zinc-900/50"
+                          ),
                           column.sticky === 'left' ? selectable ? 'left-[48px]' : 'left-0' : '',
 
-                          column.sticky === 'right' && "sticky right-0 bg-white shadow-[inset_1px_0_0_0_#ebe6e7]",
+                          column.sticky === 'right' && cn(
+                            "sticky right-0 shadow-[inset_1px_0_0_0_#ebe6e7] dark:shadow-[inset_1px_0_0_0_#27272a]",
+                            isSelected
+                              ? "bg-slate-100 dark:bg-zinc-900"
+                              : "bg-white dark:bg-zinc-950 group-hover/row:bg-slate-50 dark:group-hover/row:bg-zinc-900/50"
+                          ),
                           isSelected && "font-semibold",
                           column.className,
                           cellClassName,

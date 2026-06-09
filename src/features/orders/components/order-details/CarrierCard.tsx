@@ -257,7 +257,7 @@ export const CarrierCard: React.FC<CarrierCardProps> = memo((props) => {
                 const courierSurcharges = surchargesMap[courier.courierCode] || [];
                 const selectedNames = selectedSurchargesMap[courier.courierCode] ?? [];
                 const isSelected = selectedServiceId === serviceId
-
+                console.log(selectedServiceId, 'selectedServiceId', initialSelectedCourierId, 'initialSelectedCourierId', serviceId, 'serviceId')
                 if (courier.success === false) {
                   return (
                     <div

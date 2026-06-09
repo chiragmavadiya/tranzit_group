@@ -297,11 +297,11 @@ export default function AccountSettingsPage() {
             </>
           ) : (
             <>
-              <Button variant="outline" size="sm" onClick={handleEditClick} className="h-8 px-4 text-[13px] font-medium text-gray-700 shadow-sm shrink-0 rounded-sm">
+              <Button variant="outline" size="lg" onClick={handleEditClick} className="h-8 px-4 text-[13px] font-medium shadow-sm shrink-0 rounded-sm">
                 <Edit2 className="w-3.5 h-3.5 mr-1.5" />
                 Edit Profile
               </Button>
-              <Button variant="outline" size="sm" onClick={() => setIsPasswordOpen(true)} className="h-8 px-4 text-[13px] font-medium text-gray-700 shadow-sm shrink-0 rounded-sm">
+              <Button variant="outline" size="sm" onClick={() => setIsPasswordOpen(true)} className="h-8 px-4 text-[13px] font-medium shadow-sm shrink-0 rounded-sm">
                 Change Password
               </Button>
             </>

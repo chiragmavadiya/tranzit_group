@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
-import { Edit2 } from 'lucide-react';
+import { Edit2, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { FormInput, FormSelect } from '@/features/orders/components/OrderFormUI';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
@@ -10,6 +10,9 @@ import { PlaceAutocomplete } from '@/components/common/AutoComplateAddress';
 import { useAppSelector } from '@/hooks/store.hooks';
 import SubscriptionPlanModal from '../components/SubscriptionPlanModal';
 import { STATES } from '@/constants';
+import { useGetProfile, useUpdateProfile, useChangePassword } from '@/features/profile/hooks/useProfile';
+import { Checkbox } from '@/components/ui/checkbox';
+import { Label } from '@/components/ui/label';
 // import { CreateAddressDialog } from '@/features/address-book/components/CreateAddressDialog';
 // import { STATES } from '@/constants';
 
@@ -30,8 +33,18 @@ export default function AccountSettingsPage() {
   const [isEditingProfile, setIsEditingProfile] = useState(false);
   const [isPasswordOpen, setIsPasswordOpen] = useState(false);
   const [isPlanModalOpen, setIsPlanModalOpen] = useState(false);
-  const { user } = useAppSelector((state) => state.auth);
+  const [sameAsShipping, setSameAsShipping] = useState(false);
+  // const { user } = useAppSelector((state) => state.auth);
   const { summary } = useAppSelector((state) => state.wallet);
+
+  // Fetch profile details
+  const { data: profileResponse } = useGetProfile();
+  const profile = profileResponse?.data;
+
+  // Mutations
+  const updateProfileMutation = useUpdateProfile();
+  const changePasswordMutation = useChangePassword();
+
   // Initial Form values matching user's request
   const [formData, setFormData] = useState({
     firstName: '',
@@ -40,15 +53,28 @@ export default function AccountSettingsPage() {
     phone: '',
     companyName: '',
     abn: '',
-    address_info: '',
-    address: '',
-    unit_number: '',
-    street_number: '',
-    street_name: '',
-    street_type: '',
-    suburb: '',
-    state: '',
-    postcode: '',
+
+    // Shipping Address
+    shipping_address_info: '',
+    shipping_address: '',
+    shipping_unit_number: '',
+    shipping_street_number: '',
+    shipping_street_name: '',
+    shipping_street_type: '',
+    shipping_suburb: '',
+    shipping_state: '',
+    shipping_postcode: '',
+
+    // Billing Address
+    billing_address_info: '',
+    billing_address: '',
+    billing_unit_number: '',
+    billing_street_number: '',
+    billing_street_name: '',
+    billing_street_type: '',
+    billing_suburb: '',
+    billing_state: '',
+    billing_postcode: '',
   });
   const [backupData, setBackupData] = useState({ ...formData });
   const [passwordData, setPasswordData] = useState({
@@ -78,8 +104,45 @@ export default function AccountSettingsPage() {
   };
 
   const onSave = () => {
-    setIsEditingProfile(false);
-    // showToast("Profile updated successfully!", "success");
+    const payload = {
+      first_name: formData.firstName,
+      last_name: formData.lastName,
+      mobile: formData.phone,
+      personal_email: formData.email,
+      business_name: formData.companyName,
+      gst_number: formData.abn,
+      address_detail: {
+        default: {
+          address_info: formData.shipping_address_info,
+          address: formData.shipping_address,
+          unit_number: formData.shipping_unit_number,
+          street_number: formData.shipping_street_number,
+          street_name: formData.shipping_street_name,
+          street_type: formData.shipping_street_type,
+          suburb: formData.shipping_suburb,
+          state: formData.shipping_state,
+          postcode: formData.shipping_postcode,
+        },
+        billing: {
+          address_info: formData.billing_address_info,
+          address: formData.billing_address,
+          unit_number: formData.billing_unit_number,
+          street_number: formData.billing_street_number,
+          street_name: formData.billing_street_name,
+          street_type: formData.billing_street_type,
+          suburb: formData.billing_suburb,
+          state: formData.billing_state,
+          postcode: formData.billing_postcode,
+        }
+      }
+    }
+    console.log(payload, 'save payload......')
+    // return
+    updateProfileMutation.mutate(payload, {
+      onSuccess: () => {
+        setIsEditingProfile(false);
+      }
+    });
   };
 
   const onCancel = () => {
@@ -106,12 +169,21 @@ export default function AccountSettingsPage() {
       return;
     }
 
-    // showToast("Password updated successfully!", "success");
-    setIsPasswordOpen(false);
-    setPasswordData({
-      currentPassword: '',
-      newPassword: '',
-      confirmPassword: '',
+    changePasswordMutation.mutate({
+      current_password: passwordData.currentPassword,
+      new_password: passwordData.newPassword,
+      new_password_confirmation: passwordData.confirmPassword,
+    }, {
+      onSuccess: (res) => {
+        if (res.status) {
+          setIsPasswordOpen(false);
+          setPasswordData({
+            currentPassword: '',
+            newPassword: '',
+            confirmPassword: '',
+          });
+        }
+      }
     });
   };
 
@@ -121,36 +193,120 @@ export default function AccountSettingsPage() {
   };
 
   useEffect(() => {
-    if (user) {
-      const data = {
-        firstName: user.first_name || '',
-        lastName: user.last_name || '',
-        email: user.email || '',
-        phone: user.personal_mobile || '',
-        companyName: user.business_name || '',
-        abn: '',
-        address_info: user.addresses[0]?.address_info || '',
-        address: user.addresses[0]?.address || '',
-        unit_number: user.addresses[0]?.unit_number || '',
-        street_number: user.addresses[0]?.street_number || '',
-        street_name: user.addresses[0]?.street_name || '',
-        street_type: user.addresses[0]?.street_type || '',
-        suburb: user.addresses[0]?.suburb || '',
-        state: user.addresses[0]?.state || '',
-        postcode: user.addresses[0]?.postcode || '',
-      }
-      setFormData(data);
-      setBackupData(data)
-    }
-  }, [user]);
+    const shAddr = profile?.address_detail?.default;
+    const billAddr = profile?.address_detail?.billing;
+    // const shAddr = profile?.address_detail?.default || user.addresses?.[0];
+    // const billAddr = profile?.address_detail?.billing || user.addresses?.[0];
 
+    const isIdentical = shAddr && billAddr && (
+      (shAddr.address === billAddr.address) &&
+      (shAddr.unit_number === billAddr.unit_number) &&
+      (shAddr.suburb === billAddr.suburb) &&
+      (shAddr.state === billAddr.state) &&
+      (shAddr.postcode === billAddr.postcode)
+    );
+    setSameAsShipping(!!isIdentical);
+    // firstName: profile?.first_name || user.first_name || '',
+    // lastName: profile?.last_name || user.last_name || '',
+    // email: profile?.personal_email || user.personal_email || user.email || '',
+    // phone: profile?.mobile || user.personal_mobile || user.mobile || '',
+    // companyName: profile?.business_name || user.business_name || '',
+
+    const data = {
+      firstName: profile?.first_name || '',
+      lastName: profile?.last_name || '',
+      email: profile?.personal_email || '',
+      phone: profile?.mobile || profile?.personal_mobile || '',
+      companyName: profile?.business_name || '',
+      abn: profile?.gst_number || '',
+
+      // Shipping Address
+      shipping_address_info: shAddr?.address_info || shAddr?.address || '',
+      shipping_address: shAddr?.address || '',
+      shipping_unit_number: shAddr?.unit_number || '',
+      shipping_street_number: shAddr?.street_number || '',
+      shipping_street_name: shAddr?.street_name || '',
+      shipping_street_type: shAddr?.street_type || '',
+      shipping_suburb: shAddr?.suburb || '',
+      shipping_state: shAddr?.state || '',
+      shipping_postcode: shAddr?.postcode || '',
+
+      // Billing Address
+      billing_address_info: billAddr?.address_info || billAddr?.address || '',
+      billing_address: billAddr?.address || '',
+      billing_unit_number: billAddr?.unit_number || '',
+      billing_street_number: billAddr?.street_number || '',
+      billing_street_name: billAddr?.street_name || '',
+      billing_street_type: billAddr?.street_type || '',
+      billing_suburb: billAddr?.suburb || '',
+      billing_state: billAddr?.state || '',
+      billing_postcode: billAddr?.postcode || '',
+    };
+    setFormData(data);
+    setBackupData(data);
+  }, [profile]);
+
+  useEffect(() => {
+    if (sameAsShipping) {
+      setFormData(prev => ({
+        ...prev,
+        billing_address_info: prev.shipping_address_info,
+        billing_address: prev.shipping_address,
+        billing_unit_number: prev.shipping_unit_number,
+        billing_street_number: prev.shipping_street_number,
+        billing_street_name: prev.shipping_street_name,
+        billing_street_type: prev.shipping_street_type,
+        billing_suburb: prev.shipping_suburb,
+        billing_state: prev.shipping_state,
+        billing_postcode: prev.shipping_postcode,
+      }));
+    }
+  }, [
+    sameAsShipping,
+    formData.shipping_address_info,
+    formData.shipping_address,
+    formData.shipping_unit_number,
+    formData.shipping_street_number,
+    formData.shipping_street_name,
+    formData.shipping_street_type,
+    formData.shipping_suburb,
+    formData.shipping_state,
+    formData.shipping_postcode,
+  ]);
+
+  console.log(formData)
   return (
     <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 w-full items-start">
 
-      <div className="col-span-12 ml-auto">
-        <Button variant="outline" size="sm" onClick={() => setIsPasswordOpen(true)} className="h-8 px-3 text-[12px] font-medium text-gray-700 shadow-sm shrink-0 rounded-sm">
-          Change Password
-        </Button>
+      <div className="col-span-12 flex items-center justify-between">
+        <div>
+          <h2 className="text-xl font-bold text-gray-800 dark:text-zinc-200 my-0">Account Settings</h2>
+          <p className="text-sm text-gray-600 dark:text-gray-400 my-0">Manage your company profile, contact information, addresses, team access, and account preferences</p>
+        </div>
+
+        <div className="flex items-center gap-2">
+          {isEditingProfile ? (
+            <>
+              <Button variant="outline" size="lg" onClick={onCancel} disabled={updateProfileMutation.isPending} className="h-8 px-4 text-[13px] font-medium rounded-sm">
+                Cancel
+              </Button>
+              <Button size="lg" onClick={() => onSave()} disabled={updateProfileMutation.isPending} className="h-8 px-4 text-[13px] font-medium text-white rounded-sm">
+                {updateProfileMutation.isPending && <Loader2 className="w-3.5 h-3.5 mr-1.5 animate-spin" />}
+                Save
+              </Button>
+            </>
+          ) : (
+            <>
+              <Button variant="outline" size="sm" onClick={handleEditClick} className="h-8 px-4 text-[13px] font-medium text-gray-700 shadow-sm shrink-0 rounded-sm">
+                <Edit2 className="w-3.5 h-3.5 mr-1.5" />
+                Edit Profile
+              </Button>
+              <Button variant="outline" size="sm" onClick={() => setIsPasswordOpen(true)} className="h-8 px-4 text-[13px] font-medium text-gray-700 shadow-sm shrink-0 rounded-sm">
+                Change Password
+              </Button>
+            </>
+          )}
+        </div>
       </div>
 
       {/* Left Column: Company Information Form */}
@@ -163,24 +319,7 @@ export default function AccountSettingsPage() {
       >
         <Card className="flex flex-col w-full hover:shadow-md transition-shadow duration-300 border-gray-200/60 shadow-xs rounded-md">
           <CardHeader className="flex flex-row items-center justify-between px-6 py-4 border-b border-gray-100 dark:border-zinc-800 bg-slate-50/30 dark:bg-zinc-950 space-y-0 rounded-t-md">
-            <CardTitle className="text-[15px] font-medium text-gray-800 dark:text-zinc-200">Company Information</CardTitle>
-            {isEditingProfile ? (
-              <div className="flex items-center gap-2">
-                <Button variant="outline" size="sm" onClick={onCancel} className="h-8 px-3 text-[12px] font-medium rounded-sm">
-                  Cancel
-                </Button>
-                <Button size="sm" onClick={onSave} className="h-8 px-3 text-[12px] font-medium text-white rounded-sm">
-                  Save
-                </Button>
-              </div>
-            ) : (
-              <div className="flex items-center gap-2">
-                <Button variant="outline" size="sm" onClick={handleEditClick} className="pt-[2px] h-8 px-3 text-[12px] font-medium text-gray-700 shadow-sm shrink-0 rounded-sm">
-                  <Edit2 className="w-3.5 h-3.5 mr-1.5" />
-                  Edit
-                </Button>
-              </div>
-            )}
+            <CardTitle className="text-base font-medium text-gray-800 dark:text-zinc-200">Company Information</CardTitle>
           </CardHeader>
 
           <CardContent className="p-6 flex-1">
@@ -237,83 +376,6 @@ export default function AccountSettingsPage() {
                 value={formData.abn}
                 onChange={(val) => handleInputChange(val, 'abn')}
               />
-
-              {/* Row 4: address Line */}
-              <div className="col-span-12">
-                <PlaceAutocomplete
-                  label="Address"
-                  className="w-full col-span-12"
-                  inputClassName="w-full col-span-12"
-                  isFullWidth
-                  disabled={!isEditingProfile}
-                  value={formData.address_info}
-                  onChange={(val) => handleInputChange(val, 'address')}
-                  onPlaceSelect={(opt) => {
-                    setFormData(prev => ({
-                      ...prev,
-                      address_info: opt.formatted_address,
-                      address: opt.address1,
-                      unit_number: opt.unit_number || '',
-                      street_number: opt.street_number || '',
-                      street_name: opt.street_name || '',
-                      street_type: opt.street_type || '',
-                      suburb: opt.suburb,
-                      state: opt.state,
-                      postcode: opt.post_code,
-                    }));
-                  }}
-                />
-              </div>
-
-
-              <div className="col-span-4">
-                <FormInput
-                  label="Unit Number"
-                  required
-                  disabled={!isEditingProfile}
-                  value={formData.unit_number}
-                  onChange={(val) => handleInputChange(val, 'unit_number')}
-                />
-              </div>
-              <div className="col-span-4">
-                <FormInput
-                  label="Street"
-                  required
-                  disabled={!isEditingProfile}
-                  value={formData.address}
-                  onChange={(val) => handleInputChange(val, 'address')}
-                />
-              </div>
-
-              {/* Row 6: suburb, state, postcode */}
-              <div className="col-span-4">
-                <FormInput
-                  label="Suburb"
-                  required
-                  disabled={!isEditingProfile}
-                  value={formData.suburb}
-                  onChange={(val) => handleInputChange(val, 'suburb')}
-                />
-              </div>
-              <div className="col-span-6">
-                <FormSelect
-                  label="State"
-                  required
-                  options={STATES}
-                  disabled={!isEditingProfile}
-                  value={formData.state}
-                  onValueChange={(val) => handleInputChange(val, 'state')}
-                />
-              </div>
-              <div className="col-span-6">
-                <FormInput
-                  label="Postcode"
-                  required
-                  disabled={!isEditingProfile}
-                  value={formData.postcode}
-                  onChange={(val) => handleInputChange(val, 'postcode')}
-                />
-              </div>
             </div>
           </CardContent>
         </Card>
@@ -326,7 +388,7 @@ export default function AccountSettingsPage() {
         <motion.div custom={1} initial="hidden" animate="visible" variants={cardVariants} className="flex h-fit">
           <Card className="w-full border-gray-200/60 shadow-xs">
             <CardHeader className="flex flex-row items-center justify-between px-6 py-4 border-b border-gray-100 dark:border-zinc-800 bg-slate-50/30 dark:bg-zinc-950 space-y-0 rounded-t-md">
-              <CardTitle className="text-[15px] font-medium text-gray-800 dark:text-zinc-200">Balance</CardTitle>
+              <CardTitle className="text-base font-medium text-gray-800 dark:text-zinc-200">Balance</CardTitle>
             </CardHeader>
             <CardContent className="p-6 pt-0 flex items-center justify-between">
               <div className="flex items-center gap-2">
@@ -343,7 +405,7 @@ export default function AccountSettingsPage() {
         <motion.div custom={2} initial="hidden" animate="visible" variants={cardVariants} className="flex">
           <Card className="w-full border-gray-200/60 ">
             <CardHeader className="flex flex-row items-center justify-between px-6 py-4 border-b border-gray-100 dark:border-zinc-800 bg-slate-50/30 dark:bg-zinc-950 space-y-0 rounded-t-md">
-              <CardTitle className="text-[15px] font-medium text-gray-800 dark:text-zinc-200">Plan Information</CardTitle>
+              <CardTitle className="text-base font-medium text-gray-800 dark:text-zinc-200">Plan Information</CardTitle>
               <Button
                 size="sm"
                 className="h-8 px-4 text-[13px] font-medium text-white shadow-sm shrink-0 rounded-sm"
@@ -392,7 +454,7 @@ export default function AccountSettingsPage() {
                   <div className="flex items-center gap-2 flex-1 justify-center text-center">
                     <Map className="w-4 h-4 text-[#5D6B98] shrink-0" />
                     <span className="text-[13px] font-medium text-[#5D6B98] uppercase tracking-wide">
-                      {formData.suburb}, {formData.state}, {formData.postcode}, AU
+                      {formData.shipping_suburb}, {formData.shipping_state}, {formData.shipping_postcode}, AU
                     </span>
                     <span className="text-[10px] font-medium bg-orange-100 text-orange-600 px-2 py-0.5 rounded-sm ml-2 shrink-0">default</span>
                   </div>
@@ -419,7 +481,7 @@ export default function AccountSettingsPage() {
                   <div className="flex items-center gap-2 flex-1 justify-center text-center">
                     <Map className="w-4 h-4 text-[#5D6B98] shrink-0" />
                     <span className="text-[13px] font-medium text-[#5D6B98] uppercase tracking-wide">
-                      {formData.suburb}, {formData.state}, {formData.postcode}, AU
+                      {formData.shipping_suburb}, {formData.shipping_state}, {formData.shipping_postcode}, AU
                     </span>
                     <span className="text-[10px] font-medium bg-orange-100 text-orange-600 px-2 py-0.5 rounded-sm ml-2 shrink-0">default</span>
                   </div>
@@ -444,6 +506,213 @@ export default function AccountSettingsPage() {
 
       </div>
 
+      {/* Address Information Card */}
+      <motion.div
+        custom={3}
+        initial="hidden"
+        animate="visible"
+        variants={cardVariants}
+        className="col-span-12"
+      >
+        <Card className="w-full hover:shadow-md transition-shadow duration-300 border-gray-200/60 shadow-xs rounded-md">
+          <CardHeader className="flex flex-row items-center justify-between px-6 py-4 border-b border-gray-100 dark:border-zinc-800 bg-slate-50/30 dark:bg-zinc-950 space-y-0 rounded-t-md">
+            <CardTitle className="text-base font-medium text-gray-800 dark:text-zinc-200">Address Information</CardTitle>
+          </CardHeader>
+          <CardContent className="p-6 pt-2">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+
+              {/* Pickup Address Column */}
+              <div className="space-y-4">
+                <div className="border-b pb-2">
+                  <h4 className="text-base font-semibold text-gray-700 dark:text-zinc-300">
+                    Pickup Address
+                  </h4>
+                </div>
+                <div className="grid grid-cols-12 gap-x-4 gap-y-3.5">
+                  <div className="col-span-12">
+                    <PlaceAutocomplete
+                      label="Search Address"
+                      className="w-full col-span-12"
+                      inputClassName="w-full col-span-12"
+                      isFullWidth
+                      disabled={!isEditingProfile}
+                      value={formData.shipping_address_info}
+                      onChange={(val) => handleInputChange(val, 'shipping_address_info')}
+                      onPlaceSelect={(opt) => {
+                        setFormData(prev => ({
+                          ...prev,
+                          shipping_address_info: opt.formatted_address,
+                          shipping_address: opt.address1,
+                          shipping_unit_number: opt.unit_number || '',
+                          shipping_street_number: opt.street_number || '',
+                          shipping_street_name: opt.street_name || '',
+                          shipping_street_type: opt.street_type || '',
+                          shipping_suburb: opt.suburb,
+                          shipping_state: opt.state,
+                          shipping_postcode: opt.post_code,
+                        }));
+                      }}
+                    />
+                  </div>
+
+                  <div className="col-span-4">
+                    <FormInput
+                      label="Unit Number"
+                      placeholder='Unit Number'
+                      disabled={!isEditingProfile}
+                      value={formData.shipping_unit_number}
+                      onChange={(val) => handleInputChange(val, 'shipping_unit_number')}
+                    />
+                  </div>
+                  <div className="col-span-8">
+                    <FormInput
+                      label="Street"
+                      placeholder='Street Address'
+                      required
+                      disabled={!isEditingProfile}
+                      value={formData.shipping_address}
+                      onChange={(val) => handleInputChange(val, 'shipping_address')}
+                    />
+                  </div>
+
+                  <div className="col-span-4">
+                    <FormInput
+                      label="Suburb"
+                      placeholder='Suburb'
+                      required
+                      disabled={!isEditingProfile}
+                      value={formData.shipping_suburb}
+                      onChange={(val) => handleInputChange(val, 'shipping_suburb')}
+                    />
+                  </div>
+                  <div className="col-span-4">
+                    <FormSelect
+                      label="State"
+                      placeholder='Select State'
+                      required
+                      options={STATES}
+                      disabled={!isEditingProfile}
+                      value={formData.shipping_state}
+                      onValueChange={(val) => handleInputChange(val, 'shipping_state')}
+                    />
+                  </div>
+                  <div className="col-span-4">
+                    <FormInput
+                      label="Postcode"
+                      placeholder='Postcode'
+                      required
+                      disabled={!isEditingProfile}
+                      value={formData.shipping_postcode}
+                      onChange={(val) => handleInputChange(val, 'shipping_postcode')}
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* Billing Address Column */}
+              <div className="space-y-4">
+                <div className="flex items-center justify-between border-b pb-2">
+                  <h4 className="text-base font-semibold text-gray-700 dark:text-zinc-300">
+                    Billing Address
+                  </h4>
+                  <div className="flex items-center space-x-2 cursor-pointer">
+                    <Checkbox
+                      id="same_as_shipping"
+                      checked={sameAsShipping}
+                      disabled={!isEditingProfile}
+                      onCheckedChange={(val) => setSameAsShipping(!!val)}
+                    />
+                    <Label htmlFor="same_as_shipping" className="text-[13px] font-medium text-gray-600 dark:text-zinc-400 cursor-pointer">
+                      Same as pickup address
+                    </Label>
+                  </div>
+                </div>
+                <div className="grid grid-cols-12 gap-x-4 gap-y-3.5">
+                  <div className="col-span-12">
+                    <PlaceAutocomplete
+                      label="Search Address"
+                      className="w-full col-span-12"
+                      inputClassName="w-full col-span-12"
+                      isFullWidth
+                      disabled={!isEditingProfile || sameAsShipping}
+                      value={formData.billing_address_info}
+                      onChange={(val) => handleInputChange(val, 'billing_address_info')}
+                      onPlaceSelect={(opt) => {
+                        setFormData(prev => ({
+                          ...prev,
+                          billing_address_info: opt.formatted_address,
+                          billing_address: opt.address1,
+                          billing_unit_number: opt.unit_number || '',
+                          billing_street_number: opt.street_number || '',
+                          billing_street_name: opt.street_name || '',
+                          billing_street_type: opt.street_type || '',
+                          billing_suburb: opt.suburb,
+                          billing_state: opt.state,
+                          billing_postcode: opt.post_code,
+                        }));
+                      }}
+                    />
+                  </div>
+
+                  <div className="col-span-4">
+                    <FormInput
+                      label="Unit Number"
+                      placeholder='Unit Number'
+                      disabled={!isEditingProfile || sameAsShipping}
+                      value={formData.billing_unit_number}
+                      onChange={(val) => handleInputChange(val, 'billing_unit_number')}
+                    />
+                  </div>
+                  <div className="col-span-8">
+                    <FormInput
+                      label="Street"
+                      placeholder='Street Address'
+                      required
+                      disabled={!isEditingProfile || sameAsShipping}
+                      value={formData.billing_address}
+                      onChange={(val) => handleInputChange(val, 'billing_address')}
+                    />
+                  </div>
+
+                  <div className="col-span-4">
+                    <FormInput
+                      label="Suburb"
+                      placeholder='Suburb'
+                      required
+                      disabled={!isEditingProfile || sameAsShipping}
+                      value={formData.billing_suburb}
+                      onChange={(val) => handleInputChange(val, 'billing_suburb')}
+                    />
+                  </div>
+                  <div className="col-span-4">
+                    <FormSelect
+                      label="State"
+                      placeholder='Select State'
+                      required
+                      options={STATES}
+                      disabled={!isEditingProfile || sameAsShipping}
+                      value={formData.billing_state}
+                      onValueChange={(val) => handleInputChange(val, 'billing_state')}
+                    />
+                  </div>
+                  <div className="col-span-4">
+                    <FormInput
+                      label="Postcode"
+                      placeholder='Postcode'
+                      required
+                      disabled={!isEditingProfile || sameAsShipping}
+                      value={formData.billing_postcode}
+                      onChange={(val) => handleInputChange(val, 'billing_postcode')}
+                    />
+                  </div>
+                </div>
+              </div>
+
+            </div>
+          </CardContent>
+        </Card>
+      </motion.div>
+
       {/* Change Password Modal */}
       <CustomModel
         open={isPasswordOpen}
@@ -467,6 +736,7 @@ export default function AccountSettingsPage() {
         onSubmit={onPasswordSubmit}
         submitText="Update Password"
         contentClass="sm:max-w-md"
+        isLoading={changePasswordMutation.isPending}
       >
         <div className="py-2 space-y-4">
           <div className="grid grid-cols-12 gap-y-3.5">

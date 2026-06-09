@@ -163,6 +163,7 @@ export const API_ENDPOINTS = {
         GET_REDIRECT_URL: "/admin/zoho/redirect",
     },
     PROFILE: {
+        GET: "/profile",
         UPDATE: "/profile",
         CHANGE_PASSWORD: "/profile/change-password",
     },

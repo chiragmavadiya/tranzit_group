@@ -1,7 +1,14 @@
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { profileService } from "../services/profile.service";
 import type { UpdateProfileRequest, ChangePasswordRequest } from "../types";
 import { showToast } from "@/components/ui/custom-toast";
+
+export const useGetProfile = () => {
+  return useQuery({
+    queryKey: ["profile"],
+    queryFn: () => profileService.getProfile(),
+  });
+};
 
 export const useUpdateProfile = () => {
   const queryClient = useQueryClient();
@@ -11,8 +18,9 @@ export const useUpdateProfile = () => {
     onSuccess: (response) => {
       if (response.status) {
         showToast(response.message || "Profile updated successfully", "success");
-        // Invalidate user details to reflect changes across the app
+        // Invalidate user details and profile to reflect changes across the app
         queryClient.invalidateQueries({ queryKey: ["auth", "user-details"] });
+        queryClient.invalidateQueries({ queryKey: ["profile"] });
       } else {
         showToast(response.message || "Failed to update profile", "error");
       }

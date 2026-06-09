@@ -54,6 +54,7 @@ export interface CreateOrderRequest {
     };
     capture: boolean;
     save_address?: number;
+    is_own?: boolean;
 }
 
 export interface CreateOrderResponse {

@@ -82,6 +82,8 @@ export interface CreateOrderDialogProps {
   orderId?: string;
   isUpdate?: boolean;
   hasDefaultItemAndCourier?: boolean;
+  default_courier?: any;
+  default_item?: any;
   orderType?: string;
 }
 

@@ -32,6 +32,7 @@ export const API_ENDPOINTS = {
         RECEIVER_ADDRESS: (id: string | number) => `/customer/orders/${id}/receiver-address`,
         IMPORT_SAMPLE: "/customer/orders/import/sample",
         ARCHIVE: (id: string | number) => `/customer/orders/${id}/archive`,
+        PRINT_ORDER: "/orders/print-label",
     },
     DASHBOARD: {
         METRICS: "/dashboard/metrics",
@@ -186,6 +187,7 @@ export const API_ENDPOINTS = {
         MANUAL_PRODUCT_DETAILS: (provider: string, productCode: string) => `/integrations/${provider}/products/${productCode}`,
         PATCH_PRODUCT_STATUS: (provider: string, productCode: string) => `/integrations/${provider}/products/${productCode}/status`,
         DELIVERY_PREFERENCES: "/integrations/tranzit-group/delivery-preferences",
+        DEFAULT: (provider: string) => `/integrations/${provider}/default`,
     }
 };
 

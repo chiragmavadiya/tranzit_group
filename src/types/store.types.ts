@@ -9,4 +9,6 @@ export interface AuthState {
     error: string | null;
     role: string;
     next_step: string | null;
+    default_courier: any | null;
+    default_item: any | null;
 }

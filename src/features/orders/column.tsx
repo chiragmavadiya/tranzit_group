@@ -21,7 +21,9 @@ export const getOrdersColumns = (
   downloadingLabelId?: string | null,
   fromCustomer: boolean = false,
   onArchiveOrder?: (orderId: string) => void,
-  updateToArchiveId?: string | null
+  updateToArchiveId?: string | null,
+  onPrint?: (orderNumber: string | number, amount: number) => void,
+  printingOrderId?: string | number | null
 ): Column<Order>[] => {
   const printedAndShippedActions = (value: string) => [
     {
@@ -150,7 +152,7 @@ export const getOrdersColumns = (
         header: "",
         key: "order_number",
         sticky: 'right',
-        cell: (value: string) => (
+        cell: (value: string, row: Order) => (
           <div className="flex gap-2" onClick={(e) => e.stopPropagation()}>
             {fromCustomer ? (
               <>
@@ -182,8 +184,16 @@ export const getOrdersColumns = (
               )}
               {orderType === 'new' && (
                 <>
-                  <Button className="h-9 px-6">
-                    <Printer className="h-4 w-4 mr-2" />
+                  <Button 
+                    className="h-9 px-6 font-bold"
+                    onClick={() => onPrint?.(row.order_number, Number(row.amount))}
+                    disabled={printingOrderId === row.order_number}
+                  >
+                    {printingOrderId === row.order_number ? (
+                      <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                    ) : (
+                      <Printer className="h-4 w-4 mr-2" />
+                    )}
                     Print
                   </Button>
                   <DropdownCustomMenu

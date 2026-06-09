@@ -214,6 +214,7 @@ export interface CustomerIntegration {
     description: string;
     connected: boolean;
     logo_url: string;
+    is_default: boolean;
 }
 
 export interface CustomerIntegrationResponse {

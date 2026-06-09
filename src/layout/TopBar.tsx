@@ -32,11 +32,11 @@ const ReportsTabs = lazy(() => import('@/features/reports/components/ReportsTabs
 const CancelOrderTabs = lazy(() => import('@/features/cancel-order/components/CancelOrderTabs').then(module => ({ default: module.CancelOrderTabs })));
 const BookPickupTabs = lazy(() => import('@/features/book-pickup/components/BookPickupTabs').then(module => ({ default: module.BookPickupTabs })));
 
-export default function TopBar({ 
+export default function TopBar({
   isCollapsed,
   isMobile = false,
-  setIsMobileSidebarOpen = () => {}
-}: { 
+  setIsMobileSidebarOpen = () => { }
+}: {
   isCollapsed?: boolean;
   isMobile?: boolean;
   setIsMobileSidebarOpen?: (val: boolean) => void;
@@ -84,15 +84,15 @@ export default function TopBar({
   return (
     <header className={cn(
       "print:hidden h-16 bg-white dark:bg-zinc-950 border-b border-gray-200 dark:border-zinc-800 flex items-center justify-between px-4 sm:px-6 fixed top-0 right-0 z-10 transition-[left] duration-300 ease-in-out",
-      isMobile 
-        ? "left-0" 
+      isMobile
+        ? "left-0"
         : (isCollapsed ? 'left-[64px]' : 'left-[240px]')
     )}>
       {/* Left Portion: Hamburguer & Logo */}
       <div className="flex items-center gap-2 shrink-0">
         {isMobile && (
-          <button 
-            onClick={() => setIsMobileSidebarOpen(true)} 
+          <button
+            onClick={() => setIsMobileSidebarOpen(true)}
             className="p-2 hover:bg-gray-100 dark:hover:bg-zinc-900 rounded-md text-primary transition-colors shrink-0 cursor-pointer"
           >
             <Menu className="w-[22px] h-[22px]" strokeWidth={2.5} />
@@ -100,8 +100,8 @@ export default function TopBar({
         )}
         <div className={cn(
           "flex items-center transition-all duration-300 ease-in-out",
-          isMobile 
-            ? "w-[90px] sm:w-[110px] opacity-100 mr-2 sm:mr-4" 
+          isMobile
+            ? "w-[90px] sm:w-[110px] opacity-100 mr-2 sm:mr-4"
             : (isCollapsed ? 'w-[120px] opacity-100 mr-4' : 'w-0 opacity-0 pointer-events-none overflow-hidden mr-0')
         )}>
           <img src={theme === "dark" ? tranzit_logo_dark : tranzit_logo} alt="Tranzit" className="h-8 sm:h-10 max-w-none" />
@@ -158,10 +158,10 @@ export default function TopBar({
             <div className={cn(
               "flex items-center gap-1.5 sm:gap-2 px-2 sm:px-3 h-8 rounded-md border text-[11px] sm:text-[13px] font-bold shadow-sm transition-all duration-300 cursor-default select-none shrink-0",
               isZero
-                ? "bg-red-50 dark:bg-red-950/30 border-red-200/50 dark:border-red-900/30 text-red-700 dark:text-red-400 hover:bg-red-100/50 dark:hover:bg-red-950/50"
+                ? "bg-red-50 dark:bg-red-950/30 border-red-200/50 dark:border-red-900/30 text-red-500 dark:text-red-400 hover:bg-red-100/50 dark:hover:bg-red-950/50"
                 : "bg-emerald-50 dark:bg-emerald-950/30 border-emerald-200/50 dark:border-emerald-900/30 text-emerald-700 dark:text-emerald-400 hover:bg-emerald-100/50 dark:hover:bg-emerald-950/50"
             )}>
-              <Wallet className={cn("w-3.5 h-3.5", isZero ? "text-red-400 dark:text-red-400" : "text-emerald-600 dark:text-emerald-400")} />
+              <Wallet className={cn("w-3.5 h-3.5", isZero ? "text-red-500 dark:text-red-400" : "text-emerald-600 dark:text-emerald-400")} />
               <span className="leading-relaxed">
                 <span className="hidden sm:inline">Wallet Balance: </span>
                 {formateCurrency(Number(walletData.data.wallet_balance))}
@@ -169,9 +169,9 @@ export default function TopBar({
             </div>
           );
         })()}
-        
+
         {isMobile ? (
-          <button 
+          <button
             onClick={() => setIsSearchOpen(true)}
             className="flex items-center justify-center w-8 h-8 cursor-pointer hover:bg-gray-50 dark:hover:bg-zinc-800 rounded-md border border-gray-200 dark:border-zinc-800 transition-colors outline-none shrink-0"
           >
@@ -275,7 +275,7 @@ export default function TopBar({
 
       {isMobile && isSearchOpen && (
         <div className="absolute inset-0 bg-white dark:bg-zinc-950 z-20 flex items-center px-4 gap-3 animate-in fade-in duration-200">
-          <button 
+          <button
             onClick={() => setIsSearchOpen(false)}
             className="p-2 hover:bg-gray-100 dark:hover:bg-zinc-900 rounded-md text-gray-500 dark:text-zinc-400 transition-colors shrink-0 cursor-pointer"
           >

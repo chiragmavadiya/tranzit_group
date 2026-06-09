@@ -53,7 +53,9 @@ export const AppRouter = () => {
     if (userData?.user && !isPending) {
       dispatch(setUser({
         user: userData.user,
-        next_step: userData.next_step
+        next_step: userData.next_step,
+        default_courier: userData.default_courier,
+        default_item: userData.default_item
       }));
       // if (userData.next_step !== 'subscription_plan' && userData.user.roles[0]?.name !== 'admin') {
       //   setShowSubscriptionModal(true);

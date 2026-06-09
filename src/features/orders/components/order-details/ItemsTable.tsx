@@ -91,8 +91,8 @@ export const ItemsTable: React.FC<ItemsTableProps> = React.memo(({
         <AccordionTrigger className="hover:no-underline py-3 px-4 [&>svg]:text-primary items-center bg-slate-50 dark:bg-zinc-900 rounded-none">
           <div className="flex items-center w-full justify-between ">
             <div className="flex items-center gap-2 text-gray-600 dark:text-zinc-300">
-              <Box className="w-5 h-5" />
-              <h3 className="my-0 text-base font-semibold text-gray-900 dark:text-zinc-100 uppercase ">Parcel Details {items.length > 0 && ` (${items.length})`}
+              <Box className="w-5 h-5 text-primary" />
+              <h3 className="my-0 text-base font-bold uppercase tracking-wide text-slate-800 dark:text-zinc-400 ">Parcel Details {items.length > 0 && ` (${items.length})`}
 
                 {items.length > 0 && (
                   <span className="inline-flex group-aria-expanded/accordion-trigger:hidden normal-case font-medium text-xs  dark:text-zinc-500 ml-2 pt-0.5 leading-relaxed">

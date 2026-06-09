@@ -11,6 +11,8 @@ const initialState: AuthState = {
     error: null,
     role: localStorage.getItem("user_role") as string,
     next_step: '',
+    default_courier: null,
+    default_item: null,
 };
 
 const authSlice = createSlice({
@@ -32,12 +34,14 @@ const authSlice = createSlice({
             localStorage.setItem("user_role", role);
             localStorage.setItem("auth_token", token);
         },
-        setUser: (state, action: PayloadAction<{ user: User; next_step?: string }>) => {
-            const { user, next_step } = action.payload;
+        setUser: (state, action: PayloadAction<{ user: User; next_step?: string, default_courier?: any, default_item?: any }>) => {
+            const { user, next_step, default_courier, default_item } = action.payload;
             state.user = user;
             state.userID = user.id;
             state.isAuthenticated = true;
             const role = user.roles?.[0]?.name;
+            state.default_courier = default_courier;
+            state.default_item = default_item;
             if (role) {
                 state.role = role;
                 localStorage.setItem("user_role", role);

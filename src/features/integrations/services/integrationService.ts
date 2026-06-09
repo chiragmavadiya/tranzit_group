@@ -96,5 +96,10 @@ export const integrationService = {
     setDeliveryPreferences: async (data: any) => {
         const response = await api.put(API_ENDPOINTS.INTEGRATIONS.DELIVERY_PREFERENCES, data);
         return response.data;
+    },
+
+    setDefault: async (provider: string) => {
+        const response = await api.post(API_ENDPOINTS.INTEGRATIONS.DEFAULT(provider));
+        return response.data;
     }
 };

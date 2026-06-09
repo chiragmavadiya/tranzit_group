@@ -74,3 +74,14 @@ export const useRole = (): string => {
 export const formateCurrency = (value: number) => {
   return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(Number(value || 0));
 }
+
+export const removeEmptyFields = <T extends Record<string, any>>(obj: T): Partial<T> => {
+  return Object.fromEntries(
+    Object.entries(obj).filter(
+      ([, value]) =>
+        value !== '' &&
+        value !== null &&
+        value !== undefined
+    )
+  ) as Partial<T>;
+};

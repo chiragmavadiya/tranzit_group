@@ -8,7 +8,8 @@ import {
   useConnectIntegration,
   useDisconnectIntegration,
   useIntegrationsList,
-  useIntegrationStatusMutation
+  useIntegrationStatusMutation,
+  useSetDefaultIntegration
 } from '@/features/integrations/hooks/useIntegrations';
 import RenderIntegrationSection from '@/features/integrations/components/RenderIntegrationSection';
 import CarrierConfigForm from '../components/CarrierConfigForm';
@@ -38,6 +39,7 @@ export default function CarrierIntegrationsPage() {
 
   const connectMutation = useConnectIntegration();
   const disconnectMutation = useDisconnectIntegration();
+  const setDefaultMutation = useSetDefaultIntegration();
 
   const handleEdit = (providerId: string) => {
     navigate(`/settings/carriers/${providerId}`);
@@ -87,6 +89,7 @@ export default function CarrierIntegrationsPage() {
             // Icon={Truck}
             data={listResponse?.data?.courier_integrations}
             disconnectMutation={disconnectMutation}
+            setDefaultMutation={setDefaultMutation}
             onConnect={onConnect}
             onConfigure={handleEdit}
             isLoading={listLoading}

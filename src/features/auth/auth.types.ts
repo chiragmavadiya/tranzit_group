@@ -71,6 +71,8 @@ export interface User {
     business_name?: string;
     company_name?: string;
     mobile?: string;
+    default_courier?: any;
+    default_item?: any;
 }
 
 
@@ -85,6 +87,8 @@ export interface LoginResponse {
     message: string;
     token: string;
     next_step: string;
+    default_courier?: any;
+    default_item?: any;
 }
 
 export interface RegisterRequest {

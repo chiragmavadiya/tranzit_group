@@ -230,6 +230,8 @@ const OrderDetailsPage: React.FC = () => {
     showReceiverPhoneModal,
     setShowReceiverPhoneModal,
     handleReceiverPhoneSubmit,
+    default_courier,
+    default_item,
   } = useOrderWorkflow();
 
   const [showConsignConfirm, setShowConsignConfirm] = useState(false);
@@ -259,19 +261,15 @@ const OrderDetailsPage: React.FC = () => {
       return;
     }
 
-    const courierName = getDisplayCourierName();
-    if (!courierName) {
-      handleConsign();
+    if (!courierData?.courier) {
+      showToast('Please select a courier.', 'error');
       return;
     }
 
-    const courierNameLower = courierName.toLowerCase();
-    const isTranzit = courierNameLower.includes('tranzit') || courierNameLower.includes('transit') || courierNameLower.includes('transite');
-
-    if (!isTranzit) {
-      setShowConsignConfirm(true);
-    } else {
+    if (courierData?.is_own) {
       handleConsign();
+    } else {
+      setShowConsignConfirm(true);
     }
   };
 
@@ -445,6 +443,7 @@ const OrderDetailsPage: React.FC = () => {
                       orderDetail={orderDetail}
                       orderType={orderType!}
                       module="order"
+                      default_courier={default_courier}
                       initialSelectedCourierId={orderDetail?.courier_details && `${orderDetail?.courier_details?.courier_code || ''}${orderDetail?.courier_details?.product_id || ''}`}
                     />
                   )}
@@ -501,6 +500,8 @@ const OrderDetailsPage: React.FC = () => {
           orderId={orderID}
           orderType={orderType}
           hasDefaultItemAndCourier={hasDefaultItemAndCourier}
+          default_courier={default_courier}
+          default_item={default_item}
 
         />
       )}
@@ -510,8 +511,8 @@ const OrderDetailsPage: React.FC = () => {
           onOpenChange={setWalletCheckOpen}
           walletBalance={walletCheckData.wallet_balance}
           orderTotal={calculation.grandTotal}
-          isPending={saveLoading}
-          onConfirm={() => handleOnSave(true)}
+          isPending={isCreate ? saveLoading : isConsigning}
+          onConfirm={() => isCreate ? handleOnSave(true) : handleConsign(true)}
         />
       )}
       <ConformationModal
@@ -553,7 +554,7 @@ const OrderDetailsPage: React.FC = () => {
             setShowConsignConfirm(false);
             handleConsign();
           }}
-          confirmText={`Continue with ${getDisplayCourierName()}`}
+          confirmText={`Continue`}
           cancelText="Cancel"
           className='sm:max-w-[500px]'
         />

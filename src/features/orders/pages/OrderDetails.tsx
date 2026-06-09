@@ -17,6 +17,8 @@ import { ManualOrderDetails } from '@/features/orders/components/order-details/M
 import { useOrderWorkflow } from '@/features/orders/hooks/useOrderWorkflow';
 import { Skeleton } from '@/components/ui/skeleton';
 import { showToast } from '@/components/ui/custom-toast';
+import { CustomModel } from '@/components/ui/dialog';
+import { FormInput } from '@/features/orders/components/OrderFormUI';
 
 const OrderDetailsSkeleton: React.FC = () => {
   return (
@@ -225,9 +227,19 @@ const OrderDetailsPage: React.FC = () => {
     handleConsign,
     downloadLabel,
     hasDefaultItemAndCourier,
+    showReceiverPhoneModal,
+    setShowReceiverPhoneModal,
+    handleReceiverPhoneSubmit,
   } = useOrderWorkflow();
 
   const [showConsignConfirm, setShowConsignConfirm] = useState(false);
+  const [receiverPhoneInput, setReceiverPhoneInput] = useState('');
+
+  React.useEffect(() => {
+    if (showReceiverPhoneModal) {
+      setReceiverPhoneInput(addressData.receiver.phone || '');
+    }
+  }, [showReceiverPhoneModal, addressData.receiver.phone]);
 
   const getDisplayCourierName = () => {
     const rawName = quoteData?.courier?.carrier || orderDetail?.courier_details?.courier || courierData?.courier || '';
@@ -433,7 +445,7 @@ const OrderDetailsPage: React.FC = () => {
                       orderDetail={orderDetail}
                       orderType={orderType!}
                       module="order"
-                      initialSelectedCourierId={orderDetail?.courier_details && `${orderDetail?.courier_details?.product_id || ''}${orderDetail?.courier_details?.courier_code || ''}`}
+                      initialSelectedCourierId={orderDetail?.courier_details && `${orderDetail?.courier_details?.courier_code || ''}${orderDetail?.courier_details?.product_id || ''}`}
                     />
                   )}
                   {!isCreate && (
@@ -545,6 +557,35 @@ const OrderDetailsPage: React.FC = () => {
           cancelText="Cancel"
           className='sm:max-w-[500px]'
         />
+      )}
+      {showReceiverPhoneModal && (
+        <CustomModel
+          open={showReceiverPhoneModal}
+          onOpenChange={setShowReceiverPhoneModal}
+          title="Receiver Phone Number Required"
+          description="A contact number for the receiver is required to book this consignment."
+          onSubmit={() => {
+            if (!receiverPhoneInput.trim()) {
+              showToast("Please enter a valid phone number", "error");
+              return;
+            }
+            handleReceiverPhoneSubmit(receiverPhoneInput);
+          }}
+          submitText="Submit & Create Order"
+          cancelText="Cancel"
+          contentClass="sm:max-w-[450px]"
+        >
+          <div className="p-4 space-y-4">
+            <FormInput
+              label="Receiver Phone Number"
+              value={receiverPhoneInput}
+              onChange={(val) => setReceiverPhoneInput(val)}
+              placeholder="e.g. 0412345678"
+              required
+              isFullWidth
+            />
+          </div>
+        </CustomModel>
       )}
     </>
   );

@@ -96,6 +96,8 @@ export const useOrderWorkflow = () => {
   const [ratesAccepted, setRatesAccepted] = useState(true);
   const [dangerousGoodsAccepted, setDangerousGoodsAccepted] = useState(false);
   const [selectedCustomer, setSelectedCustomer] = useState<number>();
+  const [showReceiverPhoneModal, setShowReceiverPhoneModal] = useState(false);
+  const [receiverPhone, setReceiverPhone] = useState('');
 
   const {
     itemsData,
@@ -285,7 +287,7 @@ export const useOrderWorkflow = () => {
   }, [orderType, calculation.totalItems, itemsData, orderDetail?.courier_details?.tracking_number]);
 
   // Order Submission/Saving Flow
-  const handleOnSave = useCallback((skipWalletCheckArg?: any) => {
+  const handleOnSave = useCallback((skipWalletCheckArg?: any, overrideReceiverPhone?: string) => {
     const isValidItems = itemsData && itemsData.length > 0 && itemsData.every((item) =>
       item.type !== 'box' ||
       Number(item.height) > 0 && Number(item.width) > 0 && Number(item.length) > 0 && Number(item.weight) > 0 && Number(item.quantity) > 0
@@ -320,6 +322,10 @@ export const useOrderWorkflow = () => {
 
     const payload: any = {
       ...addressData,
+      receiver: {
+        ...addressData.receiver,
+        phone: overrideReceiverPhone || addressData.receiver.phone,
+      },
       parcels: itemsData,
       service: {
         ...courierData,
@@ -360,7 +366,11 @@ export const useOrderWorkflow = () => {
           }
         },
         onError: (err: any) => {
-          console.log(err, 'error from order create ')
+          console.log(err?.response?.data?.receiver_contact_required, 'error from order create ')
+          if (err?.response?.data?.receiver_contact_required) {
+            setShowReceiverPhoneModal(true);
+            return;
+          }
           showToast(err?.response?.data?.message || 'Failed to create orders', 'error');
         },
       });
@@ -385,6 +395,18 @@ export const useOrderWorkflow = () => {
       },
     });
   }, [itemsData, addressData, role, selectedCustomer, termsAccepted, ratesAccepted, dangerousGoodsAccepted, calculation.totalItems, calculation.grandTotal, courierData, insuranceSelected, signatureSelected, deliveryInstructions, quoteData?.courier?.base, quoteData?.courier?.gst, quoteData?.courier?.price, quoteData?.courier?.freight_levy, quoteData?.surcharges, walletCheckData?.wallet_balance, orderType, manualOrderData.trackingNumber, manualOrderData.courierId, manualOrderData.amount, checkWallet, createOrder, navigate, printLabel]);
+
+  const handleReceiverPhoneSubmit = useCallback((phone: string) => {
+    setAddressData((prev) => ({
+      ...prev,
+      receiver: {
+        ...prev.receiver,
+        phone,
+      },
+    }));
+    setShowReceiverPhoneModal(false);
+    handleOnSave(true, phone);
+  }, [handleOnSave]);
 
   // Order Cancellation Flow
   const onCancelOrder = useCallback((manual: boolean = false) => {
@@ -618,5 +640,10 @@ export const useOrderWorkflow = () => {
     handleConsign,
     downloadLabel,
     hasDefaultItemAndCourier: defaultItem?.data ? false : false, // NEED TO IMPROVE WHEN DEFAULT CARRIER GETS INTRODUCED
+    showReceiverPhoneModal,
+    setShowReceiverPhoneModal,
+    receiverPhone,
+    setReceiverPhone,
+    handleReceiverPhoneSubmit,
   };
 };

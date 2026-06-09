@@ -299,6 +299,7 @@ export const useArchiveOrder = () => {
     mutationFn: ordersService.archiveOrder,
     onSuccess: () => {
       showToast('Order archived successfully', 'success');
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.ORDERS.COUNTS() });
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.ORDERS.LIST });
     },
     onError: (error: any) => {
@@ -307,3 +308,17 @@ export const useArchiveOrder = () => {
   });
 };
 
+export const usePrintOrder = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ordersService.printOrder,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.ORDERS.COUNTS() });
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.ORDERS.LIST });
+      showToast('Order printed successfully', 'success');
+    },
+    onError: (error: any) => {
+      showToast(error?.message || "Failed to print order", "error");
+    }
+  });
+};

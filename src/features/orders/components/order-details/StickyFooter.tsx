@@ -8,7 +8,7 @@ import {
 
 interface StickyFooterProps {
   orderType: string | undefined
-  onSave?: (skipWalletCheck: boolean) => void
+  onSave?: (skipWalletCheck: string | boolean) => void
   saveLoading: boolean
   onConsign?: () => void
   isConsigning: boolean
@@ -21,7 +21,7 @@ export const StickyFooter: React.FC<StickyFooterProps> = ({ orderType, onSave, s
       {(orderType === 'create' || orderType === 'create-menual' || orderType === 'return') && (
         <>
           <Button
-            onClick={() => onSave?.(true)}
+            onClick={() => onSave?.('saveAsDraft')}
             variant="default"
             disabled={saveLoading}
           >
@@ -31,7 +31,7 @@ export const StickyFooter: React.FC<StickyFooterProps> = ({ orderType, onSave, s
 
           <div className="flex bg-primary rounded-md overflow-hidden">
             <Button onClick={() => onSave?.(false)} className="bg-primary text-white hover:bg-primary-hover flex items-center gap-2 border-r border-white/10 rounded-none h-8 px-6 font-bold uppercase text-xs">
-              <Printer className="h-4 w-4" />
+              {saveLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Printer className="h-4 w-4" />}
               Create Consignment & Download Label
             </Button>
           </div>

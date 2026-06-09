@@ -200,3 +200,18 @@ export const useSetDeliveryPreferences = () => {
         }
     });
 };
+
+export const useSetDefaultIntegration = () => {
+    const queryClient = useQueryClient();
+    return useMutation({
+        mutationFn: (provider: string) => integrationService.setDefault(provider),
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: QUERY_KEYS.INTEGRATIONS.LIST });
+            queryClient.invalidateQueries({ queryKey: QUERY_KEYS.AUTH.USER_DETAILS });
+            showToast("Default integration updated successfully", "success");
+        },
+        onError: (error: any) => {
+            showToast(error.message || "Failed to set default integration", "error");
+        }
+    });
+};

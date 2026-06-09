@@ -11,12 +11,12 @@ import { STATES } from '@/constants';
 import AutoComplete from '@/components/common/AutoComplate2';
 import { useAddressBookSearch } from '@/features/address-book/hooks/useAddressBook';
 import { useDebounce } from '@/hooks/useDebounce';
-import { useCreateOrder, useOrderReceiverAddress, useUpdateOrderReceiverAddress } from '../hooks/useOrders';
-import { useAppSelector } from '@/hooks/store.hooks';
+import { useOrderReceiverAddress, useUpdateOrderReceiverAddress } from '../hooks/useOrders';
+// import { useAppSelector } from '@/hooks/store.hooks';
 
-export default function CreateOrderDialog({ onOpenChange, type, open, initialData, isEdit, onSubmit, orderId, hasDefaultItemAndCourier, orderType }: CreateOrderDialogProps) {
+export default function CreateOrderDialog({ onOpenChange, type, open, initialData, isEdit, onSubmit, orderId, orderType }: CreateOrderDialogProps) {
   const navigate = useNavigate();
-  const { role, user } = useAppSelector((state) => state.auth);
+  // const { role, user } = useAppSelector((state) => state.auth);
   const [formData, setFormData] = useState<AddressData>({
     email: "",
     phone: "",
@@ -41,7 +41,7 @@ export default function CreateOrderDialog({ onOpenChange, type, open, initialDat
   const debouncedSearchAddress = useDebounce(searchAddress, 400);
   const { data: addressBookData } = useAddressBookSearch(debouncedSearchAddress);
   const { data: orderResponse } = useOrderReceiverAddress((!initialData && orderId) || '');
-  const { mutate: createOrder, isPending: saveLoading } = useCreateOrder();
+  // const { mutate: createOrder, isPending: saveLoading } = useCreateOrder();
   const { mutateAsync: updateOrderReceiverAddress, isPending: isUpdatePending } = useUpdateOrderReceiverAddress();
   const options = useMemo(() => {
     if (!addressBookData?.data) return [];
@@ -87,69 +87,69 @@ export default function CreateOrderDialog({ onOpenChange, type, open, initialDat
     special_instructions: formData.instructions
   }), [formData])
 
-  const executeCreateOrder = () => {
-    if (!user) return;
-    const service = JSON.parse(sessionStorage.getItem('quote_courier') || '{}')?.courier;
-    const items = JSON.parse(sessionStorage.getItem('quote_items') || '[]');
-    const payload = {
-      sender: {
-        email: user.email || '',
-        phone: user.office_number || '',
-        company: user.company_name || '',
-        address: user.addresses?.[0]?.address || '',
-        address1: user.addresses?.[0]?.address || '',
-        suburb: user.addresses?.[0]?.suburb || '',
-        state: user.addresses?.[0]?.state || '',
-        street_name: user.addresses?.[0]?.street_name || '',
-        street_number: user.addresses?.[0]?.street_number || '',
-        postcode: user.addresses?.[0]?.postcode || '',
-        name: `${user.first_name || ''} ${user.last_name || ''}`.trim(),
-        country: user.addresses?.[0]?.country || 'Australia',
-      },
-      receiver: {
-        ...formData
-      },
-      parcels: items.length > 0 ? items.map((item: any) => ({
-        type: "box",
-        quantity: item.quantity || 1,
-        weight: item.weight || 0,
-        length: item.length || 0,
-        width: item.width || 0,
-        height: item.height || 0
-      })) : undefined,
-      service: service ? {
-        courier: service.carrier_id,
-        product_id: service.product_id,
-        product_type: service.product_type,
-        shipment_summary: service.shipment_summary,
-        cover_limited_liability: 0,
-        signature_required: 0,
-      } : undefined,
-      surcharges: JSON.parse(sessionStorage.getItem('quote_courier') || '{}')?.surcharges || [],
-      capture: false
-    }
-    sessionStorage.removeItem('quote_courier')
-    sessionStorage.removeItem('quote_items')
-    createOrder(payload, {
-      onSuccess: (response) => {
-        if (response.status) {
-          showToast('Orders Created successfully', 'success');
-          setIsSubmitting(false);
-          onOpenChange(false)
-          navigate(`${role === 'admin' ? '/admin' : ''}/orders/consign/${response?.data?.order_number}`);
-          // setWalletCheckOpen(false);
-          // if (response.order_number) {
-          //   printLabel(response.order_number);
-          // }
-        } else {
-          showToast(response.message || 'Failed to create orders', 'error');
-        }
-      },
-      onError: (err: any) => {
-        showToast(err?.response?.data?.message || 'Failed to create orders', 'error');
-      },
-    });
-  };
+  // const executeCreateOrder = () => {
+  //   if (!user) return;
+  //   const service = hasDefaultItemAndCourier ? default_courier : JSON.parse(sessionStorage.getItem('quote_courier') || '{}')?.courier;
+  //   const items = hasDefaultItemAndCourier ? default_item : JSON.parse(sessionStorage.getItem('quote_items') || '[]');
+  //   const payload = {
+  //     sender: {
+  //       email: user.email || '',
+  //       phone: user.office_number || '',
+  //       company: user.company_name || '',
+  //       address: user.addresses?.[0]?.address || '',
+  //       address1: user.addresses?.[0]?.address || '',
+  //       suburb: user.addresses?.[0]?.suburb || '',
+  //       state: user.addresses?.[0]?.state || '',
+  //       street_name: user.addresses?.[0]?.street_name || '',
+  //       street_number: user.addresses?.[0]?.street_number || '',
+  //       postcode: user.addresses?.[0]?.postcode || '',
+  //       name: `${user.first_name || ''} ${user.last_name || ''}`.trim(),
+  //       country: user.addresses?.[0]?.country || 'Australia',
+  //     },
+  //     receiver: {
+  //       ...formData
+  //     },
+  //     parcels: items.length > 0 ? items.map((item: any) => ({
+  //       type: "box",
+  //       quantity: item.quantity || 1,
+  //       weight: item.weight || 0,
+  //       length: item.length || 0,
+  //       width: item.width || 0,
+  //       height: item.height || 0
+  //     })) : undefined,
+  //     service: service ? {
+  //       courier: service.carrier_id,
+  //       product_id: service.product_id,
+  //       product_type: service.product_type,
+  //       shipment_summary: service.shipment_summary,
+  //       cover_limited_liability: 0,
+  //       signature_required: 0,
+  //     } : undefined,
+  //     surcharges: JSON.parse(sessionStorage.getItem('quote_courier') || '{}')?.surcharges || [],
+  //     capture: false
+  //   }
+  //   sessionStorage.removeItem('quote_courier')
+  //   sessionStorage.removeItem('quote_items')
+  //   createOrder(payload, {
+  //     onSuccess: (response) => {
+  //       if (response.status) {
+  //         showToast('Orders Created successfully', 'success');
+  //         setIsSubmitting(false);
+  //         onOpenChange(false)
+  //         navigate(`${role === 'admin' ? '/admin' : ''}/orders/consign/${response?.data?.order_number}`);
+  //         // setWalletCheckOpen(false);
+  //         // if (response.order_number) {
+  //         //   printLabel(response.order_number);
+  //         // }
+  //       } else {
+  //         showToast(response.message || 'Failed to create orders', 'error');
+  //       }
+  //     },
+  //     onError: (err: any) => {
+  //       showToast(err?.response?.data?.message || 'Failed to create orders', 'error');
+  //     },
+  //   });
+  // };
 
   const handleSubmit = async () => {
     setIsSubmitting(true);
@@ -169,10 +169,10 @@ export default function CreateOrderDialog({ onOpenChange, type, open, initialDat
       return;
     }
 
-    if (orderType === 'create' && hasDefaultItemAndCourier && !isEdit) {
-      executeCreateOrder()
-      return;
-    }
+    // if (orderType === 'create' && hasDefaultItemAndCourier && !isEdit) {
+    //   executeCreateOrder()
+    //   return;
+    // }
     if (isEdit && orderType !== 'create') {
       updateOrderReceiverAddress({
         orderId: orderId as string,
@@ -250,7 +250,7 @@ export default function CreateOrderDialog({ onOpenChange, type, open, initialDat
         </label>
       </div>}
       submitText={isEdit ? 'Update' : 'Continue'}
-      isLoading={isUpdatePending || saveLoading}
+      isLoading={isUpdatePending}
     >
       <div className="flex-1 overflow-y-auto p-4 pt-0 custom-scrollbar">
         <div className="space-y-5 max-w-5xl mx-auto">

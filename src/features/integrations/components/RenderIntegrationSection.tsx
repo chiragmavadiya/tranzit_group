@@ -3,7 +3,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import type { CustomerIntegration } from '@/features/customers/types';
 import { cn } from '@/lib/utils';
-import { Link2, Link2Off, Loader2, Settings2 } from 'lucide-react';
+import { Link2, Link2Off, Loader2, Settings2, Check } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
 
 interface RenderIntegrationSectionProps {
@@ -11,6 +11,7 @@ interface RenderIntegrationSectionProps {
     Icon?: any;
     data: CustomerIntegration[] | undefined;
     disconnectMutation?: any;
+    setDefaultMutation?: any;
     fromCustomer?: boolean;
     onConnect?: (providerId: string) => void;
     onConfigure?: (providerId: string) => void;
@@ -24,6 +25,7 @@ const RenderIntegrationSection = ({
     data,
     onConnect,
     disconnectMutation,
+    setDefaultMutation,
     fromCustomer = false,
     onConfigure,
     isLoading = false,
@@ -62,6 +64,7 @@ const RenderIntegrationSection = ({
                     <>
                         {data?.map((provider) => {
                             const isConnected = provider.connected;
+                            const isDefault = provider.is_default;
                             return (
                                 <Card key={provider.slug} className="py-4 group relative overflow-hidden transition-all hover:shadow-md border-slate-200 dark:border-zinc-800 bg-white dark:bg-zinc-950">
                                     <CardHeader className="pb-4 bg-transparent">
@@ -69,12 +72,37 @@ const RenderIntegrationSection = ({
                                             <div className="w-12 h-12 rounded-xl flex items-center justify-center mb-3 group-hover:scale-110 transition-transform">
                                                 <img src={provider.logo_url} alt={provider.name} className="h-full w-full object-contain" />
                                             </div>
-                                            <Badge variant={isConnected ? "default" : "secondary"} className={cn(
-                                                "font-semibold text-[12px] pt-1 uppercase leading-100 tracking-wider flex items-center justify-center",
-                                                isConnected ? "bg-emerald-50 text-emerald-600 border-emerald-100 dark:bg-emerald-900/20 dark:text-emerald-400 dark:border-emerald-900/30" : "bg-slate-50 text-slate-400 border-slate-100 dark:bg-zinc-900 dark:text-zinc-500 dark:border-zinc-800"
-                                            )}>
-                                                {isConnected ? "Connected" : "Not Connected"}
-                                            </Badge>
+                                            <div className="flex flex-col gap-1.5 items-end">
+                                                <Badge variant={isConnected ? "default" : "secondary"} className={cn(
+                                                    "font-semibold text-[12px] pt-1 uppercase leading-100 tracking-wider flex items-center justify-center",
+                                                    isConnected ? "bg-emerald-50 text-emerald-600 border-emerald-100 dark:bg-emerald-900/20 dark:text-emerald-400 dark:border-emerald-900/30" : "bg-slate-50 text-slate-400 border-slate-100 dark:bg-zinc-900 dark:text-zinc-500 dark:border-zinc-800"
+                                                )}>
+                                                    {isConnected ? "Connected" : "Not Connected"}
+                                                </Badge>
+                                                {isDefault ? (
+                                                    <Badge variant="default" className="font-medium text-[12px] px-2.5  leading-relaxed tracking-wide flex items-center gap-1 bg-blue-600 text-white hover:bg-blue-600 dark:bg-blue-500 dark:hover:bg-blue-500 border-none shadow-sm rounded-full">
+                                                        <Check className="w-3.5 h-3.5 stroke-[3px]" />
+                                                        Default
+                                                    </Badge>
+                                                ) : (
+                                                    isConnected && setDefaultMutation && (
+                                                        <button
+                                                            onClick={(e) => {
+                                                                e.stopPropagation();
+                                                                setDefaultMutation.mutate(provider.slug);
+                                                            }}
+                                                            disabled={setDefaultMutation.isPending && setDefaultMutation.variables === provider.slug}
+                                                            className="text-[12px] font-bold text-blue-600 hover:text-blue-700 hover:underline dark:text-blue-400 dark:hover:text-blue-300 flex items-center gap-1 transition-colors bg-transparent border-0 cursor-pointer p-0 leading-none h-5"
+                                                        >
+                                                            {setDefaultMutation.isPending && setDefaultMutation.variables === provider.slug ? (
+                                                                <Loader2 className="w-2.5 h-2.5 animate-spin" />
+                                                            ) : (
+                                                                "Set Default"
+                                                            )}
+                                                        </button>
+                                                    )
+                                                )}
+                                            </div>
                                         </div>
                                         <CardTitle className="text-base font-bold text-slate-900 dark:text-zinc-100">{provider.name}</CardTitle>
                                         <CardDescription className="text-xs text-slate-500 dark:text-zinc-400 line-clamp-2 min-h-[32px]">

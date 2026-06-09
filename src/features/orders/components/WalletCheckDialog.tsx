@@ -18,14 +18,14 @@ const WalletCheckDialog: React.FC<WalletCheckDialogProps> = ({
         <CustomModel
             open={open}
             onOpenChange={onOpenChange}
-            title="Wallet Balance Check"
-            description="Please review your wallet balance before proceeding with the order."
+            title={isInsufficient ? "Insufficient Wallet Balance" : "Wallet Balance Check"}
+            description={isInsufficient ? "Your wallet does not have enough funds to create this consignment." : "Please review your wallet balance before proceeding with the order."}
             contentClass="sm:max-w-xl"
             submitText={isPending ? "Processing..." : isInsufficient ? "Continue" : "Consign Order"}
             cancelText="Cancel"
             onSubmit={onConfirm}
-
             isLoading={isPending}
+            showFooter={!isInsufficient}
         >
             <div className="p-2 pb-0 space-y-4">
                 <div className="flex items-center justify-between p-4 bg-slate-50 dark:bg-zinc-900 border border-slate-100 dark:border-zinc-800 rounded-xl">

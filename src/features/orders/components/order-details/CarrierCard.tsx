@@ -19,6 +19,7 @@ interface CarrierCardProps {
   module?: string;
   orderType?: string
   initialSelectedCourierId?: string
+  default_courier?: any;
 }
 
 export const CarrierCard: React.FC<CarrierCardProps> = memo((props) => {
@@ -82,6 +83,9 @@ export const CarrierCard: React.FC<CarrierCardProps> = memo((props) => {
       } else if (!selectedServiceId) {
         setSelectedServiceId((prev) => {
           if (prev !== '') return prev;
+          // if (default_courier?.slug) {
+          //   return default_courier.slug + (default_courier?.product_id || '') || '';
+          // }
           return minItem.courierCode + (minItem.product_id || '') || '';
         });
       }
@@ -175,8 +179,8 @@ export const CarrierCard: React.FC<CarrierCardProps> = memo((props) => {
       <CardHeader className="flex flex-row items-center justify-between py-3 px-4 border-b border-gray-100 dark:border-zinc-800 bg-slate-50 dark:bg-zinc-900 transition-colors">
         <div className="flex justify-between w-full items-center gap-2">
           <div className='flex items-center gap-2'>
-            <Truck className="h-4 w-4 text-primary" />
-            <CardTitle className="text-base font-bold text-gray-900 dark:text-zinc-100 tracking-wider">
+            <Truck className="h-5 w-5 text-primary" />
+            <CardTitle className="text-base font-bold uppercase tracking-wide text-slate-800 dark:text-zinc-400">
               SHIPMENT OPTIONS
             </CardTitle>
           </div>

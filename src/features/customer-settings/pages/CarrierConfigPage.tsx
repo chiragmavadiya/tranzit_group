@@ -1,12 +1,13 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { ArrowLeft, Link2Off, Loader2 } from 'lucide-react';
+import { ArrowLeft, Link2Off, Loader2, Check } from 'lucide-react';
 // import { useQueryClient } from '@tanstack/react-query';
 import {
   useConnectIntegration,
   useDisconnectIntegration,
   useIntegrationStatusMutation,
-  useIntegrationsList
+  useIntegrationsList,
+  useSetDefaultIntegration
 } from '@/features/integrations/hooks/useIntegrations';
 import CarrierConfigForm from '../components/CarrierConfigForm';
 import { Button } from '@/components/ui/button';
@@ -25,6 +26,7 @@ export default function CarrierConfigPage() {
   const { mutate: getIntegrationStatus } = useIntegrationStatusMutation();
   const connectMutation = useConnectIntegration();
   const disconnectMutation = useDisconnectIntegration();
+  const setDefaultMutation = useSetDefaultIntegration();
 
   const currentSlug = slug || 'auspost';
 
@@ -34,6 +36,11 @@ export default function CarrierConfigPage() {
   const logoUrl = carrierIntegration?.logo_url;
   const carrierName = carrierIntegration?.name || currentSlug;
   const isConnected = formData?.connected ?? carrierIntegration?.connected;
+  const isDefault = carrierIntegration?.is_default ?? false;
+
+  const handleSetDefault = () => {
+    setDefaultMutation.mutate(currentSlug);
+  };
 
   useEffect(() => {
     setFetchingData(true);
@@ -95,22 +102,40 @@ export default function CarrierConfigPage() {
               Back
             </Button>
 
-            {isConnected && (
-              <Button
-                variant="outline"
-                size="sm"
-                className="h-8 text-xs font-bold border-red-200 text-red-500 hover:text-red-600 hover:bg-red-50 dark:border-red-900/30 dark:hover:bg-red-950/20"
-                onClick={handleDisconnect}
-                disabled={disconnectMutation.isPending}
-              >
-                {disconnectMutation.isPending ? (
-                  <Loader2 className="w-3.5 h-3.5 animate-spin mr-1.5" />
-                ) : (
-                  <Link2Off className="w-3.5 h-3.5 mr-1.5" />
-                )}
-                Disconnect
-              </Button>
-            )}
+            <div className="flex items-center gap-2">
+              {isConnected && !isDefault && (
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="h-8 text-xs font-bold border-blue-200 text-blue-600 hover:text-blue-700 hover:bg-blue-50 dark:border-blue-900/30 dark:hover:bg-blue-950/20"
+                  onClick={handleSetDefault}
+                  disabled={setDefaultMutation.isPending}
+                >
+                  {setDefaultMutation.isPending ? (
+                    <Loader2 className="w-3.5 h-3.5 animate-spin mr-1.5" />
+                  ) : (
+                    <Check className="w-3.5 h-3.5 mr-1.5" />
+                  )}
+                  Set Default
+                </Button>
+              )}
+              {isConnected && (
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="h-8 text-xs font-bold border-red-200 text-red-500 hover:text-red-600 hover:bg-red-50 dark:border-red-900/30 dark:hover:bg-red-950/20"
+                  onClick={handleDisconnect}
+                  disabled={disconnectMutation.isPending}
+                >
+                  {disconnectMutation.isPending ? (
+                    <Loader2 className="w-3.5 h-3.5 animate-spin mr-1.5" />
+                  ) : (
+                    <Link2Off className="w-3.5 h-3.5 mr-1.5" />
+                  )}
+                  Disconnect
+                </Button>
+              )}
+            </div>
           </div>
 
           {/* Centered Logo & Header */}
@@ -141,6 +166,12 @@ export default function CarrierConfigPage() {
                   >
                     {isConnected ? "Connected" : "Not Connected"}
                   </Badge>
+                  {isDefault && (
+                    <Badge variant="default" className="font-medium text-[12px] px-2.5 leading-relaxed tracking-wide flex items-center gap-1 bg-blue-600 text-white hover:bg-blue-600 dark:bg-blue-500 dark:hover:bg-blue-500 border-none shadow-sm rounded-full shrink-0 mt-0.5">
+                      <Check className="w-3.5 h-3.5 stroke-[3px]" />
+                      Default
+                    </Badge>
+                  )}
                 </div>
                 <p className="my-0 text-sm text-slate-500 dark:text-zinc-400 leading-normal mt-1">
                   Connect your {carrierName} account to automate label generation, track shipments, and manage eParcel products directly from Tranzit.

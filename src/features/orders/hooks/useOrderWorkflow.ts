@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useState, useEffect, useEffectEvent } from 'react';
+import { useCallback, useMemo, useState, useEffect, useEffectEvent, useRef } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useAppSelector } from '@/hooks/store.hooks';
 import { showToast } from '@/components/ui/custom-toast';
@@ -14,6 +14,7 @@ import {
 import { useGlobalCouriers } from '@/features/courier-surcharge/hooks/useGlobalCouriers';
 import type { AddressData, WalletCheckResponse } from '../types';
 import { useDefaultItem } from '@/features/items/hooks/useItems';
+import { removeEmptyFields } from '@/lib/utils';
 
 // address1 = street
 const initialAddressData = {
@@ -37,7 +38,7 @@ const initialAddressData = {
 
 export const useOrderWorkflow = () => {
   const { orderType, orderID } = useParams<{ orderType: string; orderID: string }>();
-  const { role, user } = useAppSelector((state) => state.auth);
+  const { role, user, default_courier, default_item } = useAppSelector((state) => state.auth);
   const navigate = useNavigate();
 
   // API Hooks
@@ -60,6 +61,8 @@ export const useOrderWorkflow = () => {
   const [walletCheckData, setWalletCheckData] = useState<WalletCheckResponse | null>(null);
   const [quoteData, setQuoteData] = useState<any>(null);
   const [courierData, setCourierData] = useState<any>(null);
+  // const [isSaveAsDraft, setIsSaveAsDraft] = useState(false);
+  const isSaveAsDraft = useRef(false);
 
   const [addressData, setAddressData] = useState<{ sender: AddressData; receiver: AddressData }>(() => ({
     sender: initialAddressData,
@@ -247,6 +250,8 @@ export const useOrderWorkflow = () => {
     }
   }, []);
 
+  console.log(courierData, 'courierData...')
+
   // Summary Metrics calculations
   const calculation = useMemo(() => {
     const totalItems = itemsData?.reduce((acc, item) => acc + (Number(item.quantity) || 1), 0) || 0;
@@ -288,6 +293,7 @@ export const useOrderWorkflow = () => {
 
   // Order Submission/Saving Flow
   const handleOnSave = useCallback((skipWalletCheckArg?: any, overrideReceiverPhone?: string) => {
+    console.log(skipWalletCheckArg, 'skipWalletCheckArg')
     const isValidItems = itemsData && itemsData.length > 0 && itemsData.every((item) =>
       item.type !== 'box' ||
       Number(item.height) > 0 && Number(item.width) > 0 && Number(item.length) > 0 && Number(item.weight) > 0 && Number(item.quantity) > 0
@@ -304,6 +310,11 @@ export const useOrderWorkflow = () => {
       showToast('Please fill out item dimensions and complete both addresses.', 'error');
       return;
     }
+    console.log(courierData, 'courierData...')
+    if (!courierData?.courier) {
+      showToast('Please select a courier.', 'error');
+      return;
+    }
 
     if (!termsAccepted || !ratesAccepted) {
       showToast('You must accept all Terms & Conditions and Futile Pickup declarations.', 'error');
@@ -315,7 +326,7 @@ export const useOrderWorkflow = () => {
       return;
     }
 
-    if (calculation.totalItems > 4 && skipWalletCheckArg !== 'skipItemCountCheck' && skipWalletCheckArg !== true) {
+    if (calculation.totalItems > 4 && skipWalletCheckArg !== 'skipItemCountCheck' && skipWalletCheckArg !== 'saveAsDraft') {
       setShowItemCountModal(true);
       return;
     }
@@ -341,7 +352,7 @@ export const useOrderWorkflow = () => {
         total: quoteData?.courier?.price || 0,
         freight_levy: quoteData?.courier?.freight_levy || 0,
       },
-      capture: role === 'admin' || !skipWalletCheckArg || (walletCheckData?.wallet_balance ?? 0) > calculation.grandTotal,
+      capture: role === 'admin' || (skipWalletCheckArg !== 'saveAsDraft') || (walletCheckData?.wallet_balance ?? 0) > calculation.grandTotal,
       save_address: addressData?.receiver?.saveToAddressBook ? 1 : 0,
       customer_id: selectedCustomer || undefined,
       ...(orderType === 'create-menual' ? {
@@ -351,12 +362,16 @@ export const useOrderWorkflow = () => {
       } : {}),
     };
 
-    const executeCreateOrder = () => {
-      createOrder(payload, {
+    const executeCreateOrder = (is_own?: boolean) => {
+      createOrder({ ...payload, is_own }, {
         onSuccess: (response) => {
           if (response.status) {
             showToast('Orders Created successfully', 'success');
-            navigate(`${role === 'admin' ? '/admin' : ''}/orders/${response?.data?.order_status_category !== 'new' ? 'view' : 'consign'}/${response?.data?.order_number}`);
+            if (skipWalletCheckArg === 'saveAsDraft') {
+              navigate(`${role === 'admin' ? '/admin' : ''}/orders`);
+            } else {
+              navigate(`${role === 'admin' ? '/admin' : ''}/orders/${response?.data?.order_status_category !== 'new' ? 'view' : 'consign'}/${response?.data?.order_number}`);
+            }
             setWalletCheckOpen(false);
             if (response?.data?.order_number && response?.data?.order_status_category !== 'new') {
               printLabel(response?.data?.order_number);
@@ -369,6 +384,7 @@ export const useOrderWorkflow = () => {
           console.log(err?.response?.data?.receiver_contact_required, 'error from order create ')
           if (err?.response?.data?.receiver_contact_required) {
             setShowReceiverPhoneModal(true);
+            isSaveAsDraft.current = skipWalletCheckArg === 'saveAsDraft';
             return;
           }
           showToast(err?.response?.data?.message || 'Failed to create orders', 'error');
@@ -376,8 +392,8 @@ export const useOrderWorkflow = () => {
       });
     };
 
-    if (skipWalletCheckArg === true || role === 'admin' || courierData?.is_own) {
-      executeCreateOrder();
+    if (skipWalletCheckArg === 'saveAsDraft' || skipWalletCheckArg === true || role === 'admin' || courierData?.is_own) {
+      executeCreateOrder(courierData?.is_own);
       return;
     }
 
@@ -405,7 +421,7 @@ export const useOrderWorkflow = () => {
       },
     }));
     setShowReceiverPhoneModal(false);
-    handleOnSave(true, phone);
+    handleOnSave(isSaveAsDraft.current ? 'saveAsDraft' : '', phone);
   }, [handleOnSave]);
 
   // Order Cancellation Flow
@@ -427,7 +443,7 @@ export const useOrderWorkflow = () => {
   }, [orderID, cancelOrder, navigate, role]);
 
   // Order Consignment Flow
-  const handleConsign = useCallback(() => {
+  const handleConsign = useCallback((skipWalletCheckArg?: any) => {
     if (!termsAccepted || !ratesAccepted || !dangerousGoodsAccepted) {
       showToast('You must accept all Terms & Conditions, Dangerous Goods, and Futile Pickup declarations.', 'error');
       return;
@@ -435,7 +451,7 @@ export const useOrderWorkflow = () => {
 
     const payload = {
       customer_id: selectedCustomer || orderDetail?.sender_details?.customer_id,
-      sender: {
+      sender: removeEmptyFields({
         name: addressData.sender.name,
         company: addressData.sender.company,
         phone: addressData.sender.phone,
@@ -445,8 +461,8 @@ export const useOrderWorkflow = () => {
         state: addressData.sender.state,
         postcode: addressData.sender.postcode,
         country: addressData.sender.country || 'AU',
-      },
-      receiver: {
+      }),
+      receiver: removeEmptyFields({
         name: addressData.receiver.name,
         company: addressData.receiver.company,
         phone: addressData.receiver.phone,
@@ -456,7 +472,7 @@ export const useOrderWorkflow = () => {
         state: addressData.receiver.state,
         postcode: addressData.receiver.postcode,
         country: addressData.receiver.country || 'AU',
-      },
+      }),
       parcels: itemsData.map((item) => ({
         type: item.type,
         quantity: item.quantity,
@@ -478,7 +494,7 @@ export const useOrderWorkflow = () => {
         gst: quoteData?.courier?.gst || calculation.gst,
         total: quoteData?.courier?.price || calculation.grandTotal,
       },
-      capture: true,
+      capture: role === 'admin' || !skipWalletCheckArg || (walletCheckData?.wallet_balance ?? 0) > calculation.grandTotal,
       ...(orderType === 'create-menual' ? {
         tracking_number: manualOrderData.trackingNumber,
         courier_id: manualOrderData.courierId,
@@ -486,24 +502,51 @@ export const useOrderWorkflow = () => {
       } : {}),
     };
 
-    if (orderID) {
-      consignOrder(
-        { orderId: orderID, data: payload },
-        {
-          onSuccess: () => {
-            showToast('Order consigned successfully', 'success');
-            navigate(`${role === 'admin' ? '/admin' : ''}/orders/view/${orderID}`);
-            if (orderID) {
-              printLabel(orderID);
-            }
-          },
-          onError: (err: any) => {
-            showToast(err?.response?.data?.message || 'Failed to consign order', 'error');
-          },
-        }
-      );
+    const executeConsign = () => {
+      if (orderID) {
+        consignOrder(
+          { orderId: orderID, data: payload },
+          {
+            onSuccess: () => {
+              showToast('Order consigned successfully', 'success');
+              navigate(`${role === 'admin' ? '/admin' : ''}/orders/view/${orderID}`);
+              setWalletCheckOpen(false);
+              if (orderID) {
+                printLabel(orderID);
+              }
+            },
+            onError: (err: any) => {
+              if (err?.response?.data?.receiver_contact_required) {
+                setShowReceiverPhoneModal(true);
+                return;
+              }
+              showToast(err?.response?.data?.message || 'Failed to consign order', 'error');
+            },
+          }
+        );
+      }
+    };
+
+    if (skipWalletCheckArg === true || role === 'admin' || courierData?.is_own) {
+      executeConsign();
+      return;
     }
-  }, [termsAccepted, ratesAccepted, dangerousGoodsAccepted, selectedCustomer, orderDetail?.sender_details?.customer_id, addressData.sender.name, addressData.sender.company, addressData.sender.phone, addressData.sender.email, addressData.sender.address1, addressData.sender.suburb, addressData.sender.state, addressData.sender.postcode, addressData.sender.country, addressData.receiver.name, addressData.receiver.company, addressData.receiver.phone, addressData.receiver.email, addressData.receiver.address1, addressData.receiver.suburb, addressData.receiver.state, addressData.receiver.postcode, addressData.receiver.country, itemsData, courierData, insuranceSelected, signatureSelected, deliveryInstructions, quoteData?.courier?.base, quoteData?.courier?.gst, quoteData?.courier?.price, quoteData?.surcharges, calculation.servicePrice, calculation.gst, calculation.grandTotal, orderType, manualOrderData.trackingNumber, manualOrderData.courierId, manualOrderData.amount, orderID, consignOrder, navigate, role, printLabel]);
+
+    checkWallet(calculation.grandTotal, {
+      onSuccess: (res) => {
+        if (res.ok) {
+          setWalletCheckData(res);
+          setWalletCheckOpen(true);
+        } else {
+          executeConsign();
+        }
+      },
+      onError: () => {
+        showToast('Failed to consign order', 'error');
+      },
+    });
+
+  }, [termsAccepted, ratesAccepted, dangerousGoodsAccepted, selectedCustomer, orderDetail?.sender_details?.customer_id, addressData.sender.name, addressData.sender.company, addressData.sender.phone, addressData.sender.email, addressData.sender.address1, addressData.sender.suburb, addressData.sender.state, addressData.sender.postcode, addressData.sender.country, addressData.receiver.name, addressData.receiver.company, addressData.receiver.phone, addressData.receiver.email, addressData.receiver.address1, addressData.receiver.suburb, addressData.receiver.state, addressData.receiver.postcode, addressData.receiver.country, itemsData, courierData, insuranceSelected, signatureSelected, deliveryInstructions, quoteData?.courier?.base, quoteData?.courier?.gst, quoteData?.courier?.price, quoteData?.surcharges, calculation.servicePrice, calculation.gst, calculation.grandTotal, orderType, manualOrderData.trackingNumber, manualOrderData.courierId, manualOrderData.amount, orderID, consignOrder, navigate, role, printLabel, checkWallet, walletCheckData?.wallet_balance]);
 
   useEffect(() => {
     const savedAddressStr = sessionStorage.getItem('address');
@@ -582,6 +625,8 @@ export const useOrderWorkflow = () => {
     }
   }, [setItemsData, setQuoteData, setCourierData]);
 
+  const hasDefaultItemAndCourier = useMemo(() => Boolean(default_courier) && Boolean(default_item), [default_courier, default_item]);
+
   return {
     orderType,
     orderID,
@@ -639,7 +684,9 @@ export const useOrderWorkflow = () => {
     onCancelOrder,
     handleConsign,
     downloadLabel,
-    hasDefaultItemAndCourier: defaultItem?.data ? false : false, // NEED TO IMPROVE WHEN DEFAULT CARRIER GETS INTRODUCED
+    hasDefaultItemAndCourier,
+    default_courier,
+    default_item,
     showReceiverPhoneModal,
     setShowReceiverPhoneModal,
     receiverPhone,

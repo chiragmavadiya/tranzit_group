@@ -3,7 +3,8 @@
 import { useState, useMemo, useCallback, useEffect, lazy, Suspense } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import type { TabType } from '@/features/orders/types';
-import { useOrders, useExportOrders, useImportOrders, useDownloadLabel, useCancelOrder, useArchiveOrder } from '@/features/orders/hooks/useOrders';
+import { useOrders, useExportOrders, useImportOrders, useDownloadLabel, useCancelOrder, useArchiveOrder, usePrintOrder, useWalletCheck } from '@/features/orders/hooks/useOrders';
+import WalletCheckDialog from '@/features/orders/components/WalletCheckDialog';
 import { DataTable } from '@/components/common/DataTable';
 import { getOrdersColumns } from '../column';
 import DatePicker from '@/components/common/DatePicker';
@@ -63,7 +64,46 @@ export default function OrdersPage({ fromCustomer, customerId }: { fromCustomer?
   const downloadLabelMutation = useDownloadLabel();
   const cancelOrderMutation = useCancelOrder();
   const archiveOrderMutation = useArchiveOrder();
+  const printOrderMutation = usePrintOrder();
   const { data: customersData } = useCustomers({ pageSize: 1000 }, isAdmin);
+
+  const [walletCheckOpen, setWalletCheckOpen] = useState(false);
+  const [walletCheckData, setWalletCheckData] = useState<any>(null);
+  const [orderToPrint, setOrderToPrint] = useState<{ orderNumber: string | number; amount: number } | null>(null);
+
+  const { mutate: checkWallet, isPending: walletLoading } = useWalletCheck();
+
+  const executePrint = useCallback((orderNumber: string | number) => {
+    printOrderMutation.mutate(orderNumber, {
+      onSuccess: () => {
+        setWalletCheckOpen(false);
+        setOrderToPrint(null);
+      }
+    });
+  }, [printOrderMutation]);
+
+  const handlePrintClick = useCallback((orderNumber: string | number, amount: number) => {
+    setOrderToPrint({ orderNumber, amount });
+    
+    if (role === 'admin') {
+      executePrint(orderNumber);
+      return;
+    }
+
+    checkWallet(amount, {
+      onSuccess: (res) => {
+        if (res.ok) {
+          setWalletCheckData(res);
+          setWalletCheckOpen(true);
+        } else {
+          executePrint(orderNumber);
+        }
+      },
+      onError: () => {
+        showToast('Failed to check wallet balance', 'error');
+      }
+    });
+  }, [role, checkWallet, executePrint]);
 
 
   // Reset page when tab changes
@@ -236,8 +276,10 @@ export default function OrdersPage({ fromCustomer, customerId }: { fromCustomer?
     downloadingLabelId,
     fromCustomer,
     handleArchiveOrder,
-    updateToArchiveId
-  ), [role, activeTab, navigate, handleCustomerEdit, handleDownloadSingleLabel, handleCancelSingleOrderClick, downloadingLabelId, fromCustomer, handleArchiveOrder, updateToArchiveId]);
+    updateToArchiveId,
+    handlePrintClick,
+    printOrderMutation.isPending ? printOrderMutation.variables : (walletLoading ? orderToPrint?.orderNumber : null)
+  ), [role, activeTab, navigate, handleCustomerEdit, handleDownloadSingleLabel, handleCancelSingleOrderClick, downloadingLabelId, fromCustomer, handleArchiveOrder, updateToArchiveId, handlePrintClick, printOrderMutation.isPending, printOrderMutation.variables, walletLoading, orderToPrint?.orderNumber]);
 
   return (
     <div className={`${fromCustomer ? "p-0" : "p-page-padding"} flex-1 flex flex-col space-y-4 animate-in fade-in slide-in-from-bottom-2 duration-300 h-full overflow-hidden min-h-0`}>
@@ -513,6 +555,16 @@ export default function OrdersPage({ fromCustomer, customerId }: { fromCustomer?
           // isUpdate={true}
           />
         </Suspense>
+      )}
+      {walletCheckOpen && walletCheckData && orderToPrint && (
+        <WalletCheckDialog
+          open={walletCheckOpen}
+          onOpenChange={setWalletCheckOpen}
+          walletBalance={walletCheckData.wallet_balance}
+          orderTotal={orderToPrint.amount}
+          isPending={printOrderMutation.isPending}
+          onConfirm={() => executePrint(orderToPrint.orderNumber)}
+        />
       )}
     </div>
   );

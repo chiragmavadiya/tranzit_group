@@ -6,7 +6,7 @@ import { CustomModel } from '@/components/ui/dialog';
 import { showToast } from '@/components/ui/custom-toast';
 import { Checkbox } from '@/components/ui/checkbox';
 import { PlaceAutocomplete } from '@/components/common/AutoComplateAddress';
-import { cn } from '@/lib/utils';
+import { cn, isEmailValid, isPhoneValid } from '@/lib/utils';
 import { STATES } from '@/constants';
 import AutoComplete from '@/components/common/AutoComplate2';
 import { useAddressBookSearch } from '@/features/address-book/hooks/useAddressBook';
@@ -66,9 +66,6 @@ export default function CreateOrderDialog({ onOpenChange, type, open, initialDat
   const updateField = (field: keyof AddressData, value: string | boolean | number | string[]) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
   };
-
-  const isEmailValid = (email: string) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
-  const isPhoneValid = (phone: string) => /^(?:\+61|0)[2-478](?:[ -]?[0-9]){8}$/.test(phone.replace(/[\s-()]/g, ''));
 
   const updatePayload = useMemo(() => ({
     receiver_name: formData.name,

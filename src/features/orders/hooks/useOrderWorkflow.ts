@@ -331,6 +331,12 @@ export const useOrderWorkflow = () => {
       return;
     }
 
+    const getCapture = () => {
+      if (role === 'admin') return true;
+      if (skipWalletCheckArg == 'saveAsDraft') return false;
+      if ((walletCheckData?.wallet_balance ?? 0) > calculation.grandTotal) return true;
+    }
+
     const payload: any = {
       ...addressData,
       receiver: {
@@ -352,7 +358,7 @@ export const useOrderWorkflow = () => {
         total: quoteData?.courier?.price || 0,
         freight_levy: quoteData?.courier?.freight_levy || 0,
       },
-      capture: role === 'admin' || (skipWalletCheckArg !== 'saveAsDraft') || (walletCheckData?.wallet_balance ?? 0) > calculation.grandTotal,
+      capture: getCapture(),
       save_address: addressData?.receiver?.saveToAddressBook ? 1 : 0,
       customer_id: selectedCustomer || undefined,
       ...(orderType === 'create-menual' ? {
@@ -383,7 +389,9 @@ export const useOrderWorkflow = () => {
         onError: (err: any) => {
           console.log(err?.response?.data?.receiver_contact_required, 'error from order create ')
           if (err?.response?.data?.receiver_contact_required) {
+            setWalletCheckOpen(false);
             setShowReceiverPhoneModal(true);
+
             isSaveAsDraft.current = skipWalletCheckArg === 'saveAsDraft';
             return;
           }
@@ -421,7 +429,7 @@ export const useOrderWorkflow = () => {
       },
     }));
     setShowReceiverPhoneModal(false);
-    handleOnSave(isSaveAsDraft.current ? 'saveAsDraft' : '', phone);
+    handleOnSave(isSaveAsDraft.current ? 'saveAsDraft' : true, phone);
   }, [handleOnSave]);
 
   // Order Cancellation Flow

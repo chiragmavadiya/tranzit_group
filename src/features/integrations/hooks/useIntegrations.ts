@@ -35,6 +35,7 @@ export const useConnectIntegration = () => {
         },
         onSuccess: (_, variables) => {
             queryClient.invalidateQueries({ queryKey: QUERY_KEYS.INTEGRATIONS.STATUS(variables.provider) });
+            queryClient.invalidateQueries({ queryKey: QUERY_KEYS.INTEGRATIONS.LIST });
             showToast("Integration settings updated successfully!", "success");
         },
         onError: (error: any) => {
@@ -48,7 +49,7 @@ export const useDisconnectIntegration = () => {
     return useMutation({
         mutationFn: (provider: string) => integrationService.disconnect(provider),
         onSuccess: (_, provider) => {
-            // queryClient.invalidateQueries({ queryKey: QUERY_KEYS.INTEGRATIONS.LIST });
+            queryClient.invalidateQueries({ queryKey: QUERY_KEYS.INTEGRATIONS.LIST });
             queryClient.invalidateQueries({ queryKey: QUERY_KEYS.INTEGRATIONS.STATUS(provider) });
             showToast("Disconnected successfully", "success");
         },

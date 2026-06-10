@@ -19,6 +19,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { showToast } from '@/components/ui/custom-toast';
 import { CustomModel } from '@/components/ui/dialog';
 import { FormInput } from '@/features/orders/components/OrderFormUI';
+import { isPhoneValid } from '@/lib/utils';
 
 const OrderDetailsSkeleton: React.FC = () => {
   return (
@@ -566,7 +567,7 @@ const OrderDetailsPage: React.FC = () => {
           title="Receiver Phone Number Required"
           description="A contact number for the receiver is required to book this consignment."
           onSubmit={() => {
-            if (!receiverPhoneInput.trim()) {
+            if (!receiverPhoneInput.trim() || !isPhoneValid(receiverPhoneInput)) {
               showToast("Please enter a valid phone number", "error");
               return;
             }
@@ -584,6 +585,7 @@ const OrderDetailsPage: React.FC = () => {
               placeholder="e.g. 0412345678"
               required
               isFullWidth
+              error={!receiverPhoneInput.trim() || !isPhoneValid(receiverPhoneInput)}
             />
           </div>
         </CustomModel>

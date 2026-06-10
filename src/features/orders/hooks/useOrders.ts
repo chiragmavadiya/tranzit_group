@@ -54,6 +54,7 @@ export const useCreateOrder = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.ORDERS.LIST });
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.WALLET.SUMMARY });
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.ORDERS.COUNTS() });
     },
   });
 };
@@ -97,6 +98,7 @@ export const useCreateOwnCourierOrder = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.ORDERS.LIST });
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.WALLET.SUMMARY });
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.ORDERS.COUNTS() });
     },
   });
 };
@@ -131,6 +133,7 @@ export const useConsignOrder = (isAdmin: boolean = false) => {
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.ORDERS.LIST });
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.ORDERS.DETAILS(orderId) });
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.WALLET.SUMMARY });
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.ORDERS.COUNTS() });
     },
   });
 };

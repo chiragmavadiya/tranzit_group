@@ -13,8 +13,7 @@ export const SURCHARGE_COLUMNS = (onEdit: (row: any) => void, onDelete: (row: an
     // cell: (val) => <span className="font-bold text-slate-900 dark:text-zinc-100 text-[13px]">{val}</span>
     cell: (value: string, row: CourierSurcharge) => (
       <div className="flex items-center gap-1">
-        {/* <img src={row?.courier_logo || 'https://api.tranzit.digisite.net/assets/img/couriers/direct-freight.png'} className="h-6" alt="" /> */}
-        <img src={row?.courier_logo || 'https://api.tranzit.digisite.net/assets/img/couriers/logo-auspost.png'} className="h-6" alt="" />
+        <img src={row?.courier_logo_url || 'https://api.tranzit.digisite.net/assets/img/couriers/logo-auspost.png'} className="h-6" alt="" />
         <span>{value}</span>
       </div>
     )

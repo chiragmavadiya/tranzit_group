@@ -1,7 +1,7 @@
 export interface CourierSurcharge {
   id: number;
   courier_name: string;
-  courier_logo: string;
+  courier_logo_url: string;
   code: string;
   name: string;
   description: string;

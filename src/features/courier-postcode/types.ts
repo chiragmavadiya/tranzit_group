@@ -4,7 +4,7 @@ export interface CourierPostcode {
     global_courier_id: number;
     single_post_code: number;
     price: number;
-    courier_logo: string
+    courier_logo_url: string
 }
 
 export interface CourierPostcodeFormData {

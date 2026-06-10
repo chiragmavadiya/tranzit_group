@@ -123,9 +123,7 @@ const SurchargeForm = forwardRef<HTMLFormElement, SurchargeFormProps>(
     const handleSubmit = (e: React.FormEvent) => {
       e.preventDefault();
       setSubmited(true);
-      console.log(formData, 'formData....')
       if (!formData.global_courier_id || !formData.code || !formData.name || !formData.amount_ex_gst) {
-        console.log("is returning...")
         return;
       }
 

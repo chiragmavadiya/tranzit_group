@@ -14,7 +14,7 @@ export const POSTCODE_COLUMNS = (onEdit: (row: any) => void, onDelete: (row: any
     cell: (value: string, row: CourierPostcode) => (
       <div className="flex items-center gap-1">
         {/* <img src={row?.courier_logo || 'https://api.tranzit.digisite.net/assets/img/couriers/direct-freight.png'} className="h-6" alt="" /> */}
-        <img src={row?.courier_logo || 'https://api.tranzit.digisite.net/assets/img/couriers/logo-auspost.png'} className="h-6" alt="" />
+        <img src={row?.courier_logo_url} className="h-6" alt="" />
         <span>{value}</span>
       </div>
     )

@@ -8,7 +8,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { logout } from '@/features/auth/authSlice';
+import { logout, setCredentials, setNextStep } from '@/features/auth/authSlice';
 import { useOnboarding, useLogout, useEmailVerify } from '@/features/auth/hooks/useAuth';
 import { FormInput, FormSelect } from '@/features/orders/components/OrderFormUI';
 import { useAppDispatch, useAppSelector } from '@/hooks/store.hooks';
@@ -171,7 +171,8 @@ export default function OnboardingPage() {
       onSuccess: (response) => {
         if (response.status) {
           showToast("Onboarding completed successfully", "success");
-          localStorage.removeItem("user_auth_token")
+          localStorage.removeItem("user_auth_token");
+          dispatch(setNextStep('dashboard'));
           navigate('/orders');
         } else {
           showToast(response.message || "Failed to complete onboarding", "error");
@@ -191,6 +192,16 @@ export default function OnboardingPage() {
             localStorage.setItem("auth_userID", JSON.stringify(response.user.id));
             localStorage.setItem("user_role", "customer");
             localStorage.setItem("auth_token", response.token);
+
+            const nextStep = response.onboarding_complete === 1 ? 'dashboard' : 'onboarding';
+            dispatch(setCredentials({
+              userID: response.user.id,
+              token: response.token,
+              role: 'customer',
+              next_step: nextStep,
+              user: response.user as any
+            }));
+
             if (response.onboarding_complete === 1) {
               navigate('/orders')
               return;

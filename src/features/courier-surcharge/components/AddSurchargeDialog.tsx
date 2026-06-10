@@ -46,7 +46,7 @@ export function AddSurchargeDialog({
     const data = surchargeDetails || initialData;
     if (data) {
       return {
-        global_courier_id: (data as any).global_courier_id?.toString() || '',
+        global_courier_id: (data as any).courier_id?.toString() || '',
         code: data.code,
         name: data.name,
         description: data.description,
@@ -62,6 +62,7 @@ export function AddSurchargeDialog({
   }, [surchargeDetails, initialData, initialValues]);
 
   const handleSubmit = (data: CourierSurchargeFormData) => {
+    console.log(data, 'data....')
     if (initialData) {
       updateSurcharge({ id: initialData.id, data }, {
         onSuccess: () => onOpenChange(false)
@@ -122,8 +123,9 @@ const SurchargeForm = forwardRef<HTMLFormElement, SurchargeFormProps>(
     const handleSubmit = (e: React.FormEvent) => {
       e.preventDefault();
       setSubmited(true);
-
-      if (formData.global_courier_id || !formData.code || !formData.name || !formData.amount_ex_gst) {
+      console.log(formData, 'formData....')
+      if (!formData.global_courier_id || !formData.code || !formData.name || !formData.amount_ex_gst) {
+        console.log("is returning...")
         return;
       }
 

@@ -8,6 +8,7 @@ export interface QuoteLocation {
   state: string;
   postcode: string;
   country: string;
+  address_info?: string;
 }
 
 // export interface QuoteItem {

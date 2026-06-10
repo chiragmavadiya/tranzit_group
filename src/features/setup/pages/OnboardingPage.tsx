@@ -171,10 +171,8 @@ export default function OnboardingPage() {
       onSuccess: (response) => {
         if (response.status) {
           showToast("Onboarding completed successfully", "success");
-          // dispatch(setCredentials({ userID: response?.data?.user_id, token: token || '', role: 'customer', next_step: 'dashboard' }));
-          setTimeout(() => {
-            navigate('/orders');
-          }, 100);
+          localStorage.removeItem("user_auth_token")
+          navigate('/orders');
         } else {
           showToast(response.message || "Failed to complete onboarding", "error");
         }

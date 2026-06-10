@@ -108,7 +108,7 @@ export const CustomerHeader = ({ customer, onEdit }: CustomerHeaderProps) => {
                         <div className="flex flex-wrap items-center justify-center sm:justify-start gap-x-4 gap-y-1 dark:text-zinc-400 text-sm">
                             <div className="flex items-center gap-1 font-medium">
                                 <MapPin className="h-3.5 w-3.5 text-slate-400" />
-                                <span>{customer.address || "No Address"}</span>
+                                <span>{(customer.address_info || customer.address) || "No Address"}</span>
                             </div>
                             <div className="flex items-center gap-1">
                                 <Calendar className="h-3.5 w-3.5 text-slate-400" />

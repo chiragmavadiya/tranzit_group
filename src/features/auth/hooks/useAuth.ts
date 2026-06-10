@@ -157,3 +157,10 @@ export const useResetPassword = () => {
         mutationFn: useCallback((data: ResetPasswordRequest) => authService.resetPassword(data), []),
     });
 };
+
+// select plan api
+export const useSelectPlan = () => {
+    return useMutation({
+        mutationFn: useCallback((data: any) => authService.selectPlan(data), []),
+    });
+};

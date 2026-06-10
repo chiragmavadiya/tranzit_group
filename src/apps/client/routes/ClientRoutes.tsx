@@ -43,6 +43,8 @@ const withSuspense = (Component: React.ReactNode) => (
 );
 
 export default function ClientRoutes() {
+  console.log("render Client routes...")
+
   return (
     <Routes>
       <Route element={<ProtectedRoute role="customer" />}>

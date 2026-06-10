@@ -73,15 +73,17 @@ export default function OrdersPage({ fromCustomer, customerId }: { fromCustomer?
   const [orderToPrint, setOrderToPrint] = useState<{ orderNumber: string | number; amount: number } | null>(null);
 
   const { mutate: checkWallet, isPending: walletLoading } = useWalletCheck();
+  const { mutate: printLabel } = useDownloadLabel(true);
 
   const executePrint = useCallback((orderNumber: string | number) => {
     printOrderMutation.mutate(orderNumber, {
       onSuccess: () => {
         setWalletCheckOpen(false);
+        printLabel(orderNumber);
         setOrderToPrint(null);
       }
     });
-  }, [printOrderMutation]);
+  }, [printOrderMutation, printLabel]);
 
   const handlePrintClick = useCallback((orderNumber: string | number, amount: number) => {
     setOrderToPrint({ orderNumber, amount });
@@ -96,9 +98,10 @@ export default function OrdersPage({ fromCustomer, customerId }: { fromCustomer?
         if (res.ok) {
           setWalletCheckData(res);
           setWalletCheckOpen(true);
-        } else {
-          executePrint(orderNumber);
         }
+        // else {
+        //   executePrint(orderNumber);
+        // }
       },
       onError: () => {
         showToast('Failed to check wallet balance', 'error');
@@ -244,7 +247,6 @@ export default function OrdersPage({ fromCustomer, customerId }: { fromCustomer?
 
   const handleCustomerEdit = useCallback((id: string) => {
     setAddressEditModal(id);
-
   }, []);
 
   const handleDownloadSingleLabel = useCallback(async (orderId: string) => {

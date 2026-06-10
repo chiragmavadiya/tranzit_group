@@ -26,7 +26,7 @@ export const useStaffFormOptions = (enabled: boolean = true) => {
     queryKey: QUERY_KEYS.ADMIN_STAFF.FORM_OPTIONS,
     queryFn: () => staffService.getFormOptions(),
     enabled,
-    staleTime: 30 * 60 * 1000, // Form options change rarely
+    staleTime: Infinity, // Form options change rarely
   });
 };
 
@@ -46,7 +46,7 @@ export const useCreateStaff = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.ADMIN_STAFF.LIST });
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.ADMIN_STAFF.COUNTS });
-      queryClient.refetchQueries({ queryKey: QUERY_KEYS.ADMIN_STAFF.COUNTS });
+      // queryClient.refetchQueries({ queryKey: QUERY_KEYS.ADMIN_STAFF.COUNTS });
     },
   });
 };
@@ -59,7 +59,7 @@ export const useUpdateStaff = () => {
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.ADMIN_STAFF.LIST });
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.ADMIN_STAFF.COUNTS });
-      queryClient.refetchQueries({ queryKey: QUERY_KEYS.ADMIN_STAFF.COUNTS });
+      // queryClient.refetchQueries({ queryKey: QUERY_KEYS.ADMIN_STAFF.COUNTS });
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.ADMIN_STAFF.DETAILS(variables.id) });
     },
   });
@@ -73,7 +73,7 @@ export const useToggleStaffStatus = () => {
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.ADMIN_STAFF.LIST });
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.ADMIN_STAFF.COUNTS });
-      queryClient.refetchQueries({ queryKey: QUERY_KEYS.ADMIN_STAFF.COUNTS });
+      // queryClient.refetchQueries({ queryKey: QUERY_KEYS.ADMIN_STAFF.COUNTS });
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.ADMIN_STAFF.DETAILS(variables.id) });
     },
   });
@@ -87,7 +87,7 @@ export const useDeleteStaff = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.ADMIN_STAFF.LIST });
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.ADMIN_STAFF.COUNTS });
-      queryClient.refetchQueries({ queryKey: QUERY_KEYS.ADMIN_STAFF.COUNTS });
+      // queryClient.refetchQueries({ queryKey: QUERY_KEYS.ADMIN_STAFF.COUNTS });
     },
   });
 };

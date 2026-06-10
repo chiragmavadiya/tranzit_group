@@ -38,11 +38,11 @@ export const AddressCard: React.FC<AddressCardProps> = memo(({
 
             <div className="flex items-center gap-1.5 text-sm text-slate-600 dark:text-zinc-400">
               {/* Verified Icon */}
-              <CheckCircle2 className="h-4 w-4 fill-emerald-600 text-white dark:text-zinc-950" />
+              {name && address && <CheckCircle2 className="h-4 w-4 fill-emerald-600 text-white dark:text-zinc-950" />}
 
               {/* Sender Details */}
               <div className="flex items-center space-x-1">
-                <span className="font-medium text-slate-900 dark:text-zinc-100">{name},</span>
+                <span className="font-medium text-slate-900 dark:text-zinc-100">{name}{name && address && ','}</span>
                 <span>{address}</span>
                 {email && <span className="px-1 text-slate-300 dark:text-zinc-700">|</span>}
                 {email && <span className="text-slate-600 dark:text-zinc-400">{email}</span>}

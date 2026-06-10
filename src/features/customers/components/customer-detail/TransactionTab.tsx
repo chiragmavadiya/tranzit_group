@@ -75,11 +75,13 @@ export const TransactionTab = ({ customerId }: TransactionTabProps) => {
                 )}
             />
 
-            <CreditDebitWalletDialog
-                isOpen={isTopUpOpen}
-                onOpenChange={setIsTopUpOpen}
-                customerId={customerId}
-            />
+            {isTopUpOpen && (
+                <CreditDebitWalletDialog
+                    isOpen={isTopUpOpen}
+                    onOpenChange={setIsTopUpOpen}
+                    customerId={customerId}
+                />
+            )}
         </Card>
     );
 };

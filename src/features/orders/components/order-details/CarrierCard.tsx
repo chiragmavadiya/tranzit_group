@@ -1,4 +1,4 @@
-import React, { memo, useEffect, useEffectEvent, useState } from 'react'
+import React, { memo, useEffect, useEffectEvent, useMemo, useState } from 'react'
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card'
 import { Truck, AlertCircle, RefreshCw, Copy, Check } from 'lucide-react'
 import { Badge } from '@/components/ui/badge'
@@ -9,6 +9,7 @@ import type { AddressData, ItemData } from '../../types'
 import { useAppSelector } from '@/hooks/store.hooks'
 import type { QuoteLocation } from '@/features/quote/types'
 import { Checkbox } from '@/components/ui/checkbox'
+import { Button } from '@/components/ui/button'
 
 interface CarrierCardProps {
   itemData: ItemData[];
@@ -45,11 +46,14 @@ export const CarrierCard: React.FC<CarrierCardProps> = memo((props) => {
 
   const { mutate: getServices, isPending: loading } = useGetQuoteServices(role);
 
-  const getAddress = (
+  const getAddress = useMemo(() => (
     location: { address1?: string; address?: string; label?: string, suburb?: string, state?: string, postcode?: string, country?: string }
   ) => {
+    if (module === 'quote') {
+      return location?.label || '';
+    }
     return location?.label || `${location?.suburb} ${location?.state} ${location?.postcode}, AU` || "";
-  };
+  }, [module]);
 
   const handleServiceSuccess = useEffectEvent((data: any) => {
 
@@ -68,21 +72,25 @@ export const CarrierCard: React.FC<CarrierCardProps> = memo((props) => {
         // const totalSurcharges = surcharges.reduce((acc: number, curr: any) => acc + curr.amount, 0);
         return service.price;
       };
+      const allCourierIds = [...data.services.map((service: any) => service.courierCode + (service.product_id || ''))];
       const minItem = data.services.reduce((min: any, curr: any) =>
         getServiceTotalPrice(curr) < getServiceTotalPrice(min) ? curr : min
       );
       setBestDeal(minItem.courierCode + (minItem.product_id || '') || '');
-      if (initialSelectedCourierId !== undefined && initialSelectedCourierId !== null && initialSelectedCourierId !== '') {
-        setSelectedServiceId(initialSelectedCourierId);
-        return;
-      }
+      // if (initialSelectedCourierId !== undefined && initialSelectedCourierId !== null && initialSelectedCourierId !== '' && !selectedServiceId) {
+      //   console.log("Prev state.... 1", initialSelectedCourierId, !selectedServiceId);
+      //   setSelectedServiceId(initialSelectedCourierId);
+      //   return;
+      // }
       const selectedFromQuote = sessionStorage.getItem('quote_courier');
       if (selectedFromQuote) {
+        console.log("Prev state.... 2");
         const courier = JSON.parse(selectedFromQuote);
         setSelectedServiceId(courier.courier.courierCode + (courier.courier.product_id || '') || '');
-      } else if (!selectedServiceId) {
+      } else if (!selectedServiceId || !allCourierIds.includes(selectedServiceId)) {
         setSelectedServiceId((prev) => {
-          if (prev !== '') return prev;
+          console.log("Prev state....", prev);
+          if (prev) return prev;
           // if (default_courier?.slug) {
           //   return default_courier.slug + (default_courier?.product_id || '') || '';
           // }
@@ -93,8 +101,8 @@ export const CarrierCard: React.FC<CarrierCardProps> = memo((props) => {
       //   setSelectedServiceId(minItem.product_id || minItem.courierCode || '');
     }
   })
-  console.log(selectedServiceId, 'selectedServiceId')
-  useEffect(() => {
+
+  const fetchServices = () => {
     if (orderType !== 'create' && orderType !== 'consign' && orderType !== 'return') return;
     // Check if we have valid items with dimensions > 0
     const isValidItems = itemData && itemData.length > 0 && itemData.every(item =>
@@ -105,22 +113,52 @@ export const CarrierCard: React.FC<CarrierCardProps> = memo((props) => {
     // Check if we have both addresses
     const sender = addresses?.sender;
     const receiver = addresses?.receiver;
-    console.log(sender, receiver, 'addresses')
 
     const sender_addr1 = getAddress(sender!);
     const receiver_addr1 = getAddress(receiver!);
     if (sender_addr1 === '' || receiver_addr1 === '') return;
 
+    const receiver_details = module === 'quote' ? receiver_addr1 : ` ${receiver?.suburb} ${receiver?.state} ${receiver?.postcode}, AU`.trim();
+
+    const payload = {
+      items: itemData,
+      sender_details: sender_addr1,
+      receiver_details: receiver_details,
+      receiver_address: receiver?.address_info || receiver_addr1,
+      is_order: module === 'quote' ? "no" as const : "yes" as const,
+    }
+
+    getServices(payload, {
+      onSuccess: (data) => {
+        // eslint-disable-next-line react-hooks/rules-of-hooks
+        handleServiceSuccess(data);
+      },
+      onError: (err: any) => {
+        showToast(err?.response?.data?.message || 'Failed to fetch rates', "error");
+      }
+    });
+  };
+
+  useEffect(() => {
+    console.log(orderType, module, 'orderType....')
+    if (orderType !== 'create' && orderType !== 'consign' && orderType !== 'return') return;
+    // Check if we have valid items with dimensions > 0
+    const isValidItems = itemData && itemData.length > 0 && itemData.every(item =>
+      Number(item.height) > 0 && Number(item.width) > 0 && Number(item.length) > 0 && Number(item.weight) > 0 && Number(item.quantity) > 0
+    );
+    if (!isValidItems) return;
+
+    // Check if we have both addresses
+    const sender = addresses?.sender;
+    const receiver = addresses?.receiver;
+
+    const sender_addr1 = getAddress(sender!);
+    const receiver_addr1 = getAddress(receiver!);
+    console.log(sender_addr1, receiver_addr1, 'sender_addr1, receiver_addr1....')
+    if (sender_addr1 === '' || receiver_addr1 === '') return;
+
     const timer = setTimeout(() => {
       const receiver_details = module === 'quote' ? receiver_addr1 : ` ${receiver?.suburb} ${receiver?.state} ${receiver?.postcode}, AU`.trim();
-      // const receiver_details = receiver_addr1;
-
-
-      // const sender_addr1 = getAddress(sender);
-      // const receiver_addr1 = getAddress(receiver);
-      // const sender_addr1 = 'address1' in sender ? (sender.address1 || '') : ('address' in sender ? (sender.address || '') : (sender as QuoteLocation).label || '');
-      // const receiver_addr1 = 'address1' in receiver ? (receiver.address1 || '') : ('address' in receiver ? (receiver.address || '') : (receiver as QuoteLocation).label || '');
-
 
       const payload = {
         items: itemData,
@@ -129,6 +167,7 @@ export const CarrierCard: React.FC<CarrierCardProps> = memo((props) => {
         receiver_address: receiver?.address_info || receiver_addr1,
         is_order: module === 'quote' ? "no" as const : "yes" as const,
       }
+
       getServices(payload, {
         onSuccess: (data) => {
           handleServiceSuccess(data);
@@ -140,7 +179,7 @@ export const CarrierCard: React.FC<CarrierCardProps> = memo((props) => {
     }, 500); // 500ms debounce
     // Cleanup previous timer
     return () => clearTimeout(timer);
-  }, [itemData, addresses, getServices, orderType, module])
+  }, [itemData, addresses, getServices, orderType, module, getAddress])
 
   useEffect(() => {
     if (couriers.length > 0 && selectedServiceId) {
@@ -185,7 +224,15 @@ export const CarrierCard: React.FC<CarrierCardProps> = memo((props) => {
               SHIPMENT OPTIONS
             </CardTitle>
           </div>
-          {loading && <RefreshCw className="h-4 w-4 animate-spin" />}
+          {/* {loading && <RefreshCw className="h-4 w-4 animate-spin" />} */}
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => fetchServices()}
+            disabled={loading}
+          >
+            <RefreshCw className={`h-4 w-4 ${loading ? 'animate-spin' : ''}`} />
+          </Button>
         </div>
       </CardHeader>
 
@@ -266,17 +313,14 @@ export const CarrierCard: React.FC<CarrierCardProps> = memo((props) => {
                 if (courier.success === false) {
                   return (
                     <div
-                      // key={serviceId}
-                      // onClick={() => setSelectedServiceId(serviceId)}
-                      className={`relative flex flex-col p-4 rounded-xl border-2 transition-all duration-200 ${isSelected
-                        ? 'border-primary bg-primary/5 dark:bg-primary/10'
-                        : 'border-transparent bg-white dark:bg-zinc-900 hover:border-gray-200 dark:hover:border-zinc-700 shadow-sm'
-                        }`}
+                      className="relative flex flex-col p-4 rounded-xl border border-red-300 dark:border-red-900/30 bg-red-100/50 dark:bg-red-950/10 shadow-xs"
                     >
-                      <span className="font-bold text-gray-900 dark:text-zinc-100 text-sm">
+                      <span className="font-bold text-red-900 dark:text-red-200 text-sm">
                         {courier.carrier}
                       </span>
-                      <div key={serviceId}>{courier.message}</div>
+                      <div key={serviceId} className="text-red-500 dark:text-red-500 text-[13px] mt-1 font-medium">
+                        {courier.message}
+                      </div>
                     </div>
                   )
                 }

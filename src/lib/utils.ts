@@ -85,3 +85,6 @@ export const removeEmptyFields = <T extends Record<string, any>>(obj: T): Partia
     )
   ) as Partial<T>;
 };
+
+export const isEmailValid = (email: string) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+export const isPhoneValid = (phone: string) => /^(?:\+61|0)[2-478](?:[ -]?[0-9]){8}$/.test(phone.replace(/[\s-()]/g, ''));

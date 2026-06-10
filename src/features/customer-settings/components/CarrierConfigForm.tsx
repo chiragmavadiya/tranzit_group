@@ -372,7 +372,7 @@ export default function CarrierConfigForm({
   const validateForm = () => {
     const newErrors: Record<string, string> = {};
     const requiredFields: Record<string, string[]> = {
-      auspost: ['api_key', 'api_password', 'base_url', 'account_number', 'account_label'],
+      auspost: ['api_key', 'api_password', 'account_number', 'account_label'],
       aramex: ['client_id', 'client_secret', 'account_name', 'account_label'],
       mypostbusiness: ['merchant_token', 'account_label'],
       directfreight: ['token', 'account', 'site_id', 'base_url', 'consignment_token', 'account_label']
@@ -431,7 +431,7 @@ export default function CarrierConfigForm({
           <>
             <FormInput label="API Key" {...commonProps("api_key")} />
             <FormInput label="API Password" {...commonProps("api_password")} type="password" />
-            <FormInput label="Base URL" {...commonProps("base_url")} placeholder="https://digitalapi.auspost.com.au/test/" />
+            {/* <FormInput label="Base URL" {...commonProps("base_url")} placeholder="https://digitalapi.auspost.com.au/test/" /> */}
             <FormInput label="Account Number" {...commonProps("account_number")} />
             <FormInput label="Account Label" {...commonProps("account_label")} />
           </>
@@ -480,7 +480,7 @@ export default function CarrierConfigForm({
       <div className="grid grid-cols-12 gap-x-6 gap-y-3.5 items-start">
         {/* Left Column: Form Credentials Fields */}
         <div className="col-span-12 md:col-span-7 border flex flex-col h-full p-4 rounded-sm shadow-sm">
-          <div className="flex-1 grid grid-cols-12 gap-x-4 gap-y-3.5">
+          <div className="flex-1 grid grid-cols-12 gap-x-4 ">
             {getCredentialsFields()}
           </div>
           <div className='mt-6 justify-end self-end'>

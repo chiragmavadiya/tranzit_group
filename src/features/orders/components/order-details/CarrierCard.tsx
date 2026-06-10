@@ -46,9 +46,9 @@ export const CarrierCard: React.FC<CarrierCardProps> = memo((props) => {
   const { mutate: getServices, isPending: loading } = useGetQuoteServices(role);
 
   const getAddress = (
-    location: { address1?: string; address?: string; label?: string }
+    location: { address1?: string; address?: string; label?: string, suburb?: string, state?: string, postcode?: string, country?: string }
   ) => {
-    return location?.address1 || location?.address || location?.label || "";
+    return location?.label || `${location?.suburb} ${location?.state} ${location?.postcode}, AU` || "";
   };
 
   const handleServiceSuccess = useEffectEvent((data: any) => {
@@ -105,13 +105,14 @@ export const CarrierCard: React.FC<CarrierCardProps> = memo((props) => {
     // Check if we have both addresses
     const sender = addresses?.sender;
     const receiver = addresses?.receiver;
+    console.log(sender, receiver, 'addresses')
 
     const sender_addr1 = getAddress(sender!);
     const receiver_addr1 = getAddress(receiver!);
     if (sender_addr1 === '' || receiver_addr1 === '') return;
 
     const timer = setTimeout(() => {
-      const receiver_details = module === 'quote' ? receiver_addr1 : `${receiver!.suburb} ${receiver!.state} ${receiver!.postcode} ${receiver!.country || ''}`.trim();
+      const receiver_details = module === 'quote' ? receiver_addr1 : receiver?.address_info || `${receiver?.suburb} ${receiver?.state} ${receiver?.postcode}, ${receiver?.country}`.trim();
       // const receiver_details = receiver_addr1;
 
 

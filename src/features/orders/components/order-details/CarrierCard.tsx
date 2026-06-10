@@ -112,7 +112,7 @@ export const CarrierCard: React.FC<CarrierCardProps> = memo((props) => {
     if (sender_addr1 === '' || receiver_addr1 === '') return;
 
     const timer = setTimeout(() => {
-      const receiver_details = module === 'quote' ? receiver_addr1 : receiver?.address_info || `${receiver?.suburb} ${receiver?.state} ${receiver?.postcode}, ${receiver?.country}`.trim();
+      const receiver_details = module === 'quote' ? receiver_addr1 : ` ${receiver?.suburb} ${receiver?.state} ${receiver?.postcode}, AU`.trim();
       // const receiver_details = receiver_addr1;
 
 
@@ -126,7 +126,7 @@ export const CarrierCard: React.FC<CarrierCardProps> = memo((props) => {
         items: itemData,
         sender_details: sender_addr1,
         receiver_details: receiver_details,
-        receiver_address: receiver_addr1,
+        receiver_address: receiver?.address_info || receiver_addr1,
         is_order: module === 'quote' ? "no" as const : "yes" as const,
       }
       getServices(payload, {

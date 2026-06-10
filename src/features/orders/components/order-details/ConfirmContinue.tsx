@@ -33,8 +33,8 @@ export const ConfirmContinue: React.FC<ConfirmContinueProps> = ({
             className="mt-0.5 rounded-[6px] data-[state=checked]:bg-primary data-[state=checked]:border-primary"
           />
           <div className="flex flex-col">
-            <span className="text-sm text-gray-900 dark:text-zinc-100">
-              I agree to the {' '}
+            <span className="text-sm font-medium text-gray-900 dark:text-zinc-100">
+              I agree to the Tranzit Group’s{' '}
               <a href={TERMS_CONDITIONS_URL} target="_blank" rel="noopener noreferrer" className="font-bold text-primary hover:underline">
                 Terms & Conditions
               </a>{' '}
@@ -69,7 +69,7 @@ export const ConfirmContinue: React.FC<ConfirmContinueProps> = ({
             <span className="text-sm font-medium text-gray-900 dark:text-zinc-300">
               This consignment does not contain {' '}
               <a href={DANGEROUS_GOODS_URL} target="_blank" rel="noopener noreferrer" className="font-bold text-primary hover:underline">
-                dangerous goods
+                Dangerous goods
               </a>
             </span>
           </div>

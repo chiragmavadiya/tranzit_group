@@ -106,8 +106,8 @@ export function CreditDebitWalletDialog({ isOpen, onOpenChange, customerId }: Cr
             })}
             placeholder="Enter reason or description..."
             rows={3}
-            error={submitted && !formData.description}
-            errormsg='Please enter description'
+          // error={submitted && !formData.description}
+          // errormsg='Please enter description'
           />
         </div>
       </div>

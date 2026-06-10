@@ -320,6 +320,7 @@ export default function StaffManagementPage() {
         initialData={staffDetailsResponse?.data || editingUser}
         isLoading={isLoadingDetails}
         onSubmit={handleDialogSubmit}
+        createLoading={createMutation.isPending || updateMutation.isPending}
       />
 
       <ConformationModal

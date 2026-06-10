@@ -105,7 +105,7 @@ export const FormInput = memo(React.forwardRef<HTMLInputElement, FormInputProps>
           <button
             type="button"
             onClick={() => setShowPassword(!showPassword)}
-            className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 transition-colors cursor-pointer"
+            className="absolute right-2.5 top-4 -translate-y-1/2 text-slate-400 hover:text-slate-600 transition-colors cursor-pointer"
             tabIndex={-1}
           >
             {showPassword ? (

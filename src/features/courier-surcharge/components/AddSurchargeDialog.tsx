@@ -62,7 +62,6 @@ export function AddSurchargeDialog({
   }, [surchargeDetails, initialData, initialValues]);
 
   const handleSubmit = (data: CourierSurchargeFormData) => {
-    console.log(data, 'data....')
     if (initialData) {
       updateSurcharge({ id: initialData.id, data }, {
         onSuccess: () => onOpenChange(false)
@@ -123,6 +122,7 @@ const SurchargeForm = forwardRef<HTMLFormElement, SurchargeFormProps>(
     const handleSubmit = (e: React.FormEvent) => {
       e.preventDefault();
       setSubmited(true);
+
       if (!formData.global_courier_id || !formData.code || !formData.name || !formData.amount_ex_gst) {
         return;
       }

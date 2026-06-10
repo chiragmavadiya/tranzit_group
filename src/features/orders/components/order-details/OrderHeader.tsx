@@ -224,9 +224,9 @@ export const OrderHeader: React.FC<OrderHeaderProps> = ({
               onValueChange={(val) => setSelectedCustomer(val ? Number(val) : undefined)}
               options={customersData?.data?.map((c: any) => ({
                 value: c.id.toString(),
-                label: `${c.first_name} ${c.last_name}`
+                label: `${c.first_name} ${c.last_name} (${c.email})`
               })) || []}
-              className='w-60'
+              className='w-70'
               disabled={orderType !== "create" && orderType !== "create-menual"}
             />
           )}

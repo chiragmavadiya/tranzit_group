@@ -371,7 +371,7 @@ export const useOrderWorkflow = () => {
     const executeCreateOrder = (is_own?: boolean) => {
       createOrder({ ...payload, is_own }, {
         onSuccess: (response) => {
-          if (response.status) {
+          if (response.status || response.ok) {
             showToast('Orders Created successfully', 'success');
             if (skipWalletCheckArg === 'saveAsDraft') {
               navigate(`${role === 'admin' ? '/admin' : ''}/orders`);
@@ -379,7 +379,7 @@ export const useOrderWorkflow = () => {
               navigate(`${role === 'admin' ? '/admin' : ''}/orders/${response?.data?.order_status_category !== 'new' ? 'view' : 'consign'}/${response?.data?.order_number}`);
             }
             setWalletCheckOpen(false);
-            if (response?.data?.order_number && response?.data?.order_status_category !== 'new') {
+            if (response?.data?.order_number && (response?.data?.order_status_category !== 'new' || role === 'admin')) {
               printLabel(response?.data?.order_number);
             }
           } else {

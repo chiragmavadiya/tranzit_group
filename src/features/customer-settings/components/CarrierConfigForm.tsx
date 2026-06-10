@@ -459,7 +459,7 @@ export default function CarrierConfigForm({
             <FormInput label="Token" {...commonProps("token")} />
             <FormInput label="Account" {...commonProps("account")} />
             <FormInput label="Site ID" {...commonProps("site_id")} />
-            <FormInput label="Base URL" {...commonProps("base_url")} />
+            {/* <FormInput label="Base URL" {...commonProps("base_url")} /> */}
             <FormInput label="Consignment Token" {...commonProps("consignment_token")} />
             <FormInput label="Account Label" {...commonProps("account_label")} />
           </>

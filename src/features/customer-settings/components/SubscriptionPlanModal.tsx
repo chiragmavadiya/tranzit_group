@@ -33,7 +33,7 @@ const plansList = [
       "2 Users Included",
       "Self Onboarding",
     ],
-    buttonText: "Switch to Starter",
+    buttonText: "Choose Plan",
 
   },
   {
@@ -49,9 +49,9 @@ const plansList = [
       "Priority Phone Support",
       "Setup Call",
     ],
-    buttonText: "Switch to Silver",
+    buttonText: "Choose Plan",
     isPopular: true,
-    selected: true,
+    selected: false,
   },
   {
     slug: "gold",
@@ -66,7 +66,7 @@ const plansList = [
       "Priority Phone Support",
       "Setup Call",
     ],
-    buttonText: "Switch to Gold",
+    buttonText: "Choose Plan",
     isPopular: true,
   },
 ];
@@ -103,9 +103,14 @@ export default function SubscriptionPlanModal({ open, onOpenChange }: Subscripti
 
         {/* Header Section */}
         <DialogHeader className="px-6 py-3 border-b border-gray-150 dark:border-zinc-800 bg-white dark:bg-zinc-950 flex flex-col gap-1">
-          <DialogTitle className="text-xl font-bold text-slate-900 dark:text-zinc-100 my-0">
-            Choose your Tranzit Group plan
-          </DialogTitle>
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+            <DialogTitle className="text-xl font-bold text-slate-900 dark:text-zinc-100 my-0">
+              Choose your Tranzit Group plan
+            </DialogTitle>
+            {/* <span className="inline-flex items-center rounded-full bg-emerald-50 dark:bg-emerald-950/30 px-2.5 py-0.5 text-xs font-semibold text-emerald-700 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800/30 w-fit">
+              Start first 60-day free trial
+            </span> */}
+          </div>
           <DialogDescription className="text-[13px] text-slate-500 dark:text-zinc-400 my-0">
             Select the plan that best matches your monthly shipment volume. You can change your plan later.
           </DialogDescription>
@@ -115,7 +120,7 @@ export default function SubscriptionPlanModal({ open, onOpenChange }: Subscripti
         <div className="px-8 py-8 bg-slate-50/50 dark:bg-zinc-900/30 flex gap-3 overflow-x-auto no-scrollbar w-full">
 
           {plansList.map((plan) => (
-            <div className={`bg-white dark:bg-zinc-950 border border-gray-200 dark:border-zinc-800 rounded-xl p-6 flex flex-col justify-between shadow-sm relative hover:shadow-md transition-shadow duration-300 w-[280px] shrink-0 ${plan.selected ? 'border-2 border-blue-600! dark:border-blue-500!' : ''}`}>
+            <div className={`bg-white dark:bg-zinc-950 border border-gray-200 dark:border-zinc-800 rounded-xl p-6 flex flex-col justify-between shadow-sm relative hover:shadow-xl transition-shadow duration-300 w-[280px] shrink-0 ${plan.selected ? 'border-2 border-blue-600! dark:border-blue-500!' : ''}`}>
               {plan.isPopular && (
                 <div className="absolute top-0 right-0 w-20 h-20 overflow-hidden pointer-events-none">
                   <div className="absolute top-4 -right-6 w-24 bg-blue-600 text-white text-[9px] font-black text-center py-1 rotate-45 uppercase tracking-wider select-none shadow-sm">
@@ -156,7 +161,7 @@ export default function SubscriptionPlanModal({ open, onOpenChange }: Subscripti
                 </ul>
               </div>
 
-              <div className="mt-8">
+              <div className="mt-8 flex flex-col items-center gap-1.5">
                 <Button
                   variant="outline"
                   disabled={plan.selected}
@@ -165,6 +170,15 @@ export default function SubscriptionPlanModal({ open, onOpenChange }: Subscripti
                 >
                   {plan.selected ? "Current Plan" : plan.buttonText}
                 </Button>
+                {plan.selected ? (
+                  <span className="text-[11px] text-slate-400 dark:text-zinc-500 font-medium text-center">
+                    Currently active plan
+                  </span>
+                ) : (
+                  <span className="text-[12px] text-emerald-600 dark:text-emerald-400 font-semibold text-center">
+                    Start first 60-day free trial
+                  </span>
+                )}
               </div>
             </div>
           ))}

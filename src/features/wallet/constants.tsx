@@ -5,11 +5,11 @@ import type { WalletTransaction } from './types';
 import { Button } from '@/components/ui/button';
 
 export const TRANSACTION_STATUS_CONFIG = {
-  credit: 'bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-400',
-  debit: 'bg-red-100 text-red-800 dark:bg-red-900/20 dark:text-red-400',
-  refund: 'bg-blue-100 text-blue-800 dark:bg-blue-900/20 dark:text-blue-400',
-  success: 'bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-400',
-  failed: 'bg-red-100 text-red-800 dark:bg-red-900/20 dark:text-red-400',
+  credit: 'bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-400 capitalize',
+  debit: 'bg-red-100 text-red-800 dark:bg-red-900/20 dark:text-red-400 capitalize',
+  refund: 'bg-blue-100 text-blue-800 dark:bg-blue-900/20 dark:text-blue-400 capitalize',
+  success: 'bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-400 capitalize',
+  failed: 'bg-red-100 text-red-800 dark:bg-red-900/20 dark:text-red-400 capitalize',
 };
 
 export const getWalletColumns = (

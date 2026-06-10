@@ -17,7 +17,6 @@ import { memo, useMemo } from 'react';
 import { cn } from '@/lib/utils';
 import { StatusBadge } from '../StatusBadge';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
-
 interface SidePanelProps {
   itemsData?: any[];
   quoteData?: any;
@@ -43,6 +42,7 @@ export const SidePanel: React.FC<SidePanelProps> = memo(({
   liabilityMessage,
   payment_status,
   shipping_activity = [],
+  signatureSelected,
 }) => {
   const isCreate = useMemo(() => orderType === 'create' || orderType === 'create-menual' || orderType === 'consign' || orderType === 'return', [orderType]);
 
@@ -262,6 +262,58 @@ export const SidePanel: React.FC<SidePanelProps> = memo(({
                     </div>
                   </RadioGroup>
                 </div>
+              </AccordionContent>
+            </AccordionItem>
+          </>
+        )}
+        {(isCreate) && (
+          <>
+            <AccordionItem value="services" className="border border-gray-200 dark:border-zinc-800 rounded-xl bg-white dark:bg-zinc-950 shadow-xs px-5 border-b overflow-hidden transition-colors duration-300 [&>h3]:my-0">
+              <AccordionTrigger className="hover:no-underline py-3 px-0 [&>svg]:text-primary">
+                <span className="text-sm font-bold text-gray-900 dark:text-zinc-100 tracking-wider">Signature Required ?</span>
+              </AccordionTrigger>
+              <AccordionContent className="flex flex-col gap-5 pb-4 pt-1">
+                {/* Signature on Delivery */}
+                <div className="flex items-center justify-between">
+                  {/* <div className="flex items-center gap-3">
+                    <div className="p-1.5 bg-gray-200 dark:bg-zinc-900 rounded-md">
+                      <PenLine className="w-4 h-4 text-gray-600 dark:text-zinc-400" />
+                    </div>
+                    <div>
+                      <h4 className="text-xs font-bold text-gray-900 dark:text-zinc-100">Signature on Delivery</h4>
+                      <p className="my-0 text-[10px] text-gray-500 dark:text-zinc-400 font-medium">Ensure the parcel is handed over securely</p>
+                    </div>
+                  </div> */}
+                  {/* <Switch
+                    checked={signatureSelected}
+                    onCheckedChange={(value) => handleOptionalFieldsChange('signature', value)}
+                    className="data-[state=checked]:bg-primary shadow-sm"
+                  /> */}
+                  <RadioGroup
+                    value={signatureSelected ? "yes" : "no"}
+                    onValueChange={(val) => handleOptionalFieldsChange('signature', val === 'yes')}
+                    className="flex flex-col gap-2 mt-1"
+
+                  >
+                    <div className="flex items-center gap-2">
+                      <RadioGroupItem value="yes" id="insurance-yes" className="destructive" />
+                      <label htmlFor="insurance-yes" className="text-xs font-semibold text-gray-700 dark:text-zinc-300 cursor-pointer select-none">
+                        Yes
+                      </label>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <RadioGroupItem value="no" id="insurance-no" />
+                      <label htmlFor="insurance-no" className="text-xs font-semibold text-gray-700 dark:text-zinc-300 cursor-pointer select-none">
+                        No
+                      </label>
+                    </div>
+                  </RadioGroup>
+                </div>
+                {/* <div className="flex flex-col">
+                  <CustomLabel label='Pickup Date' />
+                  <DatePicker date={pickupDate} setDate={setPickupDate} className='w-full' disabled={{ before: new Date() }} />
+                </div> */}
+
               </AccordionContent>
             </AccordionItem>
           </>

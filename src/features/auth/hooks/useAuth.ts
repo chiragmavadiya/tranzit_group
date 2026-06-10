@@ -59,16 +59,15 @@ export const useOnboarding = () => {
         mutationFn: useCallback((data: OnboardingRequest) => authService.submitOnboarding(data), []),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: QUERY_KEYS.AUTH.VERIFICATION_STATUS });
-            queryClient.invalidateQueries({ queryKey: QUERY_KEYS.AUTH.USER_DETAILS });
 
             // Instantly update the user details cache to next_step: 'dashboard' to avoid routing race conditions
-            // queryClient.setQueryData(QUERY_KEYS.AUTH.USER_DETAILS, (oldData: any) => {
-            //     if (!oldData) return oldData;
-            //     return {
-            //         ...oldData,
-            //         next_step: 'dashboard'
-            //     };
-            // });
+            queryClient.setQueryData(QUERY_KEYS.AUTH.USER_DETAILS, (oldData: any) => {
+                if (!oldData) return oldData;
+                return {
+                    ...oldData,
+                    next_step: 'dashboard'
+                };
+            });
 
             queryClient.invalidateQueries({ queryKey: QUERY_KEYS.AUTH.USER_DETAILS });
         },

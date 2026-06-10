@@ -29,6 +29,7 @@ const ImportOrdersDialog = lazy(() => import('@/features/orders/components/Impor
 const CreateOrderDialog = lazy(() => import('@/features/orders/components/CreateOrderDialog'));
 
 export default function OrdersPage({ fromCustomer, customerId }: { fromCustomer?: boolean, customerId?: string }) {
+  console.log("Render OrdersPage...")
   const [searchParams, setSearchParams] = useSearchParams();
   const activeTab = (searchParams.get('tab')?.toLowerCase() as TabType) || 'new';
   const { role } = useAppSelector((state) => state.auth);
@@ -84,7 +85,7 @@ export default function OrdersPage({ fromCustomer, customerId }: { fromCustomer?
 
   const handlePrintClick = useCallback((orderNumber: string | number, amount: number) => {
     setOrderToPrint({ orderNumber, amount });
-    
+
     if (role === 'admin') {
       executePrint(orderNumber);
       return;

@@ -8,6 +8,7 @@ import { adminSidebarItems, clientSidebarItems } from '../router/Navigation';
 import { useAppSelector } from '@/hooks/store.hooks';
 
 export default function Layout() {
+  console.log("Render Layout...")
   const [isCollapsed, setIsCollapsed] = useState(window.innerWidth < 1280);
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
   const [isMobile, setIsMobile] = useState(window.innerWidth < 1024);
@@ -74,26 +75,25 @@ export default function Layout() {
   return (
     <div className="min-h-screen bg-white dark:bg-zinc-950 transition-colors duration-300">
       {isMobile && isMobileSidebarOpen && (
-        <div 
+        <div
           className="fixed inset-0 bg-black/40 backdrop-blur-xs z-40 transition-opacity duration-300 ease-in-out"
           onClick={() => setIsMobileSidebarOpen(false)}
         />
       )}
-      <Sidebar 
-        isCollapsed={isCollapsed} 
-        setIsCollapsed={setIsCollapsed} 
+      <Sidebar
+        isCollapsed={isCollapsed}
+        setIsCollapsed={setIsCollapsed}
         isMobile={isMobile}
         isMobileSidebarOpen={isMobileSidebarOpen}
         setIsMobileSidebarOpen={setIsMobileSidebarOpen}
       />
-      <TopBar 
-        isCollapsed={isCollapsed} 
+      <TopBar
+        isCollapsed={isCollapsed}
         isMobile={isMobile}
         setIsMobileSidebarOpen={setIsMobileSidebarOpen}
       />
-      <main className={`h-screen flex flex-col transition-[margin] duration-300 ease-in-out pt-16 z-0 relative print:ml-0 print:pt-0 print:h-auto ${
-        isMobile ? 'ml-0' : (isCollapsed ? 'ml-[64px]' : 'ml-[240px]')
-      }`}>
+      <main className={`h-screen flex flex-col transition-[margin] duration-300 ease-in-out pt-16 z-0 relative print:ml-0 print:pt-0 print:h-auto ${isMobile ? 'ml-0' : (isCollapsed ? 'ml-[64px]' : 'ml-[240px]')
+        }`}>
         <div className="mx-auto w-full flex-1 flex flex-col bg-slate-100 dark:bg-zinc-900/10 print:bg-transparent print:p-0 overflow-hidden min-h-0">
           <Outlet />
         </div>

@@ -112,4 +112,12 @@ export const authService = {
         const response = await api.post<GenericResponse>(API_ENDPOINTS.AUTH.RESET_PASSWORD, data);
         return response.data;
     },
+
+    /**
+     * Select plan
+     */
+    selectPlan: async (data: any): Promise<OnboardResponse> => {
+        const response = await api.post<OnboardResponse>(API_ENDPOINTS.PLAN.SELECT, data);
+        return response.data;
+    },
 };

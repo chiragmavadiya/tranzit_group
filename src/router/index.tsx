@@ -1,4 +1,4 @@
-import { lazy, Suspense, useEffect } from 'react';
+import { lazy, Suspense, useEffect, useState } from 'react';
 import { Routes, Route, useNavigate, useLocation } from 'react-router-dom';
 import PublicRoute from '@/router/PublicRoute';
 import brandLogo from '@/assets/Tranzit_Logo.svg';
@@ -7,7 +7,7 @@ import ClientRoutes from '@/apps/client/routes/ClientRoutes';
 import { useAppDispatch, useAppSelector } from '@/hooks/store.hooks';
 import { useGetUserDetails } from '@/features/auth/hooks/useAuth';
 import { setUser } from '@/features/auth/authSlice';
-// import SubscriptionPlanModal from '@/features/customer-settings/components/SubscriptionPlanModal';
+import SubscriptionPlanModal from '@/features/customer-settings/components/SubscriptionPlanModal';
 
 // Lazy load page components
 const SignIn = lazy(() => import('@/features/auth/pages/SignIn'));
@@ -39,6 +39,7 @@ const PageLoader = () => (
 );
 
 export const AppRouter = () => {
+  console.log("render APP ROUTER...")
   const { isAuthenticated, userID, token, next_step } = useAppSelector((state) => state.auth);
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
@@ -46,7 +47,7 @@ export const AppRouter = () => {
 
   // Fetch user details if authenticated
   const { data: userData, isLoading, isPending } = useGetUserDetails(isAuthenticated);
-  // const [showSubscriptionModal, setShowSubscriptionModal] = useState(false);
+  const [showSubscriptionModal, setShowSubscriptionModal] = useState(false);
 
   // Sync user details to Redux when query data updates
   useEffect(() => {
@@ -57,9 +58,9 @@ export const AppRouter = () => {
         default_courier: userData.default_courier,
         default_item: userData.default_item
       }));
-      // if (userData.next_step !== 'subscription_plan' && userData.user.roles[0]?.name !== 'admin') {
-      //   setShowSubscriptionModal(true);
-      // }
+      if (userData.next_step === 'purchase_plan' && userData.user.roles[0]?.name !== 'admin') {
+        setShowSubscriptionModal(true);
+      }
     }
   }, [userData, isPending, dispatch]);
 
@@ -69,7 +70,7 @@ export const AppRouter = () => {
       if ((next_step === 'onboarding' || next_step === 'verify_email') && !location.pathname.includes('/on-board')) {
         navigate('/on-board/' + userID + '/' + token);
       } else if (next_step === 'dashboard' && location.pathname.includes('/on-board')) {
-        navigate('/orders');
+        navigate('/orders?tab=new');
       }
     }
   }, [next_step, location.pathname, isAuthenticated, userID, token, navigate]);
@@ -92,10 +93,10 @@ export const AppRouter = () => {
         <Route path="/admin/*" element={<AdminRoutes />} />
         <Route path="/*" element={<ClientRoutes />} />
       </Routes>
-      {/* <SubscriptionPlanModal
+      <SubscriptionPlanModal
         open={showSubscriptionModal}
         onOpenChange={setShowSubscriptionModal}
-      /> */}
+      />
     </Suspense>
   );
 };

@@ -83,6 +83,7 @@ export interface CustomerDetails {
     total_debit: number;
     total_margin: number;
     status: string;
+    address_info: string;
 }
 
 export interface CustomerDetailsResponse {

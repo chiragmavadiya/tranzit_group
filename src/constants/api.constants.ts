@@ -188,6 +188,9 @@ export const API_ENDPOINTS = {
         PATCH_PRODUCT_STATUS: (provider: string, productCode: string) => `/integrations/${provider}/products/${productCode}/status`,
         DELIVERY_PREFERENCES: "/integrations/tranzit-group/delivery-preferences",
         DEFAULT: (provider: string) => `/integrations/${provider}/default`,
+    },
+    PLAN: {
+        SELECT: "/customer/plans/select"
     }
 };
 

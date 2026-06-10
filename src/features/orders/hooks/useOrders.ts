@@ -315,6 +315,7 @@ export const usePrintOrder = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.ORDERS.COUNTS() });
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.ORDERS.LIST });
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.WALLET.SUMMARY });
       showToast('Order printed successfully', 'success');
     },
     onError: (error: any) => {

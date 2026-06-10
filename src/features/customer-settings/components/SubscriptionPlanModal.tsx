@@ -1,5 +1,7 @@
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
+import { useSelectPlan } from '@/features/auth/hooks/useAuth';
+import { showToast } from '@/components/ui/custom-toast';
 
 interface SubscriptionPlanModalProps {
   open: boolean;
@@ -39,7 +41,7 @@ const plansList = [
     name: "Silver",
     price: "$159.0",
     duration: "/mo",
-    description: "Best for small businesses starting out",
+    description: "Best for growing businesses scaling operations.",
     features: [
       "Up to 2,000 Shipments",
       "Forum & Email Support",
@@ -56,7 +58,7 @@ const plansList = [
     name: "Gold",
     price: "$299.0",
     duration: "/mo",
-    description: "Best for small businesses starting out",
+    description: "Best for high-volume businesses needing advanced support",
     features: [
       "Up to 2,000 Shipments",
       "Forum & Email Support",
@@ -67,22 +69,6 @@ const plansList = [
     buttonText: "Switch to Gold",
     isPopular: true,
   },
-  {
-    slug: "enterprise",
-    name: "Enterprise",
-    price: "$299.0",
-    duration: "/mo",
-    description: "Best for small businesses starting out",
-    features: [
-      "Up to 2,000 Shipments",
-      "Forum & Email Support",
-      "3 Users Included",
-      "Priority Phone Support",
-      "Setup Call",
-    ],
-    buttonText: "Switch to Enterprise",
-    isPopular: true,
-  },
 ];
 
 export default function SubscriptionPlanModal({ open, onOpenChange }: SubscriptionPlanModalProps) {
@@ -90,15 +76,29 @@ export default function SubscriptionPlanModal({ open, onOpenChange }: Subscripti
   const gap = 12;
   const padding = 64;
   const plansCount = plansList?.length || 0;
-  const computedWidth = plansCount > 0 
-    ? plansCount * cardWidth + (plansCount - 1) * gap + padding 
+  const computedWidth = plansCount > 0
+    ? plansCount * cardWidth + (plansCount - 1) * gap + padding
     : 400;
 
+  const { mutateAsync: selectPlan } = useSelectPlan();
+
+  const handleSelectPlan = (plan: string) => {
+    selectPlan({ plan }, {
+      onSuccess: () => {
+        showToast("Welcome to Tranzit Group! Your subscription plan has been activated successfully.", 'success');
+        onOpenChange(false);
+      },
+      onError: (error: any) => {
+        showToast(error?.message, 'error');
+      }
+    });
+  }
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent 
+    <Dialog open={open} onOpenChange={onOpenChange} disablePointerDismissal={true}>
+      <DialogContent
         className="w-full sm:max-w-none p-0 overflow-hidden bg-white dark:bg-zinc-950 border border-gray-200 dark:border-zinc-800 rounded-xl shadow-xl gap-0"
         style={{ maxWidth: `min(${computedWidth}px, calc(100vw - 2rem))` }}
+        showCloseButton={false}
       >
 
         {/* Header Section */}
@@ -146,7 +146,7 @@ export default function SubscriptionPlanModal({ open, onOpenChange }: Subscripti
                 </div>
 
                 {/* Features */}
-                <ul className="mt-6 space-y-4">
+                <ul className="mt-6 space-y-2">
                   {plan.features.map((feature) => (
                     <li className="flex gap-2 text-[13px] text-slate-600 dark:text-zinc-300 font-medium">
                       <CheckIcon />
@@ -161,6 +161,7 @@ export default function SubscriptionPlanModal({ open, onOpenChange }: Subscripti
                   variant="outline"
                   disabled={plan.selected}
                   className="w-full border-slate-900 dark:border-zinc-700 text-slate-950 dark:text-zinc-100 hover:bg-slate-50 dark:hover:bg-zinc-900 font-semibold text-[13px] h-8 rounded-lg transition-all"
+                  onClick={() => handleSelectPlan(plan.slug)}
                 >
                   {plan.selected ? "Current Plan" : plan.buttonText}
                 </Button>

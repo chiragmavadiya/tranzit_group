@@ -13,6 +13,7 @@ const Setup = lazy(() => import('@/features/setup/pages/SetupPage'));
 const Invoices = lazy(() => import('@/features/invoices/pages/InvoicesPage'));
 const InvoiceDetails = lazy(() => import('@/features/invoices/pages/InvoiceDocumentView'));
 const ParcelReport = lazy(() => import('@/features/reports/pages/ParcelReportPage'));
+const IntegratedParcelReport = lazy(() => import('@/features/reports/pages/IntegratedParcelReport'));
 const CustomerManagement = lazy(() => import('@/features/customers/pages/CustomerPage'));
 const CustomerDetailPage = lazy(() => import('@/features/customers/pages/CustomerDetailPage'));
 const CancelOrderPage = lazy(() => import('@/features/cancel-order/pages/CancelOrderPage'));
@@ -61,6 +62,7 @@ export default function AdminRoutes() {
                     </Route>
                     <Route path="setup" element={withSuspense(<Setup />)} />
                     <Route path="customer-parcel-report" element={withSuspense(<ParcelReport />)} />
+                    <Route path="integrated-parcel-report" element={withSuspense(<IntegratedParcelReport />)} />
                     <Route path="customers">
                         <Route index element={withSuspense(<CustomerManagement />)} />
                         <Route path=":id" element={withSuspense(<CustomerDetailPage />)} />

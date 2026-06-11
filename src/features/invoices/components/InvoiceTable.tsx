@@ -59,8 +59,8 @@ export function InvoiceTable({
       header: 'Invoice #',
       sticky: 'left',
       cell: (value, row) => (
-        <NavLink to={`${isAdmin ? '/admin' : ''}/invoices/${row.id}`} className="font-bold text-primary hover:underline">
-          {value}
+        <NavLink to={`${isAdmin ? '/admin' : ''}/invoices/${value}`} className="font-bold text-primary hover:underline">
+          #{row.invoice_number}
         </NavLink>
       )
     },
@@ -73,6 +73,7 @@ export function InvoiceTable({
       accessor: 'status',
       key: 'status',
       header: 'Status',
+      className: 'capitalize',
       cell: (value) => (
         renderStatus(value)
       )

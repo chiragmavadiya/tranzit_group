@@ -82,10 +82,10 @@ export interface Invoice {
 }
 
 export interface InvoiceSummary {
-  total_invoice: number;
-  invoice_pending: number;
-  invoice_partial: number;
-  invoice_paid: number;
+  total_invoices: number;
+  pending_invoices: number;
+  partial_invoices: number;
+  paid_invoices: number;
   amount_pending: number;
   amount_paid: number;
 }

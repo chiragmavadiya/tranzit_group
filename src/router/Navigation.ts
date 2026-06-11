@@ -2,19 +2,14 @@ import {
   LayoutDashboard,
   Users,
   Package,
-  XCircle,
   Truck,
   UserCog,
   FileText,
-  FileSpreadsheet,
-  Link,
+  // Link,
   Wallet,
-  Percent,
-  MapPin,
   MessageSquare,
-  HelpCircle,
   Settings,
-  Activity,
+  // Activity,
   ClipboardList,
   PackageX,
   FileQuestion,
@@ -26,7 +21,11 @@ import {
   FileBarChart,
   // FileArchive,
   LifeBuoy,
-  Globe
+  Globe,
+  BarChart3,
+  MessageSquareMore,
+  PackageMinus,
+  Route
 } from 'lucide-react';
 import type { SidebarItem } from '../layout/types/Sidebar.types';
 
@@ -34,24 +33,62 @@ export const adminSidebarItems: SidebarItem[] = [
   { name: 'Dashboard', icon: LayoutDashboard, path: '/admin/dashboard' },
   { name: 'Customer Management', icon: Users, path: '/admin/customers' },
   { name: 'Order Management', icon: Package, path: '/admin/orders' },
-  { name: 'Cancel Order', icon: XCircle, path: '/admin/cancel-order' },
+  { name: 'Cancel Order', icon: PackageX, path: '/admin/cancel-order' },
   { name: 'Book a pickup', icon: Truck, path: '/admin/book-pickup' },
   { name: 'Staff / Sub User Management', icon: UserCog, path: '/admin/staff' },
-  { name: 'Customer Parcel Report', icon: FileText, path: '/admin/customer-parcel-report' },
-  { name: 'Invoice Management', icon: FileSpreadsheet, path: '/admin/invoices' },
-  { name: 'Zoho Invoice Integration', icon: Link, path: '/admin/zoho-integration' },
+
+
+  // { name: 'Customer Parcel Report', icon: FileText, path: '/admin/customer-parcel-report' },
+  {
+    name: 'Reports',
+    icon: BarChart3,
+    path: '/admin/customer-parcel-report',
+    hasDropdown: true,
+    subItems: [
+      { name: 'All Tranzit Group Courier Parcel Report', path: '/admin/customer-parcel-report' },
+      { name: 'Custom Integrated Courier Parcel Report', path: '/admin/integrated-parcel-report' },
+    ]
+  },
+
+
+  { name: 'Invoice Management', icon: FileText, path: '/admin/invoices' },
+  // { name: 'Zoho Invoice Integration', icon: Link, path: '/admin/zoho-integration' },
   { name: 'Topup Management', icon: Wallet, path: '/admin/topup' },
-  { name: 'Courier Surcharge', icon: Percent, path: '/admin/courier-surcharge' },
-  { name: 'Courier base Postcode', icon: MapPin, path: '/admin/courier-postcode' },
-  { name: 'Enquiry Management', icon: MessageSquare, path: '/admin/enquiry' },
-  { name: 'Help Center Management', icon: HelpCircle, path: '/admin/help-center' },
+  // { name: 'Courier Surcharge', icon: Percent, path: '/admin/courier-surcharge' },
+  // { name: 'Courier base Postcode', icon: MapPin, path: '/admin/courier-postcode' },
+  { name: 'Enquiry Management', icon: MessageSquareMore, path: '/admin/enquiry' },
+  { name: 'Help Center Management', icon: LifeBuoy, path: '/admin/help-center' },
   { name: 'System Settings', icon: Settings, path: '/admin/settings' },
-  { name: 'Admin Activity Log', icon: Activity, path: '/admin/activity-log' },
+  // { name: 'Admin Activity Log', icon: Activity, path: '/admin/activity-log' },
   { name: 'Order Summary For Auspost', icon: ClipboardList, path: '/admin/order-summary' },
-  { name: 'Undelivered Parcel', icon: PackageX, path: '/admin/undelivered' },
+  { name: 'Undelivered Parcel', icon: PackageMinus, path: '/admin/undelivered' },
   { name: 'Customer Quote', icon: FileQuestion, path: '/admin/quotes' },
 
-  { name: 'Profile', icon: User, path: '/admin/profile' },
+  {
+    name: 'Courier Global Settings',
+    icon: Route,
+    path: '/admin/courier-surcharge',
+    hasDropdown: true,
+    subItems: [
+      { name: 'Courier Surcharge', path: '/admin/courier-surcharge' },
+      { name: 'Courier base Postcode', path: '/admin/courier-postcode' },
+    ]
+  },
+
+  {
+    name: 'Global Settings',
+    icon: Globe,
+    path: '/admin/zoho-integration',
+    hasDropdown: true,
+    subItems: [
+      { name: 'Zoho Invoice Integration', path: '/admin/zoho-integration' },
+      { name: 'Admin Activity Log', path: '/admin/activity-log' },
+      { name: 'Profile', path: '/admin/profile' },
+    ]
+  },
+
+
+  // { name: 'Profile', icon: User, path: '/admin/profile' },
 ];
 
 const getOrderTab = () => localStorage.getItem('order_tab');

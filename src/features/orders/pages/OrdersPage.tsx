@@ -66,7 +66,7 @@ export default function OrdersPage({ fromCustomer, customerId }: { fromCustomer?
   const cancelOrderMutation = useCancelOrder();
   const archiveOrderMutation = useArchiveOrder();
   const printOrderMutation = usePrintOrder();
-  const { data: customersData } = useCustomers({ pageSize: 1000 }, isAdmin);
+  const { data: customersData } = useCustomers({ per_page: 1000 }, isAdmin);
 
   const [walletCheckOpen, setWalletCheckOpen] = useState(false);
   const [walletCheckData, setWalletCheckData] = useState<any>(null);
@@ -305,7 +305,7 @@ export default function OrdersPage({ fromCustomer, customerId }: { fromCustomer?
                 }}
                 options={customersData?.data?.map((c: any) => ({
                   value: c.id.toString(),
-                  label: `${c.first_name} ${c.last_name}`
+                  label: `${c.first_name} ${c.last_name} (${c.email})`
                 })) || []}
               />
             )}

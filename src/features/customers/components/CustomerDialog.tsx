@@ -7,9 +7,9 @@ import {
   Mail,
   Receipt,
   Wallet,
-  Box,
   Loader2
 } from "lucide-react"
+import Favicon from '@/assets/favicon.png';
 import { CustomModel } from "@/components/ui/dialog"
 import { Switch } from "@/components/ui/switch"
 import { FormInput, FormSelect } from "@/features/orders/components/OrderFormUI"
@@ -174,6 +174,7 @@ export default function CustomerDialog({ open, onOpenChange, customerId }: Custo
 
     const mutation = isEdit ? updateCustomer : createCustomer;
     const variables = isEdit ? { id: customerId!, data: formData as any } : (formData as any);
+    console.log(variables, 'variables')
 
     mutation(variables, {
       onSuccess: () => {
@@ -209,7 +210,7 @@ export default function CustomerDialog({ open, onOpenChange, customerId }: Custo
       open={open}
       isLoading={isPending}
       onOpenChange={onOpenChange}
-      contentClass="min-w-2xl overflow-y-auto no-scrollbar"
+      contentClass="min-w-4xl overflow-y-auto no-scrollbar"
       submitText={isEdit ? "Update Customer" : "Add Customer"}
     >
       {/* <DialogContent className="sm:max-w-2xl gap-0 overflow-hidden bg-white dark:bg-zinc-950 border-none shadow-2xl">
@@ -542,8 +543,9 @@ export default function CustomerDialog({ open, onOpenChange, customerId }: Custo
             <div className="p-4 rounded-2xl border border-slate-100 dark:border-zinc-800 bg-slate-50/50 dark:bg-zinc-900/50 space-y-4">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
-                  <div className="w-8 h-8 rounded-lg bg-primary/10 dark:bg-primary/20 flex items-center justify-center text-primary">
-                    <Truck className="w-4 h-4" />
+                  <div className="flex items-center justify-center text-primary">
+                    {/* <Truck className="w-4 h-4" /> */}
+                    <img src="https://api.tranzit.digisite.net/assets/img/couriers/direct-freight.png" className="w-14 " alt="" />
                   </div>
                   <span className="text-sm font-bold">Direct Freight Express</span>
                 </div>
@@ -555,18 +557,20 @@ export default function CustomerDialog({ open, onOpenChange, customerId }: Custo
               {formData.direct_freight_active === 1 && (
                 <div className="grid grid-cols-12 gap-4 animate-in fade-in zoom-in-95 duration-200">
                   <FormInput
-                    label="Markup Charge ($)"
+                    label="Markup Charge (%)"
                     isHalf
                     type="number"
-                    value={formData.direct_freight_markup_charge?.toString()}
-                    onChange={(val) => handleChange("direct_freight_markup_charge", parseInt(val) || 0)}
+                    step='0.01'
+                    value={formData.direct_freight_markup_charge}
+                    onChange={(val) => handleChange("direct_freight_markup_charge", Number(val) || 0)}
                   />
                   <FormInput
                     label="Pickup Charge ($)"
                     isHalf
+                    step='0.01'
                     type="number"
-                    value={formData.direct_freight_pickup_charge?.toString()}
-                    onChange={(val) => handleChange("direct_freight_pickup_charge", parseInt(val) || 0)}
+                    value={formData.direct_freight_pickup_charge}
+                    onChange={(val) => handleChange("direct_freight_pickup_charge", Number(val) || 0)}
                   />
                 </div>
               )}
@@ -576,8 +580,9 @@ export default function CustomerDialog({ open, onOpenChange, customerId }: Custo
             <div className="p-4 rounded-2xl border border-slate-100 dark:border-zinc-800 bg-slate-50/50 dark:bg-zinc-900/50 space-y-4">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
-                  <div className="w-8 h-8 rounded-lg bg-rose-100 dark:bg-rose-500/20 flex items-center justify-center text-rose-600 dark:text-rose-400">
-                    <Mail className="w-4 h-4" />
+                  <div className="flex items-center justify-center text-rose-600 dark:text-rose-400">
+                    {/* <Mail className="w-4 h-4" /> */}
+                    <img src="https://api.tranzit.digisite.net/assets/img/couriers/logo-auspost.png" className="w-14 " alt="" />
                   </div>
                   <span className="text-sm font-bold">Auspost Tranzit Group</span>
                 </div>
@@ -589,18 +594,18 @@ export default function CustomerDialog({ open, onOpenChange, customerId }: Custo
               {formData.auspost_active === 1 && (
                 <div className="grid grid-cols-12 gap-4 animate-in fade-in zoom-in-95 duration-200">
                   <FormInput
-                    label="Markup Charge ($)"
+                    label="Markup Charge (%)"
                     isHalf
                     type="number"
                     value={formData.auspost_markup_charge?.toString()}
-                    onChange={(val) => handleChange("auspost_markup_charge", parseInt(val) || 0)}
+                    onChange={(val) => handleChange("auspost_markup_charge", Number(val) || 0)}
                   />
                   <FormInput
                     label="Pickup Charge ($)"
                     isHalf
                     type="number"
                     value={formData.auspost_pickup_charge?.toString()}
-                    onChange={(val) => handleChange("auspost_pickup_charge", parseInt(val) || 0)}
+                    onChange={(val) => handleChange("auspost_pickup_charge", Number(val) || 0)}
                   />
                 </div>
               )}
@@ -610,8 +615,10 @@ export default function CustomerDialog({ open, onOpenChange, customerId }: Custo
             <div className="p-4 rounded-2xl border border-slate-100 dark:border-zinc-800 bg-slate-50/50 dark:bg-zinc-900/50 space-y-4">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
-                  <div className="w-8 h-8 rounded-lg bg-amber-100 dark:bg-amber-500/20 flex items-center justify-center text-amber-600 dark:text-amber-400">
-                    <Box className="w-4 h-4" />
+                  <div className="flex items-center justify-center text-amber-600 dark:text-amber-400">
+                    {/* <Box className="w-4 h-4" /> */}
+                    <img src={Favicon} className="w-6 " alt="" />
+
                   </div>
                   <span className="text-sm font-bold">Pallet Tranzit Group</span>
                 </div>
@@ -623,18 +630,18 @@ export default function CustomerDialog({ open, onOpenChange, customerId }: Custo
               {formData.pallet_active === 1 && (
                 <div className="grid grid-cols-12 gap-4 animate-in fade-in zoom-in-95 duration-200">
                   <FormInput
-                    label="Markup Charge ($)"
+                    label="Markup Charge (%)"
                     isHalf
                     type="number"
-                    value={formData.pallet_markup_charge?.toString()}
-                    onChange={(val) => handleChange("pallet_markup_charge", parseInt(val) || 0)}
+                    value={formData.pallet_markup_charge}
+                    onChange={(val) => handleChange("pallet_markup_charge", Number(val) || 0)}
                   />
                   <FormInput
                     label="Pickup Charge ($)"
                     isHalf
                     type="number"
-                    value={formData.pallet_pickup_charge?.toString()}
-                    onChange={(val) => handleChange("pallet_pickup_charge", parseInt(val) || 0)}
+                    value={formData.pallet_pickup_charge}
+                    onChange={(val) => handleChange("pallet_pickup_charge", Number(val) || 0)}
                   />
                 </div>
               )}

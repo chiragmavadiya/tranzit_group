@@ -57,7 +57,7 @@ export const OrderHeader: React.FC<OrderHeaderProps> = ({
   const { role } = useAppSelector((state) => state.auth)
   const [showConfirm, setShowConfirm] = useState(false)
 
-  const { data: customersData } = useCustomers({ pageSize: 1000 }, role === 'admin' && (orderType === 'create' || orderType === 'consign'));
+  const { data: customersData } = useCustomers({ per_page: 1000 }, role === 'admin' && (orderType === 'create' || orderType === 'consign'));
 
   const isCreate = useMemo(() => {
     return orderType === 'create' || orderType === 'create-menual' || orderType === 'return'

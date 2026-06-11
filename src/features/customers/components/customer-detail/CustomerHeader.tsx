@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { CheckCircle2, MapPin, Calendar, Wallet, UserMinus, RefreshCw, ShieldCheck, ChevronLeft, Loader2, Pencil, Check } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -7,6 +8,7 @@ import { useNavigate } from 'react-router-dom';
 import { showToast } from '@/components/ui/custom-toast';
 import { cn, formateCurrency } from '@/lib/utils';
 import { format, parseISO } from 'date-fns';
+import { ConformationModal } from '@/components/common/ConformationModal';
 
 interface CustomerHeaderProps {
     customer: CustomerDetails;
@@ -25,6 +27,7 @@ const getFormattedDate = (dateStr: string) => {
 export const CustomerHeader = ({ customer, onEdit }: CustomerHeaderProps) => {
     const navigate = useNavigate();
     const fullName = `${customer.first_name} ${customer.last_name}`;
+    const [isConfirmOpen, setIsConfirmOpen] = useState(false);
 
     const { mutate: verify, isPending: isVerifying } = useVerifyCustomer();
     const { mutate: zohoSync, isPending: isSyncing } = useZohoSyncCustomer();
@@ -45,9 +48,19 @@ export const CustomerHeader = ({ customer, onEdit }: CustomerHeaderProps) => {
     };
 
     const handleToggleStatus = () => {
+        setIsConfirmOpen(true);
+    };
+
+    const handleConfirmToggle = () => {
         toggleStatus(customer.id, {
-            onSuccess: (res) => showToast(res.message || 'Status updated successfully', 'success'),
-            onError: (err: any) => showToast(err?.response?.data?.message || 'Failed to update status', "error"),
+            onSuccess: (res) => {
+                showToast(res.message || 'Status updated successfully', 'success');
+                setIsConfirmOpen(false);
+            },
+            onError: (err: any) => {
+                showToast(err?.response?.data?.message || 'Failed to update status', "error");
+                setIsConfirmOpen(false);
+            },
         });
     };
 
@@ -184,6 +197,17 @@ export const CustomerHeader = ({ customer, onEdit }: CustomerHeaderProps) => {
                     </Button>
                 </div>
             </div>
+            <ConformationModal
+                open={isConfirmOpen}
+                onOpenChange={setIsConfirmOpen}
+                title="Change Status"
+                description="Are you sure you want to Change the status for this customer?"
+                confirmText="Confirm"
+                cancelText="Cancel"
+                confirmVariant={isActive ? "destructive" : "default"}
+                onConfirm={handleConfirmToggle}
+                loading={isToggling}
+            />
         </div>
     );
 };

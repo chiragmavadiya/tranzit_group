@@ -169,7 +169,7 @@ export default function Sidebar({
             sidebarItems.map((item) => (
               <div key={item.name}>
                 <NavLink
-                  to={item.isExternal ? '#' : item.path}
+                  to={item.isExternal || item.hasDropdown ? '#' : item.path}
                   onClick={(e) => {
                     if (item.isExternal) {
                       e.preventDefault();
@@ -242,7 +242,7 @@ export default function Sidebar({
                         key={sub.name}
                         to={sub.path}
                         className={({ isActive }) =>
-                          `block px-2 py-2 text-[13px] font-medium rounded-md transition-colors ${isActive ? 'text-primary font-semibold' : 'text-gray-500 dark:text-zinc-400 hover:text-gray-900 dark:hover:text-zinc-100'
+                          `block px-2 py-2 text-[13px] leading-snug font-medium rounded-md transition-colors ${isActive ? 'text-primary font-semibold' : 'text-gray-500 dark:text-zinc-400 hover:text-gray-900 dark:hover:text-zinc-100'
                           }`
                         }
                       >

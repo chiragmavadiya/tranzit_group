@@ -103,6 +103,7 @@ export default function CourierPostcodePage() {
         <DataTable
           columns={columns as any}
           data={postcodeData?.data || []}
+          headerTitle='Courier Based PostCode'
           searchable
           searchValue={search}
           onSearchChange={(val) => { setSearch(val); setPage(1); }}

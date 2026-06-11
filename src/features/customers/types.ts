@@ -104,6 +104,7 @@ export interface CustomerProfile {
     about: {
         full_name: string;
         status: string;
+        status_code: string;
         customer: string;
         gst: number | null;
         business_name: string;
@@ -116,6 +117,12 @@ export interface CustomerProfile {
     pickup_address: {
         address: string;
         post_code: string;
+        address_info: string;
+    };
+    billing_address: {
+        address: string;
+        post_code: string;
+        address_info: string;
     };
     charges_markups: {
         aus_post: { title: string; markup: number; pickup: number; };

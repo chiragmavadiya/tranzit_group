@@ -1,5 +1,8 @@
 import { useState, useCallback, useMemo } from 'react';
-import { ClipboardList, DollarSign, Users, TrendingUp, Truck, Upload, Loader2 } from 'lucide-react';
+import {
+  ClipboardList, DollarSign, Users, TrendingUp, Truck,
+  // Upload, Loader2
+} from 'lucide-react';
 import { format } from 'date-fns';
 import { Button } from '@/components/ui/button';
 // import { Calendar } from '@/components/ui/calendar';
@@ -10,15 +13,16 @@ import { PARCEL_COLUMNS, ADMIN_PARCEL_COLUMNS } from '../constants';
 import {
   useParcelReport,
   useExportParcelReport,
-  useUploadDirectFreightInvoice,
-  useUploadAusPostInvoice
+  // useUploadDirectFreightInvoice,
+  // useUploadAusPostInvoice
 } from '../hooks/useReports';
 import { FormSelect } from '@/features/orders/components/OrderFormUI';
-import { Input } from '@/components/ui/input';
+// import { Input } from '@/components/ui/input';
 import DatePicker from '@/components/common/DatePicker';
 import { useCustomers } from '@/features/customers/hooks/useCustomers';
-import { showToast } from '@/components/ui/custom-toast';
+// import { showToast } from '@/components/ui/custom-toast';
 import { useAppSelector } from '@/hooks/store.hooks';
+import { formateCurrency } from '@/lib/utils';
 
 export default function ParcelReportPage() {
   // const location = useLocation();
@@ -35,7 +39,7 @@ export default function ParcelReportPage() {
   // Admin Specific States
   const [selectedCustomer, setSelectedCustomer] = useState<string>('');
   const [invoiceType, setInvoiceType] = useState<string>('');
-  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  // const [selectedFile, setSelectedFile] = useState<File | null>(null);
 
   const formatDate = (date?: Date) => date ? format(date, 'dd/MM/yyyy') : undefined;
 
@@ -51,28 +55,28 @@ export default function ParcelReportPage() {
 
   const { data, isLoading } = useParcelReport(filters, isAdmin);
   const exportMutation = useExportParcelReport(isAdmin);
-  const { data: customersData } = useCustomers({ pageSize: 1000 }, isAdmin);
+  const { data: customersData } = useCustomers({ per_page: 1000 }, isAdmin);
 
-  const { mutate: uploadDirectFreight, isPending: isUploadingDF } = useUploadDirectFreightInvoice();
-  const { mutate: uploadAusPost, isPending: isUploadingAP } = useUploadAusPostInvoice();
+  // const { mutate: uploadDirectFreight, isPending: isUploadingDF } = useUploadDirectFreightInvoice();
+  // const { mutate: uploadAusPost, isPending: isUploadingAP } = useUploadAusPostInvoice();
 
-  const isUploading = isUploadingDF || isUploadingAP;
+  // const isUploading = isUploadingDF || isUploadingAP;
 
   const stats = useMemo(() => {
     const baseStats = [
       {
         label: 'Total Order',
-        value: data?.summary?.total_orders?.toString() || '0',
+        value: formateCurrency(data?.summary?.total_orders || 0),
         icon: ClipboardList,
         iconColor: 'text-rose-500',
-        iconBg: 'bg-rose-50 dark:bg-rose-500/10',
+        iconBg: 'bg-rose-50 dark:bg-rose-500/10 h-10 w-10',
       },
       {
         label: 'Total Amount Paid',
-        value: '$' + (data?.summary?.total_amount?.toString() || '0'),
+        value: formateCurrency(data?.summary?.total_amount || 0),
         icon: DollarSign,
         iconColor: 'text-emerald-500',
-        iconBg: 'bg-emerald-50 dark:bg-emerald-500/10',
+        iconBg: 'bg-emerald-50 dark:bg-emerald-500/10 h-10 w-10',
       },
     ];
 
@@ -83,19 +87,19 @@ export default function ParcelReportPage() {
           value: data?.summary?.total_customers?.toString() || '0',
           icon: Users,
           iconColor: 'text-primary',
-          iconBg: 'bg-primary/10',
+          iconBg: 'bg-primary/10 h-10 w-10',
         },
         ...baseStats,
         {
           label: 'Total Margin',
-          value: '$' + (data?.summary?.total_markup?.toString() || '0'),
+          value: formateCurrency(data?.summary?.total_markup || 0),
           icon: TrendingUp,
           iconColor: 'text-orange-500',
-          iconBg: 'bg-orange-50 dark:bg-orange-500/10',
+          iconBg: 'bg-orange-50 dark:bg-orange-500/10 h-10 w-10',
         },
         {
           label: 'Total Pickup Charges',
-          value: '$' + (data?.summary?.total_pickup?.toString() || '0'),
+          value: formateCurrency(data?.summary?.total_pickup || 0),
           icon: Truck,
           iconColor: 'text-amber-500',
           iconBg: 'bg-amber-50 dark:bg-amber-500/10',
@@ -112,25 +116,25 @@ export default function ParcelReportPage() {
     setPage(1);
     setSelectedCustomer('');
     setInvoiceType('');
-    setSelectedFile(null);
+    // setSelectedFile(null);
   }, []);
 
-  const handleFileUpload = () => {
-    if (!selectedFile || !invoiceType) {
-      showToast("Please select a file and an invoice type", "error");
-      return;
-    }
+  // const handleFileUpload = () => {
+  //   if (!selectedFile || !invoiceType) {
+  //     showToast("Please select a file and an invoice type", "error");
+  //     return;
+  //   }
 
-    if (invoiceType === 'direct_freight') {
-      uploadDirectFreight(selectedFile, {
-        onSuccess: () => setSelectedFile(null)
-      });
-    } else if (invoiceType === 'auspost') {
-      uploadAusPost(selectedFile, {
-        onSuccess: () => setSelectedFile(null)
-      });
-    }
-  };
+  //   if (invoiceType === 'direct_freight') {
+  //     uploadDirectFreight(selectedFile, {
+  //       onSuccess: () => setSelectedFile(null)
+  //     });
+  //   } else if (invoiceType === 'auspost') {
+  //     uploadAusPost(selectedFile, {
+  //       onSuccess: () => setSelectedFile(null)
+  //     });
+  //   }
+  // };
 
   return (
     <div className="flex flex-col flex-1 gap-4 p-page-padding min-h-0 animate-in fade-in slide-in-from-bottom-2 duration-500 bg-slate-50/30 dark:bg-zinc-950/30">
@@ -187,17 +191,17 @@ export default function ParcelReportPage() {
           <div className="space-y-3 print:hidden">
             <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
               {stats.map((stat, idx) => (
-                <StatCard key={idx} {...stat} className="shadow-sm border-gray-100 dark:border-zinc-800" contentClassName="py-4" />
+                <StatCard key={idx} {...stat} className="shadow-sm border-gray-100 dark:border-zinc-800" contentClassName="py-2" />
               ))}
             </div>
           </div>
 
           {/* Filter Section */}
-          <div className="bg-white dark:bg-zinc-950 p-5 rounded-sm border border-gray-100 dark:border-zinc-800 shadow-sm flex flex-col print:hidden">
+          <div className="bg-white dark:bg-zinc-950 px-4 py-3 rounded-sm border border-gray-100 dark:border-zinc-800 shadow-sm flex flex-col print:hidden">
             <div className="grid grid-cols-1 md:grid-cols-12 gap-4 items-end">
               <div className="md:col-span-3">
                 <DatePicker
-                  label="From Date"
+                  // label="From Date"
                   date={startDate}
                   setDate={setStartDate}
                   placeholder="Start Date"
@@ -205,7 +209,7 @@ export default function ParcelReportPage() {
               </div>
               <div className="md:col-span-3">
                 <DatePicker
-                  label="To Date"
+                  // label="To Date"
                   date={endDate}
                   setDate={setEndDate}
                   placeholder="End Date"
@@ -214,13 +218,13 @@ export default function ParcelReportPage() {
 
               <div className="md:col-span-3">
                 <FormSelect
-                  label="Customer"
+                  // label="Customer"
                   placeholder="Select Customer"
                   value={selectedCustomer}
                   onValueChange={(val) => setSelectedCustomer(val || '')}
                   options={customersData?.data?.map((c: any) => ({
                     value: c.id.toString(),
-                    label: `${c.first_name} ${c.last_name}`
+                    label: `${c.first_name} ${c.last_name} (${c.email})`
                   })) || []}
                 />
               </div>
@@ -236,7 +240,7 @@ export default function ParcelReportPage() {
               </div>
             </div>
 
-            {isAdmin && (
+            {/* {isAdmin && (
               <div className="grid grid-cols-1 md:grid-cols-12 gap-4 items-end pt-4 border-t border-gray-50 dark:border-zinc-900/50">
                 <div className="md:col-span-3">
                   <FormSelect
@@ -287,7 +291,7 @@ export default function ParcelReportPage() {
                   </div>
                 </div>
               </div>
-            )}
+            )} */}
           </div>
         </>
       )}

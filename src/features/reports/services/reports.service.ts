@@ -10,6 +10,7 @@ import type {
     UploadInvoiceResponse,
     ReportCountsResponse
 } from "../types";
+import { getFileName } from "@/lib/utils";
 
 export const reportsService = {
     getShipmentReport: async (filters: ReportFilters): Promise<PaginatedResponse<ShipmentReport>> => {
@@ -52,6 +53,11 @@ export const reportsService = {
         const response = await api.get(endpoint, { params: filters });
         return response.data;
     },
+    getIntegratedParcelReport: async (filters: ReportFilters): Promise<PaginatedResponse<ParcelReport>> => {
+        const endpoint = API_ENDPOINTS.ADMIN_REPORTS.INTEGRATED_PARCELS;
+        const response = await api.get(endpoint, { params: filters });
+        return response.data;
+    },
 
     exportParcelReport: async (filters: ReportFilters & { format: string }, isAdmin: boolean = false): Promise<{ blob: Blob; filename: string }> => {
         const endpoint = isAdmin ? API_ENDPOINTS.ADMIN_REPORTS.PARCELS_EXPORT : API_ENDPOINTS.REPORTS.PARCELS_EXPORT;
@@ -60,8 +66,18 @@ export const reportsService = {
             responseType: 'blob',
         });
 
-        const filename = `Parcel_Report_${new Date().getTime()}.${filters.format}`;
-        return { blob: response.data, filename };
+        const fileName = getFileName(response)
+        return { blob: response.data, filename: fileName };
+    },
+    exportIntegratedParcelReport: async (filters: ReportFilters & { format: string }): Promise<{ blob: Blob; filename: string }> => {
+        const endpoint = API_ENDPOINTS.ADMIN_REPORTS.INTEGRATED_PARCELS_EXPORT;
+        const response = await api.get(endpoint, {
+            params: filters,
+            responseType: 'blob',
+        });
+
+        const fileName = getFileName(response)
+        return { blob: response.data, filename: fileName };
     },
 
     uploadDirectFreightInvoice: async (file: File): Promise<UploadInvoiceResponse> => {

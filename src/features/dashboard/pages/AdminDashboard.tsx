@@ -37,7 +37,7 @@ export default function AdminDashboard() {
 
   const queryParams = useMemo(() => {
     const params: Record<string, any> = {};
-    params.activePeriod = activePeriod;
+    // params.activePeriod = activePeriod;
     if (activePeriod === 'all') {
       if (appliedStartDate) {
         const formatted = format(appliedStartDate, 'yyyy/MM/dd');
@@ -101,7 +101,7 @@ export default function AdminDashboard() {
     },
     {
       label: "Total Pickup Charges",
-      value: formatCurrency(metrics?.financeByPeriod[activePeriod]?.pickupCharges || 0),
+      value: formatCurrency(metrics?.financeByPeriod[activePeriod]?.totalPickupCharge || 0),
       subValue: "Total Pickup Charges Amount",
       icon: Truck,
       color: "bg-primary/10 dark:bg-primary/20 text-primary dark:text-primary",

@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { Loader2, MoreVertical } from 'lucide-react';
 import { Switch } from '@/components/ui/switch';
 import type { Customer } from './types';
@@ -7,31 +8,52 @@ import { NavLink } from 'react-router-dom';
 import { useToggleCustomerStatus } from './hooks/useCustomers';
 import { showToast } from '@/components/ui/custom-toast';
 import { DropdownCustomMenu } from "@/components/ui/dropdown-menu";
+import { ConformationModal } from '@/components/common/ConformationModal';
 
 // eslint-disable-next-line react-refresh/only-export-components
 const StatusSwitch = ({ customer }: { customer: Customer }) => {
+    const [isConfirmOpen, setIsConfirmOpen] = useState(false);
     const { mutate: toggleStatus, isPending } = useToggleCustomerStatus();
 
-    const handleToggle = () => {
+    const handleToggleClick = () => {
+        setIsConfirmOpen(true);
+    };
+
+    const handleConfirmToggle = () => {
         toggleStatus(customer.id, {
             onSuccess: (res) => {
-                showToast(res.message || `Customer status updated to ${customer.status === 'active' ? 'inactive' : 'active'}`, "success")
+                showToast(res.message || `Customer status updated to ${customer.status === 'active' ? 'inactive' : 'active'}`, "success");
+                setIsConfirmOpen(false);
             },
             onError: (err: any) => {
                 showToast(err?.response?.data?.message || 'Failed to update status', "error");
+                setIsConfirmOpen(false);
             }
         });
     };
 
+    const isActive = customer.status === 'active';
+
     return (
         <div className="flex items-center gap-2">
             <Switch
-                checked={customer.status === 'active'}
+                checked={isActive}
                 disabled={isPending}
-                onCheckedChange={handleToggle}
+                onCheckedChange={handleToggleClick}
                 className="data-[state=checked]:bg-slate-950"
             />
             {isPending && <Loader2 className="w-3 h-3 animate-spin text-slate-400" />}
+            <ConformationModal
+                open={isConfirmOpen}
+                onOpenChange={setIsConfirmOpen}
+                title="Change Status"
+                description="Are you sure you want to Change the status for this customer?"
+                confirmText="Confirm"
+                cancelText="Cancel"
+                confirmVariant={isActive ? "destructive" : "default"}
+                onConfirm={handleConfirmToggle}
+                loading={isPending}
+            />
         </div>
     );
 };
@@ -74,8 +96,9 @@ export const getCustomerColumns = (
             // cell: (_, customer) => <span className="text-sm text-slate-600">{customer.business_name}</span>,
         },
         {
-            key: 'customer_id',
+            key: 'id',
             header: 'CUSTOMER ID',
+            cell: (val) => <NavLink className='text-sm font-semibold text-primary hover:underline' to={`/admin/customers/${val}`}>{val}</NavLink>
             // cell: (_, customer) => <span className="text-sm font-mono text-slate-600">{customer.id}</span>,
         },
         {

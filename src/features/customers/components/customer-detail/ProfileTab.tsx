@@ -57,8 +57,8 @@ export const ProfileTab = ({ customerId }: ProfileTabProps) => {
                             <div className="flex flex-col gap-0.5 col-span-2">
                                 <span className="text-xs font-medium text-slate-600 dark:text-zinc-500 ">Status</span>
                                 <div className="flex items-center gap-1.5 text-sm font-semibold text-slate-900 dark:text-white">
-                                    <span className={cn("w-2 h-2 rounded-full", customer.about.status ? "bg-emerald-500" : "bg-red-500")} />
-                                    <span className='capitalize'>{customer.about.status}</span>
+                                    <span className={cn("w-2 h-2 rounded-full", customer.about.status_code === '1' ? "bg-emerald-500" : "bg-red-500")} />
+                                    <span className='capitalize'>{customer.about.status_code === '1' ? 'Active' : 'Inactive'}</span>
                                 </div>
                             </div>
                         </div>
@@ -101,11 +101,20 @@ export const ProfileTab = ({ customerId }: ProfileTabProps) => {
                                     <MapPin className="w-4 h-4" />
                                 </div>
                                 <div className="flex flex-col">
-                                    <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Address</span>
+                                    <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Pickup Address</span>
                                     <span className="text-sm font-semibold text-slate-900 dark:text-white">
-                                        {customer.pickup_address.address
-                                            ? `${customer.pickup_address.address}, ${customer.pickup_address.post_code}`
-                                            : "No Address"}
+                                        {customer?.pickup_address?.address_info || (customer?.pickup_address?.address ? `${customer?.pickup_address?.address}, ${customer?.pickup_address?.post_code}` : "No Address")}
+                                    </span>
+                                </div>
+                            </div>
+                            <div className="flex items-center gap-3  rounded-md dark:border-zinc-800">
+                                <div className="w-10 h-10 rounded-lg bg-white dark:bg-zinc-950 border border-slate-150 dark:border-zinc-800 flex items-center justify-center flex-shrink-0 text-slate-600 dark:text-zinc-400">
+                                    <MapPin className="w-4 h-4" />
+                                </div>
+                                <div className="flex flex-col">
+                                    <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Billing Address</span>
+                                    <span className="text-sm font-semibold text-slate-900 dark:text-white">
+                                        {customer?.billing_address?.address_info || (customer?.billing_address?.address ? `${customer?.billing_address?.address}, ${customer?.pickup_address?.post_code}` : "No Address")}
                                     </span>
                                 </div>
                             </div>

@@ -26,7 +26,7 @@ export default function CancelOrderPage() {
         per_page: pageSize,
         customer: customer
     });
-    const { data: customersData } = useCustomers({ pageSize: 1000 });
+    const { data: customersData } = useCustomers({ per_page: 1000 });
 
     const orders = useMemo(() => cancelOrderData?.data || [], [cancelOrderData]);
     const totalItems = useMemo(() => cancelOrderData?.meta?.total || 0, [cancelOrderData]);
@@ -80,7 +80,7 @@ export default function CancelOrderPage() {
                             onValueChange={(val) => setCustomer(val || '')}
                             options={customersData?.data?.map((c: any) => ({
                                 value: c.id.toString(),
-                                label: `${c.first_name} ${c.last_name}`
+                                label: `${c.first_name} ${c.last_name} (${c.email})`
                             })) || []}
                             className='w-40'
                         />

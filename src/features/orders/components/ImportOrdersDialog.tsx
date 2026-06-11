@@ -29,12 +29,12 @@ const ImportOrdersDialog = ({
 
   const downloadSampleMutation = useDownloadImportSample();
 
-  const { data: customersData } = useCustomers({ pageSize: 1000 }, isAdmin);
+  const { data: customersData } = useCustomers({ per_page: 1000 }, isAdmin);
 
   const formattedCustomers = useMemo(() => {
     return customersData?.data?.map((c: any) => ({
       value: c.id.toString(),
-      label: `${c.first_name} ${c.last_name}`
+      label: `${c.first_name} ${c.last_name} (${c.email})`
     })) || [];
   }, [customersData]);
 

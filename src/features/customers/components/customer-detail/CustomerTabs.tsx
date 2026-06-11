@@ -23,7 +23,7 @@ export const CustomerTabs = () => {
                         key={tab}
                         onClick={() => onTabChange(tab)}
                         className={cn(
-                            "pb-2 px-2 pt-1 text-sm font-medium relative transition-all duration-200 whitespace-nowrap tracking-normal",
+                            "pb-2 px-2 pt-1 text-sm cursor-pointer font-medium relative transition-all duration-200 whitespace-nowrap tracking-normal",
                             activeTab === tab
                                 ? "text-slate-900 dark:text-white font-bold"
                                 : "text-slate-500 hover:text-slate-700 dark:text-zinc-400 dark:hover:text-zinc-200"

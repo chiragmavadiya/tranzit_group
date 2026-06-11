@@ -16,7 +16,7 @@ export const useCustomers = (params?: Record<string, any>, enabled: boolean = tr
         //         label: `${c.first_name} ${c.last_name}`
         //     }));
         // }
-     });
+    });
 };
 
 export const useCustomerCounts = () => {
@@ -93,8 +93,10 @@ export const useUpdateCustomer = () => {
     return useMutation({
         mutationFn: ({ id, data }: { id: number | string; data: CustomerFormData }) => customerService.update(id, data),
         onSuccess: (_, variables) => {
+            console.log(variables, 'variables')
             queryClient.invalidateQueries({ queryKey: QUERY_KEYS.ADMIN_CUSTOMERS.LIST });
             queryClient.invalidateQueries({ queryKey: QUERY_KEYS.ADMIN_CUSTOMERS.COUNTS });
+            queryClient.invalidateQueries({ queryKey: ["admin", "customers", "edit", variables.id] });
             queryClient.invalidateQueries({ queryKey: QUERY_KEYS.ADMIN_CUSTOMERS.DETAILS(variables.id) });
             queryClient.invalidateQueries({ queryKey: QUERY_KEYS.ADMIN_CUSTOMERS.PROFILE(variables.id) });
         },
@@ -130,11 +132,13 @@ export const useToggleCustomerStatus = () => {
 
     return useMutation({
         mutationFn: (id: number | string) => customerService.toggleStatus(id),
-        onSuccess: (_, id) => {
+        onSuccess: (_, variable) => {
+            console.log('Customer status toggled for ID:', variable);
+
             queryClient.invalidateQueries({ queryKey: QUERY_KEYS.ADMIN_CUSTOMERS.LIST });
             queryClient.invalidateQueries({ queryKey: QUERY_KEYS.ADMIN_CUSTOMERS.COUNTS });
-            queryClient.invalidateQueries({ queryKey: QUERY_KEYS.ADMIN_CUSTOMERS.DETAILS(id) });
-            queryClient.invalidateQueries({ queryKey: QUERY_KEYS.ADMIN_CUSTOMERS.PROFILE(id) });
+            queryClient.invalidateQueries({ queryKey: QUERY_KEYS.ADMIN_CUSTOMERS.DETAILS(variable.toString()) });
+            queryClient.invalidateQueries({ queryKey: QUERY_KEYS.ADMIN_CUSTOMERS.PROFILE(variable.toString()) });
         },
     });
 };

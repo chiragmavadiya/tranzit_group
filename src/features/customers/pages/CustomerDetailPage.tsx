@@ -48,7 +48,7 @@ export default function CustomerDetailPage() {
             />
 
             {/* Note: Stats uses its own logic or requires more fields. Might need adjustment if stats endpoints are provided in future */}
-            <CustomerStats />
+            <CustomerStats customer={customer} />
 
             <div className="flex flex-col gap-4 flex-1">
                 <CustomerTabs />

@@ -30,7 +30,7 @@ export default function CreateOrderDialog({ onOpenChange, type, open, initialDat
     state: "",
     instructions: "",
     postcode: "",
-    country: "Australia",
+    country: "AU",
     name: "",
     saveToAddressBook: false
   });
@@ -59,7 +59,7 @@ export default function CreateOrderDialog({ onOpenChange, type, open, initialDat
       suburb: data.suburb,
       state: data.state,
       postcode: data.postcode,
-      country: "Australia",
+      country: "AU",
     }));
   }, [addressBookData]);
 
@@ -217,7 +217,7 @@ export default function CreateOrderDialog({ onOpenChange, type, open, initialDat
         suburb: orderResponse?.data.suburb,
         state: orderResponse?.data.state,
         postcode: orderResponse?.data.postcode,
-        country: orderResponse?.data.country || 'Australia',
+        country: orderResponse?.data.country || 'AU',
         saveToAddressBook: false,
       });
     }

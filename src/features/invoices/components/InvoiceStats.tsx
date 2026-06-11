@@ -2,6 +2,7 @@ import { useMemo } from 'react';
 import { FileText, Clock, AlertCircle, CheckCircle2, Wallet, DollarSign } from 'lucide-react';
 import type { InvoiceSummary } from '../types';
 import { StatCard } from '@/components/common/StatCard';
+import { formateCurrency } from '@/lib/utils';
 
 interface InvoiceStatsProps {
   stats?: InvoiceSummary;
@@ -11,42 +12,42 @@ export function InvoiceStats({ stats }: InvoiceStatsProps) {
   const statsItems = useMemo(() => [
     {
       label: 'Total Invoice',
-      value: stats?.total_invoice || 0,
+      value: stats?.total_invoices || 0,
       icon: FileText,
       iconColor: 'text-primary',
       iconBg: 'bg-primary/10 dark:bg-primary/20',
     },
     {
       label: 'Invoice Pending',
-      value: stats?.invoice_pending || 0,
+      value: stats?.pending_invoices || 0,
       icon: Clock,
       iconColor: 'text-rose-600',
       iconBg: 'bg-rose-50 dark:bg-rose-500/10',
     },
     {
       label: 'Invoice Partial',
-      value: stats?.invoice_partial || 0,
+      value: stats?.partial_invoices || 0,
       icon: AlertCircle,
       iconColor: 'text-amber-600',
       iconBg: 'bg-amber-50 dark:bg-amber-500/10',
     },
     {
       label: 'Invoice Paid',
-      value: stats?.invoice_paid || 0,
+      value: stats?.paid_invoices || 0,
       icon: CheckCircle2,
       iconColor: 'text-emerald-600',
       iconBg: 'bg-emerald-50 dark:bg-emerald-500/10',
     },
     {
       label: 'Amount Pending',
-      value: `$${stats?.amount_pending.toFixed(2) || 0}`,
+      value: formateCurrency(stats?.amount_pending || 0),
       icon: Wallet,
       iconColor: 'text-orange-600',
       iconBg: 'bg-orange-50 dark:bg-orange-500/10',
     },
     {
       label: 'Amount Paid',
-      value: `$${stats?.amount_paid.toFixed(2) || 0}`,
+      value: formateCurrency(stats?.amount_paid || 0),
       icon: DollarSign,
       iconColor: 'text-cyan-600',
       iconBg: 'bg-cyan-50 dark:bg-cyan-500/10',

@@ -345,7 +345,7 @@ const InvoiceDocumentView: React.FC = () => {
             BACK
           </Button>
           <div className="h-6 w-px bg-slate-200 dark:bg-zinc-800 mx-2" />
-          <span className="text-primary font-bold">#{invoiceData?.invoice_number}</span>
+          <span className="text-primary font-bold">#{invoiceID !== 'create' ? invoiceData?.invoice_number : 'New Invoice'}</span>
         </div>
 
         <div className="flex items-center gap-2">

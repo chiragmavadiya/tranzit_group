@@ -17,24 +17,24 @@ interface CreateAddressDialogProps {
   isLoading?: boolean;
 }
 
-const MOCK_COURIERS = [
-  {
-    "label": "MyPost Business",
-    "value": "5"
-  },
-  {
-    "label": "Aramex Tranzit Group",
-    "value": "6"
-  },
-  {
-    "label": "Australia Post",
-    "value": "8"
-  },
-  {
-    "label": "Direct Freight Express Tranzit Group",
-    "value": "13"
-  }
-]
+// const MOCK_COURIERS = [
+//   {
+//     "label": "MyPost Business",
+//     "value": "5"
+//   },
+//   {
+//     "label": "Aramex Tranzit Group",
+//     "value": "6"
+//   },
+//   {
+//     "label": "Australia Post",
+//     "value": "8"
+//   },
+//   {
+//     "label": "Direct Freight Express Tranzit Group",
+//     "value": "13"
+//   }
+// ]
 
 
 export function CreateAddressDialog({
@@ -189,7 +189,7 @@ export function CreateAddressDialog({
                 rows={3}
                 isFullWidth
               />
-              <FormSelect
+              {/* <FormSelect
                 layout="horizontal"
                 label="Preferred Courier"
                 value={formData.default_carrier || ''}
@@ -200,7 +200,7 @@ export function CreateAddressDialog({
                 error={submited && formData.default_carrier.length < 1}
                 errormsg="Please select the carrier"
                 isFullWidth
-              />
+              /> */}
               {/* <GlobalCourierSelect
                   layout='horizontal'
                   value={formData.default_carrier}

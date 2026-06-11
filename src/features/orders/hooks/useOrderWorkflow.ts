@@ -156,7 +156,7 @@ export const useOrderWorkflow = () => {
         [key]: {
           ...prev[key],
           email: user.email || '',
-          phone: user.office_number || '',
+          phone: user.office_number || user.personal_mobile || '',
           company: user.company_name || '',
           address_info: user.addresses?.[0]?.address_info || user.addresses?.[0]?.address || '',
           address1: user.addresses?.[0]?.address || '',

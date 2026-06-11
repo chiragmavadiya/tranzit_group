@@ -29,7 +29,7 @@ export default function AdminTopUpPage() {
     page,
     per_page: pageSize
   });
-  const { data: customersData } = useCustomers({ pageSize: 1000 });
+  const { data: customersData } = useCustomers({ per_page: 1000 });
 
   const transactions = topupResponse?.data || [];
   const totalItems = topupResponse?.meta?.total || 0;
@@ -107,7 +107,7 @@ export default function AdminTopUpPage() {
               onValueChange={(val) => setSelectedCustomer(val || 'all')}
               options={customersData?.data?.map((c: any) => ({
                 value: c.id.toString(),
-                label: `${c.first_name} ${c.last_name}`
+                label: `${c.first_name} ${c.last_name} (${c.email})`
               })) || []}
             />
           </div>

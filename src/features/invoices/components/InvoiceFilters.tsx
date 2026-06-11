@@ -15,7 +15,7 @@ export function InvoiceFilters({
   selectedCustomer,
   onCustomerChange,
 }: InvoiceFiltersProps) {
-  const { data: customersData } = useCustomers({ pageSize: 1000 });
+  const { data: customersData } = useCustomers({ per_page: 1000 });
   return (
     <div className="flex flex-wrap items-center justify-end p-4">
       <FormSelect
@@ -24,7 +24,7 @@ export function InvoiceFilters({
         onValueChange={(val) => onCustomerChange?.(val)}
         options={customersData?.data?.map((c: any) => ({
           value: c.id.toString(),
-          label: `${c.first_name} ${c.last_name}`
+          label: `${c.first_name} ${c.last_name} (${c.email})`
         })) || []}
         className='w-64'
       />

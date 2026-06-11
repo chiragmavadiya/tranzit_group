@@ -31,7 +31,7 @@ export const API_ENDPOINTS = {
         GET_QUOTE_SERVICES: "/customer/get-quote/services",
         RECEIVER_ADDRESS: (id: string | number) => `/customer/orders/${id}/receiver-address`,
         IMPORT_SAMPLE: "/customer/orders/import/sample",
-        ARCHIVE: (id: string | number) => `/customer/orders/${id}/archive`,
+        ARCHIVE: (id: string | number) => `/orders/${id}/archive`,
         PRINT_ORDER: "/orders/print-label",
     },
     DASHBOARD: {
@@ -141,6 +141,8 @@ export const API_ENDPOINTS = {
     ADMIN_REPORTS: {
         PARCELS: "/admin/reports/customer-parcels",
         PARCELS_EXPORT: "/admin/reports/customer-parcels/export",
+        INTEGRATED_PARCELS: "/admin/reports/integrated-courier-parcels",
+        INTEGRATED_PARCELS_EXPORT: "/admin/reports/integrated-courier-parcels/export",
         AUSPOST_ORDER_SUMMARY: "/admin/reports/auspost-order-summary",
         UNDELIVERED_PARCELS: "/admin/reports/undelivered-parcels",
         UNDELIVERED_PARCELS_EXPORT: "/admin/reports/undelivered-parcels/export",

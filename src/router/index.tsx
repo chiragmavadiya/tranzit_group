@@ -68,6 +68,7 @@ export const AppRouter = () => {
   useEffect(() => {
     if (isAuthenticated) {
       if ((next_step === 'onboarding' || next_step === 'verify_email') && !location.pathname.includes('/on-board')) {
+        console.log("Again redirect .......", location.pathname)
         navigate('/on-board/' + userID + '/' + token);
       } else if (next_step === 'dashboard' && location.pathname.includes('/on-board')) {
         navigate('/orders?tab=new');
@@ -75,7 +76,7 @@ export const AppRouter = () => {
     }
   }, [next_step, location.pathname, isAuthenticated, userID, token, navigate]);
 
-  if (isLoading) return <PageLoader />;
+  if (isLoading && !location.pathname.includes('/on-board')) return <PageLoader />;
 
   return (
     <Suspense fallback={<PageLoader />}>

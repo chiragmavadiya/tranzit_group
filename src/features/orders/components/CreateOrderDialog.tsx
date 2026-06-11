@@ -285,7 +285,7 @@ export default function CreateOrderDialog({ onOpenChange, type, open, initialDat
                     updateField('street_number', opt.street_number!);
                     updateField('state', opt.state);
                     updateField('postcode', opt.post_code);
-                    updateField('country', opt.country);
+                    // updateField('country', opt.country);
                   }}
                   onChange={(value) => { updateField('address_info', value!); }}
                   value={formData.address_info}
@@ -314,7 +314,7 @@ export default function CreateOrderDialog({ onOpenChange, type, open, initialDat
                       updateField('suburb', option.suburb);
                       updateField('state', option.state);
                       updateField('postcode', option.postcode);
-                      updateField('country', option.country);
+                      // updateField('country', option.country);
                     }
                   }}
                   options={options}

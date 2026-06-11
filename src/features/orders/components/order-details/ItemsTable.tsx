@@ -215,6 +215,7 @@ export const ItemsTable: React.FC<ItemsTableProps> = React.memo(({
                               allowClear={false}
                               className="h-8 text-sm font-medium"
                               placeholder="Select Type"
+                              searchdisable
                             />
                           </div>
 

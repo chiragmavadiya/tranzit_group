@@ -202,7 +202,8 @@ export const FormSelect = memo(({
   name,
   disabled,
   selectClassName,
-  allowClear = true
+  allowClear = true,
+  searchdisable = false
 }: FormSelectProps) => {
   const isHorizontal = useMemo(() => layout === 'horizontal', [layout]);
   const memoizedData = useMemo(() => [...options], [options]);
@@ -236,6 +237,7 @@ export const FormSelect = memo(({
           name={name}
           disabled={disabled}
           allowClear={allowClear}
+          searchdisable={searchdisable}
         />
         {/* <SelectSearch options={memoizedData} /> */}
         {error ? <div className="text-red-500 text-[11px] w-full">{errormsg}</div> : null}

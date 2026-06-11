@@ -32,7 +32,7 @@ const initialAddressData = {
   state: '',
   unit_number: '',
   postcode: '',
-  country: 'Australia',
+  country: 'AU',
   saveToAddressBook: false,
 }
 
@@ -63,6 +63,13 @@ export const useOrderWorkflow = () => {
   const [courierData, setCourierData] = useState<any>(null);
   // const [isSaveAsDraft, setIsSaveAsDraft] = useState(false);
   const isSaveAsDraft = useRef(false);
+  const [saveAction, setSaveAction] = useState<'draft' | 'consignment' | null>(null);
+
+  useEffect(() => {
+    if (!saveLoading && !walletLoading) {
+      setSaveAction(null);
+    }
+  }, [saveLoading, walletLoading]);
 
   const [addressData, setAddressData] = useState<{ sender: AddressData; receiver: AddressData }>(() => ({
     sender: initialAddressData,
@@ -192,7 +199,7 @@ export const useOrderWorkflow = () => {
           unit_number: senderDetail?.address_detail?.unit_number || '',
           state: senderDetail?.address_detail?.state || '',
           postcode: senderDetail?.address_detail?.postcode || '',
-          country: 'Australia',
+          country: 'AU',
           saveToAddressBook: false,
         },
         receiver: {
@@ -209,7 +216,7 @@ export const useOrderWorkflow = () => {
           unit_number: receiverDetail?.address_detail?.unit_number || '',
           state: receiverDetail?.address_detail?.state || '',
           postcode: receiverDetail?.address_detail?.postcode || '',
-          country: 'Australia',
+          country: 'AU',
           saveToAddressBook: false,
         },
       });
@@ -330,6 +337,9 @@ export const useOrderWorkflow = () => {
       setShowItemCountModal(true);
       return;
     }
+
+    const action = skipWalletCheckArg === 'saveAsDraft' ? 'draft' : 'consignment';
+    setSaveAction(action);
 
     const getCapture = () => {
       if (role === 'admin') return true;
@@ -635,12 +645,17 @@ export const useOrderWorkflow = () => {
 
   const hasDefaultItemAndCourier = useMemo(() => Boolean(default_courier) && Boolean(default_item), [default_courier, default_item]);
 
+  const isSavingDraft = saveLoading && saveAction === 'draft';
+  const isCreatingConsignment = (saveLoading && saveAction === 'consignment') || walletLoading;
+
   return {
     orderType,
     orderID,
     role,
     user,
     saveLoading,
+    isSavingDraft,
+    isCreatingConsignment,
     walletLoading,
     isOrderLoading,
     isDownloadingLabel,

@@ -5,6 +5,7 @@ import type { Item, ItemFormData } from './types';
 import { DataTable } from '@/components/common/DataTable';
 import type { Column } from '@/components/common/types/DataTable.types';
 import { Button } from '@/components/ui/button';
+import { Switch } from '@/components/ui/switch';
 import { Pencil, Star, Trash, Loader2 } from 'lucide-react';
 import { ConformationModal } from '@/components/common/ConformationModal';
 
@@ -15,9 +16,8 @@ import {
   useDeleteItem,
   useExportItems,
   useSetDefaultItem,
+  useToggleItemStatus,
 } from './hooks/useItems';
-import { Badge } from '@/components/ui/badge';
-import { cn } from '@/lib/utils';
 
 import { useDebounce } from '@/hooks/useDebounce';
 import { CustomTooltip } from '@/components/common/CustomTooltip';
@@ -44,6 +44,7 @@ export default function MyItemsPage() {
   const deleteItemMutation = useDeleteItem();
   const exportItemsMutation = useExportItems();
   const setDefaultItemMutation = useSetDefaultItem();
+  const toggleItemStatusMutation = useToggleItemStatus();
 
   const handleSearch = useCallback((search: string) => {
     setSearch(search);
@@ -176,14 +177,26 @@ export default function MyItemsPage() {
       key: "status",
       accessor: "status",
       header: "Status",
-      cell: (val) => (
-        <Badge variant="secondary" className={cn(
-          "px-2 py-0 h-5 text-[10px] font-bold border-none",
-          val === 'Active' ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-600'
-        )}>
-          {val as string}
-        </Badge>
-      )
+      cell: (val, row) => {
+        const isPending = toggleItemStatusMutation.isPending && toggleItemStatusMutation.variables === row.id;
+        const isActive = val === 'Active';
+
+        const handleToggle = () => {
+          toggleItemStatusMutation.mutate(row.id);
+        };
+
+        return (
+          <div className="flex items-center gap-2">
+            <Switch
+              checked={isActive}
+              disabled={isPending || row.is_default}
+              onCheckedChange={handleToggle}
+              className="data-[state=checked]:bg-slate-950"
+            />
+            {isPending && <Loader2 className="w-3 h-3 animate-spin text-slate-400" />}
+          </div>
+        );
+      }
     },
     {
       key: "actions",
@@ -205,7 +218,7 @@ export default function MyItemsPage() {
         </div>
       )
     }
-  ], [handleEditItem, handleDeleteClick, setDefaultItemMutation]);
+  ], [setDefaultItemMutation, toggleItemStatusMutation, handleEditItem, handleDeleteClick]);
 
   return (
     <div className="flex flex-col flex-1 gap-2 p-page-padding min-h-0 animate-in fade-in slide-in-from-bottom-2 duration-500">

@@ -213,6 +213,7 @@ export default function ParcelReportPage() {
                   date={endDate}
                   setDate={setEndDate}
                   placeholder="End Date"
+                  className='w-full'
                 />
               </div>
 

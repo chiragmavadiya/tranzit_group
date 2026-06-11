@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 // import { Calendar as CalendarIcon } from 'lucide-react';
 // import { format } from 'date-fns';
-import { Button } from '@/components/ui/button';
+// import { Button } from '@/components/ui/button';
 // import { Calendar } from '@/components/ui/calendar';
 // import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 // import { cn } from '@/lib/utils';
@@ -97,7 +97,7 @@ export function ReportsHeader({ startDate, endDate, activeTab }: ReportsHeaderPr
           Apply
         </Button> */}
 
-        <Button
+        {/* <Button
           onClick={() => setIsGenerateOpen(true)}
           // variant="outline"
           size="sm"
@@ -112,7 +112,7 @@ export function ReportsHeader({ startDate, endDate, activeTab }: ReportsHeaderPr
           className="h-8 p-3"
         >
           Schedule Report
-        </Button>
+        </Button> */}
 
         <CustomModel
           open={isGenerateOpen}

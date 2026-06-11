@@ -108,7 +108,10 @@ export const CarrierCard: React.FC<CarrierCardProps> = memo((props) => {
     const isValidItems = itemData && itemData.length > 0 && itemData.every(item =>
       Number(item.height) > 0 && Number(item.width) > 0 && Number(item.length) > 0 && Number(item.weight) > 0 && Number(item.quantity) > 0
     );
-    if (!isValidItems) return;
+    if (!isValidItems) {
+      showToast("Please add valid items with dimensions", "error");
+      return;
+    };
 
     // Check if we have both addresses
     const sender = addresses?.sender;
@@ -116,7 +119,11 @@ export const CarrierCard: React.FC<CarrierCardProps> = memo((props) => {
 
     const sender_addr1 = getAddress(sender!);
     const receiver_addr1 = getAddress(receiver!);
-    if (sender_addr1 === '' || receiver_addr1 === '') return;
+    console.log(sender, 'sender....')
+    if (sender_addr1 === '' || receiver_addr1 === '' || sender?.suburb === '' || receiver?.suburb === '') {
+      showToast("Please add valid addresses", "error");
+      return;
+    };
 
     const receiver_details = module === 'quote' ? receiver_addr1 : ` ${receiver?.suburb} ${receiver?.state} ${receiver?.postcode}, AU`.trim();
 
@@ -155,7 +162,7 @@ export const CarrierCard: React.FC<CarrierCardProps> = memo((props) => {
     const sender_addr1 = getAddress(sender!);
     const receiver_addr1 = getAddress(receiver!);
     console.log(sender_addr1, receiver_addr1, 'sender_addr1, receiver_addr1....')
-    if (sender_addr1 === '' || receiver_addr1 === '') return;
+    if (sender_addr1 === '' || receiver_addr1 === '' || sender?.suburb === '' || receiver?.suburb === '') return;
 
     const timer = setTimeout(() => {
       const receiver_details = module === 'quote' ? receiver_addr1 : ` ${receiver?.suburb} ${receiver?.state} ${receiver?.postcode}, AU`.trim();

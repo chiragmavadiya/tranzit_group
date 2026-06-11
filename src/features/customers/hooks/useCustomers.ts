@@ -93,7 +93,6 @@ export const useUpdateCustomer = () => {
     return useMutation({
         mutationFn: ({ id, data }: { id: number | string; data: CustomerFormData }) => customerService.update(id, data),
         onSuccess: (_, variables) => {
-            console.log(variables, 'variables')
             queryClient.invalidateQueries({ queryKey: QUERY_KEYS.ADMIN_CUSTOMERS.LIST });
             queryClient.invalidateQueries({ queryKey: QUERY_KEYS.ADMIN_CUSTOMERS.COUNTS });
             queryClient.invalidateQueries({ queryKey: ["admin", "customers", "edit", variables.id] });

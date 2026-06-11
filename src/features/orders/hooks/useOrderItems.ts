@@ -7,7 +7,19 @@ export const useOrderItems = (initialItems: ItemData[] = []) => {
   const updateItem = useCallback((index: number, field: string, value: string | number) => {
     setItemsData((prev) => {
       const newData = [...prev];
-      newData[index] = { ...newData[index], [field]: value };
+      if (field === "type") {
+        newData[index] = {
+          ...newData[index],
+          type: value as string,
+          quantity: 1,
+          weight: 0,
+          length: 0,
+          width: 0,
+          height: 0
+        };
+      } else {
+        newData[index] = { ...newData[index], [field]: value };
+      }
       return newData;
     });
   }, []);

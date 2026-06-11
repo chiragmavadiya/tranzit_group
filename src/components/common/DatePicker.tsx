@@ -22,7 +22,7 @@ const DatePicker = memo(({ date, setDate, label, className, placeholder = 'DD/MM
       {/* {label && <label className="text-[13px] font-semibold text-gray-700 dark:text-zinc-400 ml-0.5">{label}</label>} */}
       {label && <CustomLabel label={label} />}
       <Popover open={open} onOpenChange={setOpen}>
-        <PopoverTrigger className="w-fit">
+        <PopoverTrigger className="w-full">
           <Button
             variant="outline"
             className={cn(

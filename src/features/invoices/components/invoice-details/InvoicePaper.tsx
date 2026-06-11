@@ -325,7 +325,7 @@ export const InvoicePaper: React.FC<InvoicePaperProps> = ({
                 allowClear={false}
               />
             ) : (
-              <div className="flex items-center w-full h-8 border border-slate-200 dark:border-zinc-800 text-slate-700 dark:text-zinc-300 px-3 rounded-md font-bold text-sm">
+              <div className="flex items-center capitalize w-full h-8 border border-slate-200 dark:border-zinc-800 text-slate-700 dark:text-zinc-300 px-3 rounded-md font-bold text-sm">
                 {invoice?.status || 'Draft'}
               </div>
             )}
@@ -358,14 +358,14 @@ export const InvoicePaper: React.FC<InvoicePaperProps> = ({
             <Table className="min-w-[1000px]">
               <TableHeader className="bg-transparent">
                 <TableRow className="hover:bg-transparent border-y border-slate-200 dark:border-zinc-800 bg-transparent">
-                  <TableHead className="text-sm font-medium uppercase text-slate-600 dark:text-zinc-400 py-3">Type</TableHead>
-                  <TableHead className="text-sm font-medium uppercase text-slate-600 dark:text-zinc-400 py-3">Date</TableHead>
-                  <TableHead className="w-[11%] text-sm font-medium uppercase text-slate-600 dark:text-zinc-400 py-3">Order Number / Description</TableHead>
-                  <TableHead className="w-[11%] text-sm font-medium uppercase text-slate-600 dark:text-zinc-400 py-3">From</TableHead>
-                  <TableHead className="w-[11%] text-sm font-medium uppercase text-slate-600 dark:text-zinc-400 py-3">Destination</TableHead>
-                  <TableHead className="w-[11%] text-sm font-medium uppercase text-slate-600 dark:text-zinc-400 py-3">To</TableHead>
-                  <TableHead className="w-[11%] text-sm font-medium uppercase text-slate-600 dark:text-zinc-400 py-3">Receiver</TableHead>
-                  <TableHead className="w-[11%] text-sm font-medium uppercase text-slate-600 dark:text-zinc-400 py-3">
+                  <TableHead className="w-[130px] text-sm font-medium uppercase text-slate-600 dark:text-zinc-400 py-3">Type</TableHead>
+                  <TableHead className="w-[135px] text-sm font-medium uppercase text-slate-600 dark:text-zinc-400 py-3">Date</TableHead>
+                  <TableHead className=" text-sm font-medium uppercase text-slate-600 dark:text-zinc-400 py-3">Order Number / Description</TableHead>
+                  <TableHead className=" text-sm font-medium uppercase text-slate-600 dark:text-zinc-400 py-3">From</TableHead>
+                  <TableHead className=" text-sm font-medium uppercase text-slate-600 dark:text-zinc-400 py-3">Destination</TableHead>
+                  <TableHead className=" text-sm font-medium uppercase text-slate-600 dark:text-zinc-400 py-3">To</TableHead>
+                  <TableHead className=" text-sm font-medium uppercase text-slate-600 dark:text-zinc-400 py-3">Receiver</TableHead>
+                  <TableHead className=" text-sm font-medium uppercase text-slate-600 dark:text-zinc-400 py-3">
                     {isAdmin ? 'Total Charge / Credit' : 'Amount'}
                   </TableHead>
                   {isAdmin && <TableHead className="py-3 text-center"></TableHead>}
@@ -405,6 +405,7 @@ export const InvoicePaper: React.FC<InvoicePaperProps> = ({
                               className="w-30 space-y-1 col-span-1"
                               selectClassName="h-8 text-sm bg-white border border-slate-200 focus:ring-1 focus:ring-primary rounded-md px-2"
                               allowClear={false}
+                              searchdisable
                             />
                           </div>
                         ) : (

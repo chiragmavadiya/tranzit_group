@@ -295,6 +295,7 @@ export const SelectSearch = ({
   disabled,
   allowClear = false,
   name,
+  searchdisable,
 }: {
   options: options[]
   value?: string | number | null
@@ -305,6 +306,7 @@ export const SelectSearch = ({
   disabled?: boolean
   allowClear?: boolean
   name?: string
+  searchdisable?: boolean
 }) => {
   const inputRef = React.useRef<HTMLInputElement>(null)
 
@@ -327,6 +329,8 @@ export const SelectSearch = ({
     itemToStringLabel: (opt: options) => opt.label,
     itemToStringValue: (opt: options) => String(opt.value),
     onValueChange: (opt: options | null) => {
+      if (opt === null) return;
+      console.log("opt", opt)
       if (value === undefined) {
         setInternalValue(opt)
       }
@@ -354,9 +358,11 @@ export const SelectSearch = ({
         placeholder={placeholder}
         className={cn(
           "w-full cursor-pointer text-xs h-10 rounded-sm border-gray-200 dark:border-zinc-800 dark:bg-zinc-900 transition-colors placeholder:text-slate-300 dark:placeholder:text-zinc-700 ring-0! px-0.5!",
+          searchdisable && "caret-transparent select-none",
           className
         )}
         disabled={disabled}
+        readOnly={searchdisable}
         showClear={allowClear && hasValue}
         onClear={() => {
           onValueChange?.(null)

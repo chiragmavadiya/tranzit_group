@@ -76,7 +76,7 @@ export default function SignUp() {
     }
 
     if (!data?.terms) {
-      showToast("Please accept the Privacy Policy and Terms to continue", "error")
+      showToast("Please accept the Terms & Conditions and Privacy Policy before creating your account", "error")
       return;
     }
 

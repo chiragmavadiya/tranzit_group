@@ -100,7 +100,7 @@ export default function AddressBookPage() {
   }, [exportMutation, search]);
 
   const createOrder = useCallback((addr: Address) => {
-    sessionStorage.setItem('address', JSON.stringify({ ...addr, country: 'Australia' }));
+    sessionStorage.setItem('address', JSON.stringify({ ...addr, country: 'AU' }));
     navigate('/orders/create');
   }, [navigate]);
 

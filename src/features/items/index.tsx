@@ -16,6 +16,7 @@ import {
   useDeleteItem,
   useExportItems,
   useSetDefaultItem,
+  useToggleItemStatus,
 } from './hooks/useItems';
 
 import { useDebounce } from '@/hooks/useDebounce';
@@ -43,6 +44,7 @@ export default function MyItemsPage() {
   const deleteItemMutation = useDeleteItem();
   const exportItemsMutation = useExportItems();
   const setDefaultItemMutation = useSetDefaultItem();
+  const toggleItemStatusMutation = useToggleItemStatus();
 
   const handleSearch = useCallback((search: string) => {
     setSearch(search);
@@ -176,31 +178,19 @@ export default function MyItemsPage() {
       accessor: "status",
       header: "Status",
       cell: (val, row) => {
-        const isPending = updateItemMutation.isPending && updateItemMutation.variables?.id === row.id;
+        const isPending = toggleItemStatusMutation.isPending && toggleItemStatusMutation.variables === row.id;
         const isActive = val === 'Active';
 
-        // const handleToggle = () => {
-        //   const newStatus = isActive ? 'Inactive' : 'Active';
-        //   const data: any = {
-        //     item_code: row.item_code,
-        //     item_name: row.item_name,
-        //     item_weight: row.item_weight,
-        //     item_length: row.item_length,
-        //     item_width: row.item_width,
-        //     item_height: row.item_height,
-        //     item_cubic: row.item_cubic,
-        //     is_default: row.is_default ? "on" : "off",
-        //     status: newStatus
-        //   };
-        //   updateItemMutation.mutate({ id: row.id, data });
-        // };
+        const handleToggle = () => {
+          toggleItemStatusMutation.mutate(row.id);
+        };
 
         return (
           <div className="flex items-center gap-2">
             <Switch
               checked={isActive}
-              disabled={isPending}
-              // onCheckedChange={handleToggle}
+              disabled={isPending || row.is_default}
+              onCheckedChange={handleToggle}
               className="data-[state=checked]:bg-slate-950"
             />
             {isPending && <Loader2 className="w-3 h-3 animate-spin text-slate-400" />}
@@ -228,7 +218,7 @@ export default function MyItemsPage() {
         </div>
       )
     }
-  ], [setDefaultItemMutation, updateItemMutation.isPending, updateItemMutation.variables?.id, handleEditItem, handleDeleteClick]);
+  ], [setDefaultItemMutation, toggleItemStatusMutation, handleEditItem, handleDeleteClick]);
 
   return (
     <div className="flex flex-col flex-1 gap-2 p-page-padding min-h-0 animate-in fade-in slide-in-from-bottom-2 duration-500">

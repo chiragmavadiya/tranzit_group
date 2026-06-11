@@ -215,7 +215,8 @@ export default function ReportsPage() {
         <div className="flex-1 flex flex-col min-h-0">
           <DataTable
             key={activeTab}
-            // headerTitle={`${activeTab.charAt(0).toUpperCase() + activeTab.slice(1)} reports`}
+            // headerTitle={`${activeTab} Reports`}
+            headerClass='capitalize'
             columns={columns as any}
             data={data as any}
             searchPlaceholder={`Search ${activeTab} reports...`}

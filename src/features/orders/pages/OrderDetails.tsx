@@ -177,6 +177,8 @@ const OrderDetailsPage: React.FC = () => {
     orderID,
     role,
     saveLoading,
+    isSavingDraft,
+    isCreatingConsignment,
     walletLoading,
     isOrderLoading,
     isDownloadingLabel,
@@ -485,6 +487,8 @@ const OrderDetailsPage: React.FC = () => {
             orderType={orderType}
             onSave={handleOnSave}
             saveLoading={saveLoading || walletLoading}
+            isSavingDraft={isSavingDraft}
+            isCreatingConsignment={isCreatingConsignment}
             onConsign={handleConsignClick}
             isConsigning={isConsigning}
           />

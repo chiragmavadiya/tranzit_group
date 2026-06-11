@@ -89,4 +89,12 @@ export const itemsService = {
     const response = await api.get<ItemDetailsResponse>("/customer/items/default");
     return response.data;
   },
+
+  /**
+   * Toggle item status
+   */
+  toggleStatus: async (id: number | string): Promise<GenericResponse> => {
+    const response = await api.patch(`/customer/items/${id}/toggle-status`);
+    return response.data;
+  },
 };

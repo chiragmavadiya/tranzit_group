@@ -147,3 +147,25 @@ export const useDefaultItem = (enabled: boolean = true) => {
     enabled: !!enabled,
   });
 };
+
+/**
+ * Hook to toggle item status
+ */
+export const useToggleItemStatus = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (id: number | string) => itemsService.toggleStatus(id),
+    onSuccess: (response) => {
+      if (response.status) {
+        showToast(response.message || "Item status updated successfully", "success");
+        queryClient.invalidateQueries({ queryKey: QUERY_KEYS.ITEMS.LIST });
+      } else {
+        showToast(response.message || "Failed to update item status", "error");
+      }
+    },
+    onError: (error: any) => {
+      showToast(error.message || "An error occurred", "error");
+    },
+  });
+};

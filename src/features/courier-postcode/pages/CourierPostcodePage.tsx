@@ -14,7 +14,6 @@ import {
   useExportCourierPostcodes
 } from '../hooks/useCourierPostcode';
 import { useDebounce } from '@/hooks/useDebounce';
-import { downloadFile } from '@/lib/utils';
 import { showToast } from '@/components/ui/custom-toast';
 
 export default function CourierPostcodePage() {
@@ -78,15 +77,7 @@ export default function CourierPostcodePage() {
   };
 
   const handleExport = (format: string) => {
-    exportPostcodes({ format, search: debouncedSearch }, {
-      onSuccess: (blob) => {
-        downloadFile(blob, `courier-postcodes-${new Date().getTime()}.${format === 'excel' ? 'xlsx' : format}`);
-        showToast('Exported successfully', "success");
-      },
-      onError: (err: any) => {
-        showToast(err?.response?.data?.message || 'Failed to export', "error");
-      }
-    });
+    exportPostcodes({ format, search: debouncedSearch });
   };
 
   const columns = useMemo(() => POSTCODE_COLUMNS(

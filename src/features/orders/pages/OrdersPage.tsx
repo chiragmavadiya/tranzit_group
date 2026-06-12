@@ -2,6 +2,7 @@
 
 import { useState, useMemo, useCallback, useEffect, lazy, Suspense } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
+import { format } from 'date-fns';
 import type { Order, TabType } from '@/features/orders/types';
 import { useOrders, useExportOrders, useImportOrders, useDownloadLabel, useCancelOrder, useArchiveOrder, usePrintOrder, useWalletCheck } from '@/features/orders/hooks/useOrders';
 import WalletCheckDialog from '@/features/orders/components/WalletCheckDialog';
@@ -38,10 +39,36 @@ export default function OrdersPage({ fromCustomer, customerId }: { fromCustomer?
   // State for pagination and search
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(25);
-  const [search, setSearch] = useState('');
+
+  const [search, setSearch] = useState(() => searchParams.get('search') || '');
   const debouncedSearch = useDebounce(search, 400);
-  const [dateRange, setDateRange] = useState<[Date | undefined, Date | undefined]>([undefined, undefined]);
-  const [appliedDateRange, setAppliedDateRange] = useState<[Date | undefined, Date | undefined]>([undefined, undefined]);
+
+  const parseLocalDate = useCallback((dateStr?: string | null) => {
+    if (!dateStr) return undefined;
+    const parts = dateStr.split('-');
+    if (parts.length === 3) {
+      const day = parseInt(parts[0], 10);
+      const month = parseInt(parts[1], 10) - 1; // 0-based
+      const year = parseInt(parts[2], 10);
+      return new Date(year, month, day);
+    }
+    return undefined;
+  }, []);
+
+  const formatDate = useCallback((date?: Date) => {
+    return date ? format(date, 'dd-MM-yyyy') : undefined;
+  }, []);
+
+  const initialStartDate = useMemo(() => {
+    return parseLocalDate(searchParams.get('start_date'));
+  }, [searchParams, parseLocalDate]);
+
+  const initialEndDate = useMemo(() => {
+    return parseLocalDate(searchParams.get('end_date'));
+  }, [searchParams, parseLocalDate]);
+
+  const [dateRange, setDateRange] = useState<[Date | undefined, Date | undefined]>(() => [initialStartDate, initialEndDate]);
+  const [appliedDateRange, setAppliedDateRange] = useState<[Date | undefined, Date | undefined]>(() => [initialStartDate, initialEndDate]);
   const [selectedRows, setSelectedRows] = useState<string[]>([]);
   const [isDownloadingLabels, setIsDownloadingLabels] = useState(false);
   const [isCancellingOrders, setIsCancellingOrders] = useState(false);
@@ -49,6 +76,7 @@ export default function OrdersPage({ fromCustomer, customerId }: { fromCustomer?
   const [orderToCancel, setOrderToCancel] = useState<string | null>(null);
   const [orderToArchive, setOrderToArchive] = useState<string | null>(null);
   const [addressEditModal, setAddressEditModal] = useState<string>();
+
   const selectedCustomer = searchParams.get('customerId') || undefined;
   const setSelectedCustomer = useCallback((val: string | undefined) => {
     setSearchParams((prev) => {
@@ -60,6 +88,37 @@ export default function OrdersPage({ fromCustomer, customerId }: { fromCustomer?
       return prev;
     });
   }, [setSearchParams]);
+
+  // Synchronize search and date range filters with URL searchParams
+  useEffect(() => {
+    setSearchParams((prev) => {
+      let hasChanged = false;
+
+      const currentStartDate = prev.get('start_date') || undefined;
+      const newStartDate = formatDate(appliedDateRange[0]);
+      if (currentStartDate !== newStartDate) {
+        if (newStartDate) {
+          prev.set('start_date', newStartDate);
+        } else {
+          prev.delete('start_date');
+        }
+        hasChanged = true;
+      }
+
+      const currentEndDate = prev.get('end_date') || undefined;
+      const newEndDate = formatDate(appliedDateRange[1]);
+      if (currentEndDate !== newEndDate) {
+        if (newEndDate) {
+          prev.set('end_date', newEndDate);
+        } else {
+          prev.delete('end_date');
+        }
+        hasChanged = true;
+      }
+
+      return hasChanged ? prev : prev;
+    }, { replace: true });
+  }, [debouncedSearch, appliedDateRange, setSearchParams, formatDate]);
 
   const downloadLabelMutation = useDownloadLabel();
   const cancelOrderMutation = useCancelOrder();
@@ -122,10 +181,10 @@ export default function OrdersPage({ fromCustomer, customerId }: { fromCustomer?
     per_page: pageSize,
     page: page,
     search: debouncedSearch || undefined,
-    start_date: appliedDateRange[0],
-    end_date: appliedDateRange[1],
+    start_date: formatDate(appliedDateRange[0]),
+    end_date: formatDate(appliedDateRange[1]),
     customer: selectedCustomer || customerId || undefined,
-  }), [activeTab, pageSize, page, debouncedSearch, appliedDateRange, selectedCustomer, customerId]);
+  }), [activeTab, pageSize, page, debouncedSearch, appliedDateRange, selectedCustomer, customerId, formatDate]);
 
   // Fetch orders data
   const { data: ordersData, isLoading } = useOrders(filters);

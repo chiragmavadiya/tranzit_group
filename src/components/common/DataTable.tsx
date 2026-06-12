@@ -185,7 +185,7 @@ const DataTableComponent = <T extends Record<string, any>>(props: DataTableProps
             </h1>
             {headerDescription && (
               <p className="text-sm text-gray-500 dark:text-zinc-400 mb-0">
-                {headerDescription}
+                {typeof headerDescription === 'function' ? headerDescription() : headerDescription}
               </p>
             )}
           </div>

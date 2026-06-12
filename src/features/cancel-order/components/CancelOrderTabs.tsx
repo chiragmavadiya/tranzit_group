@@ -1,6 +1,7 @@
 import { cn } from '@/lib/utils';
 import { CANCEL_ORDER_TABS, type CancelOrderTabType } from '../constants/cancelOrder.constants';
 import { useCancelOrderCounts } from '../hooks/useCancelOrder';
+import { useSearchParams } from 'react-router-dom';
 
 interface CancelOrderTabsProps {
     activeTab: CancelOrderTabType;
@@ -9,7 +10,10 @@ interface CancelOrderTabsProps {
 }
 
 export function CancelOrderTabs({ activeTab, onTabChange, className }: CancelOrderTabsProps) {
-    const { data: countsData } = useCancelOrderCounts();
+
+    const [searchParams] = useSearchParams();
+    const customer = searchParams.get('customer');
+    const { data: countsData } = useCancelOrderCounts({ customer });
 
     return (
         <nav className={cn("flex space-x-6 h-full items-end", className)} aria-label="Cancel Order Tabs">

@@ -12,6 +12,7 @@ import { Button } from '@/components/ui/button';
 import { useAdminTopups } from '../hooks/useWallet';
 import { useDebounce } from '@/hooks/useDebounce';
 import { useCustomers } from '@/features/customers/hooks/useCustomers';
+import { formateCurrency } from '@/lib/utils';
 
 export default function AdminTopUpPage() {
   const [search, setSearch] = useState('');
@@ -42,7 +43,7 @@ export default function AdminTopUpPage() {
   const stats = useMemo(() => [
     {
       label: 'Credits',
-      value: '$4,569.86',
+      value: formateCurrency(topupResponse?.summary?.total_credit || 0),
       icon: ArrowDownLeft,
       iconColor: 'text-emerald-500',
       iconBg: 'bg-emerald-50 dark:bg-emerald-500/10',
@@ -50,7 +51,7 @@ export default function AdminTopUpPage() {
     },
     {
       label: 'Debits',
-      value: '$2,468.16',
+      value: formateCurrency(topupResponse?.summary?.total_debit || 0),
       icon: ArrowUpRight,
       iconColor: 'text-rose-500',
       iconBg: 'bg-rose-50 dark:bg-rose-500/10',
@@ -58,12 +59,12 @@ export default function AdminTopUpPage() {
     },
     {
       label: 'Balance',
-      value: '$2,101.70',
+      value: formateCurrency(topupResponse?.summary?.balance || 0),
       icon: Wallet,
       iconColor: 'text-primary',
       iconBg: 'bg-primary/5 dark:bg-primary/10',
     },
-  ], []);
+  ], [topupResponse?.summary]);
 
   return (
     <div className="flex flex-col flex-1 gap-4 p-page-padding min-h-0 overflow-y-auto animate-in fade-in slide-in-from-bottom-2 duration-500 bg-slate-50/30 dark:bg-zinc-950/30">
@@ -144,6 +145,7 @@ export default function AdminTopUpPage() {
           loading={isLoading}
           className="text-xs pb-3"
           rowKey="id"
+          exportable={false}
         />
       </div>
     </div>

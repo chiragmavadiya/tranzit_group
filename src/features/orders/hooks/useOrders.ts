@@ -1,4 +1,4 @@
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient, keepPreviousData } from "@tanstack/react-query";
 import { ordersService } from "@/features/orders/services/orders.api";
 import { QUERY_KEYS } from "@/constants/api.constants";
 import { showToast } from "@/components/ui/custom-toast";
@@ -8,8 +8,8 @@ import { showToast } from "@/components/ui/custom-toast";
  */
 export const useOrders = (params?: {
   status?: string;
-  start_date?: Date | undefined;
-  end_date?: Date | undefined;
+  start_date?: Date | string | undefined;
+  end_date?: Date | string | undefined;
   per_page?: number;
   page?: number;
   search?: string;
@@ -54,7 +54,7 @@ export const useCreateOrder = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.ORDERS.LIST });
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.WALLET.SUMMARY });
-      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.ORDERS.COUNTS() });
+      queryClient.invalidateQueries({ queryKey: ["orders", "counts"] });
     },
   });
 };
@@ -98,7 +98,7 @@ export const useCreateOwnCourierOrder = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.ORDERS.LIST });
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.WALLET.SUMMARY });
-      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.ORDERS.COUNTS() });
+      queryClient.invalidateQueries({ queryKey: ["orders", "counts"] });
     },
   });
 };
@@ -133,7 +133,7 @@ export const useConsignOrder = (isAdmin: boolean = false) => {
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.ORDERS.LIST });
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.ORDERS.DETAILS(orderId) });
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.WALLET.SUMMARY });
-      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.ORDERS.COUNTS() });
+      queryClient.invalidateQueries({ queryKey: ["orders", "counts"] });
     },
   });
 };
@@ -234,11 +234,20 @@ export const useDownloadLabel = (printAfterDownload: boolean = false) => {
 /**
  * Hook to fetch order status counts
  */
-export const useOrderCounts = (customerId?: string | number, enabled: boolean = true) => {
+export const useOrderCounts = (
+  params?: {
+    customer?: string | number;
+    search?: string;
+    start_date?: Date | string | undefined;
+    end_date?: Date | string | undefined;
+  },
+  enabled: boolean = true
+) => {
   return useQuery({
-    queryKey: QUERY_KEYS.ORDERS.COUNTS(customerId),
-    queryFn: () => ordersService.getOrderCounts(customerId),
-    enabled
+    queryKey: [...QUERY_KEYS.ORDERS.COUNTS(params?.customer), params],
+    queryFn: () => ordersService.getOrderCounts(params),
+    enabled,
+    placeholderData: keepPreviousData,
   });
 };
 
@@ -302,7 +311,7 @@ export const useArchiveOrder = () => {
     mutationFn: ordersService.archiveOrder,
     onSuccess: () => {
       showToast('Order archived successfully', 'success');
-      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.ORDERS.COUNTS() });
+      queryClient.invalidateQueries({ queryKey: ["orders", "counts"] });
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.ORDERS.LIST });
     },
     onError: (error: any) => {
@@ -316,7 +325,7 @@ export const usePrintOrder = () => {
   return useMutation({
     mutationFn: ordersService.printOrder,
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.ORDERS.COUNTS() });
+      queryClient.invalidateQueries({ queryKey: ["orders", "counts"] });
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.ORDERS.LIST });
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.WALLET.SUMMARY });
       showToast('Order printed successfully', 'success');

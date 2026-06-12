@@ -5,6 +5,7 @@ import type {
     CourierPostcodeFormData,
     CourierPostcodeFilters
 } from "../types";
+import { getFileName } from "@/lib/utils";
 
 export interface CourierPostcodeListResponse {
     status: boolean;
@@ -45,11 +46,14 @@ export const courierPostcodeService = {
         const response = await api.delete(API_ENDPOINTS.ADMIN_COURIER_POSTCODES.DETAILS(id));
         return response.data;
     },
-    export: async (params: { format: string; search?: string }): Promise<Blob> => {
+    export: async (params: { format: string; search?: string }): Promise<{ blob: Blob; filename: string }> => {
         const response = await api.get(API_ENDPOINTS.ADMIN_COURIER_POSTCODES.EXPORT, {
             params,
             responseType: 'blob',
         });
-        return response.data;
+        const format = params.format === "pdf" ? "pdf" : params.format === "csv" ? "csv" : "xls";
+        const filename = getFileName(response) || `courier-postcodes_${new Date().getTime()}.${format}`;
+
+        return { blob: response.data, filename };
     }
 };

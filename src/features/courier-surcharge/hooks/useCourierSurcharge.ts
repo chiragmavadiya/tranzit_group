@@ -3,6 +3,7 @@ import { courierSurchargeService } from "../services/courier-surcharge.service";
 import { QUERY_KEYS } from "@/constants/api.constants";
 import type { CourierSurchargeFilters, CourierSurchargeFormData } from "../types";
 import { showToast } from "@/components/ui/custom-toast";
+import { downloadFile } from "@/lib/utils";
 
 export function useCourierSurcharges(filters: CourierSurchargeFilters) {
     return useQuery({
@@ -82,15 +83,8 @@ export function useExportCourierSurcharge() {
     return useMutation({
         mutationFn: (params: { format: string; search?: string }) =>
             courierSurchargeService.export(params),
-        onSuccess: (blob, params) => {
-            const url = window.URL.createObjectURL(blob);
-            const link = document.createElement("a");
-            link.href = url;
-            link.setAttribute("download", `Courier_Surcharges_${new Date().getTime()}.${params.format}`);
-            document.body.appendChild(link);
-            link.click();
-            link.remove();
-            window.URL.revokeObjectURL(url);
+        onSuccess: ({ blob, filename }) => {
+            downloadFile(blob, filename)
         },
         onError: (error: any) => {
             showToast(error.message || "Failed to export courier surcharges", "error");

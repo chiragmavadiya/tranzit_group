@@ -1,15 +1,16 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { DataTable } from '@/components/common/DataTable';
 import { getCancelOrderColumns } from '../columns';
-import { useCancelOrders } from '../hooks/useCancelOrder';
+import { useCancelOrders, useExportCancelOrders } from '../hooks/useCancelOrder';
 import { useDebounce } from '@/hooks/useDebounce';
 import { FormSelect } from '@/features/orders/components/OrderFormUI';
 import { useCustomers } from '@/features/customers/hooks/useCustomers';
 import { useRole } from '@/lib/utils';
+import { useQueryClient } from '@tanstack/react-query';
 
 export default function CancelOrderPage() {
-    const [searchParams] = useSearchParams();
+    const [searchParams, setSearchParams] = useSearchParams();
     const activeTab = searchParams.get('tab') || 'request';
     const role = useRole();
     const [search, setSearch] = useState('');
@@ -28,6 +29,17 @@ export default function CancelOrderPage() {
     });
     const { data: customersData } = useCustomers({ per_page: 1000 });
 
+    const { mutate: exportCancelOrders, isPending: isExporting } = useExportCancelOrders();
+
+    const handleExport = (format: string) => {
+        exportCancelOrders({
+            format,
+            status: activeTab === 'request' ? 'pending' : 'processed',
+            search: debouncedSearch,
+            customer: customer || undefined
+        });
+    };
+
     const orders = useMemo(() => cancelOrderData?.data || [], [cancelOrderData]);
     const totalItems = useMemo(() => cancelOrderData?.meta?.total || 0, [cancelOrderData]);
 
@@ -40,6 +52,15 @@ export default function CancelOrderPage() {
         }
         return allColumns;
     }, [role, activeTab]);
+    const queryClient = useQueryClient();
+    useEffect(() => {
+        setSearchParams(prev => {
+            prev.set('customer', customer);
+            return prev;
+        });
+        // queryClient.invalidateQueries({ queryKey: QUERY_KEYS.ADMIN_CANCEL_ORDERS.COUNTS });
+    }, [customer, queryClient, setSearchParams])
+
 
     return (
         <div className="flex flex-col flex-1 gap-6 p-page-padding min-h-0 animate-in fade-in slide-in-from-bottom-4 duration-700 bg-slate-50/30 dark:bg-zinc-950/30">
@@ -62,6 +83,8 @@ export default function CancelOrderPage() {
                     onSearchChange={(val) => { setSearch(val); setPage(1); }}
                     searchValue={search}
                     headerPosition="left"
+                    onExport={handleExport}
+                    isExporting={isExporting}
                     customHeader={
                         // <SelectComponent
                         //     placeholder="Select Customer"
@@ -82,7 +105,7 @@ export default function CancelOrderPage() {
                                 value: c.id.toString(),
                                 label: `${c.first_name} ${c.last_name} (${c.email})`
                             })) || []}
-                            className='w-40'
+                            className='w-60'
                         />
                     }
                 />

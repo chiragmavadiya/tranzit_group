@@ -3,6 +3,7 @@ import { itemsService } from "../services/items.service";
 import { QUERY_KEYS } from "@/constants/api.constants";
 import type { ItemsFilters, ItemFormData } from "../types";
 import { showToast } from "@/components/ui/custom-toast";
+import { downloadFile } from "@/lib/utils";
 
 /**
  * Hook to fetch items list
@@ -101,13 +102,7 @@ export const useExportItems = () => {
     mutationFn: ({ format, search }: { format: string; search?: string }) =>
       itemsService.export(format, search),
     onSuccess: ({ blob, filename }) => {
-      const url = window.URL.createObjectURL(blob);
-      const link = document.createElement('a');
-      link.href = url;
-      link.setAttribute('download', filename);
-      document.body.appendChild(link);
-      link.click();
-      link.remove();
+      downloadFile(blob, filename)
     },
     onError: (error: any) => {
       showToast(error.message || "Failed to export items", "error");

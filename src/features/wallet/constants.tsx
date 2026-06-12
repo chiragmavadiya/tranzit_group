@@ -66,7 +66,7 @@ export const ADMIN_TOPUP_COLUMNS: Column<any>[] = [
     header: 'NAME',
     sortable: true,
     searchable: true,
-    cell: (val) => <span className="font-medium text-slate-900 dark:text-zinc-100">{val}</span>
+    cell: (val) => <span className="font-medium text-slate-900 dark:text-zinc-100">{val || '-'}</span>
   },
   {
     key: 'type',

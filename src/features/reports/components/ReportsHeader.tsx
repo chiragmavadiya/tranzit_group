@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 // import { Calendar as CalendarIcon } from 'lucide-react';
 // import { format } from 'date-fns';
-// import { Button } from '@/components/ui/button';
+import { Button } from '@/components/ui/button';
 // import { Calendar } from '@/components/ui/calendar';
 // import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 // import { cn } from '@/lib/utils';
@@ -14,19 +14,21 @@ import { FormSelect, FormInput } from '@/features/orders/components/OrderFormUI'
 // import { addDays } from 'date-fns';
 
 interface ReportsHeaderProps {
-  // onApply: (startDate: Date | undefined, endDate: Date | undefined) => void;
+  onApply: (startDate: Date | undefined, endDate: Date | undefined) => void;
   startDate: Date | undefined;
   endDate: Date | undefined;
-  // setStartDate: (date: Date | undefined) => void;
-  // setEndDate: (date: Date | undefined) => void;
+  setStartDate: (date: Date | undefined) => void;
+  setEndDate: (date: Date | undefined) => void;
   activeTab: ReportType;
+  handleClearFilters: () => void;
 }
 
-export function ReportsHeader({ startDate, endDate, activeTab }: ReportsHeaderProps) {
+export function ReportsHeader({ startDate, endDate, setStartDate, setEndDate, activeTab, onApply, handleClearFilters }: ReportsHeaderProps) {
   const [isGenerateOpen, setIsGenerateOpen] = useState(false);
   const [reportType, setReportType] = useState<ReportType>(activeTab);
   const [dialogStartDate, setDialogStartDate] = useState<Date | undefined>(startDate);
   const [dialogEndDate, setDialogEndDate] = useState<Date | undefined>(endDate);
+
 
   const [isScheduleOpen, setIsScheduleOpen] = useState(false);
   const [scheduleReportType, setScheduleReportType] = useState<ReportType>(activeTab);
@@ -57,19 +59,29 @@ export function ReportsHeader({ startDate, endDate, activeTab }: ReportsHeaderPr
     setIsScheduleOpen(false);
   };
 
+  const handleApplyFilters = () => {
+    onApply(startDate, endDate);
+  };
+
+  const handleClear = () => {
+    setStartDate(undefined);
+    setEndDate(undefined);
+    handleClearFilters();
+  };
+
   return (
     <div className="flex justify-between gap-6 p-4 pb-0 dark:border-zinc-800 bg-gray-50/50 dark:bg-zinc-950 rounded-t-lg">
-      <div className="flex flex-col items-start">
+      {/* <div className="flex flex-col items-start">
         <h1 className="my-0 text-xl font-bold text-gray-900 dark:text-white capitalize">{activeTab} Reports</h1>
         {startDate && endDate && (
           <div className="my-0 text-[13px] text-gray-500 dark:text-zinc-400">
             Reports generated from <span className="font-semibold text-gray-900 dark:text-zinc-200">{startDate.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}</span> to <span className="font-semibold text-gray-900 dark:text-zinc-200">{endDate.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}</span>
           </div>
         )}
-      </div>
+      </div> */}
 
-      <div className="flex flex-wrap items-end gap-4">
-        {/* <div className="flex flex-col">
+      <div className="flex flex-1 items-end gap-4 justify-end">
+        <div className="flex flex-col">
           <DatePicker
             label="Start Date"
             date={startDate}
@@ -88,13 +100,24 @@ export function ReportsHeader({ startDate, endDate, activeTab }: ReportsHeaderPr
         </div>
 
         <Button
-          onClick={handleApply}
+          onClick={handleApplyFilters}
           variant="default"
           size="sm"
           className="h-8 p-3"
         >
           Apply
-        </Button> */}
+        </Button>
+        {startDate || endDate ? (
+          <Button
+            onClick={handleClear}
+            variant="destructive"
+            size="sm"
+            className="h-8 p-3"
+          >
+            Clear
+          </Button>
+        ) : null}
+
 
         {/* <Button
           onClick={() => setIsGenerateOpen(true)}

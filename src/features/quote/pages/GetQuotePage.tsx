@@ -181,7 +181,7 @@ export default function GetQuotePage() {
         )}
 
       </div>
-      {canCreateOrder && (
+      {!isAdmin && canCreateOrder && (
         <div className="sticky bottom-0 -left-5 right-20 bg-white dark:bg-zinc-950 border-t border-gray-200 dark:border-zinc-800 p-3 flex justify-center items-center gap-3 z-50 shadow-[0_-4px_10px_rgba(0,0,0,0.05)] dark:shadow-[0_-4px_10px_rgba(0,0,0,0.2)] transition-colors duration-300">
           <Button
             onClick={handleCreateOrder}

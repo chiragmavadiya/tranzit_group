@@ -47,6 +47,11 @@ export interface AdminTopupResponse {
   status: boolean;
   message: string;
   data: any[];
+  summary: {
+    balance: number;
+    total_credit: number;
+    total_debit: number;
+  };
   meta: {
     current_page: number;
     per_page: number;

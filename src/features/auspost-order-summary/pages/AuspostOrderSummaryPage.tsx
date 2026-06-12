@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { DataTable } from '@/components/common/DataTable';
 import { AUSPOST_COLUMNS } from '../columns';
-import { useAuspostOrderSummary } from '../hooks/useAuspostOrderSummary';
+import { useAuspostOrderSummary, useExportAuspostOrderSummary } from '../hooks/useAuspostOrderSummary';
 import { useDebounce } from '@/hooks/useDebounce';
 
 export default function AuspostOrderSummaryPage() {
@@ -16,6 +16,12 @@ export default function AuspostOrderSummaryPage() {
     page,
     per_page: pageSize
   });
+
+  const { mutate: exportSummary, isPending: isExporting } = useExportAuspostOrderSummary();
+
+  const handleExport = (format: string) => {
+    exportSummary({ format, search: debouncedSearch });
+  };
 
   return (
     <div className="flex flex-col flex-1 gap-6 p-page-padding min-h-0 animate-in fade-in slide-in-from-bottom-2 duration-500 bg-slate-50/30 dark:bg-zinc-950/30 overflow-y-auto">
@@ -34,7 +40,8 @@ export default function AuspostOrderSummaryPage() {
           pageSize={pageSize}
           onPageSizeChange={setPageSize}
           className="text-xs pb-3"
-          onExport={(type) => console.log(`Exporting as ${type}`)}
+          onExport={handleExport}
+          isExporting={isExporting}
         />
       </div>
     </div>

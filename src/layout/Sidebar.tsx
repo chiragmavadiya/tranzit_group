@@ -169,7 +169,7 @@ export default function Sidebar({
             sidebarItems.map((item) => (
               <div key={item.name}>
                 <NavLink
-                  to={item.isExternal || item.hasDropdown ? '#' : item.path}
+                  to={item.isExternal || item.hasDropdown && item.subItems ? '#' : item.path}
                   onClick={(e) => {
                     if (item.isExternal) {
                       e.preventDefault();

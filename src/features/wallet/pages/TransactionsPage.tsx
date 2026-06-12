@@ -9,6 +9,7 @@ import { getWalletColumns, TRANSACTION_TYPES } from '../constants';
 import { useWalletTransactions, useWalletExport, useDownloadReceipt } from '../hooks/useWalletTransactions';
 import type { WalletTransaction } from '../types';
 import { useAppSelector } from '@/hooks/store.hooks';
+import { formateCurrency } from '@/lib/utils';
 
 export default function TransactionsPage() {
   const [transactionType, setTransactionType] = useState('all');
@@ -47,21 +48,21 @@ export default function TransactionsPage() {
   const stats = useMemo(() => [
     {
       label: 'Credits',
-      value: `$${summary?.total_credit ?? 0}`,
+      value: formateCurrency(summary?.total_credit ?? 0),
       icon: TrendingDown,
       iconColor: 'text-emerald-600',
       iconBg: 'bg-emerald-50 dark:bg-emerald-500/10',
     },
     {
       label: 'Debits',
-      value: `$${summary?.total_debit ?? 0}`,
+      value: formateCurrency(summary?.total_debit ?? 0),
       icon: TrendingUp,
       iconColor: 'text-rose-600',
       iconBg: 'bg-rose-50 dark:bg-rose-500/10',
     },
     {
       label: 'Balance',
-      value: `$${summary?.wallet_balance ?? 0}`,
+      value: formateCurrency(summary?.wallet_balance ?? 0),
       icon: Wallet,
       iconColor: 'text-primary',
       iconBg: 'bg-primary/5 dark:bg-primary/10',

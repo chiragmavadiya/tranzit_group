@@ -19,8 +19,8 @@ export const ordersService = {
      */
     getOrders: async (params?: {
         status?: string;
-        start_date?: Date | undefined;
-        end_date?: Date | undefined;
+        start_date?: Date | string | undefined;
+        end_date?: Date | string | undefined;
         per_page?: number;
         page?: number;
         search?: string;
@@ -125,8 +125,8 @@ export const ordersService = {
     exportOrders: async (params: {
         format: "pdf" | "csv" | "excel";
         status?: string;
-        start_date?: Date | undefined;
-        end_date?: Date | undefined;
+        start_date?: Date | string | undefined;
+        end_date?: Date | string | undefined;
         search?: string;
     }): Promise<{ blob: Blob, filename: string }> => {
         const response = await api.get(API_ENDPOINTS.ORDERS.EXPORT, {
@@ -153,8 +153,12 @@ export const ordersService = {
     /**
      * Get order status counts
      */
-    getOrderCounts: async (customerId?: string | number): Promise<OrderCountsResponse> => {
-        const params = customerId ? { customer: customerId } : undefined;
+    getOrderCounts: async (params?: {
+        customer?: string | number;
+        search?: string;
+        start_date?: Date | string | undefined;
+        end_date?: Date | string | undefined;
+    }): Promise<OrderCountsResponse> => {
         const response = await api.get<OrderCountsResponse>(API_ENDPOINTS.ORDERS.COUNTS, { params });
         return response.data;
     },

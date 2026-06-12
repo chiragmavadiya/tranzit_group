@@ -3,7 +3,7 @@ import {
   Users,
   Package,
   Truck,
-  UserCog,
+  // UserCog,
   FileText,
   // Link,
   Wallet,
@@ -35,7 +35,7 @@ export const adminSidebarItems: SidebarItem[] = [
   { name: 'Order Management', icon: Package, path: '/admin/orders' },
   { name: 'Cancel Order', icon: PackageX, path: '/admin/cancel-order' },
   { name: 'Book a pickup', icon: Truck, path: '/admin/book-pickup' },
-  { name: 'Staff / Sub User Management', icon: UserCog, path: '/admin/staff' },
+  // { name: 'Staff / Sub User Management', icon: UserCog, path: '/admin/staff' },
 
 
   // { name: 'Customer Parcel Report', icon: FileText, path: '/admin/customer-parcel-report' },
@@ -154,5 +154,5 @@ export const clientSidebarItems: SidebarItem[] = [
       },
     ]
   },
-  { name: 'Help', icon: LifeBuoy, path: 'mailto:info@tranzitgroup.com.au?subject=Support Request from Portal&body=Hi Team', isExternal: true },
+  // { name: 'Help', icon: LifeBuoy, path: 'mailto:info@tranzitgroup.com.au?subject=Support Request from Portal&body=Hi Team', isExternal: true },
 ];

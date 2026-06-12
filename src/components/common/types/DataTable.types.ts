@@ -72,7 +72,7 @@ export interface DataTableProps<T> {
   headerPosition?: 'left' | 'right';
   headerClass?: string;
   headerTitle?: string;
-  headerDescription?: string;
+  headerDescription?: string | (() => ReactNode);
   customFooter?: ReactNode | (() => ReactNode);
   onExport?: (type: "pdf" | "excel" | "print" | "csv") => void;
   isExporting?: boolean;

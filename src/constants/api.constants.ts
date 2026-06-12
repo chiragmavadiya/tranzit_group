@@ -137,6 +137,7 @@ export const API_ENDPOINTS = {
     ADMIN_CANCEL_ORDERS: {
         BASE: "/admin/cancel-orders",
         COUNTS: "/admin/cancel-orders/counts",
+        EXPORT: "/admin/cancel-orders/export",
     },
     ADMIN_REPORTS: {
         PARCELS: "/admin/reports/customer-parcels",
@@ -144,6 +145,7 @@ export const API_ENDPOINTS = {
         INTEGRATED_PARCELS: "/admin/reports/integrated-courier-parcels",
         INTEGRATED_PARCELS_EXPORT: "/admin/reports/integrated-courier-parcels/export",
         AUSPOST_ORDER_SUMMARY: "/admin/reports/auspost-order-summary",
+        AUSPOST_ORDER_SUMMARY_EXPORT: "/admin/reports/auspost-order-summary/export",
         UNDELIVERED_PARCELS: "/admin/reports/undelivered-parcels",
         UNDELIVERED_PARCELS_EXPORT: "/admin/reports/undelivered-parcels/export",
         DIRECT_FREIGHT_UPLOAD: "/admin/reports/customer-parcels/direct-freight-upload",

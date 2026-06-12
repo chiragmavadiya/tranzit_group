@@ -35,8 +35,6 @@ export const CarrierCard: React.FC<CarrierCardProps> = memo((props) => {
   const [copiedTracking, setCopiedTracking] = useState(false);
   const mount = useRef(false);
 
-  console.log(selectedSurchargesMap, 'selectedSurchargesMap')
-
   // const [authorityToLeave, setAuthorityToLeave] = useState<boolean>(false);
   // const [signatureRequired, setSignatureRequired] = useState<boolean>(false);
   const handleCopyTracking = (text: string) => {
@@ -58,7 +56,7 @@ export const CarrierCard: React.FC<CarrierCardProps> = memo((props) => {
     }
     return location?.label || `${location?.suburb} ${location?.state} ${location?.postcode}, AU` || "";
   }, [module]);
-  console.log(orderDetail, 'orderDetail')
+
   const handleServiceSuccess = useEffectEvent((data: any) => {
 
     setCouriers(data.services || []);
@@ -188,7 +186,6 @@ export const CarrierCard: React.FC<CarrierCardProps> = memo((props) => {
   useEffect(() => {
     if (couriers.length > 0 && selectedServiceId) {
       const selectedCourier = couriers.find((c) => (c.courierCode + (c.product_id || '')) === selectedServiceId);
-      console.log(selectedCourier, 'selectedCourier')
       if (selectedCourier) {
         const courierSurcharges = surchargesMap[selectedCourier.courierCode] || [];
         const selectedNames = selectedSurchargesMap[selectedCourier.courierCode] ?? [];
@@ -196,7 +193,6 @@ export const CarrierCard: React.FC<CarrierCardProps> = memo((props) => {
         const autoApplyCharges = selectedCourier?.applied_surcharges?.reduce((acc: any, curr: any) => acc + curr.amount, 0)
         const surcharges = activeSurcharges.reduce((acc: any, curr: any) => acc + curr.amount, 0);
         const totalPrice = selectedCourier.price + surcharges + autoApplyCharges;
-        console.log({ mount: mount.current }, 'mount')
         onQuoteChange?.((prev: any) => ({
           courier: selectedCourier,
           surcharges: mount.current ? activeSurcharges : (prev?.surcharges?.length ? prev?.surcharges : activeSurcharges),

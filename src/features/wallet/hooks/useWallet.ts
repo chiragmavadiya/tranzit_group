@@ -1,10 +1,11 @@
 import { useEffect } from "react";
-import { useQuery, keepPreviousData } from "@tanstack/react-query";
+import { useQuery, keepPreviousData, useMutation } from "@tanstack/react-query";
 import { walletService } from "../services/wallet.service";
 import { QUERY_KEYS } from "@/constants/api.constants";
 import type { AdminTopupParams } from "../types";
 import { useAppDispatch } from "@/hooks/store.hooks";
 import { setWalletSummary } from "../walletSlice";
+import { downloadFile } from "@/lib/utils";
 
 export const useAdminTopups = (params?: AdminTopupParams) => {
   return useQuery({
@@ -30,3 +31,15 @@ export const useWalletSummary = (enabled: boolean = true) => {
 
   return query;
 };
+
+
+export const useExportAdminTopups = () => {
+  return useMutation({
+    mutationFn: ({ format }: { format: string; }) =>
+      walletService.exportAdminTopups({ format }),
+    onSuccess: ({ blob, filename }) => {
+      downloadFile(blob, filename)
+    }
+  })
+}
+

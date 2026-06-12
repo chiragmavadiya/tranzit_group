@@ -299,7 +299,6 @@ export const useOrderWorkflow = () => {
     return hasManyItems || hasHeavyItem || noTrackingNumber;
   }, [orderType, calculation.totalItems, itemsData, orderDetail?.courier_details?.tracking_number]);
 
-  console.log(quoteData, 'quoteData...')
   // Order Submission/Saving Flow
   const handleOnSave = useCallback((skipWalletCheckArg?: any, overrideReceiverPhone?: string) => {
     const isValidItems = itemsData && itemsData.length > 0 && itemsData.every((item) =>
@@ -445,7 +444,6 @@ export const useOrderWorkflow = () => {
   // Order Cancellation Flow
   const onCancelOrder = useCallback((manual: boolean = false) => {
     if (orderID) {
-      console.log(manual, 'menual...')
       cancelOrder(
         { orderId: orderID, data: { manual: typeof manual === 'boolean' ? manual : false } },
         {
@@ -666,7 +664,6 @@ export const useOrderWorkflow = () => {
 
   const isSavingDraft = saveLoading && saveAction === 'draft';
   const isCreatingConsignment = (saveLoading && saveAction === 'consignment') || walletLoading;
-  console.log(quoteData, "quoteData...")
   return {
     orderType,
     orderID,

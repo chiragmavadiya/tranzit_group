@@ -246,6 +246,7 @@ const DataTableComponent = <T extends Record<string, any>>(props: DataTableProps
                     <Button
                       variant="outline"
                       className="gap-2 border-gray-200 dark:border-zinc-800 hover:bg-gray-50 dark:hover:bg-zinc-800 font-medium text-slate-700 dark:text-zinc-300 transition-colors"
+                      disabled={isExporting}
                     >
                       {isExporting && <Loader2 className="w-4 h-4 animate-spin" />}
                       {!isExporting && <Upload className="w-4 h-4" />}

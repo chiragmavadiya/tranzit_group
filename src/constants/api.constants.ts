@@ -112,6 +112,7 @@ export const API_ENDPOINTS = {
     ADMIN_BOOK_PICKUP: {
         BASE: "/admin/book-pickup",
         COUNTS: "/admin/book-pickup/counts",
+        EXPORT: "/admin/book-pickup/export",
     },
     ADMIN_COURIER_POSTCODES: {
         BASE: "/admin/courier-postcodes",

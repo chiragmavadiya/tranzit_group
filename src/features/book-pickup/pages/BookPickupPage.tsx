@@ -3,7 +3,7 @@ import { useSearchParams } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { DataTable } from '@/components/common/DataTable';
 import type { Column } from '@/components/common/types/DataTable.types';
-import { useBookPickups, useCreatePickup } from '../hooks/useBookPickup';
+import { useBookPickups, useCreatePickup, useExportBookPickup } from '../hooks/useBookPickup';
 import type { BookPickup } from '../types';
 import { showToast } from '@/components/ui/custom-toast';
 import { Loader2 } from 'lucide-react';
@@ -28,6 +28,7 @@ export default function BookPickupPage() {
     });
 
     const { mutate: createPickup, isPending: isBooking } = useCreatePickup();
+    const { mutate: exportBookPickup, isPending: isExporting } = useExportBookPickup();
 
     const pickups = pickupsResponse?.data || [];
     const totalItems = pickupsResponse?.meta?.total || 0;
@@ -51,6 +52,10 @@ export default function BookPickupPage() {
                 showToast(error.message || "Failed to book pickups", "error");
             }
         });
+    };
+
+    const handleExport = (format: string) => {
+        exportBookPickup({ format, book: isBooked });
     };
 
     const columns: Column<BookPickup>[] = [
@@ -89,6 +94,8 @@ export default function BookPickupPage() {
                         setSearch(val);
                         setPage(1); // Reset to first page on search
                     }}
+                    onExport={handleExport}
+                    isExporting={isExporting}
                     searchValue={search}
                     rowKey="id"
                     customHeader={activeTab === 'new' ? (

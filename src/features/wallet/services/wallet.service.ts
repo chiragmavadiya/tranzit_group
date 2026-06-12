@@ -38,4 +38,16 @@ export const walletService = {
 
     return { blob: response.data, filename };
   },
+
+  exportAdminTopups: async ({ format }: { format: string }): Promise<{ blob: Blob; filename: string }> => {
+    const response = await api.get("/admin/top-ups/export", {
+      params: { format },
+      responseType: 'blob'
+    });
+
+    const fileformat = format === "pdf" ? "pdf" : format === "csv" ? "csv" : "xls";
+    const filename = getFileName(response) || `admin-topups_${new Date().getTime()}.${fileformat}`;
+
+    return { blob: response.data, filename };
+  },
 };

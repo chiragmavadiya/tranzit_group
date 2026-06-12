@@ -9,7 +9,7 @@ import { StatCard } from '@/components/common/StatCard';
 import { ADMIN_TOPUP_COLUMNS, TRANSACTION_TYPES } from '../constants';
 import { FormSelect } from '@/features/orders/components/OrderFormUI';
 import { Button } from '@/components/ui/button';
-import { useAdminTopups } from '../hooks/useWallet';
+import { useAdminTopups, useExportAdminTopups } from '../hooks/useWallet';
 import { useDebounce } from '@/hooks/useDebounce';
 import { useCustomers } from '@/features/customers/hooks/useCustomers';
 import { formateCurrency } from '@/lib/utils';
@@ -39,6 +39,12 @@ export default function AdminTopUpPage() {
   useEffect(() => {
     setPage(1);
   }, [debouncedSearch, transactionType, selectedCustomer]);
+
+  const { mutate: exportAdminTopups, isPending: isExporting } = useExportAdminTopups()
+
+  const onExport = (format: string) => {
+    exportAdminTopups({ format })
+  }
 
   const stats = useMemo(() => [
     {
@@ -145,7 +151,8 @@ export default function AdminTopUpPage() {
           loading={isLoading}
           className="text-xs pb-3"
           rowKey="id"
-          exportable={false}
+          onExport={onExport}
+          isExporting={isExporting}
         />
       </div>
     </div>

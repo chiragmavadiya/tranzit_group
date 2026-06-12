@@ -100,7 +100,7 @@ const ImportOrdersDialog = ({
           variant="ghost"
           onClick={handleDownloadSample}
           disabled={isLoading || downloadSampleMutation.isPending}
-          className="text-[14px] cursor-pointer font-bold text-primary hover:text-primary-hover hover:bg-transparent px-0 transition-colors flex items-center gap-2 tracking-wider"
+          className="text-[14px] cursor-pointer font-bold text-primary hover:text-primary-hover hover:bg-transparent px-0 transition-colors flex items-center gap-2 tracking-wide"
         >
           <Download className="w-3.5 h-3.5" />
           <span className='leading-[100%]'>
@@ -148,7 +148,7 @@ const ImportOrdersDialog = ({
               <span className="text-sm font-bold text-slate-800 dark:text-zinc-200 max-w-[200px] truncate">
                 {selectedFile.name}
               </span>
-              <span className="text-[11px] font-medium text-slate-500 uppercase tracking-wider">
+              <span className="text-[11px] font-medium text-slate-500 uppercase tracking-wide">
                 {(selectedFile.size / 1024).toFixed(2)} KB
               </span>
               <Button
@@ -178,7 +178,7 @@ const ImportOrdersDialog = ({
             variant="ghost"
             onClick={handleDownloadSample}
             disabled={isLoading}
-            className="text-[12px] cursor-pointer font-bold text-primary hover:text-primary-hover transition-colors flex items-center gap-2 tracking-wider"
+            className="text-[12px] cursor-pointer font-bold text-primary hover:text-primary-hover transition-colors flex items-center gap-2 tracking-wide"
           >
             <Download className="w-3.5 h-3.5" />
             Download sample CSV

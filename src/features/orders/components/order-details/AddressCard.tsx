@@ -61,7 +61,7 @@ export const AddressCard: React.FC<AddressCardProps> = memo(({
         </div>
         {instruction && (
           <div className="flex py-2 items-center px-4 gap-3 bg-gray-300 dark:bg-zinc-900 border-t border-gray-200 dark:border-zinc-800">
-            <span className="text-sm font-medium tracking-wider text-slate-800 dark:text-zinc-400">
+            <span className="text-sm font-medium tracking-wide text-slate-800 dark:text-zinc-400">
               Instruction :
             </span>
 

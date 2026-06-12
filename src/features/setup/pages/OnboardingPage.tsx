@@ -279,7 +279,7 @@ export default function OnboardingPage() {
         <div className="flex items-center gap-5">
           <img src={brandLogo} alt="Logo" className="h-9 w-auto" />
           <div className="h-7 w-px bg-slate-200 dark:bg-slate-800 hidden sm:block" />
-          <h2 className="text-xs font-black text-slate-800 dark:text-zinc-200 uppercase tracking-wider hidden sm:block my-0">Set up your Tranzit Group account</h2>
+          <h2 className="text-xs font-black text-slate-800 dark:text-zinc-200 uppercase tracking-wide hidden sm:block my-0">Set up your Tranzit Group account</h2>
         </div>
 
         <div className="flex items-center gap-4">
@@ -548,7 +548,7 @@ export default function OnboardingPage() {
                       checked={!formData.hasBillingAddress}
                       onCheckedChange={(val) => handleChange('hasBillingAddress', !val)}
                     />
-                    <Label htmlFor="billing_same" className="text-[12px] font-bold text-slate-600 dark:text-zinc-400 cursor-pointer tracking-wider">
+                    <Label htmlFor="billing_same" className="text-[12px] font-bold text-slate-600 dark:text-zinc-400 cursor-pointer tracking-wide">
                       Same as pickup address
                     </Label>
                   </div>

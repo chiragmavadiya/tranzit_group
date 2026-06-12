@@ -120,7 +120,7 @@ export const GlobalSearch: React.FC<GlobalSearchProps> = ({
                         </div>
                         <div className="flex flex-col flex-1">
                             <span className="text-[13px] font-medium text-slate-900 dark:text-zinc-100">{option.label}</span>
-                            <span className="text-[11px] text-slate-500 dark:text-zinc-500 uppercase tracking-wider font-bold">{option.type}</span>
+                            <span className="text-[11px] text-slate-500 dark:text-zinc-500 uppercase tracking-wide font-bold">{option.type}</span>
                         </div>
                     </div>
                 )}

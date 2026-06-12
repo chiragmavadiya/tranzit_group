@@ -47,7 +47,7 @@ export const ENQUIRY_COLUMNS = (onView: (row: Enquiry) => void): Column<Enquiry>
     header: 'STATUS',
     cell: (val: EnquiryStatus) => (
       <div className={cn(
-        "inline-flex items-center px-2.5 py-0.5 rounded-full text-[12px] font-medium tracking-wider border transition-all",
+        "inline-flex items-center px-2.5 py-0.5 rounded-full text-[12px] font-medium tracking-wide border transition-all",
         STATUS_CONFIG[val.toLowerCase() as EnquiryStatus]?.className || 'bg-gray-50 text-gray-600'
       )}>
         {val}

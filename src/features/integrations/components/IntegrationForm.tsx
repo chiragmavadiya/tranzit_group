@@ -275,7 +275,7 @@ export function IntegrationForm({ provider }: IntegrationFormProps) {
                                             <CardTitle className="text-xl font-bold text-slate-900 dark:text-white tracking-tight leading-tight">
                                                 How to connect?
                                             </CardTitle>
-                                            <CardDescription className="text-xs font-semibold text-slate-500 dark:text-slate-400 mt-1 uppercase tracking-wider">
+                                            <CardDescription className="text-xs font-semibold text-slate-500 dark:text-slate-400 mt-1 uppercase tracking-wide">
                                                 Follow these simple steps
                                             </CardDescription>
                                         </div>
@@ -327,7 +327,7 @@ export function IntegrationForm({ provider }: IntegrationFormProps) {
                                             <CardTitle className="text-xl font-bold text-slate-900 dark:text-white tracking-tight leading-tight">
                                                 How it works
                                             </CardTitle>
-                                            <CardDescription className="text-xs font-semibold text-slate-500 dark:text-slate-400 mt-1 uppercase tracking-wider">
+                                            <CardDescription className="text-xs font-semibold text-slate-500 dark:text-slate-400 mt-1 uppercase tracking-wide">
                                                 Shopify Integration Guide
                                             </CardDescription>
                                         </div>

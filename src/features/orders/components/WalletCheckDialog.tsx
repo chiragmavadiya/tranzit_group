@@ -34,7 +34,7 @@ const WalletCheckDialog: React.FC<WalletCheckDialogProps> = ({
                             <Wallet className="w-5 h-5 text-primary" />
                         </div>
                         <div>
-                            <p className="my-0 text-[10px] font-bold text-slate-500 dark:text-zinc-400 uppercase tracking-wider">Available Balance</p>
+                            <p className="my-0 text-[10px] font-bold text-slate-500 dark:text-zinc-400 uppercase tracking-wide">Available Balance</p>
                             <p className="my-0 text-xl font-bold text-slate-900 dark:text-zinc-100">${Number(walletBalance).toFixed(2)}</p>
                         </div>
                     </div>

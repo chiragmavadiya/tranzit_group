@@ -158,7 +158,7 @@ export default function CarrierConfigPage() {
                   <Badge
                     variant={isConnected ? "default" : "secondary"}
                     className={cn(
-                      "font-semibold text-[11px] uppercase leading-none tracking-wider py-1 px-2.5 rounded-full border shrink-0 mt-0.5",
+                      "font-semibold text-[11px] uppercase leading-none tracking-wide py-1 px-2.5 rounded-full border shrink-0 mt-0.5",
                       isConnected
                         ? "bg-emerald-50 text-emerald-600 border-emerald-100 dark:bg-emerald-900/20 dark:text-emerald-400 dark:border-emerald-900/30"
                         : "bg-slate-50 text-slate-400 border-slate-100 dark:bg-zinc-900 dark:text-zinc-500 dark:border-zinc-800"

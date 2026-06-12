@@ -172,7 +172,7 @@ export default function SignUp() {
         </div>
 
         {/* <div className="space-y-1">
-          <Label htmlFor="phone" className="text-slate-700 dark:text-slate-300 font-semibold text-xs uppercase tracking-wider">
+          <Label htmlFor="phone" className="text-slate-700 dark:text-slate-300 font-semibold text-xs uppercase tracking-wide">
             Phone number <span className="text-red-500">*</span>
           </Label>
           <div className="relative flex items-center">

@@ -85,15 +85,15 @@ export function QuoteDetailsDialog({ open, onOpenChange, quoteId }: QuoteDetails
 
                     <div className="grid grid-cols-3 gap-4">
                         <div className="flex flex-col gap-1 border-l-2 border-slate-100 dark:border-zinc-800 pl-3">
-                            <span className="text-slate-500 uppercase font-medium tracking-wider">Margin</span>
+                            <span className="text-slate-500 uppercase font-medium tracking-wide">Margin</span>
                             <span className="font-bold">${details.margin_amount.toFixed(2)} ({details.margin_percent}%)</span>
                         </div>
                         <div className="flex flex-col gap-1 border-l-2 border-slate-100 dark:border-zinc-800 pl-3">
-                            <span className="text-slate-500 uppercase font-medium tracking-wider">Pickup Charge</span>
+                            <span className="text-slate-500 uppercase font-medium tracking-wide">Pickup Charge</span>
                             <span className="font-bold">${details.pickup_charge.toFixed(2)}</span>
                         </div>
                         <div className="flex flex-col gap-1 border-l-2 border-slate-100 dark:border-zinc-800 pl-3">
-                            <span className="text-slate-500 uppercase font-medium tracking-wider">Total Surcharge</span>
+                            <span className="text-slate-500 uppercase font-medium tracking-wide">Total Surcharge</span>
                             <span className="font-bold">${details.total_surcharge.toFixed(2)}</span>
                         </div>
                     </div>

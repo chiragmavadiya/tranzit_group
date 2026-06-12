@@ -23,12 +23,15 @@ interface OrderHeaderProps {
   orderDetail: OrderDetailData
   selectedCustomer?: number
   setSelectedCustomer: React.Dispatch<React.SetStateAction<number | undefined>>
-  onCancelOrder?: () => void
+  onCancelOrder?: (value: boolean) => void
+  onArchiveOrder?: (value: boolean) => void
   isCancelling?: boolean
   onConsign?: () => void
   isConsigning?: boolean
   setShowCancelModal: React.Dispatch<React.SetStateAction<boolean>>
   showCancelModal: boolean
+  showArchiveModal: boolean
+  setShowArchiveModal: React.Dispatch<React.SetStateAction<boolean>>
   requiresManualLabel: boolean
 }
 
@@ -43,10 +46,13 @@ export const OrderHeader: React.FC<OrderHeaderProps> = ({
   selectedCustomer,
   setSelectedCustomer,
   onCancelOrder,
+  onArchiveOrder,
   isCancelling,
   // onConsign,
   isConsigning,
   setShowCancelModal,
+  showArchiveModal,
+  setShowArchiveModal,
   showCancelModal,
   requiresManualLabel
 }) => {
@@ -175,40 +181,68 @@ export const OrderHeader: React.FC<OrderHeaderProps> = ({
                 </Button>
               )}
               {(orderDetail?.order_status_category === 'new' || orderDetail?.order_status_category === 'printed' || orderDetail?.status.toLocaleLowerCase() === 'new' || orderDetail?.status.toLowerCase() === 'printed') && (
-                <Button
-                  variant="outline"
-                  onClick={() => setShowCancelModal(true)}
-                  className="flex items-center gap-2 border-red-200 dark:border-red-900/30 text-red-600 dark:text-red-400 font-bold h-8 px-4 text-xs hover:bg-red-50 dark:hover:bg-red-950/30 transition-colors"
-                  disabled={orderDetail?.cancel_request !== null}
-                >
-                  <Trash2 className="h-4 w-4" />
-                  {orderDetail?.cancel_request !== null ? 'CANCEL REQUESTED' : 'DELETE ORDER'}
-                </Button>
+                <>
+                  {orderDetail?.order_status_category === 'new' || orderDetail?.status.toLocaleLowerCase() === 'new' ? (
+                    <Button
+                      variant="outline"
+                      onClick={() => setShowArchiveModal(true)}
+                      className="flex items-center gap-2 border-red-200 dark:border-red-900/30 text-red-600 dark:text-red-400 font-bold h-8 px-4 text-xs hover:bg-red-50 dark:hover:bg-red-950/30 transition-colors"
+                      disabled={orderDetail?.cancel_request !== null}
+                    >
+                      <Trash2 className="h-4 w-4" />
+                      {orderDetail?.cancel_request !== null ? 'CANCEL REQUESTED' : 'DELETE ORDER'}
+                    </Button>
+                  ) : (
+                    <Button
+                      variant="outline"
+                      onClick={() => setShowCancelModal(true)}
+                      className="flex items-center gap-2 border-red-200 dark:border-red-900/30 text-red-600 dark:text-red-400 font-bold h-8 px-4 text-xs hover:bg-red-50 dark:hover:bg-red-950/30 transition-colors"
+                      disabled={orderDetail?.cancel_request !== null}
+                    >
+                      <Trash2 className="h-4 w-4" />
+                      {orderDetail?.cancel_request !== null ? 'CANCEL REQUESTED' : 'DELETE ORDER'}
+                    </Button>
+                  )}
+                </>
               )}
             </>
           )}
           <ConformationModal
             open={showCancelModal}
             onOpenChange={setShowCancelModal}
-            title="Delete Item"
+            title="Delete Order"
             description={
               <div className="space-y-4">
-                <p className="text-sm mb-0">Are you sure you want to cancel this order?</p>
-                <p className="text-sm mb-0"> This action can’t be undone once the cancellation is processed.</p>
+                <p className="text-sm mb-0 font-medium text-slate-900">Are you sure you want to cancel this order?</p>
+                <p className="text-sm mb-0 font-medium text-slate-900"> This action can’t be undone once the cancellation is processed.</p>
                 <div className="my-3 bg-amber-50 dark:bg-amber-900/20 p-3 rounded-lg border border-amber-100 dark:border-amber-900/30">
-                  <p className="mb-0 text-amber-800 dark:text-amber-400 font-semibold text-xs">Important: A $5 cancellation service fee applies to Direct Freight bookings.</p>
+                  <p className="mb-0 text-amber-800 dark:text-amber-400 font-semibold text-xs">Important: A $3 cancellation service fee applies to Direct Freight bookings.</p>
                 </div>
                 <div className="space-y-2">
-                  <p className="font-semibold text-sm mb-0">If the cancellation is successful:</p>
+                  <p className="font-semibold text-slate-900 text-sm mb-0">If the cancellation is successful:</p>
                   <ul className="list-disc list-inside space-y-1 text-sm">
                     <li>You will receive a confirmation notification from us</li>
-                    <li>$5 will be deducted from your refund amount</li>
+                    <li>$3 will be deducted from your refund amount</li>
                   </ul>
                 </div>
-                <p className="mb-0 font-medium text-sm">Do you want to proceed with cancelling this order?</p>
+                <p className="mb-0 font-medium text-sm text-slate-900">Do you want to proceed with cancelling this order?</p>
               </div>
             }
-            onConfirm={() => onCancelOrder?.()}
+            onConfirm={() => onCancelOrder?.(true)}
+            confirmText="Yes, Cancel order"
+            cancelText="No, Keep order"
+            confirmVariant="destructive"
+            loading={isCancelling}
+            className="max-w-[440px] sm:max-w-[500px]"
+          />
+          <ConformationModal
+            open={showArchiveModal}
+            onOpenChange={setShowArchiveModal}
+            title="Delete Order"
+            description={
+              <p className="text-sm mb-0 font-medium text-slate-900">Are you sure you want to delete this order?</p>
+            }
+            onConfirm={() => onArchiveOrder?.(true)}
             confirmText="Yes, Cancel order"
             cancelText="No, Keep order"
             confirmVariant="destructive"
@@ -233,22 +267,24 @@ export const OrderHeader: React.FC<OrderHeaderProps> = ({
         </div>
       </div>
 
-      {!isCreate && (<div className="flex flex-wrap items-center gap-x-6 gap-y-2 text-xs text-gray-500 dark:text-zinc-400 font-medium">
-        <Badge variant="secondary" className="bg-gray-100 dark:bg-zinc-800 text-gray-500 dark:text-zinc-400 border-none rounded-sm px-2 py-0 h-5 uppercase font-bold">
-          {orderDetail?.order_type || 'NEW'}
-        </Badge>
+      {
+        !isCreate && (<div className="flex flex-wrap items-center gap-x-6 gap-y-2 text-xs text-gray-500 dark:text-zinc-400 font-medium">
+          <Badge variant="secondary" className="bg-gray-100 dark:bg-zinc-800 text-gray-500 dark:text-zinc-400 border-none rounded-sm px-2 py-0 h-5 uppercase font-bold">
+            {orderDetail?.order_type || 'NEW'}
+          </Badge>
 
 
-        <div className="flex items-center gap-1">
-          Created
-          <CustomTooltip title={orderDetail.created_at}>
-            <span className="text-gray-700 dark:text-zinc-300">{orderDetail?.created_human}</span>
-          </CustomTooltip>
-        </div>
-        <Badge variant="secondary" className={cn("border-none rounded-sm px-2 py-0 h-5 uppercase font-bold", Order_status_styles[orderDetail?.status || 'New'])}>
-          {orderDetail?.status || 'NEW'}
-        </Badge>
-      </div>)}
-    </div>
+          <div className="flex items-center gap-1">
+            Created
+            <CustomTooltip title={orderDetail.created_at}>
+              <span className="text-gray-700 dark:text-zinc-300">{orderDetail?.created_human}</span>
+            </CustomTooltip>
+          </div>
+          <Badge variant="secondary" className={cn("border-none rounded-sm px-2 py-0 h-5 uppercase font-bold", Order_status_styles[orderDetail?.status || 'New'])}>
+            {orderDetail?.status || 'NEW'}
+          </Badge>
+        </div>)
+      }
+    </div >
   )
 }

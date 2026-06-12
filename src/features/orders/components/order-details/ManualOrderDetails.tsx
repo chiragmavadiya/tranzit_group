@@ -20,7 +20,7 @@ export const ManualOrderDetails: React.FC<ManualOrderDetailsProps> = ({
 }) => {
   return (
     <div className="mb-4 p-5 bg-white dark:bg-zinc-950 rounded-xl border border-gray-200 dark:border-zinc-800 shadow-sm transition-colors duration-300">
-      <h3 className="mb-4 text-sm font-bold text-gray-900 dark:text-zinc-100 uppercase tracking-wider">
+      <h3 className="mb-4 text-sm font-bold text-gray-900 dark:text-zinc-100 uppercase tracking-wide">
         Manual Order Details
       </h3>
       <div className="flex flex-col md:flex-row gap-4">

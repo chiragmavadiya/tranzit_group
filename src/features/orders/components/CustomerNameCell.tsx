@@ -63,12 +63,12 @@ export const CustomerNameCell = ({
 
               <div className="flex items-center gap-3">
                 <Phone className="w-4 h-4 text-primary/80 shrink-0" />
-                <span className="font-medium">{row.receiver_phone}</span>
+                <span className="font-medium">{row.receiver_phone || 'Not Provided'}</span>
               </div>
 
               <div className="flex items-center gap-3">
                 <Mail className="w-4 h-4 text-primary/80 shrink-0" />
-                <span className="font-medium">{row.receiver_email}</span>
+                <span className="font-medium">{row.receiver_email || 'Not Provided'}</span>
               </div>
             </div>
           </PopoverContent>

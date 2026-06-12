@@ -31,7 +31,7 @@ const HelpCenterSidebar: React.FC<HelpCenterSidebarProps> = ({ categories, isLoa
             <div className="p-4 space-y-6">
                 {categories.map((category, idx) => (
                     <div key={idx} className="space-y-2">
-                        <h3 className="px-3 text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-zinc-500">
+                        <h3 className="px-3 text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-zinc-500">
                             {category.category || 'General'}
                         </h3>
                         <div className="space-y-1">

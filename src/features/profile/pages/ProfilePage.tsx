@@ -203,7 +203,7 @@ export default function ProfilePage() {
         <div className="col-span-12 lg:col-span-4">
           <Card className="bg-primary/5 py-0 dark:bg-primary/10 border-primary/20 dark:border-primary/20 sticky top-page-padding">
             <CardContent className="p-6">
-              <h3 className="my-0 text-sm font-bold text-primary dark:text-primary mb-2 uppercase tracking-wider">Profile Information</h3>
+              <h3 className="my-0 text-sm font-bold text-primary dark:text-primary mb-2 uppercase tracking-wide">Profile Information</h3>
               <p className="my-0 text-[13px] text-primary/70 dark:text-primary/70 leading-relaxed">
                 Your profile information is used for communications and billing. Please ensure your contact details are kept up to date.
               </p>

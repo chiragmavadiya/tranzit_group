@@ -80,7 +80,7 @@ export const ProfileTab = ({ customerId }: ProfileTabProps) => {
                                         <Phone className="w-4 h-4" />
                                     </div>
                                     <div className="flex flex-col">
-                                        <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Phone</span>
+                                        <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wide">Phone</span>
                                         <span className="text-sm font-semibold text-slate-900 dark:text-white">{customer.contacts.contact || "N/A"}</span>
                                     </div>
                                 </div>
@@ -90,7 +90,7 @@ export const ProfileTab = ({ customerId }: ProfileTabProps) => {
                                         <AtSign className="w-4 h-4" />
                                     </div>
                                     <div className="flex flex-col">
-                                        <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Email</span>
+                                        <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wide">Email</span>
                                         <span className="text-sm font-semibold text-slate-900 dark:text-white">{customer.contacts.email || "N/A"}</span>
                                     </div>
                                 </div>
@@ -101,7 +101,7 @@ export const ProfileTab = ({ customerId }: ProfileTabProps) => {
                                     <MapPin className="w-4 h-4" />
                                 </div>
                                 <div className="flex flex-col">
-                                    <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Pickup Address</span>
+                                    <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wide">Pickup Address</span>
                                     <span className="text-sm font-semibold text-slate-900 dark:text-white">
                                         {customer?.pickup_address?.address_info || (customer?.pickup_address?.address ? `${customer?.pickup_address?.address}, ${customer?.pickup_address?.post_code}` : "No Address")}
                                     </span>
@@ -112,7 +112,7 @@ export const ProfileTab = ({ customerId }: ProfileTabProps) => {
                                     <MapPin className="w-4 h-4" />
                                 </div>
                                 <div className="flex flex-col">
-                                    <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Billing Address</span>
+                                    <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wide">Billing Address</span>
                                     <span className="text-sm font-semibold text-slate-900 dark:text-white">
                                         {customer?.billing_address?.address_info || (customer?.billing_address?.address ? `${customer?.billing_address?.address}, ${customer?.pickup_address?.post_code}` : "No Address")}
                                     </span>
@@ -132,7 +132,7 @@ export const ProfileTab = ({ customerId }: ProfileTabProps) => {
                         <div className="grid grid-cols-3 gap-3">
                             {markups.map((m, i) => (
                                 <div key={i} className="p-3.5 rounded-xl bg-slate-50/80 dark:bg-zinc-900/50 border border-slate-100 dark:border-zinc-800 flex flex-col gap-2.5">
-                                    <span className="text-[14px] font-bold text-slate-600 dark:text-zinc-500 uppercase tracking-wider">{m.title}</span>
+                                    <span className="text-[14px] font-bold text-slate-600 dark:text-zinc-500 uppercase tracking-wide">{m.title}</span>
                                     <div className="flex flex-col gap-1.5 text-sm">
                                         <div className="flex justify-between items-center text-slate-600 dark:text-zinc-400">
                                             <span>Markup:</span>

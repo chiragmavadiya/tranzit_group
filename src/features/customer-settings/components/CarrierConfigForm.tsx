@@ -623,7 +623,7 @@ export default function CarrierConfigForm({
                 <div className="overflow-y-auto no-scrollbar">
                   <table className="w-full text-left border-collapse">
                     <thead>
-                      <tr className="border-b border-gray-100 dark:border-zinc-800 bg-gray-50/40 dark:bg-zinc-900/20 text-[11px] font-bold text-slate-500 dark:text-zinc-400 uppercase tracking-wider">
+                      <tr className="border-b border-gray-100 dark:border-zinc-800 bg-gray-50/40 dark:bg-zinc-900/20 text-[11px] font-bold text-slate-500 dark:text-zinc-400 uppercase tracking-wide">
                         <th className="py-2.5 px-4">Product Name</th>
                         <th className="py-2.5 px-4 w-24">Code</th>
                         <th className="py-2.5 px-4 w-20 text-center">Status</th>

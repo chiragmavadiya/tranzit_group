@@ -258,7 +258,7 @@ export default function ParcelReportPage() {
                 </div>
 
                 <div className="md:col-span-9 flex flex-col">
-                  <label className="text-[11px] font-extrabold text-slate-700 dark:text-zinc-400 uppercase tracking-wider mb-1 ml-0.5">Upload Invoice (PDF)</label>
+                  <label className="text-[11px] font-extrabold text-slate-700 dark:text-zinc-400 uppercase tracking-wide mb-1 ml-0.5">Upload Invoice (PDF)</label>
                   <div className="flex gap-2">
                     <div className="relative flex-1">
                       <Input

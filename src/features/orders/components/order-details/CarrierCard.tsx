@@ -1,4 +1,4 @@
-import React, { memo, useEffect, useEffectEvent, useMemo, useState } from 'react'
+import React, { memo, useEffect, useEffectEvent, useMemo, useRef, useState } from 'react'
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card'
 import { Truck, AlertCircle, RefreshCw, Copy, Check } from 'lucide-react'
 import { Badge } from '@/components/ui/badge'
@@ -33,6 +33,9 @@ export const CarrierCard: React.FC<CarrierCardProps> = memo((props) => {
   const [selectedSurchargesMap, setSelectedSurchargesMap] = useState<Record<string, string[]>>({});
   const [bestDeal, setBestDeal] = useState<string>('');
   const [copiedTracking, setCopiedTracking] = useState(false);
+  const mount = useRef(false);
+
+  console.log(selectedSurchargesMap, 'selectedSurchargesMap')
 
   // const [authorityToLeave, setAuthorityToLeave] = useState<boolean>(false);
   // const [signatureRequired, setSignatureRequired] = useState<boolean>(false);
@@ -55,7 +58,7 @@ export const CarrierCard: React.FC<CarrierCardProps> = memo((props) => {
     }
     return location?.label || `${location?.suburb} ${location?.state} ${location?.postcode}, AU` || "";
   }, [module]);
-
+  console.log(orderDetail, 'orderDetail')
   const handleServiceSuccess = useEffectEvent((data: any) => {
 
     setCouriers(data.services || []);
@@ -63,10 +66,16 @@ export const CarrierCard: React.FC<CarrierCardProps> = memo((props) => {
     if (data.surcharges) {
       const initialSelected: Record<string, string[]> = {};
       Object.keys(data.surcharges).forEach(code => {
-        initialSelected[code] = [];
+        if (!mount.current && code === orderDetail?.courier_details?.courier_code) {
+          initialSelected[code] = orderDetail?.order_details?.surcharges?.map((item: any) => item.name) || [];
+        } else {
+          initialSelected[code] = [];
+        }
       });
       setSelectedSurchargesMap(initialSelected);
     }
+    mount.current = true;
+
     if (data.services && data.services.length > 0) {
       const getServiceTotalPrice = (service: any) => {
         // const surcharges = data.surcharges?.[service.courierCode] || [];
@@ -78,25 +87,16 @@ export const CarrierCard: React.FC<CarrierCardProps> = memo((props) => {
         getServiceTotalPrice(curr) < getServiceTotalPrice(min) ? curr : min
       );
       setBestDeal(minItem.courierCode + (minItem.product_id || '') || '');
-      // if (initialSelectedCourierId !== undefined && initialSelectedCourierId !== null && initialSelectedCourierId !== '' && !selectedServiceId) {
-      //   setSelectedServiceId(initialSelectedCourierId);
-      //   return;
-      // }
       const selectedFromQuote = sessionStorage.getItem('quote_courier');
       if (selectedFromQuote) {
         const courier = JSON.parse(selectedFromQuote);
         setSelectedServiceId(courier.courier.courierCode + (courier.courier.product_id || '') || '');
       } else if (!selectedServiceId || !allCourierIds.includes(selectedServiceId)) {
         setSelectedServiceId((prev) => {
-          if (prev) return prev;
-          // if (default_courier?.slug) {
-          //   return default_courier.slug + (default_courier?.product_id || '') || '';
-          // }
+          if (prev && allCourierIds.includes(prev)) return prev;
           return minItem.courierCode + (minItem.product_id || '') || '';
         });
       }
-      // if (!selectedServiceId)
-      //   setSelectedServiceId(minItem.product_id || minItem.courierCode || '');
     }
   })
 
@@ -188,20 +188,23 @@ export const CarrierCard: React.FC<CarrierCardProps> = memo((props) => {
   useEffect(() => {
     if (couriers.length > 0 && selectedServiceId) {
       const selectedCourier = couriers.find((c) => (c.courierCode + (c.product_id || '')) === selectedServiceId);
+      console.log(selectedCourier, 'selectedCourier')
       if (selectedCourier) {
         const courierSurcharges = surchargesMap[selectedCourier.courierCode] || [];
         const selectedNames = selectedSurchargesMap[selectedCourier.courierCode] ?? [];
         const activeSurcharges = courierSurcharges.filter(charge => selectedNames.includes(charge.name));
-        const totalSurcharges = activeSurcharges.reduce((acc: any, curr: any) => acc + curr.amount, 0);
-        const totalPrice = selectedCourier.price + totalSurcharges;
-        onQuoteChange?.({
+        const autoApplyCharges = selectedCourier?.applied_surcharges?.reduce((acc: any, curr: any) => acc + curr.amount, 0)
+        const surcharges = activeSurcharges.reduce((acc: any, curr: any) => acc + curr.amount, 0);
+        const totalPrice = selectedCourier.price + surcharges + autoApplyCharges;
+        console.log({ mount: mount.current }, 'mount')
+        onQuoteChange?.((prev: any) => ({
           courier: selectedCourier,
-          surcharges: activeSurcharges,
-          totalSurcharges,
+          surcharges: mount.current ? activeSurcharges : (prev?.surcharges?.length ? prev?.surcharges : activeSurcharges),
+          totalSurcharges: surcharges + autoApplyCharges,
           totalPrice,
           // authorityToLeave,
           // signatureRequired
-        });
+        }));
         setCourierData?.({
           courierCode: selectedCourier.courierCode,
           courier: selectedCourier.carrier_id,
@@ -372,6 +375,7 @@ export const CarrierCard: React.FC<CarrierCardProps> = memo((props) => {
 
                           </span>
                           <span className="text-xs text-gray-500 dark:text-zinc-400 font-medium mt-0.5">
+                            {courier.product_id && `${courier.product_id} • `}
                             {courier.product_type || courier.service_name || courier.service_code || 'Standard Delivery'}
                             {courier.estimate_delivery_date && ` • ETA: ${courier.estimate_delivery_date}`}
                           </span>
@@ -396,12 +400,13 @@ export const CarrierCard: React.FC<CarrierCardProps> = memo((props) => {
                     {/* Surcharges list with checkboxes if selected */}
                     {isSelected && courierSurcharges.length > 0 && (
                       <div className="mt-3 pt-3 border-t border-dashed border-gray-200 dark:border-zinc-800 flex flex-col gap-2">
-                        <div className="text-[11px] font-bold text-gray-500 dark:text-zinc-400 uppercase tracking-wider">
+                        <div className="text-[11px] font-bold text-gray-500 dark:text-zinc-400 uppercase tracking-wide">
                           Surcharge Options
                         </div>
                         <div className="flex flex-col gap-2">
                           {courierSurcharges.map((charge, index) => {
                             const isChecked = selectedNames.includes(charge.name);
+                            if (!charge.is_customer_selectable) return;
                             return (
                               <label
                                 key={index}
@@ -410,7 +415,9 @@ export const CarrierCard: React.FC<CarrierCardProps> = memo((props) => {
                               >
                                 <Checkbox
                                   checked={isChecked}
+                                  disabled={!charge.is_customer_selectable}
                                   onCheckedChange={(checked) => {
+
                                     const currentlySelected = selectedSurchargesMap[courier.courierCode] ?? [];
                                     let nextSelected;
                                     if (checked) {
@@ -424,7 +431,7 @@ export const CarrierCard: React.FC<CarrierCardProps> = memo((props) => {
                                     }));
                                   }}
                                 />
-                                <div className="flex justify-between w-full">
+                                <div className={`flex justify-between w-full ${!charge.is_customer_selectable ? 'opacity-50 cursor-not-allowed' : ''}`}>
                                   <span>{charge.name}</span>
                                   <span className="font-semibold text-gray-900 dark:text-zinc-100">+${charge.amount.toFixed(2)}</span>
                                 </div>
@@ -441,7 +448,7 @@ export const CarrierCard: React.FC<CarrierCardProps> = memo((props) => {
             </div>
             {/* {selectedServiceId && module !== 'quote' && (
               <div className="col-span-4 flex flex-col gap-2dark:border-zinc-800 sticky top-0">
-                <div className="text-[11px] font-bold text-gray-500 dark:text-zinc-400 uppercase tracking-wider">
+                <div className="text-[11px] font-bold text-gray-500 dark:text-zinc-400 uppercase tracking-wide">
                   OPTIONS
                 </div>
                 <div className="border-t border-gray-200 dark:border-zinc-800 my-1" />

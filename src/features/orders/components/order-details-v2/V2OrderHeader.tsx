@@ -101,7 +101,7 @@ export const OrderHeader = ({ data }: { data: OrderDetailData }) => {
                             <div className="flex flex-wrap gap-4">
                                 <div className="group min-w-[240px] rounded-2xl border border-primary/20 bg-primary/5 p-4 transition-all hover:bg-primary/10">
                                     <div className="flex items-center justify-between">
-                                        <p className="text-[11px] font-bold uppercase tracking-wider text-primary/70">
+                                        <p className="text-[11px] font-bold uppercase tracking-wide text-primary/70">
                                             Tracking Number
                                         </p>
                                         <div className="flex items-center gap-1">
@@ -123,7 +123,7 @@ export const OrderHeader = ({ data }: { data: OrderDetailData }) => {
                                     </p>
                                 </div>
                                 <div className="min-w-[240px] rounded-2xl border border-slate-200 bg-slate-50 p-4 transition-all hover:bg-slate-100/80">
-                                    <p className="text-[11px] font-bold uppercase tracking-wider text-slate-500">
+                                    <p className="text-[11px] font-bold uppercase tracking-wide text-slate-500">
                                         Customer Reference
                                     </p>
                                     <p className="mt-1 text-base font-bold text-slate-900">

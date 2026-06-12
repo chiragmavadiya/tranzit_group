@@ -149,7 +149,7 @@ export function FormTextarea({
       isFullWidth ? "col-span-12" : "col-span-12 md:col-span-6"
     )}>
       {/* <Label className={cn(
-        "text-[11px] font-extrabold text-slate-700 dark:text-zinc-400 uppercase tracking-wider leading-none ",
+        "text-[11px] font-extrabold text-slate-700 dark:text-zinc-400 uppercase tracking-wide leading-none ",
         isHorizontal ? "h-fit leading-none" : "ml-0.5"
       )}>
         {label}
@@ -177,7 +177,7 @@ export function FormTextarea({
 
 export function ValidAddressBadge() {
   return (
-    <div className="flex items-center gap-2 px-3 py-1 bg-white dark:bg-zinc-900 border border-emerald-600 rounded-sm text-[10px] font-bold text-emerald-600 uppercase tracking-wider w-fit shadow-sm">
+    <div className="flex items-center gap-2 px-3 py-1 bg-white dark:bg-zinc-900 border border-emerald-600 rounded-sm text-[10px] font-bold text-emerald-600 uppercase tracking-wide w-fit shadow-sm">
       <CheckCircle2 className="w-3 h-3" />
       Valid Address
       <RefreshCw className="w-3 h-3 ml-1 cursor-pointer hover:rotate-180 transition-transform duration-500" />
@@ -215,7 +215,7 @@ export const FormSelect = memo(({
       className
     )}>
       {/* <Label className={cn(
-        "text-[11px] font-extrabold text-slate-700 dark:text-zinc-400 uppercase tracking-wider gap-0 mb-1",
+        "text-[11px] font-extrabold text-slate-700 dark:text-zinc-400 uppercase tracking-wide gap-0 mb-1",
         !isHorizontal && "ml-0.5"
       )}>
         {label}

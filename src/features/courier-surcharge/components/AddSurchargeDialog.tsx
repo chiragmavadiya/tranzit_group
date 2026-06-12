@@ -214,7 +214,7 @@ const SurchargeForm = forwardRef<HTMLFormElement, SurchargeFormProps>(
 
           <div className="col-span-6 space-y-4 pl-4 border-l border-slate-200 dark:border-zinc-800">
             <div className="flex items-center justify-between gap-3">
-              <Label htmlFor="default_selected" className="text-[10px] font-extrabold text-slate-500 dark:text-zinc-400 uppercase tracking-wider cursor-pointer">Default Selected</Label>
+              <Label htmlFor="default_selected" className="text-[10px] font-extrabold text-slate-500 dark:text-zinc-400 uppercase tracking-wide cursor-pointer">Default Selected</Label>
               <Switch
                 id="default_selected"
                 checked={formData.default_selected}
@@ -224,7 +224,7 @@ const SurchargeForm = forwardRef<HTMLFormElement, SurchargeFormProps>(
             </div>
 
             <div className="flex items-center justify-between gap-3">
-              <Label htmlFor="is_auto_apply" className="text-[10px] font-extrabold text-slate-500 dark:text-zinc-400 uppercase tracking-wider cursor-pointer">Auto Apply</Label>
+              <Label htmlFor="is_auto_apply" className="text-[10px] font-extrabold text-slate-500 dark:text-zinc-400 uppercase tracking-wide cursor-pointer">Auto Apply</Label>
               <Switch
                 id="is_auto_apply"
                 checked={formData.is_auto_apply}
@@ -234,7 +234,7 @@ const SurchargeForm = forwardRef<HTMLFormElement, SurchargeFormProps>(
             </div>
 
             <div className="flex items-center justify-between gap-3">
-              <Label htmlFor="is_customer_selectable" className="text-[10px] font-extrabold text-slate-500 dark:text-zinc-400 uppercase tracking-wider cursor-pointer">Customer Selectable</Label>
+              <Label htmlFor="is_customer_selectable" className="text-[10px] font-extrabold text-slate-500 dark:text-zinc-400 uppercase tracking-wide cursor-pointer">Customer Selectable</Label>
               <Switch
                 id="is_customer_selectable"
                 checked={formData.is_customer_selectable}

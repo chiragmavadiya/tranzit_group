@@ -67,7 +67,7 @@ const SettingsSidebar: React.FC<SettingsSidebarProps> = ({ categories, isLoading
     <aside className="w-72 border-r border-slate-200 dark:border-zinc-800 bg-white dark:bg-zinc-950 flex flex-col h-full overflow-y-auto custom-scrollbar">
       <div className="p-4 space-y-6">
         <div className="px-4 mb-2">
-          <h3 className="my-0 text-[11px] font-black text-slate-600 dark:text-zinc-500 uppercase tracking-wider">
+          <h3 className="my-0 text-[11px] font-black text-slate-600 dark:text-zinc-500 uppercase tracking-wide">
             Configuration
           </h3>
         </div>

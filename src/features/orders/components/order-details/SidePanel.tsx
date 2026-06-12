@@ -86,7 +86,7 @@ export const SidePanel: React.FC<SidePanelProps> = memo(({
                     </span>
                     {/* <button
                       type="button"
-                      className="flex items-center gap-1.5 text-[11px] font-bold text-gray-900 dark:text-zinc-100 hover:text-primary transition-colors uppercase tracking-wider h-8 px-3 border border-gray-200 dark:border-zinc-800 rounded-md hover:bg-gray-50 dark:hover:bg-zinc-900 transition-all duration-200"
+                      className="flex items-center gap-1.5 text-[11px] font-bold text-gray-900 dark:text-zinc-100 hover:text-primary transition-colors uppercase tracking-wide h-8 px-3 border border-gray-200 dark:border-zinc-800 rounded-md hover:bg-gray-50 dark:hover:bg-zinc-900 transition-all duration-200"
                     >
                       <RotateCw className="w-3.5 h-3.5" />
                       Refresh Timeline
@@ -137,7 +137,7 @@ export const SidePanel: React.FC<SidePanelProps> = memo(({
                             {/* {idx === 0 && (
                               <button
                                 type="button"
-                                className="flex items-center gap-1.5 text-[11px] font-bold text-gray-900 dark:text-zinc-100 hover:text-primary transition-colors uppercase tracking-wider h-5"
+                                className="flex items-center gap-1.5 text-[11px] font-bold text-gray-900 dark:text-zinc-100 hover:text-primary transition-colors uppercase tracking-wide h-5"
                               >
                                 <RotateCw className={"w-3.5 h-3.5"} />
                                 REFRESH
@@ -271,7 +271,7 @@ export const SidePanel: React.FC<SidePanelProps> = memo(({
           <>
             <AccordionItem value="services" className="border border-gray-200 dark:border-zinc-800 rounded-xl bg-white dark:bg-zinc-950 shadow-xs px-5 border-b overflow-hidden transition-colors duration-300 [&>h3]:my-0">
               <AccordionTrigger className="hover:no-underline py-3 px-0 [&>svg]:text-primary">
-                <span className="text-sm font-bold text-gray-900 dark:text-zinc-100 tracking-wider">Signature Required ?</span>
+                <span className="text-sm font-bold text-gray-900 dark:text-zinc-100 tracking-wide">Signature Required ?</span>
               </AccordionTrigger>
               <AccordionContent className="flex flex-col gap-5 pb-4 pt-1">
                 {/* Signature on Delivery */}
@@ -298,14 +298,14 @@ export const SidePanel: React.FC<SidePanelProps> = memo(({
 
                   >
                     <div className="flex items-center gap-2">
-                      <RadioGroupItem value="yes" id="insurance-yes" className="destructive" />
-                      <label htmlFor="insurance-yes" className="text-xs font-semibold text-gray-700 dark:text-zinc-300 cursor-pointer select-none">
+                      <RadioGroupItem value="yes" id="signature-yes" className="destructive" />
+                      <label htmlFor="signature-yes" className="text-xs font-semibold text-gray-700 dark:text-zinc-300 cursor-pointer select-none">
                         Yes
                       </label>
                     </div>
                     <div className="flex items-center gap-2">
-                      <RadioGroupItem value="no" id="insurance-no" />
-                      <label htmlFor="insurance-no" className="text-xs font-semibold text-gray-700 dark:text-zinc-300 cursor-pointer select-none">
+                      <RadioGroupItem value="no" id="signature-no" />
+                      <label htmlFor="signature-no" className="text-xs font-semibold text-gray-700 dark:text-zinc-300 cursor-pointer select-none">
                         No
                       </label>
                     </div>
@@ -323,7 +323,7 @@ export const SidePanel: React.FC<SidePanelProps> = memo(({
         {/* NOTES */}
         <AccordionItem value="notes" className="border border-gray-200 dark:border-zinc-800 rounded-xl bg-white dark:bg-zinc-950 shadow-xs px-5 border-b overflow-hidden transition-colors duration-300 [&>h3]:my-0">
           <AccordionTrigger className="hover:no-underline py-3 px-0 [&>svg]:text-primary items-center">
-            <span className="text-base font-bold text-gray-900 dark:text-zinc-100 tracking-wider uppercase">Delivery Instructions</span>
+            <span className="text-base font-bold text-gray-900 dark:text-zinc-100 tracking-wide uppercase">Delivery Instructions</span>
           </AccordionTrigger>
           <AccordionContent className="flex flex-col gap-2 pb-4">
             {!isCreate ? (
@@ -361,7 +361,7 @@ export const SidePanel: React.FC<SidePanelProps> = memo(({
                 liability ? "text-emerald-700 dark:text-emerald-400" : "text-slate-600 dark:text-zinc-400"
               )}>
                 <Shield className="h-4 w-4" />
-                <span className="text-base font-bold tracking-wider uppercase">Liability Cover</span>
+                <span className="text-base font-bold tracking-wide uppercase">Liability Cover</span>
               </div>
             </AccordionTrigger>
             <AccordionContent className="pb-4 pt-1">

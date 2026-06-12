@@ -47,7 +47,7 @@ export const SURCHARGE_COLUMNS = (onEdit: (row: any) => void, onDelete: (row: an
     header: 'CUSTOMER SELECTABLE',
     cell: (val) => (
       <div className={cn(
-        "inline-flex items-center gap-1.5 px-2 py-0.5 rounded text-[10px] font-black uppercase tracking-wider transition-all",
+        "inline-flex items-center gap-1.5 px-2 py-0.5 rounded text-[10px] font-black uppercase tracking-wide transition-all",
         val
           ? "bg-emerald-50 text-emerald-600 dark:bg-emerald-500/10 dark:text-emerald-400 border border-emerald-100 dark:border-emerald-500/20"
           : "bg-rose-50 text-rose-600 dark:bg-rose-500/10 dark:text-rose-400 border border-rose-100 dark:border-rose-500/20"
@@ -62,7 +62,7 @@ export const SURCHARGE_COLUMNS = (onEdit: (row: any) => void, onDelete: (row: an
     header: 'AUTO APPLY',
     cell: (val) => (
       <div className={cn(
-        "inline-flex items-center gap-1.5 px-2 py-0.5 rounded text-[10px] font-black uppercase tracking-wider transition-all",
+        "inline-flex items-center gap-1.5 px-2 py-0.5 rounded text-[10px] font-black uppercase tracking-wide transition-all",
         val
           ? "bg-emerald-50 text-emerald-600 dark:bg-emerald-500/10 dark:text-emerald-400 border border-emerald-100 dark:border-emerald-500/20"
           : "bg-rose-50 text-rose-600 dark:bg-rose-500/10 dark:text-rose-400 border border-rose-100 dark:border-rose-500/20"

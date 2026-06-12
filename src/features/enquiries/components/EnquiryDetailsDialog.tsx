@@ -57,19 +57,19 @@ export function EnquiryDetailsDialog({ enquiryId, onClose }: EnquiryDetailsDialo
         <div className="flex flex-col gap-6">
           <div className="grid grid-cols-2 gap-x-12 gap-y-4">
             <div className="space-y-1">
-              <Label className="mb-0 text-[12px] font-extrabold uppercase text-slate-700 tracking-wider">Customer</Label>
+              <Label className="mb-0 text-[12px] font-extrabold uppercase text-slate-700 tracking-wide">Customer</Label>
               <p className="mb-1 mt-0 text-[14px] font-medium text-slate-500">{enquiry.customer}</p>
             </div>
             <div className="space-y-1">
-              <Label className="mb-0 text-[12px] font-extrabold uppercase text-slate-700 tracking-wider">Email</Label>
+              <Label className="mb-0 text-[12px] font-extrabold uppercase text-slate-700 tracking-wide">Email</Label>
               <p className="mb-1 mt-0 text-[14px] font-medium text-slate-500">{enquiry.email}</p>
             </div>
             <div className="space-y-1">
-              <Label className="mb-0 text-[12px] font-extrabold uppercase text-slate-700 tracking-wider">Issue Type</Label>
+              <Label className="mb-0 text-[12px] font-extrabold uppercase text-slate-700 tracking-wide">Issue Type</Label>
               <p className="mb-1 mt-0 text-[14px] font-medium text-slate-500">{enquiry.issue_type}</p>
             </div>
             <div className="space-y-1">
-              <Label className="mb-0 text-[12px] font-extrabold uppercase text-slate-700 tracking-wider">Date</Label>
+              <Label className="mb-0 text-[12px] font-extrabold uppercase text-slate-700 tracking-wide">Date</Label>
               <p className="mb-1 mt-0 text-[14px] font-medium text-slate-500">{enquiry.date}</p>
             </div>
           </div>
@@ -77,7 +77,7 @@ export function EnquiryDetailsDialog({ enquiryId, onClose }: EnquiryDetailsDialo
           <div className="border-t border-slate-100 dark:border-zinc-800" />
 
           <div className="space-y-2">
-            <Label className="text-[12px] font-extrabold uppercase text-slate-700 tracking-wider">Message</Label>
+            <Label className="text-[12px] font-extrabold uppercase text-slate-700 tracking-wide">Message</Label>
             <div className="bg-[#e5e7eb] dark:bg-zinc-800 p-4 rounded-lg min-h-[60px]">
               <p className="text-[14px] text-slate-600 dark:text-zinc-300 font-medium whitespace-pre-wrap">
                 {enquiry.message || "No message provided."}
@@ -86,7 +86,7 @@ export function EnquiryDetailsDialog({ enquiryId, onClose }: EnquiryDetailsDialo
           </div>
 
           <div className="space-y-1">
-            <Label className="text-[12px] font-extrabold uppercase text-slate-700 tracking-wider">Attachments</Label>
+            <Label className="text-[12px] font-extrabold uppercase text-slate-700 tracking-wide">Attachments</Label>
             {enquiry.attachments && enquiry.attachments.length > 0 ? (
               <div className="flex flex-wrap gap-2 pt-1">
                 {enquiry.attachments.map((file: any, index: number) => (

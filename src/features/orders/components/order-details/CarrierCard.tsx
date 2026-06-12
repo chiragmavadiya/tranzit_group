@@ -225,14 +225,16 @@ export const CarrierCard: React.FC<CarrierCardProps> = memo((props) => {
             </CardTitle>
           </div>
           {/* {loading && <RefreshCw className="h-4 w-4 animate-spin" />} */}
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => fetchServices()}
-            disabled={loading}
-          >
-            <RefreshCw className={`h-4 w-4 ${loading ? 'animate-spin' : ''}`} />
-          </Button>
+          {(orderType === 'create' || orderType === 'consign') && (
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => fetchServices()}
+              disabled={loading}
+            >
+              <RefreshCw className={`h-4 w-4 ${loading ? 'animate-spin' : ''}`} />
+            </Button>
+          )}
         </div>
       </CardHeader>
 

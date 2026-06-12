@@ -40,7 +40,7 @@ export function ZohoSettingsCard({
         </div>
         <div className="flex items-center gap-1.5 px-3 py-1 bg-slate-50 dark:bg-zinc-900 rounded-full border border-slate-100 dark:border-zinc-800">
           <Globe className="w-3 h-3 text-slate-400" />
-          <span className="text-[10px] font-bold text-slate-500 dark:text-zinc-500 uppercase tracking-wider">Production</span>
+          <span className="text-[10px] font-bold text-slate-500 dark:text-zinc-500 uppercase tracking-wide">Production</span>
         </div>
       </div>
 

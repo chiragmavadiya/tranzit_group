@@ -226,7 +226,7 @@ export default function TopBar({
               <DropdownMenuSeparator className="bg-slate-100 dark:bg-zinc-800" />
               {isMobile && (
                 <>
-                  <div className="px-3 py-1 text-[11px] font-bold text-gray-400 dark:text-zinc-500 uppercase tracking-wider">
+                  <div className="px-3 py-1 text-[11px] font-bold text-gray-400 dark:text-zinc-500 uppercase tracking-wide">
                     Theme
                   </div>
                   <DropdownMenuItem variant={"default"} onClick={() => setTheme('light')} className={"cursor-pointer py-1.5 px-3 text-[13px] text-orange-500"}>

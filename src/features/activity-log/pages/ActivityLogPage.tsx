@@ -111,7 +111,7 @@ export default function ActivityLogPage() {
                     </div>
 
                     <div className="lg:col-span-2 flex flex-col gap-1.5">
-                        {/* <label className="text-[11px] font-extrabold text-slate-700 dark:text-zinc-400 uppercase tracking-wider ml-0.5">Start Date</label>
+                        {/* <label className="text-[11px] font-extrabold text-slate-700 dark:text-zinc-400 uppercase tracking-wide ml-0.5">Start Date</label>
                         <Popover>
                             <PopoverTrigger>
                                 <Button
@@ -142,7 +142,7 @@ export default function ActivityLogPage() {
                     </div>
 
                     <div className="lg:col-span-2 flex flex-col gap-1.5">
-                        {/* <label className="text-[11px] font-extrabold text-slate-700 dark:text-zinc-400 uppercase tracking-wider ml-0.5">End Date</label>
+                        {/* <label className="text-[11px] font-extrabold text-slate-700 dark:text-zinc-400 uppercase tracking-wide ml-0.5">End Date</label>
                         <Popover>
                             <PopoverTrigger>
                                 <Button

@@ -161,8 +161,9 @@ export default function OrdersPage({ fromCustomer, customerId }: { fromCustomer?
         //   executePrint(orderNumber);
         // }
       },
-      onError: () => {
-        showToast('Failed to check wallet balance', 'error');
+      onError: (err: any) => {
+        showToast(err?.error || 'Failed to check wallet balance', 'error');
+        setOrderToPrint(null);
       }
     });
   }, [role, checkWallet, executePrint]);
@@ -347,7 +348,7 @@ export default function OrdersPage({ fromCustomer, customerId }: { fromCustomer?
 
       <div className='rounded-lg shadow-sm flex-1 flex flex-col min-h-0 border border-gray-100 dark:border-zinc-800 bg-white dark:bg-zinc-950 '>
         {!fromCustomer && (
-          <div className="flex flex-wrap items-end justify-end gap-4 p-4 pb-0 bg-gray-50/50 dark:bg-zinc-950/50 print:hidden">
+          <div className="flex flex-wrap items-end justify-end gap-4 p-4 pb-0 print:hidden">
             {isAdmin && (
               <FormSelect
                 label="Customer"

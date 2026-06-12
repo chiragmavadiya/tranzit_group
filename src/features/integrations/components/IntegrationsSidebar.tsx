@@ -71,7 +71,7 @@ const IntegrationsSidebar: React.FC<IntegrationsSidebarProps> = ({ connectedProv
                 <div className="space-y-2">
                     <div className="flex items-center gap-2 px-3">
                         {/* <Truck className="w-3.5 h-3.5 text-blue-600 shrink-0" /> */}
-                        <h3 className="my-0 text-[11px] font-bold text-slate-600 dark:text-zinc-500 uppercase tracking-wider">
+                        <h3 className="my-0 text-[11px] font-bold text-slate-600 dark:text-zinc-500 uppercase tracking-wide">
                             Courier Integrations
                         </h3>
                     </div>
@@ -84,7 +84,7 @@ const IntegrationsSidebar: React.FC<IntegrationsSidebarProps> = ({ connectedProv
                 <div className="space-y-2">
                     <div className="flex items-center gap-2 px-3">
                         {/* <ShoppingCart className="w-3.5 h-3.5 text-purple-600 shrink-0" /> */}
-                        <h3 className="my-0 text-[11px] font-bold text-slate-600 dark:text-zinc-500 uppercase tracking-wider">
+                        <h3 className="my-0 text-[11px] font-bold text-slate-600 dark:text-zinc-500 uppercase tracking-wide">
                             E-commerce Integrations
                         </h3>
                     </div>

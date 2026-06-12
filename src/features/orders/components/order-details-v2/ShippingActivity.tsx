@@ -52,7 +52,7 @@ export const ShippingActivity = ({ activity }: { activity: ShippingActivityType[
                                         {milestone.date_time}
                                     </span>
                                     {isLast && (
-                                        <Badge variant="secondary" className="h-5 rounded-md bg-primary/10 px-1.5 text-[10px] font-bold uppercase tracking-wider text-primary">
+                                        <Badge variant="secondary" className="h-5 rounded-md bg-primary/10 px-1.5 text-[10px] font-bold uppercase tracking-wide text-primary">
                                             Latest
                                         </Badge>
                                     )}

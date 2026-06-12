@@ -123,7 +123,7 @@ export default function SubscriptionPlanModal({ open, onOpenChange }: Subscripti
             <div className={`bg-white dark:bg-zinc-950 border border-gray-200 dark:border-zinc-800 rounded-xl p-6 flex flex-col justify-between shadow-sm relative hover:shadow-xl transition-shadow duration-300 w-[280px] shrink-0 ${plan.selected ? 'border-2 border-blue-600! dark:border-blue-500!' : ''}`}>
               {plan.isPopular && (
                 <div className="absolute top-0 right-0 w-20 h-20 overflow-hidden pointer-events-none">
-                  <div className="absolute top-4 -right-6 w-24 bg-blue-600 text-white text-[9px] font-black text-center py-1 rotate-45 uppercase tracking-wider select-none shadow-sm">
+                  <div className="absolute top-4 -right-6 w-24 bg-blue-600 text-white text-[9px] font-black text-center py-1 rotate-45 uppercase tracking-wide select-none shadow-sm">
                     Popular
                   </div>
                 </div>
@@ -233,7 +233,7 @@ export default function SubscriptionPlanModal({ open, onOpenChange }: Subscripti
           {/* <div className="bg-white dark:bg-zinc-950  rounded-xl p-6 flex flex-col justify-between shadow-md relative overflow-hidden">
 
             <div className="absolute top-0 right-0 w-20 h-20 overflow-hidden pointer-events-none">
-              <div className="absolute top-4 -right-6 w-24 bg-blue-600 text-white text-[9px] font-black text-center py-1 rotate-45 uppercase tracking-wider select-none shadow-sm">
+              <div className="absolute top-4 -right-6 w-24 bg-blue-600 text-white text-[9px] font-black text-center py-1 rotate-45 uppercase tracking-wide select-none shadow-sm">
                 Popular
               </div>
             </div>

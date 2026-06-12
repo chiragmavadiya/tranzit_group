@@ -34,7 +34,7 @@ export function ZohoConnectionCard({
         <div className="grid grid-cols-1 gap-4">
           <div className="p-3 rounded-lg bg-slate-50 dark:bg-zinc-900/50 border border-slate-100 dark:border-zinc-800">
             <div className="flex justify-between items-center mb-1">
-              <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Client ID</span>
+              <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wide">Client ID</span>
               <Badge variant={clientId ? 'outline' : 'secondary'} className="text-[9px] h-4">
                 {clientId ? 'Configured' : 'Not Set'}
               </Badge>
@@ -46,7 +46,7 @@ export function ZohoConnectionCard({
 
           <div className="p-3 rounded-lg bg-slate-50 dark:bg-zinc-900/50 border border-slate-100 dark:border-zinc-800">
             <div className="flex justify-between items-center mb-1">
-              <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Organization ID</span>
+              <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wide">Organization ID</span>
               <Badge variant={organizationId ? 'outline' : 'secondary'} className="text-[9px] h-4">
                 {organizationId ? 'Configured' : 'Not Set'}
               </Badge>
@@ -76,7 +76,7 @@ export function ZohoConnectionCard({
           <div className="flex items-center justify-between mb-4">
             <span className="text-xs font-bold text-slate-500 uppercase tracking-wide">Status</span>
             <div className={cn(
-              "flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-bold tracking-wider leading-[100%]",
+              "flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-bold tracking-wide leading-[100%]",
               !isConnected
                 ? "bg-emerald-50 text-emerald-600 dark:bg-emerald-500/10 border border-emerald-100 dark:border-emerald-500/20"
                 : "bg-orange-50 text-orange-600 dark:bg-orange-500/10 border border-orange-100 dark:border-orange-500/20"

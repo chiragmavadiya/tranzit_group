@@ -68,7 +68,7 @@ export const CreditApplicationTab = () => {
                         isHalf
                     />
                     <div className="col-span-12 space-y-2">
-                        <div className="text-[11px] font-extrabold text-slate-700 dark:text-zinc-400 uppercase tracking-wider ml-0.5">
+                        <div className="text-[11px] font-extrabold text-slate-700 dark:text-zinc-400 uppercase tracking-wide ml-0.5">
                             Business Type <span className="text-destructive">*</span>
                         </div>
                         <div className="flex items-center gap-6">

@@ -10,6 +10,7 @@ import {
   useWalletCheck,
   useCancelOrder,
   useConsignOrder,
+  useArchiveOrder,
 } from './useOrders';
 import { useGlobalCouriers } from '@/features/courier-surcharge/hooks/useGlobalCouriers';
 import type { AddressData, WalletCheckResponse } from '../types';
@@ -84,6 +85,8 @@ export const useOrderWorkflow = () => {
 
   const [showCancelModal, setShowCancelModal] = useState(false);
   const [showItemCountModal, setShowItemCountModal] = useState(false);
+
+  const [showArchiveModal, setShowArchiveModal] = useState(false);
 
   const initialDialogMode = useMemo(() => {
     if (isCreate && sessionStorage.getItem('address') === null) {
@@ -296,6 +299,7 @@ export const useOrderWorkflow = () => {
     return hasManyItems || hasHeavyItem || noTrackingNumber;
   }, [orderType, calculation.totalItems, itemsData, orderDetail?.courier_details?.tracking_number]);
 
+  console.log(quoteData, 'quoteData...')
   // Order Submission/Saving Flow
   const handleOnSave = useCallback((skipWalletCheckArg?: any, overrideReceiverPhone?: string) => {
     const isValidItems = itemsData && itemsData.length > 0 && itemsData.every((item) =>
@@ -361,7 +365,8 @@ export const useOrderWorkflow = () => {
       totals: {
         subtotal: quoteData?.courier?.base || 0,
         gst: quoteData?.courier?.gst || 0,
-        total: quoteData?.courier?.price || 0,
+        extra_surcharge: calculation.totalSurcharges,
+        total: calculation.grandTotal || 0,
         freight_levy: quoteData?.courier?.freight_levy || 0,
       },
       capture: getCapture(),
@@ -423,7 +428,7 @@ export const useOrderWorkflow = () => {
         showToast('Failed to create orders', 'error');
       },
     });
-  }, [itemsData, addressData, role, selectedCustomer, termsAccepted, ratesAccepted, dangerousGoodsAccepted, calculation.totalItems, calculation.grandTotal, courierData, insuranceSelected, signatureSelected, deliveryInstructions, quoteData?.courier?.base, quoteData?.courier?.gst, quoteData?.courier?.price, quoteData?.courier?.freight_levy, quoteData?.surcharges, walletCheckData?.wallet_balance, orderType, manualOrderData.trackingNumber, manualOrderData.courierId, manualOrderData.amount, checkWallet, createOrder, navigate, printLabel]);
+  }, [itemsData, addressData, role, selectedCustomer, courierData, termsAccepted, ratesAccepted, dangerousGoodsAccepted, calculation.totalItems, calculation.totalSurcharges, calculation.grandTotal, insuranceSelected, signatureSelected, quoteData?.surcharges, quoteData?.courier?.base, quoteData?.courier?.gst, quoteData?.courier?.freight_levy, deliveryInstructions, orderType, manualOrderData.trackingNumber, manualOrderData.courierId, manualOrderData.amount, checkWallet, walletCheckData?.wallet_balance, createOrder, navigate, printLabel]);
 
   const handleReceiverPhoneSubmit = useCallback((phone: string) => {
     setAddressData((prev) => ({
@@ -440,6 +445,7 @@ export const useOrderWorkflow = () => {
   // Order Cancellation Flow
   const onCancelOrder = useCallback((manual: boolean = false) => {
     if (orderID) {
+      console.log(manual, 'menual...')
       cancelOrder(
         { orderId: orderID, data: { manual: typeof manual === 'boolean' ? manual : false } },
         {
@@ -454,6 +460,24 @@ export const useOrderWorkflow = () => {
       );
     }
   }, [orderID, cancelOrder, navigate, role]);
+
+  const archiveOrderMutation = useArchiveOrder();
+
+  const onArchiveOrder = useCallback(() => {
+    if (orderID) {
+      archiveOrderMutation.mutate(orderID, {
+        onSuccess: (response) => {
+          showToast(response?.message || 'Order archived successfully', 'success');
+          setShowArchiveModal(false);
+          navigate(`${role === 'admin' ? '/admin' : ''}/orders`);
+        },
+        onError: (err: any) => {
+          showToast(err?.response?.data?.message || 'Failed to archive order', 'error');
+        },
+      });
+    }
+  }, [orderID, archiveOrderMutation, navigate, role]);
+
 
   // Order Consignment Flow
   const handleConsign = useCallback((skipWalletCheckArg?: any) => {
@@ -642,7 +666,7 @@ export const useOrderWorkflow = () => {
 
   const isSavingDraft = saveLoading && saveAction === 'draft';
   const isCreatingConsignment = (saveLoading && saveAction === 'consignment') || walletLoading;
-
+  console.log(quoteData, "quoteData...")
   return {
     orderType,
     orderID,
@@ -672,6 +696,8 @@ export const useOrderWorkflow = () => {
     setManualOrderData,
     showCancelModal,
     setShowCancelModal,
+    showArchiveModal,
+    setShowArchiveModal,
     showItemCountModal,
     setShowItemCountModal,
     insuranceSelected,
@@ -700,6 +726,7 @@ export const useOrderWorkflow = () => {
     requiresManualLabel,
     handleOnSave,
     onCancelOrder,
+    onArchiveOrder,
     handleConsign,
     downloadLabel,
     hasDefaultItemAndCourier,

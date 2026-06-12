@@ -108,7 +108,7 @@ export function AdminWelcomeBanner({
           {activePeriod === "all" && (
             <div className="flex flex-wrap items-center gap-2 animate-in fade-in slide-in-from-right-4 duration-300">
               <div className="flex items-center gap-1.5">
-                <span className="text-[10px] font-black uppercase tracking-wider text-slate-400 dark:text-zinc-500">From</span>
+                <span className="text-[10px] font-black uppercase tracking-wide text-slate-400 dark:text-zinc-500">From</span>
                 <DatePicker
                   date={startDate}
                   setDate={setStartDate || (() => { })}
@@ -116,7 +116,7 @@ export function AdminWelcomeBanner({
                 />
               </div>
               <div className="flex items-center gap-1.5">
-                <span className="text-[10px] font-black uppercase tracking-wider text-slate-400 dark:text-zinc-500">To</span>
+                <span className="text-[10px] font-black uppercase tracking-wide text-slate-400 dark:text-zinc-500">To</span>
                 <DatePicker
                   date={endDate}
                   setDate={setEndDate || (() => { })}

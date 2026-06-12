@@ -44,7 +44,7 @@ export const QuoteSummary = memo(({
             <div className="space-y-1.5">
               <div className="flex items-center gap-2">
                 <Percent className="w-3.5 h-3.5 text-primary" />
-                <span className="text-xs font-bold text-slate-700 dark:text-zinc-300 uppercase tracking-wider">Extra Margin (%)</span>
+                <span className="text-xs font-bold text-slate-700 dark:text-zinc-300 uppercase tracking-wide">Extra Margin (%)</span>
               </div>
               <FormInput
                 placeholder="0"
@@ -58,7 +58,7 @@ export const QuoteSummary = memo(({
             <div className="space-y-1.5">
               <div className="flex items-center gap-2">
                 <Truck className="w-3.5 h-3.5 text-primary" />
-                <span className="text-[11px] font-bold text-slate-700 dark:text-zinc-300 uppercase tracking-wider">Pickup Charges ($)</span>
+                <span className="text-[11px] font-bold text-slate-700 dark:text-zinc-300 uppercase tracking-wide">Pickup Charges ($)</span>
               </div>
               <FormInput
                 placeholder="0"

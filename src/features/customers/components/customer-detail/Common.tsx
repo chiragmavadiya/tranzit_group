@@ -14,7 +14,7 @@ export const DetailItem = ({ label, value, icon: Icon }: { label: string, value:
     <div className="flex items-start gap-3 py-1.5">
         <Icon className="h-4 w-4 text-slate-400 shrink-0 -mt-[4px]" />
         <div className="flex flex-col">
-            <span className="text-[10px] font-bold text-slate-400 dark:text-zinc-500 uppercase tracking-wider leading-none mb-1">{label}</span>
+            <span className="text-[10px] font-bold text-slate-400 dark:text-zinc-500 uppercase tracking-wide leading-none mb-1">{label}</span>
             <span className="text-sm font-semibold text-slate-700 dark:text-zinc-300">{value}</span>
         </div>
     </div>
@@ -41,7 +41,7 @@ export const TimelineItem = ({ item, isLast }: { item: ActivityItem, isLast: boo
             <div className="flex flex-1 flex-col gap-0">
                 <div className="flex items-center justify-between">
                     <h4 className="text-sm font-bold text-slate-900 dark:text-zinc-100">{item.title}</h4>
-                    <span className="text-xs font-medium text-slate-900 dark:text-zinc-500 uppercase tracking-wider">{item.timestamp}</span>
+                    <span className="text-xs font-medium text-slate-900 dark:text-zinc-500 uppercase tracking-wide">{item.timestamp}</span>
                 </div>
                 <p className="text-xs text-slate-500 dark:text-zinc-400 leading-relaxed max-w-[calc(100%-190px)]">{item.description}</p>
                 {item.invoiceNo && (

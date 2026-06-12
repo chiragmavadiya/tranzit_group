@@ -199,6 +199,8 @@ const OrderDetailsPage: React.FC = () => {
     setManualOrderData,
     showCancelModal,
     setShowCancelModal,
+    showArchiveModal,
+    setShowArchiveModal,
     showItemCountModal,
     setShowItemCountModal,
     insuranceSelected,
@@ -227,6 +229,7 @@ const OrderDetailsPage: React.FC = () => {
     requiresManualLabel,
     handleOnSave,
     onCancelOrder,
+    onArchiveOrder,
     handleConsign,
     downloadLabel,
     hasDefaultItemAndCourier,
@@ -330,10 +333,13 @@ const OrderDetailsPage: React.FC = () => {
               selectedCustomer={selectedCustomer}
               setSelectedCustomer={setSelectedCustomer}
               onCancelOrder={onCancelOrder}
+              onArchiveOrder={onArchiveOrder}
               isCancelling={isCancelling}
               isConsigning={isConsigning}
               showCancelModal={showCancelModal}
               setShowCancelModal={setShowCancelModal}
+              showArchiveModal={showArchiveModal}
+              setShowArchiveModal={setShowArchiveModal}
               requiresManualLabel={requiresManualLabel}
             />
 
@@ -363,7 +369,7 @@ const OrderDetailsPage: React.FC = () => {
                     <AlertTriangle size={20} />
                   </div>
                   <div>
-                    <h3 className="my-0 text-[14px] font-bold text-amber-900 dark:text-amber-100 uppercase tracking-wider">
+                    <h3 className="my-0 text-[14px] font-bold text-amber-900 dark:text-amber-100 uppercase tracking-wide">
                       Cancellation Request Pending
                     </h3>
                     <div className=" flex flex-wrap gap-x-6 gap-y-1 text-[14px] font-bold text-amber-700 dark:text-amber-400/80">
@@ -386,7 +392,7 @@ const OrderDetailsPage: React.FC = () => {
                 </div>
                 {role === 'admin' && (
                   <Button
-                    onClick={() => onCancelOrder(false)}
+                    onClick={() => onCancelOrder(true)}
                     disabled={isCancelling}
                     className="bg-red-600 hover:bg-red-700 text-white font-bold text-xs h-8 px-4 shadow-lg shadow-red-600/20 active:scale-[0.98] transition-all flex items-center gap-2"
                   >

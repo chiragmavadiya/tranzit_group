@@ -144,7 +144,7 @@ export const ItemsTable: React.FC<ItemsTableProps> = React.memo(({
                               <Package className="w-4 h-4" />
                             </div>
                             <div>
-                              <div className="text-xs font-bold text-gray-400 uppercase tracking-wider">Packing Type</div>
+                              <div className="text-xs font-bold text-gray-400 uppercase tracking-wide">Packing Type</div>
                               <div className="text-sm font-bold text-gray-900 dark:text-zinc-100">
                                 {item.type === 'my_item' ? (
                                   predefinedItems.find(i => i.id.toString() === item.item_id?.toString())?.item_name || 'My Item'
@@ -159,7 +159,7 @@ export const ItemsTable: React.FC<ItemsTableProps> = React.memo(({
                               <Box className="w-4 h-4" />
                             </div>
                             <div>
-                              <div className="text-xs font-bold text-gray-400 uppercase tracking-wider">Qty</div>
+                              <div className="text-xs font-bold text-gray-400 uppercase tracking-wide">Qty</div>
                               <div className="text-sm font-bold text-gray-900 dark:text-zinc-100">{item.quantity} Units</div>
                             </div>
                           </div>
@@ -170,7 +170,7 @@ export const ItemsTable: React.FC<ItemsTableProps> = React.memo(({
                               <Scale className="w-4 h-4" />
                             </div>
                             <div>
-                              <div className="text-xs font-bold text-gray-400 uppercase tracking-wider">Weight</div>
+                              <div className="text-xs font-bold text-gray-400 uppercase tracking-wide">Weight</div>
                               <div className="text-sm font-bold text-gray-900 dark:text-zinc-100">{item.weight} kg</div>
                             </div>
                           </div>
@@ -181,7 +181,7 @@ export const ItemsTable: React.FC<ItemsTableProps> = React.memo(({
                               <Ruler className="w-4 h-4" />
                             </div>
                             <div>
-                              <div className="text-xs font-bold text-gray-400 uppercase tracking-wider">Dimensions (L×W×H)</div>
+                              <div className="text-xs font-bold text-gray-400 uppercase tracking-wide">Dimensions (L×W×H)</div>
                               <div className="text-sm font-bold text-gray-900 dark:text-zinc-100">
                                 {item.length} × {item.width} × {item.height} cm
                               </div>

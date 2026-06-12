@@ -51,7 +51,7 @@ export const getCancelOrderColumns = (role: string): Column<CancelOrder>[] => [
         cell: (val: string) => (
             <div className="flex flex-col">
                 <span className="text-slate-700 dark:text-zinc-300">{val}</span>
-                {/* <span className="text-[10px] text-slate-500 dark:text-zinc-500 uppercase font-bold tracking-wider">By: {row.submitted_by}</span> */}
+                {/* <span className="text-[10px] text-slate-500 dark:text-zinc-500 uppercase font-bold tracking-wide">By: {row.submitted_by}</span> */}
             </div>
         )
     },
@@ -62,7 +62,7 @@ export const getCancelOrderColumns = (role: string): Column<CancelOrder>[] => [
             <div className="flex flex-col">
                 <span className="text-slate-700 dark:text-zinc-300">{val || '—'}</span>
                 {row.processed_by && (
-                    <span className="text-[10px] text-slate-500 dark:text-zinc-500 uppercase font-bold tracking-wider">By: {row.processed_by}</span>
+                    <span className="text-[10px] text-slate-500 dark:text-zinc-500 uppercase font-bold tracking-wide">By: {row.processed_by}</span>
                 )}
             </div>
         )
@@ -73,7 +73,7 @@ export const getCancelOrderColumns = (role: string): Column<CancelOrder>[] => [
         cell: (val: string) => {
             const isPending = val.toLowerCase() === 'pending';
             return (
-                <span className={`px-2 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider ${isPending
+                <span className={`px-2 py-1 rounded-full text-[10px] font-bold uppercase tracking-wide ${isPending
                     ? 'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400'
                     : 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400'
                     }`}>

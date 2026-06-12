@@ -160,14 +160,14 @@ export default function TeamAccessPage() {
           {/* Permissions Matrix */}
           <section>
             <div className="flex items-center justify-between mb-4">
-              <h3 className="text-[13px] font-bold text-gray-900 dark:text-zinc-100 uppercase tracking-wider flex items-center gap-2">
+              <h3 className="text-[13px] font-bold text-gray-900 dark:text-zinc-100 uppercase tracking-wide flex items-center gap-2">
                 <Shield className="w-4 h-4 text-primary" /> Permissions Matrix
               </h3>
               <Button variant="ghost" size="sm" className="h-6 text-[11px] font-bold">Select All</Button>
             </div>
 
             <div className="border border-gray-200 dark:border-zinc-800 rounded-xl overflow-hidden bg-white dark:bg-zinc-950">
-              <div className="grid grid-cols-12 bg-gray-50 dark:bg-zinc-900 p-3 border-b border-gray-200 dark:border-zinc-800 text-[11px] font-bold text-gray-500 uppercase tracking-wider">
+              <div className="grid grid-cols-12 bg-gray-50 dark:bg-zinc-900 p-3 border-b border-gray-200 dark:border-zinc-800 text-[11px] font-bold text-gray-500 uppercase tracking-wide">
                 <div className="col-span-4">Module</div>
                 <div className="col-span-2 text-center">View</div>
                 <div className="col-span-2 text-center">Create</div>

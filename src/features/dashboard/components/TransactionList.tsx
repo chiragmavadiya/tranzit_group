@@ -7,6 +7,7 @@ import {
   DropdownCustomMenu
 } from "@/components/ui/dropdown-menu";
 import { useState } from "react";
+import { CustomTooltip } from "@/components/common/CustomTooltip";
 interface TransactionListProps {
   // metrics: AdminMetrics | CustomerMetrics;
   className?: string;
@@ -81,33 +82,36 @@ export function TransactionList({ transactions, className, loading }: Transactio
           {!loading && currentTransactions?.map((tx: any) => (
             <div
               key={tx.id}
-              className="flex items-center justify-between p-3 rounded-xl hover:bg-gray-50 dark:hover:bg-zinc-900/50 transition-colors group cursor-default"
+              className="flex items-center justify-between p-3 rounded-xl hover:bg-gray-50 dark:hover:bg-zinc-900/50 transition-colors group cursor-default gap-3"
             >
-              <div className="flex items-center gap-3">
+              <div className="flex items-center gap-3 flex-1 min-w-0">
                 <div className={cn(
-                  "w-10 h-10 rounded-xl flex items-center justify-center transition-transform group-hover:scale-105",
+                  "w-10 h-10 rounded-xl flex items-center justify-center transition-transform group-hover:scale-105 shrink-0",
                   tx.transaction_type === 2 ? "bg-slate-50 dark:bg-zinc-900 text-slate-500" : "bg-primary/10 text-primary"
                 )}>
                   <Wallet className="w-5 h-5" />
                 </div>
-                <div className="flex flex-col min-w-0">
-                  <span className="text-sm font-bold text-gray-700 dark:text-zinc-200 leading-tight">
-                    {tx.reason || tx.title}
-                  </span>
-                  <span className="text-[11px] font-medium text-slate-400 dark:text-zinc-500 truncate flex items-center gap-1">
+                <div className="flex flex-col min-w-0 flex-1">
+                  <CustomTooltip title={tx.reason || tx.title} onlyOnOverflow>
+                    <span className="text-sm font-bold text-gray-700 dark:text-zinc-200 leading-tight truncate">
+                      {tx.reason || tx.title}
+                    </span>
+                  </CustomTooltip>
+                  <span className="text-[11px] font-medium text-slate-400 dark:text-zinc-500 flex flex-wrap items-center gap-x-1.5 gap-y-0.5 min-w-0">
                     {tx.customer_name && (
                       <>
-                        <span className="text-slate-500 text-sm dark:text-zinc-400 font-semibold">{tx.customer_name || ''}</span>
-                        <span className="text-slate-300 dark:text-zinc-600 px-0.5">•</span>
+                        <span className="text-slate-500 text-[11px] dark:text-zinc-400 font-semibold truncate max-w-[120px]" title={tx.customer_name}>{tx.customer_name}</span>
+                        <span className="text-slate-300 dark:text-zinc-600">•</span>
                       </>
                     )}
-                    <span>{tx.payment_method || tx.type}</span>
-                    <span>{tx.created_at || tx.date}</span>
+                    {/* <span className="truncate max-w-[90px]">{tx.payment_method || tx.type}</span> */}
+                    {/* <span className="text-slate-300 dark:text-zinc-600">•</span> */}
+                    <span className="shrink-0">{tx.created_at || tx.date}</span>
                   </span>
                 </div>
               </div>
               <span className={cn(
-                "text-sm font-bold tabular-nums",
+                "text-sm font-bold tabular-nums shrink-0",
                 tx.transaction_type === 2 ? "text-[#F35555]" : "text-[#10B981]"
               )}>
                 {tx.transaction_type === 2 ? '-' : '+'}${Math.abs(tx.amount).toFixed(2)}

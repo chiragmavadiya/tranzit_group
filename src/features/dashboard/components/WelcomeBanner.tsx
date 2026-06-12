@@ -53,7 +53,7 @@ export function WelcomeBanner({ userName, description, buttons, imageSrc, classN
             </h1>
             <div className="flex items-center justify-center md:justify-start gap-2 animate-in slide-in-from-left-4 duration-1000 delay-200">
               <div className="h-1 w-12 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full animate-pulse"></div>
-              <span className="text-sm font-semibold text-blue-600 dark:text-blue-400 uppercase tracking-wider animate-pulse">Welcome Back</span>
+              <span className="text-sm font-semibold text-blue-600 dark:text-blue-400 uppercase tracking-wide animate-pulse">Welcome Back</span>
               <div className="animate-bounce hover:animate-spin transition-all duration-300">🚀</div>
             </div>
           </div>
@@ -113,7 +113,7 @@ export function WelcomeBanner({ userName, description, buttons, imageSrc, classN
                     <stat.icon className="w-4 h-4" />
                   </div>
                   <div className="flex flex-col">
-                    <span className="text-[10px] font-bold text-slate-400 dark:text-zinc-500 uppercase tracking-wider line-clamp-1">{stat.label}</span>
+                    <span className="text-[10px] font-bold text-slate-400 dark:text-zinc-500 uppercase tracking-wide line-clamp-1">{stat.label}</span>
                     <span className="text-[14px] font-black text-slate-800 dark:text-zinc-100 whitespace-nowrap">{stat.value}</span>
                   </div>
                 </div>

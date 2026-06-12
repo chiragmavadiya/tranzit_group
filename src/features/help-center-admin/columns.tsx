@@ -41,7 +41,7 @@ export const ARTICLE_COLUMNS = (
         if (val === 'Archived') variant = "destructive";
 
         return (
-          <Badge variant={variant} className="tracking-wider h-5 px-2">
+          <Badge variant={variant} className="tracking-wide h-5 px-2">
             {val as string}
           </Badge>
         );

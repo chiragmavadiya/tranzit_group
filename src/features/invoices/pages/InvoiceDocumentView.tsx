@@ -251,7 +251,7 @@ const InvoiceDocumentView: React.FC = () => {
     return true
   }, [invoiceData, invoiceID])
 
-  const handleSave = useCallback(() => {
+  const handleSave = useCallback((onSuccessCb?: (id: string) => void) => {
     if (!invoiceID) return
     if (!validateInvoice()) return
     const payload = {
@@ -282,23 +282,32 @@ const InvoiceDocumentView: React.FC = () => {
     if (invoiceID === 'create') {
       createMutation.mutate(payload, {
         onSuccess: (response) => {
-          navigate(`${isAdmin ? '/admin' : ''}/invoices/${response?.data?.id}`)
+          const newId = response?.data?.id
+          navigate(`${isAdmin ? '/admin' : ''}/invoices/${newId}`)
         }
       })
     } else {
-      updateMutation.mutate({ id: invoiceID, data: payload })
+      updateMutation.mutate({ id: invoiceID, data: payload }, {
+        onSuccess: () => {
+          if (onSuccessCb) {
+            onSuccessCb(invoiceID)
+          }
+        }
+      })
     }
   }, [invoiceID, invoiceData, createMutation, navigate, isAdmin, updateMutation, validateInvoice])
 
   const handleConfirmSend = useCallback(() => {
     if (invoiceID) {
-      sendMutation.mutate(invoiceID, {
-        onSuccess: () => {
-          setIsSendConfirmOpen(false)
-        }
+      handleSave((actualInvoiceId) => {
+        sendMutation.mutate(actualInvoiceId, {
+          onSuccess: () => {
+            setIsSendConfirmOpen(false)
+          }
+        })
       })
     }
-  }, [invoiceID, sendMutation])
+  }, [invoiceID, handleSave, sendMutation])
 
   const handleSaveOnly = useCallback(() => {
     handleSave()
@@ -401,7 +410,7 @@ const InvoiceDocumentView: React.FC = () => {
               )}
               <Button
                 variant="outline"
-                onClick={handleSave}
+                onClick={() => handleSave()}
                 disabled={updateMutation.isPending || createMutation.isPending}
                 className="h-8 flex items-center gap-2 border-slate-200 dark:border-zinc-800 font-bold text-slate-600 hover:text-slate-700 hover:bg-slate-50 shadow-sm"
               >
@@ -462,14 +471,14 @@ const InvoiceDocumentView: React.FC = () => {
       <ConformationModal
         open={isSendConfirmOpen}
         onOpenChange={setIsSendConfirmOpen}
-        title="Send Invoice"
-        description="Are you sure to send this PDF invoice to the customer?"
-        confirmText="Yes, Send"
+        title="Save and Send Invoice"
+        description="Are you sure to save and send this PDF invoice to the customer?"
+        confirmText="Yes, Save & Send"
         cancelText="No, Save Only"
         confirmVariant="default"
         onConfirm={handleConfirmSend}
         onCancel={handleSaveOnly}
-        loading={sendMutation.isPending}
+        loading={sendMutation.isPending || updateMutation.isPending || createMutation.isPending}
       />
 
       {/* <CreateInvoiceDialog

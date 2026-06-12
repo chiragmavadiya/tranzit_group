@@ -198,7 +198,9 @@ export const customerService = {
             responseType: 'blob',
         });
 
-        const filename = `invoices_${new Date().getTime()}.${format}`;
+        const formated = format === 'csv' ? 'csv' : format === 'excel' ? 'xlsx' : 'pdf';
+        const filename = getFileName(response) || `admin_customer_${id}_invoices_${new Date().getTime()}.${formated}`;
+
         return { blob: response.data, filename };
     },
 

@@ -22,7 +22,7 @@ export const getOrdersColumns = (
   fromCustomer: boolean = false,
   onArchiveOrder?: (orderId: string) => void,
   updateToArchiveId?: string | null,
-  onPrint?: (orderNumber: string | number, amount: number) => void,
+  onPrint?: (orderNumber: string | number, amount: number, row: Order) => void,
   printingOrderId?: string | number | null
 ): Column<Order>[] => {
   const printedAndShippedActions = (value: string) => [
@@ -184,9 +184,9 @@ export const getOrdersColumns = (
               )}
               {orderType === 'new' && (
                 <>
-                  <Button 
+                  <Button
                     className="h-9 px-6 font-bold"
-                    onClick={() => onPrint?.(row.order_number, Number(row.amount))}
+                    onClick={() => onPrint?.(row.order_number, Number(row.amount), row)}
                     disabled={printingOrderId === row.order_number}
                   >
                     {printingOrderId === row.order_number ? (

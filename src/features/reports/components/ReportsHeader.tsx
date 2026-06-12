@@ -54,7 +54,6 @@ export function ReportsHeader({ startDate, endDate, activeTab }: ReportsHeaderPr
   };
 
   const handleSchedule = () => {
-    console.log('Scheduled:', { scheduleReportType, recipients, frequency });
     setIsScheduleOpen(false);
   };
 

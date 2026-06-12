@@ -132,8 +132,6 @@ export const useToggleCustomerStatus = () => {
     return useMutation({
         mutationFn: (id: number | string) => customerService.toggleStatus(id),
         onSuccess: (_, variable) => {
-            console.log('Customer status toggled for ID:', variable);
-
             queryClient.invalidateQueries({ queryKey: QUERY_KEYS.ADMIN_CUSTOMERS.LIST });
             queryClient.invalidateQueries({ queryKey: QUERY_KEYS.ADMIN_CUSTOMERS.COUNTS });
             queryClient.invalidateQueries({ queryKey: QUERY_KEYS.ADMIN_CUSTOMERS.DETAILS(variable.toString()) });

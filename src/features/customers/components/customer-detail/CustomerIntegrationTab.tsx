@@ -10,7 +10,6 @@ export const CustomerIntegrationTab = ({ customerId }: CustomerIntegrationTabPro
     const { data: response, isLoading } = useCustomerIntegrations(customerId);
 
     const data = response?.data;
-    console.log(data, 'data....')
 
     return (
         <div className="space-y-8 animate-in fade-in duration-500 bg-white dark:bg-zinc-950 p-4 rounded-md">

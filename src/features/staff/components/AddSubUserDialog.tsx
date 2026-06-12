@@ -105,7 +105,6 @@ const SubUserForm = forwardRef<HTMLFormElement, SubUserFormProps>(
     }, []);
 
     const handleInputChange = useCallback((field: string, value: any) => {
-      console.log(field, value)
       setFormData((prev: any) => ({ ...prev, [field]: value }));
     }, []);
 

@@ -21,10 +21,11 @@ interface CarrierCardProps {
   orderType?: string
   initialSelectedCourierId?: string
   default_courier?: any;
+  signatureSelected?: boolean;
 }
 
 export const CarrierCard: React.FC<CarrierCardProps> = memo((props) => {
-  const { itemData, addresses, onQuoteChange, setCourierData, orderDetail, module, orderType = 'create', initialSelectedCourierId = null } = props
+  const { itemData, addresses, onQuoteChange, setCourierData, orderDetail, module, orderType = 'create', initialSelectedCourierId = null, signatureSelected = false } = props
   const { role } = useAppSelector((state) => state.auth);
   const [selectedServiceId, setSelectedServiceId] = useState<string>(initialSelectedCourierId || '')
   const [couriers, setCouriers] = useState<any[]>([]);
@@ -78,18 +79,15 @@ export const CarrierCard: React.FC<CarrierCardProps> = memo((props) => {
       );
       setBestDeal(minItem.courierCode + (minItem.product_id || '') || '');
       // if (initialSelectedCourierId !== undefined && initialSelectedCourierId !== null && initialSelectedCourierId !== '' && !selectedServiceId) {
-      //   console.log("Prev state.... 1", initialSelectedCourierId, !selectedServiceId);
       //   setSelectedServiceId(initialSelectedCourierId);
       //   return;
       // }
       const selectedFromQuote = sessionStorage.getItem('quote_courier');
       if (selectedFromQuote) {
-        console.log("Prev state.... 2");
         const courier = JSON.parse(selectedFromQuote);
         setSelectedServiceId(courier.courier.courierCode + (courier.courier.product_id || '') || '');
       } else if (!selectedServiceId || !allCourierIds.includes(selectedServiceId)) {
         setSelectedServiceId((prev) => {
-          console.log("Prev state....", prev);
           if (prev) return prev;
           // if (default_courier?.slug) {
           //   return default_courier.slug + (default_courier?.product_id || '') || '';
@@ -119,7 +117,6 @@ export const CarrierCard: React.FC<CarrierCardProps> = memo((props) => {
 
     const sender_addr1 = getAddress(sender!);
     const receiver_addr1 = getAddress(receiver!);
-    console.log(sender, 'sender....')
     if (sender_addr1 === '' || receiver_addr1 === '' || sender?.suburb === '' || receiver?.suburb === '') {
       showToast("Please add valid addresses", "error");
       return;
@@ -133,6 +130,7 @@ export const CarrierCard: React.FC<CarrierCardProps> = memo((props) => {
       receiver_details: receiver_details,
       receiver_address: receiver?.address_info || receiver_addr1,
       is_order: module === 'quote' ? "no" as const : "yes" as const,
+      signature_required: signatureSelected ? 1 : 0
     }
 
     getServices(payload, {
@@ -147,7 +145,6 @@ export const CarrierCard: React.FC<CarrierCardProps> = memo((props) => {
   };
 
   useEffect(() => {
-    console.log(orderType, module, 'orderType....')
     if (orderType !== 'create' && orderType !== 'consign' && orderType !== 'return') return;
     // Check if we have valid items with dimensions > 0
     const isValidItems = itemData && itemData.length > 0 && itemData.every(item =>
@@ -161,7 +158,6 @@ export const CarrierCard: React.FC<CarrierCardProps> = memo((props) => {
 
     const sender_addr1 = getAddress(sender!);
     const receiver_addr1 = getAddress(receiver!);
-    console.log(sender_addr1, receiver_addr1, 'sender_addr1, receiver_addr1....')
     if (sender_addr1 === '' || receiver_addr1 === '' || sender?.suburb === '' || receiver?.suburb === '') return;
 
     const timer = setTimeout(() => {
@@ -173,6 +169,7 @@ export const CarrierCard: React.FC<CarrierCardProps> = memo((props) => {
         receiver_details: receiver_details,
         receiver_address: receiver?.address_info || receiver_addr1,
         is_order: module === 'quote' ? "no" as const : "yes" as const,
+        signature_required: signatureSelected ? 1 : 0
       }
 
       getServices(payload, {
@@ -186,7 +183,7 @@ export const CarrierCard: React.FC<CarrierCardProps> = memo((props) => {
     }, 500); // 500ms debounce
     // Cleanup previous timer
     return () => clearTimeout(timer);
-  }, [itemData, addresses, getServices, orderType, module, getAddress])
+  }, [itemData, addresses, getServices, orderType, module, getAddress, signatureSelected])
 
   useEffect(() => {
     if (couriers.length > 0 && selectedServiceId) {
@@ -216,10 +213,6 @@ export const CarrierCard: React.FC<CarrierCardProps> = memo((props) => {
       }
     }
   }, [selectedServiceId, couriers, surchargesMap, selectedSurchargesMap, onQuoteChange, setCourierData])
-
-  // console.log(initialSelectedCourierId, 'initialSelectedCourierId')
-  // console.log(selectedServiceId, 'selectedServiceId')
-  // console.log(bestDeal, 'bestDeal')
 
   return (
     <Card className="border gap-0 border-gray-200 dark:border-zinc-800 overflow-hidden transition-colors duration-300">
@@ -316,7 +309,6 @@ export const CarrierCard: React.FC<CarrierCardProps> = memo((props) => {
                 const courierSurcharges = surchargesMap[courier.courierCode] || [];
                 const selectedNames = selectedSurchargesMap[courier.courierCode] ?? [];
                 const isSelected = selectedServiceId === serviceId
-                console.log(selectedServiceId, 'selectedServiceId', initialSelectedCourierId, 'initialSelectedCourierId', serviceId, 'serviceId')
                 if (courier.success === false) {
                   return (
                     <div

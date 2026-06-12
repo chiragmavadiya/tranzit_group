@@ -18,6 +18,7 @@ export interface Order {
   receiver_email?: string;
   receiver_phone?: string;
   order_source_icon?: string;
+  is_own_courier: boolean;
 }
 
 export type TabType = 'new' | 'printed' | 'shipped' | 'archived';

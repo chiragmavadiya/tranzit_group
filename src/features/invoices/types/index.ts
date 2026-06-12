@@ -79,6 +79,7 @@ export interface Invoice {
   items: InvoiceItem
   address: any
   actions: string[];
+  issued_at?: string;
 }
 
 export interface InvoiceSummary {

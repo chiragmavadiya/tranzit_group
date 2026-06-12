@@ -244,6 +244,7 @@ export const SidePanel: React.FC<SidePanelProps> = memo(({
                   </div>
                   <RadioGroup
                     value={insuranceSelected ? "yes" : "no"}
+                    name='liability_cover'
                     onValueChange={(val) => handleOptionalFieldsChange('insurance', val === 'yes')}
                     className="flex flex-col gap-2 mt-1"
 
@@ -291,6 +292,7 @@ export const SidePanel: React.FC<SidePanelProps> = memo(({
                   /> */}
                   <RadioGroup
                     value={signatureSelected ? "yes" : "no"}
+                    name='signature_required'
                     onValueChange={(val) => handleOptionalFieldsChange('signature', val === 'yes')}
                     className="flex flex-col gap-2 mt-1"
 

@@ -38,6 +38,17 @@ interface InvoicePaperProps {
   onDeletePayment?: (paymentId: string | number) => void;
 }
 
+const calculateGSTBreakdown = (finalAmount: number, gstPercent: number) => {
+  const basePrice = finalAmount / (1 + gstPercent / 100);
+  const gstAmount = finalAmount - basePrice;
+
+  return {
+    basePrice: Number(basePrice.toFixed(2)),
+    gstAmount: Number(gstAmount.toFixed(2)),
+    finalAmount: Number(finalAmount.toFixed(2)),
+  };
+};
+
 const formatDate = (dateStr: string) => {
   if (!dateStr) return '';
   if (/^\d{2}\/\d{2}\/\d{4}$/.test(dateStr)) return dateStr;
@@ -128,53 +139,80 @@ export const InvoicePaper: React.FC<InvoicePaperProps> = ({
       setShouldAutoEdit(false);
     }
   }, [invoice.items, shouldAutoEdit]);
-
-  const calculateGSTBreakdown = (finalAmount: number, gstPercent: number) => {
-    const basePrice = finalAmount / (1 + gstPercent / 100);
-    const gstAmount = finalAmount - basePrice;
-
-    return {
-      basePrice: Number(basePrice.toFixed(2)),
-      gstAmount: Number(gstAmount.toFixed(2)),
-      finalAmount: Number(finalAmount.toFixed(2)),
-    };
-  };
-
   const isCreate = invoiceId === 'create';
 
-  let subtotalExGst = 0;
-  let gstVal = 0;
-  let totalIncGst = 0;
-  let amountPaid = 0;
-  let creditAmount = 0;
-  let amountDue = 0;
-
-  if (isCreate) {
+  const getInitialTotals = useCallback(() => {
+    let credit = 0;
     let finalAmount = 0;
     (invoice?.items || []).forEach((item: any) => {
       const itemVal = Number(item?.item?.total || item?.total || item?.total_charge_credit || 0);
       if (item?.type === 'credit' || item?.type === 'Credit') {
-        // finalAmount -= itemVal;
-        creditAmount += itemVal;
+        credit += itemVal;
       } else {
         finalAmount += itemVal;
       }
     });
     const breakdown = calculateGSTBreakdown(finalAmount, 10);
-    subtotalExGst = breakdown.basePrice;
-    gstVal = breakdown.gstAmount;
-    totalIncGst = breakdown.finalAmount;
-    amountPaid = 0;
-    amountDue = finalAmount - creditAmount > 0 ? finalAmount - creditAmount : 0;
-  } else {
-    subtotalExGst = Number(invoice?.totals?.subtotal_ex_gst || 0);
-    gstVal = Number(invoice?.totals?.gst || 0);
-    totalIncGst = Number(invoice?.totals?.total_inc_gst || 0);
-    amountPaid = Number(invoice?.totals?.amount_paid || 0);
-    creditAmount = Number(invoice?.totals?.credit_amount || 0);
-    amountDue = Number(invoice?.totals?.amount_due || 0);
-  }
-  console.log(creditAmount, 'creditAmount')
+    const paid = isCreate ? 0 : Number(invoice?.till_date_paid || invoice?.totals?.amount_paid || 0);
+    const due = finalAmount - paid - credit > 0 ? finalAmount - paid - credit : 0;
+    return {
+      subtotalExGst: breakdown.basePrice,
+      gstVal: breakdown.gstAmount,
+      totalIncGst: breakdown.finalAmount,
+      amountPaid: paid,
+      creditAmount: credit,
+      amountDue: due
+    };
+  }, [invoice.items, invoice.till_date_paid, invoice.totals?.amount_paid, isCreate]);
+
+  const initial = getInitialTotals();
+  const [subtotalExGst, setSubtotalExGst] = useState(initial.subtotalExGst);
+  const [gstVal, setGstVal] = useState(initial.gstVal);
+  const [totalIncGst, setTotalIncGst] = useState(initial.totalIncGst);
+  const [amountPaid, setAmountPaid] = useState(initial.amountPaid);
+  const [creditAmount, setCreditAmount] = useState(initial.creditAmount);
+  const [amountDue, setAmountDue] = useState(initial.amountDue);
+
+  useEffect(() => {
+    const computed = getInitialTotals();
+    setSubtotalExGst(computed.subtotalExGst);
+    setGstVal(computed.gstVal);
+    setTotalIncGst(computed.totalIncGst);
+    setAmountPaid(computed.amountPaid);
+    setCreditAmount(computed.creditAmount);
+    setAmountDue(computed.amountDue);
+
+    const parentSubtotal = Number(invoice?.totals?.subtotal_ex_gst || 0);
+    const parentGst = Number(invoice?.totals?.gst || 0);
+    const parentTotal = Number(invoice?.totals?.total_inc_gst || 0);
+    const parentPaid = Number(invoice?.till_date_paid || invoice?.totals?.amount_paid || 0);
+    const parentCredit = Number(invoice?.totals?.credit_amount || 0);
+    const parentDue = Number(invoice?.remaining_balance || invoice?.totals?.amount_due || 0);
+
+    if (
+      parentSubtotal !== computed.subtotalExGst ||
+      parentGst !== computed.gstVal ||
+      parentTotal !== computed.totalIncGst ||
+      parentPaid !== computed.amountPaid ||
+      parentCredit !== computed.creditAmount ||
+      parentDue !== computed.amountDue
+    ) {
+      setInvoiceData?.((prev: any) => ({
+        ...prev,
+        till_date_paid: computed.amountPaid,
+        remaining_balance: computed.amountDue,
+        totals: {
+          ...prev?.totals,
+          subtotal_ex_gst: computed.subtotalExGst,
+          gst: computed.gstVal,
+          total_inc_gst: computed.totalIncGst,
+          amount_paid: computed.amountPaid,
+          credit_amount: computed.creditAmount,
+          amount_due: computed.amountDue,
+        }
+      }));
+    }
+  }, [invoice.items, invoice?.totals, invoice?.till_date_paid, invoice?.remaining_balance, isCreate, setInvoiceData, getInitialTotals]);
   return (
     <div className="mx-auto w-full bg-white dark:bg-zinc-900 shadow-[0_0_50px_rgba(0,0,0,0.05)] dark:shadow-[0_0_50px_rgba(0,0,0,0.3)] min-h-[1100px] flex flex-col p-8 transition-all duration-300 print:shadow-none print:p-0 font-sans text-slate-900 dark:text-zinc-100">
 
@@ -360,12 +398,12 @@ export const InvoicePaper: React.FC<InvoicePaperProps> = ({
                 <TableRow className="hover:bg-transparent border-y border-slate-200 dark:border-zinc-800 bg-transparent">
                   <TableHead className="w-[130px] text-sm font-medium uppercase text-slate-600 dark:text-zinc-400 py-3">Type</TableHead>
                   <TableHead className="w-[135px] text-sm font-medium uppercase text-slate-600 dark:text-zinc-400 py-3">Date</TableHead>
-                  <TableHead className=" text-sm font-medium uppercase text-slate-600 dark:text-zinc-400 py-3">Order Number / Description</TableHead>
-                  <TableHead className=" text-sm font-medium uppercase text-slate-600 dark:text-zinc-400 py-3">From</TableHead>
-                  <TableHead className=" text-sm font-medium uppercase text-slate-600 dark:text-zinc-400 py-3">Destination</TableHead>
-                  <TableHead className=" text-sm font-medium uppercase text-slate-600 dark:text-zinc-400 py-3">To</TableHead>
-                  <TableHead className=" text-sm font-medium uppercase text-slate-600 dark:text-zinc-400 py-3">Receiver</TableHead>
-                  <TableHead className=" text-sm font-medium uppercase text-slate-600 dark:text-zinc-400 py-3">
+                  <TableHead className="min-w-[110px] text-sm font-medium uppercase text-slate-600 dark:text-zinc-400 py-3">Order Number / Description</TableHead>
+                  <TableHead className="min-w-[110px] text-sm font-medium uppercase text-slate-600 dark:text-zinc-400 py-3">From</TableHead>
+                  <TableHead className="min-w-[110px] text-sm font-medium uppercase text-slate-600 dark:text-zinc-400 py-3">Destination</TableHead>
+                  <TableHead className="min-w-[110px] text-sm font-medium uppercase text-slate-600 dark:text-zinc-400 py-3">To</TableHead>
+                  <TableHead className="min-w-[110px] text-sm font-medium uppercase text-slate-600 dark:text-zinc-400 py-3">Receiver</TableHead>
+                  <TableHead className="min-w-[110px] text-sm font-medium uppercase text-slate-600 dark:text-zinc-400 py-3">
                     {isAdmin ? 'Total Charge / Credit' : 'Amount'}
                   </TableHead>
                   {isAdmin && <TableHead className="py-3 text-center"></TableHead>}
@@ -374,6 +412,8 @@ export const InvoicePaper: React.FC<InvoicePaperProps> = ({
               <TableBody>
                 {(invoice.items || []).map((item: any, idx: number) => {
                   const isEditing = isAdmin;
+
+                  const itemType = item.type?.toLowerCase();
 
                   return (
                     <TableRow
@@ -394,7 +434,7 @@ export const InvoicePaper: React.FC<InvoicePaperProps> = ({
                           <div className="flex gap-1">
                             <FormSelect
                               label=""
-                              value={item?.type ? item.type.toLowerCase() : ''}
+                              value={itemType}
                               name='type'
                               onValueChange={(val) => updateItemsData(item.id, 'type', val || '')}
                               options={[
@@ -411,16 +451,16 @@ export const InvoicePaper: React.FC<InvoicePaperProps> = ({
                         ) : (
                           <Badge variant="outline" className={cn(
                             "text-[10px] font-black uppercase border-none px-2 py-0.5",
-                            item.type.toLowerCase() === 'order' ? "bg-primary/10 text-primary" :
-                              item.type.toLowerCase() === 'credit' ? "bg-emerald-50 text-emerald-600" :
+                            itemType === 'order' ? "bg-primary/10 text-primary" :
+                              itemType === 'credit' ? "bg-emerald-50 text-emerald-600" :
                                 "bg-slate-100 text-slate-600"
                           )}>
-                            {item.type ? item.type.charAt(0).toUpperCase() + item.type.slice(1).toLowerCase() : 'Custom'}
+                            {itemType || 'Custom'}
                           </Badge>
                         )}
                       </TableCell>
                       <TableCell className="py-4">
-                        {isEditing && item.type === 'order' ? (
+                        {isEditing && itemType === 'order' ? (
                           <DatePicker
                             date={item.date || ''}
                             setDate={(val) => updateItemsData(item.id, 'date', val!)}
@@ -428,25 +468,25 @@ export const InvoicePaper: React.FC<InvoicePaperProps> = ({
                             placeholder="dd/mm/yyyy"
                           />
                         ) : (
-                          <span className="text-[12px] font-medium py-3 text-slate-600">{item.type === 'order' ? formatDate(item.date || item.item_date) : '-'}</span>
+                          <span className="text-[12px] font-medium py-3 text-slate-600">{itemType === 'order' ? formatDate(item.date || item.item_date) : '-'}</span>
                         )}
                       </TableCell>
-                      <TableCell className="py-4">
+                      <TableCell className="py-4 min-w-[110px]">
                         {isEditing ? (
                           <FormInput
                             className="w-full min-w-[150px] shadow-none col-span-12"
                             inputClassName="h-8 text-sm bg-white border border-slate-200 focus:ring-1 focus:ring-primary rounded-md px-3"
-                            value={item.type === 'order' ? item.order_number : item.description || ''}
-                            placeholder={item.type === 'order' ? 'Order Number' : item.type === 'credit' ? 'Credit description' : 'Description'}
-                            onChange={(val) => updateItemsData(item.id, item.type === 'order' ? 'order_number' : 'description', val)}
+                            value={itemType === 'order' ? item.order_number : item.description || ''}
+                            placeholder={itemType === 'order' ? 'Order Number' : itemType === 'credit' ? 'Credit description' : 'Description'}
+                            onChange={(val) => updateItemsData(item.id, itemType === 'order' ? 'order_number' : 'description', val)}
                           />
                         ) : (
-                          <span className="text-[12px] font-bold text-slate-700 dark:text-zinc-200">{item.type === 'order' ? item.order_number : item.description || '-'}</span>
+                          <span className="text-[12px] font-bold text-slate-700 dark:text-zinc-200">{itemType === 'order' ? item.order_number : item.description || '-'}</span>
                         )}
                       </TableCell>
-                      <TableCell className="py-4">
+                      <TableCell className="py-4 min-w-[110px]">
                         {isEditing ? (
-                          item.type === 'order' ? (
+                          itemType === 'order' ? (
                             <FormInput
                               className="w-full shadow-none col-span-12"
                               inputClassName="h-8 text-sm bg-white border border-slate-200 focus:ring-1 focus:ring-primary rounded-md px-2"
@@ -458,12 +498,12 @@ export const InvoicePaper: React.FC<InvoicePaperProps> = ({
                             <span className="text-[12px] font-medium text-slate-400 dark:text-zinc-600">-</span>
                           )
                         ) : (
-                          <span className="text-[12px] font-medium text-slate-600">{item.type === 'order' ? item.from : '-'}</span>
+                          <span className="text-[12px] font-medium text-slate-600">{itemType === 'order' ? item.from : '-'}</span>
                         )}
                       </TableCell>
-                      <TableCell className="py-4">
+                      <TableCell className="py-4 min-w-[110px]">
                         {isEditing ? (
-                          item.type === 'order' ? (
+                          itemType === 'order' ? (
                             <FormInput
                               className="w-full shadow-none col-span-12"
                               inputClassName="h-8 text-sm bg-white border border-slate-200 focus:ring-1 focus:ring-primary rounded-md px-2"
@@ -475,12 +515,12 @@ export const InvoicePaper: React.FC<InvoicePaperProps> = ({
                             <span className="text-[12px] font-medium text-slate-400 dark:text-zinc-600">-</span>
                           )
                         ) : (
-                          <span className="text-[12px] font-medium text-slate-600">{item.type === 'order' ? item.destination : '-'}</span>
+                          <span className="text-[12px] font-medium text-slate-600">{itemType === 'order' ? item.destination : '-'}</span>
                         )}
                       </TableCell>
-                      <TableCell className="py-4">
+                      <TableCell className="py-4 min-w-[110px]">
                         {isEditing ? (
-                          item.type === 'order' ? (
+                          itemType === 'order' ? (
                             <FormInput
                               className="w-full shadow-none col-span-12"
                               inputClassName="h-8 text-sm bg-white border border-slate-200 focus:ring-1 focus:ring-primary rounded-md px-2"
@@ -492,12 +532,12 @@ export const InvoicePaper: React.FC<InvoicePaperProps> = ({
                             <span className="text-[12px] font-medium text-slate-400 dark:text-zinc-600">-</span>
                           )
                         ) : (
-                          <span className="text-[12px] font-medium text-slate-600">{item.type === 'order' ? item.to : '-'}</span>
+                          <span className="text-[12px] font-medium text-slate-600">{itemType === 'order' ? item.to : '-'}</span>
                         )}
                       </TableCell>
-                      <TableCell className="py-4">
+                      <TableCell className="py-4 min-w-[110px]">
                         {isEditing ? (
-                          item.type === 'order' ? (
+                          itemType === 'order' ? (
                             <FormInput
                               className="w-full shadow-none col-span-12"
                               inputClassName="h-8 text-sm bg-white border border-slate-200 focus:ring-1 focus:ring-primary rounded-md px-2"
@@ -509,10 +549,10 @@ export const InvoicePaper: React.FC<InvoicePaperProps> = ({
                             <span className="text-[12px] font-medium text-slate-400 dark:text-zinc-600">-</span>
                           )
                         ) : (
-                          <span className="text-[12px] font-medium text-slate-600">{item.type === 'order' ? item.receiver : '-'}</span>
+                          <span className="text-[12px] font-medium text-slate-600">{itemType === 'order' ? item.receiver : '-'}</span>
                         )}
                       </TableCell>
-                      <TableCell className="py-4">
+                      <TableCell className="py-4 min-w-[110px]">
                         {isEditing ? (
                           <div className="flex items-center gap-1.5 border border-slate-200 dark:border-zinc-800 rounded-md px-2 bg-white dark:bg-zinc-950 h-8 w-28">
                             <span className="text-slate-400 text-sm font-medium">$</span>
@@ -704,7 +744,7 @@ export const InvoicePaper: React.FC<InvoicePaperProps> = ({
             {creditAmount > 0 && (
               <div className="flex justify-between text-sm">
                 <span className="text-slate-500 font-medium">Credit Amount</span>
-                <span className="text-slate-800 dark:text-white font-bold">{formateCurrency(creditAmount)}</span>
+                <span className={`${creditAmount > 0 ? 'text-emerald-600' : 'text-slate-800 dark:text-white'} font-bold`}>{formateCurrency(creditAmount)}</span>
               </div>
             )}
 

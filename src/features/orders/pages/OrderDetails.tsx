@@ -448,6 +448,7 @@ const OrderDetailsPage: React.FC = () => {
                       module="order"
                       default_courier={default_courier}
                       initialSelectedCourierId={orderDetail?.courier_details && `${orderDetail?.courier_details?.courier_code || ''}${orderDetail?.courier_details?.product_id || ''}`}
+                      signatureSelected={signatureSelected}
                     />
                   )}
                   {!isCreate && (

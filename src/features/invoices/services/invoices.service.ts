@@ -20,7 +20,8 @@ export const invoicesService = {
       responseType: 'blob',
     });
 
-    const filename = `Invoices_Export_${new Date().getTime()}.${params.format}`;
+    const formated = params.format === 'csv' ? 'csv' : params.format === 'excel' ? 'xlsx' : 'pdf';
+    const filename = getFileName(response) || `invoices_export_${new Date().getTime()}.${formated}`;
     return { blob: response.data, filename };
   },
 

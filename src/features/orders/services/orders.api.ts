@@ -134,7 +134,8 @@ export const ordersService = {
             responseType: "blob",
         });
 
-        const filename = getFileName(response) || `customer-orders-${new Date().getTime()}.${params.format}`;
+        const formated = params.format === 'csv' ? 'csv' : params.format === 'excel' ? 'xlsx' : 'pdf';
+        const filename = getFileName(response) || `customer-orders-${new Date().getTime()}.${formated}`;
 
         return { blob: response.data, filename };
     },

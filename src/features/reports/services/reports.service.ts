@@ -24,7 +24,9 @@ export const reportsService = {
             responseType: 'blob',
         });
 
-        const filename = `Shipment_Report_${new Date().getTime()}.${filters.format}`;
+        const formated = filters.format === 'csv' ? 'csv' : filters.format === 'excel' ? 'xlsx' : 'pdf';
+        const filename = getFileName(response) || `Shipment_Report_${new Date().getTime()}.${formated}`;
+
         return { blob: response.data, filename };
     },
 
@@ -38,8 +40,9 @@ export const reportsService = {
             params: filters,
             responseType: 'blob',
         });
+        const formated = filters.format === 'csv' ? 'csv' : filters.format === 'excel' ? 'xlsx' : 'pdf';
+        const filename = getFileName(response) || `Transaction_Report_${new Date().getTime()}.${formated}`;
 
-        const filename = `Transaction_Report_${new Date().getTime()}.${filters.format}`;
         return { blob: response.data, filename };
     },
 
@@ -66,8 +69,9 @@ export const reportsService = {
             responseType: 'blob',
         });
 
-        const fileName = getFileName(response)
-        return { blob: response.data, filename: fileName };
+        const formated = filters.format === 'csv' ? 'csv' : filters.format === 'excel' ? 'xlsx' : 'pdf';
+        const filename = getFileName(response) || `Parcel_Report_${new Date().getTime()}.${formated}`;
+        return { blob: response.data, filename };
     },
     exportIntegratedParcelReport: async (filters: ReportFilters & { format: string }): Promise<{ blob: Blob; filename: string }> => {
         const endpoint = API_ENDPOINTS.ADMIN_REPORTS.INTEGRATED_PARCELS_EXPORT;
@@ -76,8 +80,9 @@ export const reportsService = {
             responseType: 'blob',
         });
 
-        const fileName = getFileName(response)
-        return { blob: response.data, filename: fileName };
+        const formated = filters.format === 'csv' ? 'csv' : filters.format === 'excel' ? 'xlsx' : 'pdf';
+        const filename = getFileName(response) || `Integrated_Parcel_Report_${new Date().getTime()}.${formated}`;
+        return { blob: response.data, filename };
     },
 
     uploadDirectFreightInvoice: async (file: File): Promise<UploadInvoiceResponse> => {

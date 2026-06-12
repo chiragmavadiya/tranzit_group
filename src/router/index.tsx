@@ -39,7 +39,6 @@ const PageLoader = () => (
 );
 
 export const AppRouter = () => {
-  console.log("render APP ROUTER...")
   const { isAuthenticated, userID, token, next_step } = useAppSelector((state) => state.auth);
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
@@ -68,7 +67,6 @@ export const AppRouter = () => {
   useEffect(() => {
     if (isAuthenticated) {
       if ((next_step === 'onboarding' || next_step === 'verify_email') && !location.pathname.includes('/on-board')) {
-        console.log("Again redirect .......", location.pathname)
         navigate('/on-board/' + userID + '/' + token);
       } else if (next_step === 'dashboard' && location.pathname.includes('/on-board')) {
         navigate('/orders?tab=new');

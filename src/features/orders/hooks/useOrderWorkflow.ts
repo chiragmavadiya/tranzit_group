@@ -257,8 +257,6 @@ export const useOrderWorkflow = () => {
     }
   }, []);
 
-  console.log(courierData, 'courierData...')
-
   // Summary Metrics calculations
   const calculation = useMemo(() => {
     const totalItems = itemsData?.reduce((acc, item) => acc + (Number(item.quantity) || 1), 0) || 0;
@@ -300,7 +298,6 @@ export const useOrderWorkflow = () => {
 
   // Order Submission/Saving Flow
   const handleOnSave = useCallback((skipWalletCheckArg?: any, overrideReceiverPhone?: string) => {
-    console.log(skipWalletCheckArg, 'skipWalletCheckArg')
     const isValidItems = itemsData && itemsData.length > 0 && itemsData.every((item) =>
       item.type !== 'box' ||
       Number(item.height) > 0 && Number(item.width) > 0 && Number(item.length) > 0 && Number(item.weight) > 0 && Number(item.quantity) > 0
@@ -317,7 +314,6 @@ export const useOrderWorkflow = () => {
       showToast('Please fill out item dimensions and complete both addresses.', 'error');
       return;
     }
-    console.log(courierData, 'courierData...')
     if (!courierData?.courier) {
       showToast('Please select a courier.', 'error');
       return;
@@ -397,7 +393,6 @@ export const useOrderWorkflow = () => {
           }
         },
         onError: (err: any) => {
-          console.log(err?.response?.data?.receiver_contact_required, 'error from order create ')
           if (err?.response?.data?.receiver_contact_required) {
             setWalletCheckOpen(false);
             setShowReceiverPhoneModal(true);

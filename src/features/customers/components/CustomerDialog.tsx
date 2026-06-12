@@ -174,7 +174,6 @@ export default function CustomerDialog({ open, onOpenChange, customerId }: Custo
 
     const mutation = isEdit ? updateCustomer : createCustomer;
     const variables = isEdit ? { id: customerId!, data: formData as any } : (formData as any);
-    console.log(variables, 'variables')
 
     mutation(variables, {
       onSuccess: () => {

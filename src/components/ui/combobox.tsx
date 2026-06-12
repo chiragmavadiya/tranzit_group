@@ -330,7 +330,6 @@ export const SelectSearch = ({
     itemToStringValue: (opt: options) => String(opt.value),
     onValueChange: (opt: options | null) => {
       if (opt === null) return;
-      console.log("opt", opt)
       if (value === undefined) {
         setInternalValue(opt)
       }

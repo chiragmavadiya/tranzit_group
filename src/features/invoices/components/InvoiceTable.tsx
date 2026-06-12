@@ -105,7 +105,7 @@ export function InvoiceTable({
       header: 'Issued Date',
       cell: (_, row) => (
         <div className="text-gray-500 dark:text-zinc-400 whitespace-nowrap">
-          {row.issue_date || row.invoice_date}
+          {row.issue_date || row?.issued_at || row.invoice_date}
         </div>
       )
     },

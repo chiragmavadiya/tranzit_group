@@ -136,7 +136,6 @@ export default function AccountSettingsPage() {
         }
       }
     }
-    console.log(payload, 'save payload......')
     // return
     updateProfileMutation.mutate(payload, {
       onSuccess: () => {
@@ -274,7 +273,6 @@ export default function AccountSettingsPage() {
     formData.shipping_postcode,
   ]);
 
-  console.log(formData)
   return (
     <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 w-full items-start">
 

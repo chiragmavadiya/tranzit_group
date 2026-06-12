@@ -2,7 +2,7 @@
 
 import { useState, useMemo, useCallback, useEffect, lazy, Suspense } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import type { TabType } from '@/features/orders/types';
+import type { Order, TabType } from '@/features/orders/types';
 import { useOrders, useExportOrders, useImportOrders, useDownloadLabel, useCancelOrder, useArchiveOrder, usePrintOrder, useWalletCheck } from '@/features/orders/hooks/useOrders';
 import WalletCheckDialog from '@/features/orders/components/WalletCheckDialog';
 import { DataTable } from '@/components/common/DataTable';
@@ -29,7 +29,6 @@ const ImportOrdersDialog = lazy(() => import('@/features/orders/components/Impor
 const CreateOrderDialog = lazy(() => import('@/features/orders/components/CreateOrderDialog'));
 
 export default function OrdersPage({ fromCustomer, customerId }: { fromCustomer?: boolean, customerId?: string }) {
-  console.log("Render OrdersPage...")
   const [searchParams, setSearchParams] = useSearchParams();
   const activeTab = (searchParams.get('tab')?.toLowerCase() as TabType) || 'new';
   const { role } = useAppSelector((state) => state.auth);
@@ -85,10 +84,10 @@ export default function OrdersPage({ fromCustomer, customerId }: { fromCustomer?
     });
   }, [printOrderMutation, printLabel]);
 
-  const handlePrintClick = useCallback((orderNumber: string | number, amount: number) => {
+  const handlePrintClick = useCallback((orderNumber: string | number, amount: number, row: Order) => {
     setOrderToPrint({ orderNumber, amount });
 
-    if (role === 'admin') {
+    if (role === 'admin' || row.is_own_courier) {
       executePrint(orderNumber);
       return;
     }

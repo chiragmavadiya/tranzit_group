@@ -7,8 +7,6 @@ import {
   DropdownCustomMenu
 } from "@/components/ui/dropdown-menu";
 import { useState } from "react";
-import { format } from "date-fns";
-
 interface TransactionListProps {
   // metrics: AdminMetrics | CustomerMetrics;
   className?: string;
@@ -52,11 +50,6 @@ export function TransactionList({ transactions, className, loading }: Transactio
   // on the object we're currently processing.
   const currentTransactions = (transactions as any)?.[activePeriod.toLowerCase() as keyof typeof transactions] || [];
   const currentCount = (transactions as any)?.[countKeys[activePeriod]] || currentTransactions.length || 0;
-
-  const formattedDate = (date: string) => format(
-    new Date(date),
-    "dd MMM yyyy"
-  );
 
   return (
     <Card className={cn("border p-0 gap-0 ring-0 border-gray-200 dark:border-zinc-800 bg-white dark:bg-zinc-950 flex flex-col transition-colors duration-300", className)}>
@@ -102,11 +95,14 @@ export function TransactionList({ transactions, className, loading }: Transactio
                     {tx.reason || tx.title}
                   </span>
                   <span className="text-[11px] font-medium text-slate-400 dark:text-zinc-500 truncate flex items-center gap-1">
-                    <>
-                      <span className="text-slate-500 text-sm dark:text-zinc-400 font-semibold">{tx.customer_name || ''}</span>
-                      <span className="text-slate-300 dark:text-zinc-600 px-0.5">•</span>
-                    </>
-                    <span>{tx.payment_method || tx.type || formattedDate(tx.created_at)}</span>
+                    {tx.customer_name && (
+                      <>
+                        <span className="text-slate-500 text-sm dark:text-zinc-400 font-semibold">{tx.customer_name || ''}</span>
+                        <span className="text-slate-300 dark:text-zinc-600 px-0.5">•</span>
+                      </>
+                    )}
+                    <span>{tx.payment_method || tx.type}</span>
+                    <span>{tx.created_at || tx.date}</span>
                   </span>
                 </div>
               </div>

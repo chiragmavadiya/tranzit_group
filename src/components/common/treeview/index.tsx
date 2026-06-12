@@ -580,7 +580,6 @@ const PermissionTreeView = ({
     permissionsData: TreeNode[];
 }) => {
 
-    console.log(initialSelected, 'initialSelected')
     const [treeData, setTreeData] = useState<TreeNode[]>([]);
     const [searchQuery, setSearchQuery] = useState("");
 

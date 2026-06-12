@@ -8,7 +8,6 @@ import { adminSidebarItems, clientSidebarItems } from '../router/Navigation';
 import { useAppSelector } from '@/hooks/store.hooks';
 
 export default function Layout() {
-  console.log("Render Layout...")
   const [isCollapsed, setIsCollapsed] = useState(window.innerWidth < 1280);
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
   const [isMobile, setIsMobile] = useState(window.innerWidth < 1024);

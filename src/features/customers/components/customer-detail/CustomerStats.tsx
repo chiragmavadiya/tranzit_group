@@ -3,7 +3,6 @@ import { formateCurrency } from '@/lib/utils';
 import { Package, Wallet, MapPin, TrendingUp, TrendingDown, CreditCard } from 'lucide-react';
 
 export const CustomerStats = ({ customer }: { customer: any }) => {
-    console.log(customer, 'customer')
     return (
         <div className="flex flex-col gap-4">
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4">

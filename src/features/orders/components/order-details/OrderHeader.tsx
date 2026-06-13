@@ -174,7 +174,7 @@ export const OrderHeader: React.FC<OrderHeaderProps> = ({
                   variant="outline"
                   onClick={onDownloadLabel}
                   disabled={isDownloadingLabel || requiresManualLabel}
-                  className="flex items-center gap-2 border-gray-200 dark:border-zinc-800 text-gray-700 dark:text-zinc-300 font-bold h-8 px-4 text-xs hover:bg-gray-50 dark:hover:bg-zinc-900 transition-colors"
+                  className="flex items-center scale-3d! gap-2 border-gray-200 dark:border-zinc-800 text-gray-700 dark:text-zinc-300 font-bold h-8 px-4 text-xs hover:bg-gray-50 dark:hover:bg-zinc-900 transition-colors"
                 >
                   {isDownloadingLabel ? <Loader2 className="h-4 w-4 animate-spin" /> : <Download className="h-4 w-4" />}
                   {requiresManualLabel ? 'LABEL NOT YET GENERATED' : 'DOWNLOAD LABEL'}

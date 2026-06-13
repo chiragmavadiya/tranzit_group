@@ -238,6 +238,7 @@ const OrderDetailsPage: React.FC = () => {
     handleReceiverPhoneSubmit,
     default_courier,
     default_item,
+    // isCloning,
   } = useOrderWorkflow();
 
   const [showConsignConfirm, setShowConsignConfirm] = useState(false);
@@ -341,6 +342,13 @@ const OrderDetailsPage: React.FC = () => {
               showArchiveModal={showArchiveModal}
               setShowArchiveModal={setShowArchiveModal}
               requiresManualLabel={requiresManualLabel}
+              // for clone
+              itemsData={itemsData}
+              courierData={courierData}
+              addressData={addressData}
+              signatureSelected={signatureSelected}
+              insuranceSelected={insuranceSelected}
+              deliveryInstructions={deliveryInstructions}
             />
 
             {requiresManualLabel && (

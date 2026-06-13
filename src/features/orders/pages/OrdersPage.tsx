@@ -25,6 +25,7 @@ import { ConformationModal } from '@/components/common/ConformationModal';
 import { useDebounce } from '@/hooks/useDebounce';
 import { FormSelect } from '../components/OrderFormUI';
 import { useCustomers } from '@/features/customers/hooks/useCustomers';
+import UpdateCourierModal from '../components/UpdateCourierModal';
 
 const ImportOrdersDialog = lazy(() => import('@/features/orders/components/ImportOrdersDialog'));
 const CreateOrderDialog = lazy(() => import('@/features/orders/components/CreateOrderDialog'));
@@ -76,9 +77,11 @@ export default function OrdersPage({ fromCustomer, customerId }: { fromCustomer?
   const [orderToCancel, setOrderToCancel] = useState<string | null>(null);
   const [orderToArchive, setOrderToArchive] = useState<string | null>(null);
   const [addressEditModal, setAddressEditModal] = useState<string>();
+  const [courierEditModal, setCourierEditModal] = useState<Order>();
 
   const selectedCustomer = searchParams.get('customerId') || undefined;
   const setSelectedCustomer = useCallback((val: string | undefined) => {
+    setSelectedRows([])
     setSearchParams((prev) => {
       if (val) {
         prev.set('customerId', val);
@@ -91,6 +94,7 @@ export default function OrdersPage({ fromCustomer, customerId }: { fromCustomer?
 
   // Synchronize search and date range filters with URL searchParams
   useEffect(() => {
+    setSelectedRows([])
     setSearchParams((prev) => {
       let hasChanged = false;
 
@@ -308,6 +312,10 @@ export default function OrdersPage({ fromCustomer, customerId }: { fromCustomer?
     setAddressEditModal(id);
   }, []);
 
+  const handleCourierEdit = useCallback((row: Order) => {
+    setCourierEditModal(row);
+  }, []);
+
   const handleDownloadSingleLabel = useCallback(async (orderId: string) => {
     try {
       await downloadLabelMutation.mutateAsync(orderId);
@@ -333,6 +341,7 @@ export default function OrdersPage({ fromCustomer, customerId }: { fromCustomer?
     activeTab,
     navigate,
     handleCustomerEdit,
+    handleCourierEdit,
     handleDownloadSingleLabel,
     handleCancelSingleOrderClick,
     downloadingLabelId,
@@ -341,7 +350,7 @@ export default function OrdersPage({ fromCustomer, customerId }: { fromCustomer?
     updateToArchiveId,
     handlePrintClick,
     printOrderMutation.isPending ? printOrderMutation.variables : (walletLoading ? orderToPrint?.orderNumber : null)
-  ), [role, activeTab, navigate, handleCustomerEdit, handleDownloadSingleLabel, handleCancelSingleOrderClick, downloadingLabelId, fromCustomer, handleArchiveOrder, updateToArchiveId, handlePrintClick, printOrderMutation.isPending, printOrderMutation.variables, walletLoading, orderToPrint?.orderNumber]);
+  ), [role, activeTab, navigate, handleCustomerEdit, handleCourierEdit, handleDownloadSingleLabel, handleCancelSingleOrderClick, downloadingLabelId, fromCustomer, handleArchiveOrder, updateToArchiveId, handlePrintClick, printOrderMutation.isPending, printOrderMutation.variables, walletLoading, orderToPrint?.orderNumber]);
 
   return (
     <div className={`${fromCustomer ? "p-0" : "p-page-padding"} flex-1 flex flex-col space-y-4 animate-in fade-in slide-in-from-bottom-2 duration-300 h-full overflow-hidden min-h-0`}>
@@ -400,7 +409,7 @@ export default function OrdersPage({ fromCustomer, customerId }: { fromCustomer?
                     variant="outline"
                     size="sm"
                     className="h-8 gap-2"
-                    onClick={handleDownloadMultipleLabels}
+                    // onClick={handleDownloadMultipleLabels}
                     disabled={isDownloadingLabels || isCancellingOrders}
                   >
                     {isDownloadingLabels ? <Loader2 className="w-4 h-4 animate-spin" /> : <Zap className="w-4 h-4" />}
@@ -617,6 +626,13 @@ export default function OrdersPage({ fromCustomer, customerId }: { fromCustomer?
           // isUpdate={true}
           />
         </Suspense>
+      )}
+      {courierEditModal && (
+        <UpdateCourierModal
+          open={!!courierEditModal}
+          onOpenChange={() => setCourierEditModal(undefined)}
+          orderData={courierEditModal}
+        />
       )}
       {walletCheckOpen && walletCheckData && orderToPrint && (
         <WalletCheckDialog

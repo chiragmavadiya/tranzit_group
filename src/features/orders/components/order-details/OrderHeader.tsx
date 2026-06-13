@@ -1,6 +1,6 @@
 import React, { useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { ArrowLeft, Box, Download, Loader2, PackagePlus, Trash2, Package } from 'lucide-react'
+import { ArrowLeft, Box, Download, Loader2, PackagePlus, Trash2, Package, Copy } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 // import { DropdownUI } from '@/features/orders/components/OrderFormUI'
@@ -12,6 +12,7 @@ import { useAppSelector } from '@/hooks/store.hooks'
 import { FormSelect } from '../OrderFormUI'
 import { useCustomers } from '@/features/customers/hooks/useCustomers'
 import { CustomTooltip } from '@/components/common/CustomTooltip'
+import type { AddressData } from '../../types'
 
 
 interface OrderHeaderProps {
@@ -33,6 +34,16 @@ interface OrderHeaderProps {
   showArchiveModal: boolean
   setShowArchiveModal: React.Dispatch<React.SetStateAction<boolean>>
   requiresManualLabel: boolean
+  // for clone
+  itemsData: any;
+  courierData: any;
+  addressData: {
+    sender: AddressData;
+    receiver: AddressData;
+  };
+  signatureSelected: boolean;
+  insuranceSelected: boolean;
+  deliveryInstructions: string
 }
 
 
@@ -54,10 +65,17 @@ export const OrderHeader: React.FC<OrderHeaderProps> = ({
   showArchiveModal,
   setShowArchiveModal,
   showCancelModal,
-  requiresManualLabel
+  requiresManualLabel,
+  // for clone
+  itemsData,
+  courierData,
+  addressData,
+  signatureSelected,
+  insuranceSelected,
+  deliveryInstructions
 }) => {
 
-
+  console.log("signatureSelected", signatureSelected, "insuranceSelected", insuranceSelected)
 
   const navigate = useNavigate()
   const { role } = useAppSelector((state) => state.auth)
@@ -91,6 +109,25 @@ export const OrderHeader: React.FC<OrderHeaderProps> = ({
     const rolePath = role === 'admin' ? '/admin' : ''
     navigate(`${rolePath}/orders/consign/${orderID}`)
   }
+
+  const onCloneOrder = () => {
+    const rolePath = role === 'admin' ? '/admin' : ''
+    if (orderType === 'consign') {
+      localStorage.setItem('quote_items', JSON.stringify(itemsData));
+      localStorage.setItem('quote_courier', JSON.stringify({ courier: courierData }));
+      localStorage.setItem('quote_sender', JSON.stringify(addressData.sender));
+      localStorage.setItem('quote_receiver', JSON.stringify(addressData.receiver));
+      localStorage.setItem('quote_insurance', String(insuranceSelected));
+      localStorage.setItem('quote_signature', String(signatureSelected));
+      localStorage.setItem('quote_delivery_instructions', String(deliveryInstructions));
+
+    } else {
+      localStorage.setItem('order_to_clone', orderDetail.order_number)
+    }
+    // localStorage.setItem('quote_address', JSON.stringify(addressData));
+    window.open(`${rolePath}/orders/create`, '_blank')
+  }
+
   return (
     <div className="flex flex-col gap-3 bg-white dark:bg-zinc-950 border-b border-gray-100 dark:border-zinc-800 transition-colors duration-300 pb-3 pt-0 lg:pb-4">
       <ConformationModal
@@ -177,7 +214,17 @@ export const OrderHeader: React.FC<OrderHeaderProps> = ({
                   className="flex items-center scale-3d! gap-2 border-gray-200 dark:border-zinc-800 text-gray-700 dark:text-zinc-300 font-bold h-8 px-4 text-xs hover:bg-gray-50 dark:hover:bg-zinc-900 transition-colors"
                 >
                   {isDownloadingLabel ? <Loader2 className="h-4 w-4 animate-spin" /> : <Download className="h-4 w-4" />}
-                  {requiresManualLabel ? 'LABEL NOT YET GENERATED' : 'DOWNLOAD LABEL'}
+                  {requiresManualLabel ? 'LABEL NOT YET GENERATED' : 'REPRINT LABEL'}
+                </Button>
+              )}
+              {orderDetail?.order_status_category !== 'archived' && (
+                <Button
+                  variant="outline"
+                  onClick={onCloneOrder}
+                  className="flex items-center scale-3d! gap-2 border-gray-200 dark:border-zinc-800 text-gray-700 dark:text-zinc-300 font-bold h-8 px-4 text-xs hover:bg-gray-50 dark:hover:bg-zinc-900 transition-colors"
+                >
+                  <Copy className='w-4 h-4 text-primary' />
+                  Clone
                 </Button>
               )}
               {(orderDetail?.order_status_category === 'new' || orderDetail?.order_status_category === 'printed' || orderDetail?.status.toLocaleLowerCase() === 'new' || orderDetail?.status.toLowerCase() === 'printed') && (

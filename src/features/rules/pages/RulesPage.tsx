@@ -201,7 +201,7 @@ export default function RulesPage() {
                     onClick={() => handleQuickSetupClick('cheapest')}
                     className="cursor-pointer hover:underline hover:text-blue-800 dark:hover:text-blue-300 font-medium"
                   >
-                    2. Assign a chipest service to all orders
+                    2. Assign a cheapest carrier service to all orders
                   </li>
                 </ul>
               </div>

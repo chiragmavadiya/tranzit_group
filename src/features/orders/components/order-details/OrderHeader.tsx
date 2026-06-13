@@ -75,8 +75,6 @@ export const OrderHeader: React.FC<OrderHeaderProps> = ({
   deliveryInstructions
 }) => {
 
-  console.log("signatureSelected", signatureSelected, "insuranceSelected", insuranceSelected)
-
   const navigate = useNavigate()
   const { role } = useAppSelector((state) => state.auth)
   const [showConfirm, setShowConfirm] = useState(false)

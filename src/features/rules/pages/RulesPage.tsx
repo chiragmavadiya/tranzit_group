@@ -31,9 +31,9 @@ export default function RulesPage() {
   const [ruleToDelete, setRuleToDelete] = useState<string | null>(null);
 
   // Manual execution loading states
-  const [isRunningRules, setIsRunningRules] = useState(false);
-  const [isRunningCheapestNotSet, setIsRunningCheapestNotSet] = useState(false);
-  const [isRunningCheapestAll, setIsRunningCheapestAll] = useState(false);
+  // const [isRunningRules, setIsRunningRules] = useState(false);
+  // const [isRunningCheapestNotSet, setIsRunningCheapestNotSet] = useState(false);
+  // const [isRunningCheapestAll, setIsRunningCheapestAll] = useState(false);
 
   // Queries & Mutations
   const { data: rules = [], isLoading } = useRules();
@@ -119,29 +119,29 @@ export default function RulesPage() {
   };
 
   // Manual Trigger Simulation
-  const handleRunRulesNow = () => {
-    setIsRunningRules(true);
-    setTimeout(() => {
-      setIsRunningRules(false);
-      alert('Shipping rules successfully applied to all unshipped orders.');
-    }, 1200);
-  };
+  // const handleRunRulesNow = () => {
+  //   setIsRunningRules(true);
+  //   setTimeout(() => {
+  //     setIsRunningRules(false);
+  //     alert('Shipping rules successfully applied to all unshipped orders.');
+  //   }, 1200);
+  // };
 
-  const handleRunCheapestNotSet = () => {
-    setIsRunningCheapestNotSet(true);
-    setTimeout(() => {
-      setIsRunningCheapestNotSet(false);
-      alert('Cheapest carrier rule run for orders where not set.');
-    }, 1000);
-  };
+  // const handleRunCheapestNotSet = () => {
+  //   setIsRunningCheapestNotSet(true);
+  //   setTimeout(() => {
+  //     setIsRunningCheapestNotSet(false);
+  //     alert('Cheapest carrier rule run for orders where not set.');
+  //   }, 1000);
+  // };
 
-  const handleRunCheapestAll = () => {
-    setIsRunningCheapestAll(true);
-    setTimeout(() => {
-      setIsRunningCheapestAll(false);
-      alert('Cheapest carrier rule applied to all unshipped orders.');
-    }, 1000);
-  };
+  // const handleRunCheapestAll = () => {
+  //   setIsRunningCheapestAll(true);
+  //   setTimeout(() => {
+  //     setIsRunningCheapestAll(false);
+  //     alert('Cheapest carrier rule applied to all unshipped orders.');
+  //   }, 1000);
+  // };
 
   if (isLoading) {
     return (
@@ -287,12 +287,12 @@ export default function RulesPage() {
                 </p>
                 <Button
                   variant="default"
-                  onClick={handleRunRulesNow}
-                  disabled={isRunningRules}
+                  // onClick={handleRunRulesNow}
+                  // disabled={isRunningRules}
                   className="mt-2"
                 // className="h-8 text-[11px] font-bold text-gray-700 dark:text-zinc-200 hover:bg-gray-100 dark:hover:bg-zinc-800 border border-gray-250 dark:border-zinc-700 bg-white dark:bg-zinc-900 px-4 rounded-md cursor-pointer flex items-center gap-1.5"
                 >
-                  {isRunningRules ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <RefreshCw className="w-3.5 h-3.5" />}
+                  <RefreshCw className="w-3.5 h-3.5" />
                   Run rules now
                 </Button>
               </div>
@@ -307,22 +307,18 @@ export default function RulesPage() {
                 <div className="flex flex-wrap gap-2 pt-1">
                   <Button
                     variant="default"
-                    onClick={handleRunCheapestNotSet}
-                    disabled={isRunningCheapestNotSet}
+                    // onClick={handleRunCheapestNotSet}
                     className="mt-2"
                   // className="h-8 text-[10px] font-bold text-gray-700 dark:text-zinc-200 hover:bg-gray-100 dark:hover:bg-zinc-800 border border-gray-250 dark:border-zinc-700 bg-white dark:bg-zinc-900 px-3 rounded-md cursor-pointer flex items-center gap-1.5"
                   >
-                    {isRunningCheapestNotSet && <Loader2 className="w-3.5 h-3.5 animate-spin" />}
                     Run cheapest carrier where not set
                   </Button>
                   <Button
                     variant="default"
-                    onClick={handleRunCheapestAll}
-                    disabled={isRunningCheapestAll}
+                    // onClick={handleRunCheapestAll}
                     className="mt-2"
                   // className="h-8 text-[10px] font-bold text-gray-700 dark:text-zinc-200 hover:bg-gray-100 dark:hover:bg-zinc-800 border border-gray-250 dark:border-zinc-700 bg-white dark:bg-zinc-900 px-3 rounded-md cursor-pointer flex items-center gap-1.5"
                   >
-                    {isRunningCheapestAll && <Loader2 className="w-3.5 h-3.5 animate-spin" />}
                     Run cheapest carrier on all unshipped orders
                   </Button>
                 </div>

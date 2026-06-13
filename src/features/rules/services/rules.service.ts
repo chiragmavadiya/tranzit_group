@@ -2,90 +2,7 @@ import type { ShippingRule } from '../types/rules.types';
 
 const STORAGE_KEY = 'shipping_automation_rules';
 
-const MOCK_RULES: ShippingRule[] = [
-  {
-    id: 'rule-1',
-    name: 'Australia Express Heavy Items',
-    description: 'Send orders to Australia with weight over 5kg via Australia Post Express and require signature.',
-    status: 'active',
-    priority: 1,
-    stopProcessing: true,
-    conditions: [
-      { id: 'c-1', attribute: 'destination_country_code', operator: 'is', value: 'AU' },
-      { id: 'c-2', attribute: 'order_weight', operator: 'gt', value: '5' }
-    ],
-    actions: [
-      { id: 'a-1', type: 'set_courier_product', config: { courier: 'Australia Post', product_code: 'EXP' } },
-      { id: 'a-2', type: 'require_signature', config: {} }
-    ],
-    versionHistory: [
-      {
-        id: 'v-1',
-        version: 1,
-        updatedAt: '2026-06-12T10:00:00Z',
-        updatedBy: 'Chirag Sharma',
-        changes: 'Initial rule creation.',
-        ruleData: null
-      }
-    ],
-    createdAt: '2026-06-12T10:00:00Z',
-    updatedAt: '2026-06-12T10:00:00Z'
-  },
-  {
-    id: 'rule-2',
-    name: 'Shopify Urgent Assign to Melbourne',
-    description: 'Assign urgent Shopify orders to Melbourne Warehouse and flag internally.',
-    status: 'active',
-    priority: 2,
-    stopProcessing: false,
-    conditions: [
-      { id: 'c-3', attribute: 'integration', operator: 'is', value: 'Shopify' },
-      { id: 'c-4', attribute: 'tags', operator: 'includes', value: 'Urgent' }
-    ],
-    actions: [
-      { id: 'a-3', type: 'assign_warehouse', config: { warehouse: 'MELB_DEPOT' } },
-      { id: 'a-4', type: 'add_internal_note', config: { note: 'URGENT: Shopify Order. Process immediately.' } }
-    ],
-    versionHistory: [
-      {
-        id: 'v-2',
-        version: 1,
-        updatedAt: '2026-06-12T11:15:00Z',
-        updatedBy: 'Chirag Sharma',
-        changes: 'Initial rule creation.',
-        ruleData: null
-      }
-    ],
-    createdAt: '2026-06-12T11:15:00Z',
-    updatedAt: '2026-06-12T11:15:00Z'
-  },
-  {
-    id: 'rule-3',
-    name: 'High Value Insurance Policy',
-    description: 'Ensure orders worth more than $500 are covered by insurance.',
-    status: 'inactive',
-    priority: 3,
-    stopProcessing: false,
-    conditions: [
-      { id: 'c-5', attribute: 'order_value', operator: 'gt', value: '500' }
-    ],
-    actions: [
-      { id: 'a-5', type: 'enable_insurance', config: {} }
-    ],
-    versionHistory: [
-      {
-        id: 'v-3',
-        version: 1,
-        updatedAt: '2026-06-13T09:00:00Z',
-        updatedBy: 'System',
-        changes: 'Automated import from templates.',
-        ruleData: null
-      }
-    ],
-    createdAt: '2026-06-13T09:00:00Z',
-    updatedAt: '2026-06-13T09:00:00Z'
-  }
-];
+const MOCK_RULES: ShippingRule[] = [];
 
 export const getRules = (): ShippingRule[] => {
   const data = localStorage.getItem(STORAGE_KEY);
@@ -116,15 +33,15 @@ export const evaluateCondition = (
     // If it's a special attribute like PO Box/Parcel Locker, check if it's evaluated
     if (attribute === 'po_box_orders') {
       const isPo = String(inputData.destination_suburb || '').toUpperCase().includes('PO BOX') ||
-                   String(inputData.destination_building || '').toUpperCase().includes('PO BOX') ||
-                   String(inputData.destination_company || '').toUpperCase().includes('PO BOX') ||
-                   String(inputData.destination_address || '').toUpperCase().includes('PO BOX');
+        String(inputData.destination_building || '').toUpperCase().includes('PO BOX') ||
+        String(inputData.destination_company || '').toUpperCase().includes('PO BOX') ||
+        String(inputData.destination_address || '').toUpperCase().includes('PO BOX');
       return operator === 'yes' ? isPo : !isPo;
     }
     if (attribute === 'parcel_locker_orders') {
       const isLocker = String(inputData.destination_suburb || '').toUpperCase().includes('PARCEL LOCKER') ||
-                       String(inputData.destination_building || '').toUpperCase().includes('PARCEL LOCKER') ||
-                       String(inputData.destination_address || '').toUpperCase().includes('PARCEL LOCKER');
+        String(inputData.destination_building || '').toUpperCase().includes('PARCEL LOCKER') ||
+        String(inputData.destination_address || '').toUpperCase().includes('PARCEL LOCKER');
       return operator === 'yes' ? isLocker : !isLocker;
     }
     return false;
@@ -217,7 +134,7 @@ export const simulateRule = (
   }
 
   // Match all conditions (AND logic)
-  const isMatch = rule.conditions.every(cond => 
+  const isMatch = rule.conditions.every(cond =>
     evaluateCondition(cond.attribute, cond.operator, cond.value, inputData)
   );
 

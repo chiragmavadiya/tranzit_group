@@ -6,6 +6,7 @@ import { showToast } from '@/components/ui/custom-toast';
 interface SubscriptionPlanModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  closeable?: boolean;
 }
 
 // Plan features checkmark SVG icon
@@ -71,7 +72,7 @@ const plansList = [
   },
 ];
 
-export default function SubscriptionPlanModal({ open, onOpenChange }: SubscriptionPlanModalProps) {
+export default function SubscriptionPlanModal({ open, onOpenChange, closeable = false }: SubscriptionPlanModalProps) {
   const cardWidth = 280;
   const gap = 12;
   const padding = 64;
@@ -98,7 +99,7 @@ export default function SubscriptionPlanModal({ open, onOpenChange }: Subscripti
       <DialogContent
         className="w-full sm:max-w-none p-0 overflow-hidden bg-white dark:bg-zinc-950 border border-gray-200 dark:border-zinc-800 rounded-xl shadow-xl gap-0"
         style={{ maxWidth: `min(${computedWidth}px, calc(100vw - 2rem))` }}
-        showCloseButton={false}
+        showCloseButton={closeable}
       >
 
         {/* Header Section */}

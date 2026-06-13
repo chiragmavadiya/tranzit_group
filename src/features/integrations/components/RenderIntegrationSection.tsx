@@ -69,7 +69,7 @@ const RenderIntegrationSection = ({
                                 <Card key={provider.slug} className="py-4 group relative overflow-hidden transition-all hover:shadow-md border-slate-200 dark:border-zinc-800 bg-white dark:bg-zinc-950">
                                     <CardHeader className="pb-4 bg-transparent">
                                         <div className="flex justify-between items-start">
-                                            <div className="w-12 h-12 rounded-xl flex items-center justify-center mb-3 group-hover:scale-110 transition-transform">
+                                            <div className="w-16 h-16 rounded-xl flex items-center justify-center mb-3 group-hover:scale-110 transition-transform">
                                                 <img src={provider.logo_url} alt={provider.name} className="h-full w-full object-contain" />
                                             </div>
                                             <div className="flex flex-col gap-1.5 items-end">

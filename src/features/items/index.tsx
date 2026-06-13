@@ -6,7 +6,7 @@ import { DataTable } from '@/components/common/DataTable';
 import type { Column } from '@/components/common/types/DataTable.types';
 import { Button } from '@/components/ui/button';
 import { Switch } from '@/components/ui/switch';
-import { Pencil, Star, Trash, Loader2 } from 'lucide-react';
+import { Pencil, Star, Trash, Loader2, Info } from 'lucide-react';
 import { ConformationModal } from '@/components/common/ConformationModal';
 
 import {
@@ -21,6 +21,7 @@ import {
 
 import { useDebounce } from '@/hooks/useDebounce';
 import { CustomTooltip } from '@/components/common/CustomTooltip';
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 
 export default function MyItemsPage() {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
@@ -131,24 +132,54 @@ export default function MyItemsPage() {
       searchable: true,
       cell: (val, row) => (
         <div className='flex items-center gap-3'>
-          <CustomTooltip title={row.is_default ? "Default Item" : "Set as Default"}>
-            <button
-              onClick={() => {
-                if (!row.is_default) {
-                  setDefaultItemMutation.mutate(row.id);
-                }
-              }}
-              disabled={row.is_default || setDefaultItemMutation.isPending}
-              className={`p-0 bg-transparent border-none outline-none focus:outline-none transition-transform active:scale-95 ${row.is_default ? 'cursor-default' : 'cursor-pointer hover:scale-110'
-                }`}
+          {/* <CustomTooltip title={row.is_default ? "Default Item" : "Set as Fallback Item"}> */}
+          <Tooltip>
+            <TooltipTrigger
+              render={<div />}
+              className="block min-w-0 max-w-full cursor-pointer"
             >
-              {setDefaultItemMutation.isPending && setDefaultItemMutation.variables === row.id ? (
-                <Loader2 className="h-4! w-4! animate-spin" />
+              <button
+                onClick={() => {
+                  if (!row.is_default) {
+                    setDefaultItemMutation.mutate(row.id);
+                  }
+                }}
+                disabled={row.is_default || setDefaultItemMutation.isPending}
+                className={`p-0 bg-transparent border-none outline-none focus:outline-none transition-transform active:scale-95 ${row.is_default ? 'cursor-default' : 'cursor-pointer hover:scale-110'
+                  }`}
+              >
+                {setDefaultItemMutation.isPending && setDefaultItemMutation.variables === row.id ? (
+                  <Loader2 className="h-4! w-4! animate-spin" />
+                ) : (
+                  <Star className={`h-4 w-4 ${row.is_default ? 'fill-amber-400 text-amber-400' : 'text-primary-400'}`} />
+                )}
+              </button>
+            </TooltipTrigger>
+            <TooltipContent
+              side="bottom"
+              className="flex flex-col gap-2.5 p-4 max-w-[280px] bg-slate-950 dark:bg-zinc-950 text-slate-100 dark:text-zinc-100 border border-slate-800 dark:border-zinc-800 rounded-xl shadow-xl select-none"
+            >
+              {!row.is_default ? (
+                <>
+                  <div className="flex items-center gap-2 border-b border-slate-800/80 dark:border-zinc-800/80 pb-2">
+                    <Info className="w-4 h-4 text-amber-400 shrink-0 animate-pulse" />
+                    <h4 className="m-0 text-[13px] font-bold tracking-tight text-white">Set as Fallback Item</h4>
+                  </div>
+                  <p className="m-0 text-xs font-semibold text-slate-200 leading-normal">
+                    Used only when no default item is set for the order’s integration.
+                  </p>
+                  <p className="m-0 text-[12px] text-slate-300 dark:text-zinc-400 leading-relaxed">
+                    This item will be used automatically when an order has no default item set for its integration. For example, if a Shopify order has no Shopify default item, this fallback item will be used.
+                  </p>
+                </>
               ) : (
-                <Star className={`h-4 w-4 ${row.is_default ? 'fill-amber-400 text-amber-400' : 'text-primary-400'}`} />
+                <>
+                  <h4 className="m-0 text-[13px] font-bold tracking-tight text-white">Default Item</h4>
+                </>
               )}
-            </button>
-          </CustomTooltip>
+            </TooltipContent>
+          </Tooltip>
+          {/* </CustomTooltip> */}
           <span className='text-xs font-medium'>{val}</span>
         </div>
       )
@@ -165,6 +196,12 @@ export default function MyItemsPage() {
       accessor: "dimensions",
       header: "Dimensions",
       cell: (_, row) => `${row.item_length} × ${row.item_width} × ${row.item_height}`
+    },
+    {
+      key: "item_weight",
+      accessor: "item_weight",
+      header: "Weight",
+      cell: (val) => typeof val === 'number' ? val.toFixed(2) + ' kg' : val
     },
     {
       key: "item_cubic",

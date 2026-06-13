@@ -35,6 +35,39 @@ export default function Sidebar({
   const sidebarItems = role === 'admin' ? adminSidebarItems : clientSidebarItems;
   const { theme } = useTheme();
 
+  const isItemActive = (item: SidebarItem, isActive: boolean) => {
+    if (item.isExternal) return false;
+
+    // Fix double active highlight for base orders menu vs create order
+    if ((item.name === 'Orders' || item.name === 'Order Management') && location.pathname.includes('/orders/create')) {
+      return false;
+    }
+
+    // If the item has a dropdown, ignore the default NavLink isActive (which triggers for '#' paths).
+    // Instead, only highlight it if one of its sub-items is active.
+    if (item.hasDropdown) {
+      if (item.subItems) {
+        return item.subItems.some(sub =>
+          location.pathname === sub.path ||
+          location.pathname.startsWith(sub.path + '/')
+        );
+      }
+
+      if (item.subGroups) {
+        return item.subGroups.some(group =>
+          group.items.some(subItem =>
+            location.pathname === subItem.path ||
+            location.pathname.startsWith(subItem.path + '/')
+          )
+        );
+      }
+
+      return false;
+    }
+
+    return isActive;
+  };
+
   useEffect(() => {
     const matchingItem = sidebarItems.find(item => {
       if (item.subGroups) {
@@ -44,7 +77,7 @@ export default function Sidebar({
         return item.subGroups.some(group =>
           group.items.some(subItem =>
             location.pathname === subItem.path ||
-            location.pathname.startsWith(subItem.path)
+            location.pathname.startsWith(subItem.path + '/')
           )
         );
       }
@@ -55,6 +88,26 @@ export default function Sidebar({
       setActiveSubmenu(matchingItem.name);
     } else {
       setActiveSubmenu(null);
+    }
+
+    // Auto-expand dropdowns when a sub-item is active
+    const expanded: string[] = [];
+    sidebarItems.forEach(item => {
+      if (item.subItems) {
+        const hasActiveSub = item.subItems.some(sub =>
+          location.pathname === sub.path ||
+          location.pathname.startsWith(sub.path + '/')
+        );
+        if (hasActiveSub) {
+          expanded.push(item.name);
+        }
+      }
+    });
+    if (expanded.length > 0) {
+      setExpandedItems(prev => {
+        const combined = [...prev, ...expanded];
+        return Array.from(new Set(combined));
+      });
     }
   }, [location.pathname, sidebarItems]);
 
@@ -106,7 +159,7 @@ export default function Sidebar({
             <div className={`flex items-center transition-all duration-300 ease-in-out ${isMobile ? 'w-auto opacity-100' : (isCollapsed ? 'w-0 opacity-0 pointer-events-none overflow-hidden' : 'w-auto opacity-100')
               }`}>
               {/* brand logo */}
-              <img src={theme === "dark" ? tranzit_logo_dark : tranzit_logo} alt="Tranzit" className="h-15" />
+              <img src={theme === "dark" ? tranzit_logo_dark : tranzit_logo} alt="Tranzit" className="h-15 cursor-pointer" onClick={handleBackToMainMenu} />
             </div>
           </div>
         )}
@@ -194,33 +247,23 @@ export default function Sidebar({
                     }
                   }}
                   className={({ isActive }) => {
-                    // Fix double active highlight for base orders menu vs create order
-                    let finalActive = isActive;
-                    if (item.isExternal) finalActive = false;
-                    if ((item.name === 'Orders' || item.name === 'Order Management') && location.pathname.includes('/orders/create')) {
-                      finalActive = false;
-                    }
-
-                    return `flex items-center justify-between overflow-hidden py-[10px] px-3 border-l-4 rounded-r-md text-[14px] font-medium transition-colors ${finalActive && !item.hasDropdown ? 'text-primary bg-primary/10 border-primary dark:border-primary font-semibold' : 'text-gray-600 dark:text-zinc-400 hover:text-gray-900 dark:hover:text-zinc-100 hover:bg-gray-100 dark:hover:bg-zinc-900 border-transparent'
+                    const active = isItemActive(item, isActive);
+                    return `flex items-center justify-between overflow-hidden py-[10px] px-3 border-l-4 rounded-r-md text-[14px] font-medium transition-colors ${active ? 'text-primary bg-primary/10 border-primary dark:border-primary font-semibold' : 'text-gray-600 dark:text-zinc-400 hover:text-gray-900 dark:hover:text-zinc-100 hover:bg-gray-100 dark:hover:bg-zinc-900 border-transparent'
                       }`
                   }}
                 >
                   {({ isActive }) => {
-                    let finalActive = isActive;
-                    if (item.isExternal) finalActive = false;
-                    if ((item.name === 'Orders' || item.name === 'Order Management') && location.pathname.includes('/orders/create')) {
-                      finalActive = false;
-                    }
+                    const active = isItemActive(item, isActive);
 
                     return (
                       <>
                         <div className={`flex items-center gap-${!isCollapsed ? 3 : 3} w-full min-w-0 transition-all duration-300`}>
                           <CustomTooltip title={item.name} placement="bottom" className="flex-1">
-                            <item.icon className={`w-[18px] h-[18px] shrink-0 transition-colors ${finalActive && !item.hasDropdown ? 'text-primary' : 'text-gray-400 dark:text-zinc-500'}`} strokeWidth={2} />
+                            <item.icon className={`w-[18px] h-[18px] shrink-0 transition-colors ${active ? 'text-primary' : 'text-gray-400 dark:text-zinc-500'}`} strokeWidth={2} />
                           </CustomTooltip>
                           <div className={`flex items-center min-w-0 flex-1 transition-opacity duration-3000 ${isCollapsed ? 'opacity-100' : 'opacity-100'}`}>
                             <CustomTooltip title={item.name} placement="bottom" onlyOnOverflow={true} className="flex-1">
-                              <span>{item.name}</span>
+                              <span className={active ? 'font-semibold' : ''}>{item.name}</span>
                             </CustomTooltip>
                             {item.name === 'Getting Setup' && (
                               <span className="ml-[6px] px-[5px] py-[2px] rounded text-[10px] bg-[#111827] dark:bg-zinc-800 text-white font-semibold leading-none shadow-sm shrink-0">Menu</span>
@@ -228,7 +271,7 @@ export default function Sidebar({
                           </div>
                         </div>
                         {item.hasDropdown && (
-                          <ChevronDown className={`w-4 h-4 shrink-0 ml-2 transition-all duration-300 text-gray-400 dark:text-zinc-500 ${(isCollapsed && !isMobile) ? 'opacity-0' : 'opacity-100'} ${expandedItems.includes(item.name) ? 'rotate-360' : 'rotate-270'}`} />
+                          <ChevronDown className={`w-4 h-4 shrink-0 ml-2 transition-all duration-300 ${active ? 'text-primary' : 'text-gray-400 dark:text-zinc-500'} ${(isCollapsed && !isMobile) ? 'opacity-0' : 'opacity-100'} ${expandedItems.includes(item.name) ? 'rotate-360' : 'rotate-270'}`} />
                         )}
                       </>
                     );
@@ -242,7 +285,7 @@ export default function Sidebar({
                         key={sub.name}
                         to={sub.path}
                         className={({ isActive }) =>
-                          `block px-2 py-2 text-[13px] leading-snug font-medium rounded-md transition-colors ${isActive ? 'text-primary font-semibold' : 'text-gray-500 dark:text-zinc-400 hover:text-gray-900 dark:hover:text-zinc-100'
+                          `block px-2 py-2 text-[13.5px] leading-snug rounded-md transition-colors ${isActive ? 'text-primary font-semibold tracking-wide' : 'font-medium text-gray-500 dark:text-zinc-400 hover:text-gray-900 dark:hover:text-zinc-100'
                           }`
                         }
                       >

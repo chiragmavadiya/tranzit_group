@@ -479,10 +479,51 @@ export default function CarrierConfigForm({
     <form id="carrier-config-form" onSubmit={handleSubmit} className="space-y-6 mt-4">
       <div className="grid grid-cols-12 gap-x-6 gap-y-3.5 items-start">
         {/* Left Column: Form Credentials Fields */}
-        <div className="col-span-12 md:col-span-7 border flex flex-col h-full p-4 rounded-sm shadow-sm">
+        <div className="col-span-12 md:col-span-7 border flex flex-col h-full p-4 rounded-sm shadow-sm text-left">
           <div className="flex-1 grid grid-cols-12 gap-x-4 ">
             {getCredentialsFields()}
           </div>
+
+          {/* Checkout Delivery Settings Section */}
+          <div className="mt-6 pt-6 border-t border-gray-150 dark:border-zinc-800 space-y-4">
+            <div>
+              <h4 className="text-base font-bold text-gray-900 dark:text-zinc-100 uppercase tracking-wide">Checkout Delivery Settings</h4>
+              <p className="text-xs text-slate-500 dark:text-zinc-400">Configure how this shipping option appears to customers at checkout.</p>
+            </div>
+
+            {/* <div className="flex items-center gap-3">
+              <Checkbox
+                id="display_transit_time"
+                checked={!!formData.display_transit_time}
+                onCheckedChange={(checked) => handleInputChange(!!checked, 'display_transit_time')}
+              />
+              <label
+                htmlFor="display_transit_time"
+                className="text-sm font-medium text-slate-700 dark:text-zinc-350 cursor-pointer select-none"
+              >
+                Display estimated transit times
+              </label>
+            </div> */}
+
+            <div className="space-y-1">
+              <label className="my-0 text-[14px] font-medium text-slate-800 dark:text-zinc-400 ml-0.5 block">
+                Delivery Service Description
+              </label>
+              <p className="my-0 text-[12px] text-slate-500 dark:text-zinc-450 ml-0.5">
+                Provide a custom description to display with this delivery service.
+              </p>
+              <div className="pt-0">
+                <FormInput
+                  value={formData.delivery_service_desc || ""}
+                  onChange={(val) => handleInputChange(val, 'delivery_service_desc')}
+                  placeholder="e.g. 3-5 business days delivery to your doorstep"
+                  isFullWidth={true}
+                  className="col-span-12"
+                />
+              </div>
+            </div>
+          </div>
+
           <div className='mt-6 justify-end self-end'>
             <Button
               type="submit"

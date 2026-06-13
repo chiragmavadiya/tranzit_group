@@ -81,6 +81,10 @@ export default function TopBar({
     // open new window
     navigate('/settings/account');
   }
+
+  const redirectToHome = () => {
+    navigate(`${role === 'admin' ? '/admin' : ''}/orders`);
+  }
   return (
     <header className={cn(
       "print:hidden h-16 bg-white dark:bg-zinc-950 border-b border-gray-200 dark:border-zinc-800 flex items-center justify-between px-4 sm:px-6 fixed top-0 right-0 z-10 transition-[left] duration-300 ease-in-out",
@@ -104,7 +108,7 @@ export default function TopBar({
             ? "w-[90px] sm:w-[110px] opacity-100 mr-2 sm:mr-4"
             : (isCollapsed ? 'w-[120px] opacity-100 mr-4' : 'w-0 opacity-0 pointer-events-none overflow-hidden mr-0')
         )}>
-          <img src={theme === "dark" ? tranzit_logo_dark : tranzit_logo} alt="Tranzit" className="h-8 sm:h-10 max-w-none" />
+          <img src={theme === "dark" ? tranzit_logo_dark : tranzit_logo} alt="Tranzit" className="h-8 sm:h-10 max-w-none cursor-pointer" onClick={redirectToHome} />
         </div>
       </div>
 

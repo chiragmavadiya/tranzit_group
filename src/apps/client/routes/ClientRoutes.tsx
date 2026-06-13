@@ -32,6 +32,7 @@ const TeamAccessPage = lazy(() => import('@/features/customer-settings/pages/Tea
 const EcommerceIntegrationsPage = lazy(() => import('@/features/customer-settings/pages/EcommerceIntegrationsPage'));
 const CarrierIntegrationsPage = lazy(() => import('@/features/customer-settings/pages/CarrierIntegrationsPage'));
 const CarrierConfigPage = lazy(() => import('@/features/customer-settings/pages/CarrierConfigPage'));
+const RulesPage = lazy(() => import('@/features/rules/pages/RulesPage'));
 
 const withSuspense = (Component: React.ReactNode) => (
   <Suspense
@@ -87,7 +88,9 @@ export default function ClientRoutes() {
             <Route path="ecommerce" element={withSuspense(<EcommerceIntegrationsPage />)} />
             <Route path="carriers" element={withSuspense(<CarrierIntegrationsPage />)} />
             <Route path="carriers/:slug" element={withSuspense(<CarrierConfigPage />)} />
+            <Route path="rules" element={withSuspense(<RulesPage />)} />
           </Route>
+
 
           {/* Default authenticated route */}
           <Route path="/" element={<Navigate to="/orders" replace />} />

@@ -143,6 +143,7 @@ export const clientSidebarItems: SidebarItem[] = [
         items: [
           { name: 'Account Details', path: '/settings/account', icon: User },
           { name: 'Team Access', path: '/settings/team', icon: Users },
+          { name: 'Rule Management', path: '/settings/rules', icon: Route },
         ]
       },
       {

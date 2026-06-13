@@ -11,9 +11,10 @@ import {
   useCancelOrder,
   useConsignOrder,
   useArchiveOrder,
+  // useOrderDetailsForClone,
 } from './useOrders';
 import { useGlobalCouriers } from '@/features/courier-surcharge/hooks/useGlobalCouriers';
-import type { AddressData, WalletCheckResponse } from '../types';
+import type { AddressData, OrderDetailData, WalletCheckResponse } from '../types';
 import { useDefaultItem } from '@/features/items/hooks/useItems';
 import { removeEmptyFields } from '@/lib/utils';
 
@@ -45,7 +46,7 @@ export const useOrderWorkflow = () => {
   // API Hooks
   const { mutate: createOrder, isPending: saveLoading } = useCreateOrder();
   const { mutate: checkWallet, isPending: walletLoading } = useWalletCheck();
-  const { data: orderResponse, isLoading: isOrderLoading } = useOrderDetails(orderID || '');
+  const { data: orderResponse, isLoading: isOrderLoading } = useOrderDetails(orderID || localStorage.getItem('order_to_clone') || '');
   const { mutate: downloadLabel, isPending: isDownloadingLabel } = useDownloadLabel(false);
   const { mutate: printLabel } = useDownloadLabel(true);
   const { mutate: cancelOrder, isPending: isCancelling } = useCancelOrder();
@@ -56,7 +57,7 @@ export const useOrderWorkflow = () => {
   const isEditable = orderType === 'create' || orderType === 'consign' || orderType === 'create-menual' || orderType === 'return';
   const isCreate = orderType === 'create' || orderType === 'create-menual' || orderType === 'return';
 
-  const { data: defaultItem } = useDefaultItem(isCreate && (role !== 'admin'))
+  const { data: defaultItem } = useDefaultItem(isCreate && (role !== 'admin') && !localStorage.getItem('order_to_clone'))
   // State Management
   const [walletCheckOpen, setWalletCheckOpen] = useState(false);
   const [walletCheckData, setWalletCheckData] = useState<WalletCheckResponse | null>(null);
@@ -89,7 +90,7 @@ export const useOrderWorkflow = () => {
   const [showArchiveModal, setShowArchiveModal] = useState(false);
 
   const initialDialogMode = useMemo(() => {
-    if (isCreate && sessionStorage.getItem('address') === null) {
+    if (isCreate && !(localStorage.getItem('quote_receiver') || localStorage.getItem('order_to_clone')) && sessionStorage.getItem('address') === null) {
       if (orderType === 'return' && addressData.sender.address1 === '') {
         return 'sender';
       }
@@ -146,7 +147,8 @@ export const useOrderWorkflow = () => {
     }
   })
   useEffect(() => {
-    if (defaultItem && (orderType === 'create' || orderType === 'create-menual' || orderType === 'return')) {
+    if (defaultItem && (orderType === 'create' || orderType === 'create-menual' || orderType === 'return') && !localStorage.getItem('quote_to_clone') && !localStorage.getItem('quote_items')) {
+      console.log("Set default item...")
       setDefaultItemData(defaultItem.data)
     }
   }, [defaultItem, setItemsData, orderType]);
@@ -159,7 +161,7 @@ export const useOrderWorkflow = () => {
 
   // Sync user profile sender address (Create Mode)
   useEffect(() => {
-    if (role === 'customer' && user && (orderType === 'create' || orderType === 'create-menual' || orderType === 'return')) {
+    if (role === 'customer' && user && (orderType === 'create' || orderType === 'create-menual' || orderType === 'return') && !localStorage.getItem('order_to_clone')) {
       const key = orderType === 'return' ? 'receiver' : 'sender';
       setAddressData((prev) => ({
         ...prev,
@@ -182,63 +184,69 @@ export const useOrderWorkflow = () => {
     }
   }, [user, role, orderType]);
 
+  const setOrdesDetailData = useCallback((data: OrderDetailData) => {
+    const senderDetail = data.sender_details;
+    const receiverDetail = data.receiver_details;
+    setAddressData({
+      sender: {
+        name: senderDetail?.name || '',
+        email: senderDetail?.email || '',
+        phone: senderDetail?.mobile || '',
+        company: senderDetail?.company || '',
+        instructions: senderDetail?.address_detail?.instructions || '',
+        address1: senderDetail?.address_detail?.address_line || '',
+        address_info: senderDetail?.address_detail?.address_info || senderDetail?.address || '',
+        suburb: senderDetail?.address_detail?.suburb || '',
+        street_name: senderDetail?.address_detail?.street_name || '',
+        street_number: senderDetail?.address_detail?.street_number || '',
+        unit_number: senderDetail?.address_detail?.unit_number || '',
+        state: senderDetail?.address_detail?.state || '',
+        postcode: senderDetail?.address_detail?.postcode || '',
+        country: 'AU',
+        saveToAddressBook: false,
+      },
+      receiver: {
+        name: receiverDetail?.name || '',
+        email: receiverDetail?.email || '',
+        phone: receiverDetail?.mobile || '',
+        company: receiverDetail?.company || '',
+        instructions: receiverDetail?.address_detail?.instructions || '',
+        address1: receiverDetail?.address_detail?.address_line || '',
+        address_info: receiverDetail?.address_detail?.address_info || '',
+        suburb: receiverDetail?.address_detail?.suburb || '',
+        street_name: receiverDetail?.address_detail?.street_name || '',
+        street_number: receiverDetail?.address_detail?.street_number || '',
+        unit_number: receiverDetail?.address_detail?.unit_number || '',
+        state: receiverDetail?.address_detail?.state || '',
+        postcode: receiverDetail?.address_detail?.postcode || '',
+        country: 'AU',
+        saveToAddressBook: false,
+      },
+    });
+    setItemsData(data.order_details?.items?.map((item) => ({
+      type: item.type,
+      quantity: item.quantity,
+      weight: item.weight,
+      length: item.length,
+      width: item.width,
+      height: item.height,
+      description: item.description || '',
+    })) || []);
+    setDeliveryInstructions(data.delivery_instructions || '');
+    setInsuranceSelected(data.limited_liability_cover?.covered || false);
+    setCourierData(data.courier_details);
+    setQuoteData(data.order_details);
+    isValidConsignOrder(data.order_status_category);
+  }, [isValidConsignOrder, setItemsData])
+
   // Sync existing order details (Edit/Consign Mode)
   useEffect(() => {
-    if (orderDetail && orderType !== 'create' && orderType !== 'create-menual') {
-      const senderDetail = orderDetail.sender_details;
-      const receiverDetail = orderDetail.receiver_details;
-      setAddressData({
-        sender: {
-          name: senderDetail?.name || '',
-          email: senderDetail?.email || '',
-          phone: senderDetail?.mobile || '',
-          company: senderDetail?.company || '',
-          instructions: senderDetail?.address_detail?.instructions || '',
-          address1: senderDetail?.address_detail?.address_line || '',
-          address_info: senderDetail?.address_detail?.address_info || senderDetail?.address || '',
-          suburb: senderDetail?.address_detail?.suburb || '',
-          street_name: senderDetail?.address_detail?.street_name || '',
-          street_number: senderDetail?.address_detail?.street_number || '',
-          unit_number: senderDetail?.address_detail?.unit_number || '',
-          state: senderDetail?.address_detail?.state || '',
-          postcode: senderDetail?.address_detail?.postcode || '',
-          country: 'AU',
-          saveToAddressBook: false,
-        },
-        receiver: {
-          name: receiverDetail?.name || '',
-          email: receiverDetail?.email || '',
-          phone: receiverDetail?.mobile || '',
-          company: receiverDetail?.company || '',
-          instructions: receiverDetail?.address_detail?.instructions || '',
-          address1: receiverDetail?.address_detail?.address_line || '',
-          address_info: receiverDetail?.address_detail?.address_info || '',
-          suburb: receiverDetail?.address_detail?.suburb || '',
-          street_name: receiverDetail?.address_detail?.street_name || '',
-          street_number: receiverDetail?.address_detail?.street_number || '',
-          unit_number: receiverDetail?.address_detail?.unit_number || '',
-          state: receiverDetail?.address_detail?.state || '',
-          postcode: receiverDetail?.address_detail?.postcode || '',
-          country: 'AU',
-          saveToAddressBook: false,
-        },
-      });
-      setItemsData(orderDetail.order_details?.items?.map((item) => ({
-        type: item.type,
-        quantity: item.quantity,
-        weight: item.weight,
-        length: item.length,
-        width: item.width,
-        height: item.height,
-        description: item.description || '',
-      })) || []);
-      setDeliveryInstructions(orderDetail.delivery_instructions || '');
-      setInsuranceSelected(orderDetail.limited_liability_cover?.covered || false);
-      setCourierData(orderDetail.courier_details);
-      setQuoteData(orderDetail.order_details);
-      isValidConsignOrder(orderDetail.order_status_category);
+    if (orderDetail && (orderType !== 'create' || localStorage.getItem('order_to_clone')) && orderType !== 'create-menual') {
+      setOrdesDetailData(orderDetail)
     }
-  }, [isValidConsignOrder, orderDetail, orderType, setItemsData]);
+  }, [isValidConsignOrder, orderDetail, orderType, setItemsData, setOrdesDetailData]);
+
+
 
   const handleAddressSubmit = useCallback((type: 'sender' | 'receiver' | 'customer', data: AddressData) => {
     setAddressData((prev) => ({ ...prev, [type]: data }));
@@ -274,7 +282,7 @@ export const useOrderWorkflow = () => {
     }, 0) || 0;
     const servicePrice = quoteData?.courier?.base || quoteData?.subtotal || 0;
     const gst = quoteData?.courier?.gst || quoteData?.tax || 0;
-    const totalSurcharges = quoteData?.totalSurcharges || 0;
+    const totalSurcharges = isEditable ? (quoteData?.totalSurcharges || 0) : orderDetail?.order_details?.surcharge_amount;
     const insuranceCost = insuranceSelected ? 6.0 : 0;
     const grandTotal = (quoteData?.totalPrice || quoteData?.total || 0) + insuranceCost;
 
@@ -615,23 +623,27 @@ export const useOrderWorkflow = () => {
       }
     }
 
-    const qSender = sessionStorage.getItem('quote_sender');
-    const qReceiver = sessionStorage.getItem('quote_receiver');
-    // const qItems = sessionStorage.getItem('quote_items');
-    const qCourier = sessionStorage.getItem('quote_courier');
+    const qSender = sessionStorage.getItem('quote_sender') || localStorage.getItem('quote_sender');
+    const qReceiver = sessionStorage.getItem('quote_receiver') || localStorage.getItem('quote_receiver');
+    const qItems = sessionStorage.getItem('quote_items') || localStorage.getItem('quote_items');
+    const qCourier = sessionStorage.getItem('quote_courier') || localStorage.getItem('quote_courier');
+    const qSigneture = localStorage.getItem('quote_signature')
+    const qInsurance = localStorage.getItem('quote_insurance')
+    const qDeliveryInstructions = localStorage.getItem('quote_delivery_instructions')
+    setDeliveryInstructions(qDeliveryInstructions || '')
 
-    if (qSender || qReceiver || qCourier) {
+    if (qSender && qReceiver || qItems || qCourier) {
       try {
         if (qSender && qReceiver) {
           setAddressData(prev => ({
             ...prev,
-            // sender: JSON.parse(qSender),
+            sender: JSON.parse(qSender),
             receiver: JSON.parse(qReceiver),
           }));
         }
-        // if (qItems) {
-        //   setItemsData(JSON.parse(qItems));
-        // }
+        if (qItems) {
+          setItemsData(JSON.parse(qItems));
+        }
         if (qCourier) {
           const parsedCourier = JSON.parse(qCourier);
           setQuoteData(parsedCourier);
@@ -642,6 +654,8 @@ export const useOrderWorkflow = () => {
             shipment_summary: parsedCourier.courier?.shipment_summary,
           });
         }
+        setSignatureSelected(qSigneture === 'true')
+        setInsuranceSelected(qInsurance === 'true')
       } catch (e) {
         console.error("Failed to parse quote prefill from sessionStorage:", e);
       }
@@ -652,11 +666,22 @@ export const useOrderWorkflow = () => {
       //   sessionStorage.removeItem('quote_courier');
       // }
     }
+    setTimeout(() => {
+      localStorage.removeItem('quote_items');
+      localStorage.removeItem('quote_courier');
+      localStorage.removeItem('quote_sender');
+      localStorage.removeItem('quote_receiver');
+      localStorage.removeItem('quote_signature');
+      localStorage.removeItem('quote_insurance');
+      localStorage.removeItem('order_to_clone');
+      localStorage.removeItem('quote_delivery_instructions');
+    }, 5000);
     return () => {
       sessionStorage.removeItem('address')
       sessionStorage.removeItem('quote_sender')
       sessionStorage.removeItem('quote_receiver')
-      // sessionStorage.removeItem('quote_items')
+      // localStorage.removeItem('quote_items');
+      // localStorage.removeItem('quote_courier');
     }
   }, [setItemsData, setQuoteData, setCourierData]);
 
@@ -734,5 +759,6 @@ export const useOrderWorkflow = () => {
     receiverPhone,
     setReceiverPhone,
     handleReceiverPhoneSubmit,
+    // isCloning,
   };
 };

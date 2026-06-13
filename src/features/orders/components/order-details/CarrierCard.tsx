@@ -72,7 +72,7 @@ export const CarrierCard: React.FC<CarrierCardProps> = memo((props) => {
       });
       setSelectedSurchargesMap(initialSelected);
     }
-    mount.current = true;
+
 
     if (data.services && data.services.length > 0) {
       const getServiceTotalPrice = (service: any) => {
@@ -85,17 +85,21 @@ export const CarrierCard: React.FC<CarrierCardProps> = memo((props) => {
         getServiceTotalPrice(curr) < getServiceTotalPrice(min) ? curr : min
       );
       setBestDeal(minItem.courierCode + (minItem.product_id || '') || '');
-      const selectedFromQuote = sessionStorage.getItem('quote_courier');
+      const selectedFromQuote = sessionStorage.getItem('quote_courier') || localStorage.getItem('quote_courier');
+      console.log(selectedFromQuote)
       if (selectedFromQuote) {
         const courier = JSON.parse(selectedFromQuote);
+        console.log('if 1.....', courier.courier.courierCode + (courier.courier.product_id || '') || '')
         setSelectedServiceId(courier.courier.courierCode + (courier.courier.product_id || '') || '');
       } else if (!selectedServiceId || !allCourierIds.includes(selectedServiceId)) {
+        console.log('if 2.....')
         setSelectedServiceId((prev) => {
-          if (prev && allCourierIds.includes(prev)) return prev;
+          if ((prev && allCourierIds.includes(prev)) || !mount.current) return prev;
           return minItem.courierCode + (minItem.product_id || '') || '';
         });
       }
     }
+    mount.current = true;
   })
 
   const fetchServices = () => {
@@ -219,7 +223,7 @@ export const CarrierCard: React.FC<CarrierCardProps> = memo((props) => {
         <div className="flex justify-between w-full items-center gap-2">
           <div className='flex items-center gap-2'>
             <Truck className="h-5 w-5 text-primary" />
-            <CardTitle className="text-base font-bold uppercase tracking-wide text-slate-800 dark:text-zinc-400">
+            <CardTitle className="text-base font-bold uppercase text-slate-800 dark:text-zinc-400">
               SHIPMENT OPTIONS
             </CardTitle>
           </div>
@@ -282,7 +286,7 @@ export const CarrierCard: React.FC<CarrierCardProps> = memo((props) => {
                   <div className="text-lg font-black text-gray-900 dark:text-zinc-100 tracking-tighter">
                     ${orderDetail.order_details?.total?.toFixed(2) || '0.00'}
                   </div>
-                  <div className="text-[10px] font-bold text-gray-500 dark:text-zinc-400 uppercase tracking-wide mt-0.5">
+                  <div className="text-[10px] font-bold text-gray-500 dark:text-zinc-400 uppercase mt-0.5">
                     Total Inc. GST
                   </div>
                 </div>
@@ -396,7 +400,7 @@ export const CarrierCard: React.FC<CarrierCardProps> = memo((props) => {
                     {/* Surcharges list with checkboxes if selected */}
                     {isSelected && courierSurcharges.length > 0 && (
                       <div className="mt-3 pt-3 border-t border-dashed border-gray-200 dark:border-zinc-800 flex flex-col gap-2">
-                        <div className="text-[11px] font-bold text-gray-500 dark:text-zinc-400 uppercase tracking-wide">
+                        <div className="text-[11px] font-bold text-gray-500 dark:text-zinc-400 uppercase">
                           Surcharge Options
                         </div>
                         <div className="flex flex-col gap-2">
@@ -444,7 +448,7 @@ export const CarrierCard: React.FC<CarrierCardProps> = memo((props) => {
             </div>
             {/* {selectedServiceId && module !== 'quote' && (
               <div className="col-span-4 flex flex-col gap-2dark:border-zinc-800 sticky top-0">
-                <div className="text-[11px] font-bold text-gray-500 dark:text-zinc-400 uppercase tracking-wide">
+                <div className="text-[11px] font-bold text-gray-500 dark:text-zinc-400 uppercase">
                   OPTIONS
                 </div>
                 <div className="border-t border-gray-200 dark:border-zinc-800 my-1" />

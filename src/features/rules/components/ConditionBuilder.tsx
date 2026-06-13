@@ -14,8 +14,8 @@ export default function ConditionBuilder({ conditions, onChange }: ConditionBuil
   const handleAddCondition = () => {
     const newCondition: Condition = {
       id: 'cond-' + Date.now() + Math.random().toString(36).substr(2, 5),
-      attribute: 'order_number',
-      operator: 'is',
+      attribute: 'all_orders',
+      operator: '',
       value: '',
     };
     onChange([...conditions, newCondition]);
@@ -214,6 +214,7 @@ export default function ConditionBuilder({ conditions, onChange }: ConditionBuil
                     type="button"
                     variant="ghost"
                     size="icon"
+                    disabled={conditions.length === 1}
                     onClick={() => handleRemoveCondition(cond.id)}
                     className="h-8 w-8 text-rose-500 hover:text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/20 rounded-md cursor-pointer"
                   >

@@ -39,6 +39,7 @@ export type OrderDetailData = {
         paid: number
         balance_due: number
         items: OrderItem[]
+        surcharge_amount: number
     }
     courier_details: {
         courier: string

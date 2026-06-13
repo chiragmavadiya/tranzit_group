@@ -2,7 +2,7 @@ import { NavLink } from "react-router-dom";
 import type { Order } from "./types";
 import type { Column } from "@/components/common/types/DataTable.types";
 
-import { Eye, Loader2, MoreVertical, Printer } from "lucide-react";
+import { Eye, Loader2, MoreVertical, Pencil, Printer } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { DropdownCustomMenu } from "@/components/ui/dropdown-menu";
 import { CustomTooltip } from "@/components/common/CustomTooltip";
@@ -16,6 +16,7 @@ export const getOrdersColumns = (
   orderType: string = 'new',
   navigate: any,
   customerEditClick: (id: string) => void,
+  courierEditClick: (row: Order) => void,
   onDownloadLabel?: (orderId: string) => void,
   onCancelOrder?: (orderId: string) => void,
   downloadingLabelId?: string | null,
@@ -23,7 +24,7 @@ export const getOrdersColumns = (
   onArchiveOrder?: (orderId: string) => void,
   updateToArchiveId?: string | null,
   onPrint?: (orderNumber: string | number, amount: number, row: Order) => void,
-  printingOrderId?: string | number | null
+  printingOrderId?: string | number | null,
 ): Column<Order>[] => {
   const printedAndShippedActions = (value: string) => [
     {
@@ -111,17 +112,34 @@ export const getOrdersColumns = (
         header: 'CARRIER & PRODUCT', key: 'courier',
         width: '220px',
         cell: (value: string, row: Order) => (
-          <div className="flex items-center gap-2">
-            {(row?.courier_logo || row?.courier_logo_url) && (
-              <div className="">
-                <img src={row?.courier_logo || row?.courier_logo_url} className="h-6! min-w-[60px] object-contain" />
+          <>
+            {orderType === 'new' ? (<div className="flex gap-2 justify-between items-center truncate uppercase font-semibold py-1 px-0 transition-all duration-250 border border-transparent group-hover/row:px-1.5 group-hover/row:border-gray-200 dark:group-hover/row:border-zinc-800 group-hover/row:bg-white dark:group-hover/row:bg-zinc-900 rounded-sm text-slate-800 dark:text-zinc-200">
+              <div className="flex items-center gap-2">
+                {(row?.courier_logo || row?.courier_logo_url) && (
+                  <div className="">
+                    <img src={row?.courier_logo || row?.courier_logo_url} className="h-6! min-w-[60px] object-contain" />
+                  </div>
+                )}
+                <div className="flex flex-col">
+                  <span className="font-medium whitespace-nowrap">{value || '-'}</span>
+                  {row.product_id && <span className="font-normal text-sm">Product - {row.product_id}</span>}
+                </div>
+              </div>
+              <Pencil onClick={() => courierEditClick(row)} className="h-3 w-3 cursor-pointer text-primary opacity-0 group-hover/row:opacity-100" />
+            </div>) : (
+              <div className="flex items-center gap-2">
+                {(row?.courier_logo || row?.courier_logo_url) && (
+                  <div className="">
+                    <img src={row?.courier_logo || row?.courier_logo_url} className="h-6! min-w-[60px] object-contain" />
+                  </div>
+                )}
+                <div className="flex flex-col">
+                  <span className="font-medium whitespace-nowrap">{value || '-'}</span>
+                  {row.product_id && <span className="font-normal text-sm">Product - {row.product_id}</span>}
+                </div>
               </div>
             )}
-            <div className="flex flex-col">
-              <span className="font-medium whitespace-nowrap">{value || '-'}</span>
-              {row.product_id && <span className="font-normal text-sm">Product - {row.product_id}</span>}
-            </div>
-          </div>
+          </>
         )
       },
 

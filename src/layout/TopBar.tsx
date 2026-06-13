@@ -1,6 +1,6 @@
 "use client";
 
-import { LogOut, Sun, Moon, Monitor, Loader2, HelpCircle, User, ArrowLeftRight, Wallet, Menu, Search, ArrowLeft } from 'lucide-react';
+import { LogOut, Sun, Moon, Monitor, Loader2, HelpCircle, User, Wallet, Menu, Search, ArrowLeft } from 'lucide-react';
 import { useNavigate, useLocation, useSearchParams } from 'react-router-dom';
 import DropdownCustomContent, {
   DropdownCustomMenu,
@@ -252,10 +252,10 @@ export default function TopBar({
                 {<User className="w-4 h-4 mr-2" />}
                 Edit Profile
               </DropdownMenuItem>
-              <DropdownMenuItem variant={"default"} onClick={() => setIsAccountSwitchOpen(true)} className={"cursor-pointer py-2 px-3 text-[13px]"}>
+              {/* <DropdownMenuItem variant={"default"} onClick={() => setIsAccountSwitchOpen(true)} className={"cursor-pointer py-2 px-3 text-[13px]"}>
                 {<ArrowLeftRight className="w-4 h-4 mr-2" />}
                 Account Switch
-              </DropdownMenuItem>
+              </DropdownMenuItem> */}
               <DropdownMenuItem variant={"default"} onClick={handleFaq} className={"cursor-pointer py-2 px-3 text-[13px]"}>
                 {<HelpCircle className="w-4 h-4 mr-2" />}
                 FAQ

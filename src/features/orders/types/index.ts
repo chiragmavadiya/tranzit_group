@@ -19,6 +19,10 @@ export interface Order {
   receiver_phone?: string;
   order_source_icon?: string;
   is_own_courier: boolean;
+  items: ItemData[]
+  sender_address_info?: string;
+  receiver_address_info?: string;
+  courier_code?: string;
 }
 
 export type TabType = 'new' | 'printed' | 'shipped' | 'archived';

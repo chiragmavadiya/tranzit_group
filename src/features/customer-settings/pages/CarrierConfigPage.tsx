@@ -144,8 +144,8 @@ export default function CarrierConfigPage() {
               <div>
                 {logoUrl && (
                   <div className="flex justify-center">
-                    <div className="bg-white dark:bg-zinc-950 p-3 rounded-xl border border-gray-250/60 dark:border-zinc-800 shadow-xs flex items-center justify-center">
-                      <img src={logoUrl} alt={carrierName} className="h-12! w-12! object-contain" />
+                    <div className="bg-white dark:bg-zinc-950 p-2 rounded-xl border border-gray-250/60 dark:border-zinc-800 shadow-xs flex items-center justify-center">
+                      <img src={logoUrl} alt={carrierName} className="h-16! w-16! object-contain" />
                     </div>
                   </div>
                 )}

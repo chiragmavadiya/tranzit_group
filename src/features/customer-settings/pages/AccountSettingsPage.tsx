@@ -11,8 +11,8 @@ import { useAppSelector } from '@/hooks/store.hooks';
 import SubscriptionPlanModal from '../components/SubscriptionPlanModal';
 import { STATES } from '@/constants';
 import { useGetProfile, useUpdateProfile, useChangePassword } from '@/features/profile/hooks/useProfile';
-import { Checkbox } from '@/components/ui/checkbox';
-import { Label } from '@/components/ui/label';
+// import { Checkbox } from '@/components/ui/checkbox';
+// import { Label } from '@/components/ui/label';
 // import { CreateAddressDialog } from '@/features/address-book/components/CreateAddressDialog';
 // import { STATES } from '@/constants';
 
@@ -87,6 +87,7 @@ export default function AccountSettingsPage() {
     newPassword: '',
     confirmPassword: '',
   });
+  const [disabledAddress, setDisabledAddress] = useState(false);
   // const [isDialogOpen, setIsDialogOpen] = useState(false);
   // const [editingAddressId, setEditingAddressId] = useState<string | null>(null);
 
@@ -308,219 +309,94 @@ export default function AccountSettingsPage() {
       </div>
 
       {/* Left Column: Company Information Form */}
-      <motion.div
-        custom={0}
-        initial="hidden"
-        animate="visible"
-        variants={cardVariants}
-        className="lg:col-span-6 flex"
-      >
-        <Card className="flex flex-col w-full hover:shadow-md transition-shadow duration-300 border-gray-200/60 shadow-xs rounded-md">
-          <CardHeader className="flex flex-row items-center justify-between px-6 py-4 border-b border-gray-100 dark:border-zinc-800 bg-slate-50/30 dark:bg-zinc-950 space-y-0 rounded-t-md">
-            <CardTitle className="text-base font-medium text-gray-800 dark:text-zinc-200">Company Information</CardTitle>
-          </CardHeader>
-
-          <CardContent className="p-6 flex-1">
-            <div className="grid grid-cols-12 gap-x-4 gap-y-3.5">
-              {/* Row 1: First name , last name */}
-              <FormInput
-                label="First Name"
-                required
-                disabled={!isEditingProfile}
-                isHalf
-                value={formData.firstName}
-                onChange={(val) => handleInputChange(val, 'firstName')}
-              />
-              <FormInput
-                label="Last Name"
-                required
-                disabled={!isEditingProfile}
-                isHalf
-                value={formData.lastName}
-                onChange={(val) => handleInputChange(val, 'lastName')}
-              />
-
-              {/* Row 2: email, phone */}
-              <FormInput
-                label="Email Address"
-                type="email"
-                required
-                disabled={!isEditingProfile}
-                isHalf
-                value={formData.email}
-                onChange={(val) => handleInputChange(val, 'email')}
-              />
-              <FormInput
-                label="Phone"
-                disabled={!isEditingProfile}
-                isHalf
-                value={formData.phone}
-                onChange={(val) => handleInputChange(val, 'phone')}
-              />
-
-              {/* Row 3: company name , ABN */}
-              <FormInput
-                label="Company Name"
-                required
-                disabled={!isEditingProfile}
-                isHalf
-                value={formData.companyName}
-                onChange={(val) => handleInputChange(val, 'companyName')}
-              />
-              <FormInput
-                label="ABN"
-                disabled={!isEditingProfile}
-                isHalf
-                value={formData.abn}
-                onChange={(val) => handleInputChange(val, 'abn')}
-              />
-            </div>
-          </CardContent>
-        </Card>
-      </motion.div>
-
-      {/* Right Column: Balance, Plan Information, Sender Address */}
-      <div className="lg:col-span-6 flex flex-col gap-4">
-
-        {/* Balance Card */}
-        <motion.div custom={1} initial="hidden" animate="visible" variants={cardVariants} className="flex h-fit">
-          <Card className="w-full border-gray-200/60 shadow-xs">
+      <div className='lg:col-span-6 space-y-4'>
+        <motion.div
+          custom={0}
+          initial="hidden"
+          animate="visible"
+          variants={cardVariants}
+          className="flex"
+        >
+          <Card className="flex flex-col w-full hover:shadow-md transition-shadow duration-300 border-gray-200/60 shadow-xs rounded-md">
             <CardHeader className="flex flex-row items-center justify-between px-6 py-4 border-b border-gray-100 dark:border-zinc-800 bg-slate-50/30 dark:bg-zinc-950 space-y-0 rounded-t-md">
-              <CardTitle className="text-base font-medium text-gray-800 dark:text-zinc-200">Balance</CardTitle>
+              <CardTitle className="text-base font-medium text-gray-800 dark:text-zinc-200">Personal Information</CardTitle>
             </CardHeader>
-            <CardContent className="p-6 pt-0 flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <span className="text-[13px] font-semibold text-slate-500">Current Balance:</span>
-                <span className="text-[13px] font-bold text-emerald-700 bg-emerald-50 dark:bg-emerald-950/50 dark:text-emerald-400 px-2 py-0.5 rounded-sm">
-                  {new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(Number(summary?.wallet_balance || 0))}
-                </span>
+
+            <CardContent className="p-6 flex-1">
+              <div className="grid grid-cols-12 gap-x-4 gap-y-3.5">
+                {/* Row 1: First name , last name */}
+                <FormInput
+                  label="First Name"
+                  required
+                  disabled={!isEditingProfile}
+                  isHalf
+                  value={formData.firstName}
+                  onChange={(val) => handleInputChange(val, 'firstName')}
+                />
+                <FormInput
+                  label="Last Name"
+                  required
+                  disabled={!isEditingProfile}
+                  isHalf
+                  value={formData.lastName}
+                  onChange={(val) => handleInputChange(val, 'lastName')}
+                />
+
+                {/* Row 2: email, phone */}
+                <FormInput
+                  label="Email Address"
+                  type="email"
+                  required
+                  disabled={!isEditingProfile}
+                  isHalf
+                  value={formData.email}
+                  onChange={(val) => handleInputChange(val, 'email')}
+                />
+                <FormInput
+                  label="Phone"
+                  disabled={!isEditingProfile}
+                  isHalf
+                  value={formData.phone}
+                  onChange={(val) => handleInputChange(val, 'phone')}
+                />
+
+                {/* Row 3: company name , ABN */}
+                <FormInput
+                  label="Company Name"
+                  required
+                  disabled={!isEditingProfile}
+                  isHalf
+                  value={formData.companyName}
+                  onChange={(val) => handleInputChange(val, 'companyName')}
+                />
+                <FormInput
+                  label="ABN"
+                  disabled={!isEditingProfile}
+                  isHalf
+                  value={formData.abn}
+                  onChange={(val) => handleInputChange(val, 'abn')}
+                />
               </div>
             </CardContent>
           </Card>
         </motion.div>
 
-        {/* Plan Information Card */}
-        <motion.div custom={2} initial="hidden" animate="visible" variants={cardVariants} className="flex">
-          <Card className="w-full border-gray-200/60 ">
+        <motion.div
+          custom={3}
+          initial="hidden"
+          animate="visible"
+          variants={cardVariants}
+          className="col-span-12"
+        >
+          <Card className="w-full hover:shadow-md transition-shadow duration-300 border-gray-200/60 shadow-xs rounded-md">
             <CardHeader className="flex flex-row items-center justify-between px-6 py-4 border-b border-gray-100 dark:border-zinc-800 bg-slate-50/30 dark:bg-zinc-950 space-y-0 rounded-t-md">
-              <CardTitle className="text-base font-medium text-gray-800 dark:text-zinc-200">Plan Information</CardTitle>
-              <Button
-                size="sm"
-                className="h-8 px-4 text-[13px] font-medium text-white shadow-sm shrink-0 rounded-sm"
-                onClick={() => setIsPlanModalOpen(true)}
-              >
-                Upgrade Plan
-              </Button>
+              <CardTitle className="text-base font-medium text-gray-800 dark:text-zinc-200">Billing Address Information</CardTitle>
             </CardHeader>
-            <CardContent className="p-6 pt-0 space-y-3">
-              <div className="text-[13px] font-medium text-slate-800 dark:text-zinc-200">
-                <span className="text-slate-500 dark:text-zinc-400">Current Plan: </span>
-                <span className="font-bold text-slate-900 dark:text-zinc-100">Silver</span>
-              </div>
-              <div className="flex items-center gap-6 text-[13px] font-semibold text-indigo-900/80 dark:text-indigo-300">
-                <span>Channels: <span className="font-medium text-slate-500">0/99</span></span>
-                <span>Couriers: <span className="font-medium text-slate-500">3/99</span></span>
-                <span>Shipments: <span className="font-medium text-slate-500">4/2000</span></span>
-              </div>
-            </CardContent>
-          </Card>
-        </motion.div>
+            <CardContent className="p-6 pt-2">
+              <div className="grid grid-cols-1 md:grid-cols-1 gap-6">
 
-        {/* <motion.div custom={3} initial="hidden" animate="visible" variants={cardVariants} className="flex">
-          <Card className="flex flex-col w-full transition-shadow duration-300 border-gray-200/60">
-            <CardHeader className="flex flex-row items-center justify-between px-6 py-4 border-b border-gray-100 dark:border-zinc-800 bg-slate-50/30 dark:bg-zinc-950 space-y-0 rounded-t-md">
-              <CardTitle className="text-[15px] font-medium text-gray-800 dark:text-zinc-200">Sender Address</CardTitle>
-              <Button
-                size="sm"
-                onClick={() => {
-                  setEditingAddressId('');
-                  setIsDialogOpen(true);
-                }}
-                className="h-8 px-4 text-[13px] font-medium text-white shadow-sm shrink-0 rounded-sm">
-                Add Address
-              </Button>
-            </CardHeader>
-
-            <CardContent className="p-0 flex-1">
-              <div className='space-y-4 p-4 pt-0'>
-                <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between hover:bg-gray-50/50 dark:hover:bg-zinc-900/50 transition-colors gap-4 sm:gap-0">
-                  <div className="flex items-center gap-2 min-w-[120px]">
-                    <User className="w-4 h-4 text-slate-400" />
-                    <span className="text-[11px] font-medium bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-300 px-2 py-0.5 rounded-sm">Test</span>
-                  </div>
-
-                  <div className="flex items-center gap-2 flex-1 justify-center text-center">
-                    <Map className="w-4 h-4 text-[#5D6B98] shrink-0" />
-                    <span className="text-[13px] font-medium text-[#5D6B98] uppercase tracking-wide">
-                      {formData.shipping_suburb}, {formData.shipping_state}, {formData.shipping_postcode}, AU
-                    </span>
-                    <span className="text-[10px] font-medium bg-orange-100 text-orange-600 px-2 py-0.5 rounded-sm ml-2 shrink-0">default</span>
-                  </div>
-
-                  <div className="flex items-center gap-3 min-w-[80px] justify-end">
-                    <button className="text-blue-500 cursor-pointer hover:text-blue-600 transition-colors" onClick={() => {
-                      setEditingAddressId('');
-                      setIsDialogOpen(true);
-                    }}>
-                      <Edit2 className="w-4 h-4" />
-                    </button>
-                    <div className="h-4 w-[1px] bg-gray-200 dark:bg-zinc-700"></div>
-                    <button className="text-red-500 cursor-pointer hover:text-red-600 transition-colors">
-                      <Trash2 className="w-4 h-4" />
-                    </button>
-                  </div>
-                </div>
-                <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between hover:bg-gray-50/50 dark:hover:bg-zinc-900/50 transition-colors gap-4 sm:gap-0">
-                  <div className="flex items-center gap-2 min-w-[120px]">
-                    <User className="w-4 h-4 text-slate-400" />
-                    <span className="text-[11px] font-medium bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-300 px-2 py-0.5 rounded-sm">Test</span>
-                  </div>
-
-                  <div className="flex items-center gap-2 flex-1 justify-center text-center">
-                    <Map className="w-4 h-4 text-[#5D6B98] shrink-0" />
-                    <span className="text-[13px] font-medium text-[#5D6B98] uppercase tracking-wide">
-                      {formData.shipping_suburb}, {formData.shipping_state}, {formData.shipping_postcode}, AU
-                    </span>
-                    <span className="text-[10px] font-medium bg-orange-100 text-orange-600 px-2 py-0.5 rounded-sm ml-2 shrink-0">default</span>
-                  </div>
-
-                  <div className="flex items-center gap-3 min-w-[80px] justify-end">
-                    <button className="text-blue-500 cursor-pointer hover:text-blue-600 transition-colors" onClick={() => {
-                      setEditingAddressId('');
-                      setIsDialogOpen(true);
-                    }}>
-                      <Edit2 className="w-4 h-4" />
-                    </button>
-                    <div className="h-4 w-[1px] bg-gray-200 dark:bg-zinc-700"></div>
-                    <button className="text-red-500 cursor-pointer hover:text-red-600 transition-colors">
-                      <Trash2 className="w-4 h-4" />
-                    </button>
-                  </div>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        </motion.div> */}
-
-      </div>
-
-      {/* Address Information Card */}
-      <motion.div
-        custom={3}
-        initial="hidden"
-        animate="visible"
-        variants={cardVariants}
-        className="col-span-12"
-      >
-        <Card className="w-full hover:shadow-md transition-shadow duration-300 border-gray-200/60 shadow-xs rounded-md">
-          <CardHeader className="flex flex-row items-center justify-between px-6 py-4 border-b border-gray-100 dark:border-zinc-800 bg-slate-50/30 dark:bg-zinc-950 space-y-0 rounded-t-md">
-            <CardTitle className="text-base font-medium text-gray-800 dark:text-zinc-200">Address Information</CardTitle>
-          </CardHeader>
-          <CardContent className="p-6 pt-2">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-
-              {/* Pickup Address Column */}
-              <div className="space-y-4">
+                {/* Pickup Address Column */}
+                {/* <div className="space-y-4">
                 <div className="border-b pb-2">
                   <h4 className="text-base font-semibold text-gray-700 dark:text-zinc-300">
                     Pickup Address
@@ -605,111 +481,164 @@ export default function AccountSettingsPage() {
                     />
                   </div>
                 </div>
-              </div>
+              </div> */}
 
-              {/* Billing Address Column */}
-              <div className="space-y-4">
-                <div className="flex items-center justify-between border-b pb-2">
-                  <h4 className="text-base font-semibold text-gray-700 dark:text-zinc-300">
-                    Billing Address
-                  </h4>
-                  <div className="flex items-center space-x-2 cursor-pointer">
-                    <Checkbox
-                      id="same_as_shipping"
-                      checked={sameAsShipping}
-                      disabled={!isEditingProfile}
-                      onCheckedChange={(val) => setSameAsShipping(!!val)}
-                    />
-                    <Label htmlFor="same_as_shipping" className="text-[13px] font-medium text-gray-600 dark:text-zinc-400 cursor-pointer">
-                      Same as pickup address
-                    </Label>
+                {/* Billing Address Column */}
+                <div className="space-y-4">
+                  {/* <div className="flex items-center justify-between border-b pb-2">
+                    <h4 className="text-base font-semibold text-gray-700 dark:text-zinc-300">
+                      Billing Address
+                    </h4>
+                    <div className="flex items-center space-x-2 cursor-pointer">
+                      <Checkbox
+                        id="same_as_shipping"
+                        checked={sameAsShipping}
+                        disabled={!isEditingProfile}
+                        onCheckedChange={(val) => setSameAsShipping(!!val)}
+                      />
+                      <Label htmlFor="same_as_shipping" className="text-[13px] font-medium text-gray-600 dark:text-zinc-400 cursor-pointer">
+                        Same as pickup address
+                      </Label>
+                    </div>
+                  </div> */}
+                  <div className="grid grid-cols-12 gap-x-4 gap-y-3.5">
+                    <div className="col-span-12">
+                      <PlaceAutocomplete
+                        label="Search Address"
+                        className="w-full col-span-12"
+                        inputClassName="w-full col-span-12"
+                        isFullWidth
+                        disabled={!isEditingProfile || sameAsShipping}
+                        value={formData.billing_address_info}
+                        onChange={(val) => { handleInputChange(val, 'billing_address_info'); setDisabledAddress(false) }}
+                        onPlaceSelect={(opt) => {
+                          setFormData(prev => ({
+                            ...prev,
+                            billing_address_info: opt.formatted_address,
+                            billing_address: opt.address1,
+                            billing_unit_number: opt.unit_number || '',
+                            billing_street_number: opt.street_number || '',
+                            billing_street_name: opt.street_name || '',
+                            billing_street_type: opt.street_type || '',
+                            billing_suburb: opt.suburb,
+                            billing_state: opt.state,
+                            billing_postcode: opt.post_code,
+                          }));
+                          setDisabledAddress(true)
+                        }}
+                      />
+                    </div>
+
+                    <div className="col-span-4">
+                      <FormInput
+                        label="Unit Number"
+                        placeholder='Unit Number'
+                        disabled={!isEditingProfile || sameAsShipping || disabledAddress}
+                        value={formData.billing_unit_number}
+                        onChange={(val) => handleInputChange(val, 'billing_unit_number')}
+                      />
+                    </div>
+                    <div className="col-span-8">
+                      <FormInput
+                        label="Street"
+                        placeholder='Street Address'
+                        required
+                        disabled={!isEditingProfile || sameAsShipping || disabledAddress}
+                        value={formData.billing_address}
+                        onChange={(val) => handleInputChange(val, 'billing_address')}
+                      />
+                    </div>
+
+                    <div className="col-span-4">
+                      <FormInput
+                        label="Suburb"
+                        placeholder='Suburb'
+                        required
+                        disabled={!isEditingProfile || sameAsShipping || disabledAddress}
+                        value={formData.billing_suburb}
+                        onChange={(val) => handleInputChange(val, 'billing_suburb')}
+                      />
+                    </div>
+                    <div className="col-span-4">
+                      <FormSelect
+                        label="State"
+                        placeholder='Select State'
+                        required
+                        options={STATES}
+                        disabled={!isEditingProfile || sameAsShipping || disabledAddress}
+                        value={formData.billing_state}
+                        onValueChange={(val) => handleInputChange(val, 'billing_state')}
+                      />
+                    </div>
+                    <div className="col-span-4">
+                      <FormInput
+                        label="Postcode"
+                        placeholder='Postcode'
+                        required
+                        disabled={!isEditingProfile || sameAsShipping || disabledAddress}
+                        value={formData.billing_postcode}
+                        onChange={(val) => handleInputChange(val, 'billing_postcode')}
+                      />
+                    </div>
                   </div>
                 </div>
-                <div className="grid grid-cols-12 gap-x-4 gap-y-3.5">
-                  <div className="col-span-12">
-                    <PlaceAutocomplete
-                      label="Search Address"
-                      className="w-full col-span-12"
-                      inputClassName="w-full col-span-12"
-                      isFullWidth
-                      disabled={!isEditingProfile || sameAsShipping}
-                      value={formData.billing_address_info}
-                      onChange={(val) => handleInputChange(val, 'billing_address_info')}
-                      onPlaceSelect={(opt) => {
-                        setFormData(prev => ({
-                          ...prev,
-                          billing_address_info: opt.formatted_address,
-                          billing_address: opt.address1,
-                          billing_unit_number: opt.unit_number || '',
-                          billing_street_number: opt.street_number || '',
-                          billing_street_name: opt.street_name || '',
-                          billing_street_type: opt.street_type || '',
-                          billing_suburb: opt.suburb,
-                          billing_state: opt.state,
-                          billing_postcode: opt.post_code,
-                        }));
-                      }}
-                    />
-                  </div>
 
-                  <div className="col-span-4">
-                    <FormInput
-                      label="Unit Number"
-                      placeholder='Unit Number'
-                      disabled={!isEditingProfile || sameAsShipping}
-                      value={formData.billing_unit_number}
-                      onChange={(val) => handleInputChange(val, 'billing_unit_number')}
-                    />
-                  </div>
-                  <div className="col-span-8">
-                    <FormInput
-                      label="Street"
-                      placeholder='Street Address'
-                      required
-                      disabled={!isEditingProfile || sameAsShipping}
-                      value={formData.billing_address}
-                      onChange={(val) => handleInputChange(val, 'billing_address')}
-                    />
-                  </div>
-
-                  <div className="col-span-4">
-                    <FormInput
-                      label="Suburb"
-                      placeholder='Suburb'
-                      required
-                      disabled={!isEditingProfile || sameAsShipping}
-                      value={formData.billing_suburb}
-                      onChange={(val) => handleInputChange(val, 'billing_suburb')}
-                    />
-                  </div>
-                  <div className="col-span-4">
-                    <FormSelect
-                      label="State"
-                      placeholder='Select State'
-                      required
-                      options={STATES}
-                      disabled={!isEditingProfile || sameAsShipping}
-                      value={formData.billing_state}
-                      onValueChange={(val) => handleInputChange(val, 'billing_state')}
-                    />
-                  </div>
-                  <div className="col-span-4">
-                    <FormInput
-                      label="Postcode"
-                      placeholder='Postcode'
-                      required
-                      disabled={!isEditingProfile || sameAsShipping}
-                      value={formData.billing_postcode}
-                      onChange={(val) => handleInputChange(val, 'billing_postcode')}
-                    />
-                  </div>
-                </div>
               </div>
+            </CardContent>
+          </Card>
+        </motion.div>
+      </div>
 
-            </div>
-          </CardContent>
-        </Card>
-      </motion.div>
+      {/* Right Column: Balance, Plan Information, Sender Address */}
+      <div className="lg:col-span-6 flex flex-col gap-4">
+
+        {/* Balance Card */}
+        <motion.div custom={1} initial="hidden" animate="visible" variants={cardVariants} className="flex h-fit">
+          <Card className="w-full border-gray-200/60 shadow-xs">
+            <CardHeader className="flex flex-row items-center justify-between px-6 py-4 border-b border-gray-100 dark:border-zinc-800 bg-slate-50/30 dark:bg-zinc-950 space-y-0 rounded-t-md">
+              <CardTitle className="text-base font-medium text-gray-800 dark:text-zinc-200">Balance</CardTitle>
+            </CardHeader>
+            <CardContent className="p-6 pt-0 flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <span className="text-[13px] font-semibold text-slate-500">Current Balance:</span>
+                <span className="text-[13px] font-bold text-emerald-700 bg-emerald-50 dark:bg-emerald-950/50 dark:text-emerald-400 px-2 py-0.5 rounded-sm">
+                  {new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(Number(summary?.wallet_balance || 0))}
+                </span>
+              </div>
+            </CardContent>
+          </Card>
+        </motion.div>
+
+        {/* Plan Information Card */}
+        <motion.div custom={2} initial="hidden" animate="visible" variants={cardVariants} className="flex">
+          <Card className="w-full border-gray-200/60 ">
+            <CardHeader className="flex flex-row items-center justify-between px-6 py-4 border-b border-gray-100 dark:border-zinc-800 bg-slate-50/30 dark:bg-zinc-950 space-y-0 rounded-t-md">
+              <CardTitle className="text-base font-medium text-gray-800 dark:text-zinc-200">Plan Information</CardTitle>
+              <Button
+                size="sm"
+                className="h-8 px-4 text-[13px] font-medium text-white shadow-sm shrink-0 rounded-sm"
+                onClick={() => setIsPlanModalOpen(true)}
+              >
+                Upgrade Plan
+              </Button>
+            </CardHeader>
+            <CardContent className="p-6 pt-0 space-y-3">
+              <div className="text-[13px] font-medium text-slate-800 dark:text-zinc-200">
+                <span className="text-slate-500 dark:text-zinc-400">Current Plan: </span>
+                <span className="font-bold text-slate-900 dark:text-zinc-100">Silver</span>
+              </div>
+              <div className="flex items-center gap-6 text-[13px] font-semibold text-indigo-900/80 dark:text-indigo-300">
+                <span>Channels: <span className="font-medium text-slate-500">0/99</span></span>
+                <span>Couriers: <span className="font-medium text-slate-500">3/99</span></span>
+                <span>Shipments: <span className="font-medium text-slate-500">4/2000</span></span>
+              </div>
+            </CardContent>
+          </Card>
+        </motion.div>
+      </div>
+
+      {/* Address Information Card */}
+
 
       {/* Change Password Modal */}
       <CustomModel
@@ -775,6 +704,7 @@ export default function AccountSettingsPage() {
         <SubscriptionPlanModal
           open={isPlanModalOpen}
           onOpenChange={setIsPlanModalOpen}
+          closeable
         />
       )}
       {/* 

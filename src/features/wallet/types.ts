@@ -15,6 +15,8 @@ export interface WalletTransactionsParams {
   transaction_type?: string | number;
   page?: number;
   per_page?: number;
+  start_date?: string;
+  end_date?: string;
 }
 
 export interface WalletTransactionsResponse {
@@ -64,6 +66,8 @@ export interface WalletExportParams {
   format: 'pdf' | 'csv' | 'excel';
   search?: string;
   transaction_type?: string | number;
+  start_date?: string;
+  end_date?: string;
 }
 
 export interface WalletSummaryResponse {

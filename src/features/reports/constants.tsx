@@ -21,7 +21,7 @@ export const SHIPMENT_COLUMNS: Column<ShipmentReport>[] = [
       </NavLink>
     )
   },
-  { key: 'parcel_type', header: 'PARCEL TYPE', sortable: true, cell: (value: string) => value === "box" ? "Parcel" : value },
+  { key: 'parcel_type', header: 'TYPE', sortable: true, cell: (value: string) => value === "box" ? "Parcel" : value },
   { key: 'description', header: 'DESCRIPTION' },
   { key: 'quantity', header: 'QTY', sortable: true },
   { key: 'weight', header: 'WEIGHT (KG)', sortable: true },
@@ -39,7 +39,7 @@ export const SHIPMENT_COLUMNS: Column<ShipmentReport>[] = [
   { key: 'receiver_name', header: 'RECEIVER', sortable: true, searchable: true, width: '160px' },
   { key: 'status', header: 'STATUS', sortable: true, cell: (value: string) => <StatusBadge status={value} /> },
   { key: 'tracking_status', header: 'TRANSIT STATUS', sortable: true, cell: (value: string) => <StatusBadge status={value} /> },
-  { key: 'created_at', header: 'CREATE DATE', width: '200px' },
+  { key: 'created_at', header: 'CREATE ON', width: '200px' },
 ];
 
 export const TRANSACTION_COLUMNS: Column<TransactionReport>[] = [
@@ -83,7 +83,7 @@ export const PARCEL_COLUMNS: Column<ParcelReport>[] = [
     )
   },
   { key: 'total', header: 'TOTAL', sortable: true },
-  { key: 'create_date', header: 'CREATE DATE', sortable: true },
+  { key: 'create_date', header: 'CREATE ON', sortable: true },
 ];
 
 export const ADMIN_PARCEL_COLUMNS: Column<ParcelReport>[] = [

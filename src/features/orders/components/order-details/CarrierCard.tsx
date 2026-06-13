@@ -86,13 +86,10 @@ export const CarrierCard: React.FC<CarrierCardProps> = memo((props) => {
       );
       setBestDeal(minItem.courierCode + (minItem.product_id || '') || '');
       const selectedFromQuote = sessionStorage.getItem('quote_courier') || localStorage.getItem('quote_courier');
-      console.log(selectedFromQuote)
       if (selectedFromQuote) {
         const courier = JSON.parse(selectedFromQuote);
-        console.log('if 1.....', courier.courier.courierCode + (courier.courier.product_id || '') || '')
         setSelectedServiceId(courier.courier.courierCode + (courier.courier.product_id || '') || '');
       } else if (!selectedServiceId || !allCourierIds.includes(selectedServiceId)) {
-        console.log('if 2.....')
         setSelectedServiceId((prev) => {
           if ((prev && allCourierIds.includes(prev)) || !mount.current) return prev;
           return minItem.courierCode + (minItem.product_id || '') || '';
@@ -194,8 +191,8 @@ export const CarrierCard: React.FC<CarrierCardProps> = memo((props) => {
         const courierSurcharges = surchargesMap[selectedCourier.courierCode] || [];
         const selectedNames = selectedSurchargesMap[selectedCourier.courierCode] ?? [];
         const activeSurcharges = courierSurcharges.filter(charge => selectedNames.includes(charge.name));
-        const autoApplyCharges = selectedCourier?.applied_surcharges?.reduce((acc: any, curr: any) => acc + curr.amount, 0)
-        const surcharges = activeSurcharges.reduce((acc: any, curr: any) => acc + curr.amount, 0);
+        const autoApplyCharges = selectedCourier?.applied_surcharges?.reduce((acc: any, curr: any) => acc + curr.amount, 0) || 0;
+        const surcharges = activeSurcharges.reduce((acc: any, curr: any) => acc + curr.amount, 0) || 0;
         const totalPrice = selectedCourier.price + surcharges + autoApplyCharges;
         onQuoteChange?.((prev: any) => ({
           courier: selectedCourier,

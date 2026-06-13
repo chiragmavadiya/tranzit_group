@@ -45,7 +45,6 @@ export default function ActionBuilder({ actions, onChange }: ActionBuilderProps)
   };
 
   const handleActionConfigChange = (id: string, fieldName: string, value: any) => {
-    console.log(id, fieldName, value)
     const updated = actions.map(a => {
       if (a.id === id) {
         const newConfig = {

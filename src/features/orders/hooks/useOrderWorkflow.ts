@@ -148,7 +148,6 @@ export const useOrderWorkflow = () => {
   })
   useEffect(() => {
     if (defaultItem && (orderType === 'create' || orderType === 'create-menual' || orderType === 'return') && !localStorage.getItem('quote_to_clone') && !localStorage.getItem('quote_items')) {
-      console.log("Set default item...")
       setDefaultItemData(defaultItem.data)
     }
   }, [defaultItem, setItemsData, orderType]);
@@ -285,7 +284,6 @@ export const useOrderWorkflow = () => {
     const totalSurcharges = isEditable ? (quoteData?.totalSurcharges || 0) : orderDetail?.order_details?.surcharge_amount;
     const insuranceCost = insuranceSelected ? 6.0 : 0;
     const grandTotal = (quoteData?.totalPrice || quoteData?.total || 0) + insuranceCost;
-
     return {
       totalItems,
       totalWeight,
@@ -297,7 +295,7 @@ export const useOrderWorkflow = () => {
       grandTotal,
       insurance: insuranceSelected,
     };
-  }, [itemsData, quoteData, insuranceSelected]);
+  }, [itemsData, quoteData, isEditable, orderDetail?.order_details?.surcharge_amount, insuranceSelected]);
 
   const requiresManualLabel = useMemo(() => {
     if (orderType !== 'edit') return false;

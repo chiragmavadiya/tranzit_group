@@ -104,6 +104,7 @@ export const clientSidebarItems: SidebarItem[] = [
   },
   { name: 'Create Order', icon: PlusCircle, path: '/orders/create' },
   { name: 'Get Quote', icon: Calculator, path: '/quote' },
+  { name: 'Manifest Orders', icon: ClipboardList, path: '/manifest' },
   {
     name: 'My Wallet',
     icon: Wallet,

@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Loader2, Info, Search, Edit2, Trash2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { FormInput, FormSelect } from '@/features/orders/components/OrderFormUI';
+import { FormInput, FormSelect, FormTextarea } from '@/features/orders/components/OrderFormUI';
 import { Checkbox } from '@/components/ui/checkbox';
 import {
   useUpdateAdvancedSettings,
@@ -483,47 +483,6 @@ export default function CarrierConfigForm({
           <div className="flex-1 grid grid-cols-12 gap-x-4 gap-y-4">
             {getCredentialsFields()}
           </div>
-
-          {/* Checkout Delivery Settings Section */}
-          <div className="mt-6 pt-6 border-t border-gray-150 dark:border-zinc-800 space-y-4">
-            <div>
-              <h4 className="text-base font-bold text-gray-900 dark:text-zinc-100 uppercase tracking-wide">Checkout Delivery Settings</h4>
-              <p className="text-xs text-slate-500 dark:text-zinc-400">Configure how this shipping option appears to customers at checkout.</p>
-            </div>
-
-            {/* <div className="flex items-center gap-3">
-              <Checkbox
-                id="display_transit_time"
-                checked={!!formData.display_transit_time}
-                onCheckedChange={(checked) => handleInputChange(!!checked, 'display_transit_time')}
-              />
-              <label
-                htmlFor="display_transit_time"
-                className="text-sm font-medium text-slate-700 dark:text-zinc-350 cursor-pointer select-none"
-              >
-                Display estimated transit times
-              </label>
-            </div> */}
-
-            <div className="space-y-1">
-              <label className="my-0 text-[14px] font-medium text-slate-800 dark:text-zinc-400 ml-0.5 block">
-                Delivery Service Description
-              </label>
-              <p className="my-0 text-[12px] text-slate-500 dark:text-zinc-450 ml-0.5">
-                Provide a custom description to display with this delivery service.
-              </p>
-              <div className="pt-0">
-                <FormInput
-                  value={formData.delivery_instruction || ""}
-                  onChange={(val) => handleInputChange(val, 'delivery_instruction')}
-                  placeholder="e.g. 3-5 business days delivery to your doorstep"
-                  isFullWidth={true}
-                  className="col-span-12"
-                />
-              </div>
-            </div>
-          </div>
-
           <div className='mt-6 justify-end self-end'>
             <Button
               type="submit"
@@ -599,6 +558,22 @@ export default function CarrierConfigForm({
                 }
                 return null;
               })}
+              {/* <FormInput
+                label='Delivery Instruction:'
+                value={formData.delivery_instruction || ""}
+                onChange={(val) => handleInputChange(val, 'delivery_instruction')}
+                placeholder="e.g. 3-5 business days delivery to your doorstep"
+                isFullWidth={true}
+                className="col-span-12"
+              /> */}
+              <FormTextarea
+                label="Delivery Instruction:"
+                value={''}
+                onChange={(val) => handleAdvancedSettingChange('delivery_instruction', val)}
+                placeholder="e.g. 3-5 business days delivery to your doorstep"
+                rows={3}
+                isFullWidth
+              />
             </div>
 
             {isConnected && (
@@ -876,25 +851,27 @@ export default function CarrierConfigForm({
         })()}
       </div>
 
-      {deleteConfirmOpen && (
-        <ConformationModal
-          open={deleteConfirmOpen}
-          onOpenChange={setDeleteConfirmOpen}
-          title="Delete Product"
-          description={
-            productToDelete ? (
-              <span>
-                Are you sure you want to delete the product <strong>{productToDelete.name}</strong> ({productToDelete.code})? This action cannot be undone.
-              </span>
-            ) : undefined
-          }
-          confirmText="Delete"
-          cancelText="Cancel"
-          confirmVariant="destructive"
-          loading={deleteManualProductMut.isPending}
-          onConfirm={handleDeleteConfirm}
-        />
-      )}
-    </form>
+      {
+        deleteConfirmOpen && (
+          <ConformationModal
+            open={deleteConfirmOpen}
+            onOpenChange={setDeleteConfirmOpen}
+            title="Delete Product"
+            description={
+              productToDelete ? (
+                <span>
+                  Are you sure you want to delete the product <strong>{productToDelete.name}</strong> ({productToDelete.code})? This action cannot be undone.
+                </span>
+              ) : undefined
+            }
+            confirmText="Delete"
+            cancelText="Cancel"
+            confirmVariant="destructive"
+            loading={deleteManualProductMut.isPending}
+            onConfirm={handleDeleteConfirm}
+          />
+        )
+      }
+    </form >
   );
 }

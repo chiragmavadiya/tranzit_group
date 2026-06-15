@@ -24,10 +24,11 @@ interface CarrierCardProps {
   default_courier?: any;
   signatureSelected?: boolean;
   isLoading?: boolean;
+  selectedCustomer?: number;
 }
 
 export const CarrierCard: React.FC<CarrierCardProps> = memo((props) => {
-  const { itemData, addresses, onQuoteChange, setCourierData, orderDetail, module, orderType = 'create', initialSelectedCourierId = null, signatureSelected = false, isLoading = false } = props
+  const { itemData, addresses, onQuoteChange, setCourierData, orderDetail, module, orderType = 'create', initialSelectedCourierId = null, signatureSelected = false, isLoading = false, selectedCustomer } = props
   const { role } = useAppSelector((state) => state.auth);
   const [selectedServiceId, setSelectedServiceId] = useState<string>(initialSelectedCourierId || '')
   const [couriers, setCouriers] = useState<any[]>([]);
@@ -133,7 +134,8 @@ export const CarrierCard: React.FC<CarrierCardProps> = memo((props) => {
       receiver_details: receiver_details,
       receiver_address: receiver?.address_info || receiver_addr1,
       is_order: module === 'quote' ? "no" as const : "yes" as const,
-      signature_required: signatureSelected ? 1 : 0
+      signature_required: signatureSelected ? 1 : 0,
+      customer_id: selectedCustomer
     }
 
     getServices(payload, {
@@ -172,7 +174,8 @@ export const CarrierCard: React.FC<CarrierCardProps> = memo((props) => {
         receiver_details: receiver_details,
         receiver_address: receiver?.address_info || receiver_addr1,
         is_order: module === 'quote' ? "no" as const : "yes" as const,
-        signature_required: signatureSelected ? 1 : 0
+        signature_required: signatureSelected ? 1 : 0,
+        customer_id: selectedCustomer
       }
 
       getServices(payload, {
@@ -186,7 +189,7 @@ export const CarrierCard: React.FC<CarrierCardProps> = memo((props) => {
     }, 500); // 500ms debounce
     // Cleanup previous timer
     return () => clearTimeout(timer);
-  }, [itemData, addresses, getServices, orderType, module, getAddress, signatureSelected])
+  }, [itemData, addresses, getServices, orderType, module, getAddress, signatureSelected, selectedCustomer])
 
   useEffect(() => {
     if (couriers.length > 0 && selectedServiceId) {

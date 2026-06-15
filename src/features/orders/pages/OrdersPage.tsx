@@ -350,6 +350,14 @@ export default function OrdersPage({ fromCustomer, customerId }: { fromCustomer?
     setOrderToArchive(orderId);
   }, []);
 
+  const handleManifestOrders = useCallback(() => {
+    const auspostOrders = selectedRows.filter((orderId) => {
+      const order = ordersData?.data?.find((o: any) => String(o.order_number) === String(orderId));
+      return order?.courier_code?.toLowerCase() === 'auspost';
+    });
+    console.log("Manifesting orders", auspostOrders);
+  }, [selectedRows, ordersData?.data]);
+
   const downloadingLabelId = downloadLabelMutation.isPending ? String(downloadLabelMutation.variables) : null;
   const updateToArchiveId = archiveOrderMutation.isPending ? String(archiveOrderMutation.variables) : null;
 
@@ -426,7 +434,7 @@ export default function OrdersPage({ fromCustomer, customerId }: { fromCustomer?
                     variant="outline"
                     size="sm"
                     className="h-8 gap-2"
-                    // onClick={handleDownloadMultipleLabels}
+                    onClick={handleManifestOrders}
                     disabled={isDownloadingLabels || isCancellingOrders}
                   >
                     {isDownloadingLabels ? <Loader2 className="w-4 h-4 animate-spin" /> : <Zap className="w-4 h-4" />}

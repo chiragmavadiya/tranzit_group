@@ -320,11 +320,11 @@ export const useOrderWorkflow = () => {
       return;
     }
 
-    if (!isValidItems || !hasSenderAddress || !hasReceiverAddress) {
+    if (skipWalletCheckArg !== 'saveAsDraft' && (!isValidItems || !hasSenderAddress || !hasReceiverAddress)) {
       showToast('Please fill out item dimensions and complete both addresses.', 'error');
       return;
     }
-    if (!courierData?.courier) {
+    if (skipWalletCheckArg !== 'saveAsDraft' && !courierData?.courier) {
       showToast('Please select a courier.', 'error');
       return;
     }

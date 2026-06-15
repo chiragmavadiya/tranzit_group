@@ -459,6 +459,7 @@ const OrderDetailsPage: React.FC = () => {
                       setCourierData={setCourierData}
                       orderDetail={orderDetail}
                       orderType={orderType!}
+                      selectedCustomer={selectedCustomer}
                       module="order"
                       default_courier={default_courier}
                       initialSelectedCourierId={orderDetail?.courier_details && `${orderDetail?.courier_details?.courier_code || ''}${orderDetail?.courier_details?.product_id || ''}`}

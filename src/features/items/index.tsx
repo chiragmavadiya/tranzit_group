@@ -16,6 +16,7 @@ import {
   useDeleteItem,
   useExportItems,
   useSetDefaultItem,
+  useUnsetDefaultItem,
   useToggleItemStatus,
 } from './hooks/useItems';
 
@@ -45,6 +46,7 @@ export default function MyItemsPage() {
   const deleteItemMutation = useDeleteItem();
   const exportItemsMutation = useExportItems();
   const setDefaultItemMutation = useSetDefaultItem();
+  const unsetDefaultItemMutation = useUnsetDefaultItem();
   const toggleItemStatusMutation = useToggleItemStatus();
 
   const handleSearch = useCallback((search: string) => {
@@ -142,13 +144,15 @@ export default function MyItemsPage() {
                 onClick={() => {
                   if (!row.is_default) {
                     setDefaultItemMutation.mutate(row.id);
+                  } else {
+                    unsetDefaultItemMutation.mutate(row.id);
                   }
                 }}
-                disabled={row.is_default || setDefaultItemMutation.isPending}
-                className={`p-0 bg-transparent border-none outline-none focus:outline-none transition-transform active:scale-95 ${row.is_default ? 'cursor-default' : 'cursor-pointer hover:scale-110'
-                  }`}
+                disabled={setDefaultItemMutation.isPending || unsetDefaultItemMutation.isPending}
+                className="p-0 bg-transparent border-none outline-none focus:outline-none transition-transform active:scale-95 cursor-pointer hover:scale-110"
               >
-                {setDefaultItemMutation.isPending && setDefaultItemMutation.variables === row.id ? (
+                {(setDefaultItemMutation.isPending && setDefaultItemMutation.variables === row.id) ||
+                (unsetDefaultItemMutation.isPending && unsetDefaultItemMutation.variables === row.id) ? (
                   <Loader2 className="h-4! w-4! animate-spin" />
                 ) : (
                   <Star className={`h-4 w-4 ${row.is_default ? 'fill-amber-400 text-amber-400' : 'text-primary-400'}`} />
@@ -174,7 +178,16 @@ export default function MyItemsPage() {
                 </>
               ) : (
                 <>
-                  <h4 className="m-0 text-[13px] font-bold tracking-tight text-white">Default Item</h4>
+                  <div className="flex items-center gap-2 border-b border-slate-800/80 dark:border-zinc-800/80 pb-2">
+                    <Info className="w-4 h-4 text-amber-400 shrink-0 animate-pulse" />
+                    <h4 className="m-0 text-[13px] font-bold tracking-tight text-white">Fallback Default Item</h4>
+                  </div>
+                  <p className="m-0 text-xs font-semibold text-slate-200 leading-normal">
+                    This item is currently set as the fallback default item.
+                  </p>
+                  <p className="m-0 text-[12px] text-slate-300 dark:text-zinc-400 leading-relaxed">
+                    This item will be used automatically when an order has no default item set for its integration. Click to unset this item.
+                  </p>
                 </>
               )}
             </TooltipContent>
@@ -255,7 +268,7 @@ export default function MyItemsPage() {
         </div>
       )
     }
-  ], [setDefaultItemMutation, toggleItemStatusMutation, handleEditItem, handleDeleteClick]);
+  ], [setDefaultItemMutation, unsetDefaultItemMutation, toggleItemStatusMutation, handleEditItem, handleDeleteClick]);
 
   return (
     <div className="flex flex-col flex-1 gap-2 p-page-padding min-h-0 animate-in fade-in slide-in-from-bottom-2 duration-500">

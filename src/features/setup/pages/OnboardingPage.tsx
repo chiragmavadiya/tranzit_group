@@ -239,6 +239,7 @@ export default function OnboardingPage() {
   }, [user])
 
   useEffect(() => {
+    document.title = `On Boarding | Tranzit`;
     verifyEmailApiCall()
   }, [])
 

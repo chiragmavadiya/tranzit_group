@@ -592,7 +592,7 @@ const OrderDetailsPage: React.FC = () => {
             }
             handleReceiverPhoneSubmit(receiverPhoneInput);
           }}
-          submitText="Submit & Create Order"
+          submitText="Continue"
           cancelText="Cancel"
           contentClass="sm:max-w-[450px]"
         >

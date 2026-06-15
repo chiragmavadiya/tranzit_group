@@ -83,6 +83,14 @@ export const itemsService = {
   },
 
   /**
+   * Unset item as default
+   */
+  unsetDefault: async (id: number | string): Promise<GenericResponse> => {
+    const response = await api.delete(`/customer/items/${id}/default`);
+    return response.data;
+  },
+
+  /**
    * Get the default item
    */
   getDefault: async (): Promise<ItemDetailsResponse> => {

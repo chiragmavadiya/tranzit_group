@@ -12,7 +12,7 @@ interface GlobalSearchProps {
 }
 
 export const GlobalSearch: React.FC<GlobalSearchProps> = ({
-    className = "min-w-[300px] h-7",
+    className = "w-full h-8 text-[13px]",
     placeholder = "Search orders, invoices..."
 }) => {
     const navigate = useNavigate();
@@ -104,7 +104,7 @@ export const GlobalSearch: React.FC<GlobalSearchProps> = ({
 
     };
     return (
-        <div className='h-8'>
+        <div className='h-8 w-full'>
             <AutoComplete
                 placeholder={placeholder}
                 className={className}

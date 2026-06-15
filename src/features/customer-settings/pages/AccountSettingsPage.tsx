@@ -215,7 +215,7 @@ export default function AccountSettingsPage() {
     const data = {
       firstName: profile?.first_name || '',
       lastName: profile?.last_name || '',
-      email: profile?.personal_email || '',
+      email: profile?.email || profile?.personal_email || '',
       phone: profile?.mobile || profile?.personal_mobile || '',
       companyName: profile?.business_name || '',
       abn: profile?.gst_number || '',
@@ -347,7 +347,7 @@ export default function AccountSettingsPage() {
                   label="Email Address"
                   type="email"
                   required
-                  disabled={!isEditingProfile}
+                  disabled
                   isHalf
                   value={formData.email}
                   onChange={(val) => handleInputChange(val, 'email')}
@@ -610,7 +610,7 @@ export default function AccountSettingsPage() {
         </motion.div>
 
         {/* Plan Information Card */}
-        <motion.div custom={2} initial="hidden" animate="visible" variants={cardVariants} className="flex">
+        {/* <motion.div custom={2} initial="hidden" animate="visible" variants={cardVariants} className="flex">
           <Card className="w-full border-gray-200/60 ">
             <CardHeader className="flex flex-row items-center justify-between px-6 py-4 border-b border-gray-100 dark:border-zinc-800 bg-slate-50/30 dark:bg-zinc-950 space-y-0 rounded-t-md">
               <CardTitle className="text-base font-medium text-gray-800 dark:text-zinc-200">Plan Information</CardTitle>
@@ -634,7 +634,7 @@ export default function AccountSettingsPage() {
               </div>
             </CardContent>
           </Card>
-        </motion.div>
+        </motion.div> */}
       </div>
 
       {/* Address Information Card */}

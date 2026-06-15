@@ -33,6 +33,7 @@ export const API_ENDPOINTS = {
         IMPORT_SAMPLE: "/customer/orders/import/sample",
         ARCHIVE: (id: string | number) => `/orders/${id}/archive`,
         PRINT_ORDER: "/orders/print-label",
+        UPDATE_COURIER: (orderNumber: string) => `/orders/${orderNumber}/courier`,
     },
     DASHBOARD: {
         METRICS: "/dashboard/metrics",

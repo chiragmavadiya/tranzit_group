@@ -4,6 +4,7 @@ import { Label } from "@/components/ui/label";
 import { Link } from "react-router-dom";
 import brandlogo from '@/assets/Tranzit_Logo.svg';
 import { useForgotPassword } from "../hooks/useAuth";
+import { useEffect } from "react";
 
 export default function ForgotPassword() {
 
@@ -15,6 +16,10 @@ export default function ForgotPassword() {
     const email = formData.get("email") as string;
     forgotPassword({ email });
   };
+
+  useEffect(() => {
+    document.title = `Forgot Password | Tranzit`;
+  }, [])
 
   return (
     <div className="w-sm">

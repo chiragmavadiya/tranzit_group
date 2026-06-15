@@ -37,10 +37,10 @@ const RenderIntegrationSection = ({
                 <Icon className="w-5 h-5 text-primary" />
                 <h2 className="my-0 text-lg font-bold text-slate-800 dark:text-zinc-100">{title}</h2>
             </div> : null}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 2xl:grid-cols-4 gap-4">
                 {isLoading ? (
                     Array.from({ length: 4 }).map((_, idx) => (
-                        <Card key={idx} className="py-4 border-slate-200 dark:border-zinc-800 bg-white dark:bg-zinc-950">
+                        <Card key={idx} className="min-w-[280px] flex-1 sm:flex-initial py-4 border-slate-200 dark:border-zinc-800 bg-white dark:bg-zinc-950">
                             <CardHeader className="pb-4">
                                 <div className="flex justify-between items-start">
                                     <Skeleton className="w-12 h-12 rounded-xl mb-3" />

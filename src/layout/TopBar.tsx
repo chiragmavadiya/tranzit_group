@@ -10,6 +10,7 @@ import DropdownCustomContent, {
 import { useTheme } from '@/app/providers/theme-provider';
 import tranzit_logo from '@/assets/Tranzit_Logo.svg';
 import tranzit_logo_dark from '@/assets/Tranzit_Logo_dark.svg';
+import Favicon from '@/assets/favicon.png';
 // import { OrdersTabs } from '@/features/orders/components/OrdersTabs';
 import type { TabType } from '@/features/orders/types';
 import { useAppSelector, useAppDispatch } from '@/hooks/store.hooks';
@@ -105,15 +106,16 @@ export default function TopBar({
         <div className={cn(
           "flex items-center transition-all duration-300 ease-in-out",
           isMobile
-            ? "w-[90px] sm:w-[110px] opacity-100 mr-2 sm:mr-4"
+            ? "w-[32px] tablet:w-[120px] opacity-100 mr-2 sm:mr-4"
             : (isCollapsed ? 'w-[120px] opacity-100 mr-4' : 'w-0 opacity-0 pointer-events-none overflow-hidden mr-0')
         )}>
-          <img src={theme === "dark" ? tranzit_logo_dark : tranzit_logo} alt="Tranzit" className="h-8 sm:h-10 max-w-none cursor-pointer" onClick={redirectToHome} />
+          <img src={theme === "dark" ? tranzit_logo_dark : tranzit_logo} alt="Tranzit" className="hidden tablet:block h-8 sm:h-10 max-w-none cursor-pointer" onClick={redirectToHome} />
+          <img src={theme === "dark" ? Favicon : Favicon} alt="Tranzit" className="rounded block tablet:hidden h-8 sm:h-10 max-w-none cursor-pointer" onClick={redirectToHome} />
         </div>
       </div>
 
       {/* Center Portion: Scrollable Tabs */}
-      <div className='flex justify-start md:justify-[safe_center] flex-1 overflow-x-auto no-scrollbar min-w-0 h-full items-end px-2'>
+      <div className='flex flex-1 overflow-x-auto no-scrollbar min-w-0 h-full items-end px-2' style={{ justifyContent: 'safe center' }}>
         <Suspense fallback={null}>
           {(location.pathname === '/orders' || location.pathname === '/admin/orders' || searchParams.get('customerTab') === 'Orders') && (
             <div className="h-16 shrink-0">

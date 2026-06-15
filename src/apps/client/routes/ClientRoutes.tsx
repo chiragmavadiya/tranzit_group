@@ -33,6 +33,8 @@ const EcommerceIntegrationsPage = lazy(() => import('@/features/customer-setting
 const CarrierIntegrationsPage = lazy(() => import('@/features/customer-settings/pages/CarrierIntegrationsPage'));
 const CarrierConfigPage = lazy(() => import('@/features/customer-settings/pages/CarrierConfigPage'));
 const RulesPage = lazy(() => import('@/features/rules/pages/RulesPage'));
+const ManifestPage = lazy(() => import('@/features/manifest/pages/ManifestPage'));
+
 
 const withSuspense = (Component: React.ReactNode) => (
   <Suspense
@@ -77,6 +79,7 @@ export default function ClientRoutes() {
           <Route path="reports" element={withSuspense(<Reports />)} />
           <Route path="parcel-report" element={withSuspense(<ParcelReport />)} />
           <Route path="enquiry" element={withSuspense(<Enquiry />)} />
+          <Route path="manifest" element={withSuspense(<ManifestPage />)} />
           {/* <Route path="help-center" element={withSuspense(<HelpCenterLayout />)}>
             <Route path=":slug" element={withSuspense(<HelpCenterArticle />)} />
           </Route> */}

@@ -27,7 +27,7 @@ export const API_ENDPOINTS = {
         WALLET_CHECK: "/customer/orders/wallet-check",
         IMPORT: "/orders/import",
         EXPORT: "/orders/export",
-        CREATE_OWN_COURIER: "/customer/orders/create-own-courier",
+        CREATE_OWN_COURIER: "/orders/create-own-courier",
         GET_QUOTE_SERVICES: "/customer/get-quote/services",
         RECEIVER_ADDRESS: (id: string | number) => `/customer/orders/${id}/receiver-address`,
         IMPORT_SAMPLE: "/customer/orders/import/sample",
@@ -197,6 +197,12 @@ export const API_ENDPOINTS = {
     },
     PLAN: {
         SELECT: "/customer/plans/select"
+    },
+    MANIFEST: {
+        LIST: "/customer/manifests",
+        DETAILS: (id: string | number) => `/customer/manifests/${id}`,
+        DOWNLOAD: (id: string | number) => `/customer/manifests/${id}/download`,
+        EXPORT: "/customer/manifests/export",
     }
 };
 
@@ -303,5 +309,9 @@ export const QUERY_KEYS = {
         MANUAL_PRODUCTS: (provider: string) => ["manual-products", provider],
         PRODUCTS: (provider: string) => ["products", provider],
         DELIVERY_PREFERENCES: ["delivery-preferences"],
+    },
+    MANIFEST: {
+        LIST: ["manifests", "list"],
+        DETAILS: (id: string | number) => ["manifests", "details", id],
     }
 };

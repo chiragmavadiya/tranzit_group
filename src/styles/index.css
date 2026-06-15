@@ -8,6 +8,7 @@
 
 @theme {
   --breakpoint-small-laptop: 90rem;
+  --breakpoint-tablet: 58rem;
 }
 
 @theme inline {

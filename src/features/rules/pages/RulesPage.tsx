@@ -180,12 +180,12 @@ export default function RulesPage() {
               <h2 className="text-base font-bold text-gray-950 dark:text-zinc-100 my-0 mb-1">
                 Rules
               </h2>
-              <p className="text-[13px] text-gray-600 dark:text-zinc-300 leading-relaxed my-0">
+              <p className="text-[14px] text-gray-600 dark:text-zinc-300 leading-relaxed my-0">
                 Automate your shipping workflow by creating custom rules that apply actions based on order details, destinations, products, or customer requirements. Rules are processed automatically when orders are imported into Tranzit Group.
               </p>
 
               {/* Quick Setup */}
-              <div className="space-y-2 pt-2">
+              <div className="space-y-2 pt-4">
                 <span className="text-xs font-bold text-gray-800 dark:text-zinc-200 block uppercase tracking-wider">
                   Quick setup
                 </span>
@@ -225,7 +225,7 @@ export default function RulesPage() {
                 <HelpCircle className="w-4 h-4 text-gray-500" />
                 How to create a rule
               </AccordionTrigger>
-              <AccordionContent className="text-xs text-gray-500 dark:text-zinc-400 space-y-1.5 leading-normal pb-3">
+              <AccordionContent className="text-sm text-gray-500 dark:text-zinc-400 space-y-1.5 leading-normal pb-3">
                 <p>1. Click the <strong className="text-gray-700 dark:text-zinc-200">Add new</strong> button or select a preset shortcut from the <strong className="text-gray-700 dark:text-zinc-200">Quick setup</strong> links.</p>
                 <p>2. The rule's condition is preconfigured to apply to <strong className="text-gray-700 dark:text-zinc-200">All Orders</strong>.</p>
                 <p>3. Select the automated action: either <strong className="text-gray-700 dark:text-zinc-200">Set Courier And Product Code</strong> or <strong className="text-gray-700 dark:text-zinc-200">Select Cheapest Carrier/Service</strong>.</p>
@@ -238,7 +238,7 @@ export default function RulesPage() {
                 <Layers className="w-4 h-4 text-gray-500" />
                 Running order
               </AccordionTrigger>
-              <AccordionContent className="text-xs text-gray-500 dark:text-zinc-400 leading-normal pb-3">
+              <AccordionContent className="text-sm text-gray-500 dark:text-zinc-400 leading-normal pb-3">
                 Rules apply to orders upon import and execute sequentially from top to bottom. If multiple rules match, each matching rule will execute in order.
               </AccordionContent>
             </AccordionItem>

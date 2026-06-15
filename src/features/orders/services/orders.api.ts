@@ -206,4 +206,12 @@ export const ordersService = {
         });
         return response.data;
     },
+
+    /**
+     * Update order courier
+     */
+    updateCourier: async ({ orderNumber, data }: { orderNumber: string, data: any }): Promise<any> => {
+        const response = await api.put(API_ENDPOINTS.ORDERS.UPDATE_COURIER(orderNumber), data);
+        return response.data;
+    },
 };

@@ -143,9 +143,15 @@ export default function OrdersPage({ fromCustomer, customerId }: { fromCustomer?
         setWalletCheckOpen(false);
         printLabel(orderNumber);
         setOrderToPrint(null);
+      },
+      onError: (err: any) => {
+        if (err?.response?.data?.need_edit) {
+          navigate(`/orders/consign/${orderNumber}`)
+        }
+        setOrderToPrint(null);
       }
     });
-  }, [printOrderMutation, printLabel]);
+  }, [printOrderMutation, printLabel, navigate]);
 
   const handlePrintClick = useCallback((orderNumber: string | number, amount: number, row: Order) => {
     setOrderToPrint({ orderNumber, amount });
@@ -291,7 +297,12 @@ export default function OrdersPage({ fromCustomer, customerId }: { fromCustomer?
     let failCount = 0;
     for (const orderId of selectedRows) {
       try {
-        await cancelOrderMutation.mutateAsync({ orderId, data: { manual: false } });
+        if (activeTab === 'new') {
+          await archiveOrderMutation.mutateAsync(orderId);
+        } else {
+          await cancelOrderMutation.mutateAsync({ orderId, data: { manual: false } });
+
+        }
         successCount++;
       } catch {
         failCount++;
@@ -306,7 +317,7 @@ export default function OrdersPage({ fromCustomer, customerId }: { fromCustomer?
     setSelectedRows([]);
     setShowCancelModal(false);
     setIsCancellingOrders(false);
-  }, [selectedRows, cancelOrderMutation]);
+  }, [selectedRows, cancelOrderMutation, archiveOrderMutation, activeTab]);
 
   const handleCustomerEdit = useCallback((id: string) => {
     setAddressEditModal(id);
@@ -315,6 +326,12 @@ export default function OrdersPage({ fromCustomer, customerId }: { fromCustomer?
   const handleCourierEdit = useCallback((row: Order) => {
     setCourierEditModal(row);
   }, []);
+
+  // const updateCourier = useUpdateOrderCourier();
+
+  // const handleUpdateCourier = useCallback((orderNumber: string, courierId: string) => {
+  //   updateCourier.mutate({ orderNumber, courierId });
+  // }, [updateCourier]);
 
   const handleDownloadSingleLabel = useCallback(async (orderId: string) => {
     try {
@@ -402,7 +419,7 @@ export default function OrdersPage({ fromCustomer, customerId }: { fromCustomer?
                   disabled={isCancellingOrders || isDownloadingLabels}
                 >
                   {isCancellingOrders ? <Loader2 className="w-4 h-4 animate-spin" /> : null}
-                  <span>Cancel Orders</span>
+                  <span>{activeTab === 'new' ? 'Delete' : 'Cancel'} Orders</span>
                 </Button>
                 {activeTab === 'printed' && (
                   <Button
@@ -472,7 +489,7 @@ export default function OrdersPage({ fromCustomer, customerId }: { fromCustomer?
           onPageChange={setPage}
           onExport={handleExport}
           isExporting={exportOrders.isPending}
-          selectable={!fromCustomer}
+          selectable={!fromCustomer && activeTab !== 'archived'}
           selectedRows={selectedRows}
           onSelectionChange={setSelectedRows}
           exportable={!fromCustomer}
@@ -644,6 +661,36 @@ export default function OrdersPage({ fromCustomer, customerId }: { fromCustomer?
           onConfirm={() => executePrint(orderToPrint.orderNumber)}
         />
       )}
+      {/* {showReceiverPhoneModal && (
+        <CustomModel
+          open={showReceiverPhoneModal}
+          onOpenChange={setShowReceiverPhoneModal}
+          title="Receiver Phone Number Required"
+          description="A contact number for the receiver is required to book this consignment."
+          onSubmit={() => {
+            if (!receiverPhoneInput.trim() || !isPhoneValid(receiverPhoneInput)) {
+              showToast("Please enter a valid phone number", "error");
+              return;
+            }
+            handleReceiverPhoneSubmit(receiverPhoneInput);
+          }}
+          submitText="Print Order"
+          cancelText="Cancel"
+          contentClass="sm:max-w-[450px]"
+        >
+          <div className="p-4 space-y-4">
+            <FormInput
+              label="Receiver Phone Number"
+              value={receiverPhoneInput}
+              onChange={(val) => setReceiverPhoneInput(val)}
+              placeholder="e.g. 0412345678"
+              required
+              isFullWidth
+              error={!receiverPhoneInput.trim() || !isPhoneValid(receiverPhoneInput)}
+            />
+          </div>
+        </CustomModel>
+      )} */}
     </div>
   );
 }

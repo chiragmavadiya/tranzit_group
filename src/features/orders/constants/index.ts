@@ -20,3 +20,23 @@ export const Order_status_styles: Record<string, string> = {
   cancelled: 'bg-red-100 text-red-800 dark:bg-red-900/20 dark:text-red-400',
   draft: 'bg-gray-100 text-gray-800 dark:bg-gray-900/20 dark:text-gray-400',
 };
+
+
+export const initialAddressData = {
+  name: '',
+  email: '',
+  phone: '',
+  company: '',
+  building: '',
+  instructions: '',
+  address_info: '',
+  address1: '',
+  street_name: '',
+  street_number: '',
+  suburb: '',
+  state: '',
+  unit_number: '',
+  postcode: '',
+  country: 'AU',
+  saveToAddressBook: false,
+}

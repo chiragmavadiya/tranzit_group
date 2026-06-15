@@ -227,7 +227,7 @@ export const OrderHeader: React.FC<OrderHeaderProps> = ({
               )}
               {(orderDetail?.order_status_category === 'new' || orderDetail?.order_status_category === 'printed' || orderDetail?.status.toLocaleLowerCase() === 'new' || orderDetail?.status.toLowerCase() === 'printed') && (
                 <>
-                  {orderDetail?.order_status_category === 'new' || orderDetail?.status.toLocaleLowerCase() === 'new' ? (
+                  {orderDetail?.order_status_category === 'new' || orderDetail?.status.toLocaleLowerCase() === 'new' || orderDetail?.courier_details?.is_own_courier ? (
                     <Button
                       variant="outline"
                       onClick={() => setShowArchiveModal(true)}
@@ -255,7 +255,7 @@ export const OrderHeader: React.FC<OrderHeaderProps> = ({
           <ConformationModal
             open={showCancelModal}
             onOpenChange={setShowCancelModal}
-            title="Delete Order"
+            title="Cancel Order"
             description={
               <div className="space-y-4">
                 <p className="text-sm mb-0 font-medium text-slate-900">Are you sure you want to cancel this order?</p>
@@ -283,7 +283,7 @@ export const OrderHeader: React.FC<OrderHeaderProps> = ({
           <ConformationModal
             open={showArchiveModal}
             onOpenChange={setShowArchiveModal}
-            title="Delete Order"
+            title="Cancel Order"
             description={
               <p className="text-sm mb-0 font-medium text-slate-900">Are you sure you want to delete this order?</p>
             }

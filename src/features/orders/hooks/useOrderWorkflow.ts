@@ -233,6 +233,7 @@ export const useOrderWorkflow = () => {
     })) || []);
     setDeliveryInstructions(data.delivery_instructions || '');
     setInsuranceSelected(data.limited_liability_cover?.covered || false);
+    setSignatureSelected(data.signature_required === 'yes');
     setCourierData(data.courier_details);
     setQuoteData(data.order_details);
     isValidConsignOrder(data.order_status_category);
@@ -435,56 +436,8 @@ export const useOrderWorkflow = () => {
     });
   }, [itemsData, addressData, role, selectedCustomer, courierData, termsAccepted, ratesAccepted, dangerousGoodsAccepted, calculation.totalItems, calculation.totalSurcharges, calculation.grandTotal, insuranceSelected, signatureSelected, quoteData?.surcharges, quoteData?.courier?.base, quoteData?.courier?.gst, quoteData?.courier?.freight_levy, deliveryInstructions, orderType, manualOrderData.trackingNumber, manualOrderData.courierId, manualOrderData.amount, checkWallet, walletCheckData?.wallet_balance, createOrder, navigate, printLabel]);
 
-  const handleReceiverPhoneSubmit = useCallback((phone: string) => {
-    setAddressData((prev) => ({
-      ...prev,
-      receiver: {
-        ...prev.receiver,
-        phone,
-      },
-    }));
-    setShowReceiverPhoneModal(false);
-    handleOnSave(isSaveAsDraft.current ? 'saveAsDraft' : true, phone);
-  }, [handleOnSave]);
-
-  // Order Cancellation Flow
-  const onCancelOrder = useCallback((manual: boolean = false) => {
-    if (orderID) {
-      cancelOrder(
-        { orderId: orderID, data: { manual: typeof manual === 'boolean' ? manual : false } },
-        {
-          onSuccess: (response) => {
-            showToast(response?.message || 'Order cancelled successfully', 'success');
-            navigate(`${role === 'admin' ? '/admin' : ''}/orders`);
-          },
-          onError: (err: any) => {
-            showToast(err?.response?.data?.message || 'Failed to cancel order', 'error');
-          },
-        }
-      );
-    }
-  }, [orderID, cancelOrder, navigate, role]);
-
-  const archiveOrderMutation = useArchiveOrder();
-
-  const onArchiveOrder = useCallback(() => {
-    if (orderID) {
-      archiveOrderMutation.mutate(orderID, {
-        onSuccess: (response) => {
-          showToast(response?.message || 'Order archived successfully', 'success');
-          setShowArchiveModal(false);
-          navigate(`${role === 'admin' ? '/admin' : ''}/orders`);
-        },
-        onError: (err: any) => {
-          showToast(err?.response?.data?.message || 'Failed to archive order', 'error');
-        },
-      });
-    }
-  }, [orderID, archiveOrderMutation, navigate, role]);
-
-
   // Order Consignment Flow
-  const handleConsign = useCallback((skipWalletCheckArg?: any) => {
+  const handleConsign = useCallback((skipWalletCheckArg?: any, overrideReceiverPhone?: string) => {
     if (!termsAccepted || !ratesAccepted || !dangerousGoodsAccepted) {
       showToast('You must accept all Terms & Conditions, Dangerous Goods, and Futile Pickup declarations.', 'error');
       return;
@@ -506,7 +459,7 @@ export const useOrderWorkflow = () => {
       receiver: removeEmptyFields({
         name: addressData.receiver.name,
         company: addressData.receiver.company,
-        phone: addressData.receiver.phone,
+        phone: overrideReceiverPhone || addressData.receiver.phone,
         email: addressData.receiver.email,
         address1: addressData.receiver.address1,
         suburb: addressData.receiver.suburb,
@@ -588,6 +541,58 @@ export const useOrderWorkflow = () => {
     });
 
   }, [termsAccepted, ratesAccepted, dangerousGoodsAccepted, selectedCustomer, orderDetail?.sender_details?.customer_id, addressData.sender.name, addressData.sender.company, addressData.sender.phone, addressData.sender.email, addressData.sender.address1, addressData.sender.suburb, addressData.sender.state, addressData.sender.postcode, addressData.sender.country, addressData.receiver.name, addressData.receiver.company, addressData.receiver.phone, addressData.receiver.email, addressData.receiver.address1, addressData.receiver.suburb, addressData.receiver.state, addressData.receiver.postcode, addressData.receiver.country, itemsData, courierData, insuranceSelected, signatureSelected, deliveryInstructions, quoteData?.courier?.base, quoteData?.courier?.gst, quoteData?.courier?.price, quoteData?.surcharges, calculation.servicePrice, calculation.gst, calculation.grandTotal, orderType, manualOrderData.trackingNumber, manualOrderData.courierId, manualOrderData.amount, orderID, consignOrder, navigate, role, printLabel, checkWallet, walletCheckData?.wallet_balance]);
+
+
+  const handleReceiverPhoneSubmit = useCallback((phone: string) => {
+    setAddressData((prev) => ({
+      ...prev,
+      receiver: {
+        ...prev.receiver,
+        phone,
+      },
+    }));
+    setShowReceiverPhoneModal(false);
+    if (orderType === 'consign') {
+      handleConsign(false, phone);
+    } else {
+      handleOnSave(isSaveAsDraft.current ? 'saveAsDraft' : true, phone);
+    }
+  }, [handleConsign, handleOnSave, orderType]);
+
+  // Order Cancellation Flow
+  const onCancelOrder = useCallback((manual: boolean = false) => {
+    if (orderID) {
+      cancelOrder(
+        { orderId: orderID, data: { manual: typeof manual === 'boolean' ? manual : false } },
+        {
+          onSuccess: (response) => {
+            showToast(response?.message || 'Order cancelled successfully', 'success');
+            navigate(`${role === 'admin' ? '/admin' : ''}/orders`);
+          },
+          onError: (err: any) => {
+            showToast(err?.response?.data?.message || 'Failed to cancel order', 'error');
+          },
+        }
+      );
+    }
+  }, [orderID, cancelOrder, navigate, role]);
+
+  const archiveOrderMutation = useArchiveOrder();
+
+  const onArchiveOrder = useCallback(() => {
+    if (orderID) {
+      archiveOrderMutation.mutate(orderID, {
+        onSuccess: (response) => {
+          showToast(response?.message || 'Order archived successfully', 'success');
+          setShowArchiveModal(false);
+          navigate(`${role === 'admin' ? '/admin' : ''}/orders`);
+        },
+        onError: (err: any) => {
+          showToast(err?.response?.data?.message || 'Failed to archive order', 'error');
+        },
+      });
+    }
+  }, [orderID, archiveOrderMutation, navigate, role]);
 
   useEffect(() => {
     const savedAddressStr = sessionStorage.getItem('address');

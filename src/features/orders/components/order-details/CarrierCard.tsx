@@ -1,6 +1,6 @@
 import React, { memo, useEffect, useEffectEvent, useMemo, useRef, useState } from 'react'
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card'
-import { Truck, AlertCircle, RefreshCw, Copy, Check } from 'lucide-react'
+import { Truck, RefreshCw, Copy, Check, Box } from 'lucide-react'
 import { Badge } from '@/components/ui/badge'
 
 import { useGetQuoteServices } from '@/features/quote/hooks/useQuote'
@@ -10,6 +10,7 @@ import { useAppSelector } from '@/hooks/store.hooks'
 import type { QuoteLocation } from '@/features/quote/types'
 import { Checkbox } from '@/components/ui/checkbox'
 import { Button } from '@/components/ui/button'
+import { cn } from '@/lib/utils'
 
 interface CarrierCardProps {
   itemData: ItemData[];
@@ -22,15 +23,20 @@ interface CarrierCardProps {
   initialSelectedCourierId?: string
   default_courier?: any;
   signatureSelected?: boolean;
+  isLoading?: boolean;
 }
 
 export const CarrierCard: React.FC<CarrierCardProps> = memo((props) => {
-  const { itemData, addresses, onQuoteChange, setCourierData, orderDetail, module, orderType = 'create', initialSelectedCourierId = null, signatureSelected = false } = props
+  const { itemData, addresses, onQuoteChange, setCourierData, orderDetail, module, orderType = 'create', initialSelectedCourierId = null, signatureSelected = false, isLoading = false } = props
   const { role } = useAppSelector((state) => state.auth);
   const [selectedServiceId, setSelectedServiceId] = useState<string>(initialSelectedCourierId || '')
   const [couriers, setCouriers] = useState<any[]>([]);
   const [surchargesMap, setSurchargesMap] = useState<Record<string, any[]>>({});
   const [selectedSurchargesMap, setSelectedSurchargesMap] = useState<Record<string, string[]>>({});
+  const selectedSurchargesMapRef = useRef(selectedSurchargesMap);
+  useEffect(() => {
+    selectedSurchargesMapRef.current = selectedSurchargesMap;
+  }, [selectedSurchargesMap]);
   const [bestDeal, setBestDeal] = useState<string>('');
   const [copiedTracking, setCopiedTracking] = useState(false);
   const mount = useRef(false);
@@ -56,7 +62,6 @@ export const CarrierCard: React.FC<CarrierCardProps> = memo((props) => {
     }
     return location?.label || `${location?.suburb} ${location?.state} ${location?.postcode}, AU` || "";
   }, [module]);
-
   const handleServiceSuccess = useEffectEvent((data: any) => {
 
     setCouriers(data.services || []);
@@ -67,12 +72,11 @@ export const CarrierCard: React.FC<CarrierCardProps> = memo((props) => {
         if (!mount.current && code === orderDetail?.courier_details?.courier_code) {
           initialSelected[code] = orderDetail?.order_details?.surcharges?.map((item: any) => item.name) || [];
         } else {
-          initialSelected[code] = [];
+          initialSelected[code] = selectedSurchargesMapRef.current[code] || [];
         }
       });
       setSelectedSurchargesMap(initialSelected);
     }
-
 
     if (data.services && data.services.length > 0) {
       const getServiceTotalPrice = (service: any) => {
@@ -230,7 +234,7 @@ export const CarrierCard: React.FC<CarrierCardProps> = memo((props) => {
               variant="outline"
               size="sm"
               onClick={() => fetchServices()}
-              disabled={loading}
+              disabled={loading || isLoading}
             >
               <RefreshCw className={`h-4 w-4 ${loading ? 'animate-spin' : ''}`} />
             </Button>
@@ -290,16 +294,23 @@ export const CarrierCard: React.FC<CarrierCardProps> = memo((props) => {
               </div>
             </div>
           </div>
-        ) : loading && couriers.length === 0 ? (
+        ) : (loading || isLoading) && couriers.length === 0 ? (
           <div className="py-8 h-34 flex items-center justify-center text-sm text-gray-500 font-medium gap-2">
             <RefreshCw className="h-4 w-4 animate-spin text-primary" />
             Fetching available carriers...
           </div>
         ) : couriers.length === 0 ? (
-          <div className="py-8 h-36 flex flex-col items-center justify-center text-base text-gray-500 font-medium gap-2">
-            <AlertCircle className="h-5 w-5 text-gray-400" />
-            No shipment options available yet.<br />
-            <span className="text-sm">Please fill out item dimensions and complete both addresses.</span>
+          <div className="py-8 h-54 flex flex-col items-center justify-center text-xl text-gray-800 font-medium gap-2">
+            <div className="shrink-0 relative">
+              <div className="w-24 h-24 bg-linear-to-br from-blue-100 via-indigo-100 to-cyan-100 dark:from-blue-800/50 dark:via-indigo-800/50 dark:to-cyan-800/50 border border-slate-200/50 dark:border-zinc-700/50 rounded-2xl flex items-center justify-center shadow-inner group hover:shadow-lg transition-all duration-300 hover:rotate-3 hover:scale-105">
+                <Box className={cn(
+                  "w-12 h-12 transition-all duration-500 group-hover:scale-110 group-hover:rotate-12 group-hover:text-primary dark:group-hover:text-primary",
+                  "text-primary/60"
+                )} />
+              </div>
+            </div>
+            Ready for your shipment?<br />
+            <span className="text-sm">Complete the sender and receiver details above to unlock real-time shipping rates and carrier options.</span>
           </div>
         ) : (
           <div className="grid grid-cols-12 gap-3">
@@ -311,6 +322,7 @@ export const CarrierCard: React.FC<CarrierCardProps> = memo((props) => {
                 const courierSurcharges = surchargesMap[courier.courierCode] || [];
                 const selectedNames = selectedSurchargesMap[courier.courierCode] ?? [];
                 const isSelected = selectedServiceId === serviceId
+                const allAutoApplyChargesName = courier?.applied_surcharges?.map((item: any) => item.name) || [];
                 if (courier.success === false) {
                   return (
                     <div
@@ -403,7 +415,7 @@ export const CarrierCard: React.FC<CarrierCardProps> = memo((props) => {
                         <div className="flex flex-col gap-2">
                           {courierSurcharges.map((charge, index) => {
                             const isChecked = selectedNames.includes(charge.name);
-                            if (!charge.is_customer_selectable) return;
+                            // if (!charge.is_customer_selectable) return;
                             return (
                               <label
                                 key={index}
@@ -411,7 +423,7 @@ export const CarrierCard: React.FC<CarrierCardProps> = memo((props) => {
                                 onClick={(e) => e.stopPropagation()}
                               >
                                 <Checkbox
-                                  checked={isChecked}
+                                  checked={isChecked || allAutoApplyChargesName.includes(charge.name)}
                                   disabled={!charge.is_customer_selectable}
                                   onCheckedChange={(checked) => {
 

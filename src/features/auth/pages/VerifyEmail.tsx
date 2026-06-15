@@ -10,6 +10,7 @@ import { showToast } from "@/components/ui/custom-toast";
 import { logout } from "../authSlice";
 import { useAppDispatch } from "@/hooks/store.hooks";
 import { Loader2 } from "lucide-react";
+import { useEffect } from "react";
 
 export default function VerifyEmail() {
   const [searchParams] = useSearchParams();
@@ -68,6 +69,10 @@ export default function VerifyEmail() {
       }
     });
   };
+
+  useEffect(() => {
+    document.title = `Verify Email | Tranzit`;
+  }, [])
 
   return (
     <>

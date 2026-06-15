@@ -113,7 +113,7 @@ export default function TopBar({
       </div>
 
       {/* Center Portion: Scrollable Tabs */}
-      <div className='flex justify-start md:justify-center flex-1 overflow-x-auto no-scrollbar min-w-0 h-full items-end px-2'>
+      <div className='flex justify-start md:justify-[safe_center] flex-1 overflow-x-auto no-scrollbar min-w-0 h-full items-end px-2'>
         <Suspense fallback={null}>
           {(location.pathname === '/orders' || location.pathname === '/admin/orders' || searchParams.get('customerTab') === 'Orders') && (
             <div className="h-16 shrink-0">
@@ -167,25 +167,25 @@ export default function TopBar({
             )}>
               <Wallet className={cn("w-3.5 h-3.5", isZero ? "text-red-500 dark:text-red-400" : "text-emerald-600 dark:text-emerald-400")} />
               <span className="leading-relaxed">
-                <span className="hidden sm:inline">Wallet Balance: </span>
+                <span className="hidden xl:inline">Wallet Balance: </span>
                 {formateCurrency(Number(walletData.data.wallet_balance))}
               </span>
             </div>
           );
         })()}
 
-        {isMobile ? (
-          <button
-            onClick={() => setIsSearchOpen(true)}
-            className="flex items-center justify-center w-8 h-8 cursor-pointer hover:bg-gray-50 dark:hover:bg-zinc-800 rounded-md border border-gray-200 dark:border-zinc-800 transition-colors outline-none shrink-0"
-          >
-            <Search className="h-[16px] w-[16px] text-gray-500 dark:text-zinc-400" />
-          </button>
+        {/* {isMobile ? (
         ) : (
-          <div className="relative flex items-center">
-            <GlobalSearch />
-          </div>
-        )}
+        )} */}
+        <button
+          onClick={() => setIsSearchOpen(true)}
+          className="flex small-laptop:hidden items-center justify-center w-8 h-8 cursor-pointer hover:bg-gray-50 dark:hover:bg-zinc-800 rounded-md border border-gray-200 dark:border-zinc-800 transition-colors outline-none shrink-0"
+        >
+          <Search className="h-[16px] w-[16px] text-gray-500 dark:text-zinc-400" />
+        </button>
+        <div className="small-laptop:flex hidden relative items-center w-[160px] lg:w-[220px] xl:w-[260px] 2xl:w-[300px]">
+          <GlobalSearch className="w-full h-8 text-[13px]" />
+        </div>
 
         <div className="hidden sm:block">
           <DropdownCustomMenu
@@ -277,8 +277,8 @@ export default function TopBar({
         </DropdownCustomContent>
       </div>
 
-      {isMobile && isSearchOpen && (
-        <div className="absolute inset-0 bg-white dark:bg-zinc-950 z-20 flex items-center px-4 gap-3 animate-in fade-in duration-200">
+      {isSearchOpen && (
+        <div className="absolute small-laptop:hidden   inset-0 bg-white dark:bg-zinc-950 z-20 flex items-center px-4 gap-3 animate-in fade-in duration-200">
           <button
             onClick={() => setIsSearchOpen(false)}
             className="p-2 hover:bg-gray-100 dark:hover:bg-zinc-900 rounded-md text-gray-500 dark:text-zinc-400 transition-colors shrink-0 cursor-pointer"

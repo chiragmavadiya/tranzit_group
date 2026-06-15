@@ -50,8 +50,8 @@ export const getOrdersColumns = (
 
   const newActions = (value: string) => [
     {
-      label: "View order",
-      onClick: () => navigate(`${role === "admin" ? "/admin/orders/view" : "/orders/view"}/${value}`),
+      label: "Consign order",
+      onClick: () => navigate(`${role === "admin" ? "/admin/orders/consign" : "/orders/consign"}/${value}`),
       // icon: Eye,
     },
     {
@@ -121,7 +121,7 @@ export const getOrdersColumns = (
                   </div>
                 )}
                 <div className="flex flex-col">
-                  <span className="font-medium whitespace-nowrap">{value || '-'}</span>
+                  <span className="font-medium whitespace-nowrap">{value && value !== 'unknown' ? value : '-'}</span>
                   {row.product_id && <span className="font-normal text-sm">Product - {row.product_id}</span>}
                 </div>
               </div>
@@ -134,7 +134,7 @@ export const getOrdersColumns = (
                   </div>
                 )}
                 <div className="flex flex-col">
-                  <span className="font-medium whitespace-nowrap">{value || '-'}</span>
+                  <span className="font-medium whitespace-nowrap">{value && value !== 'unknown' ? value : '-'}</span>
                   {row.product_id && <span className="font-normal text-sm">Product - {row.product_id}</span>}
                 </div>
               </div>

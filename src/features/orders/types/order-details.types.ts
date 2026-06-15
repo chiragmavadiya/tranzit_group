@@ -47,6 +47,7 @@ export type OrderDetailData = {
         customer_reference: string
         product_id: string
         courier_code: string
+        is_own_courier: boolean
     }
     sender_details: {
         name: string
@@ -101,6 +102,7 @@ export type OrderDetailData = {
     order_status_category: string
     payment_status: string
     status: string
+    signature_required: string
     shipping_activity: ShippingActivity[]
     cancel_request: CancelRequest | null
     transit_timeline?: {

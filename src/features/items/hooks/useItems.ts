@@ -133,6 +133,28 @@ export const useSetDefaultItem = () => {
 };
 
 /**
+ * Hook to unset default item
+ */
+export const useUnsetDefaultItem = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (id: number | string) => itemsService.unsetDefault(id),
+    onSuccess: (response) => {
+      if (response.status) {
+        showToast(response.message || "Default item unset successfully", "success");
+        queryClient.invalidateQueries({ queryKey: QUERY_KEYS.ITEMS.LIST });
+      } else {
+        showToast(response.message || "Failed to unset default item", "error");
+      }
+    },
+    onError: (error: any) => {
+      showToast(error.message || "An error occurred", "error");
+    },
+  });
+};
+
+/**
  * Hook to fetch the default item details
  */
 export const useDefaultItem = (enabled: boolean = true) => {

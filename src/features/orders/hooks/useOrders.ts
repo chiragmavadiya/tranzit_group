@@ -225,8 +225,20 @@ export const useDownloadLabel = (printAfterDownload: boolean = false) => {
 
 
     },
-    onError: (error: any) => {
-      showToast(error?.message || "Failed to download label", "error")
+    onError: async (error: any) => {
+      let errorMessage = "Failed to download label";
+      if (error?.response?.data instanceof Blob) {
+        try {
+          const text = await error.response.data.text();
+          const parsed = JSON.parse(text);
+          errorMessage = parsed.message || errorMessage;
+        } catch {
+          errorMessage = error.message || errorMessage;
+        }
+      } else {
+        errorMessage = error?.message || errorMessage;
+      }
+      showToast(errorMessage, "error");
     }
   });
 };
@@ -332,6 +344,22 @@ export const usePrintOrder = () => {
     },
     onError: (error: any) => {
       showToast(error?.message || "Failed to print order", "error");
+    }
+  });
+};
+
+export const useUpdateOrderCourier = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ordersService.updateCourier,
+    onSuccess: (response: any) => {
+      queryClient.invalidateQueries({ queryKey: ["orders", "counts"] });
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.ORDERS.LIST });
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.WALLET.SUMMARY });
+      showToast(response.message || 'Order courier updated successfully', 'success');
+    },
+    onError: (error: any) => {
+      showToast(error?.message || "Failed to update order courier", "error");
     }
   });
 };

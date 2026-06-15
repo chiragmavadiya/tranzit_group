@@ -9,7 +9,7 @@ import { Link, useNavigate } from "react-router-dom";
 import brandlogo from '@/assets/Tranzit_Logo.svg'
 import { useRegister } from "@/features/auth/hooks/useAuth";
 import type { RegisterRequest } from "../auth.types";
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { showToast } from "@/components/ui/custom-toast";
 import { PRIVACY_POLICY_URL, TERMS_CONDITIONS_URL } from "@/constants";
 
@@ -100,6 +100,9 @@ export default function SignUp() {
     });
   };
 
+  useEffect(() => {
+    document.title = `Register | Tranzit`;
+  }, [])
 
 
   return (

@@ -9,15 +9,14 @@ import type { ShippingRule, Condition, RuleAction } from '../types/rules.types';
 import RuleList from '../components/RuleList';
 import RuleForm from '../components/RuleForm';
 import { CustomModel } from '@/components/ui/dialog';
-import { Button } from '@/components/ui/button';
-import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import {
   Accordion,
   AccordionItem,
   AccordionTrigger,
   AccordionContent
 } from '@/components/ui/accordion';
-import { Loader2, Settings, RefreshCw, HelpCircle, BookOpen, Layers } from 'lucide-react';
+import { Loader2, Settings, HelpCircle, BookOpen, Layers } from 'lucide-react';
 
 export default function RulesPage() {
   const [view, setView] = useState<'list' | 'create' | 'edit'>('list');
@@ -271,7 +270,7 @@ export default function RulesPage() {
           </Accordion>
 
           {/* Run Rules Manual Triggers */}
-          <Card className="border gap-0 border-gray-200 dark:border-zinc-850 shadow-xs overflow-hidden bg-white dark:bg-zinc-900">
+          {/* <Card className="border gap-0 border-gray-200 dark:border-zinc-850 shadow-xs overflow-hidden bg-white dark:bg-zinc-900">
             <CardHeader className="px-5 py-4 border-b border-gray-100 dark:border-zinc-800">
               <CardTitle className="text-[15px] font-bold text-gray-800 dark:text-zinc-200 uppercase tracking-wider my-0">
                 Run rules
@@ -324,7 +323,7 @@ export default function RulesPage() {
                 </div>
               </div>
             </CardContent>
-          </Card>
+          </Card> */}
         </div>
 
         {/* Right Column: Rules list & Inline builder */}

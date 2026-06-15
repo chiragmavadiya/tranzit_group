@@ -11,7 +11,7 @@ import { useLogin } from "@/features/auth/hooks/useAuth";
 import type { LoginRequest } from "@/features/auth/auth.types";
 import { useAppDispatch } from "@/hooks/store.hooks";
 import { setCredentials } from "@/features/auth/authSlice";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Spinner } from "@/components/ui/spinner";
 import { showToast } from "@/components/ui/custom-toast";
 
@@ -81,6 +81,10 @@ export default function SignIn({ role = "customer" }: { role?: string }) {
   //   { value: "sveltekit", label: "SvelteKit" },
   //   { value: "nuxt.js", label: "Nuxt.js" },
   // ];
+
+  useEffect(() => {
+    document.title = `Login | Tranzit`;
+  }, [])
 
   return (
     <>

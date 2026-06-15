@@ -429,39 +429,39 @@ export default function CarrierConfigForm({
       case 'auspost':
         return (
           <>
-            <FormInput label="API Key" {...commonProps("api_key")} />
-            <FormInput label="API Password" {...commonProps("api_password")} type="password" />
+            <FormInput label="API Key" {...commonProps("api_key")} placeholder="Enter your API Key" />
+            <FormInput label="API Password" {...commonProps("api_password")} type="password" placeholder="Enter your API Password" />
             {/* <FormInput label="Base URL" {...commonProps("base_url")} placeholder="https://digitalapi.auspost.com.au/test/" /> */}
-            <FormInput label="Account Number" {...commonProps("account_number")} />
-            <FormInput label="Account Label" {...commonProps("account_label")} />
+            <FormInput label="Account Number" {...commonProps("account_number")} placeholder="Enter your Account Number" />
+            <FormInput label="Account Label" {...commonProps("account_label")} placeholder="Enter your Account Label" />
           </>
         );
       case 'aramex':
         return (
           <>
-            <FormInput label="Client ID" {...commonProps("client_id")} />
-            <FormInput label="Client Secret" {...commonProps("client_secret")} type="password" />
-            <FormInput label="Account Name" {...commonProps("account_name")} />
-            <FormInput label="Account Label" {...commonProps("account_label")} />
+            <FormInput label="Client ID" {...commonProps("client_id")} placeholder="Enter your Client ID" />
+            <FormInput label="Client Secret" {...commonProps("client_secret")} type="password" placeholder="Enter your Client Secret" />
+            <FormInput label="Account Name" {...commonProps("account_name")} placeholder="Enter your Account Name" />
+            <FormInput label="Account Label" {...commonProps("account_label")} placeholder="Enter your Account Label" />
           </>
         );
       case 'mypostbusiness':
         return (
           <>
-            <FormInput label="Merchant Token" {...commonProps("merchant_token")} />
+            <FormInput label="Merchant Token" {...commonProps("merchant_token")} placeholder="Enter your Merchant Token" />
             {/* <FormInput label="Base URL" {...commonProps("base_url")} placeholder="https://digitalapi.auspost.com.au/test" /> */}
-            <FormInput label="Account Label" {...commonProps("account_label")} />
+            <FormInput label="Account Label" {...commonProps("account_label")} placeholder="Enter your Account Label" />
           </>
         );
       case 'directfreight':
         return (
           <>
-            <FormInput label="Token" {...commonProps("token")} />
-            <FormInput label="Account" {...commonProps("account")} />
-            <FormInput label="Site ID" {...commonProps("site_id")} />
+            <FormInput label="Token" {...commonProps("token")} placeholder="Enter your Token" />
+            <FormInput label="Account" {...commonProps("account")} placeholder="Enter your Account number" />
+            <FormInput label="Site ID" {...commonProps("site_id")} placeholder="Enter your Site ID" />
             {/* <FormInput label="Base URL" {...commonProps("base_url")} /> */}
-            <FormInput label="Consignment Token" {...commonProps("consignment_token")} />
-            <FormInput label="Account Label" {...commonProps("account_label")} />
+            <FormInput label="Consignment Token" {...commonProps("consignment_token")} placeholder="Enter your Consignment Token" />
+            <FormInput label="Account Label" {...commonProps("account_label")} placeholder="Enter your Account Label" />
           </>
         );
       default:
@@ -480,7 +480,7 @@ export default function CarrierConfigForm({
       <div className="grid grid-cols-12 gap-x-6 gap-y-3.5 items-start">
         {/* Left Column: Form Credentials Fields */}
         <div className="col-span-12 md:col-span-7 border flex flex-col h-full p-4 rounded-sm shadow-sm text-left">
-          <div className="flex-1 grid grid-cols-12 gap-x-4 ">
+          <div className="flex-1 grid grid-cols-12 gap-x-4 gap-y-4">
             {getCredentialsFields()}
           </div>
 
@@ -514,8 +514,8 @@ export default function CarrierConfigForm({
               </p>
               <div className="pt-0">
                 <FormInput
-                  value={formData.delivery_service_desc || ""}
-                  onChange={(val) => handleInputChange(val, 'delivery_service_desc')}
+                  value={formData.delivery_instruction || ""}
+                  onChange={(val) => handleInputChange(val, 'delivery_instruction')}
                   placeholder="e.g. 3-5 business days delivery to your doorstep"
                   isFullWidth={true}
                   className="col-span-12"
@@ -531,7 +531,7 @@ export default function CarrierConfigForm({
               className="h-8 text-sm px-5 font-semibold"
             >
               {isLoading ? <Loader2 className="w-3.5 h-3.5 animate-spin mr-2" /> : null}
-              Save & Connect
+              {isConnected ? 'Save Changes' : 'Save & Connect'}
             </Button>
           </div>
         </div>

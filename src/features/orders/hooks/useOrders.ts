@@ -2,6 +2,7 @@ import { useQuery, useMutation, useQueryClient, keepPreviousData } from "@tansta
 import { ordersService } from "@/features/orders/services/orders.api";
 import { QUERY_KEYS } from "@/constants/api.constants";
 import { showToast } from "@/components/ui/custom-toast";
+import { useDownloadManifestPDF } from "@/features/manifest/hooks/useManifest";
 
 /**
  * Hook to fetch customer orders with filters
@@ -360,6 +361,50 @@ export const useUpdateOrderCourier = () => {
     },
     onError: (error: any) => {
       showToast(error?.message || "Failed to update order courier", "error");
+    }
+  });
+};
+
+export const useCreateAuspostManifest = () => {
+  const queryClient = useQueryClient();
+  const downloadPDFMutation = useDownloadManifestPDF();
+  return useMutation({
+    mutationFn: ordersService.createAuspostManifest,
+    onSuccess: (response: any) => {
+      queryClient.invalidateQueries({ queryKey: ["orders", "counts"] });
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.ORDERS.LIST });
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.MANIFEST.LIST });
+
+      if (Array.isArray(response?.data)) {
+        let successCount = 0;
+        let failCount = 0;
+
+        response?.data?.forEach(async (item: any) => {
+          if (item.status) {
+            successCount++;
+            if (item.data?.pdf_url) {
+              downloadPDFMutation.mutate(item.data.pdf_url);
+            }
+          } else {
+            failCount++;
+            if (item.message) {
+              showToast(item.message, 'error');
+            }
+          }
+        });
+
+        if (successCount > 0) {
+          showToast(`Successfully created ${successCount} manifest(s).`, 'success');
+        }
+        if (failCount > 0) {
+          showToast(`Failed to create ${failCount} manifest(s).`, 'error');
+        }
+      } else {
+        showToast(response?.message || 'AusPost manifest created successfully', 'success');
+      }
+    },
+    onError: (error: any) => {
+      showToast(error?.message || "Failed to create AusPost manifest", "error");
     }
   });
 };

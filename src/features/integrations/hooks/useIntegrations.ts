@@ -33,10 +33,10 @@ export const useConnectIntegration = () => {
             }
             return integrationService.connect(provider, data);
         },
-        onSuccess: (_, variables) => {
+        onSuccess: (response, variables) => {
             queryClient.invalidateQueries({ queryKey: QUERY_KEYS.INTEGRATIONS.STATUS(variables.provider) });
             queryClient.invalidateQueries({ queryKey: QUERY_KEYS.INTEGRATIONS.LIST });
-            showToast("Integration settings updated successfully!", "success");
+            showToast(response?.message || "Integration settings updated successfully!", "success");
         },
         onError: (error: any) => {
             showToast(error.message || "Failed to connect", "error");
@@ -213,6 +213,34 @@ export const useSetDefaultIntegration = () => {
         },
         onError: (error: any) => {
             showToast(error.message || "Failed to set default integration", "error");
+        }
+    });
+};
+
+export const useToggleEbayAutoSync = () => {
+    const queryClient = useQueryClient();
+    return useMutation({
+        mutationFn: (enabled: boolean) => integrationService.toggleEbayAutoSync(enabled),
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: QUERY_KEYS.INTEGRATIONS.STATUS("ebay") });
+            showToast("eBay Auto-sync status updated", "success");
+        },
+        onError: (error: any) => {
+            showToast(error.message || "Failed to update eBay Auto-sync status", "error");
+        }
+    });
+};
+
+export const useToggleEbayAutoFulfillment = () => {
+    const queryClient = useQueryClient();
+    return useMutation({
+        mutationFn: (enabled: boolean) => integrationService.toggleEbayAutoFulfillment(enabled),
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: QUERY_KEYS.INTEGRATIONS.STATUS("ebay") });
+            showToast("eBay Auto-fulfillment status updated", "success");
+        },
+        onError: (error: any) => {
+            showToast(error.message || "Failed to update eBay Auto-fulfillment status", "error");
         }
     });
 };

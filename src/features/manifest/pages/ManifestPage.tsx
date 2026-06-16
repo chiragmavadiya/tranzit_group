@@ -1,13 +1,15 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useCallback } from 'react';
 import { DataTable } from '@/components/common/DataTable';
 import { getManifestColumns } from '../columns';
 import { useManifests, useExportManifests, useDownloadManifestPDF } from '../hooks/useManifest';
 import { useDebounce } from '@/hooks/useDebounce';
+import type { Manifest } from '../types';
 
 export default function ManifestPage() {
   const [search, setSearch] = useState('');
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(25);
+  const [downloadingId, setDownloadingId] = useState<string | null>(null);
 
   const debouncedSearch = useDebounce(search, 500);
 
@@ -18,19 +20,25 @@ export default function ManifestPage() {
   });
 
   const { mutate: exportManifests, isPending: isExporting } = useExportManifests();
-  const { mutate: downloadPDF, isPending: isDownloadingPDF, variables: downloadingId } = useDownloadManifestPDF();
+  const downloadPDFMutation = useDownloadManifestPDF();
 
   const handleExport = (format: string) => {
     exportManifests({ format, search: debouncedSearch });
   };
 
-  const handleDownloadPDF = (id: string | number) => {
-    downloadPDF(id);
-  };
+  const handleDownloadPDF = useCallback((row: Manifest) => {
+    if (!row.order_number) return;
+    setDownloadingId(row.order_number);
+    downloadPDFMutation.mutate(row.pdf_url, {
+      onSettled: () => {
+        setDownloadingId(null);
+      }
+    });
+  }, [downloadPDFMutation]);
 
-  const columns = useMemo(() => 
-    getManifestColumns(handleDownloadPDF, isDownloadingPDF && downloadingId !== undefined ? downloadingId : null),
-    [isDownloadingPDF, downloadingId]
+  const columns = useMemo(() =>
+    getManifestColumns(handleDownloadPDF, downloadingId),
+    [handleDownloadPDF, downloadingId]
   );
 
   return (
@@ -53,6 +61,7 @@ export default function ManifestPage() {
           className="text-xs pb-3"
           onExport={handleExport}
           isExporting={isExporting}
+          headerPosition="left"
         />
       </div>
     </div>

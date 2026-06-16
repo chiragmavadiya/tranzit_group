@@ -89,6 +89,13 @@ export interface LoginResponse {
     next_step: string;
     default_courier?: any;
     default_item?: any;
+    announcements?: {
+        id: number;
+        text: string;
+        text_color: string;
+        background_color: string;
+        expire_date: string;
+    }[];
 }
 
 export interface RegisterRequest {

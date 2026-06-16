@@ -4,7 +4,7 @@ import { useState, useMemo, useCallback, useEffect, lazy, Suspense } from 'react
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { format } from 'date-fns';
 import type { Order, TabType } from '@/features/orders/types';
-import { useOrders, useExportOrders, useImportOrders, useDownloadLabel, useCancelOrder, useArchiveOrder, usePrintOrder, useWalletCheck } from '@/features/orders/hooks/useOrders';
+import { useOrders, useExportOrders, useImportOrders, useDownloadLabel, useCancelOrder, useArchiveOrder, usePrintOrder, useWalletCheck, useCreateAuspostManifest } from '@/features/orders/hooks/useOrders';
 import WalletCheckDialog from '@/features/orders/components/WalletCheckDialog';
 import { DataTable } from '@/components/common/DataTable';
 import { getOrdersColumns } from '../column';
@@ -128,6 +128,7 @@ export default function OrdersPage({ fromCustomer, customerId }: { fromCustomer?
   const cancelOrderMutation = useCancelOrder();
   const archiveOrderMutation = useArchiveOrder();
   const printOrderMutation = usePrintOrder();
+  const createAuspostManifestMutation = useCreateAuspostManifest();
   const { data: customersData } = useCustomers({ per_page: 1000 }, isAdmin);
 
   const [walletCheckOpen, setWalletCheckOpen] = useState(false);
@@ -355,8 +356,16 @@ export default function OrdersPage({ fromCustomer, customerId }: { fromCustomer?
       const order = ordersData?.data?.find((o: any) => String(o.order_number) === String(orderId));
       return order?.courier_code?.toLowerCase() === 'auspost';
     });
-    console.log("Manifesting orders", auspostOrders);
-  }, [selectedRows, ordersData?.data]);
+    if (auspostOrders.length === 0) {
+      showToast("No AusPost orders selected for manifesting", "error");
+      return;
+    }
+    createAuspostManifestMutation.mutate(auspostOrders, {
+      onSuccess: () => {
+        setSelectedRows([]);
+      }
+    });
+  }, [selectedRows, ordersData?.data, createAuspostManifestMutation]);
 
   const downloadingLabelId = downloadLabelMutation.isPending ? String(downloadLabelMutation.variables) : null;
   const updateToArchiveId = archiveOrderMutation.isPending ? String(archiveOrderMutation.variables) : null;
@@ -435,9 +444,9 @@ export default function OrdersPage({ fromCustomer, customerId }: { fromCustomer?
                     size="sm"
                     className="h-8 gap-2"
                     onClick={handleManifestOrders}
-                    disabled={isDownloadingLabels || isCancellingOrders}
+                    disabled={createAuspostManifestMutation.isPending}
                   >
-                    {isDownloadingLabels ? <Loader2 className="w-4 h-4 animate-spin" /> : <Zap className="w-4 h-4" />}
+                    {createAuspostManifestMutation.isPending ? <Loader2 className="w-4 h-4 animate-spin" /> : <Zap className="w-4 h-4" />}
                     <span>Manifest orders ({selectedRows.length})</span>
                   </Button>
                 )}

@@ -33,8 +33,8 @@ export interface FormTextareaProps extends Omit<FormInputProps, 'type'> {
 
 export interface FormSelectProps extends Omit<FormInputProps, 'value' | 'onChange'> {
   label?: string;
-  value: string;
-  onValueChange: (val: string | null) => void;
+  value: string | string[];
+  onValueChange: (val: any) => void;
   options: readonly { label: string; value: string | number }[];
   placeholder?: string;
   className?: string;
@@ -48,6 +48,7 @@ export interface FormSelectProps extends Omit<FormInputProps, 'value' | 'onChang
   selectClassName?: string;
   allowClear?: boolean;
   searchdisable?: boolean;
+  multiple?: boolean;
 }
 
 export interface SummaryCardProps {

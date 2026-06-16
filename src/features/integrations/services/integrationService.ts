@@ -18,6 +18,10 @@ export const integrationService = {
     },
 
     connect: async (provider: string, data: any) => {
+        if (provider === 'ebay') {
+            const response = await api.get(API_ENDPOINTS.INTEGRATIONS.CONNECT(provider));
+            return response.data;
+        }
         const response = await api.post(API_ENDPOINTS.INTEGRATIONS.CONNECT(provider), data);
         return response.data;
     },
@@ -29,7 +33,7 @@ export const integrationService = {
 
     disconnect: async (provider: string) => {
         // Some use DELETE, some use POST /disconnect
-        const postProviders = ['shopify', 'woocommerce'];
+        const postProviders = ['shopify', 'woocommerce', 'ebay'];
         if (postProviders.includes(provider)) {
             const response = await api.post(API_ENDPOINTS.INTEGRATIONS.DISCONNECT(provider));
             return response.data;
@@ -45,6 +49,24 @@ export const integrationService = {
 
     toggleAutoFulfillment: async (enabled: boolean) => {
         const response = await api.post(API_ENDPOINTS.INTEGRATIONS.AUTO_FULFILLMENT, { enabled });
+        return response.data;
+    },
+
+    toggleEbayAutoSync: async (enabled: boolean) => {
+        const response = await api.request({
+            method: "GET",
+            url: API_ENDPOINTS.INTEGRATIONS.EBAY_AUTO_SYNC,
+            data: { enabled }
+        });
+        return response.data;
+    },
+
+    toggleEbayAutoFulfillment: async (enabled: boolean) => {
+        const response = await api.request({
+            method: "GET",
+            url: API_ENDPOINTS.INTEGRATIONS.EBAY_AUTO_FULFILLMENT,
+            data: { enabled }
+        });
         return response.data;
     },
 

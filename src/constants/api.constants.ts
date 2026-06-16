@@ -34,6 +34,7 @@ export const API_ENDPOINTS = {
         ARCHIVE: (id: string | number) => `/orders/${id}/archive`,
         PRINT_ORDER: "/orders/print-label",
         UPDATE_COURIER: (orderNumber: string) => `/orders/${orderNumber}/courier`,
+        AUSPOST_MANIFEST: "/customer/orders/auspost/manifests",
     },
     DASHBOARD: {
         METRICS: "/dashboard/metrics",
@@ -161,6 +162,10 @@ export const API_ENDPOINTS = {
         BASE: "/admin/settings",
         DETAILS: (id: string | number) => `/admin/settings/${id}`,
     },
+    ANNOUNCEMENTS: {
+        BASE: "/admin/announcements",
+        DETAILS: (id: string | number) => `/admin/announcements/${id}`,
+    },
     SEARCH: {
         GLOBAL: "/globalsearch",
     },
@@ -194,14 +199,14 @@ export const API_ENDPOINTS = {
         PATCH_PRODUCT_STATUS: (provider: string, productCode: string) => `/integrations/${provider}/products/${productCode}/status`,
         DELIVERY_PREFERENCES: "/integrations/tranzit-group/delivery-preferences",
         DEFAULT: (provider: string) => `/integrations/${provider}/default`,
+        EBAY_AUTO_SYNC: "/integrations/ebay/auto-sync",
+        EBAY_AUTO_FULFILLMENT: "/integrations/ebay/auto-fulfillment",
     },
     PLAN: {
         SELECT: "/customer/plans/select"
     },
     MANIFEST: {
-        LIST: "/customer/manifests",
-        DETAILS: (id: string | number) => `/customer/manifests/${id}`,
-        DOWNLOAD: (id: string | number) => `/customer/manifests/${id}/download`,
+        LIST: "/customer/orders/auspost/manifests",
         EXPORT: "/customer/manifests/export",
     }
 };
@@ -293,6 +298,10 @@ export const QUERY_KEYS = {
     ADMIN_SETTINGS: {
         LIST: ["admin", "settings", "list"],
         DETAILS: (slug: string) => ["admin", "settings", "details", slug],
+    },
+    ANNOUNCEMENTS: {
+        LIST: ["admin", "announcements", "list"],
+        DETAILS: (id: string | number) => ["admin", "announcements", "details", id],
     },
     SEARCH: {
         GLOBAL: (q: string) => ["search", "global", q],

@@ -21,7 +21,7 @@ const DatePicker = memo(({ date, setDate, label, className, placeholder = 'DD/MM
     <div className='flex flex-col'>
       {/* {label && <label className="text-[13px] font-semibold text-gray-700 dark:text-zinc-400 ml-0.5">{label}</label>} */}
       {label && <CustomLabel label={label} />}
-      <Popover open={open} onOpenChange={setOpen}>
+      <Popover open={open} onOpenChange={setOpen} modal={true}>
         <PopoverTrigger className="w-full">
           <Button
             variant="outline"
@@ -34,7 +34,7 @@ const DatePicker = memo(({ date, setDate, label, className, placeholder = 'DD/MM
             <CalendarIcon className="h-4 w-4 opacity-50" />
           </Button>
         </PopoverTrigger>
-        <PopoverContent className="w-auto p-0" align="start">
+        <PopoverContent className="w-auto p-0 z-9999" align="start">
           <Calendar
             mode="single"
             selected={parsedDate}

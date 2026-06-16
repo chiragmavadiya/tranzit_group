@@ -75,4 +75,18 @@ export interface GetProfileResponse {
   status: boolean;
   message: string;
   data: ProfileDetails;
+  user?: any;
+  address_detail?: any;
+  default_item?: any;
+  default_courier?: any;
+  announcements?: {
+    id: number;
+    text: string;
+    text_color: string;
+    background_color: string;
+    expire_date: string;
+  }[];
+  email_verified?: boolean;
+  next_step?: string;
+  is_onboarded?: boolean;
 }

@@ -29,6 +29,7 @@ const UndeliveredParcelPage = lazy(() => import('@/features/undelivered-parcel/p
 const GetQuote = lazy(() => import('@/features/quote/pages/GetQuotePage'));
 const QuoteList = lazy(() => import('@/features/customer-quote/pages/QuoteListPage'));
 const ProfilePage = lazy(() => import('@/features/profile/pages/ProfilePage'));
+const GlobalConfigPage = lazy(() => import('@/features/global-config/pages/GlobalConfigPage'));
 
 const HelpCenterAdminPage = lazy(() => import('@/features/help-center-admin/pages/HelpCenterAdminPage'));
 const SettingsLayout = lazy(() => import('@/features/settings/components/SettingsLayout'));
@@ -82,6 +83,7 @@ export default function AdminRoutes() {
                         <Route index element={withSuspense(<GetQuote />)} />
                     </Route>
                     <Route path="profile" element={withSuspense(<ProfilePage />)} />
+                    <Route path="global-config" element={withSuspense(<GlobalConfigPage />)} />
 
                     <Route path="help-center" element={withSuspense(<HelpCenterAdminPage />)} />
                     <Route path="settings" element={withSuspense(<SettingsLayout />)}>

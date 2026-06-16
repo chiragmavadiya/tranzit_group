@@ -18,11 +18,11 @@ export const manifestService = {
 
     return { blob: response.data, filename };
   },
-  downloadPDF: async (id: string | number): Promise<{ blob: Blob; filename: string }> => {
-    const response = await api.get(API_ENDPOINTS.MANIFEST.DOWNLOAD(id), {
+  downloadPDF: async (url: string): Promise<{ blob: Blob; filename: string }> => {
+    const response = await api.get(url.replace('https://api.tranzit.digisite.net/api', ''), {
       responseType: "blob",
     });
-    const filename = getFileName(response) || `manifest_${id}_${new Date().getTime()}.pdf`;
+    const filename = getFileName(response) || `manifests_${new Date().getTime()}.pdf`;
     return { blob: response.data, filename };
-  }
+  },
 };

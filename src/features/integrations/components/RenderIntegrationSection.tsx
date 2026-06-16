@@ -65,6 +65,7 @@ const RenderIntegrationSection = ({
                         {data?.map((provider) => {
                             const isConnected = provider.connected;
                             const isDefault = provider.is_default;
+                            const isTranzit = provider.slug.includes('tranzit') || false;
                             return (
                                 <Card key={provider.slug} className="py-4 group relative overflow-hidden transition-all hover:shadow-md border-slate-200 dark:border-zinc-800 bg-white dark:bg-zinc-950">
                                     <CardHeader className="pb-4 bg-transparent">
@@ -125,18 +126,22 @@ const RenderIntegrationSection = ({
                                                         ) : (
                                                             <Settings2 className="w-3.5 h-3.5 mr-1.5" />
                                                         )}
-                                                        Configurations
+                                                        {isTranzit ? "Integration Settings" : "Configurations"}
                                                     </Button>
-                                                    <Button
-                                                        variant="ghost"
-                                                        size="sm"
-                                                        className="h-8 text-red-500 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-950/20 px-2"
-                                                        onClick={() => disconnectMutation.mutate(provider.slug)}
-                                                        disabled={disconnectMutation.isPending && disconnectMutation.variables === provider.slug}
-                                                    >
-                                                        {disconnectMutation.isPending && disconnectMutation.variables === provider.slug ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Link2Off className="w-3.5 h-3.5" />}
-                                                        Disconnect
-                                                    </Button>
+                                                    {
+                                                        !isTranzit && (
+                                                            <Button
+                                                                variant="ghost"
+                                                                size="sm"
+                                                                className="h-8 text-red-500 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-950/20 px-2"
+                                                                onClick={() => disconnectMutation.mutate(provider.slug)}
+                                                                disabled={disconnectMutation.isPending && disconnectMutation.variables === provider.slug}
+                                                            >
+                                                                {disconnectMutation.isPending && disconnectMutation.variables === provider.slug ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Link2Off className="w-3.5 h-3.5" />}
+                                                                Disconnect
+                                                            </Button>
+                                                        )
+                                                    }
                                                 </>
                                             ) : (
                                                 <Button

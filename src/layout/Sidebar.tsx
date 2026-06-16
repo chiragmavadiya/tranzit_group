@@ -18,6 +18,7 @@ interface SidebarProps {
   isMobile?: boolean;
   isMobileSidebarOpen?: boolean;
   setIsMobileSidebarOpen?: (val: boolean) => void;
+  bannerOpen?: boolean;
 }
 
 export default function Sidebar({
@@ -25,7 +26,8 @@ export default function Sidebar({
   setIsCollapsed,
   isMobile = false,
   isMobileSidebarOpen = false,
-  setIsMobileSidebarOpen = () => { }
+  setIsMobileSidebarOpen = () => { },
+  bannerOpen = false,
 }: SidebarProps) {
   const [activeSubmenu, setActiveSubmenu] = useState<string | null>(null);
   const [expandedItems, setExpandedItems] = useState<string[]>([]);
@@ -135,16 +137,19 @@ export default function Sidebar({
   const currentSubmenuData = sidebarItems.find(i => i.name === activeSubmenu);
 
   return (
-    <aside className={cn(
-      "print:hidden h-screen bg-white dark:bg-zinc-950 border-r border-gray-200 dark:border-zinc-800 flex flex-col justify-between fixed top-0 left-0 transition-all duration-300 ease-in-out z-20",
-      isMobile
-        ? "w-[240px] z-50 shadow-2xl"
-        : "z-20",
-      isMobile
-        ? (isMobileSidebarOpen ? "translate-x-0" : "-translate-x-full")
-        : "translate-x-0",
-      !isMobile && (isCollapsed ? "w-[64px]" : "w-[240px]")
-    )}>
+    <aside
+      style={bannerOpen ? { top: '36px', height: 'calc(100vh - 36px)' } : {}}
+      className={cn(
+        "print:hidden h-screen bg-white dark:bg-zinc-950 border-r border-gray-200 dark:border-zinc-800 flex flex-col justify-between fixed top-0 left-0 transition-all duration-300 ease-in-out z-20",
+        isMobile
+          ? "w-[240px] z-50 shadow-2xl"
+          : "z-20",
+        isMobile
+          ? (isMobileSidebarOpen ? "translate-x-0" : "-translate-x-full")
+          : "translate-x-0",
+        !isMobile && (isCollapsed ? "w-[64px]" : "w-[240px]")
+      )}
+    >
       <div className="flex-1 overflow-y-auto overflow-x-hidden w-full no-scrollbar">
         {/* Main Menu Header */}
         {!activeSubmenu && (

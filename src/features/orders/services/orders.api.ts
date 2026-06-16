@@ -214,4 +214,14 @@ export const ordersService = {
         const response = await api.put(API_ENDPOINTS.ORDERS.UPDATE_COURIER(orderNumber), data);
         return response.data;
     },
+
+    /**
+     * Create AusPost manifests
+     */
+    createAuspostManifest: async (orderNumbers: string[]): Promise<any> => {
+        const response = await api.post(API_ENDPOINTS.ORDERS.AUSPOST_MANIFEST, {
+            order_numbers: orderNumbers,
+        });
+        return response.data;
+    },
 };

@@ -1,93 +1,104 @@
 import type { Column } from '@/components/common/types/DataTable.types';
-import type { Manifest } from './types';
-import { Badge } from '@/components/ui/badge';
-import { cn } from '@/lib/utils';
+import { formateCurrency } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { Download, Loader2 } from 'lucide-react';
 import { CustomTooltip } from '@/components/common/CustomTooltip';
-import { format } from 'date-fns';
-
-const MANIFEST_STATUS_COLORS: Record<string, string> = {
-  completed: 'bg-emerald-50 text-emerald-700 dark:bg-emerald-950/30 dark:text-emerald-400 border border-emerald-200/50 dark:border-emerald-900/30',
-  pending: 'bg-amber-50 text-amber-700 dark:bg-amber-950/30 dark:text-amber-400 border border-amber-200/50 dark:border-amber-900/30',
-  processing: 'bg-blue-50 text-blue-700 dark:bg-blue-950/30 dark:text-blue-400 border border-blue-200/50 dark:border-blue-900/30',
-  failed: 'bg-rose-50 text-rose-700 dark:bg-rose-950/30 dark:text-rose-400 border border-rose-200/50 dark:border-rose-900/30',
-};
+import { NavLink } from 'react-router-dom';
+import { StatusBadge } from '../orders/components/StatusBadge';
+import type { Manifest } from './types';
+import Favicon from '@/assets/favicon.png';
 
 export const getManifestColumns = (
-  onDownloadPDF: (id: string | number) => void,
-  downloadingId: string | number | null
+  onDownloadPDF: (row: Manifest) => void,
+  downloadingId: string | null
 ): Column<Manifest>[] => [
-  {
-    key: 'manifest_number',
-    header: 'MANIFEST NUMBER',
-    sortable: true,
-    sticky: 'left',
-    cell: (value) => <span className="font-bold text-gray-900 dark:text-zinc-100">{value}</span>
-  },
-  {
-    key: 'courier_name',
-    header: 'COURIER',
-    sortable: true,
-    cell: (value) => <span className="text-slate-600 dark:text-zinc-400 font-medium">{value}</span>
-  },
-  {
-    key: 'total_consignments',
-    header: 'CONSIGNMENTS',
-    sortable: true,
-    cell: (value) => <span className="text-slate-600 dark:text-zinc-400 font-semibold">{value}</span>
-  },
-  {
-    key: 'status',
-    header: 'STATUS',
-    sortable: true,
-    cell: (value) => {
-      const status = String(value).toLowerCase();
-      const colorClass = MANIFEST_STATUS_COLORS[status] || 'bg-slate-50 text-slate-700 border border-slate-200/50';
-      return (
-        <Badge className={cn("px-2.5 py-0.5 rounded-md font-semibold text-[11px] capitalize shadow-none border-none", colorClass)}>
-          {status}
-        </Badge>
-      );
-    }
-  },
-  {
-    key: 'created_at',
-    header: 'CREATED DATE',
-    sortable: true,
-    cell: (value) => {
-      try {
-        return <span className="text-slate-500 dark:text-zinc-500 font-medium">{format(new Date(value), 'dd-MM-yyyy HH:mm')}</span>;
-      } catch {
-        return <span className="text-slate-500 dark:text-zinc-500 font-medium">{value}</span>;
+    {
+      header: 'ORDER #',
+      key: 'order_number',
+      className: 'text-primary font-bold',
+      sticky: 'left',
+      cell: (value: string) => (
+        <NavLink to={`/orders/view/${value}`} className="font-bold text-primary underline">
+          {value}
+        </NavLink>
+      )
+
+    },
+    {
+      header: 'SHIPPED', key: 'consignment_date',
+      width: '200px',
+      cell: (value: string) => value || '-'
+    },
+    {
+      header: 'CUSTOMER',
+      key: 'customer_name',
+      width: '220px',
+      cell: (value: string) => (
+        <div className="flex justify-between items-center truncate uppercase font-semibold py-1 px-0 transition-all duration-250 border border-transparent rounded-sm text-slate-800 dark:text-zinc-200">
+          {value || '-'}
+        </div>
+      )
+    },
+    {
+      header: 'SUBURB', key: 'suburb', width: '140px'
+    },
+    {
+      header: 'CARRIER & PRODUCT', key: 'courier',
+      width: '220px',
+      cell: (value: string, row: Manifest) => (
+        <div className="flex items-center gap-2">
+          {(row?.courier_logo || row?.courier_logo_url) && (
+            <div className="">
+              <img src={row?.courier_logo || row?.courier_logo_url} className="h-6! min-w-[60px] object-contain" />
+            </div>
+          )}
+          <div className="flex flex-col">
+            <span className="font-medium whitespace-nowrap">{value && value !== 'unknown' ? value : '-'}</span>
+            {row.product_id && <span className="font-normal text-sm">Product - {row.product_id}</span>}
+          </div>
+        </div>
+      )
+    },
+    {
+      header: 'AMOUNT', key: 'amount', cell: (value: string) => <span className="font-medium"> {formateCurrency(Number(value))}</span>
+    },
+    {
+      header: 'PAYMENT STATUS', key: 'payment_status', cell: (value: string) => <StatusBadge status={value} />
+    },
+    {
+      header: 'ORDER SOURCE', key: 'order_type',
+      cell: (value: string, row: Manifest) => (
+        <div className="flex items-center gap-2">
+          <img src={row?.order_source_icon || Favicon} className="h-4 w-4" alt="" />
+          <span className="capitalize">{value}</span>
+        </div>
+      )
+    },
+    {
+      key: 'actions',
+      header: 'ACTION',
+      sticky: 'right',
+      cell: (_, row: Manifest) => {
+        const isDownloading = downloadingId === row?.order_number;
+        return (
+          <div className="flex items-center gap-2">
+            <CustomTooltip title="Download PDF" placement="bottom">
+              <Button
+                variant="ghost"
+                size="sm"
+                className="p-0 hover:text-primary bg-transparent hover:bg-transparent dark:hover:bg-transparent"
+                onClick={() => onDownloadPDF(row)}
+                disabled={isDownloading}
+              >
+                {isDownloading ? (
+                  <Loader2 className="w-4 h-4 animate-spin text-primary" />
+                ) : (
+                  <Download className="w-4 h-4" />
+                )}
+              </Button>
+            </CustomTooltip>
+          </div>
+        );
       }
     }
-  },
-  {
-    key: 'actions',
-    header: 'ACTION',
-    sticky: 'right',
-    cell: (_, row) => {
-      const isDownloading = downloadingId === row.id;
-      return (
-        <div className="flex items-center gap-2">
-          <CustomTooltip title="Download PDF" placement="bottom">
-            <Button
-              variant="ghost"
-              size="sm"
-              className="p-0 hover:text-primary bg-transparent hover:bg-transparent dark:hover:bg-transparent"
-              onClick={() => onDownloadPDF(row.id)}
-              disabled={isDownloading}
-            >
-              {isDownloading ? (
-                <Loader2 className="w-4 h-4 animate-spin text-primary" />
-              ) : (
-                <Download className="w-4 h-4" />
-              )}
-            </Button>
-          </CustomTooltip>
-        </div>
-      );
-    }
-  }
-];
+  ];

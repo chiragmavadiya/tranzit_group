@@ -36,11 +36,13 @@ const BookPickupTabs = lazy(() => import('@/features/book-pickup/components/Book
 export default function TopBar({
   isCollapsed,
   isMobile = false,
-  setIsMobileSidebarOpen = () => { }
+  setIsMobileSidebarOpen = () => { },
+  bannerOpen = false,
 }: {
   isCollapsed?: boolean;
   isMobile?: boolean;
   setIsMobileSidebarOpen?: (val: boolean) => void;
+  bannerOpen?: boolean;
 }) {
   const { user } = useAppSelector((state) => state.auth);
   const dispatch = useAppDispatch();
@@ -87,12 +89,15 @@ export default function TopBar({
     navigate(`${role === 'admin' ? '/admin' : ''}/orders`);
   }
   return (
-    <header className={cn(
-      "print:hidden h-16 bg-white dark:bg-zinc-950 border-b border-gray-200 dark:border-zinc-800 flex items-center justify-between px-4 sm:px-6 fixed top-0 right-0 z-10 transition-[left] duration-300 ease-in-out",
-      isMobile
-        ? "left-0"
-        : (isCollapsed ? 'left-[64px]' : 'left-[240px]')
-    )}>
+    <header
+      style={bannerOpen ? { top: '36px' } : {}}
+      className={cn(
+        "print:hidden h-16 bg-white dark:bg-zinc-950 border-b border-gray-200 dark:border-zinc-800 flex items-center justify-between px-4 sm:px-6 fixed top-0 right-0 z-10 transition-[left,top] duration-300 ease-in-out",
+        isMobile
+          ? "left-0"
+          : (isCollapsed ? 'left-[64px]' : 'left-[240px]')
+      )}
+    >
       {/* Left Portion: Hamburguer & Logo */}
       <div className="flex items-center gap-2 shrink-0">
         {isMobile && (

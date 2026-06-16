@@ -296,51 +296,70 @@ export const SelectSearch = ({
   allowClear = false,
   name,
   searchdisable,
+  multiple,
 }: {
   options: options[]
-  value?: string | number | null
-  onValueChange?: (value: string | null) => void
-  defaultValue?: string | number | null
+  value?: any
+  onValueChange?: (value: any) => void
+  defaultValue?: any
   placeholder?: string
   className?: string
   disabled?: boolean
   allowClear?: boolean
   name?: string
   searchdisable?: boolean
+  multiple?: boolean
 }) => {
   const inputRef = React.useRef<HTMLInputElement>(null)
+  const containerRef = React.useRef<HTMLDivElement>(null)
 
   const selectedOption = React.useMemo(() => {
-    if (value === undefined || value === null) return null
+    if (value === undefined || value === null) return multiple ? [] : null
+    if (multiple) {
+      const valueArray = Array.isArray(value) ? value : [value]
+      return options.filter((opt) => valueArray.map(String).includes(String(opt.value)))
+    }
     return options.find((opt) => String(opt.value) === String(value)) || null
-  }, [options, value])
+  }, [options, value, multiple])
 
   const defaultSelectedOption = React.useMemo(() => {
-    if (defaultValue === undefined || defaultValue === null) return null
+    if (defaultValue === undefined || defaultValue === null) return multiple ? [] : null
+    if (multiple) {
+      const defaultValueArray = Array.isArray(defaultValue) ? defaultValue : [defaultValue]
+      return options.filter((opt) => defaultValueArray.map(String).includes(String(opt.value)))
+    }
     return options.find((opt) => String(opt.value) === String(defaultValue)) || null
-  }, [options, defaultValue])
+  }, [options, defaultValue, multiple])
 
-  const [internalValue, setInternalValue] = React.useState<options | null>(defaultSelectedOption)
+  const [internalValue, setInternalValue] = React.useState<options | options[] | null>(defaultSelectedOption)
   const currentOption = value !== undefined ? selectedOption : internalValue
-  const hasValue = !!currentOption
+  const hasValue = multiple
+    ? Array.isArray(currentOption) && currentOption.length > 0
+    : !!currentOption
 
   const comboboxProps: any = {
     items: options,
     itemToStringLabel: (opt: options) => opt.label,
     itemToStringValue: (opt: options) => String(opt.value),
-    onValueChange: (opt: options | null) => {
-      if (opt === null) return;
+    onValueChange: (opt: options | options[] | null) => {
       if (value === undefined) {
         setInternalValue(opt)
       }
-      onValueChange?.(opt ? String(opt.value) : null)
-      setTimeout(() => {
-        inputRef.current?.blur()
-      }, 0)
+      if (multiple && Array.isArray(opt)) {
+        onValueChange?.(opt.map((item) => String(item.value)))
+      } else if (opt && !Array.isArray(opt)) {
+        onValueChange?.(String(opt.value))
+        setTimeout(() => {
+          inputRef.current?.blur()
+        }, 0)
+      } else {
+        onValueChange?.(null)
+      }
     },
     disabled,
     name,
     openOnInputClick: true,
+    multiple,
   }
 
   if (value !== undefined) {
@@ -348,6 +367,63 @@ export const SelectSearch = ({
   }
   if (defaultValue !== undefined) {
     comboboxProps.defaultValue = defaultSelectedOption
+  }
+
+  if (multiple) {
+    return (
+      <Combobox {...comboboxProps}>
+        <ComboboxChips
+          ref={containerRef}
+          className={cn(
+            "w-full border-gray-200 dark:border-zinc-800 dark:bg-zinc-900 rounded-sm bg-white dark:bg-zinc-950 px-2 flex flex-wrap items-center gap-1",
+            className,
+            "max-h-[122px] min-h-8 h-auto py-1 px-2 flex flex-wrap items-center gap-1.5 overflow-y-auto"
+          )}
+        >
+          {Array.isArray(currentOption) && currentOption.map((opt) => (
+            <ComboboxChip key={opt.value} className="h-6 text-xs bg-slate-100 dark:bg-zinc-800 text-slate-800 dark:text-zinc-200 font-medium px-2 py-0.5 border border-slate-200/50 dark:border-zinc-700/50 rounded-sm">
+              {opt.label}
+            </ComboboxChip>
+          ))}
+          <ComboboxChipsInput
+            ref={inputRef}
+            placeholder={Array.isArray(currentOption) && currentOption.length > 0 ? "" : placeholder}
+            className="text-xs outline-none h-7 min-w-[60px] flex-1 text-slate-800 dark:text-zinc-200 bg-transparent"
+            disabled={disabled}
+          />
+          {allowClear && hasValue && (
+            <ComboboxClear
+              disabled={disabled}
+              onClick={() => {
+                onValueChange?.([])
+                setInternalValue([])
+              }}
+              className="ml-auto p-1 text-slate-400 hover:text-slate-600 dark:hover:text-zinc-200"
+            />
+          )}
+        </ComboboxChips>
+        <ComboboxContent
+          align="start"
+          anchor={containerRef}
+          className="max-w-max dark:bg-zinc-900 dark:border-zinc-800 p-1 rounded-md max-h-[220px] flex flex-col"
+        >
+          <ComboboxEmpty className="py-2 text-center text-xs text-muted-foreground">
+            No results found.
+          </ComboboxEmpty>
+          <ComboboxList className="overflow-y-auto flex-1 min-h-0">
+            {(item: options) => (
+              <ComboboxItem
+                key={item.value}
+                value={item}
+                className="min-h-7 word-break text-sm font-medium data-highlighted:bg-primary/20 data-selected:bg-primary"
+              >
+                {item.label}
+              </ComboboxItem>
+            )}
+          </ComboboxList>
+        </ComboboxContent>
+      </Combobox>
+    )
   }
 
   return (

@@ -84,6 +84,7 @@ export const adminSidebarItems: SidebarItem[] = [
       { name: 'Zoho Invoice Integration', path: '/admin/zoho-integration' },
       { name: 'Admin Activity Log', path: '/admin/activity-log' },
       { name: 'Profile', path: '/admin/profile' },
+      { name: 'Global Configuration', path: '/admin/global-config' },
     ]
   },
 

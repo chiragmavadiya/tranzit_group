@@ -1,13 +1,25 @@
 export interface Manifest {
-  id: string | number;
-  manifest_number: string;
-  courier_name: string;
-  courier_code: string;
-  total_consignments: number;
+  customer_name: string;
+  order_number: string;
+  suburb: string | null;
+  amount: string | number;
   status: string;
-  created_at: string;
-  manifest_pdf_url?: string;
-  actions: string[];
+  payment_status: string;
+  courier: string;
+  order_type: string;
+  consignment_date: string;
+  courier_logo?: string;
+  courier_logo_url?: string;
+  product_id?: string;
+  customer_full_address?: string;
+  receiver_email?: string;
+  receiver_phone?: string;
+  order_source_icon?: string;
+  is_own_courier: boolean;
+  sender_address_info?: string;
+  receiver_address_info?: string;
+  courier_code?: string;
+  pdf_url: string;
 }
 
 export interface ManifestFilters {

@@ -27,6 +27,7 @@ function PopoverContent({
         align={align}
         side={side}
         sideOffset={sideOffset}
+        className="isolate z-9999"
       >
         <PopoverPrimitive.Popup
           className={cn(

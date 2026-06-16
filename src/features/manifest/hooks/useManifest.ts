@@ -28,7 +28,7 @@ export function useExportManifests() {
 
 export function useDownloadManifestPDF() {
   return useMutation({
-    mutationFn: (id: string | number) => manifestService.downloadPDF(id),
+    mutationFn: (url: string) => manifestService.downloadPDF(url),
     onSuccess: ({ blob, filename }) => {
       downloadFile(blob, filename);
       showToast("Manifest downloaded successfully", "success");
@@ -38,3 +38,4 @@ export function useDownloadManifestPDF() {
     },
   });
 }
+

@@ -465,11 +465,12 @@ export default function CarrierConfigForm({
           </>
         );
       default:
-        return (
-          <div className="py-10 text-center col-span-12">
-            <p className="text-slate-500">Configuration is coming soon.</p>
-          </div>
-        );
+        return null
+      // (
+      //   <div className="py-10 text-center col-span-12">
+      //     <p className="text-slate-500">Configuration is coming soon.</p>
+      //   </div>
+      // );
     }
   };
 
@@ -479,32 +480,36 @@ export default function CarrierConfigForm({
     <form id="carrier-config-form" onSubmit={handleSubmit} className="space-y-6 mt-4">
       <div className="grid grid-cols-12 gap-x-6 gap-y-3.5 items-start">
         {/* Left Column: Form Credentials Fields */}
-        <div className="col-span-12 md:col-span-7 border flex flex-col h-full p-4 rounded-sm shadow-sm text-left">
-          <div className="flex-1 grid grid-cols-12 gap-x-4 gap-y-4">
-            {getCredentialsFields()}
-          </div>
-          <div className='mt-6 justify-end self-end'>
-            <Button
-              type="submit"
-              disabled={isLoading}
-              className="h-8 text-sm px-5 font-semibold"
-            >
-              {isLoading ? <Loader2 className="w-3.5 h-3.5 animate-spin mr-2" /> : null}
-              {isConnected ? 'Save Changes' : 'Save & Connect'}
-            </Button>
-          </div>
-        </div>
 
-        {/* Right Column: Config Tip */}
         {tip && (
-          <div className="col-span-12 md:col-span-5">
-            <CarrierConfigTip selectedCarrier={selectedCarrier} />
-          </div>
+          <>
+            <div className="col-span-12 md:col-span-7 border flex flex-col h-full p-4 rounded-sm shadow-sm text-left">
+              <div className="flex-1 grid grid-cols-12 gap-x-4 gap-y-4">
+                {getCredentialsFields()}
+              </div>
+              <div className='mt-6 justify-end self-end'>
+                <Button
+                  type="submit"
+                  disabled={isLoading}
+                  className="h-8 text-sm px-5 font-semibold"
+                >
+                  {isLoading ? <Loader2 className="w-3.5 h-3.5 animate-spin mr-2" /> : null}
+                  {isConnected ? 'Save Changes' : 'Save & Connect'}
+                </Button>
+              </div>
+            </div>
+
+            {/* Right Column: Config Tip */}
+            {tip && (
+              <div className="col-span-12 md:col-span-5">
+                <CarrierConfigTip selectedCarrier={selectedCarrier} />
+              </div>
+            )}
+
+            {/* Devider */}
+            <div className="col-span-12 flex justify-start pb-4 border-b border-gray-200 dark:border-zinc-800" />
+          </>
         )}
-
-        {/* Devider */}
-        <div className="col-span-12 flex justify-start pb-4 border-b border-gray-200 dark:border-zinc-800" />
-
 
         {/* Advanced Settings Column (left) */}
         {formData.advanced_settings?.settings && formData.advanced_settings.settings.length > 0 && (
@@ -541,7 +546,7 @@ export default function CarrierConfigForm({
                     value: opt
                   }));
                   return (
-                    <div className="col-span-6" key={setting.key}>
+                    <div className="col-span-12" key={setting.key}>
                       <FormSelect
                         label={setting.label + ':'}
                         options={options}
@@ -551,7 +556,20 @@ export default function CarrierConfigForm({
                         isHalf={true}
                         allowClear={false}
                         layout='horizontal'
-                        selectClassName='w-50'
+                        selectClassName='w-full'
+                      />
+                    </div>
+                  );
+                } else if (setting.type === 'textarea') {
+                  return (
+                    <div className="col-span-12" key={setting.key}>
+                      <FormTextarea
+                        label="Delivery Instruction:"
+                        value={setting.value || ''}
+                        onChange={(val) => handleAdvancedSettingChange(setting.key, val)}
+                        placeholder="e.g. 3-5 business days delivery to your doorstep"
+                        rows={3}
+                        isFullWidth
                       />
                     </div>
                   );
@@ -566,14 +584,7 @@ export default function CarrierConfigForm({
                 isFullWidth={true}
                 className="col-span-12"
               /> */}
-              <FormTextarea
-                label="Delivery Instruction:"
-                value={''}
-                onChange={(val) => handleAdvancedSettingChange('delivery_instruction', val)}
-                placeholder="e.g. 3-5 business days delivery to your doorstep"
-                rows={3}
-                isFullWidth
-              />
+
             </div>
 
             {isConnected && (

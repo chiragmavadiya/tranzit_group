@@ -40,19 +40,13 @@
 // ============================================================================
 
 import { useState } from 'react';
-import { Plus, Shield, Settings2, Package, Users, Wallet, Link, FileText, MapPin } from 'lucide-react';
+import { Plus, Pencil, Trash } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { DataTable } from '@/components/common/DataTable';
-import { CustomModel } from '@/components/ui/dialog';
-import { FormInput, FormSelect } from '@/features/orders/components/OrderFormUI';
 import { Switch } from '@/components/ui/switch';
-import { useForm, Controller } from 'react-hook-form';
-
-const roles = [
-  { label: 'Parent Account', value: 'parent' },
-  { label: '3PL User', value: '3pl' },
-  { label: 'Full Access User', value: 'full' },
-];
+import { ConformationModal } from '@/components/common/ConformationModal';
+import { TeamMemberModal } from '../components/TeamMemberModal';
+import { roles } from '../constant';
 
 const mockUsers = [
   { id: '3', name: 'Charlie Brown', email: 'charlie@example.com', role: 'Admin', status: 'Active', createdAt: '2022-01-01' },
@@ -60,28 +54,35 @@ const mockUsers = [
   { id: '2', name: 'Bob Jones', email: 'bob@example.com', role: '3PL User', status: 'Invited', createdAt: '2022-01-01' },
 ];
 
-const permissionModules = [
-  { id: 'orders', name: 'Orders', icon: Package },
-  { id: 'customers', name: 'Customers', icon: Users },
-  { id: 'wallet', name: 'Wallet', icon: Wallet },
-  { id: 'settings', name: 'Settings', icon: Settings2 },
-  { id: 'integrations', name: 'Integrations', icon: Link },
-  { id: 'reports', name: 'Reports', icon: FileText },
-  { id: 'pickup', name: 'Pickup Addresses', icon: MapPin },
-];
-
-export default function TeamAccessPageOriginal() {
+export default function TeamAccessPage() {
   const [isAddUserOpen, setIsAddUserOpen] = useState(false);
   const [users, setUsers] = useState(mockUsers);
+  const [editingUser, setEditingUser] = useState<any>(null);
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const [userToDelete, setUserToDelete] = useState<any>(null);
 
-  const { control, handleSubmit, reset } = useForm({
-    defaultValues: {
-      firstName: '',
-      lastName: '',
-      email: '',
-      role: 'full',
+  const handleEditClick = (user: any) => {
+    setEditingUser(user);
+    setIsAddUserOpen(true);
+  };
+
+  const handleDeleteClick = (user: any) => {
+    setUserToDelete(user);
+    setIsDeleteDialogOpen(true);
+  };
+
+  const handleConfirmDelete = () => {
+    if (userToDelete) {
+      setUsers(prev => prev.filter(u => u.id !== userToDelete.id));
+      setIsDeleteDialogOpen(false);
+      setUserToDelete(null);
     }
-  });
+  };
+
+  const handleCancelDelete = () => {
+    setIsDeleteDialogOpen(false);
+    setUserToDelete(null);
+  };
 
   const columns = [
     {
@@ -133,20 +134,55 @@ export default function TeamAccessPageOriginal() {
       header: 'Created Date',
       key: 'createdAt',
     },
+    {
+      header: 'Actions',
+      key: 'actions',
+      className: "w-24 px-0 pr-3 print:hidden",
+      cell: (_: any, row: any) => (
+        <div className="flex items-center gap-4">
+          <Button
+            variant="ghost"
+            size="sm"
+            className="h-8 w-8 p-0 hover:text-primary bg-transparent dark:hover:bg-transparent"
+            onClick={() => handleEditClick(row)}
+            disabled={row.role === 'Admin'}
+          >
+            <Pencil className="h-4 w-4" />
+          </Button>
+
+          <Button
+            variant="ghost"
+            size="sm"
+            className="h-8 w-8 p-0 hover:text-red-600 bg-transparent dark:hover:bg-transparent"
+            onClick={() => handleDeleteClick(row)}
+            disabled={row.role === 'Admin'}
+          >
+            <Trash className="h-4 w-4" />
+          </Button>
+        </div>
+      )
+    }
   ];
 
-  const onSubmit = (data: any) => {
-    const newUser = {
-      id: String(users.length + 1),
-      name: `${data.firstName} ${data.lastName}`,
-      email: data.email,
-      role: roles.find(r => r.value === data.role)?.label || 'Full Access User',
-      status: 'Invited',
-      createdAt: new Date().toISOString().split('T')[0],
-    };
-    setUsers(prev => [...prev, newUser]);
-    setIsAddUserOpen(false);
-    reset();
+  const handleFormSubmit = (data: any) => {
+    if (editingUser) {
+      setUsers(prev => prev.map(u => u.id === editingUser.id ? {
+        ...u,
+        name: `${data.firstName} ${data.lastName}`,
+        email: data.email,
+        role: roles.find(r => r.value === data.role)?.label || 'Full Access User',
+      } : u));
+    } else {
+      const newUser = {
+        id: String(Math.max(...users.map(u => Number(u.id)), 0) + 1),
+        name: `${data.firstName} ${data.lastName}`,
+        email: data.email,
+        role: roles.find(r => r.value === data.role)?.label || 'Full Access User',
+        status: 'Invited',
+        createdAt: new Date().toISOString().split('T')[0],
+      };
+      setUsers(prev => [...prev, newUser]);
+    }
   };
 
   return (
@@ -157,7 +193,8 @@ export default function TeamAccessPageOriginal() {
           columns={columns}
           headerTitle="Team Members"
           headerDescription="Manage your team access and permissions."
-          searchable
+          searchable={false}
+          exportable={false}
           searchPlaceholder="Search users by name or email..."
           customHeader={
             <Button onClick={() => setIsAddUserOpen(true)} className="h-8 bg-primary hover:bg-primary/90 text-white gap-2">
@@ -170,70 +207,28 @@ export default function TeamAccessPageOriginal() {
         />
       </div>
 
-      <CustomModel
+      <TeamMemberModal
         open={isAddUserOpen}
-        onOpenChange={setIsAddUserOpen}
-        title="Invite New User"
-        description="Add a new member to your team and configure their access."
-        onSubmit={handleSubmit(onSubmit)}
-        submitText="Send Invitation"
-        contentClass="sm:max-w-3xl"
-      >
-        <div className="py-2 space-y-4">
-          {/* Basic Info */}
-          <section>
-            <div className="grid grid-cols-12 gap-x-4 gap-y-3.5 ">
-              <Controller name="firstName" control={control} render={({ field }) => (
-                <FormInput label="First Name" isHalf required {...field} />
-              )} />
-              <Controller name="lastName" control={control} render={({ field }) => (
-                <FormInput label="Last Name" isHalf required {...field} />
-              )} />
-              <Controller name="email" control={control} render={({ field }) => (
-                <FormInput label="Email Address" type="email" isHalf required {...field} />
-              )} />
-              <Controller name="role" control={control} render={({ field }) => (
-                <FormSelect label="Assigned Role" options={roles} isHalf required {...field} onValueChange={field.onChange} />
-              )} />
-            </div>
-          </section>
+        onClose={(open) => {
+          setIsAddUserOpen(open);
+          if (!open) setEditingUser(null);
+        }}
+        onSubmit={handleFormSubmit}
+        editingUser={editingUser}
+      />
 
-          {/* Permissions Matrix */}
-          <section>
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="text-[13px] font-bold text-gray-900 dark:text-zinc-100 uppercase tracking-wide flex items-center gap-2">
-                <Shield className="w-4 h-4 text-primary" /> Permissions Matrix
-              </h3>
-              <Button variant="ghost" size="sm" className="h-6 text-[11px] font-bold">Select All</Button>
-            </div>
-
-            <div className="border border-gray-200 dark:border-zinc-800 rounded-xl overflow-hidden bg-white dark:bg-zinc-950">
-              <div className="grid grid-cols-12 bg-gray-50 dark:bg-zinc-900 p-3 border-b border-gray-200 dark:border-zinc-800 text-[11px] font-bold text-gray-500 uppercase tracking-wide">
-                <div className="col-span-4">Module</div>
-                <div className="col-span-2 text-center">View</div>
-                <div className="col-span-2 text-center">Create</div>
-                <div className="col-span-2 text-center">Edit</div>
-                <div className="col-span-2 text-center">Delete</div>
-              </div>
-
-              <div className="divide-y divide-gray-100 dark:divide-zinc-800">
-                {permissionModules.map((mod) => (
-                  <div key={mod.id} className="grid grid-cols-12 p-3 items-center hover:bg-gray-50/50 dark:hover:bg-zinc-900/50 transition-colors">
-                    <div className="col-span-4 flex items-center gap-3">
-                      <mod.icon className="w-4 h-4 text-gray-400" />
-                      <span className="text-[13px] font-semibold text-gray-700 dark:text-zinc-300">{mod.name}</span>
-                    </div>
-                    <div className="col-span-2 flex justify-center"><input type="checkbox" className="w-4 h-4 rounded border-gray-300 text-primary focus:ring-primary" defaultChecked /></div>
-                    <div className="col-span-2 flex justify-center"><input type="checkbox" className="w-4 h-4 rounded border-gray-300 text-primary focus:ring-primary" /></div>
-                    <div className="col-span-2 flex justify-center"><input type="checkbox" className="w-4 h-4 rounded border-gray-300 text-primary focus:ring-primary" /></div>
-                    <div className="col-span-2 flex justify-center"><input type="checkbox" className="w-4 h-4 rounded border-gray-300 text-primary focus:ring-primary" /></div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </section>
-        </div>
-      </CustomModel>
+      <ConformationModal
+        open={isDeleteDialogOpen}
+        onOpenChange={setIsDeleteDialogOpen}
+        title="Delete User"
+        description={`Are you sure you want to delete ${userToDelete?.name}? This action cannot be undone.`}
+        onConfirm={handleConfirmDelete}
+        onCancel={handleCancelDelete}
+        confirmText="Delete"
+        cancelText="Cancel"
+        confirmVariant="destructive"
+        className="w-full"
+      />
     </div>
   );
 }

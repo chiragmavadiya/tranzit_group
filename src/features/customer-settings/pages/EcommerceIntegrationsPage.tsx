@@ -1,15 +1,19 @@
 import React, { useState, useCallback } from 'react';
-import { ShoppingCart, Loader2, Box, Store } from 'lucide-react';
+import { ShoppingCart, Loader2, Box, Store, RefreshCw, Check } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Drawer } from '@/components/ui/drawer';
 import { FormInput } from '@/features/orders/components/OrderFormUI';
+import { Switch } from '@/components/ui/switch';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useQueryClient } from '@tanstack/react-query';
 import {
   useConnectIntegration,
   useDisconnectIntegration,
   useIntegrationsList,
-  useIntegrationStatusMutation
+  useIntegrationStatusMutation,
+  useSyncIntegration,
+  useToggleEbayAutoSync,
+  useToggleEbayAutoFulfillment
 } from '@/features/integrations/hooks/useIntegrations';
 import { showToast } from '@/components/ui/custom-toast';
 import RenderIntegrationSection from '@/features/integrations/components/RenderIntegrationSection';
@@ -38,6 +42,14 @@ export default function EcommerceIntegrationsPage() {
 
   const connectMutation = useConnectIntegration();
   const disconnectMutation = useDisconnectIntegration();
+  const { mutate: toggleAutoSync, isPending: isTogglingAutoSync } = useToggleEbayAutoSync();
+  const { mutate: toggleAutoFulfillment, isPending: isTogglingAutoFulfillment } = useToggleEbayAutoFulfillment();
+  const { mutate: manualSync, isPending: isSyncing } = useSyncIntegration();
+
+  const selectedConnection = listResponse?.data?.ecommerce_connections?.find(
+    (c: any) => c.slug === selectedPlatform
+  );
+  const isConnected = selectedConnection?.connected;
 
   const handleEdit = (providerId: string) => {
     getIntegrationStatus(providerId, {
@@ -153,18 +165,97 @@ export default function EcommerceIntegrationsPage() {
           </div>
         );
       case 'ebay':
+        if (isConnected) {
+          return (
+            <div className="col-span-12 space-y-6">
+              <div className="flex items-center justify-between p-4 bg-emerald-50/50 dark:bg-emerald-950/10 border border-emerald-100 dark:border-emerald-900/30 rounded-xl">
+                <div className="flex items-center gap-3">
+                  <div className="w-8 h-8 rounded-full bg-emerald-500/10 flex items-center justify-center text-emerald-600 dark:text-emerald-400">
+                    <Check className="w-4 h-4 stroke-[3px]" />
+                  </div>
+                  <div>
+                    <h5 className="my-0 font-bold text-slate-800 dark:text-zinc-200 text-sm">eBay Connected</h5>
+                    <p className="my-0 text-xs text-slate-500 dark:text-zinc-400">Tranzit is authorized to sync your eBay store.</p>
+                  </div>
+                </div>
+              </div>
+
+              <div className="space-y-4 pt-2">
+                <h4 className="my-0 font-bold text-slate-800 dark:text-zinc-200 text-sm border-b pb-2">Sync Settings</h4>
+                
+                {/* Auto-Sync Toggle */}
+                <div className="flex items-center justify-between py-2">
+                  <div className="space-y-0.5">
+                    <label className="text-sm font-bold text-slate-800 dark:text-zinc-200">Automatic Order Sync</label>
+                    <p className="text-xs text-slate-500 dark:text-zinc-400">Automatically import new orders from eBay periodically.</p>
+                  </div>
+                  <Switch
+                    checked={formData.auto_sync ?? false}
+                    onCheckedChange={(checked) => {
+                      setFormData((prev: any) => ({ ...prev, auto_sync: checked }));
+                      toggleAutoSync(checked, {
+                        onError: () => {
+                          setFormData((prev: any) => ({ ...prev, auto_sync: !checked }));
+                        }
+                      });
+                    }}
+                    disabled={isTogglingAutoSync}
+                  />
+                </div>
+
+                {/* Auto-Fulfillment Toggle */}
+                <div className="flex items-center justify-between py-2 border-t pt-4">
+                  <div className="space-y-0.5">
+                    <label className="text-sm font-bold text-slate-800 dark:text-zinc-200">Automatic Tracking Upload</label>
+                    <p className="text-xs text-slate-500 dark:text-zinc-400">Automatically upload tracking details to eBay once shipped.</p>
+                  </div>
+                  <Switch
+                    checked={formData.auto_fulfillment ?? false}
+                    onCheckedChange={(checked) => {
+                      setFormData((prev: any) => ({ ...prev, auto_fulfillment: checked }));
+                      toggleAutoFulfillment(checked, {
+                        onError: () => {
+                          setFormData((prev: any) => ({ ...prev, auto_fulfillment: !checked }));
+                        }
+                      });
+                    }}
+                    disabled={isTogglingAutoFulfillment}
+                  />
+                </div>
+
+                {/* Manual Sync Button */}
+                <div className="flex items-center justify-between py-2 border-t pt-4">
+                  <div className="space-y-0.5">
+                    <label className="text-sm font-bold text-slate-800 dark:text-zinc-200">Manual Synchronization</label>
+                    <p className="text-xs text-slate-500 dark:text-zinc-400">Manually trigger a sync of eBay orders right now.</p>
+                  </div>
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    className="h-8 leading-none font-bold"
+                    onClick={() => manualSync('ebay')}
+                    disabled={isSyncing}
+                  >
+                    {isSyncing ? (
+                      <Loader2 className="w-3.5 h-3.5 mr-2 animate-spin" />
+                    ) : (
+                      <RefreshCw className="w-3.5 h-3.5 mr-2" />
+                    )}
+                    Sync Orders
+                  </Button>
+                </div>
+              </div>
+            </div>
+          );
+        }
+
         return (
-          <div className="grid grid-cols-12 gap-x-4 gap-y-3.5">
-            {/* <FormSelect
-              label="Marketplace Region"
-              options={[{ label: 'Australia', value: 'au' }, { label: 'US', value: 'us' }]}
-              value={formData.region || ''}
-              onValueChange={(val) => handleInputChange(val, "region")}
-              isHalf={true}
-            /> */}
-            <Button onClick={() => { }} className="col-span-12">
-              Connect eBay Account
-            </Button>
+          <div className="flex flex-col items-center justify-center p-6 text-center border border-dashed border-slate-200 dark:border-zinc-800 rounded-xl bg-slate-50/50 dark:bg-zinc-900/50 col-span-12">
+            <Store className="w-10 h-10 text-primary mb-3" />
+            <h4 className="font-bold text-slate-800 dark:text-zinc-200 text-sm mb-1 my-0">Authorize eBay Integration</h4>
+            <p className="text-xs text-slate-500 dark:text-zinc-400 max-w-sm mb-4">
+              You will be redirected to eBay to securely authorize Tranzit to access and sync your orders.
+            </p>
           </div>
         );
       default:
@@ -208,11 +299,17 @@ export default function EcommerceIntegrationsPage() {
         description="Connect a new ecommerce platform to your account."
         className="max-w-[800px]"
         footer={
-          <div className='flex justify-end'>
-            <Button onClick={handleConnect} disabled={isLoading} className="h-8 text-[13px] rounded-sm">
-              {isLoading ? <Loader2 className="w-3.5 h-3.5 animate-spin mr-2" /> : null}
-              Connect
-            </Button>
+          <div className='flex justify-end gap-2'>
+            {isConnected ? (
+              <Button onClick={resetFlow} variant="outline" className="h-8 text-[13px] rounded-sm font-semibold">
+                Close
+              </Button>
+            ) : (
+              <Button onClick={handleConnect} disabled={isLoading} className="h-8 text-[13px] rounded-sm font-semibold">
+                {isLoading ? <Loader2 className="w-3.5 h-3.5 animate-spin mr-2" /> : null}
+                Connect
+              </Button>
+            )}
           </div>
         }
       >

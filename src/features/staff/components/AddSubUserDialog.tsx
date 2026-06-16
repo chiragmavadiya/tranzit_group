@@ -5,6 +5,16 @@ import { FormInput, FormSelect } from '@/features/orders/components/OrderFormUI'
 import PermissionTreeView from '@/components/common/treeview';
 import { useStaffFormOptions } from '../hooks/useStaff';
 
+const normalizeRole = (role?: string): string => {
+  if (!role) return 'Staff';
+  const lower = role.toLowerCase();
+  if (lower === 'it manager') return 'It Manager';
+  if (lower === 'operation manager') return 'Operation Manager';
+  if (lower === 'staff') return 'Staff';
+  if (lower === 'super admin') return 'Super Admin';
+  return role;
+};
+
 interface AddSubUserDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
@@ -24,6 +34,7 @@ export function AddSubUserDialog({ open, onOpenChange, onSubmit, initialData, is
     personal_mobile: '',
     role: 'Staff',
     password: '',
+    confirm_password: '',
     status: '1',
     permissions: []
   }), []);
@@ -35,12 +46,13 @@ export function AddSubUserDialog({ open, onOpenChange, onSubmit, initialData, is
         first_name: initialData.first_name || '',
         last_name: initialData.last_name || '',
         email: initialData.email || '',
-        mobile: initialData.office_number || '',
+        mobile: initialData.mobile || initialData.office_number || '',
         personal_email: initialData.personal_email || '',
         personal_mobile: initialData.personal_mobile || '',
-        role: initialData.role.toLowerCase() || 'staff',
+        role: normalizeRole(initialData.role),
         password: '',
-        status: initialData.status_code.toString() || '1',
+        confirm_password: '',
+        status: (initialData.status_code !== undefined ? initialData.status_code : initialData.status || '1').toString(),
         permissions: initialData.permissions || []
       };
     }
@@ -112,16 +124,48 @@ const SubUserForm = forwardRef<HTMLFormElement, SubUserFormProps>(
       e.preventDefault();
       setSubmited(true);
 
-      const requiredFields = ['first_name', 'last_name', 'email', 'password', 'confirm_password'];
+      const requiredFields = ['first_name', 'last_name', 'email'];
       if (!formData.id) {
-        requiredFields.push('password');
+        requiredFields.push('password', 'confirm_password');
+      } else if (formData.password) {
+        requiredFields.push('confirm_password');
       }
 
-      const hasErrors = requiredFields.some(field => !formData[field]);
+      let hasErrors = requiredFields.some(field => !formData[field]);
+      if (formData.password && formData.password !== formData.confirm_password) {
+        hasErrors = true;
+      }
 
       if (hasErrors) return;
 
-      onSubmit(formData);
+      // Filter out top-level module names from the permissions payload sent to the backend
+      const modules = formOptionsData?.data?.modules || [];
+      const moduleNames = new Set(modules.map((m: any) => m.name));
+      const cleanPermissions = (formData.permissions || []).filter(
+        (perm: string) => !moduleNames.has(perm)
+      );
+
+      const payload: any = {
+        first_name: formData.first_name,
+        last_name: formData.last_name,
+        email: formData.email,
+        personal_email: formData.personal_email || '',
+        personal_mobile: formData.personal_mobile || '',
+        mobile: formData.mobile || '',
+        role: formData.role,
+        status: formData.status,
+        permissions: cleanPermissions
+      };
+
+      if (formData.id) {
+        payload.id = formData.id;
+      }
+
+      if (formData.password) {
+        payload.password = formData.password;
+      }
+
+      onSubmit(payload);
     };
 
     return (
@@ -206,32 +250,36 @@ const SubUserForm = forwardRef<HTMLFormElement, SubUserFormProps>(
 
           />
         </div>
-        <div className="col-span-12 md:col-span-6">
-          <FormInput
-            label="Password"
-            placeholder={formData.id ? "Leave empty to keep current" : "Password"}
-            type="password"
-            required={!formData.id}
-            value={formData.password}
-            onChange={(val) => handleInputChange('password', val)}
-            error={submited && !formData.id && !formData.password}
-            errormsg="Please enter Password"
-          />
-        </div>
-        <div className="col-span-12 md:col-span-6">
-          <FormInput
-            label="Confirm Password"
-            placeholder="Confirm Password"
-            type="password"
-            required={!formData.id}
-            value={formData.confirm_password}
-            onChange={(val) => handleInputChange('confirm_password', val)}
-            error={submited && (!formData.confirm_password || formData.confirm_password !== formData.password)}
-            errormsg={!formData.confirm_password ? "Please enter Password" : "Password does not match"}
-          />
-        </div>
+        {!formData.id && (
+          <>
+            <div className="col-span-12 md:col-span-6">
+              <FormInput
+                label="Password"
+                placeholder={formData.id ? "Leave empty to keep current" : "Password"}
+                type="password"
+                required={!formData.id}
+                value={formData.password}
+                onChange={(val) => handleInputChange('password', val)}
+                error={submited && !formData.id && !formData.password}
+                errormsg="Please enter Password"
+              />
+            </div>
+            <div className="col-span-12 md:col-span-6">
+              <FormInput
+                label="Confirm Password"
+                placeholder="Confirm Password"
+                type="password"
+                required={!formData.id || !!formData.password}
+                value={formData.confirm_password}
+                onChange={(val) => handleInputChange('confirm_password', val)}
+                error={submited && (!formData.id || !!formData.password) && (!formData.confirm_password || formData.confirm_password !== formData.password)}
+                errormsg={!formData.confirm_password ? "Please enter Confirm Password" : "Password does not match"}
+              />
+            </div>
+          </>
+        )}
 
-        <div className="col-span-12 my-4 border-t" />
+        <div className="col-span-12 my-0 border-t" />
         <div className="col-span-12">
           <PermissionTreeView
             title="Role Management"

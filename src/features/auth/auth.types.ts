@@ -73,6 +73,8 @@ export interface User {
     mobile?: string;
     default_courier?: any;
     default_item?: any;
+    permissions?: string[];
+    role: string;
 }
 
 
@@ -89,6 +91,7 @@ export interface LoginResponse {
     next_step: string;
     default_courier?: any;
     default_item?: any;
+    permissions?: string[];
     announcements?: {
         id: number;
         text: string;

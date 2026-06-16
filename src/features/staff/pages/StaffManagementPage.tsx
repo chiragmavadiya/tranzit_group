@@ -186,7 +186,7 @@ export default function StaffManagementPage() {
         const initialsBg = getBgColor(row.email);
         const name = `${row.first_name} ${row.last_name}`;
         return (
-          <div className="flex items-center gap-3 py-1">
+          <div className="flex items-center gap-3">
             <div className={cn("w-8 h-8 rounded-full flex items-center justify-center text-[10px] font-bold shadow-sm border border-white dark:border-zinc-800 pt-[3px]", initialsBg)}>
               {initials}
             </div>
@@ -201,12 +201,10 @@ export default function StaffManagementPage() {
     {
       key: 'role',
       header: 'ROLE',
-      cell: (val: string) => <span className="text-slate-500 dark:text-zinc-400 font-medium">{val}</span>
     },
     {
-      key: 'last_login',
+      key: 'last_login_at',
       header: 'LAST LOGIN',
-      cell: (_, row: any) => <span className="text-slate-500 dark:text-zinc-400 font-medium">{row.last_login || '—'}</span>
     },
     {
       key: 'created_at',

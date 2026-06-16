@@ -8,6 +8,7 @@ export interface AnnouncementPayload {
   text_color: string;
   background_color: string;
   expire_date: string;
+  is_active?: boolean;
 }
 
 export interface AnnouncementResponse {
@@ -18,6 +19,7 @@ export interface AnnouncementResponse {
   text_color: string;
   background_color: string;
   expire_date: string;
+  is_active: boolean;
   created_at?: string;
   updated_at?: string;
 }
@@ -69,6 +71,11 @@ export const announcementService = {
 
   deleteAnnouncement: async (id: number | string): Promise<{ status: boolean; message: string }> => {
     const response = await api.delete<{ status: boolean; message: string }>(API_ENDPOINTS.ANNOUNCEMENTS.DETAILS(id));
+    return response.data;
+  },
+
+  toggleStatus: async (id: number | string): Promise<{ status: boolean; message: string }> => {
+    const response = await api.patch<{ status: boolean; message: string }>(`/admin/announcements/${id}/toggle-status`);
     return response.data;
   },
 };

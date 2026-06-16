@@ -52,3 +52,17 @@ export function useDeleteAnnouncement() {
     },
   });
 }
+
+export function useToggleAnnouncementStatus() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (id: number | string) => announcementService.toggleStatus(id),
+    onSuccess: (response) => {
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.ANNOUNCEMENTS.LIST });
+      showToast(response.message || "Status updated successfully", "success");
+    },
+    onError: (error: any) => {
+      showToast(error.message || "Failed to update status", "error");
+    },
+  });
+}

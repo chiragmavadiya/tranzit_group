@@ -5,15 +5,17 @@ import { Button } from '@/components/ui/button';
 import { CustomModel } from '@/components/ui/dialog';
 import { FormInput, FormSelect } from '@/features/orders/components/OrderFormUI';
 import DatePicker from '@/components/common/DatePicker';
-import { Edit2, Trash2, Plus } from 'lucide-react';
+import { Edit2, Trash2, Plus, Loader2 } from 'lucide-react';
 import { useCustomers } from '@/features/customers/hooks/useCustomers';
 import { useDebounce } from '@/hooks/useDebounce';
 import { ConformationModal } from '@/components/common/ConformationModal';
+import { Switch } from '@/components/ui/switch';
 import {
   useAnnouncements,
   useCreateAnnouncement,
   useUpdateAnnouncement,
   useDeleteAnnouncement,
+  useToggleAnnouncementStatus,
 } from '../hooks/useAnnouncement';
 import type { AnnouncementPayload } from '../services/announcement.service';
 
@@ -25,6 +27,7 @@ interface GlobalConfigItem {
   bgColor: string;
   expiryDate: string;
   customerId: string[];
+  isActive: boolean;
 }
 
 const DEFAULT_FORM_STATE = {
@@ -34,6 +37,7 @@ const DEFAULT_FORM_STATE = {
   bgColor: '#ffffff',
   expiryDate: undefined as Date | undefined,
   customerId: ['all'] as string[],
+  isActive: true,
 };
 
 export default function GlobalConfigPage() {
@@ -68,6 +72,7 @@ export default function GlobalConfigPage() {
   const createMutation = useCreateAnnouncement();
   const updateMutation = useUpdateAnnouncement();
   const deleteMutation = useDeleteAnnouncement();
+  const toggleStatusMutation = useToggleAnnouncementStatus();
 
   const configs = useMemo<GlobalConfigItem[]>(() => {
     const rawData = apiData?.data;
@@ -81,6 +86,7 @@ export default function GlobalConfigPage() {
       bgColor: item.background_color,
       expiryDate: item.expire_date,
       customerId: item.target_type === 'all' ? ['all'] : item.customer_ids.map(String),
+      isActive: !!item.is_active,
     }));
   }, [apiData]);
 
@@ -108,6 +114,7 @@ export default function GlobalConfigPage() {
         bgColor: item.bgColor,
         expiryDate: item.expiryDate ? new Date(item.expiryDate) : undefined,
         customerId: Array.isArray(item.customerId) ? item.customerId : [item.customerId || 'all'],
+        isActive: item.isActive,
       });
     } else {
       setEditingId(null);
@@ -163,6 +170,7 @@ export default function GlobalConfigPage() {
       text_color: formData.textColor,
       background_color: formData.bgColor,
       expire_date: expiryString,
+      is_active: formData.isActive,
     };
 
     if (editingId) {
@@ -280,6 +288,27 @@ export default function GlobalConfigPage() {
         },
       },
       {
+        header: 'STATUS',
+        key: 'isActive',
+        cell: (value: boolean, row: GlobalConfigItem) => {
+          const isPending = toggleStatusMutation.isPending && toggleStatusMutation.variables === row.id;
+          const handleToggle = () => {
+            toggleStatusMutation.mutate(row.id);
+          };
+          return (
+            <div className="flex items-center gap-2">
+              <Switch
+                checked={value}
+                disabled={isPending}
+                onCheckedChange={handleToggle}
+                className="data-[state=checked]:bg-slate-950"
+              />
+              {isPending && <Loader2 className="w-3 h-3 animate-spin text-slate-400" />}
+            </div>
+          );
+        },
+      },
+      {
         key: 'actions',
         header: 'ACTION',
         sticky: 'right',
@@ -305,7 +334,7 @@ export default function GlobalConfigPage() {
         ),
       },
     ],
-    [handleDeleteClick, handleOpenModal, customersData]
+    [handleDeleteClick, handleOpenModal, customersData, toggleStatusMutation]
   );
 
   return (
@@ -355,7 +384,6 @@ export default function GlobalConfigPage() {
             placeholder="Select Customer or All Customers"
             value={formData.customerId || ['all']}
             onValueChange={(val) => {
-              console.log('val', val)
               let nextValue = Array.isArray(val) ? val : [val];
               const hadAll = (formData.customerId || []).includes('all');
               const hasAll = nextValue.includes('all');
@@ -464,6 +492,22 @@ export default function GlobalConfigPage() {
             {errors.expiryDate && (
               <div className="text-red-500 text-[11px] w-full mt-0.5">{errors.expiryDate}</div>
             )}
+          </div>
+
+          <div className="flex items-center justify-between p-3 rounded-lg border border-slate-150 dark:border-zinc-800 bg-slate-50/50 dark:bg-zinc-900/30">
+            <div className="space-y-0.5">
+              <label className="text-[13px] font-semibold text-slate-800 dark:text-zinc-200">
+                Active Status
+              </label>
+              <p className="text-[11px] text-slate-500 dark:text-zinc-400">
+                Determine if this announcement is active and visible.
+              </p>
+            </div>
+            <Switch
+              checked={formData.isActive}
+              onCheckedChange={(checked) => handleFormChange('isActive', checked)}
+              className="data-[state=checked]:bg-slate-950"
+            />
           </div>
         </div>
       </CustomModel>

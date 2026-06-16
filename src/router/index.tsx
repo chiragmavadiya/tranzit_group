@@ -6,7 +6,8 @@ import AdminRoutes from '@/apps/admin/routes/AdminRoutes';
 import ClientRoutes from '@/apps/client/routes/ClientRoutes';
 import { useAppDispatch, useAppSelector } from '@/hooks/store.hooks';
 import { useGetUserDetails } from '@/features/auth/hooks/useAuth';
-import { setUser } from '@/features/auth/authSlice';
+import { setUser, setPermissions } from '@/features/auth/authSlice';
+import { ADMIN_ROLES } from '@/constants';
 import SubscriptionPlanModal from '@/features/customer-settings/components/SubscriptionPlanModal';
 
 // Lazy load page components
@@ -57,6 +58,14 @@ export const AppRouter = () => {
         default_courier: userData.default_courier,
         default_item: userData.default_item
       }));
+
+      // Set global permissions if staff/admin
+      const userSubRole = userData.user.roles?.[0]?.name;
+      if (userSubRole && ADMIN_ROLES.includes(userSubRole)) {
+        const permissions = userData.user.permissions || userData.permissions || [];
+        dispatch(setPermissions(permissions));
+      }
+
       if (userData.next_step === 'purchase_plan' && userData.user.roles[0]?.name !== 'admin') {
         setShowSubscriptionModal(true);
       }

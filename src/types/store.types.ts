@@ -11,4 +11,6 @@ export interface AuthState {
     next_step: string | null;
     default_courier: any | null;
     default_item: any | null;
+    subRole: string;
+    permissions: string[];
 }

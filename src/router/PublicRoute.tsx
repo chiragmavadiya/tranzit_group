@@ -7,7 +7,7 @@ export default function PublicRoute() {
 
   // If the user is authenticated, redirect them away from public auth pages to orders
   if (isAuthenticated && next_step !== 'onboarding') {
-    if (role === 'admin') {
+    if (role === 'admin' || role === 'Staff') {
       return <Navigate to="/admin/orders" replace />;
     } else {
       return <Navigate to="/orders" replace />;

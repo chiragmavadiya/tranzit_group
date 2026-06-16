@@ -77,10 +77,9 @@ export const getOrdersColumns = (
       {
         header: 'ORDER #',
         key: 'order_number',
-        className: 'text-primary font-bold',
         sticky: 'left',
         cell: (value: string) => (
-          <NavLink to={`${role === "admin" ? "/admin" : ""}/orders/${(orderType === 'new' && !fromCustomer) ? 'consign' : 'view'}/${value}`} className="font-bold text-primary underline">
+          <NavLink to={`${role === "admin" ? "/admin" : ""}/orders/${(orderType === 'new' && !fromCustomer) ? 'consign' : 'view'}/${value}`} className="font-medium text-primary underline">
             {value}
           </NavLink>
         )
@@ -120,9 +119,9 @@ export const getOrdersColumns = (
                     <img src={row?.courier_logo || row?.courier_logo_url} className="h-6! min-w-[60px] object-contain" />
                   </div>
                 )}
-                <div className="flex flex-col">
-                  <span className="font-medium whitespace-nowrap">{value && value !== 'unknown' ? value : '-'}</span>
-                  {row.product_id && <span className="font-normal text-sm">Product - {row.product_id}</span>}
+                <div className="">
+                  <span className="whitespace-nowrap font-normal">{value && value !== 'unknown' ? value : '-'}</span>
+                  {row.product_id && <span className="font-normal text-sm"> - {row.product_id}</span>}
                 </div>
               </div>
               <Pencil onClick={() => courierEditClick(row)} className="h-3 w-3 cursor-pointer text-primary opacity-0 group-hover/row:opacity-100" />
@@ -133,9 +132,9 @@ export const getOrdersColumns = (
                     <img src={row?.courier_logo || row?.courier_logo_url} className="h-6! min-w-[60px] object-contain" />
                   </div>
                 )}
-                <div className="flex flex-col">
-                  <span className="font-medium whitespace-nowrap">{value && value !== 'unknown' ? value : '-'}</span>
-                  {row.product_id && <span className="font-normal text-sm">Product - {row.product_id}</span>}
+                <div className="">
+                  <span className="whitespace-nowrap font-normal">{value && value !== 'unknown' ? value : '-'}</span>
+                  {row.product_id && <span className="font-normal text-sm"> - {row.product_id}</span>}
                 </div>
               </div>
             )}
@@ -206,7 +205,7 @@ export const getOrdersColumns = (
               {orderType === 'new' && (
                 <>
                   <Button
-                    className="h-9 px-6 font-bold"
+                    className="h-9 px-4 font-normal"
                     onClick={() => onPrint?.(row.order_number, Number(row.amount), row)}
                     disabled={printingOrderId === row.order_number}
                   >

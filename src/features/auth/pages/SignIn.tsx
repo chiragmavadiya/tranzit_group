@@ -14,6 +14,7 @@ import { setCredentials } from "@/features/auth/authSlice";
 import { useEffect, useState } from "react";
 import { Spinner } from "@/components/ui/spinner";
 import { showToast } from "@/components/ui/custom-toast";
+import { ADMIN_ROLES } from "@/constants";
 
 export default function SignIn({ role = "customer" }: { role?: string }) {
   const navigate = useNavigate();
@@ -41,12 +42,13 @@ export default function SignIn({ role = "customer" }: { role?: string }) {
     loginMutation.mutate(data, {
       onSuccess: (response) => {
         if (response?.status && response.user) {
-          const role = response.user.roles[0]?.name;
+          const role = ADMIN_ROLES.includes(response.user.role) ? 'admin' : response.user.roles[0]?.name;
           dispatch(setCredentials({
             userID: response.user.id,
             token: response.token,
             role: role,
-            next_step: response.next_step
+            next_step: response.next_step,
+            sub_role: response.user.role
           }));
           if (response.next_step === 'onboarding') {
             navigate("/on-board" + '/' + response.user.id + '/' + response.token);

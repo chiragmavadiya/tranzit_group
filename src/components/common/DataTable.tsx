@@ -178,7 +178,7 @@ const DataTableComponent = <T extends Record<string, any>>(props: DataTableProps
   return (
     <div className={cn("flex flex-col group flex-1 min-h-0", className)}>
       {header && (
-        <div className={cn("flex w-full border-b justify-between gap-4 p-4", headerClass)}>
+        <div className={cn("flex w-full border-b justify-between gap-4 px-4 py-2", headerClass)}>
           <div className="flex flex-col justify-center">
             <h1 className={`text-lg font-bold text-gray-800 dark:text-zinc-200 my-0`}>
               {headerTitle}
@@ -266,7 +266,7 @@ const DataTableComponent = <T extends Record<string, any>>(props: DataTableProps
           <TableHeader className={cn("bg-white dark:bg-zinc-950 sticky top-0 z-10 shadow-sm", headerClassName)}>
             <TableRow className="hover:bg-transparent border-b border-gray-100 dark:border-zinc-800">
               {selectable && (
-                <TableHead className="sticky left-0 bg-white dark:bg-zinc-950 h-12 text-[14px] font-bold text-gray-900 dark:text-zinc-100 uppercase tracking-wide px-5 pr-3! print:hidden border-b border-gray-100 dark:border-zinc-800">
+                <TableHead className="sticky left-0 bg-white dark:bg-zinc-950 h-9 text-[14px] font-bold text-gray-900 dark:text-zinc-100 uppercase tracking-wide px-5 pr-3! print:hidden border-b border-gray-100 dark:border-zinc-800">
                   <Checkbox
                     checked={currentSelectedRows.length === displayData.length && displayData.length > 0}
                     onCheckedChange={handleSelectAll}
@@ -278,7 +278,7 @@ const DataTableComponent = <T extends Record<string, any>>(props: DataTableProps
                 <TableHead
                   key={`${column.key}-${index}`}
                   className={cn(
-                    "h-12 text-[14px] font-bold text-gray-900 dark:text-zinc-100 uppercase tracking-wide px-5",
+                    "h-9 text-[14px] font-bold text-gray-900 dark:text-zinc-100 uppercase tracking-wide px-4",
                     column.sortable !== false && sortable && "cursor-pointer hover:bg-muted/50",
                     column.sticky === 'left' && "sticky bg-white dark:bg-zinc-950 z-20 shadow-[inset_-1px_0_0_0_#ebe6e7] dark:shadow-[inset_-1px_0_0_0_#27272a]",
                     column.sticky === 'left' ? selectable ? 'left-[48px]' : 'left-0' : '',
@@ -333,7 +333,7 @@ const DataTableComponent = <T extends Record<string, any>>(props: DataTableProps
                   >
                     {selectable && (
                       <TableCell className={cn(
-                        "sticky left-0 px-5 py-3 text-sm font-medium text-gray-700 dark:text-zinc-300 print:hidden transition-colors",
+                        "sticky left-0 px-4 py-[5px] text-sm font-medium text-gray-700 dark:text-zinc-300 print:hidden transition-colors",
                         isSelected
                           ? "bg-slate-100 dark:bg-zinc-900"
                           : "bg-white dark:bg-zinc-950 group-hover/row:bg-slate-50 dark:group-hover/row:bg-zinc-900/50"
@@ -350,7 +350,7 @@ const DataTableComponent = <T extends Record<string, any>>(props: DataTableProps
                       <TableCell
                         key={`${column.key}-${rowId}-${colIndex}`}
                         className={cn(
-                          `px-5 py-3 text-sm text-gray-800 dark:text-zinc-300 whitespace-normal transition-colors`,
+                          `px-4 py-[10px] min-h-12 text-sm text-gray-800 dark:text-zinc-300 whitespace-normal transition-colors`,
                           column.sticky === 'left' && cn(
                             "sticky left-0 shadow-[inset_-1px_0_0_0_#ebe6e7] dark:shadow-[inset_-1px_0_0_0_#27272a]",
                             isSelected

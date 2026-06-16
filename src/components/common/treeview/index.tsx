@@ -595,27 +595,21 @@ const PermissionTreeView = ({
     }, [permissionsData]);
 
     const selectedIds = useMemo(() => getAllCheckedIds(treeData), [treeData]);
-    const isAllSelected = selectedIds.length === totalNodesCount;
 
-    useEffect(() => {
-        if (onChange) {
-            onChange(selectedIds);
-        }
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [treeData,]);
-
+    const selectAllState = useMemo(() => {
+        if (selectedIds.length === 0) return false;
+        if (selectedIds.length === totalNodesCount) return true;
+        return "indeterminate";
+    }, [selectedIds, totalNodesCount]);
 
     useEffect(() => {
         if (permissionsData.length > 0) {
-            setTreeData(() =>
-                initialSelected.length > 0
-                    ? initializeTree(permissionsData, initialSelected)
-                    : permissionsData
-            )
+            const currentCheckedIds = getAllCheckedIds(treeData);
+            if (treeData.length === 0 || !arraysEqual(initialSelected, currentCheckedIds)) {
+                setTreeData(initializeTree(permissionsData, initialSelected));
+            }
         }
     }, [initialSelected, permissionsData]);
-
-
 
     const filterTree = (nodes: TreeNode[], query: string): TreeNode[] => {
         if (!query) return nodes;
@@ -623,7 +617,9 @@ const PermissionTreeView = ({
 
         return nodes
             .map((node) => {
-                const isMatch = node.name.toLowerCase().includes(lowerQuery);
+                const isMatch =
+                    node.name.toLowerCase().includes(lowerQuery) ||
+                    node.label.toLowerCase().includes(lowerQuery);
                 const filteredChildren = node.permissions
                     ? filterTree(node.permissions, query)
                     : undefined;
@@ -633,7 +629,7 @@ const PermissionTreeView = ({
                 if (isMatch || hasMatchingChildren) {
                     return {
                         ...node,
-                        children: filteredChildren,
+                        permissions: filteredChildren,
                     } as TreeNode;
                 }
                 return null;
@@ -643,69 +639,37 @@ const PermissionTreeView = ({
 
     const filteredTreeData = filterTree(treeData, searchQuery);
 
-    const updateNode = (
-        nodes: TreeNode[],
-        name: string,
-        checked: boolean
-    ): TreeNode[] => {
-        return nodes.map((node) => {
-            if (node.name === name) {
-                return {
-                    ...node,
-                    checked,
-                    children: node.permissions
-                        ? updateAllChildren(node.permissions, checked)
-                        : undefined,
-                };
-            }
-
-            return {
-                ...node,
-                children: node.permissions
-                    ? updateNode(node.permissions, name, checked)
-                    : undefined,
-            };
-        });
-    };
-
-    const updateAllChildren = (
-        nodes: TreeNode[],
-        checked: boolean
-    ): TreeNode[] => {
-        return nodes.map((node) => ({
-            ...node,
-            checked,
-            children: node.permissions
-                ? updateAllChildren(node.permissions, checked)
-                : undefined,
-        }));
-    };
-
     const handleCheck = (name: string, checked: boolean) => {
-        setTreeData((prev) => updateNode(prev, name, checked));
+        setTreeData((prev) => {
+            const nextTree = updateNode(prev, name, checked);
+            if (onChange) {
+                onChange(getAllCheckedIds(nextTree));
+            }
+            return nextTree;
+        });
     };
 
     return (
         <>
-            {/* // <Card className="p-6 rounded-2xl shadow-md flex flex-col h-full"> */}
-            <div className="flex flex-col gap-1 pb-4 sticky top-0 bg-white dark:bg-zinc-950 z-10 border-b">
+            <div className="flex flex-col gap-1 pb-2 sticky top-0 bg-white dark:bg-zinc-950 z-10 border-b">
                 <div className="flex items-center justify-between">
                     <div className="flex flex-col gap-0.5">
-                        <h2 className="text-lg font-bold text-slate-900 dark:text-zinc-100">
+                        <h2 className="text-lg my-0 font-bold text-slate-900 dark:text-zinc-100">
                             {title}
                         </h2>
-
                     </div>
-                    <div className="flex items-center gap-2  px-3 py-1.5">
+                    <div className="flex items-center gap-2 px-3 py-1.5">
                         <Checkbox
                             id="select-all"
-                            checked={isAllSelected}
-                            // indeterminate={selectAllState}
-                            onCheckedChange={(checked) =>
-                                setTreeData(
-                                    updateAllNodes(treeData, Boolean(checked))
-                                )
-                            }
+                            checked={selectAllState === true}
+                            indeterminate={selectAllState === "indeterminate"}
+                            onCheckedChange={(checked) => {
+                                const nextTree = updateAllNodes(treeData, Boolean(checked));
+                                setTreeData(nextTree);
+                                if (onChange) {
+                                    onChange(getAllCheckedIds(nextTree));
+                                }
+                            }}
                         />
                         <label
                             htmlFor="select-all"
@@ -743,17 +707,46 @@ const PermissionTreeView = ({
                     </div>
                 )}
             </div>
-            {/* // </Card> */}
         </>
     );
-}
+};
 
 // Helper functions for tree manipulation
+const arraysEqual = (a: string[], b: string[]) => {
+    if (a.length !== b.length) return false;
+    const setA = new Set(a);
+    return b.every((x) => setA.has(x));
+};
+
+const initializeTree = (
+    nodes: TreeNode[],
+    selectedIds: string[]
+): TreeNode[] => {
+    return nodes.map((node) => {
+        let isChecked = selectedIds.includes(node.name);
+
+        let updatedPermissions: TreeNode[] | undefined = undefined;
+        if (node.permissions && node.permissions.length > 0) {
+            updatedPermissions = initializeTree(node.permissions, selectedIds);
+            const hasCheckedChild = updatedPermissions.some((child) => child.checked === true);
+            if (hasCheckedChild) {
+                isChecked = true;
+            }
+        }
+
+        return {
+            ...node,
+            checked: isChecked,
+            permissions: updatedPermissions,
+        };
+    });
+};
+
 const updateAllNodes = (nodes: TreeNode[], checked: boolean): TreeNode[] => {
     return nodes.map((node) => ({
         ...node,
         checked,
-        children: node.permissions
+        permissions: node.permissions
             ? updateAllNodes(node.permissions, checked)
             : undefined,
     }));
@@ -768,17 +761,48 @@ const getAllCheckedIds = (nodes: TreeNode[]): string[] => {
     return ids;
 };
 
-const initializeTree = (
+const updateAllChildren = (
     nodes: TreeNode[],
-    selectedIds: string[]
+    checked: boolean
 ): TreeNode[] => {
     return nodes.map((node) => ({
         ...node,
-        checked: selectedIds.includes(node.name),
-        children: node.permissions
-            ? initializeTree(node.permissions, selectedIds)
+        checked,
+        permissions: node.permissions
+            ? updateAllChildren(node.permissions, checked)
             : undefined,
     }));
+};
+
+const updateNode = (
+    nodes: TreeNode[],
+    targetName: string,
+    checked: boolean
+): TreeNode[] => {
+    return nodes.map((node) => {
+        if (node.name === targetName) {
+            return {
+                ...node,
+                checked,
+                permissions: node.permissions && !checked
+                    ? updateAllChildren(node.permissions, false)
+                    : node.permissions,
+            };
+        }
+
+        if (node.permissions && node.permissions.length > 0) {
+            return {
+                ...node,
+                permissions: updateNode(
+                    node.permissions,
+                    targetName,
+                    checked
+                ),
+            };
+        }
+
+        return node;
+    });
 };
 
 type TreeItemProps = {
@@ -797,12 +821,8 @@ function TreeItem({
     searchQuery = "",
 }: TreeItemProps) {
     const shouldDefaultOpen = useMemo(() => {
-        const hasCheckedChild = (n: TreeNode): boolean => {
-            if (!n.permissions?.length) return false;
-            return n.permissions.some(child => child.checked || hasCheckedChild(child));
-        };
-        return node.checked || hasCheckedChild(node);
-    }, [node]);
+        return node.checked;
+    }, [node.checked]);
 
     const [isOpen, setIsOpen] = useState(shouldDefaultOpen);
 
@@ -813,7 +833,6 @@ function TreeItem({
     }, [shouldDefaultOpen]);
 
     const hasChildren = !!node.permissions?.length;
-    // Submenu is shown if manual toggle is open, or if we are actively searching
     const isExpanded = isOpen || !!searchQuery;
 
     return (
@@ -845,7 +864,7 @@ function TreeItem({
                                 setIsOpen(!isOpen);
                             }}
                         >
-                            {isExpanded ? (
+                            {isExpanded && node.checked ? (
                                 <FolderOpen className="w-4 h-4 text-primary fill-primary/20" />
                             ) : (
                                 <Folder className="w-4 h-4 text-primary fill-primary/20" />
@@ -871,7 +890,7 @@ function TreeItem({
             </div>
 
             {/* CHILDREN */}
-            {hasChildren && isExpanded && (
+            {hasChildren && node.checked && isExpanded && (
                 <div className="relative ml-[22px] pl-[2px]">
                     {node.permissions?.map((child, index) => (
                         <TreeItem

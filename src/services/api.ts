@@ -22,7 +22,8 @@ api.interceptors.request.use(
         const role = localStorage.getItem("user_role") || "customer";
         // Only prefix if the URL doesn't already have one
         if (config.url && !config.url.startsWith('/admin') && !config.url.startsWith('/customer') && config.url !== '/localities/search') {
-            config.url = `/${role}${config.url}`;
+            const cutsomRole = (role === 'Staff' || role === 'Operation Manager') ? 'admin' : role;
+            config.url = `/${cutsomRole}${config.url}`;
         }
 
         return config;

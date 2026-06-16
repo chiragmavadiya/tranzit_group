@@ -211,3 +211,117 @@ export const STATUS_STYLE: Record<string, string> = {
     cancelled: 'bg-red-100 text-red-800 dark:bg-red-900/20 dark:text-red-400',
     draft1: 'bg-gray-100 text-gray-800 dark:bg-gray-900/20 dark:text-gray-400',
 }
+
+export const ADMIN_ROLES = ['admin', 'Staff', 'Operation Manager', 'It Manager', 'Super Admin'];
+
+
+export const MODULE_PERMISSIONS: Record<string, string[]> = {
+    dashboard: [
+        'view_dashboard',
+        'dashboard.statistics',
+        'dashboard.margin_count',
+        'dashboard.orders_count',
+        'dashboard.paid_invoices_count',
+        'dashboard.unpaid_invoices_count',
+        'dashboard.invoices_count',
+        'dashboard.topup_count',
+        'dashboard.transactions_table',
+        'dashboard.pending_invoices_table'
+    ],
+    customer: [
+        'view_customer',
+        'customer.view_customer_statistics',
+        'customer.view_customer_profile_tab',
+        'customer.view_customer_orders_tab',
+        'customer.view_customer_integration_tab',
+        'customer.view_customer_transaction_tab',
+        'customer.view_customer_credit_application_tab',
+        'customer.view_customer_invoice_tab',
+        'customer.can_verify_customer_account',
+        'add_customer',
+        'edit_customer',
+        'delete_customer',
+        'active_customer'
+    ],
+    order: [
+        'view_order',
+        'add_order',
+        'edit_order',
+        'delete_order',
+        'active_order',
+        'view_cancel_order'
+    ],
+    subuser: [
+        'view_subuser',
+        'add_subuser',
+        'edit_subuser',
+        'delete_subuser',
+        'active_subuser'
+    ],
+    invoice: [
+        'view_invoice',
+        'invoice.can_send_invoice',
+        'invoice.can_download_invoice',
+        'invoice.can_print_invoice',
+        'invoice.can_add_payment',
+        'add_invoice',
+        'edit_invoice',
+        'delete_invoice',
+        'active_invoice'
+    ],
+    topup: [
+        'view_topup',
+        'add_topup',
+        'edit_topup',
+        'delete_topup',
+        'active_topup'
+    ],
+    ratecard: [
+        'view_ratecard',
+        'add_ratecard',
+        'edit_ratecard',
+        'delete_ratecard',
+        'active_ratecard'
+    ],
+    profile: [
+        'view_profile',
+        'add_profile',
+        'edit_profile',
+        'delete_profile',
+        'active_profile'
+    ],
+    report: [
+        'view_report',
+        'add_report',
+        'edit_report',
+        'delete_report',
+        'active_report'
+    ],
+    setting: ['view_setting', 'edit_setting'],
+    'Book a Pickup': ['view_book_pickup', 'book_with_direct_freight'],
+    'Credit Application': ['view_credit_application', 'edit_status'],
+    'Courier Surcharge': [
+        'view_surcharge',
+        'add_surcharge',
+        'edit_surcharge',
+        'delete_surcharge'
+    ],
+    'Courier Base Postcode': [
+        'view_courier_base_postcode',
+        'add_courier_base_postcode',
+        'edit_courier_base_postcode',
+        'delete_courier_base_postcode'
+    ],
+    'Enquiry Management': ['view_enquiry_management'],
+    'Admin Activity Log': ['view_activity'],
+    'AusPost Order Summary': ['view_auspost_summary'],
+    'Un-Delivered Parcel': ['view_undelivered_parcel'],
+    'Customer Quote': ['view_customer_quote', 'view_customer_quote_history'],
+    'Customer Parcel Report': ['view_customer_parcel_report'],
+    'Help Center': [
+        'view_help_center',
+        'add_help_center',
+        'edit_help_center',
+        'delete_help_center'
+    ]
+}

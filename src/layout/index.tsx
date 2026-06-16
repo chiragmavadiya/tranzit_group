@@ -107,8 +107,6 @@ export default function Layout() {
     document.title = activeName ? `${activeName} | Tranzit` : 'Tranzit';
   }, [location.pathname, sidebarItems]);
 
-  console.log(activeAnnouncements, 'activeAnnouncements')
-
   const hasAnnouncements = activeAnnouncements.length > 0 && !!currentAnnouncement;
 
   return (
@@ -187,7 +185,7 @@ export default function Layout() {
         bannerOpen={hasAnnouncements}
       />
       <main
-        style={hasAnnouncements ? { paddingTop: 'calc(4rem + 36px)', height: 'calc(100vh - 36px)' } : {}}
+        style={hasAnnouncements ? { height: 'calc(100vh - 36px)' } : {}}
         className={`h-screen flex flex-col transition-[margin,padding-top,height] duration-300 ease-in-out pt-16 z-0 relative print:ml-0 print:pt-0 print:h-auto ${isMobile ? 'ml-0' : (isCollapsed ? 'ml-[64px]' : 'ml-[240px]')
           }`}
       >

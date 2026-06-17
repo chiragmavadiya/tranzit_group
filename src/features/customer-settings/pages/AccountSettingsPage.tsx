@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { motion } from 'framer-motion';
 import { Edit2, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -36,6 +36,8 @@ export default function AccountSettingsPage() {
   const [sameAsShipping, setSameAsShipping] = useState(false);
   // const { user } = useAppSelector((state) => state.auth);
   const { summary } = useAppSelector((state) => state.wallet);
+  const { is_sub_user, team_access } = useAppSelector((state) => state.auth)
+  const canReadWrite = useMemo(() => !is_sub_user || team_access?.permissions?.settings_account_detail === 'full', [is_sub_user, team_access]);
 
   // Fetch profile details
   const { data: profileResponse } = useGetProfile();
@@ -283,29 +285,31 @@ export default function AccountSettingsPage() {
           <p className="text-sm text-gray-600 dark:text-gray-400 my-0">Manage your company profile, contact information, addresses, team access, and account preferences</p>
         </div>
 
-        <div className="flex items-center gap-2">
-          {isEditingProfile ? (
-            <>
-              <Button variant="outline" size="lg" onClick={onCancel} disabled={updateProfileMutation.isPending} className="h-8 px-4 text-[13px] font-medium rounded-sm">
-                Cancel
-              </Button>
-              <Button size="lg" onClick={() => onSave()} disabled={updateProfileMutation.isPending} className="h-8 px-4 text-[13px] font-medium text-white rounded-sm">
-                {updateProfileMutation.isPending && <Loader2 className="w-3.5 h-3.5 mr-1.5 animate-spin" />}
-                Save
-              </Button>
-            </>
-          ) : (
-            <>
-              <Button variant="outline" size="lg" onClick={handleEditClick} className="h-8 px-4 text-[13px] font-medium shadow-sm shrink-0 rounded-sm">
-                <Edit2 className="w-3.5 h-3.5 mr-1.5" />
-                Edit Profile
-              </Button>
-              <Button variant="outline" size="sm" onClick={() => setIsPasswordOpen(true)} className="h-8 px-4 text-[13px] font-medium shadow-sm shrink-0 rounded-sm">
-                Change Password
-              </Button>
-            </>
-          )}
-        </div>
+        {canReadWrite && (
+          <div className="flex items-center gap-2">
+            {isEditingProfile ? (
+              <>
+                <Button variant="outline" size="lg" onClick={onCancel} disabled={updateProfileMutation.isPending} className="h-8 px-4 text-[13px] font-medium rounded-sm">
+                  Cancel
+                </Button>
+                <Button size="lg" onClick={() => onSave()} disabled={updateProfileMutation.isPending} className="h-8 px-4 text-[13px] font-medium text-white rounded-sm">
+                  {updateProfileMutation.isPending && <Loader2 className="w-3.5 h-3.5 mr-1.5 animate-spin" />}
+                  Save
+                </Button>
+              </>
+            ) : (
+              <>
+                <Button variant="outline" size="lg" onClick={handleEditClick} className="h-8 px-4 text-[13px] font-medium shadow-sm shrink-0 rounded-sm">
+                  <Edit2 className="w-3.5 h-3.5 mr-1.5" />
+                  Edit Profile
+                </Button>
+                <Button variant="outline" size="sm" onClick={() => setIsPasswordOpen(true)} className="h-8 px-4 text-[13px] font-medium shadow-sm shrink-0 rounded-sm">
+                  Change Password
+                </Button>
+              </>
+            )}
+          </div>
+        )}
       </div>
 
       {/* Left Column: Company Information Form */}

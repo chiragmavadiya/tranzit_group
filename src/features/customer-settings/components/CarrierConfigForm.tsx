@@ -178,6 +178,7 @@ interface CarrierConfigFormProps {
   onSubmit: (data: any) => void;
   isLoading?: boolean;
   isConnected?: boolean;
+  canReadWrite: boolean;
 }
 
 export default function CarrierConfigForm({
@@ -185,7 +186,8 @@ export default function CarrierConfigForm({
   initialValues = {},
   onSubmit,
   isLoading = false,
-  isConnected
+  isConnected,
+  canReadWrite = true
 }: CarrierConfigFormProps) {
   const [formData, setFormData] = useState<any>({});
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -412,7 +414,7 @@ export default function CarrierConfigForm({
   };
 
 
-
+  console.log(canReadWrite, 'canReadWritecanReadWrite')
   const commonProps = (name: string) => ({
     name,
     value: formData[name] || "",
@@ -421,6 +423,7 @@ export default function CarrierConfigForm({
     error: submitted && !!errors[name],
     errormsg: errors[name],
     isHalf: true,
+    disabled: !canReadWrite
     // isFullWidth: name === 'base_url'
   });
 
@@ -487,16 +490,18 @@ export default function CarrierConfigForm({
               <div className="flex-1 grid grid-cols-12 gap-x-4 gap-y-4">
                 {getCredentialsFields()}
               </div>
-              <div className='mt-6 justify-end self-end'>
-                <Button
-                  type="submit"
-                  disabled={isLoading}
-                  className="h-8 text-sm px-5 font-semibold"
-                >
-                  {isLoading ? <Loader2 className="w-3.5 h-3.5 animate-spin mr-2" /> : null}
-                  {isConnected ? 'Save Changes' : 'Save & Connect'}
-                </Button>
-              </div>
+              {canReadWrite && (
+                <div className='mt-6 justify-end self-end'>
+                  <Button
+                    type="submit"
+                    disabled={isLoading}
+                    className="h-8 text-sm px-5 font-semibold"
+                  >
+                    {isLoading ? <Loader2 className="w-3.5 h-3.5 animate-spin mr-2" /> : null}
+                    {isConnected ? 'Save Changes' : 'Save & Connect'}
+                  </Button>
+                </div>
+              )}
             </div>
 
             {/* Right Column: Config Tip */}
@@ -530,11 +535,12 @@ export default function CarrierConfigForm({
                         id={`setting-${setting.key}`}
                         checked={setting.value}
                         onCheckedChange={(checked) => handleAdvancedSettingChange(setting.key, !!checked)}
-                        disabled={!isConnected}
+                        disabled={!isConnected || !canReadWrite}
                       />
                       <label
                         htmlFor={`setting-${setting.key}`}
-                        className="text-sm font-medium text-slate-700 dark:text-zinc-300 cursor-pointer select-none"
+                        className={`text-sm font-medium text-slate-700 dark:text-zinc-300 ${!isConnected || !canReadWrite ? 'cursor-not-allowed' : 'cursor-pointer'
+                          } select-none`}
                       >
                         {setting.label}
                       </label>
@@ -557,6 +563,7 @@ export default function CarrierConfigForm({
                         allowClear={false}
                         layout='horizontal'
                         selectClassName='w-full'
+                        disabled={!isConnected || !canReadWrite}
                       />
                     </div>
                   );
@@ -570,6 +577,7 @@ export default function CarrierConfigForm({
                         placeholder="e.g. 3-5 business days delivery to your doorstep"
                         rows={3}
                         isFullWidth
+                        disabled={!isConnected || !canReadWrite}
                       />
                     </div>
                   );
@@ -587,7 +595,7 @@ export default function CarrierConfigForm({
 
             </div>
 
-            {isConnected && (
+            {isConnected && canReadWrite && (
               <div className='flex mt-6'>
                 <Button
                   type="button"
@@ -631,7 +639,7 @@ export default function CarrierConfigForm({
                       className="mb-0"
                     />
                   </div>
-                  {isConnected && (
+                  {isConnected && canReadWrite && (
                     <Button
                       type="button"
                       variant="outline"
@@ -810,12 +818,12 @@ export default function CarrierConfigForm({
                                   <Checkbox
                                     checked={product.enabled}
                                     onCheckedChange={(checked) => handleProductToggle(product.product_code, !!checked)}
-                                    disabled={(isManual && (updateManualProductMut.isPending || deleteManualProductMut.isPending)) || !isConnected}
+                                    disabled={(isManual && (updateManualProductMut.isPending || deleteManualProductMut.isPending)) || !isConnected || !canReadWrite}
                                   />
                                 </div>
                               </td>
                               <td className="py-2.5 px-4 text-right">
-                                {isManual ? (
+                                {isManual && canReadWrite ? (
                                   <div className="flex items-center justify-end gap-1">
                                     <Button
                                       type="button"

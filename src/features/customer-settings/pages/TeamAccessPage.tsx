@@ -12,11 +12,13 @@ import {
   useDeleteTeamUser,
   useTeamUserDetails,
 } from '../hooks/useTeamUsers';
+import { useAppSelector } from '@/hooks/store.hooks';
 
-const StatusSwitch = ({ user, isChecked }: { user: any; isChecked: boolean }) => {
+const StatusSwitch = ({ user, isChecked, disabled }: { user: any; isChecked: boolean, disabled: boolean }) => {
   const { mutate: toggleStatus, isPending } = useToggleTeamUserStatus();
 
   const handleToggle = () => {
+    if (disabled) return;
     toggleStatus(user.id, {
       onSuccess: () => {
         showToast("Status updated successfully", "success");
@@ -31,7 +33,7 @@ const StatusSwitch = ({ user, isChecked }: { user: any; isChecked: boolean }) =>
     <div className="flex items-center gap-2">
       <Switch
         checked={isChecked}
-        disabled={isPending || user.role === "Admin" || user.role === "admin" || user.role === "parent"}
+        disabled={isPending || user.role === "Admin" || user.role === "admin" || user.role === "parent" || disabled}
         onCheckedChange={handleToggle}
         className="data-[state=checked]:bg-primary"
       />
@@ -45,6 +47,9 @@ export default function TeamAccessPage() {
   const [editingUser, setEditingUser] = useState<any>(null);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [userToDelete, setUserToDelete] = useState<any>(null);
+  const { is_sub_user, team_access } = useAppSelector((state) => state.auth)
+  const canReadWrite = useMemo(() => !is_sub_user || team_access?.permissions?.settings_team_access === 'full', [is_sub_user, team_access]);
+
 
   const { data: teamUsersResponse, isLoading } = useTeamUsersList();
   const users = useMemo(() => teamUsersResponse?.data || [], [teamUsersResponse]);
@@ -95,11 +100,11 @@ export default function TeamAccessPage() {
         const initials = `${row.first_name?.[0] || ''}${row.last_name?.[0] || ''}`.toUpperCase() || nameVal.substring(0, 2);
         return (
           <div className="flex items-center gap-3">
-            <div className="w-8 h-8 rounded-full bg-primary/10 text-primary flex items-center justify-center font-bold text-xs uppercase pt-[3px]">
+            <div className="w-8 h-8 rounded-full bg-primary/10 text-primary flex items-center justify-center font-bold text-xs uppercase">
               {initials || '??'}
             </div>
             <div>
-              <p className="my-0 font-semibold text-gray-900 dark:text-zinc-100">{nameVal}</p>
+              <p className="my-0 font-medium text-gray-900 dark:text-zinc-100">{nameVal}</p>
             </div>
           </div>
         );
@@ -108,9 +113,7 @@ export default function TeamAccessPage() {
     {
       header: 'Email',
       key: 'email',
-      cell: (val: any) => (
-        <p className="my-0 text-xs text-gray-500 dark:text-zinc-400">{val}</p>
-      )
+
     },
     {
       header: 'Status',
@@ -118,7 +121,7 @@ export default function TeamAccessPage() {
       cell: (val: string | number | boolean, row: any) => {
         const isChecked = val === 'Active' || val === 'active' || val === 1 || val === '1' || val === true;
         return (
-          <StatusSwitch user={row} isChecked={isChecked} />
+          <StatusSwitch user={row} isChecked={isChecked} disabled={!canReadWrite} />
         );
       }
     },
@@ -126,7 +129,7 @@ export default function TeamAccessPage() {
       header: 'Created Date',
       key: 'created_at',
     },
-    {
+    ...(canReadWrite ? [{
       header: 'Actions',
       key: 'actions',
       className: "w-24 px-0 pr-3 print:hidden",
@@ -153,8 +156,8 @@ export default function TeamAccessPage() {
           </Button>
         </div>
       )
-    }
-  ], []);
+    }] : [])
+  ], [canReadWrite]);
 
 
   return (
@@ -168,12 +171,12 @@ export default function TeamAccessPage() {
           searchable={false}
           exportable={false}
           searchPlaceholder="Search users by name or email..."
-          customHeader={
+          customHeader={canReadWrite && (
             <Button onClick={() => setIsAddUserOpen(true)} className="h-8 bg-primary hover:bg-primary/90 text-white gap-2">
               <Plus className="w-4 h-4" />
               Add User
             </Button>
-          }
+          )}
           totalItems={users.length}
           className='pb-3'
           loading={isLoading}

@@ -25,7 +25,6 @@ export default function ProtectedRoute({ role: requiredRole }: ProtectedRoutePro
     if (userRole === 'admin' || userRole === 'Staff') {
       return <Navigate to="/admin/orders" replace />;
     } else {
-      console.log('render protected rotute')
       return <Navigate to="/orders" replace />;
     }
   }
@@ -33,7 +32,6 @@ export default function ProtectedRoute({ role: requiredRole }: ProtectedRoutePro
   // Permission checks for customer sub-users
   if (userRole === 'customer' && team_access?.is_sub_user) {
     if (!hasRoutePermission(location.pathname, team_access, userRole)) {
-      console.log('redirect....', userRole)
       if (location.pathname === '/settings' || location.pathname.startsWith('/settings/')) {
         const firstAllowedSettings = getFirstAllowedSettingsPath(team_access, userRole);
         if (firstAllowedSettings) {

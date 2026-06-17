@@ -1,4 +1,4 @@
-import { useCallback, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Truck } from 'lucide-react';
 import { Drawer } from '@/components/ui/drawer';
@@ -13,6 +13,7 @@ import {
 } from '@/features/integrations/hooks/useIntegrations';
 import RenderIntegrationSection from '@/features/integrations/components/RenderIntegrationSection';
 import CarrierConfigForm from '../components/CarrierConfigForm';
+import { useAppSelector } from '@/hooks/store.hooks';
 
 const carriers = [
   { id: 'auspost', name: 'Australia Post', icon: Truck, status: 'available' },
@@ -36,6 +37,8 @@ export default function CarrierIntegrationsPage() {
   const { data: listResponse, isLoading: listLoading } = useIntegrationsList();
   // Fetch status of the individual courier integrations
   const { isPending: statusLoading, variables: statusVariables } = useIntegrationStatusMutation();
+  const { is_sub_user, team_access } = useAppSelector((state) => state.auth)
+  const canReadWrite = useMemo(() => !is_sub_user || team_access?.permissions?.settings_integrations === 'full', [is_sub_user, team_access]);
 
   const connectMutation = useConnectIntegration();
   const disconnectMutation = useDisconnectIntegration();
@@ -94,6 +97,7 @@ export default function CarrierIntegrationsPage() {
             onConfigure={handleEdit}
             isLoading={listLoading}
             configLoadingProvider={statusLoading ? statusVariables : undefined}
+            canReadWrite={canReadWrite}
           />
           {/* <RenderIntegrationSection
             title="E-commerce Integrations"
@@ -148,6 +152,7 @@ export default function CarrierIntegrationsPage() {
                     initialValues={formData}
                     onSubmit={handleConnect}
                     isLoading={isLoading}
+                    canReadWrite={canReadWrite}
                   />
                 </motion.div>
               )}

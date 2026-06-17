@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import { DataTable } from '@/components/common/DataTable';
 import type { Column } from '@/components/common/types/DataTable.types';
 import { ATTRIBUTES, ACTION_TYPES } from '../constants/rules.constants';
-import { getOperatorLabel } from '../utils/rulePreview';
+// import { getOperatorLabel } from '../utils/rulePreview';
 import {
   Edit2,
   Trash2,
@@ -17,6 +17,7 @@ interface RuleListProps {
   onDelete: (id: string) => void;
   onCreateClick: () => void;
   isFormOpen: boolean;
+  canReadWrite: boolean;
 }
 
 export default function RuleList({
@@ -24,7 +25,8 @@ export default function RuleList({
   onEdit,
   onDelete,
   onCreateClick,
-  isFormOpen
+  isFormOpen,
+  canReadWrite
 }: RuleListProps) {
   const [searchTerm, setSearchTerm] = useState('');
 
@@ -61,59 +63,59 @@ export default function RuleList({
         );
       }
     },
-    {
-      key: 'operator',
-      header: 'Condition',
-      width: '140px',
-      cell: (_value, rule) => {
-        return (
-          <div className="flex flex-col gap-1">
-            {rule.conditions.map((cond) => {
-              const opLabel = cond.operator ? getOperatorLabel(cond.operator) : '—';
-              return (
-                <div key={cond.id} className="text-sm text-gray-600 dark:text-zinc-400">
-                  {opLabel}
-                </div>
-              );
-            })}
-            {rule.conditions.length === 0 && (
-              <div className="text-sm text-gray-400 font-semibold">—</div>
-            )}
-          </div>
-        );
-      }
-    },
-    {
-      key: 'value',
-      header: 'Value',
-      width: '150px',
-      cell: (_value, rule) => {
-        return (
-          <div className="flex flex-col gap-1">
-            {rule.conditions.map((cond) => {
-              let valText = '';
-              if (cond.operator === 'yes' || cond.operator === 'no') {
-                valText = cond.operator === 'yes' ? 'Yes' : 'No';
-              } else if (cond.operator === 'between' && Array.isArray(cond.value)) {
-                valText = `${cond.value[0]} and ${cond.value[1]}`;
-              } else if (cond.operator === 'last_x_days') {
-                valText = `${cond.value} days`;
-              } else {
-                valText = cond.value !== undefined && cond.value !== null ? String(cond.value) : '—';
-              }
-              return (
-                <div key={cond.id} className="text-sm text-gray-700 dark:text-zinc-300">
-                  {valText || '—'}
-                </div>
-              );
-            })}
-            {rule.conditions.length === 0 && (
-              <div className="text-sm text-gray-400 font-semibold">—</div>
-            )}
-          </div>
-        );
-      }
-    },
+    // {
+    //   key: 'operator',
+    //   header: 'Condition',
+    //   width: '140px',
+    //   cell: (_value, rule) => {
+    //     return (
+    //       <div className="flex flex-col gap-1">
+    //         {rule.conditions.map((cond) => {
+    //           const opLabel = cond.operator ? getOperatorLabel(cond.operator) : '—';
+    //           return (
+    //             <div key={cond.id} className="text-sm text-gray-600 dark:text-zinc-400">
+    //               {opLabel}
+    //             </div>
+    //           );
+    //         })}
+    //         {rule.conditions.length === 0 && (
+    //           <div className="text-sm text-gray-400 font-semibold">—</div>
+    //         )}
+    //       </div>
+    //     );
+    //   }
+    // },
+    // {
+    //   key: 'value',
+    //   header: 'Value',
+    //   width: '150px',
+    //   cell: (_value, rule) => {
+    //     return (
+    //       <div className="flex flex-col gap-1">
+    //         {rule.conditions.map((cond) => {
+    //           let valText = '';
+    //           if (cond.operator === 'yes' || cond.operator === 'no') {
+    //             valText = cond.operator === 'yes' ? 'Yes' : 'No';
+    //           } else if (cond.operator === 'between' && Array.isArray(cond.value)) {
+    //             valText = `${cond.value[0]} and ${cond.value[1]}`;
+    //           } else if (cond.operator === 'last_x_days') {
+    //             valText = `${cond.value} days`;
+    //           } else {
+    //             valText = cond.value !== undefined && cond.value !== null ? String(cond.value) : '—';
+    //           }
+    //           return (
+    //             <div key={cond.id} className="text-sm text-gray-700 dark:text-zinc-300">
+    //               {valText || '—'}
+    //             </div>
+    //           );
+    //         })}
+    //         {rule.conditions.length === 0 && (
+    //           <div className="text-sm text-gray-400 font-semibold">—</div>
+    //         )}
+    //       </div>
+    //     );
+    //   }
+    // },
     {
       key: 'action',
       header: 'Action',
@@ -171,12 +173,12 @@ export default function RuleList({
         );
       }
     },
-    {
+    ...(canReadWrite ? [{
       key: 'id',
       header: 'Actions',
       width: '100px',
-      sticky: 'right',
-      cell: (_value, rule) => {
+      sticky: 'right' as const,
+      cell: (_value: any, rule: any) => {
         return (
           <div className="flex items-center justify-end gap-1 opacity-80 group-hover/row:opacity-100 transition-opacity">
             {/* Edit Button */}
@@ -203,7 +205,7 @@ export default function RuleList({
           </div>
         );
       }
-    }
+    }] : [])
   ];
 
   return (
@@ -225,7 +227,7 @@ export default function RuleList({
       </div>
 
       {/* Add New Button matching screenshot inline flow */}
-      {!isFormOpen && (
+      {!isFormOpen && canReadWrite && (
         <div className="pt-2">
           <Button
             variant="default"

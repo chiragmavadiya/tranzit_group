@@ -23,6 +23,7 @@ export interface Order {
   sender_address_info?: string;
   receiver_address_info?: string;
   courier_code?: string;
+  canReadWrite?: boolean
 }
 
 export type TabType = 'new' | 'printed' | 'shipped' | 'archived';

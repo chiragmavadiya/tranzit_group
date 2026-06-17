@@ -36,7 +36,8 @@ import type { InvoiceDocumentData } from '../types'
 const InvoiceDocumentView: React.FC = () => {
   const { invoiceID } = useParams<{ invoiceID: string }>()
   const navigate = useNavigate()
-  const { role } = useAppSelector((state) => state.auth)
+  const { role, is_sub_user, team_access } = useAppSelector((state) => state.auth)
+  const canReadWrite = useMemo(() => !is_sub_user || team_access?.permissions?.invoice === 'full', [is_sub_user, team_access]);
   const isAdmin = role === 'admin'
   const [invoiceData, setInvoiceData] = useState<InvoiceDocumentData>({
     "invoice_number": "",
@@ -419,7 +420,7 @@ const InvoiceDocumentView: React.FC = () => {
               </Button>
             </>
           )}
-          {invoiceID !== 'create' && (
+          {invoiceID !== 'create' && canReadWrite && (
             <Button
               onClick={handleDownload}
               disabled={downloadMutation.isPending}

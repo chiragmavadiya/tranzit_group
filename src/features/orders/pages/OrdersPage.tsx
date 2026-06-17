@@ -33,9 +33,11 @@ const CreateOrderDialog = lazy(() => import('@/features/orders/components/Create
 export default function OrdersPage({ fromCustomer, customerId }: { fromCustomer?: boolean, customerId?: string }) {
   const [searchParams, setSearchParams] = useSearchParams();
   const activeTab = (searchParams.get('tab')?.toLowerCase() as TabType) || 'new';
-  const { role } = useAppSelector((state) => state.auth);
+  const { role, team_access } = useAppSelector((state) => state.auth);
   const navigate = useNavigate();
   const isAdmin = role === 'admin';
+  const isSubUser = role === 'customer' && team_access?.is_sub_user;
+  const canReadWrite = !isSubUser || team_access?.permissions?.order === 'full';
 
   // State for pagination and search
   const [page, setPage] = useState(1);
@@ -383,8 +385,9 @@ export default function OrdersPage({ fromCustomer, customerId }: { fromCustomer?
     handleArchiveOrder,
     updateToArchiveId,
     handlePrintClick,
-    printOrderMutation.isPending ? printOrderMutation.variables : (walletLoading ? orderToPrint?.orderNumber : null)
-  ), [role, activeTab, navigate, handleCustomerEdit, handleCourierEdit, handleDownloadSingleLabel, handleCancelSingleOrderClick, downloadingLabelId, fromCustomer, handleArchiveOrder, updateToArchiveId, handlePrintClick, printOrderMutation.isPending, printOrderMutation.variables, walletLoading, orderToPrint?.orderNumber]);
+    printOrderMutation.isPending ? printOrderMutation.variables : (walletLoading ? orderToPrint?.orderNumber : null),
+    canReadWrite
+  ), [role, activeTab, navigate, handleCustomerEdit, handleCourierEdit, handleDownloadSingleLabel, handleCancelSingleOrderClick, downloadingLabelId, fromCustomer, handleArchiveOrder, updateToArchiveId, handlePrintClick, printOrderMutation.isPending, printOrderMutation.variables, walletLoading, orderToPrint?.orderNumber, canReadWrite]);
 
   return (
     <div className={`${fromCustomer ? "p-0" : "p-page-padding"} flex-1 flex flex-col space-y-4 animate-in fade-in slide-in-from-bottom-2 duration-300 h-full overflow-hidden min-h-0`}>
@@ -509,8 +512,8 @@ export default function OrdersPage({ fromCustomer, customerId }: { fromCustomer?
           selectable={!fromCustomer && activeTab !== 'archived'}
           selectedRows={selectedRows}
           onSelectionChange={setSelectedRows}
-          exportable={!fromCustomer}
-          customHeader={!fromCustomer && (() => (
+          exportable={!fromCustomer && canReadWrite}
+          customHeader={!fromCustomer && canReadWrite ? (() => (
             <div className="flex items-center justify-between gap-2">
 
               <Button
@@ -556,7 +559,7 @@ export default function OrdersPage({ fromCustomer, customerId }: { fromCustomer?
                 <span>Create Order</span>
               </Button> */}
             </div>
-          ))}
+          )) : undefined}
         />
       </div>
       {

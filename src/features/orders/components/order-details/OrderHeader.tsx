@@ -44,6 +44,7 @@ interface OrderHeaderProps {
   signatureSelected: boolean;
   insuranceSelected: boolean;
   deliveryInstructions: string
+  canReadWrite: boolean;
 }
 
 
@@ -72,7 +73,8 @@ export const OrderHeader: React.FC<OrderHeaderProps> = ({
   addressData,
   signatureSelected,
   insuranceSelected,
-  deliveryInstructions
+  deliveryInstructions,
+  canReadWrite = true,
 }) => {
 
   const navigate = useNavigate()
@@ -155,13 +157,6 @@ export const OrderHeader: React.FC<OrderHeaderProps> = ({
               {orderType === 'return' ? <Package className="h-5 w-5 text-primary" /> : <Box className="h-5 w-5 text-primary" />}
               <span className="text-xl font-bold text-gray-900 dark:text-zinc-100">{isCreate ? (orderType === 'return' ? 'RETURN ORDER' : 'CREATE NEW ORDER') : orderID}</span>
             </div>
-            {/* <div className="flex items-center gap-2 px-0">
-              <span className="text-xl font-bold text-gray-900 dark:text-zinc-100 tracking-tight">{orderType === 'create' ? 'NEW ORDER' : 'EDIT ORDER'}</span>
-            </div> */}
-            {/* <div className="flex items-center gap-1 text-primary font-medium">
-              <MapPin className="h-4 w-4" />
-              <span className="text-sm">AUSTRALIA</span>
-            </div> */}
           </div>
         </div>
 
@@ -190,7 +185,7 @@ export const OrderHeader: React.FC<OrderHeaderProps> = ({
               { value: 'delete_order', label: 'Delete order' },
             ]}
           /> */}
-          {orderType !== 'consign' && orderType !== 'create' && orderType !== 'create-menual' && orderDetail?.order_status_category === 'new' && (
+          {canReadWrite && orderType !== 'consign' && orderType !== 'create' && orderType !== 'create-menual' && orderDetail?.order_status_category === 'new' && (
             <Button
               variant="outline"
               onClick={onConsign}
@@ -202,7 +197,7 @@ export const OrderHeader: React.FC<OrderHeaderProps> = ({
             </Button>
 
           )}
-          {orderType !== 'create' && orderType !== 'create-menual' && orderType !== 'return' && (
+          {canReadWrite && orderType !== 'create' && orderType !== 'create-menual' && orderType !== 'return' && (
             <>
               {(orderDetail?.order_status_category !== 'new' && orderDetail?.order_status_category !== 'archived') && (
                 <Button

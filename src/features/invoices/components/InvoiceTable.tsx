@@ -35,8 +35,9 @@ export function InvoiceTable({
   totalItems = 0, currentPage = 1, pageSize = 10, search = '',
   onPageChange, onPageSizeChange, onSearchChange, onExport, isExporting
 }: InvoiceTableProps) {
-  const { role } = useAppSelector((state) => state.auth);
+  const { role, is_sub_user, team_access } = useAppSelector((state) => state.auth);
   const navigate = useNavigate();
+  const canReadWrite = useMemo(() => !is_sub_user || team_access?.permissions?.invoice === 'full', [is_sub_user, team_access]);
 
   const onAddInvoice = () => {
     // redirect to /createpage
@@ -135,12 +136,12 @@ export function InvoiceTable({
         );
       }
     },
-    {
+    ...(canReadWrite ? [{
       accessor: 'actions',
       key: 'actions',
       header: 'Action',
-      sticky: 'right',
-      cell: (_, row) => {
+      sticky: 'right' as const,
+      cell: (_: any, row: any) => {
         const isCustomer = role === 'customer';
 
         if (isCustomer) {
@@ -204,8 +205,8 @@ export function InvoiceTable({
           </div>
         );
       }
-    },
-  ], [onEdit, onDelete, onView, onSend, renderStatus, isAdmin, role]);
+    }] : []),
+  ], [onEdit, onDelete, onView, onSend, renderStatus, isAdmin, role, canReadWrite]);
 
   const customHeader = () => {
     return (
@@ -242,6 +243,7 @@ export function InvoiceTable({
           loading={loading}
           onExport={onExport}
           isExporting={isExporting}
+          exportable={canReadWrite}
         />
       </div>
     </div>

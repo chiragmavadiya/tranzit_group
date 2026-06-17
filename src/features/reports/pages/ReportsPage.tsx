@@ -19,10 +19,14 @@ import {
   useExportTransactionReport,
   useExportParcelReport
 } from '../hooks/useReports';
+import { useAppSelector } from '@/hooks/store.hooks';
 
 export default function ReportsPage() {
   const [searchParams, setSearchParams] = useSearchParams();
   const activeTab = (searchParams.get('tab') as ReportType) || 'shipment';
+
+  const { is_sub_user, team_access } = useAppSelector((state) => state.auth);
+  const canReadWrite = useMemo(() => !is_sub_user || team_access?.permissions?.report === 'full', [is_sub_user, team_access]);
 
   const parseLocalDate = useCallback((dateStr?: string | null) => {
     if (!dateStr) return undefined;
@@ -289,6 +293,7 @@ export default function ReportsPage() {
             // header={false}
             // customHeader={customHeader}
             headerPosition='left'
+            exportable={canReadWrite}
           />
         </div>
       </div>

@@ -73,14 +73,22 @@ export interface User {
     mobile?: string;
     default_courier?: any;
     default_item?: any;
-    permissions?: string[];
-    role: string;
+    role?: string;
 }
 
 
 export interface LoginRequest {
     email: string;
     password: string;
+}
+
+export interface TeamAccess {
+    is_sub_user: boolean;
+    parent_customer_id: number | null;
+    account_owner_id: number | null;
+    must_change_password: boolean;
+    order_creation_email_received: boolean;
+    permissions: Record<string, string>;
 }
 
 export interface LoginResponse {
@@ -91,7 +99,6 @@ export interface LoginResponse {
     next_step: string;
     default_courier?: any;
     default_item?: any;
-    permissions?: string[];
     announcements?: {
         id: number;
         text: string;
@@ -99,7 +106,9 @@ export interface LoginResponse {
         background_color: string;
         expire_date: string;
     }[];
+    team_access?: TeamAccess;
 }
+
 
 export interface RegisterRequest {
     first_name: string;

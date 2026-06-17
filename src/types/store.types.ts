@@ -1,4 +1,4 @@
-import type { User } from "@/features/auth/auth.types";
+import type { User, TeamAccess } from "@/features/auth/auth.types";
 
 export interface AuthState {
     user: User | null;
@@ -11,6 +11,7 @@ export interface AuthState {
     next_step: string | null;
     default_courier: any | null;
     default_item: any | null;
-    subRole: string;
     permissions: string[];
+    team_access?: TeamAccess | null;
+    is_sub_user: boolean;
 }

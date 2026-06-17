@@ -4,6 +4,7 @@ import { getManifestColumns } from '../columns';
 import { useManifests, useExportManifests, useDownloadManifestPDF } from '../hooks/useManifest';
 import { useDebounce } from '@/hooks/useDebounce';
 import type { Manifest } from '../types';
+import { useAppSelector } from '@/hooks/store.hooks';
 
 export default function ManifestPage() {
   const [search, setSearch] = useState('');
@@ -18,6 +19,11 @@ export default function ManifestPage() {
     page,
     per_page: pageSize
   });
+
+  const { is_sub_user, team_access } = useAppSelector((state) => state.auth);
+  const canReadWrite = useMemo(() => !is_sub_user || team_access?.permissions?.get_quote === 'full', [is_sub_user, team_access]);
+  const canOrderView = useMemo(() => !is_sub_user || team_access?.permissions?.order === 'read_only' || team_access?.permissions?.order === 'full', [is_sub_user, team_access]);
+
 
   const { mutate: exportManifests, isPending: isExporting } = useExportManifests();
   const downloadPDFMutation = useDownloadManifestPDF();
@@ -37,8 +43,8 @@ export default function ManifestPage() {
   }, [downloadPDFMutation]);
 
   const columns = useMemo(() =>
-    getManifestColumns(handleDownloadPDF, downloadingId),
-    [handleDownloadPDF, downloadingId]
+    getManifestColumns(handleDownloadPDF, downloadingId, canReadWrite, canOrderView),
+    [handleDownloadPDF, downloadingId, canReadWrite, canOrderView]
   );
 
   return (
@@ -60,6 +66,7 @@ export default function ManifestPage() {
           onPageSizeChange={setPageSize}
           className="text-xs pb-3"
           onExport={handleExport}
+          exportable={canReadWrite}
           isExporting={isExporting}
           headerPosition="left"
         />

@@ -28,50 +28,54 @@ import {
   Route
 } from 'lucide-react';
 import type { SidebarItem } from '../layout/types/Sidebar.types';
+import { MODULE_PERMISSIONS } from '../constants';
 
 export const adminSidebarItems: SidebarItem[] = [
-  { name: 'Dashboard', icon: LayoutDashboard, path: '/admin/dashboard' },
-  { name: 'Customer Management', icon: Users, path: '/admin/customers' },
-  { name: 'Order Management', icon: Package, path: '/admin/orders' },
-  { name: 'Cancel Order', icon: PackageX, path: '/admin/cancel-order' },
-  { name: 'Book a pickup', icon: Truck, path: '/admin/book-pickup' },
-  { name: 'Staff / Sub User Management', icon: UserCog, path: '/admin/staff' },
+  { name: 'Dashboard', key: 'dashboard', icon: LayoutDashboard, path: '/admin/dashboard', permissions: MODULE_PERMISSIONS.dashboard },
+  { name: 'Customer Management', key: 'customer', icon: Users, path: '/admin/customers', permissions: MODULE_PERMISSIONS.customer },
+  { name: 'Order Management', key: 'order', icon: Package, path: '/admin/orders', permissions: MODULE_PERMISSIONS.order },
+  { name: 'Cancel Order', key: 'cancel_order', icon: PackageX, path: '/admin/cancel-order', permissions: ['view_cancel_order'] },
+  { name: 'Book a pickup', key: 'book_pickup', icon: Truck, path: '/admin/book-pickup', permissions: MODULE_PERMISSIONS['Book a Pickup'] },
+  { name: 'Staff / Sub User Management', key: 'subuser', icon: UserCog, path: '/admin/staff', permissions: MODULE_PERMISSIONS.subuser },
 
 
   // { name: 'Customer Parcel Report', icon: FileText, path: '/admin/customer-parcel-report' },
   {
     name: 'Reports',
+    key: 'report',
     icon: BarChart3,
     path: '/admin/customer-parcel-report',
     hasDropdown: true,
+    permissions: [...(MODULE_PERMISSIONS['Customer Parcel Report'] || []), ...(MODULE_PERMISSIONS.report || [])],
     subItems: [
-      { name: 'All Tranzit Group Courier Parcel Report', path: '/admin/customer-parcel-report' },
-      { name: 'Custom Integrated Courier Parcel Report', path: '/admin/integrated-parcel-report' },
+      { name: 'All Tranzit Group Courier Parcel Report', path: '/admin/customer-parcel-report', permissions: MODULE_PERMISSIONS['Customer Parcel Report'] },
+      { name: 'Custom Integrated Courier Parcel Report', path: '/admin/integrated-parcel-report', permissions: MODULE_PERMISSIONS.report },
     ]
   },
 
 
-  { name: 'Invoice Management', icon: FileText, path: '/admin/invoices' },
+  { name: 'Invoice Management', key: "invoice", icon: FileText, path: '/admin/invoices', permissions: MODULE_PERMISSIONS.invoice },
   // { name: 'Zoho Invoice Integration', icon: Link, path: '/admin/zoho-integration' },
-  { name: 'Topup Management', icon: Wallet, path: '/admin/topup' },
+  { name: 'Topup Management', key: 'topup', icon: Wallet, path: '/admin/topup', permissions: MODULE_PERMISSIONS.topup },
   // { name: 'Courier Surcharge', icon: Percent, path: '/admin/courier-surcharge' },
   // { name: 'Courier base Postcode', icon: MapPin, path: '/admin/courier-postcode' },
-  { name: 'Enquiry Management', icon: MessageSquareMore, path: '/admin/enquiry' },
-  { name: 'Help Center Management', icon: LifeBuoy, path: '/admin/help-center' },
-  { name: 'System Settings', icon: Settings, path: '/admin/settings' },
+  { name: 'Enquiry Management', key: 'Enquiry Management', icon: MessageSquareMore, path: '/admin/enquiry', permissions: MODULE_PERMISSIONS['Enquiry Management'] },
+  { name: 'Help Center Management', key: 'Help Center', icon: LifeBuoy, path: '/admin/help-center', permissions: MODULE_PERMISSIONS['Help Center'] },
+  { name: 'System Settings', icon: Settings, path: '/admin/settings', permissions: MODULE_PERMISSIONS.setting },
   // { name: 'Admin Activity Log', icon: Activity, path: '/admin/activity-log' },
-  { name: 'Order Summary For Auspost', icon: ClipboardList, path: '/admin/order-summary' },
-  { name: 'Undelivered Parcel', icon: PackageMinus, path: '/admin/undelivered' },
-  { name: 'Customer Quote', icon: FileQuestion, path: '/admin/quotes' },
+  { name: 'Order Summary For Auspost', key: 'AusPost Order Summary', icon: ClipboardList, path: '/admin/order-summary', permissions: MODULE_PERMISSIONS['AusPost Order Summary'] },
+  { name: 'Undelivered Parcel', key: 'Un-Delivered Parcel', icon: PackageMinus, path: '/admin/undelivered', permissions: MODULE_PERMISSIONS['Un-Delivered Parcel'] },
+  { name: 'Customer Quote', key: 'Customer Quote', icon: FileQuestion, path: '/admin/quotes', permissions: MODULE_PERMISSIONS['Customer Quote'] },
 
   {
     name: 'Courier Global Settings',
     icon: Route,
     path: '/admin/courier-surcharge',
     hasDropdown: true,
+    permissions: [...(MODULE_PERMISSIONS['Courier Surcharge'] || []), ...(MODULE_PERMISSIONS['Courier Base Postcode'] || [])],
     subItems: [
-      { name: 'Courier Surcharge', path: '/admin/courier-surcharge' },
-      { name: 'Courier base Postcode', path: '/admin/courier-postcode' },
+      { name: 'Courier Surcharge', key: 'Courier Surcharge', path: '/admin/courier-surcharge', permissions: MODULE_PERMISSIONS['Courier Surcharge'] },
+      { name: 'Courier base Postcode', key: 'Courier Base Postcode', path: '/admin/courier-postcode', permissions: MODULE_PERMISSIONS['Courier Base Postcode'] },
     ]
   },
 
@@ -80,11 +84,12 @@ export const adminSidebarItems: SidebarItem[] = [
     icon: Globe,
     path: '/admin/zoho-integration',
     hasDropdown: true,
+    permissions: [...(MODULE_PERMISSIONS.setting || []), ...(MODULE_PERMISSIONS['Admin Activity Log'] || []), ...(MODULE_PERMISSIONS.profile || [])],
     subItems: [
-      { name: 'Zoho Invoice Integration', path: '/admin/zoho-integration' },
-      { name: 'Admin Activity Log', path: '/admin/activity-log' },
-      { name: 'Profile', path: '/admin/profile' },
-      { name: 'Global Configuration', path: '/admin/global-config' },
+      { name: 'Zoho Invoice Integration', key: 'setting', path: '/admin/zoho-integration', permissions: MODULE_PERMISSIONS.setting },
+      { name: 'Admin Activity Log', key: 'Admin Activity Log', path: '/admin/activity-log', permissions: MODULE_PERMISSIONS['Admin Activity Log'] },
+      { name: 'Profile', key: 'profile', path: '/admin/profile', permissions: MODULE_PERMISSIONS.profile },
+      { name: 'Global Configuration', key: 'setting', path: '/admin/global-config', permissions: MODULE_PERMISSIONS.setting },
     ]
   },
 
@@ -95,19 +100,21 @@ export const adminSidebarItems: SidebarItem[] = [
 const getOrderTab = () => localStorage.getItem('order_tab');
 
 export const clientSidebarItems: SidebarItem[] = [
-  { name: 'Dashboard', icon: LayoutDashboard, path: '/dashboard' },
+  { name: 'Dashboard', key: 'dashboard', icon: LayoutDashboard, path: '/dashboard' },
   {
     name: 'Orders',
+    key: 'order',
     icon: Package,
     get path() {
       return `/orders?tab=${getOrderTab() || 'new'}`;
     }
   },
-  { name: 'Create Order', icon: PlusCircle, path: '/orders/create' },
-  { name: 'Get Quote', icon: Calculator, path: '/quote' },
-  { name: 'Manifest Orders', icon: ClipboardList, path: '/manifest' },
+  { name: 'Create Order', key: 'order', icon: PlusCircle, path: '/orders/create' },
+  { name: 'Get Quote', key: 'get_quote', icon: Calculator, path: '/quote' },
+  { name: 'Manifest Orders', key: 'manifest_order', icon: ClipboardList, path: '/manifest' },
   {
     name: 'My Wallet',
+    key: 'my_wallet',
     icon: Wallet,
     path: '/wallet/transactions',
     // hasDropdown: true,
@@ -117,20 +124,21 @@ export const clientSidebarItems: SidebarItem[] = [
     // ]
 
   },
-  { name: 'My Items', icon: Box, path: '/items' },
-  { name: 'My Address Book', icon: BookOpen, path: '/address-book' },
+  { name: 'My Items', key: 'my_items', icon: Box, path: '/items' },
+  { name: 'My Address Book', key: 'my_address_book', icon: BookOpen, path: '/address-book' },
   {
     name: 'Report',
+    key: 'report',
     icon: FileBarChart,
     path: '/reports',
     hasDropdown: true,
     subItems: [
-      { name: 'All Report', path: '/reports' },
-      { name: 'Parcel Report', path: '/parcel-report' },
+      { name: 'All Report', key: 'report', path: '/reports' },
+      { name: 'Parcel Report', key: 'report', path: '/parcel-report' },
     ]
   },
-  { name: 'Invoices', icon: FileText, path: '/invoices' },
-  { name: 'Enquiry', icon: MessageSquare, path: '/enquiry' },
+  { name: 'Invoices', key: 'invoice', icon: FileText, path: '/invoices' },
+  { name: 'Enquiry', key: 'enquiry', icon: MessageSquare, path: '/enquiry' },
   // { name: 'Help Center', icon: HelpCircle, path: '/help-center' }, // NEED TO CHECK CODE
   // { name: 'Parcel Report', icon: FileArchive, path: '/parcel-report' },
   // { name: 'Integrations', icon: Link, path: '/integrations' },
@@ -143,16 +151,16 @@ export const clientSidebarItems: SidebarItem[] = [
       {
         title: 'Organization',
         items: [
-          { name: 'Account Details', path: '/settings/account', icon: User },
-          { name: 'Team Access', path: '/settings/team', icon: Users },
-          { name: 'Rule Management', path: '/settings/rules', icon: Route },
+          { name: 'Account Details', key: 'settings_account_detail', path: '/settings/account', icon: User },
+          { name: 'Team Access', key: 'settings_team_access', path: '/settings/team', icon: Users },
+          { name: 'Rule Management', key: 'settings_rule_management', path: '/settings/rules', icon: Route },
         ]
       },
       {
         title: 'Integrations',
         items: [
-          { name: 'Ecommerce', path: '/settings/ecommerce', icon: Globe },
-          { name: 'Carriers', path: '/settings/carriers', icon: Truck },
+          { name: 'Ecommerce', key: 'settings_integrations', path: '/settings/ecommerce', icon: Globe },
+          { name: 'Carriers', key: 'settings_integrations', path: '/settings/carriers', icon: Truck },
         ]
       },
     ]

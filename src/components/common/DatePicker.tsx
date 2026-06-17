@@ -3,14 +3,23 @@ import { Button } from '../ui/button'
 import { CalendarIcon } from 'lucide-react'
 import { Calendar } from '../ui/calendar'
 import { cn } from '@/lib/utils'
-import { format } from 'date-fns'
+import { format, parse, isValid } from 'date-fns';
 import { memo, useState } from 'react'
 import { CustomLabel } from '@/features/orders/components/OrderFormUI'
 
 const DatePicker = memo(({ date, setDate, label, className, placeholder = 'DD/MM/YYYY', disabled }: { date: Date | string | undefined, setDate: (date: Date | undefined) => void, label?: string, className?: string, placeholder?: string, disabled?: { after?: Date | undefined, before?: Date | undefined } }) => {
   const [open, setOpen] = useState<boolean>(false);
 
-  const parsedDate = date ? (typeof date === 'string' ? new Date(date) : date) : undefined;
+  // const parsedDate = date ? (typeof date === 'string' ? new Date(date) : date) : undefined;
+  const parsedDate = (() => {
+    if (!date) return undefined;
+
+    if (date instanceof Date) return date;
+
+    const parsed = parse(date, 'dd/MM/yy hh:mm a', new Date());
+
+    return isValid(parsed) ? parsed : undefined;
+  })();
 
   const handleDateChange = (date: Date | undefined) => {
     setDate(date);

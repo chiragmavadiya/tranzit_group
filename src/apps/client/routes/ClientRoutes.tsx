@@ -3,6 +3,8 @@ import ProtectedRoute from "@/router/ProtectedRoute";
 import { lazy, Suspense } from "react";
 import Layout from "@/layout";
 import { Loader2 } from "lucide-react";
+import { useAppSelector } from "@/hooks/store.hooks";
+import { getFirstAllowedSettingsPath } from "@/utils/permission";
 // import IntegrationsPage from "@/features/integrations/pages/IntegrationPage";
 
 // Lazy load page components
@@ -35,6 +37,11 @@ const CarrierConfigPage = lazy(() => import('@/features/customer-settings/pages/
 const RulesPage = lazy(() => import('@/features/rules/pages/RulesPage'));
 const ManifestPage = lazy(() => import('@/features/manifest/pages/ManifestPage'));
 
+function SettingsIndexRedirect() {
+  const { role, team_access } = useAppSelector((state) => state.auth);
+  const path = getFirstAllowedSettingsPath(team_access, role) || "/settings/account";
+  return <Navigate to={path} replace />;
+}
 
 const withSuspense = (Component: React.ReactNode) => (
   <Suspense
@@ -85,7 +92,7 @@ export default function ClientRoutes() {
           </Route> */}
           {/* <Route path="integrations" element={<IntegrationsPage />} /> */}
           <Route path="settings" element={withSuspense(<CustomerSettingsLayout />)}>
-            <Route index element={<Navigate to="account" replace />} />
+            <Route index element={<SettingsIndexRedirect />} />
             <Route path="account" element={withSuspense(<AccountSettingsPage />)} />
             <Route path="team" element={withSuspense(<TeamAccessPage />)} />
             <Route path="ecommerce" element={withSuspense(<EcommerceIntegrationsPage />)} />

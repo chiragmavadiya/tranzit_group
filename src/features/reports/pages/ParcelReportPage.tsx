@@ -27,8 +27,10 @@ import { formateCurrency } from '@/lib/utils';
 export default function ParcelReportPage() {
   // const location = useLocation();
   // const isAdmin = location.pathname.includes('/admin');
-  const { role } = useAppSelector((state) => state.auth);
+
+  const { role, is_sub_user, team_access } = useAppSelector((state) => state.auth);
   const isAdmin = role === "admin";
+  const canReadWrite = useMemo(() => !is_sub_user || team_access?.permissions?.report === 'full', [is_sub_user, team_access]);
 
   const [startDate, setStartDate] = useState<Date | undefined>();
   const [endDate, setEndDate] = useState<Date | undefined>();
@@ -316,6 +318,7 @@ export default function ParcelReportPage() {
           loading={isLoading}
           onExport={(format) => exportMutation.mutate({ ...filters, format })}
           isExporting={exportMutation.isPending}
+          exportable={canReadWrite}
         />
       </div>
     </div>

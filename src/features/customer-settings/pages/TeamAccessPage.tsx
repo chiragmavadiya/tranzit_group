@@ -1,65 +1,60 @@
-// import { 
-//   Shield, 
-//   Lock
-// } from 'lucide-react';
-
-// export default function TeamAccessPage() {
-//   return (
-//     <div className="flex flex-1 flex-col gap-6 h-full animate-in fade-in duration-500">
-//       {/* Header */}
-//       <div className="flex flex-col gap-1">
-//         <h1 className="text-2xl font-bold flex items-center gap-2.5 text-slate-900 dark:text-zinc-100 my-0">
-//           <Shield className="w-6 h-6 text-primary" />
-//           Team Access & Permissions
-//         </h1>
-//         <p className="text-sm text-slate-500 dark:text-zinc-400">
-//           Manage your team members and roles.
-//         </p>
-//       </div>
-
-//       {/* Coming Soon Content */}
-//       <div className="bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-800 rounded-3xl shadow-sm p-12 flex flex-col items-center justify-center text-center min-h-[400px]">
-//         <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mb-6">
-//           <Lock className="w-6 h-6 text-primary" />
-//         </div>
-
-//         <h2 className="text-xl font-bold text-slate-900 dark:text-zinc-100 mt-0 mb-2">
-//           Coming Soon
-//         </h2>
-
-//         <p className="text-sm text-slate-500 dark:text-zinc-400 max-w-md my-0 leading-relaxed">
-//           We are currently building the team access and role-based permissions management system. Soon you will be able to invite team members, assign custom roles, and configure granular access controls for your organization.
-//         </p>
-//       </div>
-//     </div>
-//   );
-// }
-
-// ============================================================================
-// PRESERVED ORIGINAL CODE (DISABLED)
-// ============================================================================
-
-import { useState } from 'react';
-import { Plus, Pencil, Trash } from 'lucide-react';
+import { useState, useMemo } from 'react';
+import { Plus, Pencil, Trash, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { DataTable } from '@/components/common/DataTable';
 import { Switch } from '@/components/ui/switch';
 import { ConformationModal } from '@/components/common/ConformationModal';
 import { TeamMemberModal } from '../components/TeamMemberModal';
-import { roles } from '../constant';
+import { showToast } from '@/components/ui/custom-toast';
+import {
+  useTeamUsersList,
+  useToggleTeamUserStatus,
+  useDeleteTeamUser,
+  useTeamUserDetails,
+} from '../hooks/useTeamUsers';
 
-const mockUsers = [
-  { id: '3', name: 'Charlie Brown', email: 'charlie@example.com', role: 'Admin', status: 'Active', createdAt: '2022-01-01' },
-  { id: '1', name: 'Alice Smith', email: 'alice@example.com', role: 'Full Access User', status: 'Active', createdAt: '2022-01-01' },
-  { id: '2', name: 'Bob Jones', email: 'bob@example.com', role: '3PL User', status: 'Invited', createdAt: '2022-01-01' },
-];
+const StatusSwitch = ({ user, isChecked }: { user: any; isChecked: boolean }) => {
+  const { mutate: toggleStatus, isPending } = useToggleTeamUserStatus();
+
+  const handleToggle = () => {
+    toggleStatus(user.id, {
+      onSuccess: () => {
+        showToast("Status updated successfully", "success");
+      },
+      onError: (err: any) => {
+        showToast(err?.response?.data?.message || "Failed to update status", "error");
+      }
+    });
+  };
+
+  return (
+    <div className="flex items-center gap-2">
+      <Switch
+        checked={isChecked}
+        disabled={isPending || user.role === "Admin" || user.role === "admin" || user.role === "parent"}
+        onCheckedChange={handleToggle}
+        className="data-[state=checked]:bg-primary"
+      />
+      {isPending && <Loader2 className="w-3 h-3 animate-spin text-slate-400" />}
+    </div>
+  );
+};
 
 export default function TeamAccessPage() {
   const [isAddUserOpen, setIsAddUserOpen] = useState(false);
-  const [users, setUsers] = useState(mockUsers);
   const [editingUser, setEditingUser] = useState<any>(null);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [userToDelete, setUserToDelete] = useState<any>(null);
+
+  const { data: teamUsersResponse, isLoading } = useTeamUsersList();
+  const users = useMemo(() => teamUsersResponse?.data || [], [teamUsersResponse]);
+
+  const { data: teamUserDetailsResponse } = useTeamUserDetails(
+    editingUser?.id || '',
+    isAddUserOpen && !!editingUser?.id
+  );
+
+  const deleteMutation = useDeleteTeamUser();
 
   const handleEditClick = (user: any) => {
     setEditingUser(user);
@@ -73,9 +68,16 @@ export default function TeamAccessPage() {
 
   const handleConfirmDelete = () => {
     if (userToDelete) {
-      setUsers(prev => prev.filter(u => u.id !== userToDelete.id));
-      setIsDeleteDialogOpen(false);
-      setUserToDelete(null);
+      deleteMutation.mutate(userToDelete.id, {
+        onSuccess: () => {
+          showToast("User deleted successfully", "success");
+          setIsDeleteDialogOpen(false);
+          setUserToDelete(null);
+        },
+        onError: (err: any) => {
+          showToast(err?.response?.data?.message || "Failed to delete user", "error");
+        }
+      });
     }
   };
 
@@ -84,20 +86,24 @@ export default function TeamAccessPage() {
     setUserToDelete(null);
   };
 
-  const columns = [
+  const columns = useMemo(() => [
     {
       header: 'User',
       key: 'user',
-      cell: (_: any, row: any) => (
-        <div className="flex items-center gap-3">
-          <div className="w-8 h-8 rounded-full bg-primary/10 text-primary flex items-center justify-center font-bold text-xs uppercase">
-            {row.name.substring(0, 2)}
+      cell: (_: any, row: any) => {
+        const nameVal = row.name || `${row.first_name || ''} ${row.last_name || ''}`.trim() || row.email || '';
+        const initials = `${row.first_name?.[0] || ''}${row.last_name?.[0] || ''}`.toUpperCase() || nameVal.substring(0, 2);
+        return (
+          <div className="flex items-center gap-3">
+            <div className="w-8 h-8 rounded-full bg-primary/10 text-primary flex items-center justify-center font-bold text-xs uppercase pt-[3px]">
+              {initials || '??'}
+            </div>
+            <div>
+              <p className="my-0 font-semibold text-gray-900 dark:text-zinc-100">{nameVal}</p>
+            </div>
           </div>
-          <div>
-            <p className="my-0 font-semibold text-gray-900 dark:text-zinc-100">{row.name}</p>
-          </div>
-        </div>
-      )
+        );
+      }
     },
     {
       header: 'Email',
@@ -107,32 +113,18 @@ export default function TeamAccessPage() {
       )
     },
     {
-      header: 'Role',
-      key: 'role',
-      cell: (val: string) => <span className="font-medium">{val}</span>
-    },
-    {
       header: 'Status',
       key: 'status',
-      cell: (val: string, row: any) => (
-        <div className="flex items-center gap-2">
-          <Switch
-            checked={val === 'Active'}
-            onCheckedChange={(checked) => {
-              setUsers(prev => prev.map(u => u.id === row.id ? { ...u, status: checked ? 'Active' : 'Invited' } : u));
-            }}
-            className="data-[state=checked]:bg-primary"
-            disabled={row.role === "Admin"}
-          />
-          <span className="text-xs text-gray-500 font-medium">
-            {val}
-          </span>
-        </div>
-      )
+      cell: (val: string | number | boolean, row: any) => {
+        const isChecked = val === 'Active' || val === 'active' || val === 1 || val === '1' || val === true;
+        return (
+          <StatusSwitch user={row} isChecked={isChecked} />
+        );
+      }
     },
     {
       header: 'Created Date',
-      key: 'createdAt',
+      key: 'created_at',
     },
     {
       header: 'Actions',
@@ -145,7 +137,7 @@ export default function TeamAccessPage() {
             size="sm"
             className="h-8 w-8 p-0 hover:text-primary bg-transparent dark:hover:bg-transparent"
             onClick={() => handleEditClick(row)}
-            disabled={row.role === 'Admin'}
+            disabled={row.role === 'Admin' || row.role === 'admin' || row.role === 'parent'}
           >
             <Pencil className="h-4 w-4" />
           </Button>
@@ -155,35 +147,15 @@ export default function TeamAccessPage() {
             size="sm"
             className="h-8 w-8 p-0 hover:text-red-600 bg-transparent dark:hover:bg-transparent"
             onClick={() => handleDeleteClick(row)}
-            disabled={row.role === 'Admin'}
+            disabled={row.role === 'Admin' || row.role === 'admin' || row.role === 'parent'}
           >
             <Trash className="h-4 w-4" />
           </Button>
         </div>
       )
     }
-  ];
+  ], []);
 
-  const handleFormSubmit = (data: any) => {
-    if (editingUser) {
-      setUsers(prev => prev.map(u => u.id === editingUser.id ? {
-        ...u,
-        name: `${data.firstName} ${data.lastName}`,
-        email: data.email,
-        role: roles.find(r => r.value === data.role)?.label || 'Full Access User',
-      } : u));
-    } else {
-      const newUser = {
-        id: String(Math.max(...users.map(u => Number(u.id)), 0) + 1),
-        name: `${data.firstName} ${data.lastName}`,
-        email: data.email,
-        role: roles.find(r => r.value === data.role)?.label || 'Full Access User',
-        status: 'Invited',
-        createdAt: new Date().toISOString().split('T')[0],
-      };
-      setUsers(prev => [...prev, newUser]);
-    }
-  };
 
   return (
     <div className="flex flex-1 flex-col gap-6 h-full">
@@ -204,6 +176,7 @@ export default function TeamAccessPage() {
           }
           totalItems={users.length}
           className='pb-3'
+          loading={isLoading}
         />
       </div>
 
@@ -213,21 +186,22 @@ export default function TeamAccessPage() {
           setIsAddUserOpen(open);
           if (!open) setEditingUser(null);
         }}
-        onSubmit={handleFormSubmit}
-        editingUser={editingUser}
+        // onSubmit={handleFormSubmit}
+        editingUser={teamUserDetailsResponse?.data || editingUser}
       />
 
       <ConformationModal
         open={isDeleteDialogOpen}
         onOpenChange={setIsDeleteDialogOpen}
         title="Delete User"
-        description={`Are you sure you want to delete ${userToDelete?.name}? This action cannot be undone.`}
+        description={`Are you sure you want to delete ${userToDelete?.first_name || userToDelete?.name || ''}? This action cannot be undone.`}
         onConfirm={handleConfirmDelete}
         onCancel={handleCancelDelete}
         confirmText="Delete"
         cancelText="Cancel"
         confirmVariant="destructive"
         className="w-full"
+        loading={deleteMutation.isPending}
       />
     </div>
   );

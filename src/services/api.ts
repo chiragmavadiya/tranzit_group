@@ -19,7 +19,7 @@ api.interceptors.request.use(
         if (tokenData && config.headers) {
             config.headers.Authorization = `Bearer ${tokenData}`;
         }
-        const role = localStorage.getItem("user_role") || "customer";
+        const role = (localStorage.getItem("user_role") && localStorage.getItem("user_role") !== 'undefined') ? localStorage.getItem("user_role") : "customer";
         // Only prefix if the URL doesn't already have one
         if (config.url && !config.url.startsWith('/admin') && !config.url.startsWith('/customer') && config.url !== '/localities/search') {
             // const cutsomRole = (role === 'Staff' || role === 'Operation Manager') ? 'admin' : role;

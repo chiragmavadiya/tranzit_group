@@ -17,6 +17,7 @@ interface RenderIntegrationSectionProps {
     onConfigure?: (providerId: string) => void;
     isLoading?: boolean;
     configLoadingProvider?: string;
+    canReadWrite?: boolean;
 }
 
 const RenderIntegrationSection = ({
@@ -29,7 +30,8 @@ const RenderIntegrationSection = ({
     fromCustomer = false,
     onConfigure,
     isLoading = false,
-    configLoadingProvider
+    configLoadingProvider,
+    canReadWrite = true
 }: RenderIntegrationSectionProps) => {
     return (
         <div className="space-y-2">
@@ -67,7 +69,7 @@ const RenderIntegrationSection = ({
                             const isDefault = provider.is_default;
                             const isTranzit = provider.slug.includes('tranzit') || false;
                             return (
-                                <Card key={provider.slug} className="py-4 group relative overflow-hidden transition-all hover:shadow-md border-slate-200 dark:border-zinc-800 bg-white dark:bg-zinc-950">
+                                <Card key={provider.slug} className="py-4 group justify-between relative overflow-hidden transition-all hover:shadow-md border-slate-200 dark:border-zinc-800 bg-white dark:bg-zinc-950">
                                     <CardHeader className="pb-4 bg-transparent">
                                         <div className="flex justify-between items-start">
                                             <div className="w-16 h-16 rounded-xl flex items-center justify-center mb-3 group-hover:scale-110 transition-transform">
@@ -86,7 +88,7 @@ const RenderIntegrationSection = ({
                                                         Default
                                                     </Badge>
                                                 ) : (
-                                                    isConnected && setDefaultMutation && (
+                                                    isConnected && setDefaultMutation && canReadWrite && (
                                                         <button
                                                             onClick={(e) => {
                                                                 e.stopPropagation();
@@ -129,7 +131,7 @@ const RenderIntegrationSection = ({
                                                         {isTranzit ? "Integration Settings" : "Configurations"}
                                                     </Button>
                                                     {
-                                                        !isTranzit && (
+                                                        !isTranzit && canReadWrite && (
                                                             <Button
                                                                 variant="ghost"
                                                                 size="sm"
@@ -143,7 +145,7 @@ const RenderIntegrationSection = ({
                                                         )
                                                     }
                                                 </>
-                                            ) : (
+                                            ) : canReadWrite && (
                                                 <Button
                                                     className="w-full h-8 text-xs leading-none font-bold text-white transition-all shadow-sm active:scale-[0.98]"
                                                     onClick={() => onConnect?.(provider.slug)}

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import {
   useRules,
   useCreateRule,
@@ -16,7 +16,8 @@ import {
   AccordionTrigger,
   AccordionContent
 } from '@/components/ui/accordion';
-import { Loader2, Settings, HelpCircle, BookOpen, Layers } from 'lucide-react';
+import { Loader2, Settings, HelpCircle, Layers } from 'lucide-react';
+import { useAppSelector } from '@/hooks/store.hooks';
 
 export default function RulesPage() {
   const [view, setView] = useState<'list' | 'create' | 'edit'>('list');
@@ -28,6 +29,9 @@ export default function RulesPage() {
 
   // Deletion confirm modal state
   const [ruleToDelete, setRuleToDelete] = useState<string | null>(null);
+  const { is_sub_user, team_access } = useAppSelector((state) => state.auth)
+  const canReadWrite = useMemo(() => !is_sub_user || team_access?.permissions?.settings_rule_management === 'full', [is_sub_user, team_access]);
+
 
   // Manual execution loading states
   // const [isRunningRules, setIsRunningRules] = useState(false);
@@ -185,26 +189,27 @@ export default function RulesPage() {
               </p>
 
               {/* Quick Setup */}
-              <div className="space-y-2 pt-4">
-                <span className="text-xs font-bold text-gray-800 dark:text-zinc-200 block uppercase tracking-wider">
-                  Quick setup
-                </span>
-                <ul className="text-sm text-primary dark:text-blue-400 space-y-1.5 list-none pl-0">
-                  <li
-                    onClick={() => handleQuickSetupClick('service')}
-                    className="cursor-pointer hover:underline hover:text-blue-800 dark:hover:text-blue-300 font-medium"
-                  >
-                    1. Assign a service to all orders
-                  </li>
-                  <li
-                    onClick={() => handleQuickSetupClick('cheapest')}
-                    className="cursor-pointer hover:underline hover:text-blue-800 dark:hover:text-blue-300 font-medium"
-                  >
-                    2. Assign a cheapest carrier service to all orders
-                  </li>
-                </ul>
-              </div>
-
+              {canReadWrite && (
+                <div className="space-y-2 pt-4">
+                  <span className="text-xs font-bold text-gray-800 dark:text-zinc-200 block uppercase tracking-wider">
+                    Quick setup
+                  </span>
+                  <ul className="text-sm text-primary dark:text-blue-400 space-y-1.5 list-none pl-0">
+                    <li
+                      onClick={() => handleQuickSetupClick('service')}
+                      className="cursor-pointer hover:underline hover:text-blue-800 dark:hover:text-blue-300 font-medium"
+                    >
+                      1. Assign a service to all orders
+                    </li>
+                    <li
+                      onClick={() => handleQuickSetupClick('cheapest')}
+                      className="cursor-pointer hover:underline hover:text-blue-800 dark:hover:text-blue-300 font-medium"
+                    >
+                      2. Assign a cheapest carrier service to all orders
+                    </li>
+                  </ul>
+                </div>
+              )}
               {/* YouTube Video Preview */}
               <div className="pt-2 hidden">
                 <iframe
@@ -219,56 +224,32 @@ export default function RulesPage() {
           </Card>
 
           {/* Accordions Section */}
-          <Accordion className="w-full space-y-2">
-            <AccordionItem value="how-to" className="border border-gray-200 dark:border-zinc-850 rounded-md bg-white dark:bg-zinc-900 px-4">
-              <AccordionTrigger className="my-0 text-[15px] font-bold text-gray-800 dark:text-zinc-200 py-3 hover:no-underline flex items-center gap-2">
-                <HelpCircle className="w-4 h-4 text-gray-500" />
-                How to create a rule
-              </AccordionTrigger>
-              <AccordionContent className="text-sm text-gray-500 dark:text-zinc-400 space-y-1.5 leading-normal pb-3">
-                <p>1. Click the <strong className="text-gray-700 dark:text-zinc-200">Add new</strong> button or select a preset shortcut from the <strong className="text-gray-700 dark:text-zinc-200">Quick setup</strong> links.</p>
-                <p>2. The rule's condition is preconfigured to apply to <strong className="text-gray-700 dark:text-zinc-200">All Orders</strong>.</p>
-                <p>3. Select the automated action: either <strong className="text-gray-700 dark:text-zinc-200">Set Courier And Product Code</strong> or <strong className="text-gray-700 dark:text-zinc-200">Select Cheapest Carrier/Service</strong>.</p>
-                <p>4. Save the rule. It will run automatically on newly imported orders.</p>
-              </AccordionContent>
-            </AccordionItem>
+          {canReadWrite && (
+            <Accordion className="w-full space-y-2">
+              <AccordionItem value="how-to" className="border border-gray-200 dark:border-zinc-850 rounded-md bg-white dark:bg-zinc-900 px-4">
+                <AccordionTrigger className="my-0 text-[15px] font-bold text-gray-800 dark:text-zinc-200 py-3 hover:no-underline flex items-center gap-2">
+                  <HelpCircle className="w-4 h-4 text-gray-500" />
+                  How to create a rule
+                </AccordionTrigger>
+                <AccordionContent className="text-sm text-gray-500 dark:text-zinc-400 space-y-1.5 leading-normal pb-3">
+                  <p>1. Click the <strong className="text-gray-700 dark:text-zinc-200">Add new</strong> button or select a preset shortcut from the <strong className="text-gray-700 dark:text-zinc-200">Quick setup</strong> links.</p>
+                  <p>2. The rule's condition is preconfigured to apply to <strong className="text-gray-700 dark:text-zinc-200">All Orders</strong>.</p>
+                  <p>3. Select the automated action: either <strong className="text-gray-700 dark:text-zinc-200">Set Courier And Product Code</strong> or <strong className="text-gray-700 dark:text-zinc-200">Select Cheapest Carrier/Service</strong>.</p>
+                  <p>4. Save the rule. It will run automatically on newly imported orders.</p>
+                </AccordionContent>
+              </AccordionItem>
 
-            <AccordionItem value="running-order" className="border border-gray-200 dark:border-zinc-850 rounded-md bg-white dark:bg-zinc-900 px-4">
-              <AccordionTrigger className="text-[15px] font-bold text-gray-800 dark:text-zinc-200 py-3 hover:no-underline flex items-center gap-2">
-                <Layers className="w-4 h-4 text-gray-500" />
-                Running order
-              </AccordionTrigger>
-              <AccordionContent className="text-sm text-gray-500 dark:text-zinc-400 leading-normal pb-3">
-                Rules apply to orders upon import and execute sequentially from top to bottom. If multiple rules match, each matching rule will execute in order.
-              </AccordionContent>
-            </AccordionItem>
-
-            <AccordionItem value="contains-vs" className="hidden border border-gray-200 dark:border-zinc-850 rounded-md bg-white dark:bg-zinc-900 px-4">
-              <AccordionTrigger className="text-[15px] font-bold text-gray-800 dark:text-zinc-200 py-3 hover:no-underline flex items-center gap-2">
-                <BookOpen className="w-4 h-4 text-gray-500" />
-                Contains vs. Does not contain
-              </AccordionTrigger>
-              <AccordionContent className="text-xs text-gray-500 dark:text-zinc-400 space-y-3 pb-3">
-                <div>
-                  <div className="bg-slate-50 dark:bg-zinc-950 px-2.5 py-1.5 rounded-md border border-gray-150 dark:border-zinc-850 text-xs font-semibold text-gray-700 dark:text-zinc-300">
-                    Destination State Contains NSW; VIC
-                  </div>
-                  <span className="text-[10px] text-gray-500 dark:text-zinc-500 mt-1 block">
-                    This means: Destination State contains NSW OR Destination State contains VIC
-                  </span>
-                </div>
-                <div>
-                  <div className="bg-slate-50 dark:bg-zinc-950 px-2.5 py-1.5 rounded-md border border-gray-150 dark:border-zinc-850 text-xs font-semibold text-gray-700 dark:text-zinc-300">
-                    Destination State Does not contain NSW; VIC
-                  </div>
-                  <span className="text-[10px] text-gray-500 dark:text-zinc-500 mt-1 block">
-                    This means: Destination State Does not contain NSW AND Destination State Does not contain VIC
-                  </span>
-                </div>
-              </AccordionContent>
-            </AccordionItem>
-          </Accordion>
-
+              <AccordionItem value="running-order" className="border border-gray-200 dark:border-zinc-850 rounded-md bg-white dark:bg-zinc-900 px-4">
+                <AccordionTrigger className="text-[15px] font-bold text-gray-800 dark:text-zinc-200 py-3 hover:no-underline flex items-center gap-2">
+                  <Layers className="w-4 h-4 text-gray-500" />
+                  Running order
+                </AccordionTrigger>
+                <AccordionContent className="text-sm text-gray-500 dark:text-zinc-400 leading-normal pb-3">
+                  Rules apply to orders upon import and execute sequentially from top to bottom. If multiple rules match, each matching rule will execute in order.
+                </AccordionContent>
+              </AccordionItem>
+            </Accordion>
+          )}
           {/* Run Rules Manual Triggers */}
           {/* <Card className="border gap-0 border-gray-200 dark:border-zinc-850 shadow-xs overflow-hidden bg-white dark:bg-zinc-900">
             <CardHeader className="px-5 py-4 border-b border-gray-100 dark:border-zinc-800">
@@ -343,6 +324,7 @@ export default function RulesPage() {
             }}
             onDelete={(id) => setRuleToDelete(id)}
             isFormOpen={isFormOpen}
+            canReadWrite={canReadWrite}
           />
 
           {/* Inline builder loaded beneath list */}
@@ -354,6 +336,7 @@ export default function RulesPage() {
                 setView('list');
                 setPrefilledData(null);
               }}
+
               isSaving={createRuleMutation.isPending}
             />
           )}

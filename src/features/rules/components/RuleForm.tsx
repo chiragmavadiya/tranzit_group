@@ -20,7 +20,7 @@ export default function RuleForm({
   prefilledData,
   onSave,
   onCancel,
-  isSaving = false
+  isSaving = false,
 }: RuleFormProps) {
   const [conditions, setConditions] = useState<Condition[]>([]);
   const [actions, setActions] = useState<RuleAction[]>([]);

@@ -107,6 +107,10 @@ export interface LoginResponse {
         expire_date: string;
     }[];
     team_access?: TeamAccess;
+    address_detail?: {
+        default: UserAddress;
+        billing: UserAddress;
+    }
 }
 
 

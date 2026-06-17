@@ -57,6 +57,8 @@ const authSlice = createSlice({
             if (next_step !== undefined) state.next_step = next_step;
             if (team_access !== undefined) {
                 state.team_access = team_access;
+                console.log(team_access);
+                state.is_sub_user = team_access.is_sub_user;
                 localStorage.setItem("team_access", JSON.stringify(team_access));
             }
         },

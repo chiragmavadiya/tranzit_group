@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { ArrowLeft, Link2Off, Loader2, Check } from 'lucide-react';
 // import { useQueryClient } from '@tanstack/react-query';
@@ -13,10 +13,14 @@ import CarrierConfigForm from '../components/CarrierConfigForm';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
+import { useAppSelector } from '@/hooks/store.hooks';
 
 export default function CarrierConfigPage() {
   const navigate = useNavigate();
   const { slug } = useParams<{ slug: string }>();
+  const { is_sub_user, team_access } = useAppSelector((state) => state.auth)
+  const canReadWrite = useMemo(() => !is_sub_user || team_access?.permissions?.settings_integrations === 'full', [is_sub_user, team_access]);
+
   // const queryClient = useQueryClient();
   const [isLoading, setIsLoading] = useState(false);
   const [formData, setFormData] = useState<any>({});
@@ -102,40 +106,42 @@ export default function CarrierConfigPage() {
               Back
             </Button>
 
-            <div className="flex items-center gap-2">
-              {isConnected && !isDefault && (
-                <Button
-                  variant="outline"
-                  size="sm"
-                  className="h-8 text-xs font-bold border-blue-200 text-blue-600 hover:text-blue-700 hover:bg-blue-50 dark:border-blue-900/30 dark:hover:bg-blue-950/20"
-                  onClick={handleSetDefault}
-                  disabled={setDefaultMutation.isPending}
-                >
-                  {setDefaultMutation.isPending ? (
-                    <Loader2 className="w-3.5 h-3.5 animate-spin mr-1.5" />
-                  ) : (
-                    <Check className="w-3.5 h-3.5 mr-1.5" />
-                  )}
-                  Set Default
-                </Button>
-              )}
-              {isConnected && (
-                <Button
-                  variant="outline"
-                  size="sm"
-                  className="h-8 text-xs font-bold border-red-200 text-red-500 hover:text-red-600 hover:bg-red-50 dark:border-red-900/30 dark:hover:bg-red-950/20"
-                  onClick={handleDisconnect}
-                  disabled={disconnectMutation.isPending}
-                >
-                  {disconnectMutation.isPending ? (
-                    <Loader2 className="w-3.5 h-3.5 animate-spin mr-1.5" />
-                  ) : (
-                    <Link2Off className="w-3.5 h-3.5 mr-1.5" />
-                  )}
-                  Disconnect
-                </Button>
-              )}
-            </div>
+            {canReadWrite && (
+              <div className="flex items-center gap-2">
+                {isConnected && !isDefault && (
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="h-8 text-xs font-bold border-blue-200 text-blue-600 hover:text-blue-700 hover:bg-blue-50 dark:border-blue-900/30 dark:hover:bg-blue-950/20"
+                    onClick={handleSetDefault}
+                    disabled={setDefaultMutation.isPending}
+                  >
+                    {setDefaultMutation.isPending ? (
+                      <Loader2 className="w-3.5 h-3.5 animate-spin mr-1.5" />
+                    ) : (
+                      <Check className="w-3.5 h-3.5 mr-1.5" />
+                    )}
+                    Set Default
+                  </Button>
+                )}
+                {isConnected && (
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="h-8 text-xs font-bold border-red-200 text-red-500 hover:text-red-600 hover:bg-red-50 dark:border-red-900/30 dark:hover:bg-red-950/20"
+                    onClick={handleDisconnect}
+                    disabled={disconnectMutation.isPending}
+                  >
+                    {disconnectMutation.isPending ? (
+                      <Loader2 className="w-3.5 h-3.5 animate-spin mr-1.5" />
+                    ) : (
+                      <Link2Off className="w-3.5 h-3.5 mr-1.5" />
+                    )}
+                    Disconnect
+                  </Button>
+                )}
+              </div>
+            )}
           </div>
 
           {/* Centered Logo & Header */}
@@ -193,6 +199,7 @@ export default function CarrierConfigPage() {
             onSubmit={handleConnect}
             isLoading={isLoading}
             isConnected={isConnected}
+            canReadWrite={canReadWrite}
           />
         )}
       </div>

@@ -52,8 +52,9 @@ export const AppRouter = () => {
   // Sync user details to Redux when query data updates
   useEffect(() => {
     if (userData?.user && !isPending) {
+      const add = userData?.address_detail ? [userData.address_detail.default, userData.address_detail.billing] : []
       dispatch(setUser({
-        user: userData.user,
+        user: { ...userData.user, addresses: add },
         next_step: userData.next_step,
         default_courier: userData.default_courier,
         default_item: userData.default_item,

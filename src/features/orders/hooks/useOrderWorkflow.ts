@@ -163,6 +163,7 @@ export const useOrderWorkflow = () => {
   // Sync user profile sender address (Create Mode)
   useEffect(() => {
     if (role === 'customer' && user && (orderType === 'create' || orderType === 'create-menual' || orderType === 'return') && !localStorage.getItem('order_to_clone')) {
+      console.log(user, 'user')
       const key = orderType === 'return' ? 'receiver' : 'sender';
       setAddressData((prev) => ({
         ...prev,

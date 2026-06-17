@@ -23,7 +23,7 @@ api.interceptors.request.use(
         // Only prefix if the URL doesn't already have one
         if (config.url && !config.url.startsWith('/admin') && !config.url.startsWith('/customer') && config.url !== '/localities/search') {
             // const cutsomRole = (role === 'Staff' || role === 'Operation Manager') ? 'admin' : role;
-            config.url = `/${role?.toLowerCase() || 'customer'}${config.url}`;
+            config.url = `/${role?.toLowerCase()}${config.url}`;
         }
 
         return config;

@@ -135,7 +135,8 @@ export function FormTextarea({
   layout = 'vertical',
   required = false,
   error,
-  errormsg
+  errormsg,
+  disabled = false,
 }: FormTextareaProps) {
   const isHorizontal = useMemo(() => layout === 'horizontal', [layout]);
 
@@ -165,6 +166,7 @@ export function FormTextarea({
         value={value}
         onChange={handleChange}
         rows={rows}
+        disabled={disabled}
         className={cn(
           "rounded-sm shadow-none border-slate-200 dark:border-zinc-800 bg-white dark:bg-zinc-950 font-medium focus-visible:ring-0 focus-visible:ring-primary dark:focus-visible:ring-primary focus-visible:border-primary dark:focus-visible:border-primary transition-all placeholder:text-muted-foreground placeholder:font-normal dark:placeholder:text-zinc-700 text-sm resize-none px-3 py-2",
           error ? "border-red-500 dark:border-red-500 focus-visible:border-red-500 dark:focus-visible:border-red-500" : ""

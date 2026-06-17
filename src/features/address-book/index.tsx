@@ -15,6 +15,7 @@ import {
   useExportAddressBook
 } from './hooks/useAddressBook';
 import { useNavigate } from 'react-router-dom';
+import { useAppSelector } from '@/hooks/store.hooks';
 
 export default function AddressBookPage() {
   const navigate = useNavigate();
@@ -25,6 +26,8 @@ export default function AddressBookPage() {
   const [search, setSearch] = useState('');
   const [pageSize, setPageSize] = useState(25);
   const [currentPage, setCurrentPage] = useState(1);
+  const { is_sub_user, team_access } = useAppSelector((state) => state.auth);
+  const canReadWrite = useMemo(() => !is_sub_user || team_access?.permissions?.my_address_book === 'full', [is_sub_user, team_access]);
 
   // API Hooks
   const { data, isLoading } = useAddressBookList({
@@ -126,7 +129,7 @@ export default function AddressBookPage() {
       searchable: true,
       cell: (value: string, row: Address) => {
         return (
-          <div className='cursor-pointer hover:text-primary' onClick={() => handleEditAddress(row)}>
+          <div className={`hover:text-primary ${canReadWrite ? 'cursor-pointer' : ''}`} onClick={() => canReadWrite && handleEditAddress(row)}>
             <span className="text-sm font-semibold uppercase text-gray-900 dark:text-white">{value}</span>
           </div>
         );
@@ -161,11 +164,11 @@ export default function AddressBookPage() {
       header: "ADDRESS",
       sortable: true,
     },
-    {
+    ...(canReadWrite ? [{
       key: "actions",
       header: "ACTIONS",
       className: "w-20 px-0 pr-3 print:hidden",
-      cell: (_, row) => (
+      cell: (_: any, row: any) => (
         <div className="flex items-center gap-4">
           <Button size="sm" variant='outline' className="" onClick={() => createOrder(row)}>
             Create Order
@@ -178,8 +181,8 @@ export default function AddressBookPage() {
           </Button>
         </div>
       )
-    }
-  ], [handleEditAddress, handleConfirmDelete, createOrder]);
+    }] : [])
+  ], [handleEditAddress, handleConfirmDelete, createOrder, canReadWrite]);
 
   return (
     <div className="flex flex-col flex-1 gap-2 p-page-padding min-h-0 animate-in fade-in slide-in-from-bottom-2 duration-500">
@@ -193,7 +196,7 @@ export default function AddressBookPage() {
           searchValue={search}
           pageSize={pageSize}
           onPageSizeChange={handlePageSizeChange}
-          customHeader={<AddressBookHeader onAddAddress={handleAddAddress} />}
+          customHeader={canReadWrite && <AddressBookHeader onAddAddress={handleAddAddress} />}
           headerTitle='My Address Book'
           headerDescription="Manage your saved addresses, contact persons, and business details."
           headerClass="h-20"
@@ -203,6 +206,7 @@ export default function AddressBookPage() {
           onPageChange={setCurrentPage}
           onExport={onExport}
           isExporting={exportMutation.isPending}
+          exportable={canReadWrite}
         />
 
         {isDialogOpen && (

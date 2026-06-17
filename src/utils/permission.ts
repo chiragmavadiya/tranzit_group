@@ -1,54 +1,151 @@
-import { store } from "@/app/store";
-import { useAppSelector } from "@/hooks/store.hooks";
+import type { AuthState } from "@/types/store.types";
+
+export const ROUTE_PERMISSIONS: Record<string, string> = {
+  '/dashboard': 'dashboard',
+  '/orders': 'order',
+  '/quote': 'get_quote',
+  '/manifest': 'manifest_order',
+  '/wallet': 'my_wallet',
+  '/items': 'my_items',
+  '/address-book': 'my_address_book',
+  '/reports': 'report',
+  '/parcel-report': 'report',
+  '/invoices': 'invoice',
+  '/enquiry': 'enquiry',
+  '/settings/account': 'settings_account_detail',
+  '/settings/team': 'settings_team_access',
+  '/settings/rules': 'settings_rule_management',
+  '/settings/ecommerce': 'settings_integrations',
+  '/settings/carriers': 'settings_integrations',
+};
 
 /**
- * Check if the current user has a specific permission (pure utility function).
- * Reads from Redux store state first, then falls back to localStorage.
+ * Checks if the customer user has permission for a specific module key.
  */
-export const hasPermission = (permissionName: string): boolean => {
-  try {
-    const state = store.getState();
-    const permissions = state.auth.permissions || [];
-    
-    // Fallback to localStorage if store is empty (e.g. during initialization or non-React contexts)
-    const finalPermissions = permissions.length > 0 
-      ? permissions 
-      : JSON.parse(localStorage.getItem("user_permissions") || "[]");
+export const hasCustomerPermission = (
+  key: string | undefined,
+  teamAccess: AuthState['team_access'] | null | undefined,
+  role: string
+): boolean => {
+  if (role !== 'customer') return true;
+  if (!key) return true;
 
-    return finalPermissions.includes(permissionName);
-  } catch (error) {
-    console.error("Error checking permission:", error);
-    return false;
+  if (teamAccess?.is_sub_user) {
+    const permissions = teamAccess.permissions;
+    if (permissions && permissions[key] === 'no_access') {
+      return false;
+    }
   }
+
+  return true;
 };
 
 /**
- * Check if the current user has ANY of the specified permissions.
+ * Checks if the customer user has permission for a specific route path.
  */
-export const hasAnyPermission = (permissionNames: string[]): boolean => {
-  return permissionNames.some(name => hasPermission(name));
+export const hasRoutePermission = (
+  pathname: string,
+  teamAccess: AuthState['team_access'] | null | undefined,
+  role: string
+): boolean => {
+  if (role !== 'customer') return true;
+  if (!teamAccess?.is_sub_user) return true;
+
+  // Find permission key for the path
+  const keys = Object.keys(ROUTE_PERMISSIONS).sort((a, b) => b.length - a.length);
+  let permissionKey: string | null = null;
+  for (const prefix of keys) {
+    if (pathname === prefix || pathname.startsWith(prefix + '/')) {
+      permissionKey = ROUTE_PERMISSIONS[prefix];
+      break;
+    }
+  }
+
+  if (permissionKey) {
+    const permissions = teamAccess.permissions || {};
+    if (pathname === '/orders/create' || pathname.startsWith('/orders/create/')) {
+      return permissions['order'] === 'full';
+    }
+    if (permissions[permissionKey] === 'no_access') {
+      return false;
+    }
+  }
+
+  return true;
 };
 
 /**
- * Check if the current user has ALL of the specified permissions.
+ * Gets the first allowed settings sub-route path for a customer sub-user.
  */
-export const hasAllPermissions = (permissionNames: string[]): boolean => {
-  return permissionNames.every(name => hasPermission(name));
+export const getFirstAllowedSettingsPath = (
+  teamAccess: AuthState['team_access'] | null | undefined,
+  role: string
+): string | null => {
+  if (role !== 'customer') return '/settings/account';
+  if (!teamAccess?.is_sub_user) return '/settings/account';
+
+  const permissions = teamAccess.permissions || {};
+
+  const settingsOrder = [
+    { key: 'settings_account_detail', path: '/settings/account' },
+    { key: 'settings_team_access', path: '/settings/team' },
+    { key: 'settings_rule_management', path: '/settings/rules' },
+    { key: 'settings_integrations', path: '/settings/ecommerce' },
+  ];
+
+  for (const item of settingsOrder) {
+    if (permissions[item.key] !== 'no_access') {
+      return item.path;
+    }
+  }
+
+  return null;
 };
 
 /**
- * React hook to check if the current user has a specific permission.
- * Automatically triggers re-renders when the permission state in Redux updates.
+ * Gets the first allowed route path for a customer sub-user.
  */
-export const useHasPermission = (permissionName: string): boolean => {
-  const permissions = useAppSelector((state) => state.auth.permissions) || [];
-  return permissions.includes(permissionName);
-};
+export const getFirstAllowedPath = (
+  teamAccess: AuthState['team_access'] | null | undefined,
+  role: string
+): string => {
+  if (role !== 'customer' || !teamAccess?.is_sub_user) {
+    return '/orders?tab=new';
+  }
 
-/**
- * React hook to check if the current user has ANY of the specified permissions.
- */
-export const useHasAnyPermission = (permissionNames: string[]): boolean => {
-  const permissions = useAppSelector((state) => state.auth.permissions) || [];
-  return permissionNames.some(name => permissions.includes(name));
+  const permissions = teamAccess.permissions || {};
+
+  // Check dashboard first
+  if (permissions['dashboard'] !== 'no_access') {
+    return '/dashboard';
+  }
+  // Check orders
+  if (permissions['order'] !== 'no_access') {
+    return '/orders?tab=new';
+  }
+
+  // Iterate over preference order
+  const checkOrder = [
+    { key: 'dashboard', path: '/dashboard' },
+    { key: 'order', path: '/orders?tab=new' },
+    { key: 'get_quote', path: '/quote' },
+    { key: 'manifest_order', path: '/manifest' },
+    { key: 'my_items', path: '/items' },
+    { key: 'my_address_book', path: '/address-book' },
+    { key: 'my_wallet', path: '/wallet/transactions' },
+    { key: 'invoice', path: '/invoices' },
+    { key: 'enquiry', path: '/enquiry' },
+    { key: 'settings_account_detail', path: '/settings/account' },
+    { key: 'settings_team_access', path: '/settings/team' },
+    { key: 'settings_rule_management', path: '/settings/rules' },
+    { key: 'settings_integrations', path: '/settings/ecommerce' },
+  ];
+
+  for (const item of checkOrder) {
+    if (permissions[item.key] !== 'no_access') {
+      return item.path;
+    }
+  }
+
+  return '/orders?tab=new';
 };

@@ -14,7 +14,8 @@ export const TRANSACTION_STATUS_CONFIG = {
 
 export const getWalletColumns = (
   onDownload: (row: WalletTransaction) => void,
-  isDownloadingId?: string | number | null
+  isDownloadingId?: string | number | null,
+  canReadWrite?: boolean
 ): Column<WalletTransaction>[] => [
     {
       key: 'transaction_type',
@@ -34,7 +35,7 @@ export const getWalletColumns = (
     { key: 'reason', header: 'REASON', sortable: true },
     { key: 'transaction_id', header: 'TRANSACTION ID', sortable: true },
     { key: 'transaction_date_time', header: 'TRANSACTION DATE & TIME', sortable: true },
-    {
+    ...(canReadWrite ? [{
       key: 'receipt',
       header: 'PAYMENT RECEIPT',
       className: 'text-center',
@@ -57,7 +58,7 @@ export const getWalletColumns = (
           </Button>
         );
       }
-    },
+    }] : []),
   ];
 
 export const ADMIN_TOPUP_COLUMNS: Column<any>[] = [

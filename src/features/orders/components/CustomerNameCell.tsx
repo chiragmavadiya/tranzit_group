@@ -9,6 +9,7 @@ interface CustomerNameCellProps {
   orderType: string;
   customerEditClick: (id: string) => void;
   fromCustomer: boolean;
+  canReadWrite: boolean;
 }
 
 export const CustomerNameCell = ({
@@ -16,7 +17,8 @@ export const CustomerNameCell = ({
   row,
   orderType,
   customerEditClick,
-  fromCustomer
+  fromCustomer,
+  canReadWrite
 }: CustomerNameCellProps) => {
   const [open, setOpen] = useState(false);
 
@@ -29,7 +31,7 @@ export const CustomerNameCell = ({
   const state = row.customer_full_address?.split(',')?.[2];
   const postcode = row.customer_full_address?.split(',')?.[3];
 
-  if (orderType !== 'new') {
+  if (orderType !== 'new' || !canReadWrite) {
     return (
       <div
         onMouseLeave={() => setOpen(false)}

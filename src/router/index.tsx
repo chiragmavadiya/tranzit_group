@@ -6,9 +6,9 @@ import AdminRoutes from '@/apps/admin/routes/AdminRoutes';
 import ClientRoutes from '@/apps/client/routes/ClientRoutes';
 import { useAppDispatch, useAppSelector } from '@/hooks/store.hooks';
 import { useGetUserDetails } from '@/features/auth/hooks/useAuth';
-import { setUser, setPermissions } from '@/features/auth/authSlice';
-import { ADMIN_ROLES } from '@/constants';
+import { setUser } from '@/features/auth/authSlice';
 import SubscriptionPlanModal from '@/features/customer-settings/components/SubscriptionPlanModal';
+import ChangePassword from '@/features/auth/pages/ChangePassword';
 
 // Lazy load page components
 const SignIn = lazy(() => import('@/features/auth/pages/SignIn'));
@@ -56,17 +56,11 @@ export const AppRouter = () => {
         user: userData.user,
         next_step: userData.next_step,
         default_courier: userData.default_courier,
-        default_item: userData.default_item
+        default_item: userData.default_item,
+        team_access: userData.team_access
       }));
 
-      // Set global permissions if staff/admin
-      const userSubRole = userData.user.roles?.[0]?.name;
-      if (userSubRole && ADMIN_ROLES.includes(userSubRole)) {
-        const permissions = userData.user.permissions || userData.permissions || [];
-        dispatch(setPermissions(permissions));
-      }
-
-      if (userData.next_step === 'purchase_plan' && userData.user.roles[0]?.name !== 'admin') {
+      if (userData.next_step === 'purchase_plan' && userData.user.role !== 'admin') {
         setShowSubscriptionModal(true);
       }
     }
@@ -77,6 +71,8 @@ export const AppRouter = () => {
     if (isAuthenticated) {
       if ((next_step === 'onboarding' || next_step === 'verify_email') && !location.pathname.includes('/on-board')) {
         navigate('/on-board/' + userID + '/' + token);
+      } else if (next_step === 'change_password') {
+        navigate(`/change-password`, { replace: true })
       } else if (next_step === 'dashboard' && location.pathname.includes('/on-board')) {
         navigate('/orders?tab=new');
       }
@@ -95,6 +91,7 @@ export const AppRouter = () => {
           <Route path="/register" element={<SignUp />} />
           <Route path="/forgot-password" element={<ForgotPassword />} />
           <Route path="/reset-password/:token" element={<ResetPassword />} />
+          <Route path="/change-password" element={<ChangePassword />} />
           <Route path="/verify-email" element={<VerifyEmail />} />
         </Route>
         <Route path="/on-board/:customerId/:token" element={<OnboardingPage />} />

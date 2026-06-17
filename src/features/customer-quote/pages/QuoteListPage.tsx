@@ -6,7 +6,6 @@ import { useDebounce } from '@/hooks/useDebounce';
 import { downloadFile } from '@/lib/utils';
 import { QuoteDetailsDialog } from '../components/QuoteDetailsDialog';
 import { Eye, Plus } from 'lucide-react';
-import { format } from 'date-fns';
 import { useNavigate } from 'react-router-dom';
 import { showToast } from '@/components/ui/custom-toast';
 
@@ -69,7 +68,6 @@ export default function QuoteListPage() {
             key: 'created_at',
             header: 'DATE',
             sortable: true,
-            cell: (val: string) => <span className="text-slate-500 text-[11px]">{format(new Date(val), 'dd MMM yyyy HH:mm')}</span>
         },
         {
             key: 'actions',

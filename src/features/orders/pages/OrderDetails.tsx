@@ -238,6 +238,7 @@ const OrderDetailsPage: React.FC = () => {
     handleReceiverPhoneSubmit,
     default_courier,
     default_item,
+    canReadWrite,
     // isCloning,
   } = useOrderWorkflow();
 
@@ -349,6 +350,7 @@ const OrderDetailsPage: React.FC = () => {
               signatureSelected={signatureSelected}
               insuranceSelected={insuranceSelected}
               deliveryInstructions={deliveryInstructions}
+              canReadWrite={canReadWrite}
             />
 
             {requiresManualLabel && (

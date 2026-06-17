@@ -207,7 +207,13 @@ export const API_ENDPOINTS = {
     },
     MANIFEST: {
         LIST: "/customer/orders/auspost/manifests",
-        EXPORT: "/customer/manifests/export",
+        EXPORT: "/customer/orders/auspost/manifests/export",
+    },
+    CUSTOMER_TEAM: {
+        BASE: "/customer/team-users",
+        FORM_OPTIONS: "/customer/team-users/form-options",
+        DETAILS: (id: string | number) => `/customer/team-users/${id}`,
+        TOGGLE_STATUS: (id: string | number) => `/customer/team-users/${id}/toggle-status`,
     }
 };
 
@@ -322,5 +328,10 @@ export const QUERY_KEYS = {
     MANIFEST: {
         LIST: ["manifests", "list"],
         DETAILS: (id: string | number) => ["manifests", "details", id],
+    },
+    CUSTOMER_TEAM: {
+        LIST: ["customer", "team-users", "list"],
+        FORM_OPTIONS: ["customer", "team-users", "form-options"],
+        DETAILS: (id: string | number) => ["customer", "team-users", "details", id],
     }
 };

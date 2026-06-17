@@ -1,6 +1,4 @@
-"use client";
-
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { NavLink, useLocation, useNavigate } from 'react-router-dom';
 import { Menu, ArrowLeft, ChevronDown, X } from 'lucide-react';
 import type { SidebarItem } from './types/Sidebar.types';
@@ -11,6 +9,7 @@ import { CustomTooltip } from '@/components/common/CustomTooltip';
 import { useAppSelector } from '@/hooks/store.hooks';
 import { useTheme } from '@/app/providers/theme-provider';
 import { cn } from '@/lib/utils';
+import { getFirstAllowedSettingsPath } from '@/utils/permission';
 
 interface SidebarProps {
   isCollapsed: boolean;
@@ -31,10 +30,75 @@ export default function Sidebar({
 }: SidebarProps) {
   const [activeSubmenu, setActiveSubmenu] = useState<string | null>(null);
   const [expandedItems, setExpandedItems] = useState<string[]>([]);
-  const { role } = useAppSelector((state) => state.auth);
+  const { role, team_access } = useAppSelector((state) => state.auth);
   const location = useLocation();
   const navigate = useNavigate();
-  const sidebarItems = role === 'admin' ? adminSidebarItems : clientSidebarItems;
+
+  const sidebarItems = useMemo(() => {
+    let items = role === 'admin' ? adminSidebarItems : clientSidebarItems;
+
+    if (role === 'customer' && team_access?.is_sub_user) {
+      const permissions = team_access.permissions || {};
+
+      items = clientSidebarItems
+        .filter((item) => {
+          if (item.key) {
+            if (item.path === '/orders/create') {
+              return permissions[item.key] === 'full';
+            }
+            return permissions[item.key] !== 'no_access';
+          }
+          return true;
+        })
+        .map((item) => {
+          if (item.subItems) {
+            const filteredSubItems = item.subItems.filter((sub) => {
+              if (sub.key) {
+                return permissions[sub.key] !== 'no_access';
+              }
+              return true;
+            });
+            return { ...item, subItems: filteredSubItems };
+          }
+
+          if (item.subGroups) {
+            const filteredSubGroups = item.subGroups
+              .map((group) => {
+                const filteredItems = group.items.filter((subItem) => {
+                  if (subItem.key) {
+                    return permissions[subItem.key] !== 'no_access';
+                  }
+                  return true;
+                });
+                return { ...group, items: filteredItems };
+              })
+              .filter((group) => group.items.length > 0);
+            return { ...item, subGroups: filteredSubGroups };
+          }
+
+          return item;
+        })
+        .filter((item) => {
+          if (item.hasDropdown) {
+            if (item.subItems && item.subItems.length === 0) return false;
+            if (item.subGroups && item.subGroups.length === 0) return false;
+          }
+          return true;
+        });
+    }
+
+    return items.map((item) => {
+      if (item.name === 'Settings') {
+        const firstAllowedSettings = getFirstAllowedSettingsPath(team_access, role);
+        return {
+          ...item,
+          path: firstAllowedSettings || '/settings/account',
+        };
+      }
+      return item;
+    });
+  }, [role, team_access]);
+
   const { theme } = useTheme();
 
   const isItemActive = (item: SidebarItem, isActive: boolean) => {

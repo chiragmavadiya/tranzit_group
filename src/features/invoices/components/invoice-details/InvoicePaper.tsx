@@ -58,6 +58,9 @@ const formatDate = (dateStr: string) => {
     const day = String(d.getDate()).padStart(2, '0');
     const month = String(d.getMonth() + 1).padStart(2, '0');
     const year = d.getFullYear();
+    console.log("day", day);
+    console.log("month", month);
+    console.log("year", year);
     return `${day}/${month}/${year}`;
   } catch {
     return dateStr;

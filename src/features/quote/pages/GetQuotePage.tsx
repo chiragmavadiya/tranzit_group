@@ -22,6 +22,8 @@ export default function GetQuotePage() {
   const [pickupCharge, setPickupCharge] = useState<string>('0');
   const [isSendDialogOpen, setIsSendDialogOpen] = useState(false);
   const navigate = useNavigate();
+  const { is_sub_user, team_access } = useAppSelector((state) => state.auth);
+  const canReadWrite = useMemo(() => !is_sub_user || team_access?.permissions?.get_quote === 'full', [is_sub_user, team_access]);
 
   const {
     itemsData,
@@ -181,7 +183,7 @@ export default function GetQuotePage() {
         )}
 
       </div>
-      {!isAdmin && canCreateOrder && (
+      {!isAdmin && canReadWrite && canCreateOrder && (
         <div className="sticky bottom-0 -left-5 right-20 bg-white dark:bg-zinc-950 border-t border-gray-200 dark:border-zinc-800 p-3 flex justify-center items-center gap-3 z-50 shadow-[0_-4px_10px_rgba(0,0,0,0.05)] dark:shadow-[0_-4px_10px_rgba(0,0,0,0.2)] transition-colors duration-300">
           <Button
             onClick={handleCreateOrder}

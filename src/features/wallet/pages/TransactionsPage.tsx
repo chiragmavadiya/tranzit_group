@@ -15,6 +15,8 @@ import { useAppSelector } from '@/hooks/store.hooks';
 import { formateCurrency } from '@/lib/utils';
 
 export default function TransactionsPage() {
+  const { is_sub_user, team_access } = useAppSelector((state) => state.auth);
+  const canReadWrite = useMemo(() => !is_sub_user || team_access?.permissions?.get_quote === 'full', [is_sub_user, team_access]);
   const [searchParams, setSearchParams] = useSearchParams();
   const [transactionType, setTransactionType] = useState('all');
   const [search, setSearch] = useState('');
@@ -105,8 +107,8 @@ export default function TransactionsPage() {
   }, [downloadReceiptMutation]);
 
   const columns = useMemo(() => {
-    return getWalletColumns(handleDownloadReceipt, downloadingId);
-  }, [handleDownloadReceipt, downloadingId]);
+    return getWalletColumns(handleDownloadReceipt, downloadingId, canReadWrite);
+  }, [handleDownloadReceipt, downloadingId, canReadWrite]);
 
   const stats = useMemo(() => [
     {
@@ -259,6 +261,7 @@ export default function TransactionsPage() {
           onPageChange={setCurrentPage}
           onExport={handleExport}
           isExporting={exportMutation.isPending}
+          exportable={canReadWrite}
         />
       </div>
     </div>

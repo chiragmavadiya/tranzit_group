@@ -13,12 +13,15 @@ import type { DashboardOrder, CustomerMetrics } from "../types";
 import { useNavigate } from "react-router";
 import { ClientDashboardSkeleton } from "../components/DashboardSkeleton";
 import { StatusBadge } from "@/features/orders/components/StatusBadge";
-
-
+import { useAppSelector } from "@/hooks/store.hooks";
 
 export default function ClientDashboard() {
   const navigate = useNavigate();
+  const { role, team_access } = useAppSelector((state) => state.auth);
   const { data: metricsData, isLoading } = useDashboardMetrics();
+
+  const isSubUser = role === 'customer' && team_access?.is_sub_user;
+  const canCreateOrder = !isSubUser || team_access?.permissions?.order === 'full';
 
   if (isLoading) {
     return <ClientDashboardSkeleton />;
@@ -77,7 +80,7 @@ export default function ClientDashboard() {
         userName="Welcome to Tranzit Group, Customer1 User"
         description="Manage pickups, create shipments, and track every parcel in real time, all from one dashboard built to keep your delivery costs low."
         buttons={[
-          { label: "Send Parcel", variant: "default", onClick: () => navigate("/orders/create") },
+          ...(canCreateOrder ? [{ label: "Send Parcel", variant: "default" as const, onClick: () => navigate("/orders/create") }] : []),
           { label: "View Orders", variant: "outline", onClick: () => navigate("/orders") },
         ]}
         stats={stats}

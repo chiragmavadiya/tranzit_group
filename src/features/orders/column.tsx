@@ -25,6 +25,7 @@ export const getOrdersColumns = (
   updateToArchiveId?: string | null,
   onPrint?: (orderNumber: string | number, amount: number, row: Order) => void,
   printingOrderId?: string | number | null,
+  canReadWrite: boolean = true,
 ): Column<Order>[] => {
   const printedAndShippedActions = (value: string) => [
     {
@@ -79,7 +80,7 @@ export const getOrdersColumns = (
         key: 'order_number',
         sticky: 'left',
         cell: (value: string) => (
-          <NavLink to={`${role === "admin" ? "/admin" : ""}/orders/${(orderType === 'new' && !fromCustomer) ? 'consign' : 'view'}/${value}`} className="font-medium text-primary underline">
+          <NavLink to={`${role === "admin" ? "/admin" : ""}/orders/${(orderType === 'new' && !fromCustomer && canReadWrite) ? 'consign' : 'view'}/${value}`} className="font-medium text-primary underline">
             {value}
           </NavLink>
         )
@@ -101,6 +102,7 @@ export const getOrdersColumns = (
             orderType={orderType}
             customerEditClick={customerEditClick}
             fromCustomer={fromCustomer}
+            canReadWrite={canReadWrite}
           />
         )
       },
@@ -112,7 +114,7 @@ export const getOrdersColumns = (
         width: '220px',
         cell: (value: string, row: Order) => (
           <>
-            {orderType === 'new' ? (<div className="flex gap-2 justify-between items-center truncate uppercase font-semibold py-1 px-0 transition-all duration-250 border border-transparent group-hover/row:px-1.5 group-hover/row:border-gray-200 dark:group-hover/row:border-zinc-800 group-hover/row:bg-white dark:group-hover/row:bg-zinc-900 rounded-sm text-slate-800 dark:text-zinc-200">
+            {orderType === 'new' && canReadWrite ? (<div className="flex gap-2 justify-between items-center truncate uppercase font-semibold py-1 px-0 transition-all duration-250 border border-transparent group-hover/row:px-1.5 group-hover/row:border-gray-200 dark:group-hover/row:border-zinc-800 group-hover/row:bg-white dark:group-hover/row:bg-zinc-900 rounded-sm text-slate-800 dark:text-zinc-200">
               <div className="flex items-center gap-2">
                 {(row?.courier_logo || row?.courier_logo_url) && (
                   <div className="">
@@ -132,9 +134,9 @@ export const getOrdersColumns = (
                     <img src={row?.courier_logo || row?.courier_logo_url} className="h-6! min-w-[60px] object-contain" />
                   </div>
                 )}
-                <div className="">
+                <div className="flex">
                   <span className="whitespace-nowrap font-normal">{value && value !== 'unknown' ? value : '-'}</span>
-                  {row.product_id && <span className="font-normal text-sm"> - {row.product_id}</span>}
+                  {row.product_id && <span className="font-normal text-sm whitespace-nowrap"> - {row.product_id}</span>}
                 </div>
               </div>
             )}
@@ -174,7 +176,7 @@ export const getOrdersColumns = (
         noPrint: true,
         cell: (value: string, row: Order) => (
           <div className="flex gap-2" onClick={(e) => e.stopPropagation()}>
-            {fromCustomer ? (
+            {fromCustomer || !canReadWrite ? (
               <>
                 <CustomTooltip title="View Order">
 

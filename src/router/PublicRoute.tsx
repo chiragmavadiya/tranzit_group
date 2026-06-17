@@ -6,7 +6,7 @@ export default function PublicRoute() {
   const { isAuthenticated, role, next_step } = useAppSelector((state) => state.auth);
 
   // If the user is authenticated, redirect them away from public auth pages to orders
-  if (isAuthenticated && next_step !== 'onboarding') {
+  if (isAuthenticated && next_step !== 'onboarding' && next_step !== 'change_password') {
     if (role === 'admin' || role === 'Staff') {
       return <Navigate to="/admin/orders" replace />;
     } else {

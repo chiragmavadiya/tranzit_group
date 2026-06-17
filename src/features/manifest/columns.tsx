@@ -10,18 +10,25 @@ import Favicon from '@/assets/favicon.png';
 
 export const getManifestColumns = (
   onDownloadPDF: (row: Manifest) => void,
-  downloadingId: string | null
+  downloadingId: string | null,
+  canReadWrite: boolean,
+  canOrderView: boolean
 ): Column<Manifest>[] => [
     {
       header: 'ORDER #',
       key: 'order_number',
       className: 'text-primary font-bold',
       sticky: 'left',
-      cell: (value: string) => (
-        <NavLink to={`/orders/view/${value}`} className="font-bold text-primary underline">
-          {value}
-        </NavLink>
-      )
+      cell: (value: string) => {
+        if (!canOrderView) {
+          return value;
+        }
+        return (
+          <NavLink to={`/orders/view/${value}`} className="font-bold text-primary underline">
+            {value}
+          </NavLink>
+        )
+      }
 
     },
     {
@@ -52,9 +59,9 @@ export const getManifestColumns = (
               <img src={row?.courier_logo || row?.courier_logo_url} className="h-6! min-w-[60px] object-contain" />
             </div>
           )}
-          <div className="flex flex-col">
-            <span className="font-medium whitespace-nowrap">{value && value !== 'unknown' ? value : '-'}</span>
-            {row.product_id && <span className="font-normal text-sm">Product - {row.product_id}</span>}
+          <div className="flex">
+            <span className="font-normal whitespace-nowrap">{value && value !== 'unknown' ? value : '-'}</span>
+            {row.product_id && <span className="font-normal text-sm whitespace-nowrap"> - {row.product_id}</span>}
           </div>
         </div>
       )
@@ -74,11 +81,11 @@ export const getManifestColumns = (
         </div>
       )
     },
-    {
+    ...(canReadWrite ? [{
       key: 'actions',
       header: 'ACTION',
-      sticky: 'right',
-      cell: (_, row: Manifest) => {
+      sticky: 'right' as const,
+      cell: (_: any, row: Manifest) => {
         const isDownloading = downloadingId === row?.order_number;
         return (
           <div className="flex items-center gap-2">
@@ -100,5 +107,5 @@ export const getManifestColumns = (
           </div>
         );
       }
-    }
+    }] : []),
   ];

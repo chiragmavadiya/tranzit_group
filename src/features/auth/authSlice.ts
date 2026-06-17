@@ -1,7 +1,6 @@
 import { createSlice, type PayloadAction } from "@reduxjs/toolkit";
 import type { AuthState } from "@/types/store.types";
-import type { User } from "@/features/auth/auth.types";
-import { ADMIN_ROLES } from "@/constants";
+import type { User, TeamAccess } from "@/features/auth/auth.types";
 
 const initialState: AuthState = {
     user: null,
@@ -13,9 +12,10 @@ const initialState: AuthState = {
     role: localStorage.getItem("user_role") as string,
     next_step: '',
     default_courier: null,
+    is_sub_user: false,
     default_item: null,
-    subRole: localStorage.getItem("user_sub_role") as string,
     permissions: JSON.parse(localStorage.getItem("user_permissions") || "[]"),
+    team_access: JSON.parse(localStorage.getItem("team_access") || "null"),
 };
 
 const authSlice = createSlice({
@@ -24,35 +24,41 @@ const authSlice = createSlice({
     reducers: {
         setCredentials: (
             state,
-            action: PayloadAction<{ userID: number; token: string, role: string, next_step: string, user?: User, sub_role?: string }>
+            action: PayloadAction<{ userID: number; token: string, role: string, next_step: string, user?: User, team_access?: TeamAccess }>
         ) => {
-            const { userID, token, role, next_step, user, sub_role } = action.payload;
+            const { userID, token, role, next_step, user, team_access } = action.payload;
             state.userID = userID;
             state.role = role;
             state.token = token;
             state.next_step = next_step;
             if (user) state.user = user;
+            if (team_access) {
+                state.team_access = team_access;
+                state.is_sub_user = team_access.is_sub_user;
+                localStorage.setItem("team_access", JSON.stringify(team_access));
+            }
             state.isAuthenticated = true;
             localStorage.setItem("auth_userID", JSON.stringify(userID));
             localStorage.setItem("user_role", role);
-            localStorage.setItem("user_sub_role", sub_role || '');
             localStorage.setItem("auth_token", token);
         },
-        setUser: (state, action: PayloadAction<{ user: User; next_step?: string, default_courier?: any, default_item?: any }>) => {
-            const { user, next_step, default_courier, default_item } = action.payload;
+        setUser: (state, action: PayloadAction<{ user: User; next_step?: string, default_courier?: any, default_item?: any, team_access?: TeamAccess }>) => {
+            const { user, next_step, default_courier, default_item, team_access } = action.payload;
             state.user = user;
             state.userID = user.id;
             state.isAuthenticated = true;
-            const role = ADMIN_ROLES.includes(user.role) ? 'admin' : user.roles?.[0]?.name;
+            const role = user.role;
             state.default_courier = default_courier;
             state.default_item = default_item;
             if (role) {
-                state.role = role;
-                state.subRole = user.role;
-                localStorage.setItem("user_role", role);
-                localStorage.setItem("user_sub_role", user.role || '');
+                state.role = role.toLowerCase();
+                localStorage.setItem("user_role", role.toLowerCase());
             }
             if (next_step !== undefined) state.next_step = next_step;
+            if (team_access !== undefined) {
+                state.team_access = team_access;
+                localStorage.setItem("team_access", JSON.stringify(team_access));
+            }
         },
         setNextStep: (state, action: PayloadAction<string>) => {
             state.next_step = action.payload;
@@ -64,11 +70,13 @@ const authSlice = createSlice({
             state.isAuthenticated = false;
             state.next_step = '';
             state.permissions = [];
+            state.team_access = null;
             localStorage.removeItem("auth_token");
             localStorage.removeItem("auth_userID");
             localStorage.removeItem("user_role");
             localStorage.removeItem("user_sub_role");
             localStorage.removeItem("user_permissions");
+            localStorage.removeItem("team_access");
             sessionStorage.removeItem("verify-email-payloads");
         },
         setPermissions: (state, action: PayloadAction<string[]>) => {

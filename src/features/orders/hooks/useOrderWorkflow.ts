@@ -40,8 +40,10 @@ const initialAddressData = {
 
 export const useOrderWorkflow = () => {
   const { orderType, orderID } = useParams<{ orderType: string; orderID: string }>();
-  const { role, user, default_courier, default_item } = useAppSelector((state) => state.auth);
+  const { role, user, default_courier, default_item, team_access } = useAppSelector((state) => state.auth);
   const navigate = useNavigate();
+  const isSubUser = useMemo(() => (role === 'customer' && team_access?.is_sub_user), [role, team_access]);
+  const canReadWrite = useMemo(() => !isSubUser || team_access?.permissions?.order === 'full', [isSubUser, team_access]);
 
   // API Hooks
   const { mutate: createOrder, isPending: saveLoading } = useCreateOrder();
@@ -763,5 +765,6 @@ export const useOrderWorkflow = () => {
     setReceiverPhone,
     handleReceiverPhoneSubmit,
     // isCloning,
+    canReadWrite,
   };
 };

@@ -23,6 +23,7 @@ import {
 import { useDebounce } from '@/hooks/useDebounce';
 import { CustomTooltip } from '@/components/common/CustomTooltip';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
+import { useAppSelector } from '@/hooks/store.hooks';
 
 export default function MyItemsPage() {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
@@ -33,7 +34,10 @@ export default function MyItemsPage() {
   const debouncedSearch = useDebounce(search, 500); // 500ms delay
   const [pageSize, setPageSize] = useState(25);
   const [currentPage, setCurrentPage] = useState(1);
+  const { is_sub_user, team_access } = useAppSelector((state) => state.auth);
+  const canReadWrite = useMemo(() => !is_sub_user || team_access?.permissions?.my_items === 'full', [is_sub_user, team_access]);
 
+  console.log(team_access?.permissions, is_sub_user)
   const { data: itemsData, isLoading } = useItems({
     search: debouncedSearch,
     per_page: pageSize,
@@ -134,64 +138,65 @@ export default function MyItemsPage() {
       searchable: true,
       cell: (val, row) => (
         <div className='flex items-center gap-3'>
-          {/* <CustomTooltip title={row.is_default ? "Default Item" : "Set as Fallback Item"}> */}
-          <Tooltip>
-            <TooltipTrigger
-              render={<div />}
-              className="block min-w-0 max-w-full cursor-pointer"
-            >
-              <button
-                onClick={() => {
-                  if (!row.is_default) {
-                    setDefaultItemMutation.mutate(row.id);
-                  } else {
-                    unsetDefaultItemMutation.mutate(row.id);
-                  }
-                }}
-                disabled={setDefaultItemMutation.isPending || unsetDefaultItemMutation.isPending}
-                className="p-0 bg-transparent border-none outline-none focus:outline-none transition-transform active:scale-95 cursor-pointer hover:scale-110"
+          {canReadWrite && (
+            <Tooltip>
+              <TooltipTrigger
+                render={<div />}
+                className="block min-w-0 max-w-full cursor-pointer"
               >
-                {(setDefaultItemMutation.isPending && setDefaultItemMutation.variables === row.id) ||
-                (unsetDefaultItemMutation.isPending && unsetDefaultItemMutation.variables === row.id) ? (
-                  <Loader2 className="h-4! w-4! animate-spin" />
+                <button
+                  onClick={() => {
+                    if (!canReadWrite) return;
+                    if (!row.is_default) {
+                      setDefaultItemMutation.mutate(row.id);
+                    } else {
+                      unsetDefaultItemMutation.mutate(row.id);
+                    }
+                  }}
+                  disabled={setDefaultItemMutation.isPending || unsetDefaultItemMutation.isPending}
+                  className="p-0 bg-transparent border-none outline-none focus:outline-none transition-transform active:scale-95 cursor-pointer hover:scale-110"
+                >
+                  {(setDefaultItemMutation.isPending && setDefaultItemMutation.variables === row.id) ||
+                    (unsetDefaultItemMutation.isPending && unsetDefaultItemMutation.variables === row.id) ? (
+                    <Loader2 className="h-4! w-4! animate-spin" />
+                  ) : (
+                    <Star className={`h-4 w-4 ${row.is_default ? 'fill-amber-400 text-amber-400' : 'text-primary-400'}`} />
+                  )}
+                </button>
+              </TooltipTrigger>
+              <TooltipContent
+                side="bottom"
+                className="flex flex-col gap-2.5 p-4 max-w-[280px] bg-slate-950 dark:bg-zinc-950 text-slate-100 dark:text-zinc-100 border border-slate-800 dark:border-zinc-800 rounded-xl shadow-xl select-none"
+              >
+                {!row.is_default ? (
+                  <>
+                    <div className="flex items-center gap-2 border-b border-slate-800/80 dark:border-zinc-800/80 pb-2">
+                      <Info className="w-4 h-4 text-amber-400 shrink-0 animate-pulse" />
+                      <h4 className="m-0 text-[13px] font-bold tracking-tight text-white">Set as Fallback Item</h4>
+                    </div>
+                    <p className="m-0 text-xs font-semibold text-slate-200 leading-normal">
+                      Used only when no default item is set for the order’s integration.
+                    </p>
+                    <p className="m-0 text-[12px] text-slate-300 dark:text-zinc-400 leading-relaxed">
+                      This item will be used automatically when an order has no default item set for its integration. For example, if a Shopify order has no Shopify default item, this fallback item will be used.
+                    </p>
+                  </>
                 ) : (
-                  <Star className={`h-4 w-4 ${row.is_default ? 'fill-amber-400 text-amber-400' : 'text-primary-400'}`} />
+                  <>
+                    <div className="flex items-center gap-2 border-b border-slate-800/80 dark:border-zinc-800/80 pb-2">
+                      <Info className="w-4 h-4 text-amber-400 shrink-0 animate-pulse" />
+                      <h4 className="m-0 text-[13px] font-bold tracking-tight text-white">Fallback Default Item</h4>
+                    </div>
+                    <p className="m-0 text-xs font-semibold text-slate-200 leading-normal">
+                      This item is currently set as the fallback default item.
+                    </p>
+                    <p className="m-0 text-[12px] text-slate-300 dark:text-zinc-400 leading-relaxed">
+                      This item will be used automatically when an order has no default item set for its integration. Click to unset this item.
+                    </p>
+                  </>
                 )}
-              </button>
-            </TooltipTrigger>
-            <TooltipContent
-              side="bottom"
-              className="flex flex-col gap-2.5 p-4 max-w-[280px] bg-slate-950 dark:bg-zinc-950 text-slate-100 dark:text-zinc-100 border border-slate-800 dark:border-zinc-800 rounded-xl shadow-xl select-none"
-            >
-              {!row.is_default ? (
-                <>
-                  <div className="flex items-center gap-2 border-b border-slate-800/80 dark:border-zinc-800/80 pb-2">
-                    <Info className="w-4 h-4 text-amber-400 shrink-0 animate-pulse" />
-                    <h4 className="m-0 text-[13px] font-bold tracking-tight text-white">Set as Fallback Item</h4>
-                  </div>
-                  <p className="m-0 text-xs font-semibold text-slate-200 leading-normal">
-                    Used only when no default item is set for the order’s integration.
-                  </p>
-                  <p className="m-0 text-[12px] text-slate-300 dark:text-zinc-400 leading-relaxed">
-                    This item will be used automatically when an order has no default item set for its integration. For example, if a Shopify order has no Shopify default item, this fallback item will be used.
-                  </p>
-                </>
-              ) : (
-                <>
-                  <div className="flex items-center gap-2 border-b border-slate-800/80 dark:border-zinc-800/80 pb-2">
-                    <Info className="w-4 h-4 text-amber-400 shrink-0 animate-pulse" />
-                    <h4 className="m-0 text-[13px] font-bold tracking-tight text-white">Fallback Default Item</h4>
-                  </div>
-                  <p className="m-0 text-xs font-semibold text-slate-200 leading-normal">
-                    This item is currently set as the fallback default item.
-                  </p>
-                  <p className="m-0 text-[12px] text-slate-300 dark:text-zinc-400 leading-relaxed">
-                    This item will be used automatically when an order has no default item set for its integration. Click to unset this item.
-                  </p>
-                </>
-              )}
-            </TooltipContent>
-          </Tooltip>
+              </TooltipContent>
+            </Tooltip>)}
           {/* </CustomTooltip> */}
           <span className='text-xs font-medium'>{val}</span>
         </div>
@@ -232,6 +237,8 @@ export default function MyItemsPage() {
         const isActive = val === 'Active';
 
         const handleToggle = () => {
+          if (!canReadWrite) return;
+
           toggleItemStatusMutation.mutate(row.id);
         };
 
@@ -239,7 +246,7 @@ export default function MyItemsPage() {
           <div className="flex items-center gap-2">
             <Switch
               checked={isActive}
-              disabled={isPending || row.is_default}
+              disabled={!canReadWrite || isPending || row.is_default}
               onCheckedChange={handleToggle}
               className="data-[state=checked]:bg-slate-950"
             />
@@ -248,11 +255,11 @@ export default function MyItemsPage() {
         );
       }
     },
-    {
+    ...(canReadWrite ? [{
       key: "actions",
       header: "ACTIONS",
       className: "w-20 px-0 pr-3 print:hidden",
-      cell: (_, row) => (
+      cell: (_: any, row: any) => (
         <div className="flex items-center gap-4">
           <CustomTooltip title="Edit item">
             <Button variant="ghost" size="sm" className="p-0 hover:text-primary bg-transparent dark:hover:bg-transparent" onClick={() => handleEditItem(row)}>
@@ -267,8 +274,8 @@ export default function MyItemsPage() {
           </CustomTooltip>
         </div>
       )
-    }
-  ], [setDefaultItemMutation, unsetDefaultItemMutation, toggleItemStatusMutation, handleEditItem, handleDeleteClick]);
+    }] : [])
+  ], [setDefaultItemMutation, unsetDefaultItemMutation, toggleItemStatusMutation, handleEditItem, handleDeleteClick, canReadWrite]);
 
   return (
     <div className="flex flex-col flex-1 gap-2 p-page-padding min-h-0 animate-in fade-in slide-in-from-bottom-2 duration-500">
@@ -283,7 +290,7 @@ export default function MyItemsPage() {
           pageSize={pageSize}
           onPageSizeChange={handlePageSizeChange}
           // pageSizeInFooter
-          customHeader={<ItemsHeader onAddItem={handleAddItem} />}
+          customHeader={canReadWrite ? <ItemsHeader onAddItem={handleAddItem} /> : null}
           headerTitle='My Items'
           headerDescription='Manage your shipping items, dimensions, and cubic measurements.'
           headerClass="h-20"
@@ -293,6 +300,7 @@ export default function MyItemsPage() {
           onPageChange={setCurrentPage}
           onExport={(type) => handleExport(type)}
           isExporting={exportItemsMutation.isPending}
+          exportable={canReadWrite}
         />
         {isDialogOpen && (
           <CreateItemDialog

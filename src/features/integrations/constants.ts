@@ -5,6 +5,7 @@ export const PROVIDERS = [
     { id: 'aramex', name: 'Aramex', type: 'courier', description: 'Aramex (Fastway) shipping services.', icon: Truck },
     { id: 'mypostbusiness', name: 'MyPost Business', type: 'courier', description: 'Australia Post MyPost Business.', icon: Truck },
     { id: 'directfreight', name: 'Direct Freight', type: 'courier', description: 'Direct Freight Express integration.', icon: Truck },
+    { id: 'couriersplease', name: 'Couriers Please', type: 'courier', description: 'Couriers Please shipping integration.', icon: Truck },
     { id: 'shopify', name: 'Shopify', type: 'ecommerce', description: 'Sync orders and fulfillments with Shopify.', icon: ShoppingCart },
     { id: 'ebay', name: 'eBay', type: 'ecommerce', description: 'Sync orders and fulfillments with eBay.', icon: ShoppingCart },
     { id: 'woocommerce', name: 'WooCommerce', type: 'ecommerce', description: 'Sync orders and fulfillments with WooCommerce.', icon: ShoppingCart },

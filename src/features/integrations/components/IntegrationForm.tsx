@@ -51,6 +51,7 @@ export function IntegrationForm({ provider }: IntegrationFormProps) {
             aramex: ['client_id', 'client_secret', 'account_name', 'account_label'],
             mypostbusiness: ['merchant_token', 'base_url', 'account_label', 'account_number'],
             directfreight: ['token', 'account', 'site_id', 'base_url', 'consignment_token', 'account_label'],
+            couriersplease: ['username', 'password', 'account_label'],
             shopify: ['shop'],
             woocommerce: ['store_url', 'consumer_key', 'consumer_secret']
         };
@@ -79,11 +80,11 @@ export function IntegrationForm({ provider }: IntegrationFormProps) {
         connectMutation.mutate({ provider: provider.id, data: formData }, {
             onSuccess: (response: any) => {
                 if (response?.status) {
-                    window.location.href = response.data.authorization_url;
-
-                    // navigate(response.data.authorization_url, { target: "_blank" })
-                    // showToast(`${provider.name} settings updated successfully.`, "success");
-                    // window.location.reload();
+                    if (response.data?.authorization_url) {
+                        window.location.href = response.data.authorization_url;
+                    } else {
+                        window.location.reload();
+                    }
                 }
             },
         });
@@ -142,6 +143,14 @@ export function IntegrationForm({ provider }: IntegrationFormProps) {
                         <FormInput label="Site ID" {...commonProps("site_id")} />
                         <FormInput label="Base URL" {...commonProps("base_url")} />
                         <FormInput label="Consignment Token" {...commonProps("consignment_token")} />
+                        <FormInput label="Account Label" {...commonProps("account_label")} />
+                    </>
+                );
+            case 'couriersplease':
+                return (
+                    <>
+                        <FormInput label="Username" {...commonProps("username")} />
+                        <FormInput label="Password" {...commonProps("password")} type="password" />
                         <FormInput label="Account Label" {...commonProps("account_label")} />
                     </>
                 );

@@ -257,6 +257,7 @@ const OrderDetailsPage: React.FC = () => {
     if (rawName === 'auspost') return 'Australia Post';
     if (rawName === 'direct-freight') return 'Direct Freight Express';
     if (rawName === 'aramex') return 'Aramex';
+    if (rawName === 'couriersplease' || rawName === 'couriers-please') return 'Couriers Please';
     return rawName
       .split('-')
       .map((word: string) => word.charAt(0).toUpperCase() + word.slice(1))

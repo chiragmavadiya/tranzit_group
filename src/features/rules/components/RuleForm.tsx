@@ -113,7 +113,7 @@ export default function RuleForm({
   return (
     <Card className="border gap-0 border-gray-200 dark:border-zinc-800 shadow-sm rounded-md overflow-hidden mt-6 bg-white dark:bg-zinc-950">
       <CardHeader className="px-6 py-4 border-b border-gray-100 dark:border-zinc-800 bg-slate-50/50 dark:bg-zinc-950/40">
-        <CardTitle className="text-[14px] font-bold text-gray-800 dark:text-zinc-200 my-0 uppercase tracking-wider">
+        <CardTitle className="text-[14px] font-bold text-gray-800 dark:text-zinc-200 my-0 uppercase tracking-wide">
           {initialData ? 'Edit rule' : 'Add new rule'}
         </CardTitle>
       </CardHeader>

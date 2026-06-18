@@ -46,6 +46,14 @@ const CARRIER_TIPS: Record<string, { title: string; description: React.ReactNode
         From <strong>Direct Freight Portal → Developer Centre</strong>. Follow the instructions to generate your authorization keys. These keys securely connect your store with Direct Freight Express's servers to handle live pricing and shipping labels.
       </>
     )
+  },
+  couriersplease: {
+    title: "Finding Your API Credentials",
+    description: (
+      <>
+        From your <strong>Couriers Please Customer Portal</strong>. You need your API Username, Password, and a label to identify this account.
+      </>
+    )
   }
 };
 
@@ -143,6 +151,22 @@ const GUIDE_TIPS: Record<string, { title: string; content: React.ReactNode }> = 
         </p>
         <p>
           Copy and paste the Merchant Token into the Connection Details section.
+        </p>
+      </div>
+    )
+  },
+  couriersplease: {
+    title: "API Credentials Guide",
+    content: (
+      <div className="space-y-2 text-[13px] text-slate-500 dark:text-slate-400 leading-relaxed text-left">
+        <p>
+          Visit the Couriers Please Portal and log in.
+        </p>
+        <p>
+          Enter your API Username and Password.
+        </p>
+        <p>
+          Add an Account Label to recognize this integration.
         </p>
       </div>
     )
@@ -377,7 +401,8 @@ export default function CarrierConfigForm({
       auspost: ['api_key', 'api_password', 'account_number', 'account_label'],
       aramex: ['client_id', 'client_secret', 'account_name', 'account_label'],
       mypostbusiness: ['merchant_token', 'account_label'],
-      directfreight: ['token', 'account', 'site_id', 'base_url', 'consignment_token', 'account_label']
+      directfreight: ['token', 'account', 'site_id', 'base_url', 'consignment_token', 'account_label'],
+      couriersplease: ['username', 'password', 'account_label']
     };
 
     const fieldsToValidate = requiredFields[selectedCarrier] || [];
@@ -464,6 +489,14 @@ export default function CarrierConfigForm({
             <FormInput label="Site ID" {...commonProps("site_id")} placeholder="Enter your Site ID" />
             {/* <FormInput label="Base URL" {...commonProps("base_url")} /> */}
             <FormInput label="Consignment Token" {...commonProps("consignment_token")} placeholder="Enter your Consignment Token" />
+            <FormInput label="Account Label" {...commonProps("account_label")} placeholder="Enter your Account Label" />
+          </>
+        );
+      case 'couriersplease':
+        return (
+          <>
+            <FormInput label="Account number (username)" {...commonProps("username")} placeholder="Enter your Username" />
+            <FormInput label="API Password" {...commonProps("password")} type="password" placeholder="Enter your Password" />
             <FormInput label="Account Label" {...commonProps("account_label")} placeholder="Enter your Account Label" />
           </>
         );

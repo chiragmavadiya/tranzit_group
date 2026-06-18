@@ -9,7 +9,8 @@ import {
   useDisconnectIntegration,
   useIntegrationsList,
   useIntegrationStatusMutation,
-  useSetDefaultIntegration
+  useSetDefaultIntegration,
+  useRemoveDefaultIntegration
 } from '@/features/integrations/hooks/useIntegrations';
 import RenderIntegrationSection from '@/features/integrations/components/RenderIntegrationSection';
 import CarrierConfigForm from '../components/CarrierConfigForm';
@@ -44,6 +45,7 @@ export default function CarrierIntegrationsPage() {
   const connectMutation = useConnectIntegration();
   const disconnectMutation = useDisconnectIntegration();
   const setDefaultMutation = useSetDefaultIntegration();
+  const removeDefaultMutation = useRemoveDefaultIntegration();
 
   const handleEdit = (providerId: string) => {
     navigate(`/settings/carriers/${providerId}`);
@@ -94,6 +96,7 @@ export default function CarrierIntegrationsPage() {
             data={listResponse?.data?.courier_integrations}
             disconnectMutation={disconnectMutation}
             setDefaultMutation={setDefaultMutation}
+            removeDefaultMutation={removeDefaultMutation}
             onConnect={onConnect}
             onConfigure={handleEdit}
             isLoading={listLoading}

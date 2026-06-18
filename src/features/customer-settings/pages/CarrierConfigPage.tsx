@@ -7,7 +7,8 @@ import {
   useDisconnectIntegration,
   useIntegrationStatusMutation,
   useIntegrationsList,
-  useSetDefaultIntegration
+  useSetDefaultIntegration,
+  useRemoveDefaultIntegration
 } from '@/features/integrations/hooks/useIntegrations';
 import CarrierConfigForm from '../components/CarrierConfigForm';
 import { Button } from '@/components/ui/button';
@@ -31,6 +32,7 @@ export default function CarrierConfigPage() {
   const connectMutation = useConnectIntegration();
   const disconnectMutation = useDisconnectIntegration();
   const setDefaultMutation = useSetDefaultIntegration();
+  const removeDefaultMutation = useRemoveDefaultIntegration();
 
   const currentSlug = slug || 'auspost';
 
@@ -44,6 +46,18 @@ export default function CarrierConfigPage() {
 
   const handleSetDefault = () => {
     setDefaultMutation.mutate(currentSlug);
+  };
+
+  const handleRemoveDefault = () => {
+    removeDefaultMutation.mutate(currentSlug, {
+      onSuccess: () => {
+        getIntegrationStatus(currentSlug, {
+          onSuccess: (response) => {
+            setFormData(response.data || {});
+          }
+        });
+      }
+    });
   };
 
   useEffect(() => {
@@ -122,6 +136,22 @@ export default function CarrierConfigPage() {
                       <Check className="w-3.5 h-3.5 mr-1.5" />
                     )}
                     Set Default
+                  </Button>
+                )}
+                {isConnected && isDefault && (
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="h-8 text-xs font-bold border-red-200 text-red-500 hover:text-red-600 hover:bg-red-50 dark:border-red-900/30 dark:hover:bg-red-950/20"
+                    onClick={handleRemoveDefault}
+                    disabled={removeDefaultMutation.isPending}
+                  >
+                    {removeDefaultMutation.isPending ? (
+                      <Loader2 className="w-3.5 h-3.5 animate-spin mr-1.5" />
+                    ) : (
+                      <Link2Off className="w-3.5 h-3.5 mr-1.5" />
+                    )}
+                    Remove Default
                   </Button>
                 )}
                 {isConnected && (

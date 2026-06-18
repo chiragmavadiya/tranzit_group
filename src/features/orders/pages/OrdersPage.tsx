@@ -327,8 +327,8 @@ export default function OrdersPage({ fromCustomer, customerId }: { fromCustomer?
   }, []);
 
   const handleCourierEdit = useCallback((row: Order) => {
-    setCourierEditModal(row);
-  }, []);
+    navigate(`${isAdmin ? '/admin' : ''}/orders/consign/${row.order_number}`);
+  }, [navigate, isAdmin]);
 
   // const updateCourier = useUpdateOrderCourier();
 

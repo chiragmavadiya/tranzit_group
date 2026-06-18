@@ -158,11 +158,12 @@ const UpdateCourierModal = (props: UpdateCourierModalProps) => {
                                 onQuoteChange={setQuoteData}
                                 setCourierData={setCourierData}
                                 signatureSelected={signatureSelected}
+                                orderDetail={orderDetailsResponse?.data}
                             />
 
                         </div>
                         <div className='col-span-12 lg:col-span-5'>
-                            <Accordion defaultValue={['summary']} className="flex flex-col gap-3">
+                            <Accordion defaultValue={['summary']} className="flex flex-col gap-3 sticky top-4">
 
                                 <AccordionItem value="summary" className="border border-gray-200 dark:border-zinc-800 rounded-xl bg-white dark:bg-zinc-950 shadow-xs px-5 border-b overflow-hidden transition-colors duration-300 [&>h3]:my-0">
                                     <AccordionTrigger className="hover:no-underline py-3 px-0 [&>svg]:text-primary">

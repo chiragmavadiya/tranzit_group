@@ -217,6 +217,21 @@ export const useSetDefaultIntegration = () => {
     });
 };
 
+export const useRemoveDefaultIntegration = () => {
+    const queryClient = useQueryClient();
+    return useMutation({
+        mutationFn: (provider: string) => integrationService.removeDefault(provider),
+        onSuccess: (response) => {
+            queryClient.invalidateQueries({ queryKey: QUERY_KEYS.INTEGRATIONS.LIST });
+            queryClient.invalidateQueries({ queryKey: QUERY_KEYS.AUTH.USER_DETAILS });
+            showToast(response.message || "Default integration removed successfully", "success");
+        },
+        onError: (error: any) => {
+            showToast(error.message || "Failed to remove default integration", "error");
+        }
+    });
+};
+
 export const useToggleEbayAutoSync = () => {
     const queryClient = useQueryClient();
     return useMutation({

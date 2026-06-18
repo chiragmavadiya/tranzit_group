@@ -123,5 +123,10 @@ export const integrationService = {
     setDefault: async (provider: string) => {
         const response = await api.post(API_ENDPOINTS.INTEGRATIONS.DEFAULT(provider));
         return response.data;
+    },
+
+    removeDefault: async (provider: string) => {
+        const response = await api.delete(API_ENDPOINTS.INTEGRATIONS.DEFAULT(provider));
+        return response.data;
     }
 };

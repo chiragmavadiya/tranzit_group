@@ -12,6 +12,7 @@ interface RenderIntegrationSectionProps {
     data: CustomerIntegration[] | undefined;
     disconnectMutation?: any;
     setDefaultMutation?: any;
+    removeDefaultMutation?: any;
     fromCustomer?: boolean;
     onConnect?: (providerId: string) => void;
     onConfigure?: (providerId: string) => void;
@@ -27,6 +28,7 @@ const RenderIntegrationSection = ({
     onConnect,
     disconnectMutation,
     setDefaultMutation,
+    removeDefaultMutation,
     fromCustomer = false,
     onConfigure,
     isLoading = false,
@@ -83,10 +85,28 @@ const RenderIntegrationSection = ({
                                                     {isConnected ? "Connected" : "Not Connected"}
                                                 </Badge>
                                                 {isDefault ? (
-                                                    <Badge variant="default" className="font-medium text-[12px] px-2.5  leading-relaxed tracking-wide flex items-center gap-1 bg-blue-600 text-white hover:bg-blue-600 dark:bg-blue-500 dark:hover:bg-blue-500 border-none shadow-sm rounded-full">
-                                                        <Check className="w-3.5 h-3.5 stroke-[3px]" />
-                                                        Default
-                                                    </Badge>
+                                                    <div className="flex flex-col items-end gap-1">
+                                                        <Badge variant="default" className="font-medium text-[12px] px-2.5  leading-relaxed tracking-wide flex items-center gap-1 bg-blue-600 text-white hover:bg-blue-600 dark:bg-blue-500 dark:hover:bg-blue-500 border-none shadow-sm rounded-full">
+                                                            <Check className="w-3.5 h-3.5 stroke-[3px]" />
+                                                            Default
+                                                        </Badge>
+                                                        {removeDefaultMutation && canReadWrite && (
+                                                            <button
+                                                                onClick={(e) => {
+                                                                    e.stopPropagation();
+                                                                    removeDefaultMutation.mutate(provider.slug);
+                                                                }}
+                                                                disabled={removeDefaultMutation.isPending && removeDefaultMutation.variables === provider.slug}
+                                                                className="text-[11px] font-semibold text-slate-500 hover:text-red-500 hover:underline dark:text-zinc-400 dark:hover:text-red-400 flex items-center gap-1 transition-colors bg-transparent border-0 cursor-pointer p-0 leading-none h-4 mt-0.5"
+                                                            >
+                                                                {removeDefaultMutation.isPending && removeDefaultMutation.variables === provider.slug ? (
+                                                                    <Loader2 className="w-2.5 h-2.5 animate-spin" />
+                                                                ) : (
+                                                                    "Remove Default"
+                                                                )}
+                                                            </button>
+                                                        )}
+                                                    </div>
                                                 ) : (
                                                     isConnected && setDefaultMutation && canReadWrite && (
                                                         <button

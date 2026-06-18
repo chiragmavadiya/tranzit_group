@@ -29,7 +29,7 @@ interface CarrierCardProps {
 
 export const CarrierCard: React.FC<CarrierCardProps> = memo((props) => {
   const { itemData, addresses, onQuoteChange, setCourierData, orderDetail, module, orderType = 'create', initialSelectedCourierId = null, signatureSelected = false, isLoading = false, selectedCustomer } = props
-  const { role } = useAppSelector((state) => state.auth);
+  const { role, default_courier } = useAppSelector((state) => state.auth);
   const [selectedServiceId, setSelectedServiceId] = useState<string>(initialSelectedCourierId || '')
   const [couriers, setCouriers] = useState<any[]>([]);
   const [surchargesMap, setSurchargesMap] = useState<Record<string, any[]>>({});
@@ -97,6 +97,13 @@ export const CarrierCard: React.FC<CarrierCardProps> = memo((props) => {
       } else if (!selectedServiceId || !allCourierIds.includes(selectedServiceId)) {
         setSelectedServiceId((prev) => {
           if ((prev && allCourierIds.includes(prev)) || !mount.current) return prev;
+          if (default_courier && default_courier.courier_id) {
+            const findCourier = data.services.find((courier: any) => courier.carrier_id === default_courier.courier_id);
+            console.log(findCourier, data.services, default_courier, 'findCourier')
+            if (findCourier) {
+              return findCourier.courierCode + (findCourier.product_id || '') || '';
+            }
+          }
           return minItem.courierCode + (minItem.product_id || '') || '';
         });
       }
@@ -199,8 +206,9 @@ export const CarrierCard: React.FC<CarrierCardProps> = memo((props) => {
         const selectedNames = selectedSurchargesMap[selectedCourier.courierCode] ?? [];
         const activeSurcharges = courierSurcharges.filter(charge => selectedNames.includes(charge.name));
         const autoApplyCharges = selectedCourier?.applied_surcharges?.reduce((acc: any, curr: any) => acc + curr.amount, 0) || 0;
-        const surcharges = activeSurcharges.reduce((acc: any, curr: any) => acc + curr.amount, 0) || 0;
+        const surcharges = activeSurcharges.filter((charge: any) => !charge.is_auto_apply).reduce((acc: any, curr: any) => acc + curr.amount, 0) || 0;
         const totalPrice = selectedCourier.price + surcharges + autoApplyCharges;
+        console.log(surcharges, autoApplyCharges, 'activeSurcharges', mount.current)
         onQuoteChange?.((prev: any) => ({
           courier: selectedCourier,
           surcharges: mount.current ? activeSurcharges : (prev?.surcharges?.length ? prev?.surcharges : activeSurcharges),

@@ -89,7 +89,7 @@ export default function ActionBuilder({ actions, onChange }: ActionBuilderProps)
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
-        <h3 className="text-[14px] font-bold text-gray-800 dark:text-zinc-200 my-0 uppercase tracking-wider">
+        <h3 className="text-[14px] font-bold text-gray-800 dark:text-zinc-200 my-0 uppercase tracking-wide">
           Actions (executed in order)
         </h3>
       </div>

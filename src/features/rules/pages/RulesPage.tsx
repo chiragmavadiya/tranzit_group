@@ -191,7 +191,7 @@ export default function RulesPage() {
               {/* Quick Setup */}
               {canReadWrite && (
                 <div className="space-y-2 pt-4">
-                  <span className="text-xs font-bold text-gray-800 dark:text-zinc-200 block uppercase tracking-wider">
+                  <span className="text-xs font-bold text-gray-800 dark:text-zinc-200 block uppercase tracking-wide">
                     Quick setup
                   </span>
                   <ul className="text-sm text-primary dark:text-blue-400 space-y-1.5 list-none pl-0">
@@ -253,7 +253,7 @@ export default function RulesPage() {
           {/* Run Rules Manual Triggers */}
           {/* <Card className="border gap-0 border-gray-200 dark:border-zinc-850 shadow-xs overflow-hidden bg-white dark:bg-zinc-900">
             <CardHeader className="px-5 py-4 border-b border-gray-100 dark:border-zinc-800">
-              <CardTitle className="text-[15px] font-bold text-gray-800 dark:text-zinc-200 uppercase tracking-wider my-0">
+              <CardTitle className="text-[15px] font-bold text-gray-800 dark:text-zinc-200 uppercase tracking-wide my-0">
                 Run rules
               </CardTitle>
             </CardHeader>

@@ -3,21 +3,35 @@ import {
   MessageSquare,
   HelpCircle,
   Clock,
-  ExternalLink
+  // ExternalLink,
+  History
 } from 'lucide-react';
-import { NavLink } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
+import { Button } from '@/components/ui/button';
+import { TERMS_CONDITIONS_URL } from '@/constants';
 
 export default function EnquiryPage() {
+  const navigate = useNavigate();
+
   return (
     <div className="flex flex-col flex-1 gap-4 p-page-padding min-h-0 animate-in fade-in slide-in-from-bottom-2 duration-500  mx-auto w-full overflow-auto">
       {/* Header & Breadcrumbs */}
-      <div className="flex flex-col gap-1">
+      <div className="flex justify-between gap-1">
         {/* <div className="flex items-center gap-2 text-xs text-gray-400 dark:text-zinc-500 font-medium">
           <NavLink to="/dashboard" className="hover:text-blue-500 transition-colors">Support</NavLink>
           <ChevronRight className="w-3 h-3" />
           <span className="text-gray-900 dark:text-zinc-100">Submit an Enquiry</span>
         </div> */}
         <h1 className="text-2xl font-bold text-gray-900 dark:text-zinc-100 my-0">Help & Support</h1>
+
+        <Button
+          variant="outline"
+          onClick={() => navigate('/enquiry/history')}
+          className="gap-2 border-slate-200 dark:border-zinc-800 h-8 font-bold text-[13px]"
+        >
+          <History className="w-4 h-4" />
+          Enquiry History
+        </Button>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
@@ -69,7 +83,7 @@ export default function EnquiryPage() {
               </div> */}
             </div>
 
-            <div className="mt-6 pt-6 border-t border-gray-100 dark:border-zinc-800">
+            {/* <div className="mt-6 pt-6 border-t border-gray-100 dark:border-zinc-800">
               <NavLink
                 to="/help-center"
                 className="flex items-center justify-between p-3 rounded-xl bg-gray-50 dark:bg-zinc-900 group hover:bg-primary/5 dark:hover:bg-primary/10 transition-colors"
@@ -80,12 +94,12 @@ export default function EnquiryPage() {
                 </div>
                 <ExternalLink className="w-3 h-3 text-gray-400 group-hover:text-primary transition-colors" />
               </NavLink>
-            </div>
+            </div> */}
           </div>
 
           <div className="px-2">
             <p className="text-[12px] text-gray-400 dark:text-zinc-500 leading-relaxed">
-              By submitting this enquiry, you agree to our <span className="underline cursor-pointer">Support Terms</span> and understand that we may collect details to help resolve your issue.
+              By submitting this enquiry, you agree to our <a href={TERMS_CONDITIONS_URL} target='_blank' className="underline cursor-pointer">Support Terms</a> and understand that we may collect details to help resolve your issue.
             </p>
           </div>
         </div>

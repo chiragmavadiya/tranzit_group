@@ -194,8 +194,8 @@ export const PRIVACY_POLICY_URL = "https://tranzit.digisite.net/privacy-policy"
 export const DANGEROUS_GOODS_URL = "https://tranzit.digisite.net/dangerous-goods"
 
 export const PHONE_REGEX = /^(\+61|0)[2-478](\d{8})$/;
-// export const PHONE_REGEX_WITH_SPACE = /^(\+61|0)[2-478](\s?\d){8}$/;
-export const PHONE_REGEX_WITH_SPACE = /^(?:(?:0[23478])|(?:\+61[23478]))(?:\s?\d){8}$/;
+export const PHONE_REGEX_WITH_SPACE = /^(\+61|0)[2-478](\s?\d){8}$/;
+// export const PHONE_REGEX_WITH_SPACE = /^(?:(?:0[23478])|(?:\+61[23478]))(?:\s?\d){8}$/;
 
 
 export const STATUS_STYLE: Record<string, string> = {

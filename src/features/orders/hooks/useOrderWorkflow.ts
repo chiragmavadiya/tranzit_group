@@ -16,7 +16,7 @@ import {
 import { useGlobalCouriers } from '@/features/courier-surcharge/hooks/useGlobalCouriers';
 import type { AddressData, OrderDetailData, WalletCheckResponse } from '../types';
 import { useDefaultItem } from '@/features/items/hooks/useItems';
-import { removeEmptyFields } from '@/lib/utils';
+import { cleanSpaces, removeEmptyFields } from '@/lib/utils';
 
 // address1 = street
 const initialAddressData = {
@@ -360,7 +360,7 @@ export const useOrderWorkflow = () => {
       ...addressData,
       receiver: {
         ...addressData.receiver,
-        phone: overrideReceiverPhone || addressData.receiver.phone,
+        phone: cleanSpaces(overrideReceiverPhone || addressData.receiver.phone),
       },
       parcels: itemsData,
       service: {
@@ -451,7 +451,7 @@ export const useOrderWorkflow = () => {
       sender: removeEmptyFields({
         name: addressData.sender.name,
         company: addressData.sender.company,
-        phone: addressData.sender.phone,
+        phone: cleanSpaces(addressData.sender.phone),
         email: addressData.sender.email,
         address1: addressData.sender.address1,
         suburb: addressData.sender.suburb,
@@ -462,7 +462,7 @@ export const useOrderWorkflow = () => {
       receiver: removeEmptyFields({
         name: addressData.receiver.name,
         company: addressData.receiver.company,
-        phone: overrideReceiverPhone || addressData.receiver.phone,
+        phone: cleanSpaces(overrideReceiverPhone || addressData.receiver.phone),
         email: addressData.receiver.email,
         address1: addressData.receiver.address1,
         suburb: addressData.receiver.suburb,
@@ -551,14 +551,14 @@ export const useOrderWorkflow = () => {
       ...prev,
       receiver: {
         ...prev.receiver,
-        phone,
+        phone: cleanSpaces(phone),
       },
     }));
     setShowReceiverPhoneModal(false);
     if (orderType === 'consign') {
-      handleConsign(false, phone);
+      handleConsign(false, cleanSpaces(phone));
     } else {
-      handleOnSave(isSaveAsDraft.current ? 'saveAsDraft' : true, phone);
+      handleOnSave(isSaveAsDraft.current ? 'saveAsDraft' : true, cleanSpaces(phone));
     }
   }, [handleConsign, handleOnSave, orderType]);
 

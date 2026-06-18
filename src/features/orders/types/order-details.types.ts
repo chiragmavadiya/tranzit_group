@@ -32,6 +32,7 @@ export type OrderDetailData = {
     order_type: string
     created_at: string
     created_human: string
+    order_reference: string
     order_details: {
         subtotal: number
         tax: number

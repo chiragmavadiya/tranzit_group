@@ -323,6 +323,8 @@ export const OrderHeader: React.FC<OrderHeaderProps> = ({
           <Badge variant="secondary" className={cn("border-none rounded-sm px-2 py-0 h-5 uppercase font-bold", Order_status_styles[orderDetail?.status || 'New'])}>
             {orderDetail?.status || 'NEW'}
           </Badge>
+          {orderDetail.order_reference && <span className="text-sm text-gray-900 dark:text-zinc-100"> Order Referance - <span className='font-bold'>{orderDetail.order_reference}</span></span>}
+
         </div>)
       }
     </div >

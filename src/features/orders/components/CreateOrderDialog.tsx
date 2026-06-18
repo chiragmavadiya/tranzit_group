@@ -6,7 +6,7 @@ import { CustomModel } from '@/components/ui/dialog';
 import { showToast } from '@/components/ui/custom-toast';
 import { Checkbox } from '@/components/ui/checkbox';
 import { PlaceAutocomplete } from '@/components/common/AutoComplateAddress';
-import { cn, isEmailValid, isPhoneValid } from '@/lib/utils';
+import { cleanSpaces, cn, isEmailValid, isPhoneValid } from '@/lib/utils';
 import { STATES } from '@/constants';
 import AutoComplete from '@/components/common/AutoComplate2';
 import { useAddressBookSearch } from '@/features/address-book/hooks/useAddressBook';
@@ -37,6 +37,7 @@ export default function CreateOrderDialog({ onOpenChange, type, open, initialDat
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [searchAddress, setSearchAddress] = useState('');
   const [activeLookup, setActiveLookup] = useState<string>('address');
+  const [isSelected, setIsSelected] = useState(false);
 
   const debouncedSearchAddress = useDebounce(searchAddress, 400);
   const { data: addressBookData } = useAddressBookSearch(debouncedSearchAddress);
@@ -70,7 +71,7 @@ export default function CreateOrderDialog({ onOpenChange, type, open, initialDat
   const updatePayload = useMemo(() => ({
     receiver_name: formData.name,
     receiver_business_name: formData.company,
-    receiver_phone: formData.phone,
+    receiver_phone: cleanSpaces(formData.phone),
     receiver_email: formData.email,
     receiver_address: formData.address1,
     unit_number: formData.unit_number,
@@ -162,7 +163,7 @@ export default function CreateOrderDialog({ onOpenChange, type, open, initialDat
     }
 
     if (phone && !isPhoneValid(phone)) {
-      showToast("Please enter a valid Australian phone number", "error");
+      showToast("Please enter a valid phone number", "error");
       return;
     }
 
@@ -285,9 +286,10 @@ export default function CreateOrderDialog({ onOpenChange, type, open, initialDat
                     updateField('street_number', opt.street_number!);
                     updateField('state', opt.state);
                     updateField('postcode', opt.post_code);
+                    setIsSelected(true);
                     // updateField('country', opt.country);
                   }}
-                  onChange={(value) => { updateField('address_info', value!); }}
+                  onChange={(value) => { updateField('address_info', value!); setIsSelected(false) }}
                   value={formData.address_info}
                   inputClassName='rounded-none'
                 />
@@ -296,7 +298,7 @@ export default function CreateOrderDialog({ onOpenChange, type, open, initialDat
                   placeholder='Enter name or code to search the address book'
                   className='rounded-none'
                   inputClassName='rounded-none'
-                  onChange={(value) => { setSearchAddress(value!); }}
+                  onChange={(value) => { setSearchAddress(value!); setIsSelected(false) }}
                   value={searchAddress}
                   onSearch={(value) => setSearchAddress(value)}
                   shouldFilter={false}
@@ -314,6 +316,7 @@ export default function CreateOrderDialog({ onOpenChange, type, open, initialDat
                       updateField('suburb', option.suburb);
                       updateField('state', option.state);
                       updateField('postcode', option.postcode);
+                      setIsSelected(true);
                       // updateField('country', option.country);
                     }
                   }}
@@ -396,6 +399,7 @@ export default function CreateOrderDialog({ onOpenChange, type, open, initialDat
                 onChange={val => updateField('unit_number', val)}
                 layout="horizontal"
                 placeholder='Enter Unit Number'
+                disabled={isSelected}
               />
               <FormInput
                 label="Street"
@@ -406,6 +410,7 @@ export default function CreateOrderDialog({ onOpenChange, type, open, initialDat
                 required
                 error={isSubmitting && formData.address1?.trim() === ''}
                 errormsg="Please enter your street name"
+                disabled={isSelected}
               />
               <FormInput
                 label="Suburb"
@@ -416,6 +421,7 @@ export default function CreateOrderDialog({ onOpenChange, type, open, initialDat
                 required
                 error={isSubmitting && formData.suburb?.trim() === ''}
                 errormsg="Please enter your suburb"
+                disabled={isSelected}
               />
               <FormSelect
                 label="State"
@@ -427,6 +433,7 @@ export default function CreateOrderDialog({ onOpenChange, type, open, initialDat
                 error={isSubmitting && formData.state?.trim() === ''}
                 errormsg="Please select your state"
                 layout="horizontal"
+                disabled={isSelected}
               />
               <FormInput
                 label="Postcode"
@@ -438,6 +445,7 @@ export default function CreateOrderDialog({ onOpenChange, type, open, initialDat
                 required
                 error={isSubmitting && formData.postcode?.trim() === ''}
                 errormsg="Please enter your postcode"
+                disabled={isSelected}
               />
               <div className="space-y-4">
                 <FormInput

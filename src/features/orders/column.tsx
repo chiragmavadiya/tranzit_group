@@ -92,6 +92,10 @@ export const getOrdersColumns = (
         cell: (value: string) => value
       },
       {
+        header: 'ORDER REFERENCE', key: 'order_reference',
+        width: '200px',
+      },
+      {
         header: 'CUSTOMER',
         key: 'customer_name',
         width: '220px',
@@ -156,7 +160,7 @@ export const getOrdersColumns = (
       {
         header: 'AMOUNT', key: 'amount', cell: (value: string) => <span className="font-medium"> {formateCurrency(Number(value))}</span>
       },
-      ...(orderType !== 'shipped' ? [{
+      ...(orderType !== 'shipped' && orderType !== 'new' ? [{
         header: 'PAYMENT STATUS', key: 'payment_status', cell: (value: string) => <StatusBadge status={value} />
       }] : []),
       {

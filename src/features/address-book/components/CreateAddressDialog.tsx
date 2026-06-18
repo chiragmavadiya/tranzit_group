@@ -7,6 +7,7 @@ import { AUSTRALIAN_STATES } from '../constants';
 import { useAddressBookDetails } from '../hooks/useAddressBook';
 import { PlaceAutocomplete } from '@/components/common/AutoComplateAddress';
 import { showToast } from '@/components/ui/custom-toast';
+import { cleanSpaces, isPhoneValid } from '@/lib/utils';
 // import { GlobalCourierSelect } from '@/features/courier-surcharge/components/GlobalCourierSelect';
 
 interface CreateAddressDialogProps {
@@ -65,6 +66,7 @@ export function CreateAddressDialog({
     country: 'Australia',
   });
   const [submited, setSubmited] = useState(false);
+  const [isSelected, setIsSelected] = useState(false);
   const { data: detailsData, isLoading: isFetchingDetails } = useAddressBookDetails(editingAddressId || undefined);
 
   // const formRef = useRef<HTMLFormElement>(null);
@@ -88,7 +90,12 @@ export function CreateAddressDialog({
       return;
     }
 
-    onSubmit(formData);
+    if (formData.phone && !isPhoneValid(formData.phone)) {
+      showToast("Please enter a valid phone number", 'error');
+      return;
+    }
+
+    onSubmit({ ...formData, phone: cleanSpaces(formData.phone) });
   };
 
   useEffect(() => {
@@ -134,8 +141,9 @@ export function CreateAddressDialog({
                   handleChange('suburb', opt.suburb);
                   handleChange('state', opt.state);
                   handleChange('postcode', opt.post_code);
+                  setIsSelected(true)
                 }}
-                onChange={(value) => handleChange('address_info', value)}
+                onChange={(value) => { handleChange('address_info', value); setIsSelected(false) }}
                 // error={submited && formData.address_information?.trim() === ''}
                 // errormsg='Please enter an address'
                 value={formData.address_info}
@@ -239,6 +247,7 @@ export function CreateAddressDialog({
                 onChange={(val) => handleChange('unit_number', val)}
                 placeholder="e.g. 1234"
                 isFullWidth
+                disabled={isSelected}
               />
               <FormInput
                 layout="horizontal"
@@ -250,6 +259,7 @@ export function CreateAddressDialog({
                 error={submited && formData.address.length < 1}
                 errormsg="Please enter the street"
                 isFullWidth
+                disabled={isSelected}
               />
               <FormInput
                 layout="horizontal"
@@ -261,6 +271,7 @@ export function CreateAddressDialog({
                 error={submited && formData.suburb.length < 1}
                 errormsg="Please enter the suburb"
                 isFullWidth
+                disabled={isSelected}
               />
               <FormSelect
                 layout="horizontal"
@@ -272,6 +283,8 @@ export function CreateAddressDialog({
                 required
                 error={submited && formData.state.length < 1}
                 errormsg="Please select the state"
+                disabled={isSelected}
+                allowClear={false}
               // isFullWidth
               />
               <FormInput
@@ -284,6 +297,7 @@ export function CreateAddressDialog({
                 error={submited && formData.postcode.length < 1}
                 errormsg="Please enter the post code"
                 isFullWidth
+                disabled={isSelected}
               />
               <FormInput
                 layout="horizontal"

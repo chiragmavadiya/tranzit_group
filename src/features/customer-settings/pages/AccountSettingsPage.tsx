@@ -11,6 +11,7 @@ import { useAppSelector } from '@/hooks/store.hooks';
 import SubscriptionPlanModal from '../components/SubscriptionPlanModal';
 import { STATES } from '@/constants';
 import { useGetProfile, useUpdateProfile, useChangePassword } from '@/features/profile/hooks/useProfile';
+import { cleanSpaces, isPhoneValid } from '@/lib/utils';
 // import { Checkbox } from '@/components/ui/checkbox';
 // import { Label } from '@/components/ui/label';
 // import { CreateAddressDialog } from '@/features/address-book/components/CreateAddressDialog';
@@ -78,6 +79,7 @@ export default function AccountSettingsPage() {
     billing_state: '',
     billing_postcode: '',
   });
+  const [submit, setSubmit] = useState(false);
   const [backupData, setBackupData] = useState({ ...formData });
   const [passwordData, setPasswordData] = useState({
     currentPassword: '',
@@ -107,10 +109,23 @@ export default function AccountSettingsPage() {
   };
 
   const onSave = () => {
+    setSubmit(true)
+    const { firstName, lastName, phone, email, billing_address, billing_suburb, billing_state, billing_postcode } = formData;
+
+    if (!(firstName && lastName && email && phone && billing_address && billing_suburb && billing_state && billing_postcode)) {
+      showToast("Please fill all the required fields", "error");
+      return;
+    }
+
+    if (phone && !isPhoneValid(phone)) {
+      showToast("Please enter a valid phone number", 'error');
+      return;
+    }
+
     const payload = {
       first_name: formData.firstName,
       last_name: formData.lastName,
-      mobile: formData.phone,
+      mobile: cleanSpaces(formData.phone),
       personal_email: formData.email,
       business_name: formData.companyName,
       gst_number: formData.abn,
@@ -139,6 +154,7 @@ export default function AccountSettingsPage() {
         }
       }
     }
+
     // return
     updateProfileMutation.mutate(payload, {
       onSuccess: () => {
@@ -279,7 +295,7 @@ export default function AccountSettingsPage() {
   return (
     <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 w-full items-start">
 
-      <div className="col-span-12 flex items-center justify-between">
+      <div className="col-span-12 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <h2 className="text-xl font-bold text-gray-800 dark:text-zinc-200 my-0">Account Settings</h2>
           <p className="text-sm text-gray-600 dark:text-gray-400 my-0">Manage your company profile, contact information, addresses, team access, and account preferences</p>
@@ -312,95 +328,232 @@ export default function AccountSettingsPage() {
         )}
       </div>
 
-      {/* Left Column: Company Information Form */}
-      <div className='lg:col-span-6 space-y-4'>
-        <motion.div
-          custom={0}
-          initial="hidden"
-          animate="visible"
-          variants={cardVariants}
-          className="flex"
-        >
-          <Card className="flex flex-col w-full hover:shadow-md transition-shadow duration-300 border-gray-200/60 shadow-xs rounded-md">
-            <CardHeader className="flex flex-row items-center justify-between px-6 py-4 border-b border-gray-100 dark:border-zinc-800 bg-slate-50/30 dark:bg-zinc-950 space-y-0 rounded-t-md">
-              <CardTitle className="text-base font-medium text-gray-800 dark:text-zinc-200">Personal Information</CardTitle>
-            </CardHeader>
+      {/* Personal Information & Balance */}
+      <motion.div
+        custom={0}
+        initial="hidden"
+        animate="visible"
+        variants={cardVariants}
+        className="col-span-12 lg:col-span-8 flex"
+      >
+        <Card className="flex flex-col w-full hover:shadow-md transition-shadow duration-300 border-gray-200 shadow-xs rounded-md">
+          <CardHeader className="flex flex-row items-center justify-between px-6 py-4 border-b border-gray-100 dark:border-zinc-800 bg-slate-50/30 dark:bg-zinc-950 space-y-0 rounded-t-md">
+            <CardTitle className="text-base font-medium text-gray-800 dark:text-zinc-200">Personal Information</CardTitle>
+          </CardHeader>
 
-            <CardContent className="p-6 flex-1">
-              <div className="grid grid-cols-12 gap-x-4 gap-y-3.5">
-                {/* Row 1: First name , last name */}
-                <FormInput
-                  label="First Name"
-                  required
-                  disabled={!isEditingProfile}
-                  isHalf
-                  value={formData.firstName}
-                  onChange={(val) => handleInputChange(val, 'firstName')}
-                />
-                <FormInput
-                  label="Last Name"
-                  required
-                  disabled={!isEditingProfile}
-                  isHalf
-                  value={formData.lastName}
-                  onChange={(val) => handleInputChange(val, 'lastName')}
-                />
+          <CardContent className="p-6 flex-1">
+            <div className="grid grid-cols-12 gap-x-4 gap-y-3.5">
+              {/* Row 1: First name , last name */}
+              <FormInput
+                label="First Name"
+                required
+                disabled={!isEditingProfile}
+                isHalf
+                value={formData.firstName}
+                onChange={(val) => handleInputChange(val, 'firstName')}
+                error={submit && !formData.firstName}
+                errormsg="Please enter first name"
+              />
+              <FormInput
+                label="Last Name"
+                required
+                disabled={!isEditingProfile}
+                isHalf
+                value={formData.lastName}
+                onChange={(val) => handleInputChange(val, 'lastName')}
+                error={submit && !formData.lastName}
+                errormsg="Please enter last name"
+              />
 
-                {/* Row 2: email, phone */}
-                <FormInput
-                  label="Email Address"
-                  type="email"
-                  required
-                  disabled
-                  isHalf
-                  value={formData.email}
-                  onChange={(val) => handleInputChange(val, 'email')}
-                />
-                <FormInput
-                  label="Phone"
-                  disabled={!isEditingProfile}
-                  isHalf
-                  value={formData.phone}
-                  onChange={(val) => handleInputChange(val, 'phone')}
-                />
+              {/* Row 2: email, phone */}
+              <FormInput
+                label="Email Address"
+                type="email"
+                required
+                disabled
+                isHalf
+                value={formData.email}
+                onChange={(val) => handleInputChange(val, 'email')}
+                error={submit && !formData.email}
+                errormsg="Please enter email address"
+              />
+              <FormInput
+                label="Phone"
+                disabled={!isEditingProfile}
+                isHalf
+                value={formData.phone}
+                onChange={(val) => handleInputChange(val, 'phone')}
+                error={submit && (!formData.phone || !isPhoneValid(formData.phone))}
+                errormsg={!formData.phone ? "Please enter phone number" : "Please enter valid phone number"}
+              />
 
-                {/* Row 3: company name , ABN */}
-                <FormInput
-                  label="Company Name"
-                  required
-                  disabled={!isEditingProfile}
-                  isHalf
-                  value={formData.companyName}
-                  onChange={(val) => handleInputChange(val, 'companyName')}
-                />
-                <FormInput
-                  label="ABN"
-                  disabled={!isEditingProfile}
-                  isHalf
-                  value={formData.abn}
-                  onChange={(val) => handleInputChange(val, 'abn')}
-                />
+              {/* Row 3: company name , ABN */}
+              <FormInput
+                label="Company Name"
+                disabled={!isEditingProfile}
+                isHalf
+                value={formData.companyName}
+                onChange={(val) => handleInputChange(val, 'companyName')}
+              />
+              <FormInput
+                label="ABN"
+                disabled={!isEditingProfile}
+                isHalf
+                value={formData.abn}
+                onChange={(val) => handleInputChange(val, 'abn')}
+              />
+            </div>
+          </CardContent>
+        </Card>
+      </motion.div>
+
+      {/* Balance Card */}
+      <motion.div
+        custom={1}
+        initial="hidden"
+        animate="visible"
+        variants={cardVariants}
+        className="col-span-12 lg:col-span-4 flex h-fit"
+      >
+        <Card className="w-full border-gray-200 shadow-xs">
+          <CardHeader className="flex flex-row items-center justify-between px-6 py-4 border-b border-gray-100 dark:border-zinc-800 bg-slate-50/30 dark:bg-zinc-950 space-y-0 rounded-t-md">
+            <CardTitle className="text-base font-medium text-gray-800 dark:text-zinc-200">Balance</CardTitle>
+          </CardHeader>
+          <CardContent className="p-6 pt-6 flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <span className="text-[13px] font-semibold text-slate-500">Current Balance:</span>
+              <span className="text-[13px] font-bold text-emerald-700 bg-emerald-50 dark:bg-emerald-950/50 dark:text-emerald-400 px-2 py-0.5 rounded-sm">
+                {new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(Number(summary?.wallet_balance || 0))}
+              </span>
+            </div>
+          </CardContent>
+        </Card>
+      </motion.div>
+      <motion.div
+        custom={3}
+        initial="hidden"
+        animate="visible"
+        variants={cardVariants}
+        className="col-span-12"
+      >
+        <Card className="w-full hover:shadow-md transition-shadow duration-300 border-gray-200 shadow-xs rounded-md">
+          <CardHeader className="flex flex-row items-center justify-between px-6 py-4 border-b border-gray-100 dark:border-zinc-800 bg-slate-50/30 dark:bg-zinc-950 space-y-0 rounded-t-md">
+            <CardTitle className="text-base font-medium text-gray-800 dark:text-zinc-200">Address Information</CardTitle>
+          </CardHeader>
+          <CardContent className="p-6 pt-2">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+
+              {/* Billing Address Column */}
+              <div className="space-y-4">
+                <div className="flex items-center justify-between border-b pb-2">
+                  <h4 className="text-base font-semibold text-gray-700 dark:text-zinc-300">
+                    Billing Address
+                  </h4>
+                  {/* <div className="flex items-center space-x-2 cursor-pointer">
+                    <Checkbox
+                      id="same_as_shipping"
+                      checked={sameAsShipping}
+                      disabled={!isEditingProfile}
+                      onCheckedChange={(val) => setSameAsShipping(!!val)}
+                    />
+                    <Label htmlFor="same_as_shipping" className="text-[13px] font-medium text-gray-600 dark:text-zinc-400 cursor-pointer">
+                      Same as pickup address
+                    </Label>
+                  </div> */}
+                </div>
+                <div className="grid grid-cols-12 gap-x-4 gap-y-3.5">
+                  <div className="col-span-12">
+                    <PlaceAutocomplete
+                      label="Search Address"
+                      className="w-full col-span-12"
+                      inputClassName="w-full col-span-12"
+                      isFullWidth
+                      disabled={!isEditingProfile || sameAsShipping}
+                      value={formData.billing_address_info}
+                      onChange={(val) => { handleInputChange(val, 'billing_address_info'); setDisabledAddress(false) }}
+                      onPlaceSelect={(opt) => {
+                        setFormData(prev => ({
+                          ...prev,
+                          billing_address_info: opt.formatted_address,
+                          billing_address: opt.address1,
+                          billing_unit_number: opt.unit_number || '',
+                          billing_street_number: opt.street_number || '',
+                          billing_street_name: opt.street_name || '',
+                          billing_street_type: opt.street_type || '',
+                          billing_suburb: opt.suburb,
+                          billing_state: opt.state,
+                          billing_postcode: opt.post_code,
+                        }));
+                        setDisabledAddress(true)
+                      }}
+                    />
+                  </div>
+
+                  <div className="col-span-12 sm:col-span-4">
+                    <FormInput
+                      label="Unit Number"
+                      placeholder='Unit Number'
+                      disabled={!isEditingProfile || sameAsShipping || disabledAddress}
+                      value={formData.billing_unit_number}
+                      onChange={(val) => handleInputChange(val, 'billing_unit_number')}
+                    />
+                  </div>
+                  <div className="col-span-12 sm:col-span-8">
+                    <FormInput
+                      label="Street"
+                      placeholder='Street Address'
+                      required
+                      disabled={!isEditingProfile || sameAsShipping || disabledAddress}
+                      value={formData.billing_address}
+                      onChange={(val) => handleInputChange(val, 'billing_address')}
+                      error={submit && !formData.billing_address}
+                      errormsg="Please enter street address"
+                    />
+                  </div>
+
+                  <div className="col-span-12 sm:col-span-4">
+                    <FormInput
+                      label="Suburb"
+                      placeholder='Suburb'
+                      required
+                      disabled={!isEditingProfile || sameAsShipping || disabledAddress}
+                      value={formData.billing_suburb}
+                      onChange={(val) => handleInputChange(val, 'billing_suburb')}
+                      error={submit && !formData.billing_suburb}
+                      errormsg="Please enter suburb"
+                    />
+                  </div>
+                  <div className="col-span-12 sm:col-span-4">
+                    <FormSelect
+                      label="State"
+                      placeholder='Select State'
+                      required
+                      options={STATES}
+                      disabled={!isEditingProfile || sameAsShipping || disabledAddress}
+                      value={formData.billing_state}
+                      onValueChange={(val) => handleInputChange(val, 'billing_state')}
+                      error={submit && !formData.billing_state}
+                      errormsg="Please select state"
+                      allowClear={false}
+                    />
+                  </div>
+                  <div className="col-span-12 sm:col-span-4">
+                    <FormInput
+                      label="Postcode"
+                      placeholder='Postcode'
+                      required
+                      disabled={!isEditingProfile || sameAsShipping || disabledAddress}
+                      value={formData.billing_postcode}
+                      onChange={(val) => handleInputChange(val, 'billing_postcode')}
+                      error={submit && !formData.billing_postcode}
+                      errormsg="Please enter postcode"
+                    />
+                  </div>
+                </div>
               </div>
-            </CardContent>
-          </Card>
-        </motion.div>
 
-        <motion.div
-          custom={3}
-          initial="hidden"
-          animate="visible"
-          variants={cardVariants}
-          className="col-span-12"
-        >
-          <Card className="w-full hover:shadow-md transition-shadow duration-300 border-gray-200/60 shadow-xs rounded-md">
-            <CardHeader className="flex flex-row items-center justify-between px-6 py-4 border-b border-gray-100 dark:border-zinc-800 bg-slate-50/30 dark:bg-zinc-950 space-y-0 rounded-t-md">
-              <CardTitle className="text-base font-medium text-gray-800 dark:text-zinc-200">Billing Address Information</CardTitle>
-            </CardHeader>
-            <CardContent className="p-6 pt-2">
-              <div className="grid grid-cols-1 md:grid-cols-1 gap-6">
-
-                {/* Pickup Address Column */}
-                {/* <div className="space-y-4">
+              {/* Pickup Address Column */}
+              <div className="space-y-4">
                 <div className="border-b pb-2">
                   <h4 className="text-base font-semibold text-gray-700 dark:text-zinc-300">
                     Pickup Address
@@ -413,7 +566,7 @@ export default function AccountSettingsPage() {
                       className="w-full col-span-12"
                       inputClassName="w-full col-span-12"
                       isFullWidth
-                      disabled={!isEditingProfile}
+                      disabled
                       value={formData.shipping_address_info}
                       onChange={(val) => handleInputChange(val, 'shipping_address_info')}
                       onPlaceSelect={(opt) => {
@@ -433,213 +586,69 @@ export default function AccountSettingsPage() {
                     />
                   </div>
 
-                  <div className="col-span-4">
+                  <div className="col-span-12 sm:col-span-4">
                     <FormInput
                       label="Unit Number"
                       placeholder='Unit Number'
-                      disabled={!isEditingProfile}
+                      disabled
                       value={formData.shipping_unit_number}
                       onChange={(val) => handleInputChange(val, 'shipping_unit_number')}
                     />
                   </div>
-                  <div className="col-span-8">
+                  <div className="col-span-12 sm:col-span-8">
                     <FormInput
                       label="Street"
                       placeholder='Street Address'
                       required
-                      disabled={!isEditingProfile}
+                      disabled
                       value={formData.shipping_address}
                       onChange={(val) => handleInputChange(val, 'shipping_address')}
                     />
                   </div>
 
-                  <div className="col-span-4">
+                  <div className="col-span-12 sm:col-span-4">
                     <FormInput
                       label="Suburb"
                       placeholder='Suburb'
                       required
-                      disabled={!isEditingProfile}
+                      disabled
                       value={formData.shipping_suburb}
                       onChange={(val) => handleInputChange(val, 'shipping_suburb')}
                     />
                   </div>
-                  <div className="col-span-4">
+                  <div className="col-span-12 sm:col-span-4">
                     <FormSelect
                       label="State"
                       placeholder='Select State'
                       required
                       options={STATES}
-                      disabled={!isEditingProfile}
+                      disabled
                       value={formData.shipping_state}
                       onValueChange={(val) => handleInputChange(val, 'shipping_state')}
                     />
                   </div>
-                  <div className="col-span-4">
+                  <div className="col-span-12 sm:col-span-4">
                     <FormInput
                       label="Postcode"
                       placeholder='Postcode'
                       required
-                      disabled={!isEditingProfile}
+                      disabled
                       value={formData.shipping_postcode}
                       onChange={(val) => handleInputChange(val, 'shipping_postcode')}
                     />
                   </div>
                 </div>
-              </div> */}
-
-                {/* Billing Address Column */}
-                <div className="space-y-4">
-                  {/* <div className="flex items-center justify-between border-b pb-2">
-                    <h4 className="text-base font-semibold text-gray-700 dark:text-zinc-300">
-                      Billing Address
-                    </h4>
-                    <div className="flex items-center space-x-2 cursor-pointer">
-                      <Checkbox
-                        id="same_as_shipping"
-                        checked={sameAsShipping}
-                        disabled={!isEditingProfile}
-                        onCheckedChange={(val) => setSameAsShipping(!!val)}
-                      />
-                      <Label htmlFor="same_as_shipping" className="text-[13px] font-medium text-gray-600 dark:text-zinc-400 cursor-pointer">
-                        Same as pickup address
-                      </Label>
-                    </div>
-                  </div> */}
-                  <div className="grid grid-cols-12 gap-x-4 gap-y-3.5">
-                    <div className="col-span-12">
-                      <PlaceAutocomplete
-                        label="Search Address"
-                        className="w-full col-span-12"
-                        inputClassName="w-full col-span-12"
-                        isFullWidth
-                        disabled={!isEditingProfile || sameAsShipping}
-                        value={formData.billing_address_info}
-                        onChange={(val) => { handleInputChange(val, 'billing_address_info'); setDisabledAddress(false) }}
-                        onPlaceSelect={(opt) => {
-                          setFormData(prev => ({
-                            ...prev,
-                            billing_address_info: opt.formatted_address,
-                            billing_address: opt.address1,
-                            billing_unit_number: opt.unit_number || '',
-                            billing_street_number: opt.street_number || '',
-                            billing_street_name: opt.street_name || '',
-                            billing_street_type: opt.street_type || '',
-                            billing_suburb: opt.suburb,
-                            billing_state: opt.state,
-                            billing_postcode: opt.post_code,
-                          }));
-                          setDisabledAddress(true)
-                        }}
-                      />
-                    </div>
-
-                    <div className="col-span-4">
-                      <FormInput
-                        label="Unit Number"
-                        placeholder='Unit Number'
-                        disabled={!isEditingProfile || sameAsShipping || disabledAddress}
-                        value={formData.billing_unit_number}
-                        onChange={(val) => handleInputChange(val, 'billing_unit_number')}
-                      />
-                    </div>
-                    <div className="col-span-8">
-                      <FormInput
-                        label="Street"
-                        placeholder='Street Address'
-                        required
-                        disabled={!isEditingProfile || sameAsShipping || disabledAddress}
-                        value={formData.billing_address}
-                        onChange={(val) => handleInputChange(val, 'billing_address')}
-                      />
-                    </div>
-
-                    <div className="col-span-4">
-                      <FormInput
-                        label="Suburb"
-                        placeholder='Suburb'
-                        required
-                        disabled={!isEditingProfile || sameAsShipping || disabledAddress}
-                        value={formData.billing_suburb}
-                        onChange={(val) => handleInputChange(val, 'billing_suburb')}
-                      />
-                    </div>
-                    <div className="col-span-4">
-                      <FormSelect
-                        label="State"
-                        placeholder='Select State'
-                        required
-                        options={STATES}
-                        disabled={!isEditingProfile || sameAsShipping || disabledAddress}
-                        value={formData.billing_state}
-                        onValueChange={(val) => handleInputChange(val, 'billing_state')}
-                      />
-                    </div>
-                    <div className="col-span-4">
-                      <FormInput
-                        label="Postcode"
-                        placeholder='Postcode'
-                        required
-                        disabled={!isEditingProfile || sameAsShipping || disabledAddress}
-                        value={formData.billing_postcode}
-                        onChange={(val) => handleInputChange(val, 'billing_postcode')}
-                      />
-                    </div>
-                  </div>
-                </div>
-
               </div>
-            </CardContent>
-          </Card>
-        </motion.div>
-      </div>
 
-      {/* Right Column: Balance, Plan Information, Sender Address */}
-      <div className="lg:col-span-6 flex flex-col gap-4">
 
-        {/* Balance Card */}
-        <motion.div custom={1} initial="hidden" animate="visible" variants={cardVariants} className="flex h-fit">
-          <Card className="w-full border-gray-200/60 shadow-xs">
-            <CardHeader className="flex flex-row items-center justify-between px-6 py-4 border-b border-gray-100 dark:border-zinc-800 bg-slate-50/30 dark:bg-zinc-950 space-y-0 rounded-t-md">
-              <CardTitle className="text-base font-medium text-gray-800 dark:text-zinc-200">Balance</CardTitle>
-            </CardHeader>
-            <CardContent className="p-6 pt-0 flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <span className="text-[13px] font-semibold text-slate-500">Current Balance:</span>
-                <span className="text-[13px] font-bold text-emerald-700 bg-emerald-50 dark:bg-emerald-950/50 dark:text-emerald-400 px-2 py-0.5 rounded-sm">
-                  {new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(Number(summary?.wallet_balance || 0))}
-                </span>
-              </div>
-            </CardContent>
-          </Card>
-        </motion.div>
 
-        {/* Plan Information Card */}
-        {/* <motion.div custom={2} initial="hidden" animate="visible" variants={cardVariants} className="flex">
-          <Card className="w-full border-gray-200/60 ">
-            <CardHeader className="flex flex-row items-center justify-between px-6 py-4 border-b border-gray-100 dark:border-zinc-800 bg-slate-50/30 dark:bg-zinc-950 space-y-0 rounded-t-md">
-              <CardTitle className="text-base font-medium text-gray-800 dark:text-zinc-200">Plan Information</CardTitle>
-              <Button
-                size="sm"
-                className="h-8 px-4 text-[13px] font-medium text-white shadow-sm shrink-0 rounded-sm"
-                onClick={() => setIsPlanModalOpen(true)}
-              >
-                Upgrade Plan
-              </Button>
-            </CardHeader>
-            <CardContent className="p-6 pt-0 space-y-3">
-              <div className="text-[13px] font-medium text-slate-800 dark:text-zinc-200">
-                <span className="text-slate-500 dark:text-zinc-400">Current Plan: </span>
-                <span className="font-bold text-slate-900 dark:text-zinc-100">Silver</span>
-              </div>
-              <div className="flex items-center gap-6 text-[13px] font-semibold text-indigo-900/80 dark:text-indigo-300">
-                <span>Channels: <span className="font-medium text-slate-500">0/99</span></span>
-                <span>Couriers: <span className="font-medium text-slate-500">3/99</span></span>
-                <span>Shipments: <span className="font-medium text-slate-500">4/2000</span></span>
-              </div>
-            </CardContent>
-          </Card>
-        </motion.div> */}
-      </div>
+            </div>
+          </CardContent>
+        </Card>
+      </motion.div>
+
+
+
 
       {/* Address Information Card */}
 

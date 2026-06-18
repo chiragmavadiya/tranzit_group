@@ -19,6 +19,7 @@ import brandLogo from '@/assets/Tranzit_Logo.svg';
 import { showToast } from '@/components/ui/custom-toast';
 import { PlaceAutocomplete } from '@/components/common/AutoComplateAddress';
 import { STATES, PRIVACY_POLICY_URL, TERMS_CONDITIONS_URL } from '@/constants';
+import { cleanSpaces, isPhoneValid } from '@/lib/utils';
 
 const SectionHeader = ({ title, icon: Icon, children }: { title: string, icon: any, children?: React.ReactNode }) => (
   <div className="flex items-center justify-between pb-3 border-b border-slate-50 dark:border-zinc-800/50 mb-6">
@@ -142,7 +143,7 @@ export default function OnboardingPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitted(true);
-    if (!/^\d{10}$/.test(formData.mobile.replace(/\s/g, ''))) {
+    if (!isPhoneValid(formData.mobile)) {
       showToast("Invalid mobile number", "error");
       return false;
     };
@@ -154,7 +155,7 @@ export default function OnboardingPage() {
       showToast("Please accept the Privacy Policy and Terms & Conditions", "error");
       return
     }
-    const payload = { ...formData };
+    const payload = { ...formData, mobile: cleanSpaces(formData.mobile) };
     if (!formData.hasBillingAddress) {
       payload.billing_address = formData.address;
       payload.billing_unit_number = formData.unit_number;

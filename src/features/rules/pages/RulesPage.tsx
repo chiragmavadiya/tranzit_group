@@ -1,13 +1,8 @@
 import { useMemo, useState } from 'react';
-import {
-  useRules,
-  useCreateRule,
-  useUpdateRule,
-  useDeleteRule
-} from '../hooks/useRules';
-import type { ShippingRule, Condition, RuleAction } from '../types/rules.types';
-import RuleList from '../components/RuleList';
-import RuleForm from '../components/RuleForm';
+import { useRules, useDeleteRule, useCreateRule, useUpdateRule } from '../hooks/useRules';
+// import type { Condition, RuleAction } from '../types/rules.types';
+// import RuleList from '../components/RuleList';
+// import RuleForm from '../components/RuleForm';
 import { CustomModel } from '@/components/ui/dialog';
 import { Card, CardContent } from '@/components/ui/card';
 import {
@@ -18,14 +13,14 @@ import {
 } from '@/components/ui/accordion';
 import { Loader2, Settings, HelpCircle, Layers } from 'lucide-react';
 import { useAppSelector } from '@/hooks/store.hooks';
+import RuleList from '../components/RuleList';
+import RuleForm from '../components/RuleForm';
+import type { RuleFormType, ShippingRule } from '../types/rules.types';
 
 export default function RulesPage() {
   const [view, setView] = useState<'list' | 'create' | 'edit'>('list');
-  const [editingRule, setEditingRule] = useState<ShippingRule | null>(null);
-  const [prefilledData, setPrefilledData] = useState<{
-    conditions: Condition[];
-    actions: RuleAction[];
-  } | null>(null);
+  // const [editingRule, setEditingRule] = useState<any | null>(null);
+  const [prefilledData, setPrefilledData] = useState<ShippingRule | null>(null);
 
   // Deletion confirm modal state
   const [ruleToDelete, setRuleToDelete] = useState<string | null>(null);
@@ -39,31 +34,41 @@ export default function RulesPage() {
   // const [isRunningCheapestAll, setIsRunningCheapestAll] = useState(false);
 
   // Queries & Mutations
-  const { data: rules = [], isLoading } = useRules();
+  const { data: rulesData, isLoading } = useRules();
+  console.log(rulesData, 'data')
+  // useRuleOptions();
   const createRuleMutation = useCreateRule();
   const updateRuleMutation = useUpdateRule();
   const deleteRuleMutation = useDeleteRule();
 
-  const handleCreateRule = (data: Omit<ShippingRule, 'id' | 'createdAt' | 'updatedAt' | 'versionHistory'>) => {
-    createRuleMutation.mutate(data, {
-      onSuccess: () => {
-        setView('list');
-        setPrefilledData(null);
-      }
-    });
+  const handleCreateRule = (data: any) => {
+    if (data.id) {
+      // updateRuleMutation.mutate(data, {
+      //   onSuccess: () => {
+      //     setView('list');
+      //     setPrefilledData(null);
+      //   }
+      // });
+    } else {
+      createRuleMutation.mutate(data, {
+        onSuccess: () => {
+          setView('list');
+          setPrefilledData(null);
+        }
+      });
+    };
   };
 
-  const handleUpdateRule = (data: Omit<ShippingRule, 'id' | 'createdAt' | 'updatedAt' | 'versionHistory'>) => {
-    if (!editingRule) return;
+  const handleUpdateRule = (data: RuleFormType) => {
+    if (!prefilledData) return;
 
     updateRuleMutation.mutate({
-      id: editingRule.id,
-      data: data,
-      changes: 'Rule updated.'
+      id: prefilledData.id,
+      data: data
     }, {
       onSuccess: () => {
         setView('list');
-        setEditingRule(null);
+        setPrefilledData(null);
       }
     });
   };
@@ -79,47 +84,47 @@ export default function RulesPage() {
   };
 
   // Quick setup helper to auto-configure and open form
-  const handleQuickSetupClick = (type: 'service' | 'cheapest') => {
-    setEditingRule(null);
-    if (type === 'service') {
-      setPrefilledData({
-        conditions: [
-          {
-            id: 'cond-' + Date.now(),
-            attribute: 'all_orders',
-            operator: '',
-            value: ''
-          }
-        ],
-        actions: [
-          {
-            id: 'act-' + Date.now(),
-            type: 'set_courier_product',
-            config: { courier: 'auspost', product_code: '' }
-          }
-        ]
-      });
-    } else {
-      setPrefilledData({
-        conditions: [
-          {
-            id: 'cond-' + Date.now(),
-            attribute: 'all_orders',
-            operator: '',
-            value: ''
-          }
-        ],
-        actions: [
-          {
-            id: 'act-' + Date.now(),
-            type: 'select_cheapest_carrier_service',
-            config: {}
-          }
-        ]
-      });
-    }
-    setView('create');
-  };
+  // const handleQuickSetupClick = (type: 'service' | 'cheapest') => {
+  //   // setEditingRule(null);
+  //   if (type === 'service') {
+  //     // setPrefilledData({
+  //     //   conditions: [
+  //     //     {
+  //     //       id: 'cond-' + Date.now(),
+  //     //       attribute: 'all_orders',
+  //     //       operator: '',
+  //     //       value: ''
+  //     //     }
+  //     //   ],
+  //     //   actions: [
+  //     //     {
+  //     //       id: 'act-' + Date.now(),
+  //     //       type: 'set_courier_product',
+  //     //       config: { courier: 'auspost', product_code: '' }
+  //     //     }
+  //     //   ]
+  //     // });
+  //   } else {
+  //     setPrefilledData({
+  //       conditions: [
+  //         {
+  //           id: 'cond-' + Date.now(),
+  //           attribute: 'all_orders',
+  //           operator: '',
+  //           value: ''
+  //         }
+  //       ],
+  //       actions: [
+  //         {
+  //           id: 'act-' + Date.now(),
+  //           type: 'select_cheapest_carrier_service',
+  //           config: {}
+  //         }
+  //       ]
+  //     });
+  //   }
+  //   setView('create');
+  // };
 
   // Manual Trigger Simulation
   // const handleRunRulesNow = () => {
@@ -189,7 +194,7 @@ export default function RulesPage() {
               </p>
 
               {/* Quick Setup */}
-              {canReadWrite && (
+              {/* {canReadWrite && (
                 <div className="space-y-2 pt-4">
                   <span className="text-xs font-bold text-gray-800 dark:text-zinc-200 block uppercase tracking-wide">
                     Quick setup
@@ -209,7 +214,7 @@ export default function RulesPage() {
                     </li>
                   </ul>
                 </div>
-              )}
+              )} */}
               {/* YouTube Video Preview */}
               <div className="pt-2 hidden">
                 <iframe
@@ -309,17 +314,17 @@ export default function RulesPage() {
 
         {/* Right Column: Rules list & Inline builder */}
         <div className="lg:col-span-8 space-y-6">
-          {/* Rules List (always visible) */}
+          {/* {console.log(rules, "rules")} */}
           <RuleList
-            rules={rules}
+            rules={rulesData?.data || []}
             onCreateClick={() => {
-              setEditingRule(null);
+              // setEditingRule(null);
               setPrefilledData(null);
               setView('create');
             }}
             onEdit={(rule) => {
-              setEditingRule(rule);
-              setPrefilledData(null);
+              // setEditingRule(rule);
+              setPrefilledData(rule);
               setView('edit');
             }}
             onDelete={(id) => setRuleToDelete(id)}
@@ -332,22 +337,22 @@ export default function RulesPage() {
             <RuleForm
               prefilledData={prefilledData}
               onSave={handleCreateRule}
+              isSaving={createRuleMutation.isPending}
               onCancel={() => {
                 setView('list');
                 setPrefilledData(null);
               }}
 
-              isSaving={createRuleMutation.isPending}
             />
           )}
 
           {view === 'edit' && (
             <RuleForm
-              initialData={editingRule}
+              prefilledData={prefilledData}
               onSave={handleUpdateRule}
               onCancel={() => {
                 setView('list');
-                setEditingRule(null);
+                setPrefilledData(null);
               }}
               isSaving={updateRuleMutation.isPending}
             />

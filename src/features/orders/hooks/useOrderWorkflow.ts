@@ -1,5 +1,5 @@
 import { useCallback, useMemo, useState, useEffect, useEffectEvent, useRef } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { useAppSelector } from '@/hooks/store.hooks';
 import { showToast } from '@/components/ui/custom-toast';
 import { useOrderItems } from './useOrderItems';
@@ -40,6 +40,8 @@ const initialAddressData = {
 
 export const useOrderWorkflow = () => {
   const { orderType, orderID } = useParams<{ orderType: string; orderID: string }>();
+  const [searchParams] = useSearchParams();
+  console.log("searchParams", Boolean(searchParams.get("require_phone") === 'true'))
   const { role, user, default_courier, default_item, team_access } = useAppSelector((state) => state.auth);
   const navigate = useNavigate();
   const isSubUser = useMemo(() => (role === 'customer' && team_access?.is_sub_user), [role, team_access]);
@@ -96,12 +98,15 @@ export const useOrderWorkflow = () => {
       if (orderType === 'return' && addressData.sender.address1 === '') {
         return 'sender';
       }
-      if (orderType !== 'return' && addressData.receiver.address1 === '') {
+      if ((orderType !== 'return' && addressData.receiver.address1 === '')) {
         return 'receiver';
       }
     }
+    if (searchParams.get("require_phone") === 'true') {
+      return 'receiver';
+    }
     return null;
-  }, [addressData.receiver.address1, orderType, addressData.sender.address1, isCreate]);
+  }, [addressData.receiver.address1, orderType, addressData.sender.address1, isCreate, searchParams]);
 
   const [insuranceSelected, setInsuranceSelected] = useState<boolean>(false);
   const [signatureSelected, setSignatureSelected] = useState<boolean>(false);
@@ -287,7 +292,7 @@ export const useOrderWorkflow = () => {
     const gst = quoteData?.courier?.gst || quoteData?.tax || 0;
     const totalSurcharges = isEditable ? (quoteData?.totalSurcharges || 0) : orderDetail?.order_details?.surcharge_amount;
     const insuranceCost = insuranceSelected ? 6.0 : 0;
-    const grandTotal = (quoteData?.totalPrice || quoteData?.total || 0) + insuranceCost;
+    const grandTotal = (quoteData?.totalPrice || quoteData?.total || 0) + (orderType === 'view' ? 0 : insuranceCost);
     return {
       totalItems,
       totalWeight,
@@ -299,7 +304,7 @@ export const useOrderWorkflow = () => {
       grandTotal,
       insurance: insuranceSelected,
     };
-  }, [itemsData, quoteData, isEditable, orderDetail?.order_details?.surcharge_amount, insuranceSelected]);
+  }, [itemsData, quoteData, isEditable, orderDetail?.order_details?.surcharge_amount, insuranceSelected, orderType]);
 
   const requiresManualLabel = useMemo(() => {
     if (orderType !== 'edit') return false;
@@ -691,10 +696,15 @@ export const useOrderWorkflow = () => {
     }
   }, [setItemsData, setQuoteData, setCourierData]);
 
+  useEffect(() => {
+    document.title = orderType === 'new' ? "New order | Tranzit" : `Order ${orderID} | Tranzit`;
+  }, [orderType, orderID])
+
+
   const hasDefaultItemAndCourier = useMemo(() => Boolean(default_courier) && Boolean(default_item), [default_courier, default_item]);
 
-  const isSavingDraft = saveLoading && saveAction === 'draft';
-  const isCreatingConsignment = (saveLoading && saveAction === 'consignment') || walletLoading;
+  const isSavingDraft = useMemo(() => saveLoading && saveAction === 'draft', [saveLoading, saveAction]);
+  const isCreatingConsignment = useMemo(() => (saveLoading && saveAction === 'consignment') || walletLoading, [saveLoading, saveAction, walletLoading]);
   return {
     orderType,
     orderID,

@@ -25,7 +25,7 @@ import { ConformationModal } from '@/components/common/ConformationModal';
 import { useDebounce } from '@/hooks/useDebounce';
 import { FormSelect } from '../components/OrderFormUI';
 import { useCustomers } from '@/features/customers/hooks/useCustomers';
-import UpdateCourierModal from '../components/UpdateCourierModal';
+// import UpdateCourierModal from '../components/UpdateCourierModal';
 
 const ImportOrdersDialog = lazy(() => import('@/features/orders/components/ImportOrdersDialog'));
 const CreateOrderDialog = lazy(() => import('@/features/orders/components/CreateOrderDialog'));
@@ -79,7 +79,7 @@ export default function OrdersPage({ fromCustomer, customerId }: { fromCustomer?
   const [orderToCancel, setOrderToCancel] = useState<string | null>(null);
   const [orderToArchive, setOrderToArchive] = useState<string | null>(null);
   const [addressEditModal, setAddressEditModal] = useState<string>();
-  const [courierEditModal, setCourierEditModal] = useState<Order>();
+  // const [courierEditModal, setCourierEditModal] = useState<Order>();
 
   const selectedCustomer = searchParams.get('customerId') || undefined;
   const setSelectedCustomer = useCallback((val: string | undefined) => {
@@ -149,7 +149,7 @@ export default function OrdersPage({ fromCustomer, customerId }: { fromCustomer?
       },
       onError: (err: any) => {
         if (err?.response?.data?.need_edit) {
-          navigate(`/orders/consign/${orderNumber}`)
+          navigate(`/orders/consign/${orderNumber}?require_phone=true`)
         }
         setOrderToPrint(null);
       }
@@ -664,13 +664,13 @@ export default function OrdersPage({ fromCustomer, customerId }: { fromCustomer?
           />
         </Suspense>
       )}
-      {courierEditModal && (
+      {/* {courierEditModal && (
         <UpdateCourierModal
           open={!!courierEditModal}
           onOpenChange={() => setCourierEditModal(undefined)}
           orderData={courierEditModal}
         />
-      )}
+      )} */}
       {walletCheckOpen && walletCheckData && orderToPrint && (
         <WalletCheckDialog
           open={walletCheckOpen}

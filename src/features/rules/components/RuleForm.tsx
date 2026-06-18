@@ -1,16 +1,15 @@
 import { useState, useEffect } from 'react';
-import type { ShippingRule, Condition, RuleAction } from '../types/rules.types';
+import type { RuleFormType, ShippingRule } from '../types/rules.types';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { CustomModel } from '@/components/ui/dialog';
-import ConditionBuilder from './ConditionBuilder';
-import ActionBuilder from './ActionBuilder';
-import { generateRuleSentence } from '../utils/rulePreview';
+import { FormSelect } from '@/features/orders/components/OrderFormUI';
+import { useRuleOptions } from '../hooks/useRules';
+import { Loader2 } from 'lucide-react';
 
 interface RuleFormProps {
-  initialData?: ShippingRule | null;
-  prefilledData?: { conditions: Condition[]; actions: RuleAction[] } | null;
-  onSave: (data: Omit<ShippingRule, 'id' | 'createdAt' | 'updatedAt' | 'versionHistory'>) => void;
+  initialData?: any;
+  prefilledData?: ShippingRule | null;
+  onSave: (data: RuleFormType) => void;
   onCancel: () => void;
   isSaving?: boolean;
 }
@@ -22,94 +21,42 @@ export default function RuleForm({
   onCancel,
   isSaving = false,
 }: RuleFormProps) {
-  const [conditions, setConditions] = useState<Condition[]>([]);
-  const [actions, setActions] = useState<RuleAction[]>([]);
-
-  // Unsaved changes detection state
-  const [hasChanges, setHasChanges] = useState(false);
-  const [isDiscardModalOpen, setIsDiscardModalOpen] = useState(false);
-
-  // Validation errors
-  const [actionError, setActionError] = useState('');
+  const { data: ruleOptions } = useRuleOptions()
+  const [formData, setFormData] = useState<RuleFormType>({
+    condition_type: "",
+    action_type: '',
+    global_courier_id: null,
+    product_code: '',
+  })
+  const [submitted, setSubmitted] = useState<boolean>(false)
 
   // Initialize form
   useEffect(() => {
     if (initialData) {
-      setConditions(initialData.conditions || []);
-      setActions(initialData.actions || []);
+      setFormData(initialData)
     } else if (prefilledData) {
-      setConditions(prefilledData.conditions || []);
-      setActions(prefilledData.actions || []);
+      setFormData(prefilledData)
     } else {
       // Show exactly one condition and action by default
-      setConditions([
-        {
-          id: 'cond-' + Date.now(),
-          attribute: 'all_orders',
-          operator: '',
-          value: '',
-        }
-      ]);
-      setActions([
-        {
-          id: 'act-' + Date.now(),
-          type: 'select_cheapest_carrier_service',
-          config: {},
-        }
-      ]);
     }
-    setHasChanges(false);
   }, [initialData, prefilledData]);
 
-  // Detect changes
-  useEffect(() => {
-    if (!initialData && !prefilledData) {
-      // Compare with the default single values to see if user changed anything
-      const hasDiff = conditions.length > 1 ||
-        actions.length > 1 ||
-        (conditions[0] && conditions[0].attribute !== 'all_orders') ||
-        (actions[0] && (actions[0].type !== 'set_courier_product' || JSON.stringify(actions[0].config) !== JSON.stringify({ courier: 'auspost', product_code: '' })));
-      setHasChanges(hasDiff);
-    } else {
-      const compareSource = initialData || prefilledData;
-      if (compareSource) {
-        const isDifferent =
-          JSON.stringify(conditions) !== JSON.stringify(compareSource.conditions) ||
-          JSON.stringify(actions) !== JSON.stringify(compareSource.actions);
-        setHasChanges(isDifferent);
-      }
-    }
-  }, [conditions, actions, initialData, prefilledData]);
-
   const handleCancelClick = () => {
-    if (hasChanges) {
-      setIsDiscardModalOpen(true);
-    } else {
-      onCancel();
-    }
+    onCancel();
   };
 
   const handleSaveClick = () => {
-    setActionError('');
-
-    if (actions.length === 0) {
-      setActionError('At least one Action is required');
+    setSubmitted(true)
+    if (!formData.condition_type || !formData.action_type) {
       return;
     }
 
-    const dynamicName = generateRuleSentence(conditions, actions) || 'Rule';
-
-    onSave({
-      name: dynamicName,
-      description: '',
-      status: 'active',
-      priority: 1,
-      stopProcessing: false,
-      conditions,
-      actions,
-    });
+    if (formData.action_type === 'set_courier_product_code' && !(formData.global_courier_id && formData.product_code)) {
+      return
+    }
+    onSave(formData);
   };
-
+  console.log(formData, 'formData')
   return (
     <Card className="border gap-0 border-gray-200 dark:border-zinc-800 shadow-sm rounded-md overflow-hidden mt-6 bg-white dark:bg-zinc-950">
       <CardHeader className="px-6 py-4 border-b border-gray-100 dark:border-zinc-800 bg-slate-50/50 dark:bg-zinc-950/40">
@@ -120,26 +67,88 @@ export default function RuleForm({
       <CardContent className="py-4 px-6 space-y-4">
 
         {/* Condition Builder */}
-        <div>
-          <ConditionBuilder
-            conditions={conditions}
-            onChange={setConditions}
+        <div className='space-y-4'>
+          <h3 className="text-[14px] font-bold text-gray-800 dark:text-zinc-200 mt-0 uppercase tracking-wide">
+            Condition
+          </h3>
+          <FormSelect
+            label="Attribute"
+            placeholder='Select Attribute'
+            value={formData.condition_type}
+            onValueChange={(val) => setFormData({ ...formData, condition_type: val || '' })}
+            options={ruleOptions?.data?.condition_types?.map((item: any) => ({ label: item.label, value: item.key })) || []}
+            isFullWidth
+            allowClear={false}
+            required
+            error={submitted && !formData.condition_type}
+            errormsg="Please select condition"
           />
         </div>
 
         <div className="border-t border-gray-100 dark:border-zinc-800 my-4" />
 
         {/* Action Builder */}
-        <div>
-          <ActionBuilder
-            actions={actions}
-            onChange={setActions}
-          />
-          {actionError && (
-            <div className="text-red-500 text-xs mt-3 font-semibold">
-              {actionError}
+        <div className='space-y-4'>
+          <h3 className="text-[14px] font-bold text-gray-800 dark:text-zinc-200 my-0 uppercase tracking-wide">
+            Actions (executed in order)
+          </h3>
+          <div
+            className="flex flex-col md:flex-row gap-3 w-full mt-4"
+          >
+            {/* Action Type Select */}
+            <div className="w-full md:w-1/3">
+              <FormSelect
+                label="Action Type"
+                placeholder='Select Action'
+                value={formData.action_type}
+                onValueChange={(val) => setFormData({ ...formData, action_type: val || '' })}
+                options={ruleOptions?.data?.action_types?.map((item: any) => ({ label: item.label, value: item.key })) || []}
+                isFullWidth
+                allowClear={false}
+                searchdisable
+                required
+                error={submitted && !formData.action_type}
+                errormsg="Please select action type"
+              />
             </div>
-          )}
+            {formData.action_type === 'set_cheapest_carrier_service' && (
+              <div className="w-full md:w-2/3 h-8 flex items-center">
+                <span className="text-xs text-gray-400 dark:text-zinc-500 bg-gray-50 dark:bg-zinc-950 px-2.5 py-1.5 rounded-sm border border-gray-150 dark:border-zinc-850 font-semibold">
+                  No parameters required for this action
+                </span>
+              </div>
+            )}
+            {formData.action_type === 'set_courier_product_code' && (
+              <>
+                <div className="w-full md:w-1/2">
+                  <FormSelect
+                    label="Courier"
+                    value={String(formData.global_courier_id)}
+                    onValueChange={(newVal) => setFormData({ ...formData, global_courier_id: newVal || '' })}
+                    options={ruleOptions?.data?.carriers?.map((item: any) => ({ label: item.account_label, value: item.id })) || []}
+                    allowClear={false}
+                    placeholder='Select courier'
+                    required
+                    error={submitted && !formData.global_courier_id}
+                    errormsg="Please select courier"
+                  />
+                </div>
+                <div className="w-full md:w-1/2">
+                  <FormSelect
+                    label="Product Code"
+                    value={formData.product_code || ''}
+                    onValueChange={(newVal) => setFormData({ ...formData, product_code: newVal || '' })}
+                    options={ruleOptions?.data?.products?.filter((item: any) => item.carrier_id === Number(formData.global_courier_id)).map((item: any) => ({ label: item.product_name + " - " + item.product_code, value: item.product_code })) || []}
+                    allowClear={false}
+                    placeholder='Select Product Code'
+                    required
+                    error={submitted && !formData.product_code}
+                    errormsg="Please select product code"
+                  />
+                </div>
+              </>
+            )}
+          </div>
         </div>
 
         {/* Inline Save / Cancel buttons */}
@@ -148,8 +157,8 @@ export default function RuleForm({
             type="button"
             onClick={handleSaveClick}
             disabled={isSaving}
-          // className="h-8 text-[12px] font-bold text-white bg-blue-500 hover:bg-blue-600 rounded-md px-4 cursor-pointer"
           >
+            {isSaving ? <Loader2 className="h-4 w-4 animate-spin" /> : ""}
             Save
           </Button>
           <Button
@@ -162,25 +171,6 @@ export default function RuleForm({
           </Button>
         </div>
       </CardContent>
-
-      {/* Confirmation Modals */}
-      {/* 1. Unsaved changes modal */}
-      <CustomModel
-        open={isDiscardModalOpen}
-        onOpenChange={setIsDiscardModalOpen}
-        title="Discard Unsaved Changes?"
-        description="You have made modifications to this shipping rule. Are you sure you want to discard them? This action cannot be undone."
-        onSubmit={() => {
-          setIsDiscardModalOpen(false);
-          onCancel();
-        }}
-        submitText="Discard Changes"
-        contentClass="sm:max-w-md"
-      >
-        <div className="py-2 text-sm text-gray-500 dark:text-zinc-400">
-          Any updates to the conditions or actions will be permanently lost.
-        </div>
-      </CustomModel>
     </Card>
   );
 }

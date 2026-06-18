@@ -1,4 +1,4 @@
-import { Routes, Route, Navigate } from "react-router-dom";
+import { Routes, Route, Navigate, useParams } from "react-router-dom";
 import ProtectedRoute from "@/router/ProtectedRoute";
 import { lazy, Suspense } from "react";
 import Layout from "@/layout";
@@ -53,6 +53,11 @@ const withSuspense = (Component: React.ReactNode) => (
   </Suspense>
 );
 
+function OrderDetailsWrapper() {
+  const { orderType, orderID } = useParams<{ orderType: string; orderID: string }>();
+  return <OrderDetails key={`${orderType}-${orderID || ''}`} />;
+}
+
 export default function ClientRoutes() {
   return (
     <Routes>
@@ -61,9 +66,9 @@ export default function ClientRoutes() {
           <Route path="dashboard" element={withSuspense(<Dashboard />)} />
           <Route path="orders">
             <Route index element={withSuspense(<Orders />)} />
-            <Route path=":orderType" element={withSuspense(<OrderDetails />)} />
+            <Route path=":orderType" element={withSuspense(<OrderDetailsWrapper />)} />
             <Route path=":orderID" element={withSuspense(<OrderDetails2 />)} />
-            <Route path=":orderType/:orderID" element={withSuspense(<OrderDetails />)} />
+            <Route path=":orderType/:orderID" element={withSuspense(<OrderDetailsWrapper />)} />
           </Route>
 
           {/* <Route path="orders/create" element={<CreateOrder />} /> */}

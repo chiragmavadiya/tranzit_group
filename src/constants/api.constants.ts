@@ -333,5 +333,8 @@ export const QUERY_KEYS = {
         LIST: ["customer", "team-users", "list"],
         FORM_OPTIONS: ["customer", "team-users", "form-options"],
         DETAILS: (id: string | number) => ["customer", "team-users", "details", id],
+    },
+    ENQUIRIES: {
+        LIST: ["enquiries", "list"],
     }
 };

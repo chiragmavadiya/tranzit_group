@@ -34,7 +34,7 @@ export function FileUpload({ files, onFilesChange, maxFiles = 5, maxSizeMB = 10 
   const handleDrop = useCallback((e: React.DragEvent) => {
     e.preventDefault();
     setIsDragging(false);
-    
+
     const droppedFiles = Array.from(e.dataTransfer.files);
     addFiles(droppedFiles);
   }, [addFiles]);
@@ -52,6 +52,7 @@ export function FileUpload({ files, onFilesChange, maxFiles = 5, maxSizeMB = 10 
   };
 
   const getFileIcon = (file: File) => {
+    if (file.type) return <img src={URL.createObjectURL(file)} alt={file.name} className="w-5 h-5 text-primary" />
     if (file.type.startsWith('image/')) return <ImageIcon className="w-5 h-5 text-primary" />;
     if (file.type.includes('pdf')) return <FileText className="w-5 h-5 text-red-500" />;
     return <FileIcon className="w-5 h-5 text-gray-500" />;
@@ -65,8 +66,8 @@ export function FileUpload({ files, onFilesChange, maxFiles = 5, maxSizeMB = 10 
         onDrop={handleDrop}
         className={cn(
           "relative border-2 border-dashed rounded-xl p-8 transition-all duration-200 flex flex-col items-center justify-center text-center cursor-pointer",
-          isDragging 
-            ? "border-primary bg-primary/5 dark:bg-primary/10 scale-[1.01]" 
+          isDragging
+            ? "border-primary bg-primary/5 dark:bg-primary/10 scale-[1.01]"
             : "border-gray-200 dark:border-zinc-800 hover:border-primary hover:bg-gray-50 dark:hover:bg-zinc-900/50"
         )}
         onClick={() => document.getElementById('file-upload-input')?.click()}
@@ -79,11 +80,11 @@ export function FileUpload({ files, onFilesChange, maxFiles = 5, maxSizeMB = 10 
           onChange={handleFileChange}
           accept=".jpg,.jpeg,.png,.pdf,.doc,.docx,.xls,.xlsx"
         />
-        
+
         <div className="w-12 h-12 rounded-full bg-primary/10 dark:bg-primary/20 flex items-center justify-center mb-4 text-primary">
           <Upload className="w-6 h-6" />
         </div>
-        
+
         <div className="space-y-1">
           <p className="text-sm font-semibold text-gray-900 dark:text-zinc-100">
             Click to upload or drag and drop
@@ -97,17 +98,17 @@ export function FileUpload({ files, onFilesChange, maxFiles = 5, maxSizeMB = 10 
       {files.length > 0 && (
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 animate-in fade-in slide-in-from-top-2 duration-300">
           {files.map((file, index) => (
-            <div 
+            <div
               key={`${file.name}-${index}`}
               className="flex items-center justify-between p-3 rounded-lg border border-gray-100 dark:border-zinc-800 bg-white dark:bg-zinc-900 shadow-sm"
             >
               <div className="flex items-center gap-3 min-w-0">
                 {getFileIcon(file)}
                 <div className="min-w-0">
-                  <p className="text-xs font-medium text-gray-900 dark:text-zinc-100 truncate">
+                  <p className="my-0 text-xs font-medium text-gray-900 dark:text-zinc-100 truncate">
                     {file.name}
                   </p>
-                  <p className="text-[10px] text-gray-500 dark:text-zinc-400">
+                  <p className="my-0 text-[10px] text-gray-500 dark:text-zinc-400">
                     {(file.size / (1024 * 1024)).toFixed(2)} MB
                   </p>
                 </div>

@@ -5,6 +5,7 @@ import Layout from "@/layout";
 import { Loader2 } from "lucide-react";
 import { useAppSelector } from "@/hooks/store.hooks";
 import { getFirstAllowedSettingsPath } from "@/utils/permission";
+import EnquiryListPage from "@/features/enquiry/pages/EnquiryList";
 // import IntegrationsPage from "@/features/integrations/pages/IntegrationPage";
 
 // Lazy load page components
@@ -85,7 +86,11 @@ export default function ClientRoutes() {
           </Route>
           <Route path="reports" element={withSuspense(<Reports />)} />
           <Route path="parcel-report" element={withSuspense(<ParcelReport />)} />
-          <Route path="enquiry" element={withSuspense(<Enquiry />)} />
+          {/* <Route path="enquiry" element={withSuspense(<Enquiry />)} /> */}
+          <Route path="enquiry">
+            <Route path="history" element={withSuspense(<EnquiryListPage />)} />
+            <Route index element={withSuspense(<Enquiry />)} />
+          </Route>
           <Route path="manifest" element={withSuspense(<ManifestPage />)} />
           {/* <Route path="help-center" element={withSuspense(<HelpCenterLayout />)}>
             <Route path=":slug" element={withSuspense(<HelpCenterArticle />)} />

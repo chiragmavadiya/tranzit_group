@@ -65,7 +65,7 @@ export function ChangePasswordDialog({ open, onOpenChange, onSubmit, isLoading }
 
         <FormInput
           label="New Password"
-          placeholder="••••••••"
+          placeholder="Enter new password"
           type={"password"}
           value={formData.newPassword}
           onChange={(val) => handleInputChange('newPassword', val)}

@@ -214,6 +214,11 @@ export const API_ENDPOINTS = {
         FORM_OPTIONS: "/customer/team-users/form-options",
         DETAILS: (id: string | number) => `/customer/team-users/${id}`,
         TOGGLE_STATUS: (id: string | number) => `/customer/team-users/${id}/toggle-status`,
+    },
+    RULES: {
+        BASE: "/customer/rule-management",
+        OPTIONS: "/customer/rule-management/options",
+        DETAILS: (id: string | number) => `/customer/rule-management/${id}`,
     }
 };
 
@@ -336,5 +341,10 @@ export const QUERY_KEYS = {
     },
     ENQUIRIES: {
         LIST: ["enquiries", "list"],
+    },
+    RULES: {
+        LIST: ["rules", "list"],
+        DETAILS: (id: string | number) => ["rules", "details", id],
+        OPTIONS: ["rules", "options"],
     }
 };

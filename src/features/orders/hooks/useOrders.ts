@@ -323,10 +323,11 @@ export const useArchiveOrder = () => {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: ordersService.archiveOrder,
-    onSuccess: () => {
+    onSuccess: (_, orderId) => {
       showToast('Order archived successfully', 'success');
       queryClient.invalidateQueries({ queryKey: ["orders", "counts"] });
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.ORDERS.LIST });
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.ORDERS.DETAILS(orderId) });
     },
     onError: (error: any) => {
       showToast(error?.message || "Failed to archive order", "error");

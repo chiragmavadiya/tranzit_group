@@ -299,7 +299,7 @@ export const CarrierCard: React.FC<CarrierCardProps> = memo((props) => {
                     ${orderDetail.order_details?.total?.toFixed(2) || '0.00'}
                   </div>
                   <div className="text-[10px] font-bold text-gray-500 dark:text-zinc-400 uppercase mt-0.5">
-                    Total Inc. GST
+                    Total Incl. GST
                   </div>
                 </div>
               </div>

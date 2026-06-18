@@ -685,6 +685,7 @@ export default function AccountSettingsPage() {
               type="password"
               required
               isFullWidth
+              placeholder='Enter current password'
               value={passwordData.currentPassword}
               onChange={(val) => handlePasswordChange(val, 'currentPassword')}
               error={!!passwordErrors.currentPassword}
@@ -695,6 +696,7 @@ export default function AccountSettingsPage() {
               type="password"
               required
               isFullWidth
+              placeholder='Enter new password'
               value={passwordData.newPassword}
               onChange={(val) => handlePasswordChange(val, 'newPassword')}
               error={!!passwordErrors.newPassword}
@@ -705,6 +707,7 @@ export default function AccountSettingsPage() {
               type="password"
               required
               isFullWidth
+              placeholder='Re-enter new password'
               value={passwordData.confirmPassword}
               onChange={(val) => handlePasswordChange(val, 'confirmPassword')}
               error={!!passwordErrors.confirmPassword}

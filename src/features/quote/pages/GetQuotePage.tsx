@@ -80,7 +80,8 @@ export default function GetQuotePage() {
   }, [locations, itemsData]);
 
   const canCreateOrder = useMemo(() => {
-    return isValid && quoteData?.courier;
+    console.log(quoteData.courier, 'quoteData')
+    return isValid && quoteData?.courier?.success;
   }, [isValid, quoteData]);
 
   const handleCreateOrder = () => {

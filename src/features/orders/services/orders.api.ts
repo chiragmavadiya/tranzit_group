@@ -41,7 +41,12 @@ export const ordersService = {
      * Create a new order
      */
     createOrder: async (data: CreateOrderRequest): Promise<CreateOrderResponse> => {
-        const response = await api.post(data.is_own ? API_ENDPOINTS.ORDERS.CREATE_OWN_COURIER : API_ENDPOINTS.ORDERS.CREATE, data);
+        const response = await api.post(data.is_own_courier ? API_ENDPOINTS.ORDERS.CREATE_OWN_COURIER : API_ENDPOINTS.ORDERS.CREATE, data);
+        return response.data;
+    },
+
+    updateOrder: async (orderId: string | number, data: any): Promise<any> => {
+        const response = await api.put(API_ENDPOINTS.ORDERS.UPDATE(orderId), data);
         return response.data;
     },
 

@@ -11,6 +11,7 @@ import {
   useCancelOrder,
   useConsignOrder,
   useArchiveOrder,
+  useUpdateOrder,
   // useOrderDetailsForClone,
 } from './useOrders';
 import { useGlobalCouriers } from '@/features/courier-surcharge/hooks/useGlobalCouriers';
@@ -49,6 +50,7 @@ export const useOrderWorkflow = () => {
 
   // API Hooks
   const { mutate: createOrder, isPending: saveLoading } = useCreateOrder();
+  const { mutate: updateOrder, isPending: updateLoading } = useUpdateOrder();
   const { mutate: checkWallet, isPending: walletLoading } = useWalletCheck();
   const { data: orderResponse, isLoading: isOrderLoading } = useOrderDetails(orderID || localStorage.getItem('order_to_clone') || '');
   const { mutate: downloadLabel, isPending: isDownloadingLabel } = useDownloadLabel(false);
@@ -72,10 +74,10 @@ export const useOrderWorkflow = () => {
   const [saveAction, setSaveAction] = useState<'draft' | 'consignment' | null>(null);
 
   useEffect(() => {
-    if (!saveLoading && !walletLoading) {
+    if (!saveLoading && !walletLoading && !updateLoading) {
       setSaveAction(null);
     }
-  }, [saveLoading, walletLoading]);
+  }, [saveLoading, walletLoading, updateLoading]);
 
   const [addressData, setAddressData] = useState<{ sender: AddressData; receiver: AddressData }>(() => ({
     sender: initialAddressData,
@@ -289,7 +291,7 @@ export const useOrderWorkflow = () => {
       return acc + ((w * h * l * 250) / 1000000) * q;
     }, 0) || 0;
     const servicePrice = quoteData?.courier?.base || quoteData?.subtotal || 0;
-    const gst = quoteData?.courier?.gst || quoteData?.tax || 0;
+    const gst = quoteData?.gst || quoteData?.tax || 0;
     const totalSurcharges = isEditable ? (quoteData?.totalSurcharges || 0) : orderDetail?.order_details?.surcharge_amount;
     const insuranceCost = insuranceSelected ? 6.0 : 0;
     const grandTotal = (quoteData?.totalPrice || quoteData?.total || 0) + (orderType === 'view' ? 0 : insuranceCost);
@@ -393,39 +395,72 @@ export const useOrderWorkflow = () => {
       } : {}),
     };
 
-    const executeCreateOrder = (is_own?: boolean) => {
-      createOrder({ ...payload, is_own }, {
-        onSuccess: (response) => {
-          if (response.status || response.ok) {
-            showToast('Orders Created successfully', 'success');
-            if (skipWalletCheckArg === 'saveAsDraft') {
-              navigate(`${role === 'admin' ? '/admin' : ''}/orders`);
+    const executeCreateOrder = (is_own_courier?: boolean) => {
+      if (orderID) {
+        updateOrder({ orderId: orderID, data: { ...payload, is_own_courier } }, {
+          onSuccess: (response) => {
+            if (response.status || response.ok) {
+              showToast('Orders updated successfully', 'success');
+              if (skipWalletCheckArg === 'saveAsDraft') {
+                navigate(`${role === 'admin' ? '/admin' : ''}/orders`);
+              } else {
+                navigate(`${role === 'admin' ? '/admin' : ''}/orders/${response?.data?.order_status_category !== 'new' ? 'view' : 'consign'}/${response?.data?.order_number}`);
+              }
+              setWalletCheckOpen(false);
+              if (response?.data?.order_number && (response?.data?.order_status_category !== 'new' || role === 'admin')) {
+                printLabel(response?.data?.order_number);
+              }
             } else {
-              navigate(`${role === 'admin' ? '/admin' : ''}/orders/${response?.data?.order_status_category !== 'new' ? 'view' : 'consign'}/${response?.data?.order_number}`);
+              showToast(response.message || 'Failed to create orders', 'error');
             }
-            setWalletCheckOpen(false);
-            if (response?.data?.order_number && (response?.data?.order_status_category !== 'new' || role === 'admin')) {
-              printLabel(response?.data?.order_number);
-            }
-          } else {
-            showToast(response.message || 'Failed to create orders', 'error');
-          }
-        },
-        onError: (err: any) => {
-          if (err?.response?.data?.receiver_contact_required) {
-            setWalletCheckOpen(false);
-            setShowReceiverPhoneModal(true);
+          },
+          onError: (err: any) => {
+            if (err?.response?.data?.receiver_contact_required) {
+              setWalletCheckOpen(false);
+              setShowReceiverPhoneModal(true);
 
-            isSaveAsDraft.current = skipWalletCheckArg === 'saveAsDraft';
-            return;
-          }
-          showToast(err?.response?.data?.message || 'Failed to create orders', 'error');
-        },
-      });
+              isSaveAsDraft.current = skipWalletCheckArg === 'saveAsDraft';
+              return;
+            }
+            showToast(err?.response?.data?.message || 'Failed to create orders', 'error');
+          },
+        });
+
+      } else {
+
+        createOrder({ ...payload, is_own_courier }, {
+          onSuccess: (response) => {
+            if (response.status || response.ok) {
+              showToast('Orders Created successfully', 'success');
+              if (skipWalletCheckArg === 'saveAsDraft') {
+                navigate(`${role === 'admin' ? '/admin' : ''}/orders`);
+              } else {
+                navigate(`${role === 'admin' ? '/admin' : ''}/orders/${response?.data?.order_status_category !== 'new' ? 'view' : 'consign'}/${response?.data?.order_number}`);
+              }
+              setWalletCheckOpen(false);
+              if (response?.data?.order_number && (response?.data?.order_status_category !== 'new' || role === 'admin')) {
+                printLabel(response?.data?.order_number);
+              }
+            } else {
+              showToast(response.message || 'Failed to create orders', 'error');
+            }
+          },
+          onError: (err: any) => {
+            if (err?.response?.data?.receiver_contact_required) {
+              setWalletCheckOpen(false);
+              setShowReceiverPhoneModal(true);
+
+              isSaveAsDraft.current = skipWalletCheckArg === 'saveAsDraft';
+              return;
+            }
+            showToast(err?.response?.data?.message || 'Failed to create orders', 'error');
+          },
+        });
+      }
     };
 
-    if (skipWalletCheckArg === 'saveAsDraft' || skipWalletCheckArg === true || role === 'admin' || courierData?.is_own) {
-      executeCreateOrder(courierData?.is_own);
+    if (skipWalletCheckArg === 'saveAsDraft' || skipWalletCheckArg === true || role === 'admin' || courierData?.is_own_courier) {
+      executeCreateOrder(courierData?.is_own_courier);
       return;
     }
 
@@ -442,7 +477,7 @@ export const useOrderWorkflow = () => {
         showToast('Failed to create orders', 'error');
       },
     });
-  }, [itemsData, addressData, role, selectedCustomer, courierData, termsAccepted, ratesAccepted, dangerousGoodsAccepted, calculation.totalItems, calculation.totalSurcharges, calculation.grandTotal, insuranceSelected, signatureSelected, quoteData?.surcharges, quoteData?.courier?.base, quoteData?.courier?.gst, quoteData?.courier?.freight_levy, deliveryInstructions, orderType, manualOrderData.trackingNumber, manualOrderData.courierId, manualOrderData.amount, checkWallet, walletCheckData?.wallet_balance, createOrder, navigate, printLabel]);
+  }, [itemsData, addressData, role, selectedCustomer, courierData, termsAccepted, ratesAccepted, dangerousGoodsAccepted, calculation.totalItems, calculation.totalSurcharges, calculation.grandTotal, insuranceSelected, signatureSelected, quoteData?.surcharges, quoteData?.courier?.base, quoteData?.courier?.gst, quoteData?.courier?.freight_levy, deliveryInstructions, orderType, manualOrderData.trackingNumber, manualOrderData.courierId, manualOrderData.amount, checkWallet, walletCheckData?.wallet_balance, orderID, updateOrder, navigate, printLabel, createOrder]);
 
   // Order Consignment Flow
   const handleConsign = useCallback((skipWalletCheckArg?: any, overrideReceiverPhone?: string) => {
@@ -529,7 +564,7 @@ export const useOrderWorkflow = () => {
       }
     };
 
-    if (skipWalletCheckArg === true || role === 'admin' || courierData?.is_own) {
+    if (skipWalletCheckArg === true || role === 'admin' || courierData?.is_own_courier) {
       executeConsign();
       return;
     }
@@ -697,13 +732,13 @@ export const useOrderWorkflow = () => {
   }, [setItemsData, setQuoteData, setCourierData]);
 
   useEffect(() => {
-    document.title = orderType === 'new' ? "New order | Tranzit" : `Order ${orderID} | Tranzit`;
+    document.title = orderType === 'create' ? "Create Order | Tranzit" : `Order ${orderID} | Tranzit`;
   }, [orderType, orderID])
 
 
   const hasDefaultItemAndCourier = useMemo(() => Boolean(default_courier) && Boolean(default_item), [default_courier, default_item]);
 
-  const isSavingDraft = useMemo(() => saveLoading && saveAction === 'draft', [saveLoading, saveAction]);
+  const isSavingDraft = useMemo(() => (saveLoading || updateLoading) && saveAction === 'draft', [saveLoading, saveAction, updateLoading]);
   const isCreatingConsignment = useMemo(() => (saveLoading && saveAction === 'consignment') || walletLoading, [saveLoading, saveAction, walletLoading]);
   return {
     orderType,

@@ -207,13 +207,16 @@ export const CarrierCard: React.FC<CarrierCardProps> = memo((props) => {
         const activeSurcharges = courierSurcharges.filter(charge => selectedNames.includes(charge.name));
         const autoApplyCharges = selectedCourier?.applied_surcharges?.reduce((acc: any, curr: any) => acc + curr.amount, 0) || 0;
         const surcharges = activeSurcharges.filter((charge: any) => !charge.is_auto_apply).reduce((acc: any, curr: any) => acc + curr.amount, 0) || 0;
-        const totalPrice = selectedCourier.price + surcharges + autoApplyCharges;
-        console.log(surcharges, autoApplyCharges, 'activeSurcharges', mount.current)
+        const totalSurcharges = surcharges + autoApplyCharges
+        const surchargesGst = (totalSurcharges || 0) * 0.1
+        const totalGst = (selectedCourier?.gst || 0) + surchargesGst
+        const totalPrice = selectedCourier.price + totalSurcharges + surchargesGst;
         onQuoteChange?.((prev: any) => ({
           courier: selectedCourier,
           surcharges: mount.current ? activeSurcharges : (prev?.surcharges?.length ? prev?.surcharges : activeSurcharges),
-          totalSurcharges: surcharges + autoApplyCharges,
+          totalSurcharges: totalSurcharges,
           totalPrice,
+          gst: totalGst,
           // authorityToLeave,
           // signatureRequired
         }));
@@ -223,7 +226,7 @@ export const CarrierCard: React.FC<CarrierCardProps> = memo((props) => {
           product_id: selectedCourier.product_id,
           product_type: selectedCourier.product_type,
           shipment_summary: selectedCourier.shipment_summary,
-          is_own: selectedCourier.is_own_courier
+          is_own_courier: selectedCourier.is_own_courier
         })
       }
     }

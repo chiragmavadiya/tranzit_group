@@ -1,5 +1,5 @@
 import { useCallback, useMemo } from 'react';
-import { Pencil, Trash2, Eye, Bell, Plus } from 'lucide-react';
+import { Pencil, Trash2, Eye, Bell, Plus, Download, Loader2 } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import type { Invoice } from '../types';
@@ -19,6 +19,8 @@ interface InvoiceTableProps {
   onDelete?: (id: number) => void;
   onView?: (invoiceNumber: string) => void;
   onSend?: (id: number) => void;
+  onDownload?: (id: number) => void;
+  downloadingId?: number | null;
   totalItems?: number;
   currentPage?: number;
   pageSize?: number;
@@ -31,7 +33,7 @@ interface InvoiceTableProps {
 }
 
 export function InvoiceTable({
-  invoices, loading, isAdmin, onEdit, onDelete, onView, onSend,
+  invoices, loading, isAdmin, onEdit, onDelete, onView, onSend, onDownload, downloadingId,
   totalItems = 0, currentPage = 1, pageSize = 10, search = '',
   onPageChange, onPageSizeChange, onSearchChange, onExport, isExporting
 }: InvoiceTableProps) {
@@ -145,11 +147,27 @@ export function InvoiceTable({
         const isCustomer = role === 'customer';
 
         if (isCustomer) {
+          const isDownloading = downloadingId === row.id;
           return (
             <div className="flex items-center gap-2">
               <CustomTooltip title="View invoice" placement="bottom">
                 <Button variant="ghost" size="sm" className="p-0 hover:text-blue-500 bg-transparent hover:bg-transparent dark:hover:bg-transparent" onClick={() => onView?.(row.id?.toString())}>
                   <Eye className="w-4 h-4" />
+                </Button>
+              </CustomTooltip>
+              <CustomTooltip title="Download PDF" placement="bottom">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="p-0 hover:text-blue-500 bg-transparent hover:bg-transparent dark:hover:bg-transparent"
+                  onClick={() => onDownload?.(row.id)}
+                  disabled={isDownloading}
+                >
+                  {isDownloading ? (
+                    <Loader2 className="w-4 h-4 animate-spin text-primary" />
+                  ) : (
+                    <Download className="w-4 h-4" />
+                  )}
                 </Button>
               </CustomTooltip>
             </div>
@@ -161,6 +179,7 @@ export function InvoiceTable({
         const showEdit = row.actions.includes('edit');
         const showReminder = row.actions.includes('reminder');
         const showDelete = row.actions.includes('delete');
+        const isDownloading = downloadingId === row.id;
 
         return (
           <div className="flex items-center gap-2">
@@ -171,6 +190,22 @@ export function InvoiceTable({
                 </Button>
               </CustomTooltip>
             )}
+
+            <CustomTooltip title="Download PDF" placement="bottom">
+              <Button
+                variant="ghost"
+                size="sm"
+                className="p-0 hover:text-blue-500 bg-transparent hover:bg-transparent dark:hover:bg-transparent"
+                onClick={() => onDownload?.(row.id)}
+                disabled={isDownloading}
+              >
+                {isDownloading ? (
+                  <Loader2 className="w-4 h-4 animate-spin text-primary" />
+                ) : (
+                  <Download className="w-4 h-4" />
+                )}
+              </Button>
+            </CustomTooltip>
 
             {showEdit && (
               <CustomTooltip title="Edit invoice" placement="bottom">
@@ -206,7 +241,7 @@ export function InvoiceTable({
         );
       }
     }] : []),
-  ], [onEdit, onDelete, onView, onSend, renderStatus, isAdmin, role, canReadWrite]);
+  ], [onEdit, onDelete, onView, onSend, onDownload, downloadingId, renderStatus, isAdmin, role, canReadWrite]);
 
   const customHeader = () => {
     return (

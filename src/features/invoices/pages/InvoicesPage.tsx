@@ -4,7 +4,7 @@ import { useAppSelector } from '@/hooks/store.hooks';
 import { InvoiceStats } from '../components/InvoiceStats';
 import { InvoiceFilters } from '../components/InvoiceFilters';
 import { InvoiceTable } from '../components/InvoiceTable';
-import { useAdminInvoices, useCustomerInvoices, useExportAdminInvoices, useExportCustomerInvoices, useDeleteAdminInvoice, useRemindAdminInvoice } from '../hooks/useInvoices';
+import { useAdminInvoices, useCustomerInvoices, useExportAdminInvoices, useExportCustomerInvoices, useDeleteAdminInvoice, useRemindAdminInvoice, useDownloadAdminInvoice, useDownloadCustomerInvoice } from '../hooks/useInvoices';
 import { ConformationModal } from '@/components/common/ConformationModal';
 
 export default function InvoicesPage() {
@@ -34,6 +34,15 @@ export default function InvoicesPage() {
 
   const deleteMutation = useDeleteAdminInvoice();
   const remindMutation = useRemindAdminInvoice();
+  const downloadAdminMutation = useDownloadAdminInvoice();
+  const downloadCustomerMutation = useDownloadCustomerInvoice();
+  const downloadMutation = isAdmin ? downloadAdminMutation : downloadCustomerMutation;
+
+  const handleDownload = useCallback((id: number) => {
+    downloadMutation.mutate(id);
+  }, [downloadMutation]);
+
+  const downloadingId = downloadMutation.isPending ? (downloadMutation.variables as number) : null;
 
   const data = isAdmin ? adminData : customerData;
   const isLoading = isAdmin ? isAdminLoading : isCustomerLoading;
@@ -130,6 +139,8 @@ export default function InvoicesPage() {
           onDelete={handleDelete}
           onView={handleView}
           onSend={(id) => remindMutation.mutate(id)}
+          onDownload={handleDownload}
+          downloadingId={downloadingId}
           isAdmin={isAdmin}
         />
       </div>

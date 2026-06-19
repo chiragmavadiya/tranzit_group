@@ -342,17 +342,52 @@
 
 .pac-container {
   border-radius: 8px;
-
+  border-top: none !important;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
 }
 
 .pac-item {
   font-family: 'Geist Variable', sans-serif;
   padding: 4px 8px;
   font-size: 14px;
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+}
+
+.pac-item:hover {
+  background-color: #f1f5f9;
 }
 
 .pac-item-query {
   font-size: 14px;
+}
+
+/* Dark mode overrides for Google Autocomplete */
+.dark .pac-container {
+  background-color: oklch(0.205 0 0);
+  /* Match card/popover bg */
+  border: 1px solid oklch(1 0 0 / 10%);
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.5), 0 4px 6px -2px rgba(0, 0, 0, 0.3);
+}
+
+.dark .pac-item {
+  border-top: 1px solid oklch(1 0 0 / 10%);
+  color: oklch(0.708 0 0);
+  /* Match muted-foreground for secondary text */
+}
+
+.dark .pac-item:hover {
+  background-color: oklch(0.269 0 0);
+  /* Match accent bg */
+}
+
+.dark .pac-item-query {
+  color: oklch(0.985 0 0);
+  /* Match foreground for main text */
+}
+
+.dark .pac-item .pac-icon {
+  filter: invert(0.8) brightness(1.2);
 }
 
 .pace .pace-progress {

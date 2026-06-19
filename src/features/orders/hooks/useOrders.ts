@@ -59,6 +59,18 @@ export const useCreateOrder = () => {
     },
   });
 };
+export const useUpdateOrder = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ orderId, data }: { orderId: string | number; data?: any }) => ordersService.updateOrder(orderId, data),
+    onSuccess: (_, { orderId }) => {
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.ORDERS.LIST });
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.WALLET.SUMMARY });
+      queryClient.invalidateQueries({ queryKey: ["orders", "counts"] });
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.ORDERS.DETAILS(orderId) });
+    },
+  });
+};
 
 /**
  * Hook to cancel an order

@@ -115,8 +115,8 @@ export default function CustomerPage() {
     const confirmDelete = () => {
         if (!deleteId) return;
         deleteCustomer(deleteId, {
-            onSuccess: () => {
-                showToast('Customer deleted successfully', "success");
+            onSuccess: (data: any) => {
+                showToast(data?.message || 'Customer deleted successfully', "success");
                 setIsDeleteDialogOpen(false);
                 setDeleteId(null);
             },

@@ -29,7 +29,7 @@ export const invoicesService = {
     const response = await api.get(API_ENDPOINTS.INVOICES.DOWNLOAD(id), {
       responseType: 'blob',
     });
-    const filename = `Invoice_${id}.pdf`;
+    const filename = getFileName(response) || `Invoice_${id}.pdf`;
     return { blob: response.data, filename };
   },
 
@@ -67,7 +67,7 @@ export const invoicesService = {
     const response = await api.get(API_ENDPOINTS.ADMIN_INVOICES.DOWNLOAD(id), {
       responseType: 'blob',
     });
-    const filename = `Invoice_${id}.pdf`;
+    const filename = getFileName(response) || `Invoice_${id}.pdf`;
     return { blob: response.data, filename };
   },
 

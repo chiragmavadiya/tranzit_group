@@ -281,7 +281,7 @@ export const InvoicePaper: React.FC<InvoicePaperProps> = ({
                 label: `${c.first_name} ${c.last_name} (${c.email})`
               })) || []}
               className="w-full space-y-1 col-span-1"
-              selectClassName="h-8 border-slate-200 rounded-md bg-white text-sm"
+              selectClassName="h-8 border-slate-200 dark:border-zinc-800 rounded-md bg-white dark:bg-zinc-900 text-sm"
               allowClear={false}
             />
           </div>
@@ -314,7 +314,7 @@ export const InvoicePaper: React.FC<InvoicePaperProps> = ({
         <div className="grid grid-cols-4 gap-4 mb-6 border border-slate-200 dark:border-zinc-800 rounded-xl p-4 bg-slate-50/10 shadow-sm items-center">
           {/* Invoice Date Box */}
           <div className="space-y-1">
-            <p className="text-sm text-slate-500 font-medium">Invoice Date</p>
+            <p className="text-sm text-slate-500 dark:text-zinc-400 font-medium">Invoice Date</p>
             {isAdmin ? (
               <Popover>
                 <PopoverTrigger className="flex items-center justify-between w-full h-8 bg-white border border-slate-200 dark:border-zinc-800 hover:bg-slate-50 dark:bg-zinc-900 dark:hover:bg-zinc-700 text-slate-700 dark:text-zinc-300 px-3 rounded-md font-bold text-sm cursor-pointer outline-none">
@@ -336,7 +336,7 @@ export const InvoicePaper: React.FC<InvoicePaperProps> = ({
                 </PopoverContent>
               </Popover>
             ) : (
-              <div className="flex items-center justify-between w-full h-8 bg-white border border-slate-200 dark:border-zinc-800 text-slate-700 dark:text-zinc-300 px-3 rounded-md font-bold text-sm">
+              <div className="flex items-center justify-between w-full h-8 bg-white dark:bg-zinc-900 border border-slate-200 dark:border-zinc-800 text-slate-700 dark:text-zinc-300 px-3 rounded-md font-bold text-sm">
                 <span>{formatDate(invoice?.issue_date)}</span>
                 <CalendarIcon className="w-4 h-4 text-slate-400" />
               </div>
@@ -345,7 +345,7 @@ export const InvoicePaper: React.FC<InvoicePaperProps> = ({
 
           {/* Status Box */}
           <div className="space-y-1">
-            <p className="text-sm text-slate-500 font-medium">Status</p>
+            <p className="text-sm text-slate-500 dark:text-zinc-400 font-medium">Status</p>
             {isAdmin ? (
               <FormSelect
                 label=""
@@ -359,11 +359,11 @@ export const InvoicePaper: React.FC<InvoicePaperProps> = ({
                   { value: 'paid', label: 'Paid' },
                 ]}
                 className="w-full space-y-1 col-span-1"
-                selectClassName="bg-white border border-slate-200 dark:border-zinc-800 font-bold text-slate-700 dark:text-zinc-300 h-8 rounded-md"
+                selectClassName="bg-white dark:bg-zinc-900 border border-slate-200 dark:border-zinc-800 font-bold text-slate-700 dark:text-zinc-300 h-8 rounded-md"
                 allowClear={false}
               />
             ) : (
-              <div className="flex items-center capitalize w-full h-8 border border-slate-200 dark:border-zinc-800 text-slate-700 dark:text-zinc-300 px-3 rounded-md font-bold text-sm">
+              <div className="flex items-center capitalize w-full h-8 bg-white dark:bg-zinc-900 border border-slate-200 dark:border-zinc-800 text-slate-700 dark:text-zinc-300 px-3 rounded-md font-bold text-sm">
                 {invoice?.status || 'Draft'}
               </div>
             )}
@@ -371,7 +371,7 @@ export const InvoicePaper: React.FC<InvoicePaperProps> = ({
 
           {/* Amount Paid Box */}
           <div className="text-center space-y-1">
-            <p className="text-sm text-slate-500 font-medium">Amount Paid</p>
+            <p className="text-sm text-slate-500 dark:text-zinc-400 font-medium">Amount Paid</p>
             <p className="text-lg font-bold text-slate-800 dark:text-white leading-none mt-1">
               {formateCurrency(invoice?.till_date_paid || invoice?.totals?.amount_paid || 0)}
             </p>
@@ -379,7 +379,7 @@ export const InvoicePaper: React.FC<InvoicePaperProps> = ({
 
           {/* Balance Due Box */}
           <div className="text-center space-y-1">
-            <p className="text-sm text-slate-500 font-medium">Balance Due</p>
+            <p className="text-sm text-slate-500 dark:text-zinc-400 font-medium">Balance Due</p>
             <p className="text-lg font-bold text-slate-800 dark:text-white leading-none mt-1">
               {formateCurrency(invoice?.remaining_balance || invoice?.totals?.amount_due || 0)}
             </p>
@@ -389,7 +389,7 @@ export const InvoicePaper: React.FC<InvoicePaperProps> = ({
 
       {/* 3. Line Items Section */}
       <div className="mb-4grow" ref={editingRowRef}>
-        <h3 className="text-base font-bold text-slate-700 mb-1">Items</h3>
+        <h3 className="text-base font-bold text-slate-800 dark:text-white mb-1">Items</h3>
 
         <div className="border border-slate-100 dark:border-zinc-800 rounded-xl overflow-hidden">
           <div className="overflow-x-auto">
@@ -443,7 +443,7 @@ export const InvoicePaper: React.FC<InvoicePaperProps> = ({
                                 { value: 'custom', label: 'Custom' },
                               ]}
                               className="w-30 space-y-1 col-span-1"
-                              selectClassName="h-8 text-sm bg-white border border-slate-200 focus:ring-1 focus:ring-primary rounded-md px-2"
+                              selectClassName="h-8 text-sm bg-white dark:bg-zinc-900 border border-slate-200 dark:border-zinc-800 focus:ring-1 focus:ring-primary rounded-md px-2"
                               allowClear={false}
                               searchdisable
                             />
@@ -464,18 +464,18 @@ export const InvoicePaper: React.FC<InvoicePaperProps> = ({
                           <DatePicker
                             date={item.date || ''}
                             setDate={(val) => updateItemsData(item.id, 'date', val!)}
-                            className="h-8 w-[130px] border-slate-200 text-sm  bg-white"
+                            className="h-8 w-[130px] border-slate-200 dark:border-zinc-800 text-sm bg-white dark:bg-zinc-900"
                             placeholder="dd/mm/yyyy"
                           />
                         ) : (
-                          <span className="text-[12px] font-medium py-3 text-slate-600">{itemType === 'order' ? formatDate(item.date || item.item_date) : '-'}</span>
+                          <span className="text-[12px] font-medium py-3 text-slate-600 dark:text-zinc-400">{itemType === 'order' ? formatDate(item.date || item.item_date) : '-'}</span>
                         )}
                       </TableCell>
                       <TableCell className="py-4 min-w-[110px]">
                         {isEditing ? (
                           <FormInput
                             className="w-full min-w-[150px] shadow-none col-span-12"
-                            inputClassName="h-8 text-sm bg-white border border-slate-200 focus:ring-1 focus:ring-primary rounded-md px-3"
+                            inputClassName="h-8 text-sm bg-white dark:bg-zinc-900 border border-slate-200 dark:border-zinc-800 focus:ring-1 focus:ring-primary rounded-md px-3"
                             value={itemType === 'order' ? item.order_number : item.description || ''}
                             placeholder={itemType === 'order' ? 'Order Number' : itemType === 'credit' ? 'Credit description' : 'Description'}
                             onChange={(val) => updateItemsData(item.id, itemType === 'order' ? 'order_number' : 'description', val)}
@@ -489,7 +489,7 @@ export const InvoicePaper: React.FC<InvoicePaperProps> = ({
                           itemType === 'order' ? (
                             <FormInput
                               className="w-full shadow-none col-span-12"
-                              inputClassName="h-8 text-sm bg-white border border-slate-200 focus:ring-1 focus:ring-primary rounded-md px-2"
+                              inputClassName="h-8 text-sm bg-white dark:bg-zinc-900 border border-slate-200 dark:border-zinc-800 focus:ring-1 focus:ring-primary rounded-md px-2"
                               value={item.from || ''}
                               placeholder="e.g. VIC 3000"
                               onChange={(val) => updateItemsData(item.id, 'from', val)}
@@ -498,7 +498,7 @@ export const InvoicePaper: React.FC<InvoicePaperProps> = ({
                             <span className="text-[12px] font-medium text-slate-400 dark:text-zinc-600">-</span>
                           )
                         ) : (
-                          <span className="text-[12px] font-medium text-slate-600">{itemType === 'order' ? item.from : '-'}</span>
+                          <span className="text-[12px] font-medium text-slate-600 dark:text-zinc-400">{itemType === 'order' ? item.from : '-'}</span>
                         )}
                       </TableCell>
                       <TableCell className="py-4 min-w-[110px]">
@@ -506,7 +506,7 @@ export const InvoicePaper: React.FC<InvoicePaperProps> = ({
                           itemType === 'order' ? (
                             <FormInput
                               className="w-full shadow-none col-span-12"
-                              inputClassName="h-8 text-sm bg-white border border-slate-200 focus:ring-1 focus:ring-primary rounded-md px-2"
+                              inputClassName="h-8 text-sm bg-white dark:bg-zinc-900 border border-slate-200 dark:border-zinc-800 focus:ring-1 focus:ring-primary rounded-md px-2"
                               value={item.destination || ''}
                               placeholder="e.g. Melbourne"
                               onChange={(val) => updateItemsData(item.id, 'destination', val)}
@@ -515,7 +515,7 @@ export const InvoicePaper: React.FC<InvoicePaperProps> = ({
                             <span className="text-[12px] font-medium text-slate-400 dark:text-zinc-600">-</span>
                           )
                         ) : (
-                          <span className="text-[12px] font-medium text-slate-600">{itemType === 'order' ? item.destination : '-'}</span>
+                          <span className="text-[12px] font-medium text-slate-600 dark:text-zinc-400">{itemType === 'order' ? item.destination : '-'}</span>
                         )}
                       </TableCell>
                       <TableCell className="py-4 min-w-[110px]">
@@ -523,7 +523,7 @@ export const InvoicePaper: React.FC<InvoicePaperProps> = ({
                           itemType === 'order' ? (
                             <FormInput
                               className="w-full shadow-none col-span-12"
-                              inputClassName="h-8 text-sm bg-white border border-slate-200 focus:ring-1 focus:ring-primary rounded-md px-2"
+                              inputClassName="h-8 text-sm bg-white dark:bg-zinc-900 border border-slate-200 dark:border-zinc-800 focus:ring-1 focus:ring-primary rounded-md px-2"
                               value={item.to || ''}
                               placeholder="e.g. VIC 3000"
                               onChange={(val) => updateItemsData(item.id, 'to', val)}
@@ -532,7 +532,7 @@ export const InvoicePaper: React.FC<InvoicePaperProps> = ({
                             <span className="text-[12px] font-medium text-slate-400 dark:text-zinc-600">-</span>
                           )
                         ) : (
-                          <span className="text-[12px] font-medium text-slate-600">{itemType === 'order' ? item.to : '-'}</span>
+                          <span className="text-[12px] font-medium text-slate-600 dark:text-zinc-400">{itemType === 'order' ? item.to : '-'}</span>
                         )}
                       </TableCell>
                       <TableCell className="py-4 min-w-[110px]">
@@ -540,7 +540,7 @@ export const InvoicePaper: React.FC<InvoicePaperProps> = ({
                           itemType === 'order' ? (
                             <FormInput
                               className="w-full shadow-none col-span-12"
-                              inputClassName="h-8 text-sm bg-white border border-slate-200 focus:ring-1 focus:ring-primary rounded-md px-2"
+                              inputClassName="h-8 text-sm bg-white dark:bg-zinc-900 border border-slate-200 dark:border-zinc-800 focus:ring-1 focus:ring-primary rounded-md px-2"
                               value={item.receiver || ''}
                               placeholder="Receiver Name"
                               onChange={(val) => updateItemsData(item.id, 'receiver', val)}
@@ -549,7 +549,7 @@ export const InvoicePaper: React.FC<InvoicePaperProps> = ({
                             <span className="text-[12px] font-medium text-slate-400 dark:text-zinc-600">-</span>
                           )
                         ) : (
-                          <span className="text-[12px] font-medium text-slate-600">{itemType === 'order' ? item.receiver : '-'}</span>
+                          <span className="text-[12px] font-medium text-slate-600 dark:text-zinc-400">{itemType === 'order' ? item.receiver : '-'}</span>
                         )}
                       </TableCell>
                       <TableCell className="py-4 min-w-[110px]">
@@ -695,7 +695,7 @@ export const InvoicePaper: React.FC<InvoicePaperProps> = ({
       <div className="grid grid-cols-1 lg:grid-cols-[1.5fr_1fr] gap-8 pt-8 dark:border-zinc-800">
 
         {/* Left: Banking Details & Terms in one card */}
-        <div className="bg-[#F8FAFC] dark:bg-zinc-855 p-6 rounded-2xl border border-slate-200 dark:border-zinc-800 space-y-6">
+        <div className="bg-[#F8FAFC] dark:bg-zinc-950 p-6 rounded-2xl border border-slate-200 dark:border-zinc-800 space-y-6">
           {/* Banking Details */}
           <div>
             <h3 className="text-base font-bold text-slate-800 dark:text-white mb-3 mt-0">Banking Details</h3>

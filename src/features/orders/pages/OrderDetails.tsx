@@ -242,7 +242,7 @@ const OrderDetailsPage: React.FC = () => {
     // isCloning,
   } = useOrderWorkflow();
 
-  const [showConsignConfirm, setShowConsignConfirm] = useState(false);
+  const [showCarrierConfirm, setShowCarrierConfirm] = useState(false);
   const [receiverPhoneInput, setReceiverPhoneInput] = useState('');
 
   React.useEffect(() => {
@@ -275,14 +275,56 @@ const OrderDetailsPage: React.FC = () => {
       return;
     }
 
-    if (courierData?.is_own) {
-      handleConsign();
+    if (courierData?.is_own_courier) {
+      setShowCarrierConfirm(true);
     } else {
-      setShowConsignConfirm(true);
+      handleConsign();
     }
   };
 
+  const handleSaveClick = (skipWalletCheckArg: string | boolean) => {
+    if (skipWalletCheckArg === 'saveAsDraft') {
+      handleOnSave('saveAsDraft');
+      return;
+    }
 
+    const isValidItems = itemsData && itemsData.length > 0 && itemsData.every((item) =>
+      item.type !== 'box' ||
+      (Number(item.height) > 0 && Number(item.width) > 0 && Number(item.length) > 0 && Number(item.weight) > 0 && Number(item.quantity) > 0)
+    );
+    const hasSenderAddress = Boolean(addressData?.sender?.address1);
+    const hasReceiverAddress = Boolean(addressData?.receiver?.address1);
+
+    if (role === 'admin' && !selectedCustomer) {
+      showToast('Please select a customer.', 'error');
+      return;
+    }
+
+    if (!isValidItems || !hasSenderAddress || !hasReceiverAddress) {
+      showToast('Please fill out item dimensions and complete both addresses.', 'error');
+      return;
+    }
+    if (!courierData?.courier) {
+      showToast('Please select a courier.', 'error');
+      return;
+    }
+
+    if (!termsAccepted || !ratesAccepted) {
+      showToast('You must accept all Terms & Conditions and Futile Pickup declarations.', 'error');
+      return;
+    }
+
+    if (!dangerousGoodsAccepted) {
+      showToast("Please confirm that this consignment does not contain dangerous goods", 'error');
+      return;
+    }
+
+    if (courierData?.is_own_courier) {
+      setShowCarrierConfirm(true);
+    } else {
+      handleOnSave(skipWalletCheckArg);
+    }
+  };
 
   const isCreate = orderType === 'create' || orderType === 'create-menual' || orderType === 'return';
   // if (isOrderLoading || (isCreate && orderDialogMode)) {
@@ -504,7 +546,7 @@ const OrderDetailsPage: React.FC = () => {
           </div>
           <StickyFooter
             orderType={orderType}
-            onSave={handleOnSave}
+            onSave={handleSaveClick}
             saveLoading={saveLoading || walletLoading}
             isSavingDraft={isSavingDraft}
             isCreatingConsignment={isCreatingConsignment}
@@ -559,10 +601,10 @@ const OrderDetailsPage: React.FC = () => {
         cancelText="Cancel"
         className="sm:max-w-[500px]"
       />
-      {showConsignConfirm && (
+      {showCarrierConfirm && (
         <ConformationModal
-          open={showConsignConfirm}
-          onOpenChange={setShowConsignConfirm}
+          open={showCarrierConfirm}
+          onOpenChange={setShowCarrierConfirm}
           title="Confirm carrier"
           description={
             <div className="space-y-4 pt-2">
@@ -575,8 +617,12 @@ const OrderDetailsPage: React.FC = () => {
             </div>
           }
           onConfirm={() => {
-            setShowConsignConfirm(false);
-            handleConsign();
+            setShowCarrierConfirm(false);
+            if (isCreate) {
+              handleOnSave(false);
+            } else {
+              handleConsign();
+            }
           }}
           confirmText={`Continue`}
           cancelText="Cancel"

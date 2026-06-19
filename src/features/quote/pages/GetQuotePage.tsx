@@ -62,7 +62,7 @@ export default function GetQuotePage() {
     }, 0) || 0;
 
     const servicePrice = quoteData?.courier?.base || quoteData?.subtotal || 0;
-    const gst = quoteData?.courier?.gst || quoteData?.tax || 0;
+    const gst = quoteData?.gst || quoteData?.tax || 0;
     const totalSurcharges = quoteData?.totalSurcharges || 0;
     const marginPrice = (Number(servicePrice) * Number(margin)) / 100;
     const grandTotal = Number(servicePrice) + Number(gst) + Number(totalSurcharges) + Number(marginPrice) + Number(pickupCharge || 0);

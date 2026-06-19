@@ -89,12 +89,12 @@ export const QuoteSummary = memo(({
           <span className="font-semibold text-slate-700 dark:text-zinc-200">{formatCurrency(calculation?.servicePrice || 0)}</span>
         </div>
         <div className="flex justify-between items-center text-sm">
-          <span className="text-slate-500 dark:text-zinc-400">GST (10%)</span>
-          <span className="font-semibold text-slate-700 dark:text-zinc-200">{formatCurrency(calculation?.gst || 0)}</span>
-        </div>
-        <div className="flex justify-between items-center text-sm">
           <span className="text-slate-500 dark:text-zinc-400">Extra surcharges</span>
           <span className="font-semibold text-slate-700 dark:text-zinc-200">{formatCurrency(calculation?.totalSurcharges || 0)}</span>
+        </div>
+        <div className="flex justify-between items-center text-sm">
+          <span className="text-slate-500 dark:text-zinc-400">GST</span>
+          <span className="font-semibold text-slate-700 dark:text-zinc-200">{formatCurrency(calculation?.gst || 0)}</span>
         </div>
 
         {isAdmin && calculation?.margin && (Number(calculation?.margin) > 0) ? (

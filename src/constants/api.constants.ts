@@ -16,6 +16,7 @@ export const API_ENDPOINTS = {
     ORDERS: {
         LIST: "/orders",
         CREATE: "/orders",
+        UPDATE: (orderId: string | number) => `/orders/${orderId}`,
         DETAILS: (id: string | number) => `/orders/${id}`,
         CANCEL: (id: string | number) => `/orders/${id}/cancel`,
         CONSIGN: (id: string | number, isAdmin: boolean = false) => isAdmin ? `/admin/orders/${id}/consign` : `/customer/orders/${id}/consign`,

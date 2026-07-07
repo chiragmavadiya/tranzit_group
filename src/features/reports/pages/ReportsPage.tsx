@@ -1,6 +1,6 @@
 import { useState, useCallback, useMemo, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import { format, subDays } from 'date-fns';
+import { format } from 'date-fns';
 import { ReportsHeader } from '../components/ReportsHeader';
 import {
   SHIPMENT_COLUMNS,
@@ -28,17 +28,17 @@ export default function ReportsPage() {
   const { is_sub_user, team_access } = useAppSelector((state) => state.auth);
   const canReadWrite = useMemo(() => !is_sub_user || team_access?.permissions?.report === 'full', [is_sub_user, team_access]);
 
-  const parseLocalDate = useCallback((dateStr?: string | null) => {
-    if (!dateStr) return undefined;
-    const parts = dateStr.split('-');
-    if (parts.length === 3) {
-      const day = parseInt(parts[0], 10);
-      const month = parseInt(parts[1], 10) - 1; // 0-based
-      const year = parseInt(parts[2], 10);
-      return new Date(year, month, day);
-    }
-    return undefined;
-  }, []);
+  // const parseLocalDate = useCallback((dateStr?: string | null) => {
+  //   if (!dateStr) return undefined;
+  //   const parts = dateStr.split('-');
+  //   if (parts.length === 3) {
+  //     const day = parseInt(parts[0], 10);
+  //     const month = parseInt(parts[1], 10) - 1; // 0-based
+  //     const year = parseInt(parts[2], 10);
+  //     return new Date(year, month, day);
+  //   }
+  //   return undefined;
+  // }, []);
 
   const formatUrlDate = useCallback((date?: Date) => {
     return date ? format(date, 'dd-MM-yyyy') : undefined;
@@ -48,18 +48,18 @@ export default function ReportsPage() {
     return date ? format(date, 'dd/MM/yyyy') : undefined;
   }, []);
 
-  const initialStartDate = useMemo(() => {
-    const s = searchParams.get('start_date');
-    return s ? parseLocalDate(s) : subDays(new Date(), 7);
-  }, [searchParams, parseLocalDate]);
+  // const initialStartDate = useMemo(() => {
+  //   const s = searchParams.get('start_date');
+  //   return s ? parseLocalDate(s) : subDays(new Date(), 7);
+  // }, [searchParams, parseLocalDate]);
 
-  const initialEndDate = useMemo(() => {
-    const e = searchParams.get('end_date');
-    return e ? parseLocalDate(e) : new Date();
-  }, [searchParams, parseLocalDate]);
+  // const initialEndDate = useMemo(() => {
+  //   const e = searchParams.get('end_date');
+  //   return e ? parseLocalDate(e) : new Date();
+  // }, [searchParams, parseLocalDate]);
 
-  const [dateRange, setDateRange] = useState<[Date | undefined, Date | undefined]>(() => [initialStartDate, initialEndDate]);
-  const [appliedDateRange, setAppliedDateRange] = useState<[Date | undefined, Date | undefined]>(() => [initialStartDate, initialEndDate]);
+  const [dateRange, setDateRange] = useState<[Date | undefined, Date | undefined]>(() => [undefined, undefined]);
+  const [appliedDateRange, setAppliedDateRange] = useState<[Date | undefined, Date | undefined]>(() => [undefined, undefined]);
 
   const [pageSize, setPageSize] = useState(25);
   const [page, setPage] = useState(1);

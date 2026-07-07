@@ -59,15 +59,16 @@ export default function BookPickupPage() {
     };
 
     const columns: Column<BookPickup>[] = [
-        { key: 'customer_name', header: 'CUSTOMER NAME' },
-        { key: 'order_number', header: 'ORDER NUMBER' },
+        { key: 'customer_name', header: 'CUSTOMER NAME', width: '180px' },
+        { key: 'order_number', header: 'ORDER NUMBER', width: '160px' },
         {
             key: 'amount',
             header: 'AMOUNT',
+            width: '110px',
             cell: (val: number) => <span className="font-bold">${Number(val).toFixed(2)}</span>
         },
-        { key: 'shipping_address', header: 'SHIPPING ADDRESS' },
-        { key: 'order_created_date', header: 'ORDER CREATED DATE' },
+        { key: 'shipping_address', header: 'SHIPPING ADDRESS', width: '280px' },
+        { key: 'order_created_date', header: 'ORDER CREATED DATE', width: '160px' },
     ];
 
     return (

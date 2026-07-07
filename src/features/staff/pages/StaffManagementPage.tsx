@@ -181,6 +181,7 @@ export default function StaffManagementPage() {
     {
       key: 'first_name',
       header: 'DETAILS',
+      width: '260px',
       cell: (_, row) => {
         const initials = getInitials(row.first_name, row.last_name);
         const initialsBg = getBgColor(row.email);
@@ -201,14 +202,17 @@ export default function StaffManagementPage() {
     {
       key: 'role',
       header: 'ROLE',
+      width: '140px',
     },
     {
       key: 'last_login_at',
       header: 'LAST LOGIN',
+      width: '180px',
     },
     {
       key: 'created_at',
       header: 'CREATED AT',
+      width: '180px',
       // cell: (_, row: any) => {
       //   const dateStr = row.created_at;
       //   return (
@@ -221,11 +225,13 @@ export default function StaffManagementPage() {
     {
       key: 'status_code',
       header: 'STATUS',
+      width: '120px',
       cell: (_, row) => <StatusSwitch user={row} />
     },
     {
       key: 'actions',
       header: 'ACTIONS',
+      width: '120px',
       cell: (_, row) => (
         <div className="flex items-center gap-2">
           <Button

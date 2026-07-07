@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { motion } from 'framer-motion';
-import { Edit2, Loader2 } from 'lucide-react';
+import { Edit2, Loader2, Info, Mail } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { FormInput, FormSelect } from '@/features/orders/components/OrderFormUI';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
@@ -34,7 +34,6 @@ export default function AccountSettingsPage() {
   const [isEditingProfile, setIsEditingProfile] = useState(false);
   const [isPasswordOpen, setIsPasswordOpen] = useState(false);
   const [isPlanModalOpen, setIsPlanModalOpen] = useState(false);
-  const [sameAsShipping, setSameAsShipping] = useState(false);
   // const { user } = useAppSelector((state) => state.auth);
   const { summary } = useAppSelector((state) => state.wallet);
   const { is_sub_user, team_access } = useAppSelector((state) => state.auth)
@@ -213,22 +212,6 @@ export default function AccountSettingsPage() {
   useEffect(() => {
     const shAddr = profile?.address_detail?.default;
     const billAddr = profile?.address_detail?.billing;
-    // const shAddr = profile?.address_detail?.default || user.addresses?.[0];
-    // const billAddr = profile?.address_detail?.billing || user.addresses?.[0];
-
-    const isIdentical = shAddr && billAddr && (
-      (shAddr.address === billAddr.address) &&
-      (shAddr.unit_number === billAddr.unit_number) &&
-      (shAddr.suburb === billAddr.suburb) &&
-      (shAddr.state === billAddr.state) &&
-      (shAddr.postcode === billAddr.postcode)
-    );
-    setSameAsShipping(!!isIdentical);
-    // firstName: profile?.first_name || user.first_name || '',
-    // lastName: profile?.last_name || user.last_name || '',
-    // email: profile?.personal_email || user.personal_email || user.email || '',
-    // phone: profile?.mobile || user.personal_mobile || user.mobile || '',
-    // companyName: profile?.business_name || user.business_name || '',
 
     const data = {
       firstName: profile?.first_name || '',
@@ -263,34 +246,6 @@ export default function AccountSettingsPage() {
     setFormData(data);
     setBackupData(data);
   }, [profile]);
-
-  useEffect(() => {
-    if (sameAsShipping) {
-      setFormData(prev => ({
-        ...prev,
-        billing_address_info: prev.shipping_address_info,
-        billing_address: prev.shipping_address,
-        billing_unit_number: prev.shipping_unit_number,
-        billing_street_number: prev.shipping_street_number,
-        billing_street_name: prev.shipping_street_name,
-        billing_street_type: prev.shipping_street_type,
-        billing_suburb: prev.shipping_suburb,
-        billing_state: prev.shipping_state,
-        billing_postcode: prev.shipping_postcode,
-      }));
-    }
-  }, [
-    sameAsShipping,
-    formData.shipping_address_info,
-    formData.shipping_address,
-    formData.shipping_unit_number,
-    formData.shipping_street_number,
-    formData.shipping_street_name,
-    formData.shipping_street_type,
-    formData.shipping_suburb,
-    formData.shipping_state,
-    formData.shipping_postcode,
-  ]);
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 w-full items-start">
@@ -468,7 +423,7 @@ export default function AccountSettingsPage() {
                       className="w-full col-span-12"
                       inputClassName="w-full col-span-12"
                       isFullWidth
-                      disabled={!isEditingProfile || sameAsShipping}
+                      disabled={!isEditingProfile}
                       value={formData.billing_address_info}
                       onChange={(val) => { handleInputChange(val, 'billing_address_info'); setDisabledAddress(false) }}
                       onPlaceSelect={(opt) => {
@@ -493,7 +448,7 @@ export default function AccountSettingsPage() {
                     <FormInput
                       label="Unit Number"
                       placeholder='Unit Number'
-                      disabled={!isEditingProfile || sameAsShipping || disabledAddress}
+                      disabled={!isEditingProfile}
                       value={formData.billing_unit_number}
                       onChange={(val) => handleInputChange(val, 'billing_unit_number')}
                     />
@@ -503,9 +458,9 @@ export default function AccountSettingsPage() {
                       label="Street"
                       placeholder='Street Address'
                       required
-                      disabled={!isEditingProfile || sameAsShipping || disabledAddress}
+                      disabled={!isEditingProfile || disabledAddress}
                       value={formData.billing_address}
-                      onChange={(val) => handleInputChange(val, 'billing_address')}
+                      onChange={(val) => { handleInputChange(val, 'billing_address'); handleInputChange(val, 'billing_street_name'); }}
                       error={submit && !formData.billing_address}
                       errormsg="Please enter street address"
                     />
@@ -516,7 +471,7 @@ export default function AccountSettingsPage() {
                       label="Suburb"
                       placeholder='Suburb'
                       required
-                      disabled={!isEditingProfile || sameAsShipping || disabledAddress}
+                      disabled={!isEditingProfile || disabledAddress}
                       value={formData.billing_suburb}
                       onChange={(val) => handleInputChange(val, 'billing_suburb')}
                       error={submit && !formData.billing_suburb}
@@ -529,7 +484,7 @@ export default function AccountSettingsPage() {
                       placeholder='Select State'
                       required
                       options={STATES}
-                      disabled={!isEditingProfile || sameAsShipping || disabledAddress}
+                      disabled={!isEditingProfile || disabledAddress}
                       value={formData.billing_state}
                       onValueChange={(val) => handleInputChange(val, 'billing_state')}
                       error={submit && !formData.billing_state}
@@ -542,7 +497,7 @@ export default function AccountSettingsPage() {
                       label="Postcode"
                       placeholder='Postcode'
                       required
-                      disabled={!isEditingProfile || sameAsShipping || disabledAddress}
+                      disabled={!isEditingProfile || disabledAddress}
                       value={formData.billing_postcode}
                       onChange={(val) => handleInputChange(val, 'billing_postcode')}
                       error={submit && !formData.billing_postcode}
@@ -554,10 +509,26 @@ export default function AccountSettingsPage() {
 
               {/* Pickup Address Column */}
               <div className="space-y-4">
-                <div className="border-b pb-2">
+                <div className="flex items-center justify-between border-b pb-2">
                   <h4 className="text-base font-semibold text-gray-700 dark:text-zinc-300">
                     Pickup Address
                   </h4>
+                </div>
+
+                <div className="bg-blue-50/40 dark:bg-blue-950/10 border border-blue-100/80 dark:border-blue-900/30 rounded-lg p-3.5 flex items-start gap-3 shadow-2xs">
+                  <div className="p-1 rounded-md bg-blue-100/80 dark:bg-blue-950/60 text-blue-600 dark:text-blue-400 shrink-0">
+                    <Info className="w-4 h-4" />
+                  </div>
+                  <div className="text-[13px] text-slate-600 dark:text-zinc-400 leading-relaxed font-medium">
+                    To change the Pickup address, please email us at{' '}
+                    <a
+                      href="mailto:info@tranzitgroup.com.au"
+                      className="inline-flex items-center gap-1 font-semibold text-blue-600 dark:text-blue-400 hover:underline transition-all"
+                    >
+                      <Mail className="w-3.5 h-3.5 inline" />
+                      info@tranzitgroup.com.au
+                    </a>
+                  </div>
                 </div>
                 <div className="grid grid-cols-12 gap-x-4 gap-y-3.5">
                   <div className="col-span-12">

@@ -24,6 +24,8 @@ export interface Order {
   receiver_address_info?: string;
   courier_code?: string;
   canReadWrite?: boolean
+  customer_id?: number | string
+  can_consign: boolean
 }
 
 export type TabType = 'new' | 'printed' | 'shipped' | 'archived';
@@ -91,6 +93,8 @@ export interface CreateOrderDialogProps {
   default_courier?: any;
   default_item?: any;
   orderType?: string;
+  selectedCustomer?: number;
+  onCustomerSelect?: (id: number | undefined) => void;
 }
 
 export interface WalletCheckDialogProps {

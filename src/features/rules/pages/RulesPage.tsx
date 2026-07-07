@@ -35,7 +35,6 @@ export default function RulesPage() {
 
   // Queries & Mutations
   const { data: rulesData, isLoading } = useRules();
-  console.log(rulesData, 'data')
   // useRuleOptions();
   const createRuleMutation = useCreateRule();
   const updateRuleMutation = useUpdateRule();
@@ -216,7 +215,7 @@ export default function RulesPage() {
                 </div>
               )} */}
               {/* YouTube Video Preview */}
-              <div className="pt-2 hidden">
+              {/* <div className="pt-2 hidden">
                 <iframe
                   className="w-full aspect-video rounded-lg border border-slate-200 dark:border-zinc-850"
                   src="https://www.youtube.com/embed/MpV5FDCaLE4"
@@ -224,7 +223,7 @@ export default function RulesPage() {
                   allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
                   allowFullScreen
                 ></iframe>
-              </div>
+              </div> */}
             </CardContent>
           </Card>
 
@@ -314,7 +313,6 @@ export default function RulesPage() {
 
         {/* Right Column: Rules list & Inline builder */}
         <div className="lg:col-span-8 space-y-6">
-          {/* {console.log(rules, "rules")} */}
           <RuleList
             rules={rulesData?.data || []}
             onCreateClick={() => {

@@ -54,7 +54,7 @@ export const integrationService = {
 
     toggleEbayAutoSync: async (enabled: boolean) => {
         const response = await api.request({
-            method: "GET",
+            method: "POST",
             url: API_ENDPOINTS.INTEGRATIONS.EBAY_AUTO_SYNC,
             data: { enabled }
         });
@@ -63,7 +63,7 @@ export const integrationService = {
 
     toggleEbayAutoFulfillment: async (enabled: boolean) => {
         const response = await api.request({
-            method: "GET",
+            method: "POST",
             url: API_ENDPOINTS.INTEGRATIONS.EBAY_AUTO_FULFILLMENT,
             data: { enabled }
         });

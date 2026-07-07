@@ -49,9 +49,9 @@ export const TransactionTab = ({ customerId }: TransactionTabProps) => {
                     { key: 'transaction_id', header: 'Transaction ID', cell: (val) => <span className="font-bold text-slate-600 dark:text-zinc-400">{val}</span> },
                     { key: 'amount', header: 'Amount', cell: (val) => <span className="font-bold text-slate-900 dark:text-zinc-100">${val}</span> },
                     // { key: 'payment_status', header: 'Payment Status', cell: (val) => <StatusCell value={val?.toLowerCase()} statusConfig={TRANSACTION_STATUS_CONFIG} /> },
-                    { key: 'description', header: 'Description' },
-                    { key: 'type', header: 'Type', cell: (val) => <StatusCell value={val?.toLowerCase()} statusConfig={TRANSACTION_STATUS_CONFIG} /> },
-                    { key: 'payment_date', header: 'Payment Date' },
+                    { key: 'reason', header: 'Description' },
+                    { key: 'transaction_type', header: 'Type', cell: (val) => <StatusCell value={val?.toLowerCase()} statusConfig={TRANSACTION_STATUS_CONFIG} /> },
+                    { key: 'transaction_date_time', header: 'Payment Date' },
                 ]}
                 data={transactions}
                 totalItems={meta?.total || 0}

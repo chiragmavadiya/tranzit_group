@@ -10,17 +10,20 @@ interface ManualOrderData {
 interface ManualOrderDetailsProps {
   manualOrderData: ManualOrderData;
   setManualOrderData: React.Dispatch<React.SetStateAction<ManualOrderData>>;
-  globalCouriers: Array<{ label: string; value: string }> | undefined;
 }
+
+const globalCouriers = [
+  { value: 2, label: 'Direct Freight Express TR' },
+  { value: 1, label: 'Australia Post TR' },
+]
 
 export const ManualOrderDetails: React.FC<ManualOrderDetailsProps> = ({
   manualOrderData,
   setManualOrderData,
-  globalCouriers,
 }) => {
   return (
-    <div className="mb-4 p-5 bg-white dark:bg-zinc-950 rounded-xl border border-gray-200 dark:border-zinc-800 shadow-sm transition-colors duration-300">
-      <h3 className="mb-4 text-sm font-bold text-gray-900 dark:text-zinc-100 uppercase tracking-wide">
+    <div className="mb-4 p-5 bg-white dark:bg-zinc-950 rounded-md border border-gray-200 dark:border-zinc-800 shadow-xs transition-colors duration-300">
+      <h3 className="mb-4 mt-0 text-sm font-bold text-gray-900 dark:text-zinc-100 uppercase tracking-wide">
         Manual Order Details
       </h3>
       <div className="flex flex-col md:flex-row gap-4">
@@ -29,7 +32,7 @@ export const ManualOrderDetails: React.FC<ManualOrderDetailsProps> = ({
           value={manualOrderData.trackingNumber}
           onChange={(val) => setManualOrderData((prev) => ({ ...prev, trackingNumber: val }))}
           placeholder="Enter tracking number"
-          className="flex-1 h-8"
+          className="flex-1"
         />
         <FormSelect
           label="Courier"
@@ -37,14 +40,14 @@ export const ManualOrderDetails: React.FC<ManualOrderDetailsProps> = ({
           onValueChange={(val) => setManualOrderData((prev) => ({ ...prev, courierId: val || '' }))}
           options={globalCouriers || []}
           placeholder="Select courier"
-          className="flex-1 h-8"
+          className="flex-1"
         />
         <FormInput
           label="Amount"
           value={manualOrderData.amount}
           onChange={(val) => setManualOrderData((prev) => ({ ...prev, amount: val }))}
           placeholder="Enter amount"
-          className="flex-1 h-8"
+          className="flex-1"
           type="number"
         />
       </div>

@@ -20,6 +20,7 @@ export interface UserAddress {
     address_type: string;
     parent_customer_id: number | null;
     label: string | null;
+    company_name: string | null;
     address: string;
     address_info: string;
     suburb: string;
@@ -42,6 +43,7 @@ export interface UserAddress {
 }
 
 export interface User {
+    gst_number: string;
     id: number;
     first_name: string;
     last_name: string;
@@ -91,6 +93,12 @@ export interface TeamAccess {
     permissions: Record<string, string>;
 }
 
+export interface BlackoutDay {
+    id: number;
+    name: string;
+    date: string;
+}
+
 export interface LoginResponse {
     status: boolean;
     user: User
@@ -110,7 +118,9 @@ export interface LoginResponse {
     address_detail?: {
         default: UserAddress;
         billing: UserAddress;
-    }
+    };
+    courier?: any;
+    blackout_days?: BlackoutDay[];
 }
 
 

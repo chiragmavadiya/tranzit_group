@@ -1,5 +1,5 @@
 import React, { memo } from "react";
-import { Pencil, CheckCircle2 } from "lucide-react";
+import { Pencil, User, Mail, Phone } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 
@@ -28,27 +28,35 @@ export const AddressCard: React.FC<AddressCardProps> = memo(({
   return (
 
     <Card className="w-full border ring-0 border-gray-200 dark:border-zinc-800 dark:bg-zinc-950 transition-colors duration-300">
-      <CardContent className="p-0 ">
-        <div className="flex items-center justify-between p-4 py-2">
-          <div className="flex items-center gap-3 min-h-8">
+      <CardContent className="p-0 bg-slate-50 dark:bg-zinc-900">
+        <div className="flex items-center justify-between p-4 py-2.5">
+          <div className="flex flex-col md:flex-row md:items-center gap-2 md:gap-4 flex-1 min-h-8 mr-2">
             {/* Section Label */}
-            <span className="text-base font-bold uppercase text-slate-800 dark:text-zinc-400">
+            <span className="text-sm font-bold flex items-center gap-1.5 text-slate-800 dark:text-zinc-400 shrink-0">
+              <User className="h-4 w-4 text-slate-600 dark:text-zinc-500" />
               {title}
             </span>
 
-            <div className="flex items-center gap-1.5 text-sm text-slate-600 dark:text-zinc-400">
-              {/* Verified Icon */}
-              {name && address && <CheckCircle2 className="h-4 w-4 fill-emerald-600 text-white dark:text-zinc-950" />}
-
+            <div className="flex flex-wrap items-center gap-x-2 gap-y-1.5 text-sm text-slate-600 dark:text-zinc-400">
               {/* Sender Details */}
-              <div className="flex items-center space-x-1">
-                <span className="font-medium text-slate-900 dark:text-zinc-100">{name}{name && address && ','}</span>
-                <span>{address}</span>
-                {email && <span className="px-1 text-slate-300 dark:text-zinc-700">|</span>}
-                {email && <span className="text-slate-600 dark:text-zinc-400">{email}</span>}
-                {phone && <span className="px-1 text-slate-300 dark:text-zinc-700">|</span>}
-                {phone && <span className="text-slate-600 dark:text-zinc-400">{phone}</span>}
-              </div>
+              <span className="font-semibold text-slate-900 dark:text-zinc-100 whitespace-nowrap">
+                {name}{name && address && ','}
+              </span>
+              <span className="text-slate-600 dark:text-zinc-400">{address}</span>
+
+              {/* Contact Badges */}
+              {email && (
+                <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded bg-slate-100 dark:bg-zinc-800/80 text-xs font-medium text-slate-600 dark:text-zinc-300 border border-slate-200/60 dark:border-zinc-700/50">
+                  <Mail className="h-3 w-3 text-slate-400 dark:text-zinc-500" />
+                  {email}
+                </span>
+              )}
+              {phone && (
+                <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded bg-slate-100 dark:bg-zinc-800/80 text-xs font-medium text-slate-600 dark:text-zinc-300 border border-slate-200/60 dark:border-zinc-700/50">
+                  <Phone className="h-3 w-3 text-slate-400 dark:text-zinc-500" />
+                  {phone}
+                </span>
+              )}
             </div>
           </div>
 

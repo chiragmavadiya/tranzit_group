@@ -1,6 +1,6 @@
 import React, { memo, useEffect, useEffectEvent, useMemo, useRef, useState } from 'react'
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card'
-import { Truck, RefreshCw, Copy, Check, Box } from 'lucide-react'
+import { Truck, RefreshCw, Copy, Check, Box, ExternalLink } from 'lucide-react'
 import { Badge } from '@/components/ui/badge'
 
 import { useGetQuoteServices } from '@/features/quote/hooks/useQuote'
@@ -25,23 +25,35 @@ interface CarrierCardProps {
   signatureSelected?: boolean;
   isLoading?: boolean;
   selectedCustomer?: number;
+  setDeliveryInstructions?: React.Dispatch<React.SetStateAction<any>>;
+  activeSettings?: any;
+  setActiveSettings?: React.Dispatch<React.SetStateAction<any>>;
+  onLoadingChange?: (loading: boolean) => void;
 }
 
 export const CarrierCard: React.FC<CarrierCardProps> = memo((props) => {
-  const { itemData, addresses, onQuoteChange, setCourierData, orderDetail, module, orderType = 'create', initialSelectedCourierId = null, signatureSelected = false, isLoading = false, selectedCustomer } = props
-  const { role, default_courier } = useAppSelector((state) => state.auth);
+  const { itemData, addresses, onQuoteChange, setCourierData, orderDetail, module, orderType = 'create', initialSelectedCourierId = null, signatureSelected = false, isLoading = false, selectedCustomer, setDeliveryInstructions, activeSettings, setActiveSettings, onLoadingChange } = props
+  const { role, default_courier, courier_settings } = useAppSelector((state) => state.auth);
   const [selectedServiceId, setSelectedServiceId] = useState<string>(initialSelectedCourierId || '')
   const [couriers, setCouriers] = useState<any[]>([]);
   const [surchargesMap, setSurchargesMap] = useState<Record<string, any[]>>({});
   const [selectedSurchargesMap, setSelectedSurchargesMap] = useState<Record<string, string[]>>({});
   const selectedSurchargesMapRef = useRef(selectedSurchargesMap);
+  const selectedCourierRef = useRef<any>(null);
+
   useEffect(() => {
     selectedSurchargesMapRef.current = selectedSurchargesMap;
   }, [selectedSurchargesMap]);
   const [bestDeal, setBestDeal] = useState<string>('');
   const [copiedTracking, setCopiedTracking] = useState(false);
+  // const [advanceSetting, setAdvanceSetting] = useState([])
   const mount = useRef(false);
-
+  const settingsInitializedForRef = useRef<string | null>(null);
+  const lastApiSigReqRef = useRef<boolean>(false);
+  const prevSettingsRef = useRef({
+    signature_required: activeSettings?.signature_required,
+    authority_to_leave: activeSettings?.authority_to_leave
+  });
   // const [authorityToLeave, setAuthorityToLeave] = useState<boolean>(false);
   // const [signatureRequired, setSignatureRequired] = useState<boolean>(false);
   const handleCopyTracking = (text: string) => {
@@ -55,6 +67,10 @@ export const CarrierCard: React.FC<CarrierCardProps> = memo((props) => {
 
   const { mutate: getServices, isPending: loading } = useGetQuoteServices(role);
 
+  useEffect(() => {
+    onLoadingChange?.(loading);
+  }, [loading, onLoadingChange]);
+
   const getAddress = useMemo(() => (
     location: { address1?: string; address?: string; label?: string, suburb?: string, state?: string, postcode?: string, country?: string }
   ) => {
@@ -63,49 +79,86 @@ export const CarrierCard: React.FC<CarrierCardProps> = memo((props) => {
     }
     return location?.label || `${location?.suburb} ${location?.state} ${location?.postcode}, AU` || "";
   }, [module]);
-  const handleServiceSuccess = useEffectEvent((data: any) => {
-
-    setCouriers(data.services || []);
-    setSurchargesMap(data.surcharges || {});
-    if (data.surcharges) {
-      const initialSelected: Record<string, string[]> = {};
-      Object.keys(data.surcharges).forEach(code => {
-        if (!mount.current && code === orderDetail?.courier_details?.courier_code) {
-          initialSelected[code] = orderDetail?.order_details?.surcharges?.map((item: any) => item.name) || [];
-        } else {
-          initialSelected[code] = selectedSurchargesMapRef.current[code] || [];
-        }
-      });
-      setSelectedSurchargesMap(initialSelected);
-    }
-
-    if (data.services && data.services.length > 0) {
-      const getServiceTotalPrice = (service: any) => {
-        // const surcharges = data.surcharges?.[service.courierCode] || [];
-        // const totalSurcharges = surcharges.reduce((acc: number, curr: any) => acc + curr.amount, 0);
-        return service.price;
-      };
-      const allCourierIds = [...data.services.map((service: any) => service.courierCode + (service.product_id || ''))];
-      const minItem = data.services.reduce((min: any, curr: any) =>
-        getServiceTotalPrice(curr) < getServiceTotalPrice(min) ? curr : min
-      );
-      setBestDeal(minItem.courierCode + (minItem.product_id || '') || '');
-      const selectedFromQuote = sessionStorage.getItem('quote_courier') || localStorage.getItem('quote_courier');
-      if (selectedFromQuote) {
-        const courier = JSON.parse(selectedFromQuote);
-        setSelectedServiceId(courier.courier.courierCode + (courier.courier.product_id || '') || '');
-      } else if (!selectedServiceId || !allCourierIds.includes(selectedServiceId)) {
-        setSelectedServiceId((prev) => {
-          if ((prev && allCourierIds.includes(prev)) || !mount.current) return prev;
-          if (default_courier && default_courier.courier_id) {
-            const findCourier = data.services.find((courier: any) => courier.carrier_id === default_courier.courier_id);
-            console.log(findCourier, data.services, default_courier, 'findCourier')
-            if (findCourier) {
-              return findCourier.courierCode + (findCourier.product_id || '') || '';
-            }
+  const handleServiceSuccess = useEffectEvent((data: any, onlyChangeSettings = false) => {
+    if (onlyChangeSettings) {
+      setCouriers((prevCouriers) => {
+        const updatedCouriers = prevCouriers.map((courier) => {
+          const matchingService = (data.services || []).find(
+            (s: any) => s.courierCode === courier.courierCode && s.product_id === courier.product_id
+          );
+          if (matchingService) {
+            return {
+              ...courier,
+              price: matchingService.price,
+            };
           }
-          return minItem.courierCode + (minItem.product_id || '') || '';
+          return courier;
         });
+
+        if (updatedCouriers.length > 0) {
+          const getServiceTotalPrice = (service: any) => service.price;
+          const minItem = updatedCouriers.reduce((min: any, curr: any) =>
+            getServiceTotalPrice(curr) < getServiceTotalPrice(min) ? curr : min
+          );
+          setBestDeal(minItem.courierCode + (minItem.product_id || '') || '');
+        }
+
+        return updatedCouriers;
+      });
+
+      if (data.surcharges) {
+        setSurchargesMap(prev => ({
+          ...prev,
+          ...data.surcharges
+        }));
+      }
+    } else {
+      setCouriers(data.services || []);
+      setSurchargesMap(data.surcharges || {});
+      if (data.surcharges) {
+        const initialSelected: Record<string, string[]> = {};
+        Object.keys(data.surcharges).forEach(code => {
+          if (!mount.current && (code === orderDetail?.courier_details?.courier_code || localStorage.getItem('quote_surcharges'))) {
+            initialSelected[code] = orderDetail?.order_details?.surcharges?.map((item: any) => item.name) || JSON.parse(localStorage.getItem('quote_surcharges') || '[]').map((item: any) => item.name) || [];
+            localStorage.removeItem('quote_surcharges');
+          } else {
+            initialSelected[code] = selectedSurchargesMapRef.current[code] || [];
+          }
+        });
+        setSelectedSurchargesMap(initialSelected);
+      }
+
+      if (data.services && data.services.length > 0) {
+        const getServiceTotalPrice = (service: any) => {
+          return service.price;
+        };
+        const allCourierIds = [...data.services.map((service: any) => service.courierCode + (service.product_id || ''))];
+        const minItem = data.services.reduce((min: any, curr: any) =>
+          getServiceTotalPrice(curr) < getServiceTotalPrice(min) ? curr : min
+        );
+        setBestDeal(minItem.courierCode + (minItem.product_id || '') || '');
+        const selectedFromQuote = sessionStorage.getItem('quote_courier') || localStorage.getItem('quote_courier');
+        if (selectedFromQuote) {
+          const courier = JSON.parse(selectedFromQuote);
+          setSelectedServiceId(courier.courier.courierCode + (courier.courier.product_id || '') || '');
+        } else if (!selectedServiceId || !allCourierIds.includes(selectedServiceId)) {
+          setSelectedServiceId((prev) => {
+            if ((prev && allCourierIds.includes(prev)) || !mount.current) return prev;
+            if (data.services.some((c: any) => c.rule_applied)) {
+              const findCourier = data.services.find((courier: any) => courier.rule_applied);
+              if (findCourier) {
+                return findCourier.courierCode + (findCourier.product_id || '') || '';
+              }
+            }
+            if (default_courier && default_courier.courier_id) {
+              const findCourier = data.services.find((courier: any) => courier.carrier_id === default_courier.courier_id);
+              if (findCourier) {
+                return findCourier.courierCode + (findCourier.product_id || '') || '';
+              }
+            }
+            return minItem.courierCode + (minItem.product_id || '') || '';
+          });
+        }
       }
     }
     mount.current = true;
@@ -141,8 +194,9 @@ export const CarrierCard: React.FC<CarrierCardProps> = memo((props) => {
       receiver_details: receiver_details,
       receiver_address: receiver?.address_info || receiver_addr1,
       is_order: module === 'quote' ? "no" as const : "yes" as const,
-      signature_required: signatureSelected ? 1 : 0,
-      customer_id: selectedCustomer
+      signature_required: (activeSettings?.signature_required ?? signatureSelected) ? 1 : 0,
+      customer_id: selectedCustomer,
+      atl: activeSettings?.authority_to_leave ? 1 : 0,
     }
 
     getServices(payload, {
@@ -165,38 +219,62 @@ export const CarrierCard: React.FC<CarrierCardProps> = memo((props) => {
     if (!isValidItems) return;
 
     // Check if we have both addresses
-    const sender = addresses?.sender;
-    const receiver = addresses?.receiver;
+    const sender_addr1 = getAddress(addresses?.sender || {});
+    const receiver_addr1 = getAddress(addresses?.receiver || {});
+    if (sender_addr1 === '' || receiver_addr1 === '' || addresses?.sender?.suburb === '' || addresses?.receiver?.suburb === '') return;
 
-    const sender_addr1 = getAddress(sender!);
-    const receiver_addr1 = getAddress(receiver!);
-    if (sender_addr1 === '' || receiver_addr1 === '' || sender?.suburb === '' || receiver?.suburb === '') return;
+    // Detect if settings changed
+    const settingsChanged =
+      prevSettingsRef.current.signature_required !== activeSettings?.signature_required ||
+      prevSettingsRef.current.authority_to_leave !== activeSettings?.authority_to_leave;
 
-    const timer = setTimeout(() => {
-      const receiver_details = module === 'quote' ? receiver_addr1 : ` ${receiver?.suburb} ${receiver?.state} ${receiver?.postcode}, AU`.trim();
+    // Update ref
+    prevSettingsRef.current = {
+      signature_required: activeSettings?.signature_required,
+      authority_to_leave: activeSettings?.authority_to_leave
+    };
 
+    const triggerApi = (onlyChangeSettings = false) => {
+      const receiver_details = module === 'quote' ? receiver_addr1 : ` ${addresses?.receiver?.suburb} ${addresses?.receiver?.state} ${addresses?.receiver?.postcode}, AU`.trim();
+
+      const sigReq = !!activeSettings?.signature_required;
+      lastApiSigReqRef.current = sigReq;
+
+      const selectedCourier = couriers.find((c) => (c.courierCode + (c.product_id || '')) === selectedServiceId);
       const payload = {
         items: itemData,
         sender_details: sender_addr1,
         receiver_details: receiver_details,
-        receiver_address: receiver?.address_info || receiver_addr1,
+        receiver_address: addresses?.receiver?.address_info || receiver_addr1,
         is_order: module === 'quote' ? "no" as const : "yes" as const,
-        signature_required: signatureSelected ? 1 : 0,
-        customer_id: selectedCustomer
-      }
+        signature_required: sigReq ? 1 : 0,
+        customer_id: selectedCustomer,
+        atl: activeSettings?.authority_to_leave ? 1 : 0,
+        ...(onlyChangeSettings && { courier_code: selectedCourier?.courierCode || "couriersplease_tranzit_group" }),
+      };
 
       getServices(payload, {
         onSuccess: (data) => {
-          handleServiceSuccess(data);
+          handleServiceSuccess(data, onlyChangeSettings);
         },
         onError: (err: any) => {
           showToast(err?.response?.data?.message || 'Failed to fetch rates', "error");
         }
       });
+    };
+
+    if (settingsChanged) {
+      triggerApi(true);
+      return;
+    }
+
+    const timer = setTimeout(() => {
+      triggerApi();
     }, 500); // 500ms debounce
     // Cleanup previous timer
     return () => clearTimeout(timer);
-  }, [itemData, addresses, getServices, orderType, module, getAddress, signatureSelected, selectedCustomer])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [itemData, addresses?.sender?.suburb, addresses?.sender?.state, addresses?.sender?.postcode, addresses?.receiver?.suburb, addresses?.receiver?.state, addresses?.receiver?.postcode, getServices, orderType, module, getAddress, activeSettings?.signature_required, activeSettings?.authority_to_leave, selectedCustomer])
 
   useEffect(() => {
     if (couriers.length > 0 && selectedServiceId) {
@@ -228,9 +306,69 @@ export const CarrierCard: React.FC<CarrierCardProps> = memo((props) => {
           shipment_summary: selectedCourier.shipment_summary,
           is_own_courier: selectedCourier.is_own_courier
         })
+
       }
     }
-  }, [selectedServiceId, couriers, surchargesMap, selectedSurchargesMap, onQuoteChange, setCourierData])
+  }, [selectedServiceId, couriers, surchargesMap, selectedSurchargesMap, onQuoteChange, setCourierData, setDeliveryInstructions])
+
+  useEffect(() => {
+    // advance settings
+    if (selectedCourierRef.current === selectedServiceId) return;
+
+
+    const selectedCourier = couriers.find((c) => (c.courierCode + (c.product_id || '')) === selectedServiceId);
+    if (selectedCourier) {
+      selectedCourierRef.current = selectedServiceId;
+      const qActiveSettings = localStorage.getItem('quote_active_settings');
+      if (qActiveSettings) {
+        setActiveSettings?.(JSON.parse(qActiveSettings));
+        localStorage.removeItem('quote_active_settings');
+        return;
+      }
+      // Skip re-initializing settings if already done for this courier (e.g. couriers refreshed due to API call)
+      if (settingsInitializedForRef.current === selectedServiceId) return;
+      settingsInitializedForRef.current = selectedServiceId;
+
+      // setDeliveryInstructions?.("Hello word")
+      const setting = courier_settings?.find((c: any) => c.courierCode === selectedCourier.courierCode)
+      if (setting) {
+        setDeliveryInstructions?.(setting?.advanced_settings?.delivery_instruction || '')
+        const targetObj = setting.advanced_settings?.settings || setting;
+        const filteredSettings: Record<string, any> = {};
+
+        if (Array.isArray(targetObj)) {
+          targetObj.forEach((item: any) => {
+            if (item && item.key && item.key !== 'delivery_instruction' && item.key !== 'delivery_instructions' && item.type === 'checkbox') {
+              filteredSettings[item.key] = item.value;
+            }
+          });
+        } else if (targetObj) {
+          Object.keys(targetObj).forEach((key) => {
+            if (key !== 'delivery_instruction' && key !== 'delivery_instructions' && key !== 'settings' && typeof targetObj[key] === 'boolean') {
+              filteredSettings[key] = targetObj[key];
+            }
+          });
+        }
+
+        setActiveSettings?.((prev: any) => {
+          const newSettings = { ...filteredSettings };
+          // Only suppress the dep change when this courier actually has signature_required
+          // AND its effective value matches what was last sent to the API.
+          // Couriers without the key (e.g. Auspost) are left untouched — no stale key injected.
+          if ('signature_required' in filteredSettings) {
+            const effectiveNewSigReq = !!filteredSettings.signature_required;
+            if (effectiveNewSigReq === lastApiSigReqRef.current) {
+              newSettings.signature_required = prev?.signature_required || false;
+            }
+          }
+          return newSettings;
+        });
+      } else {
+        setActiveSettings?.({});
+      }
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedServiceId, couriers])
 
   return (
     <Card className="border gap-0 border-gray-200 dark:border-zinc-800 overflow-hidden transition-colors duration-300">
@@ -238,8 +376,8 @@ export const CarrierCard: React.FC<CarrierCardProps> = memo((props) => {
         <div className="flex justify-between w-full items-center gap-2">
           <div className='flex items-center gap-2'>
             <Truck className="h-5 w-5 text-primary" />
-            <CardTitle className="text-base font-bold uppercase text-slate-800 dark:text-zinc-400">
-              SHIPMENT OPTIONS
+            <CardTitle className="text-base font-bold text-slate-800 dark:text-zinc-400">
+              Shipment Options
             </CardTitle>
           </div>
           {/* {loading && <RefreshCw className="h-4 w-4 animate-spin" />} */}
@@ -256,9 +394,18 @@ export const CarrierCard: React.FC<CarrierCardProps> = memo((props) => {
         </div>
       </CardHeader>
 
-      <CardContent className="p-4 bg-white dark:bg-zinc-950">
+      <CardContent className="p-4 bg-white dark:bg-zinc-950 relative">
+        {(loading || isLoading) && (couriers.length > 0 || (orderType !== 'create' && orderType !== 'consign' && !!orderDetail)) && (
+          <div className="absolute inset-0 bg-white/40 dark:bg-zinc-950/40 flex items-center justify-center z-10 transition-all duration-300 rounded-b-xl">
+            <div className="flex flex-col items-center gap-2 bg-white dark:bg-zinc-900 px-6 py-4 rounded-2xl shadow-xl border border-gray-100 dark:border-zinc-800 animate-in fade-in zoom-in-95 duration-200">
+              <RefreshCw className="h-6 w-6 animate-spin text-primary" />
+              <span className="text-[10px] font-bold text-gray-700 dark:text-zinc-300 uppercase tracking-wider">Recalculating Rates...</span>
+            </div>
+          </div>
+        )}
+
         {orderType !== 'create' && orderType !== 'consign' && orderDetail ? (
-          <div className="flex flex-col gap-3">
+          <div className={cn("flex flex-col gap-3 transition-all duration-300", (loading || isLoading) && "opacity-40 pointer-events-none")}>
             <div className="relative flex flex-col p-4 rounded-xl border border-primary bg-primary/5 dark:bg-primary/10 shadow-sm">
               <div className="flex items-center justify-between gap-4">
                 <div className="flex items-center gap-4">
@@ -280,7 +427,19 @@ export const CarrierCard: React.FC<CarrierCardProps> = memo((props) => {
                     </h4>
                     <div className="flex items-center gap-2 mt-1">
                       <span className="text-xs font-bold text-gray-500 dark:text-zinc-400 uppercase">Tracking:</span>
-                      <span className="text-xs font-bold text-primary">{orderDetail.courier_details?.tracking_number || 'N/A'}</span>
+                      {orderDetail.courier_details?.tracking_url ? (
+                        <a
+                          href={orderDetail.courier_details.tracking_url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-xs font-bold text-primary hover:underline flex items-center gap-1"
+                        >
+                          {orderDetail.courier_details.tracking_number}
+                          <ExternalLink className="h-3.5 w-3.5 shrink-0 opacity-70" />
+                        </a>
+                      ) : (
+                        <span className="text-xs font-bold text-primary">{orderDetail.courier_details?.tracking_number || 'N/A'}</span>
+                      )}
                       {orderDetail.courier_details?.tracking_number && (
                         <button
                           onClick={() => handleCopyTracking(orderDetail.courier_details.tracking_number)}
@@ -327,8 +486,8 @@ export const CarrierCard: React.FC<CarrierCardProps> = memo((props) => {
             <span className="text-sm">Complete the sender and receiver details above to unlock real-time shipping rates and carrier options.</span>
           </div>
         ) : (
-          <div className="grid grid-cols-12 gap-3">
-            <div className={`${module !== 'quote' ? 'col-span-12' : 'col-span-12'} flex flex-col gap-3`}>
+          <div className={cn("grid grid-cols-12 gap-4 transition-all duration-300", (loading || isLoading) && "opacity-40 pointer-events-none")}>
+            <div className={`${module !== 'quote' ? 'col-span-12 lg:col-span-8' : 'col-span-12'} flex flex-col gap-3 max-h-100 overflow-y-auto pt-4 pr-1`}>
               {couriers.map((courier) => {
                 const serviceId = courier.courierCode + (courier.product_id || '') || '';
 
@@ -358,7 +517,7 @@ export const CarrierCard: React.FC<CarrierCardProps> = memo((props) => {
                     onClick={() => setSelectedServiceId(serviceId)}
                     className={`relative flex flex-col p-4 rounded-xl border-2 cursor-pointer transition-all duration-200 ${isSelected
                       ? 'border-primary bg-primary/5 dark:bg-primary/10'
-                      : 'border-slate-200 border! bg-white dark:bg-zinc-900 hover:border-gray-200 dark:hover:border-zinc-700 shadow-sm'
+                      : 'border-slate-200 border-2 bg-white dark:bg-zinc-900 hover:border-gray-200 dark:hover:border-zinc-700 shadow-sm'
                       }`}
                   >
                     {/* Recommended Badge (Example logic: lowest price) */}
@@ -429,7 +588,15 @@ export const CarrierCard: React.FC<CarrierCardProps> = memo((props) => {
                         <div className="flex flex-col gap-2">
                           {courierSurcharges.map((charge, index) => {
                             const isChecked = selectedNames.includes(charge.name);
-                            // if (!charge.is_customer_selectable) return;
+
+                            const displaySurcharges = [
+                              "airport_delivery_surcharge",
+                              "exhibition_centre_surcharge",
+                              "hand_unload",
+                              "palletising",
+                              "tailgate_pickup_delivery"
+                            ]
+                            if (!displaySurcharges.includes(charge.code)) return;
                             return (
                               <label
                                 key={index}
@@ -456,7 +623,7 @@ export const CarrierCard: React.FC<CarrierCardProps> = memo((props) => {
                                 />
                                 <div className={`flex justify-between w-full ${!charge.is_customer_selectable ? 'opacity-50 cursor-not-allowed' : ''}`}>
                                   <span>{charge.name}</span>
-                                  <span className="font-semibold text-gray-900 dark:text-zinc-100">+${charge.amount.toFixed(2)}</span>
+                                  {/* <span className="font-semibold text-gray-900 dark:text-zinc-100">+${charge.amount.toFixed(2)}</span> */}
                                 </div>
                               </label>
                             );
@@ -469,30 +636,51 @@ export const CarrierCard: React.FC<CarrierCardProps> = memo((props) => {
                 )
               })}
             </div>
-            {/* {selectedServiceId && module !== 'quote' && (
-              <div className="col-span-4 flex flex-col gap-2dark:border-zinc-800 sticky top-0">
-                <div className="text-[11px] font-bold text-gray-500 dark:text-zinc-400 uppercase">
+            {selectedServiceId && module !== 'quote' && (
+              <div className="col-span-12 lg:col-span-4 flex flex-col gap-3 bg-slate-50/50 dark:bg-zinc-900/10 p-4 rounded-xl border border-slate-100 dark:border-zinc-800/60 lg:sticky lg:top-0 h-fit mt-4 lg:mt-0">
+                <div className="text-[11px] font-bold text-gray-500 dark:text-zinc-400 uppercase tracking-wider">
                   OPTIONS
                 </div>
                 <div className="border-t border-gray-200 dark:border-zinc-800 my-1" />
-                <div className="flex flex-col gap-3 mt-2">
-                  <label className="flex items-center gap-2 text-xs font-medium text-gray-700 dark:text-zinc-300 cursor-pointer hover:text-gray-900 dark:hover:text-zinc-100">
+                <div className="flex flex-col gap-3 mt-1">
+                  {Object.keys(activeSettings).map((setting) => (
+                    <label key={setting} className="flex items-center gap-2 text-xs font-medium text-gray-700 dark:text-zinc-300 cursor-pointer hover:text-gray-900 dark:hover:text-zinc-100">
+                      <Checkbox
+                        checked={!!activeSettings[setting]}
+                        onCheckedChange={(checked) => {
+                          setActiveSettings?.((prev: any) => {
+                            const next: any = { ...prev, [setting]: !!checked };
+                            if (checked) {
+                              if (setting === 'authority_to_leave' && 'signature_required' in prev) {
+                                next.signature_required = false;
+                              } else if (setting === 'signature_required' && 'authority_to_leave' in prev) {
+                                next.authority_to_leave = false;
+                              }
+                            }
+                            return next;
+                          });
+                        }}
+                      />
+                      <span>{setting.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase())}</span>
+                    </label>
+                  ))}
+                  {/* <label className="flex items-center gap-2 text-xs font-medium text-gray-700 dark:text-zinc-300 cursor-pointer hover:text-gray-900 dark:hover:text-zinc-100">
                     <Checkbox
-                      checked={authorityToLeave}
-                      onCheckedChange={(checked) => setAuthorityToLeave(!!checked)}
+                    checked={authorityToLeave}
+                    onCheckedChange={(checked) => setAuthorityToLeave(!!checked)}
                     />
                     <span>Authority to Leave</span>
                   </label>
                   <label className="flex items-center gap-2 text-xs font-medium text-gray-700 dark:text-zinc-300 cursor-pointer hover:text-gray-900 dark:hover:text-zinc-100">
                     <Checkbox
-                      checked={signatureRequired}
-                      onCheckedChange={(checked) => setSignatureRequired(!!checked)}
+                    checked={signatureRequired}
+                    onCheckedChange={(checked) => setSignatureRequired(!!checked)}
                     />
                     <span>Signature Required</span>
-                  </label>
+                  </label> */}
                 </div>
               </div>
-            )} */}
+            )}
           </div>
         )}
       </CardContent>

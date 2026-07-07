@@ -43,6 +43,8 @@ export interface AdminTopupParams {
   page?: number;
   status?: string;
   search?: string;
+  start_date?: string;
+  end_date?: string;
 }
 
 export interface AdminTopupResponse {

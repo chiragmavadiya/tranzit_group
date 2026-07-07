@@ -144,14 +144,14 @@ export default function ProfilePage() {
                 icon={Mail}
                 disabled
               />
-              <FormInput
+              {/* <FormInput
                 label="Work Mobile Number"
                 placeholder="0400 000 000"
                 value={profileData.mobileNumber}
                 onChange={(val) => handleInputChange('mobileNumber', val)}
                 isHalf
                 icon={Phone}
-              />
+              /> */}
             </CardContent>
           </Card>
 

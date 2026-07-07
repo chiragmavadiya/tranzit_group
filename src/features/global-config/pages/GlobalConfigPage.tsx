@@ -137,7 +137,7 @@ export default function GlobalConfigPage() {
   const validate = () => {
     const newErrors: Record<string, string> = {};
     if (!formData.customerId?.length || formData.customerId.length === 0) newErrors.customerId = 'At least one customer must be selected';
-    if (!formData.name.trim()) newErrors.name = 'Please enter config name';
+    // if (!formData.name.trim()) newErrors.name = 'Please enter config name';
     if (!formData.text.trim()) newErrors.text = 'Please enter config text';
     if (!formData.textColor.trim()) newErrors.textColor = 'Please enter text color';
     if (!formData.bgColor.trim()) newErrors.bgColor = 'Please enter background color';
@@ -233,12 +233,6 @@ export default function GlobalConfigPage() {
 
   const columns = useMemo<Column<GlobalConfigItem>[]>(
     () => [
-      {
-        header: 'NAME',
-        key: 'name',
-        className: 'font-semibold text-slate-800 dark:text-zinc-200',
-        cell: (value: string) => value || '-',
-      },
       {
         header: 'CUSTOMER',
         key: 'customerId',
@@ -403,7 +397,7 @@ export default function GlobalConfigPage() {
             errormsg={errors.customerId}
           />
 
-          <FormInput
+          {/* <FormInput
             label="Name"
             value={formData.name}
             onChange={(val) => handleFormChange('name', val)}
@@ -412,7 +406,7 @@ export default function GlobalConfigPage() {
             required
             error={!!errors.name}
             errormsg={errors.name}
-          />
+          /> */}
 
           <FormInput
             label="Text"

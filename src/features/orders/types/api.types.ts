@@ -68,6 +68,7 @@ export interface CreateOrderResponse {
     data?: {
         order_number: string;
         order_status_category: string;
+        need_add_tracking: boolean
     }
 }
 
@@ -129,6 +130,7 @@ export interface WalletCheckResponse {
     wallet_balance: number;
     total: number;
     payment_capture: boolean;
+    skipWalletCheckArg?: string | boolean;
 }
 
 export interface PaymentInfoResponse {

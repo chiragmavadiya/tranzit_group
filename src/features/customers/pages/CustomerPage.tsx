@@ -2,7 +2,6 @@ import { useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Users, UserCheck, UserX, Plus } from 'lucide-react';
 import { DataTable } from '@/components/common/DataTable';
-import { StatCard } from '@/components/common/StatCard';
 import { Button } from '@/components/ui/button';
 import { SUBURBS, STATES } from '../constants';
 import { getCustomerColumns } from '../columns';
@@ -13,7 +12,7 @@ import { useDebounce } from '@/hooks/useDebounce';
 import { ConformationModal } from '@/components/common/ConformationModal';
 import { showToast } from '@/components/ui/custom-toast';
 import { FormSelect } from '@/features/orders/components/OrderFormUI';
-// import { FormSelect } from '@/features/orders/components/OrderFormUI';
+import ChangePasswordModal from '../components/ChangePasswordModal';
 
 export default function CustomerPage() {
     const [suburb, setSuburb] = useState('');
@@ -31,6 +30,10 @@ export default function CustomerPage() {
     // Delete state
     const [deleteId, setDeleteId] = useState<string | number | null>(null);
     const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+
+    // Change password state
+    const [isPasswordDialogOpen, setIsPasswordDialogOpen] = useState(false);
+    const [passwordCustomerId, setPasswordCustomerId] = useState<string | number | null>(null);
 
     // Prepare API params
     const queryParams = useMemo(() => {
@@ -93,13 +96,11 @@ export default function CustomerPage() {
     ], [totalItems, customers, countsData]);
 
     const suburbOptions = useMemo(() => [
-        { label: 'All Suburbs', value: 'all' },
-        ...SUBURBS.map(s => ({ label: s, value: s.toLowerCase() }))
+        ...SUBURBS.map(s => ({ label: s, value: s }))
     ], []);
 
     const stateOptions = useMemo(() => [
-        { label: 'All States', value: 'all' },
-        ...STATES.map(s => ({ label: s, value: s.toLowerCase() }))
+        ...STATES.map(s => ({ label: s, value: s }))
     ], []);
 
     const handleEdit = (id: string | number) => {
@@ -126,56 +127,45 @@ export default function CustomerPage() {
         });
     };
 
+    const handleChangePassword = (id: string | number) => {
+        setPasswordCustomerId(id);
+        setIsPasswordDialogOpen(true);
+    };
+
     const handleAdd = () => {
         setEditCustomerId(undefined);
         setIsDialogOpen(true);
     };
 
     const navigate = useNavigate();
-    const columns = useMemo(() => getCustomerColumns(handleEdit, handleDelete, navigate), [navigate]);
+    const columns = useMemo(() => getCustomerColumns(handleEdit, handleDelete, navigate, handleChangePassword), [navigate]);
 
     return (
-        <div className="flex flex-col flex-1 gap-4 p-page-padding min-h-0 animate-in fade-in slide-in-from-bottom-2 duration-500 bg-slate-50/30 dark:bg-zinc-950/30">
+        <div className="flex flex-col flex-1 gap-3 p-page-padding min-h-0 animate-in fade-in slide-in-from-bottom-2 duration-500 bg-slate-50/30 dark:bg-zinc-950/30">
 
-            {/* Stats Section */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                {stats.map((stat, idx) => (
-                    <StatCard
-                        key={idx}
-                        {...stat}
-                        className="shadow-sm border-gray-100 dark:border-zinc-800"
-                        contentClassName="py-4"
-                    />
-                ))}
-            </div>
-
-            {/* Filter Section */}
-            <div className="bg-white dark:bg-zinc-950 p-6 rounded-xl border border-gray-100 dark:border-zinc-800 shadow-sm space-y-4">
-                <div className="grid grid-cols-12 gap-4">
-                    {/* <FormSelect
-                        data={suburbOptions}
-                        value={suburb}
-                        onValueChange={(val) => { setSuburb(val || 'all'); setCurrentPage(1); }}
-                        placeholder="Select Suburb"
-                        className="h-10 border-gray-200 dark:border-zinc-800"
-                    /> */}
-                    <FormSelect
-                        options={suburbOptions}
-                        value={suburb}
-                        onValueChange={(val) => { setSuburb(val || 'all'); setCurrentPage(1); }}
-                        placeholder="Select Suburb"
-                        // selectClassName="h-10 border-gray-200 dark:border-zinc-800"
-                        isHalf
-                    />
-                    <FormSelect
-                        options={stateOptions}
-                        value={state}
-                        isHalf
-                        onValueChange={(val) => { setState(val || 'all'); setCurrentPage(1); }}
-                        placeholder="Select State"
-                    // className="h-10 border-gray-200 dark:border-zinc-800"
-                    />
-                </div>
+            {/* Compact Stats Ribbon */}
+            <div className="grid grid-cols-3 gap-2 sm:gap-3 shrink-0">
+                {stats.map((stat, idx) => {
+                    const Icon = stat.icon;
+                    return (
+                        <div
+                            key={idx}
+                            className="bg-white dark:bg-zinc-950 rounded-xl border border-slate-150 dark:border-zinc-800 shadow-2xs px-2 py-1.5 sm:px-4 sm:py-2.5 flex items-center gap-2 sm:gap-3.5 hover:border-slate-300 dark:hover:border-zinc-700 transition-all duration-200"
+                        >
+                            <div className={`w-7 h-7 sm:w-9 sm:h-9 rounded-lg flex items-center justify-center shrink-0 ${stat.iconBg}`}>
+                                <Icon className={`w-3.5 h-3.5 sm:w-4.5 sm:h-4.5 ${stat.iconColor}`} />
+                            </div>
+                            <div className="flex flex-col min-w-0 flex-1">
+                                <span className="text-[8px] sm:text-[11px] font-bold text-slate-400 dark:text-zinc-500 uppercase tracking-wider truncate">
+                                    {stat.label}
+                                </span>
+                                <span className="text-xs sm:text-base md:text-lg font-extrabold text-slate-900 dark:text-white leading-tight truncate">
+                                    {stat.value}
+                                </span>
+                            </div>
+                        </div>
+                    );
+                })}
             </div>
 
             {/* Table Section */}
@@ -197,15 +187,33 @@ export default function CustomerPage() {
                     onExport={handleExport}
                     className="pb-3"
                     customHeader={(
-                        <Button
-                            size="sm"
-                            variant="default"
-                            className="h-8 rounded-lg"
-                            onClick={handleAdd}
-                        >
-                            <Plus className="mr-2 h-4 w-4" />
-                            Add Customer
-                        </Button>
+                        <div className="flex flex-wrap sm:flex-nowrap items-center gap-2 justify-end w-full sm:w-auto">
+                            <FormSelect
+                                options={suburbOptions}
+                                value={suburb}
+                                onValueChange={(val) => { setSuburb(val || ''); setCurrentPage(1); }}
+                                placeholder="Select Suburb"
+                                className="flex-1 sm:flex-none sm:w-[155px] !space-y-0 order-2 sm:order-1"
+                                selectClassName="h-8 text-xs font-semibold"
+                            />
+                            <FormSelect
+                                options={stateOptions}
+                                value={state}
+                                onValueChange={(val) => { setState(val || ''); setCurrentPage(1); }}
+                                placeholder="Select State"
+                                className="flex-1 sm:flex-none sm:w-[145px] !space-y-0 order-3 sm:order-2"
+                                selectClassName="h-8 text-xs font-semibold"
+                            />
+                            <Button
+                                size="sm"
+                                variant="default"
+                                className="h-8 w-full sm:w-auto shrink-0 order-1 sm:order-3"
+                                onClick={handleAdd}
+                            >
+                                <Plus className="mr-1.5 h-4 w-4" />
+                                Add Customer
+                            </Button>
+                        </div>
                     )}
                     totalItems={totalItems}
                 />
@@ -216,6 +224,14 @@ export default function CustomerPage() {
                     open={isDialogOpen}
                     onOpenChange={setIsDialogOpen}
                     customerId={editCustomerId}
+                />
+            )}
+
+            {isPasswordDialogOpen && (
+                <ChangePasswordModal
+                    open={isPasswordDialogOpen}
+                    onOpenChange={setIsPasswordDialogOpen}
+                    customerId={passwordCustomerId}
                 />
             )}
 

@@ -45,6 +45,11 @@ export const ordersService = {
         return response.data;
     },
 
+    createManualOrder: async (data: any): Promise<any> => {
+        const response = await api.post(API_ENDPOINTS.ORDERS.MANUAL_STORE, data);
+        return response.data;
+    },
+
     updateOrder: async (orderId: string | number, data: any): Promise<any> => {
         const response = await api.put(API_ENDPOINTS.ORDERS.UPDATE(orderId), data);
         return response.data;
@@ -69,8 +74,8 @@ export const ordersService = {
     /**
      * Check wallet balance against a total amount
      */
-    checkWalletBalance: async (total: number): Promise<WalletCheckResponse> => {
-        const response = await api.post(API_ENDPOINTS.ORDERS.WALLET_CHECK, { total });
+    checkWalletBalance: async (data: { total: number, customer_id: string | number, role: string }): Promise<WalletCheckResponse> => {
+        const response = await api.post(data.role === 'customer' ? API_ENDPOINTS.ORDERS.WALLET_CHECK : API_ENDPOINTS.ORDERS.ADMIN_WALLET_CHECK, { ...data });
         return response.data;
     },
 
@@ -227,6 +232,10 @@ export const ordersService = {
         const response = await api.post(API_ENDPOINTS.ORDERS.AUSPOST_MANIFEST, {
             order_numbers: orderNumbers,
         });
+        return response.data;
+    },
+    addManualTrackingNumbers: async ({ orderNumber, data }: { orderNumber: string, data: any }): Promise<any> => {
+        const response = await api.post(API_ENDPOINTS.ORDERS.ADD_MANUAL_TRACKING_NUMBERS(orderNumber), data);
         return response.data;
     },
 };

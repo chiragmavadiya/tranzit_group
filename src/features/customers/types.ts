@@ -28,6 +28,15 @@ export interface CustomerListResponse {
     meta: Meta;
 }
 
+export interface CourierWeightCharge {
+    courier: string;
+    over_3kg: number;
+    over_5kg: number;
+    over_10kg: number;
+    over_15kg: number;
+    [key: string]: any;
+}
+
 export interface CustomerFormData {
     first_name: string;
     last_name: string;
@@ -56,16 +65,14 @@ export interface CustomerFormData {
     postcode: string;
     country: string;
     direct_freight_active: number;
-    direct_freight_markup_charge: number;
-    direct_freight_pickup_charge: number;
     auspost_active: number;
-    auspost_markup_charge: number;
-    auspost_pickup_charge: number;
+    couriersplease_active: number;
     pallet_active: number;
-    pallet_markup_charge: number;
-    pallet_pickup_charge: number;
     topup_enable: boolean;
     order_prefix: string;
+    additional_high_kg_weight_rate: number;
+    markup_charges?: CourierWeightCharge[];
+    pickup_charges?: CourierWeightCharge[];
 }
 
 export interface CustomerDetails {
@@ -106,29 +113,50 @@ export interface CustomerProfile {
         status: string;
         status_code: string;
         customer: string;
-        gst: number | null;
+        gst: string | number | null;
         business_name: string;
         role: string;
     };
     contacts: {
         contact: string;
         email: string;
+        office_number?: string;
     };
     pickup_address: {
         address: string;
         post_code: string;
         address_info: string;
+        unit_number?: string;
+        street_number?: string;
+        street_name?: string;
+        street_type?: string;
+        suburb?: string;
+        state?: string;
+        postcode?: string;
+        latitude?: number | null;
+        longitude?: number | null;
     };
     billing_address: {
         address: string;
         post_code: string;
         address_info: string;
+        unit_number?: string;
+        street_number?: string;
+        street_name?: string;
+        street_type?: string;
+        suburb?: string;
+        state?: string;
+        postcode?: string;
+        latitude?: number | null;
+        longitude?: number | null;
     };
-    charges_markups: {
+    charges_markups?: {
         aus_post: { title: string; markup: number; pickup: number; };
         direct_freight: { title: string; markup: number; pickup: number; };
         pallet: { title: string; markup: number; pickup: number; };
     };
+    markup_charges?: CourierWeightCharge[];
+    pickup_charges?: CourierWeightCharge[];
     activity_timeline: CustomerProfileActivity[];
 }
 

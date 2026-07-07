@@ -159,9 +159,10 @@ interface CustomModelProps {
   contentClass?: string;
   showFooter?: boolean;
   customFooter?: React.ReactNode;
+  disablePointerDismissal?: boolean;
 }
 
-const CustomModel = ({ open, title, description, onOpenChange, children, onSubmit, onCancel, cancelText = 'Cancel', submitText = 'Submit', isLoading = false, contentClass = "", showFooter = true, customFooter }: CustomModelProps) => {
+const CustomModel = ({ open, title, description, onOpenChange, children, onSubmit, onCancel, cancelText = 'Cancel', submitText = 'Submit', isLoading = false, contentClass = "", showFooter = true, customFooter, disablePointerDismissal = false }: CustomModelProps) => {
   const handleCancel = () => {
     if (onCancel) {
       onCancel()
@@ -169,12 +170,15 @@ const CustomModel = ({ open, title, description, onOpenChange, children, onSubmi
     onOpenChange(false)
   }
   return (
-    <Dialog open={open} onOpenChange={onOpenChange} modal={false}>
+    <Dialog open={open} onOpenChange={onOpenChange} modal={false} disablePointerDismissal={disablePointerDismissal}>
       <DialogContent
-        className={contentClass || "min-w-xl"}
+        className={cn(
+          "flex flex-col max-h-[85vh] md:max-h-[90vh] overflow-hidden gap-0",
+          contentClass || "min-w-xl"
+        )}
         tabIndex={undefined}
       >
-        <DialogHeader className="border-b pb-2 border-gray-200 dark:border-zinc-800 gap-0">
+        <DialogHeader className="border-b pb-3 border-gray-200 dark:border-zinc-800 gap-0 mb-3">
           <DialogTitle className="my-0 mb-0 text-2xl font-bold text-slate-900 dark:text-zinc-100">
             {title}
           </DialogTitle>
@@ -184,12 +188,12 @@ const CustomModel = ({ open, title, description, onOpenChange, children, onSubmi
             </DialogDescription>
           )}
         </DialogHeader>
-        <div className="-mx-4 no-scrollbar max-h-[65vh] overflow-y-auto px-4" autoFocus={false}>
+        <div className="-mx-4 no-scrollbar flex-1 overflow-y-auto px-4 mb-3" autoFocus={false}>
           {children}
         </div>
         {
           showFooter && (
-            <DialogFooter className="gap-3 flex sm:justify-between p-4 border-t border-gray-300 dark:border-zinc-800 bg-gray-50/50 dark:bg-zinc-900/50">
+            <DialogFooter className="gap-3 flex flex-col sm:flex-row sm:justify-between p-4 border-t border-gray-300 dark:border-zinc-800 bg-gray-50/50 dark:bg-zinc-900/50 mt-auto">
               <div className="flex items-center gap-2">
                 {customFooter}
               </div>

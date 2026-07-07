@@ -49,6 +49,7 @@ export interface FormSelectProps extends Omit<FormInputProps, 'value' | 'onChang
   allowClear?: boolean;
   searchdisable?: boolean;
   multiple?: boolean;
+  optionClassName?: string;
 }
 
 export interface SummaryCardProps {

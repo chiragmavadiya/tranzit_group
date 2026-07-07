@@ -11,8 +11,15 @@ import {
   RefreshCw,
   Mail,
   Bell,
-  CircleDollarSign
+  CircleDollarSign,
+  ChevronDown
 } from 'lucide-react'
+import {
+  DropdownMenu,
+  DropdownMenuTrigger,
+  DropdownMenuContent,
+  DropdownMenuItem
+} from '@/components/ui/dropdown-menu'
 import { useAppSelector } from '@/hooks/store.hooks'
 import {
   useAdminInvoiceDetails,
@@ -31,7 +38,44 @@ import { AddPaymentDialog } from '../components/AddPaymentDialog'
 import { ConformationModal } from '@/components/common/ConformationModal'
 import { showToast } from '@/components/ui/custom-toast'
 import type { InvoiceDocumentData } from '../types'
+const parseApiDate = (dateStr: any): string => {
+  if (!dateStr) return new Date().toISOString().split('T')[0];
 
+  const str = String(dateStr).trim();
+
+  // If it's already yyyy-MM-dd
+  if (/^\d{4}-\d{2}-\d{2}$/.test(str)) {
+    return str;
+  }
+
+  // If it's dd/MM/yy or dd/MM/yyyy or dd-MM-yy or dd-MM-yyyy
+  const ddMMyyRegex = /^(\d{1,2})[/-](\d{1,2})[/-](\d{2,4})$/;
+  const match = str.match(ddMMyyRegex);
+  if (match) {
+    const day = match[1].padStart(2, '0');
+    const month = match[2].padStart(2, '0');
+    let year = match[3];
+    if (year.length === 2) {
+      year = `20${year}`;
+    }
+    return `${year}-${month}-${day}`;
+  }
+
+  // ISO string or other parseable date string
+  try {
+    const d = new Date(str);
+    if (!isNaN(d.getTime())) {
+      const year = d.getFullYear();
+      const month = String(d.getMonth() + 1).padStart(2, '0');
+      const day = String(d.getDate()).padStart(2, '0');
+      return `${year}-${month}-${day}`;
+    }
+  } catch {
+    // fallback
+  }
+
+  return new Date().toISOString().split('T')[0];
+};
 
 const InvoiceDocumentView: React.FC = () => {
   const { invoiceID } = useParams<{ invoiceID: string }>()
@@ -94,6 +138,7 @@ const InvoiceDocumentView: React.FC = () => {
   const { data: customerDetails, isLoading: customerIsLoading } = useCustomerInvoiceDetails(Number(invoiceID!), invoiceID !== 'create' && !isAdmin)
   const details = useMemo(() => isAdmin ? adminDetails : customerDetails, [customerDetails, isAdmin, adminDetails]);
   const isLoading = isAdmin ? adminIsLoading : customerIsLoading;
+  const isPaid = details?.data?.status === 'Paid';
   // const invoiceData = details?.data
 
   // Mutations
@@ -168,6 +213,7 @@ const InvoiceDocumentView: React.FC = () => {
       setInvoiceData({
         ...data,
         items: itemsData,
+        issue_date: parseApiDate(data.issue_date),
         status: data.status?.toLowerCase(),
         customer: data.customer || {
           id: data.customer_id,
@@ -272,7 +318,7 @@ const InvoiceDocumentView: React.FC = () => {
         description: item.description,
         total: Number(item.total || item.total_charge_credit || 0),
         order_number: item.order_number,
-        item_date: item.date || item.item_date,
+        item_date: parseApiDate(item.date || item.item_date),
         from: item.from,
         destination: item.destination,
         to: item.to,
@@ -316,17 +362,127 @@ const InvoiceDocumentView: React.FC = () => {
 
   if (isLoading) {
     return (
-      <div className="p-12 space-y-8 animate-pulse bg-slate-50/50 dark:bg-zinc-950 min-h-screen">
-        <div className="max-w-[1240px] mx-auto grid grid-cols-1 lg:grid-cols-12 gap-8">
-          <div className="lg:col-span-8 space-y-8">
-            <Skeleton className="h-12 w-48" />
-            <Skeleton className="h-[900px] w-full rounded-2xl" />
+      <div className="flex flex-col min-h-screen bg-slate-50 dark:bg-black/40 print:hidden">
+        {/* Top Bar Skeleton */}
+        <div className="w-full bg-white dark:bg-zinc-900 border-b border-slate-200 dark:border-zinc-800 px-6 py-4 flex items-center justify-between">
+          <div className="flex items-center gap-4">
+            <Skeleton className="h-8 w-20" />
+            <div className="h-6 w-px bg-slate-200 dark:bg-zinc-800" />
+            <Skeleton className="h-6 w-24" />
           </div>
-          <div className="lg:col-span-4 space-y-6">
-            <Skeleton className="h-48 w-full rounded-2xl" />
-            <Skeleton className="h-48 w-full rounded-2xl" />
+          <div className="flex items-center gap-2">
+            <Skeleton className="h-8 w-28" />
+            <Skeleton className="h-8 w-28" />
+            <Skeleton className="h-8 w-28" />
+            <Skeleton className="h-8 w-20" />
           </div>
         </div>
+
+        {/* Main Paper Skeleton */}
+        <main className="flex-grow p-page-padding flex justify-center overflow-y-auto">
+          <div className="w-full bg-white dark:bg-zinc-950 border border-slate-200 dark:border-zinc-800 shadow-xl p-8 lg:p-12 space-y-8">
+            {/* Header row */}
+            <div className="flex flex-wrap justify-between items-start gap-6 border-b border-slate-100 dark:border-zinc-800 pb-8">
+              <div className="space-y-3">
+                {/* Logo block */}
+                <Skeleton className="h-10 w-32" />
+                {/* Customer details block */}
+                <div className="space-y-2 pt-4">
+                  <Skeleton className="h-4 w-40" />
+                  <Skeleton className="h-3 w-48" />
+                  <Skeleton className="h-3 w-32" />
+                  <Skeleton className="h-3 w-44" />
+                </div>
+              </div>
+              <div className="space-y-3 text-right flex flex-col items-end">
+                {/* Company details */}
+                <Skeleton className="h-5 w-48" />
+                <Skeleton className="h-3.5 w-60" />
+                <Skeleton className="h-3.5 w-40" />
+                {/* Invoice meta */}
+                <div className="space-y-2 pt-6 flex flex-col items-end">
+                  <Skeleton className="h-4 w-32" />
+                  <Skeleton className="h-4 w-40" />
+                </div>
+              </div>
+            </div>
+
+            {/* Quick info ribbon */}
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 p-4 border border-slate-200 dark:border-zinc-800 rounded-xl bg-slate-50/50 dark:bg-zinc-900/30">
+              <div className="space-y-2">
+                <Skeleton className="h-3 w-20" />
+                <Skeleton className="h-8 w-28 border border-slate-200 dark:border-zinc-800" />
+              </div>
+              <div className="space-y-2">
+                <Skeleton className="h-3 w-16" />
+                <Skeleton className="h-8 w-28 border border-slate-200 dark:border-zinc-800" />
+              </div>
+              <div className="space-y-2">
+                <Skeleton className="h-3 w-24" />
+                <Skeleton className="h-6 w-16" />
+              </div>
+              <div className="space-y-2">
+                <Skeleton className="h-3 w-24" />
+                <Skeleton className="h-6 w-16" />
+              </div>
+            </div>
+
+            {/* Items Table */}
+            <div className="space-y-4 pt-4">
+              <Skeleton className="h-4 w-12" />
+              <div className="border border-slate-200 dark:border-zinc-800 rounded-lg overflow-hidden">
+                <div className="h-10 bg-slate-50 dark:bg-zinc-900/50 border-b border-slate-200 dark:border-zinc-800 flex items-center px-4 justify-between">
+                  <Skeleton className="h-3.5 w-16" />
+                  <Skeleton className="h-3.5 w-12" />
+                  <Skeleton className="h-3.5 w-48" />
+                  <Skeleton className="h-3.5 w-24" />
+                  <Skeleton className="h-3.5 w-20" />
+                </div>
+                <div className="divide-y divide-slate-200 dark:divide-zinc-800">
+                  {[1, 2, 3].map((i) => (
+                    <div key={i} className="h-12 flex items-center px-4 justify-between">
+                      <Skeleton className="h-3 w-12" />
+                      <Skeleton className="h-3 w-16" />
+                      <Skeleton className="h-3 w-40" />
+                      <Skeleton className="h-3 w-20" />
+                      <Skeleton className="h-3 w-16" />
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+
+            {/* Bottom Grid */}
+            <div className="grid grid-cols-1 md:grid-cols-12 gap-8 pt-6">
+              <div className="md:col-span-7 space-y-6 p-6 border border-slate-200 dark:border-zinc-800 rounded-xl bg-slate-50/30 dark:bg-zinc-900/10">
+                <div className="space-y-2">
+                  <Skeleton className="h-4.5 w-28" />
+                  <Skeleton className="h-3 w-48" />
+                  <Skeleton className="h-3 w-32" />
+                </div>
+                <div className="space-y-2 pt-2">
+                  <Skeleton className="h-4 w-36" />
+                  <Skeleton className="h-2.5 w-full" />
+                  <Skeleton className="h-2.5 w-5/6" />
+                </div>
+              </div>
+              <div className="md:col-span-5 p-6 border border-slate-200 dark:border-zinc-800 rounded-xl space-y-4 bg-slate-50/30 dark:bg-zinc-900/10">
+                <div className="flex justify-between">
+                  <Skeleton className="h-3.5 w-24" />
+                  <Skeleton className="h-3.5 w-16" />
+                </div>
+                <div className="flex justify-between">
+                  <Skeleton className="h-3.5 w-16" />
+                  <Skeleton className="h-3.5 w-12" />
+                </div>
+                <div className="flex justify-between font-bold border-t border-slate-200 dark:border-zinc-800 pt-3">
+                  <Skeleton className="h-4 w-28" />
+                  <Skeleton className="h-4 w-20" />
+                </div>
+              </div>
+            </div>
+          </div>
+        </main>
       </div>
     )
   }
@@ -359,54 +515,115 @@ const InvoiceDocumentView: React.FC = () => {
         </div>
 
         <div className="flex items-center gap-2">
-          {isAdmin && (
+          {isAdmin && !isPaid && (
             <>
               {invoiceID !== 'create' && (
                 <>
-                  <Button
-                    variant="outline"
-                    onClick={() => {
-                      setEditingPayment(null)
-                      setIsPaymentDialogOpen(true)
-                    }}
-                    className="h-8 flex items-center gap-2 border-slate-200 dark:border-zinc-800 font-bold text-emerald-600 hover:text-emerald-700 hover:bg-emerald-50 shadow-sm"
-                  >
-                    <CircleDollarSign className="h-4 w-4" />
-                    Add Payment
-                  </Button>
+                  {/* Desktop view (xl and up): show all inline */}
+                  <div className="hidden xl:flex items-center gap-2">
+                    <Button
+                      variant="outline"
+                      onClick={() => {
+                        setEditingPayment(null)
+                        setIsPaymentDialogOpen(true)
+                      }}
+                      className="h-8 flex items-center gap-2 border-slate-200 dark:border-zinc-800 font-bold text-emerald-600 hover:text-emerald-700 hover:bg-emerald-50 shadow-sm"
+                    >
+                      <CircleDollarSign className="h-4 w-4" />
+                      Add Payment
+                    </Button>
 
-                  <Button
-                    variant="outline"
-                    onClick={handleRemind}
-                    disabled={remindMutation.isPending}
-                    className="h-8 flex items-center gap-2 border-slate-200 dark:border-zinc-800 font-bold text-amber-600 hover:text-amber-700 hover:bg-amber-50 shadow-sm"
-                  >
-                    {remindMutation.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Bell className="h-4 w-4" />}
-                    Send Remainder
-                  </Button>
+                    <Button
+                      variant="outline"
+                      onClick={handleRemind}
+                      disabled={remindMutation.isPending}
+                      className="h-8 flex items-center gap-2 border-slate-200 dark:border-zinc-800 font-bold text-amber-600 hover:text-amber-700 hover:bg-amber-50 shadow-sm"
+                    >
+                      {remindMutation.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Bell className="h-4 w-4" />}
+                      Send Reminder
+                    </Button>
 
-                  <Button
-                    variant="outline"
-                    onClick={handleZohoSync}
-                    disabled={zohoSyncMutation.isPending}
-                    className="h-8 flex items-center gap-2 border-slate-200 dark:border-zinc-800 font-bold text-purple-600 hover:text-purple-700 hover:bg-purple-50 shadow-sm"
-                  >
-                    {zohoSyncMutation.isPending ? <RefreshCw className="h-4 w-4 animate-spin" /> : <RefreshCw className="h-4 w-4" />}
-                    Send to Zoho
-                  </Button>
-                  <Button
-                    variant="outline"
-                    onClick={() => {
-                      if (validateInvoice()) {
-                        setIsSendConfirmOpen(true)
-                      }
-                    }}
-                    disabled={sendMutation.isPending}
-                    className="h-8 flex items-center gap-2 border-slate-200 dark:border-zinc-800 font-bold text-primary hover:text-primary-hover hover:bg-primary/5 shadow-sm"
-                  >
-                    {sendMutation.isPending ? <RefreshCw className="h-4 w-4 animate-spin" /> : <Mail className="h-4 w-4" />}
-                    Save & Send
-                  </Button>
+                    <Button
+                      variant="outline"
+                      onClick={handleZohoSync}
+                      disabled={zohoSyncMutation.isPending}
+                      className="h-8 flex items-center gap-2 border-slate-200 dark:border-zinc-800 font-bold text-purple-600 hover:text-purple-700 hover:bg-purple-50 shadow-sm"
+                    >
+                      {zohoSyncMutation.isPending ? <RefreshCw className="h-4 w-4 animate-spin" /> : <RefreshCw className="h-4 w-4" />}
+                      Send to Zoho
+                    </Button>
+                    <Button
+                      variant="outline"
+                      onClick={() => {
+                        if (validateInvoice()) {
+                          setIsSendConfirmOpen(true)
+                        }
+                      }}
+                      disabled={sendMutation.isPending}
+                      className="h-8 flex items-center gap-2 border-slate-200 dark:border-zinc-800 font-bold text-primary hover:text-primary-hover hover:bg-primary/5 shadow-sm"
+                    >
+                      {sendMutation.isPending ? <RefreshCw className="h-4 w-4 animate-spin" /> : <Mail className="h-4 w-4" />}
+                      Save & Send
+                    </Button>
+                  </div>
+
+                  {/* Tablet/Mobile view (below xl): show in dropdown */}
+                  <div className="flex xl:hidden">
+                    <DropdownMenu>
+                      <DropdownMenuTrigger>
+                        <Button
+                          variant="outline"
+                          className="h-8 flex items-center gap-1.5 border-slate-200 dark:border-zinc-800 font-bold text-slate-700 dark:text-zinc-300 shadow-sm cursor-pointer"
+                        >
+                          Actions
+                          <ChevronDown className="h-4 w-4 opacity-70" />
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="end" className="w-48 bg-white dark:bg-zinc-950 border border-slate-200 dark:border-zinc-800 rounded-lg p-1 shadow-md z-50">
+                        <DropdownMenuItem
+                          onClick={() => {
+                            setEditingPayment(null)
+                            setIsPaymentDialogOpen(true)
+                          }}
+                          className="flex items-center gap-2 px-3 py-2 text-sm text-emerald-600 dark:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-950/20 rounded-md cursor-pointer font-medium"
+                        >
+                          <CircleDollarSign className="h-4 w-4" />
+                          Add Payment
+                        </DropdownMenuItem>
+
+                        <DropdownMenuItem
+                          onClick={handleRemind}
+                          disabled={remindMutation.isPending}
+                          className="flex items-center gap-2 px-3 py-2 text-sm text-amber-600 dark:text-amber-400 hover:bg-amber-50 dark:hover:bg-amber-950/20 rounded-md cursor-pointer font-medium disabled:opacity-50"
+                        >
+                          {remindMutation.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Bell className="h-4 w-4" />}
+                          Send Reminder
+                        </DropdownMenuItem>
+
+                        <DropdownMenuItem
+                          onClick={handleZohoSync}
+                          disabled={zohoSyncMutation.isPending}
+                          className="flex items-center gap-2 px-3 py-2 text-sm text-purple-600 dark:text-purple-400 hover:bg-purple-50 dark:hover:bg-purple-950/20 rounded-md cursor-pointer font-medium disabled:opacity-50"
+                        >
+                          {zohoSyncMutation.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <RefreshCw className="h-4 w-4" />}
+                          Send to Zoho
+                        </DropdownMenuItem>
+
+                        <DropdownMenuItem
+                          onClick={() => {
+                            if (validateInvoice()) {
+                              setIsSendConfirmOpen(true)
+                            }
+                          }}
+                          disabled={sendMutation.isPending}
+                          className="flex items-center gap-2 px-3 py-2 text-sm text-primary dark:text-primary hover:bg-primary/5 rounded-md cursor-pointer font-medium disabled:opacity-50"
+                        >
+                          {sendMutation.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Mail className="h-4 w-4" />}
+                          Save & Send
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+                  </div>
                 </>
               )}
               <Button
@@ -440,7 +657,7 @@ const InvoiceDocumentView: React.FC = () => {
           <div className="flex justify-center print:block">
             <InvoicePaper
               invoice={invoiceData}
-              isAdmin={isAdmin}
+              isAdmin={isAdmin && !isPaid}
               onUpdateDate={handleUpdateDate}
               setInvoiceData={setInvoiceData}
               invoiceId={invoiceID!}

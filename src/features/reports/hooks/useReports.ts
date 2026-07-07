@@ -3,6 +3,7 @@ import { reportsService } from "../services/reports.service";
 import { QUERY_KEYS } from "@/constants/api.constants";
 import type { ReportFilters } from "../types";
 import { showToast } from "@/components/ui/custom-toast";
+import { downloadFile } from "@/lib/utils";
 
 export const useShipmentReport = (filters: ReportFilters, enabled: boolean = true) => {
   return useQuery({
@@ -161,11 +162,33 @@ export const useUploadAusPostInvoice = () => {
   });
 };
 
-export const useReportCounts = (enabled: boolean = true) => {
+export const useReportCounts = (filters?: ReportFilters, enabled: boolean = true) => {
   return useQuery({
-    queryKey: QUERY_KEYS.REPORTS.COUNTS,
-    queryFn: () => reportsService.getReportCounts(),
+    queryKey: filters ? [...QUERY_KEYS.REPORTS.COUNTS, filters] : QUERY_KEYS.REPORTS.COUNTS,
+    queryFn: () => reportsService.getReportCounts(filters),
     enabled,
+  });
+};
+
+export const useAuspostReport = (filters: ReportFilters, enabled: boolean = true) => {
+  return useQuery({
+    queryKey: [...QUERY_KEYS.REPORTS.AUSPOST_REPORT, filters],
+    queryFn: () => reportsService.getAuspostReport(filters),
+    placeholderData: keepPreviousData,
+    enabled,
+  });
+};
+
+export const useExportAuspostReport = () => {
+  return useMutation({
+    mutationFn: (filters: ReportFilters & { format: string }) =>
+      reportsService.exportAuspostReport(filters),
+    onSuccess: ({ blob, filename }) => {
+      downloadFile(blob, filename)
+    },
+    onError: (error: any) => {
+      showToast(error?.response?.data?.message || "Failed to export AusPost report", "error");
+    },
   });
 };
 

@@ -16,6 +16,7 @@ export interface ShipmentReport {
   receiver_suburb: string;
   status: string;
   created_at: string;
+  product_id: string;
 }
 
 export interface TransactionReport {
@@ -52,6 +53,7 @@ export interface ParcelReport {
   tranzit_group_markup?: number;
   total: number;
   create_date: string;
+  product_id: string;
 }
 
 export interface ReportTab {
@@ -81,6 +83,7 @@ export interface PaginatedResponse<T> {
     total_markup: number;
     total_pickup: number;
     total_surcharge: number;
+    total_amount_paid?: number;
 
   }
   meta: {

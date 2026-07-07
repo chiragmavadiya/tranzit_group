@@ -3,6 +3,15 @@ import { customerService } from "../services/customer.service";
 import { QUERY_KEYS } from "@/constants/api.constants";
 import type { CustomerFormData } from "../types";
 
+export const useCustomerMe = (id: number | string | undefined) => {
+    return useQuery({
+        queryKey: QUERY_KEYS.ADMIN_CUSTOMERS.ME(id!),
+        queryFn: () => customerService.getMe(id!),
+        enabled: !!id,
+        staleTime: 5 * 60 * 1000,
+    });
+};
+
 export const useCustomers = (params?: Record<string, any>, enabled: boolean = true) => {
     return useQuery({
         queryKey: [...QUERY_KEYS.ADMIN_CUSTOMERS.LIST, params],
@@ -96,8 +105,8 @@ export const useUpdateCustomer = () => {
             queryClient.invalidateQueries({ queryKey: QUERY_KEYS.ADMIN_CUSTOMERS.LIST });
             queryClient.invalidateQueries({ queryKey: QUERY_KEYS.ADMIN_CUSTOMERS.COUNTS });
             queryClient.invalidateQueries({ queryKey: ["admin", "customers", "edit", variables.id] });
-            queryClient.invalidateQueries({ queryKey: QUERY_KEYS.ADMIN_CUSTOMERS.DETAILS(variables.id) });
-            queryClient.invalidateQueries({ queryKey: QUERY_KEYS.ADMIN_CUSTOMERS.PROFILE(variables.id) });
+            queryClient.invalidateQueries({ queryKey: QUERY_KEYS.ADMIN_CUSTOMERS.DETAILS(variables.id?.toString()) });
+            queryClient.invalidateQueries({ queryKey: QUERY_KEYS.ADMIN_CUSTOMERS.PROFILE(variables.id?.toString()) });
         },
     });
 };
@@ -120,8 +129,8 @@ export const useVerifyCustomer = () => {
     return useMutation({
         mutationFn: (id: number | string) => customerService.verify(id),
         onSuccess: (_, id) => {
-            queryClient.invalidateQueries({ queryKey: QUERY_KEYS.ADMIN_CUSTOMERS.DETAILS(id) });
-            queryClient.invalidateQueries({ queryKey: QUERY_KEYS.ADMIN_CUSTOMERS.PROFILE(id) });
+            queryClient.invalidateQueries({ queryKey: QUERY_KEYS.ADMIN_CUSTOMERS.DETAILS(id.toString()) });
+            queryClient.invalidateQueries({ queryKey: QUERY_KEYS.ADMIN_CUSTOMERS.PROFILE(id.toString()) });
         },
     });
 };
@@ -184,11 +193,18 @@ export const useCreateCustomerTransaction = () => {
     return useMutation({
         mutationFn: ({ id, data }: { id: number | string; data: any }) => customerService.addTransaction(id, data),
         onSuccess: (_, variables) => {
-            queryClient.invalidateQueries({ queryKey: QUERY_KEYS.ADMIN_CUSTOMERS.TRANSACTION(variables.id) });
-            queryClient.invalidateQueries({ queryKey: QUERY_KEYS.ADMIN_CUSTOMERS.DETAILS(variables.id) });
-            queryClient.invalidateQueries({ queryKey: QUERY_KEYS.ADMIN_CUSTOMERS.PROFILE(variables.id) });
+            queryClient.invalidateQueries({ queryKey: QUERY_KEYS.ADMIN_CUSTOMERS.TRANSACTION(variables.id?.toString()) });
+            queryClient.invalidateQueries({ queryKey: QUERY_KEYS.ADMIN_CUSTOMERS.DETAILS(variables.id?.toString()) });
+            queryClient.invalidateQueries({ queryKey: QUERY_KEYS.ADMIN_CUSTOMERS.PROFILE(variables.id?.toString()) });
             queryClient.invalidateQueries({ queryKey: ["admin", "topups"] });
         },
+    });
+};
+
+export const useChangeCustomerPassword = () => {
+    return useMutation({
+        mutationFn: ({ id, data }: { id: number | string; data: { new_password: string; new_password_confirmation: string } }) =>
+            customerService.changePassword(id, data),
     });
 };
 

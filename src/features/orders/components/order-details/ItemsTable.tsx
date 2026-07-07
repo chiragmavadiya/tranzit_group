@@ -88,11 +88,11 @@ export const ItemsTable: React.FC<ItemsTableProps> = React.memo(({
 
       {/* ORDER ITEMS */}
       <AccordionItem value="summary" className="border border-gray-200 dark:border-zinc-800 rounded-md bg-white dark:bg-zinc-950 shadow-xs border-b overflow-hidden transition-colors duration-300 [&>h3]:my-0">
-        <AccordionTrigger className="hover:no-underline py-3 px-4 [&>svg]:text-primary items-center bg-slate-50 dark:bg-zinc-900 rounded-none">
+        <AccordionTrigger className="hover:no-underline py-3 px-4 [&>svg]:text-primary items-center bg-slate-50 dark:bg-zinc-900 rounded-none cursor-pointer">
           <div className="flex items-center w-full justify-between ">
             <div className="flex items-center gap-2 text-gray-600 dark:text-zinc-300">
               <Box className="w-5 h-5 text-primary" />
-              <h3 className="my-0 text-base font-bold uppercase text-slate-800 dark:text-zinc-400 ">Parcel Details {items.length > 0 && ` (${items.length})`}
+              <h3 className="my-0 text-base font-bold text-slate-800 dark:text-zinc-400 ">Parcel Details {items.length > 0 && ` (${items.length})`}
 
                 {items.length > 0 && (
                   <span className="inline-flex group-aria-expanded/accordion-trigger:hidden normal-case font-medium text-xs  dark:text-zinc-500 ml-2 pt-0.5 leading-relaxed">
@@ -189,130 +189,116 @@ export const ItemsTable: React.FC<ItemsTableProps> = React.memo(({
                           </div>
                         </div>
                       ) : (
-                        <div className={`flex items-end gap-3 pb-4 ${idx !== items.length - 1 ? 'border-b border-gray-100 dark:border-zinc-800' : ''}`}>
-                          {/* Type Selection */}
-                          <div className="flex flex-col gap-1 w-[180px] shrink-0">
-                            <Label className="text-[12px] font-medium text-gray-600 dark:text-zinc-400">Packing Type</Label>
-                            {/* <SelectComponent
-                              value={item.type || 'box'}
-                              onValueChange={(val) => onUpdateItem?.(idx, 'type', val!)}
-                              data={[
-                                { label: 'Parcel', value: 'box' },
-                                { label: 'My Items', value: 'my_item' }
-                              ]}
-                              placeholder="Select Type"
-                              className="h-8 text-sm font-medium"
-                            /> */}
-                            <FormSelect
-                              // label='Type'
-                              options={[
-                                { label: 'Parcel', value: 'box' },
-                                { label: 'Pallet', value: 'pallet' },
-                                { label: 'My Items', value: 'my_item' }
-                              ]}
-                              value={item.type || 'box'}
-                              onValueChange={(val) => onUpdateItem?.(idx, 'type', val!)}
-                              allowClear={false}
-                              className="h-8 text-sm font-medium"
-                              placeholder="Select Type"
-                              searchdisable
-                            />
-                          </div>
-
-                          {/* Quantity */}
-                          <div className="flex flex-col gap-1 w-[80px] shrink-0">
-                            <Label className="text-[12px] font-medium text-gray-600 dark:text-zinc-400">Quantity</Label>
-                            <Input
-                              type="number"
-                              value={item.quantity || ''}
-                              onChange={(e) => onUpdateItem?.(idx, 'quantity', Number(e.target.value) || 0)}
-                              className="h-8 text-sm font-medium"
-                              min="1"
-                              placeholder='Quantity'
-                            />
-                          </div>
-
-                          {/* Conditional Fields based on Type */}
-                          {item.type === 'my_item' ? (
-                            <div className="flex flex-col gap-1 flex-1">
-                              <Label className="text-[12px] font-medium text-gray-600 dark:text-zinc-400">Select Item</Label>
-                              {/* <SelectComponent
-                                value={item.item_id?.toString() || ''}
-                                onValueChange={(val) => handlePredefinedItemSelect(idx, val!)}
-                                data={predefinedItemsOptions}
-                                placeholder="Select a predefined item"
-                                className="h-8 text-sm font-medium"
-                              /> */}
+                        <div className={`flex flex-col gap-3 sm:flex-row sm:items-end pb-4 ${idx !== items.length - 1 ? 'border-b border-gray-100 dark:border-zinc-800' : ''}`}>
+                          {/* Packing Type and Quantity */}
+                          <div className="flex gap-2 w-full sm:w-auto shrink-0">
+                            {/* Type Selection */}
+                            <div className="flex flex-col gap-1 flex-1 sm:w-[120px] sm:flex-initial">
+                              <Label className="text-[12px] font-medium text-gray-600 dark:text-zinc-400">Packing Type</Label>
                               <FormSelect
-                                // label='Type'
-                                options={predefinedItemsOptions}
-                                value={item.item_id?.toString() || ''}
-                                onValueChange={(val) => handlePredefinedItemSelect(idx, val!)}
+                                options={[
+                                  { label: 'Parcel', value: 'box' },
+                                  { label: 'Pallet', value: 'pallet' },
+                                  { label: 'My Items', value: 'my_item' }
+                                ]}
+                                value={item.type || 'box'}
+                                onValueChange={(val) => onUpdateItem?.(idx, 'type', val!)}
                                 allowClear={false}
                                 className="h-8 text-sm font-medium"
-                                placeholder="Select a predefined item"
+                                placeholder="Select Type"
+                                searchdisable
                               />
                             </div>
-                          ) : (
-                            <>
-                              <div className="flex flex-col gap-1 flex-1">
-                                <Label className="text-[12px] font-medium text-gray-600 dark:text-zinc-400">Weight (kg)</Label>
-                                <Input
-                                  type="number"
-                                  value={item.weight || ''}
-                                  onChange={(e) => onUpdateItem?.(idx, 'weight', Number(e.target.value) || 0)}
-                                  className="h-8 text-sm font-medium"
-                                  min="0"
-                                  step="0.01"
-                                  placeholder='kg'
-                                />
-                              </div>
-                              <div className="flex flex-col gap-1 flex-1">
-                                <Label className="text-[12px] font-medium text-gray-600 dark:text-zinc-400">Length (cm)</Label>
-                                <Input
-                                  type="number"
-                                  value={item.length || ''}
-                                  onChange={(e) => onUpdateItem?.(idx, 'length', Number(e.target.value) || 0)}
-                                  className="h-8 text-sm font-medium"
-                                  min="0"
-                                  placeholder='cm'
-                                />
-                              </div>
-                              <div className="flex flex-col gap-1 flex-1">
-                                <Label className="text-[12px] font-medium text-gray-600 dark:text-zinc-400">Width (cm)</Label>
-                                <Input
-                                  type="number"
-                                  value={item.width || ''}
-                                  onChange={(e) => onUpdateItem?.(idx, 'width', Number(e.target.value) || 0)}
-                                  className="h-8 text-sm font-medium"
-                                  min="0"
-                                  placeholder='cm'
-                                />
-                              </div>
-                              <div className="flex flex-col gap-1 flex-1">
-                                <Label className="text-[12px] font-medium text-gray-600 dark:text-zinc-400">Height (cm)</Label>
-                                <Input
-                                  type="number"
-                                  value={item.height || ''}
-                                  onChange={(e) => onUpdateItem?.(idx, 'height', Number(e.target.value) || 0)}
-                                  className="h-8 text-sm font-medium"
-                                  min="0"
-                                  placeholder='cm'
-                                />
-                              </div>
-                            </>
-                          )}
 
-                          {/* Delete Button */}
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            className="h-8 w-10 shrink-0 bg-red-50 hover:bg-red-100 text-red-500 dark:bg-red-950/30 dark:hover:bg-red-900/50 rounded-md"
-                            onClick={() => removeItem?.(idx)}
-                            disabled={items?.length === 1}
-                          >
-                            <Trash2 className="h-4 w-4" />
-                          </Button>
+                            {/* Quantity */}
+                            <div className="flex flex-col gap-1 w-[80px]">
+                              <Label className="text-[12px] font-medium text-gray-600 dark:text-zinc-400">Quantity</Label>
+                              <Input
+                                type="number"
+                                value={item.quantity || ''}
+                                onChange={(e) => onUpdateItem?.(idx, 'quantity', Number(e.target.value) || 0)}
+                                className="h-8 text-sm font-medium"
+                                min="1"
+                                placeholder='Quantity'
+                              />
+                            </div>
+                          </div>
+
+                          {/* Dimensions & Item select */}
+                          <div className="flex items-end gap-2 w-full sm:flex-1">
+                            {item.type === 'my_item' ? (
+                              <div className="flex flex-col gap-1 flex-1">
+                                <Label className="text-[12px] font-medium text-gray-600 dark:text-zinc-400">Select Item</Label>
+                                <FormSelect
+                                  options={predefinedItemsOptions}
+                                  value={item.item_id?.toString() || ''}
+                                  onValueChange={(val) => handlePredefinedItemSelect(idx, val!)}
+                                  allowClear={false}
+                                  className="h-8 text-sm font-medium"
+                                  placeholder="Select a predefined item"
+                                />
+                              </div>
+                            ) : (
+                              <div className="grid grid-cols-4 gap-2 flex-1 sm:flex sm:gap-3">
+                                <div className="flex flex-col gap-1">
+                                  <Label className="text-[12px] font-medium text-gray-600 dark:text-zinc-400 whitespace-nowrap overflow-hidden text-ellipsis">Weight</Label>
+                                  <Input
+                                    type="number"
+                                    value={item.weight || ''}
+                                    onChange={(e) => onUpdateItem?.(idx, 'weight', Number(e.target.value) || 0)}
+                                    className="h-8 text-sm font-medium px-2"
+                                    min="0"
+                                    step="0.01"
+                                    placeholder='kg'
+                                  />
+                                </div>
+                                <div className="flex flex-col gap-1">
+                                  <Label className="text-[12px] font-medium text-gray-600 dark:text-zinc-400 whitespace-nowrap overflow-hidden text-ellipsis">Length</Label>
+                                  <Input
+                                    type="number"
+                                    value={item.length || ''}
+                                    onChange={(e) => onUpdateItem?.(idx, 'length', Number(e.target.value) || 0)}
+                                    className="h-8 text-sm font-medium px-2"
+                                    min="0"
+                                    placeholder='cm'
+                                  />
+                                </div>
+                                <div className="flex flex-col gap-1">
+                                  <Label className="text-[12px] font-medium text-gray-600 dark:text-zinc-400 whitespace-nowrap overflow-hidden text-ellipsis">Width</Label>
+                                  <Input
+                                    type="number"
+                                    value={item.width || ''}
+                                    onChange={(e) => onUpdateItem?.(idx, 'width', Number(e.target.value) || 0)}
+                                    className="h-8 text-sm font-medium px-2"
+                                    min="0"
+                                    placeholder='cm'
+                                  />
+                                </div>
+                                <div className="flex flex-col gap-1">
+                                  <Label className="text-[12px] font-medium text-gray-600 dark:text-zinc-400 whitespace-nowrap overflow-hidden text-ellipsis">Height</Label>
+                                  <Input
+                                    type="number"
+                                    value={item.height || ''}
+                                    onChange={(e) => onUpdateItem?.(idx, 'height', Number(e.target.value) || 0)}
+                                    className="h-8 text-sm font-medium px-2"
+                                    min="0"
+                                    placeholder='cm'
+                                  />
+                                </div>
+                              </div>
+                            )}
+
+                            {/* Delete Button */}
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              className="h-8 w-10 shrink-0 bg-red-50 hover:bg-red-100 text-red-500 dark:bg-red-950/30 dark:hover:bg-red-900/50 rounded-md"
+                              onClick={() => removeItem?.(idx)}
+                              disabled={items?.length === 1}
+                            >
+                              <Trash2 className="h-4 w-4" />
+                            </Button>
+                          </div>
                         </div>
                       )}
                     </React.Fragment>

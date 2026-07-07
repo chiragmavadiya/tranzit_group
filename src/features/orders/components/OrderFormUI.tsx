@@ -67,7 +67,7 @@ export const FormInput = memo(React.forwardRef<HTMLInputElement, FormInputProps>
 
   return (
     <div className={cn(
-      isHorizontal ? "grid grid-cols-[160px_1fr] items-center gap-4" : "space-y-0",
+      isHorizontal ? "grid grid-cols-1 md:grid-cols-[160px_1fr] items-start md:items-center gap-1 md:gap-4" : "space-y-0",
       isFullWidth ? "col-span-12" : isHalf ? "col-span-12 md:col-span-6" : isCompact ? "col-span-6 md:col-span-3" : "col-span-12 md:col-span-6",
       className
     )}>
@@ -146,7 +146,7 @@ export function FormTextarea({
 
   return (
     <div className={cn(
-      isHorizontal ? "grid grid-cols-[160px_1fr] items-start gap-4" : "space-y-2",
+      isHorizontal ? "grid grid-cols-1 md:grid-cols-[160px_1fr] items-start gap-1 md:gap-4" : "space-y-2",
       isFullWidth ? "col-span-12" : "col-span-12 md:col-span-6"
     )}>
       {/* <Label className={cn(
@@ -206,14 +206,15 @@ export const FormSelect = memo(({
   selectClassName,
   allowClear = true,
   searchdisable = false,
-  multiple = false
+  multiple = false,
+  optionClassName
 }: FormSelectProps) => {
   const isHorizontal = useMemo(() => layout === 'horizontal', [layout]);
   const memoizedData = useMemo(() => [...options], [options]);
 
   return (
     <div className={cn(
-      isHorizontal ? "grid grid-cols-[160px_1fr] items-center gap-4" : "space-y-1",
+      isHorizontal ? "grid grid-cols-1 md:grid-cols-[160px_1fr] items-start md:items-center gap-1 md:gap-4" : "space-y-1",
       isHalf ? "col-span-12 md:col-span-6" : isCompact ? "col-span-6 md:col-span-3" : "col-span-12 md:col-span-6",
       className
     )}>
@@ -240,8 +241,9 @@ export const FormSelect = memo(({
           name={name}
           disabled={disabled}
           allowClear={allowClear}
-          searchdisable={searchdisable}
+          searchdisable={(memoizedData.length < 6 || searchdisable)}
           multiple={multiple}
+          optionClassName={optionClassName}
         />
         {/* <SelectSearch options={memoizedData} /> */}
         {error ? <div className="text-red-500 text-[11px] w-full">{errormsg}</div> : null}

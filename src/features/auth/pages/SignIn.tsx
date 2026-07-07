@@ -14,11 +14,13 @@ import { setCredentials } from "@/features/auth/authSlice";
 import { useEffect, useState } from "react";
 import { Spinner } from "@/components/ui/spinner";
 import { showToast } from "@/components/ui/custom-toast";
+import { useLoginRedirectHandler } from "@/features/shopifyLink/Loginredirechandler";
 
 export default function SignIn({ role = "customer" }: { role?: string }) {
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
   const loginMutation = useLogin(role);
+  const { redirectAfterLogin } = useLoginRedirectHandler(showToast);
   const [submited, setSubmited] = useState(false);
   const [data, setData] = useState<LoginRequest>({
     email: '',
@@ -49,6 +51,13 @@ export default function SignIn({ role = "customer" }: { role?: string }) {
             next_step: response.next_step,
             team_access: response.team_access,
           }));
+
+          showToast(response?.message || "Logged in successfully", "success");
+
+          if (redirectAfterLogin()) {
+            return;
+          }
+
           if (response.next_step === 'onboarding') {
             navigate("/on-board" + '/' + response.user.id + '/' + response.token);
             return;

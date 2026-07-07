@@ -113,23 +113,52 @@ export const OrderHeader = ({ data }: { data: OrderDetailData }) => {
                                             >
                                                 {copiedTracking ? <Check className="h-3 w-3 text-emerald-500" /> : <Copy className="h-3 w-3 text-primary/80" />}
                                             </Button>
-                                            <Button variant="ghost" size="icon" className="h-6 w-6 rounded-md hover:bg-primary/20">
-                                                <ExternalLink className="h-3 w-3 text-primary/80" />
-                                            </Button>
+                                            {data.courier_details?.tracking_url && (
+                                                <Button
+                                                    variant="ghost"
+                                                    size="icon"
+                                                    className="h-6 w-6 rounded-md hover:bg-primary/20"
+                                                    onClick={() => window.open(data.courier_details.tracking_url!, '_blank')}
+                                                >
+                                                    <ExternalLink className="h-3 w-3 text-primary/80" />
+                                                </Button>
+                                            )}
                                         </div>
                                     </div>
                                     <p className="mt-1 font-mono text-base font-bold text-primary">
                                         {data.courier_details.tracking_number}
                                     </p>
                                 </div>
-                                <div className="min-w-[240px] rounded-2xl border border-slate-200 bg-slate-50 p-4 transition-all hover:bg-slate-100/80">
-                                    <p className="text-[11px] font-bold uppercase tracking-wide text-slate-500">
-                                        Customer Reference
-                                    </p>
-                                    <p className="mt-1 text-base font-bold text-slate-900">
-                                        {data.courier_details.customer_reference}
-                                    </p>
-                                </div>
+                                {(data.courier_details?.customer_reference || data.customer_reference) && (
+                                    <div className="min-w-[240px] rounded-2xl border border-slate-200 bg-slate-50 p-4 transition-all hover:bg-slate-100/80">
+                                        <p className="text-[11px] font-bold uppercase tracking-wide text-slate-500">
+                                            Customer Reference
+                                        </p>
+                                        <p className="mt-1 text-base font-bold text-slate-900">
+                                            {data.courier_details.customer_reference || data.customer_reference}
+                                        </p>
+                                    </div>
+                                )}
+                                {(data.courier_details?.external_reference || data.external_reference) && (
+                                    <div className="min-w-[240px] rounded-2xl border border-slate-200 bg-slate-50 p-4 transition-all hover:bg-slate-100/80">
+                                        <p className="text-[11px] font-bold uppercase tracking-wide text-slate-500">
+                                            External Reference
+                                        </p>
+                                        <p className="mt-1 text-base font-bold text-slate-900">
+                                            {data.courier_details.external_reference || data.external_reference}
+                                        </p>
+                                    </div>
+                                )}
+                                {(data.courier_details?.external_order_id || data.external_order_id) && (
+                                    <div className="min-w-[240px] rounded-2xl border border-slate-200 bg-slate-50 p-4 transition-all hover:bg-slate-100/80">
+                                        <p className="text-[11px] font-bold uppercase tracking-wide text-slate-500">
+                                            External Order ID
+                                        </p>
+                                        <p className="mt-1 text-base font-bold text-slate-900">
+                                            {data.courier_details.external_order_id || data.external_order_id}
+                                        </p>
+                                    </div>
+                                )}
                             </div>
                         </div>
 

@@ -3,7 +3,7 @@ import { invoicesService } from '../services/invoices.service';
 import { QUERY_KEYS } from '@/constants/api.constants';
 import { showToast } from '@/components/ui/custom-toast';
 
-export const useCustomerInvoices = (params?: { search?: string; page?: number; per_page?: number; }, enabled: boolean = true) => {
+export const useCustomerInvoices = (params?: { search?: string; page?: number; per_page?: number; date_from?: string; date_to?: string }, enabled: boolean = true) => {
   return useQuery({
     queryKey: [...QUERY_KEYS.INVOICES.LIST, params],
     queryFn: () => invoicesService.getCustomerInvoices(params),
@@ -22,7 +22,7 @@ export const useCustomerInvoiceDetails = (id: number, enabled: boolean = true) =
 
 export const useExportCustomerInvoices = () => {
   return useMutation({
-    mutationFn: (params: { format: string; search?: string }) =>
+    mutationFn: (params: { format: string; search?: string; date_from?: string; date_to?: string }) =>
       invoicesService.exportCustomerInvoices(params),
     onSuccess: ({ blob, filename }) => {
       const url = window.URL.createObjectURL(blob);
@@ -78,7 +78,7 @@ export const useCreateCustomerInvoice = () => {
   });
 };
 
-export const useAdminInvoices = (params?: { search?: string; page?: number; per_page?: number; customer?: string }, enabled: boolean = true) => {
+export const useAdminInvoices = (params?: { search?: string; page?: number; per_page?: number; customer?: string; date_from?: string; date_to?: string }, enabled: boolean = true) => {
   return useQuery({
     queryKey: ['admin', 'invoices', 'list', params],
     queryFn: () => invoicesService.getAdminInvoices(params),
@@ -241,7 +241,7 @@ export const useAdminInvoicePayment = () => {
 
 export const useExportAdminInvoices = () => {
   return useMutation({
-    mutationFn: (params: { format: string; customer?: string; search?: string }) => invoicesService.exportAdminInvoices(params),
+    mutationFn: (params: { format: string; customer?: string; search?: string; date_from?: string; date_to?: string }) => invoicesService.exportAdminInvoices(params),
     onSuccess: ({ blob, filename }) => {
       const url = window.URL.createObjectURL(blob);
       const link = document.createElement("a");

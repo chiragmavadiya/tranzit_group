@@ -13,19 +13,15 @@ import { Button } from '@/components/ui/button';
 import {
   Download, Plus, Loader2,
   Zap,
-  // ChevronDown,
-  // Package
+  ChevronDown,
 } from 'lucide-react';
-// import { DropdownCustomMenu } from '@/components/ui/dropdown-menu';
 import { useAppSelector } from '@/hooks/store.hooks';
 import { showToast } from '@/components/ui/custom-toast';
-// import { ImportOrdersDialog } from '../components/ImportOrdersDialog';
 import { ConformationModal } from '@/components/common/ConformationModal';
-// import CreateOrderDialog from '../components/CreateOrderDialog';
 import { useDebounce } from '@/hooks/useDebounce';
 import { FormSelect } from '../components/OrderFormUI';
 import { useCustomers } from '@/features/customers/hooks/useCustomers';
-// import UpdateCourierModal from '../components/UpdateCourierModal';
+import { DropdownCustomMenu } from '@/components/ui/dropdown-menu';
 
 const ImportOrdersDialog = lazy(() => import('@/features/orders/components/ImportOrdersDialog'));
 const CreateOrderDialog = lazy(() => import('@/features/orders/components/CreateOrderDialog'));
@@ -48,7 +44,7 @@ export default function OrdersPage({ fromCustomer, customerId }: { fromCustomer?
 
   const parseLocalDate = useCallback((dateStr?: string | null) => {
     if (!dateStr) return undefined;
-    const parts = dateStr.split('-');
+    const parts = dateStr.includes('/') ? dateStr.split('/') : dateStr.split('-');
     if (parts.length === 3) {
       const day = parseInt(parts[0], 10);
       const month = parseInt(parts[1], 10) - 1; // 0-based
@@ -135,36 +131,40 @@ export default function OrdersPage({ fromCustomer, customerId }: { fromCustomer?
 
   const [walletCheckOpen, setWalletCheckOpen] = useState(false);
   const [walletCheckData, setWalletCheckData] = useState<any>(null);
-  const [orderToPrint, setOrderToPrint] = useState<{ orderNumber: string | number; amount: number } | null>(null);
+  const [orderToPrint, setOrderToPrint] = useState<{ orderNumber: string | number; amount: number; canConsign: boolean } | null>(null);
+  const [showItemCountModal, setShowItemCountModal] = useState(false);
+  const [pendingPrintArgs, setPendingPrintArgs] = useState<{ orderNumber: string | number; amount: number; row: Order } | null>(null);
 
   const { mutate: checkWallet, isPending: walletLoading } = useWalletCheck();
   const { mutate: printLabel } = useDownloadLabel(true);
 
-  const executePrint = useCallback((orderNumber: string | number) => {
+  const executePrint = useCallback((orderNumber: string | number, canConsign: boolean = true) => {
     printOrderMutation.mutate(orderNumber, {
       onSuccess: () => {
         setWalletCheckOpen(false);
-        printLabel(orderNumber);
+        if (canConsign) {
+          printLabel(orderNumber);
+        }
         setOrderToPrint(null);
       },
       onError: (err: any) => {
         if (err?.response?.data?.need_edit) {
-          navigate(`/orders/consign/${orderNumber}?require_phone=true`)
+          navigate(`/orders/consign/${orderNumber}`)
         }
         setOrderToPrint(null);
       }
     });
   }, [printOrderMutation, printLabel, navigate]);
 
-  const handlePrintClick = useCallback((orderNumber: string | number, amount: number, row: Order) => {
-    setOrderToPrint({ orderNumber, amount });
+  const proceedPrint = useCallback((orderNumber: string | number, amount: number, row: Order) => {
+    setOrderToPrint({ orderNumber, amount, canConsign: row.can_consign });
 
-    if (role === 'admin' || row.is_own_courier) {
-      executePrint(orderNumber);
+    if (row.is_own_courier) {
+      executePrint(orderNumber, row.can_consign);
       return;
     }
 
-    checkWallet(amount, {
+    checkWallet({ total: amount, customer_id: row.customer_id || '', role }, {
       onSuccess: (res) => {
         if (res.ok) {
           setWalletCheckData(res);
@@ -180,6 +180,16 @@ export default function OrdersPage({ fromCustomer, customerId }: { fromCustomer?
       }
     });
   }, [role, checkWallet, executePrint]);
+
+  const handlePrintClick = useCallback((orderNumber: string | number, amount: number, row: Order) => {
+    if (row.can_consign === false) {
+      setPendingPrintArgs({ orderNumber, amount, row });
+      setShowItemCountModal(true);
+      return;
+    }
+
+    proceedPrint(orderNumber, amount, row);
+  }, [proceedPrint]);
 
 
   // Reset page when tab changes
@@ -300,10 +310,11 @@ export default function OrdersPage({ fromCustomer, customerId }: { fromCustomer?
     let failCount = 0;
     for (const orderId of selectedRows) {
       try {
-        if (activeTab === 'new') {
+        const order = ordersData?.data.find((order) => order.order_number === orderId);
+        if (order?.is_own_courier || activeTab === 'new') {
           await archiveOrderMutation.mutateAsync(orderId);
         } else {
-          await cancelOrderMutation.mutateAsync({ orderId, data: { manual: false } });
+          await cancelOrderMutation.mutateAsync({ orderId, data: { manually: false } });
 
         }
         successCount++;
@@ -320,7 +331,7 @@ export default function OrdersPage({ fromCustomer, customerId }: { fromCustomer?
     setSelectedRows([]);
     setShowCancelModal(false);
     setIsCancellingOrders(false);
-  }, [selectedRows, cancelOrderMutation, archiveOrderMutation, activeTab]);
+  }, [selectedRows, ordersData, activeTab, archiveOrderMutation, cancelOrderMutation]);
 
   const handleCustomerEdit = useCallback((id: string) => {
     setAddressEditModal(id);
@@ -394,28 +405,30 @@ export default function OrdersPage({ fromCustomer, customerId }: { fromCustomer?
 
       <div className='rounded-lg shadow-sm flex-1 flex flex-col min-h-0 border border-gray-100 dark:border-zinc-800 bg-white dark:bg-zinc-950 '>
         {!fromCustomer && (
-          <div className="flex flex-wrap items-end justify-end gap-4 p-4 pb-0 print:hidden">
+          <div className="flex flex-col md:flex-row md:items-end md:justify-end gap-4 p-4 pb-0 print:hidden w-full">
             {isAdmin && (
-              <FormSelect
-                label="Customer"
-                placeholder="Select Customer"
-                value={selectedCustomer || ''}
-                onValueChange={(val) => {
-                  const selectedCustomer = customersData?.data?.find((c: any) => c.id.toString() === val);
-                  if (selectedCustomer) {
-                    setSelectedCustomer(selectedCustomer.id.toString());
-                  } else {
-                    setSelectedCustomer(undefined);
-                  }
-                }}
-                options={customersData?.data?.map((c: any) => ({
-                  value: c.id.toString(),
-                  label: `${c.first_name} ${c.last_name} (${c.email})`
-                })) || []}
-              />
+              <div className="w-full md:w-64">
+                <FormSelect
+                  label="Customer"
+                  placeholder="Select Customer"
+                  value={selectedCustomer || ''}
+                  onValueChange={(val) => {
+                    const selectedCustomer = customersData?.data?.find((c: any) => c.id.toString() === val);
+                    if (selectedCustomer) {
+                      setSelectedCustomer(selectedCustomer.id.toString());
+                    } else {
+                      setSelectedCustomer(undefined);
+                    }
+                  }}
+                  options={customersData?.data?.map((c: any) => ({
+                    value: c.id.toString(),
+                    label: `${c.first_name} ${c.last_name} (${c.email})`
+                  })) || []}
+                />
+              </div>
             )}
             {selectedRows.length > 0 && (
-              <div className="flex items-center gap-2 mr-2 border-r border-gray-200 dark:border-zinc-800 pr-4">
+              <div className="flex items-center gap-2 mr-0 md:mr-2 border-b md:border-b-0 md:border-r border-gray-200 dark:border-zinc-800 pb-2 md:pb-0 pr-0 md:pr-4 w-full md:w-auto">
                 <span className="text-xs text-slate-500 dark:text-zinc-400 font-medium mr-2 whitespace-nowrap">
                   {selectedRows.length} Selected
                 </span>
@@ -455,38 +468,41 @@ export default function OrdersPage({ fromCustomer, customerId }: { fromCustomer?
                 )}
               </div>
             )}
-            <DatePicker
-              label="Start Date"
-              date={dateRange[0]}
-              setDate={(value) => handleDateRangeChange(value, 'start')}
-            />
+            <div className="grid grid-cols-2 gap-3 w-full md:w-auto md:flex md:items-end md:gap-4">
+              <DatePicker
+                label="Start Date"
+                date={dateRange[0]}
+                setDate={(value) => handleDateRangeChange(value, 'start')}
+              />
 
-            <DatePicker
-              label="End Date"
-              date={dateRange[1]}
-              setDate={(value) => handleDateRangeChange(value, 'end')}
-            />
+              <DatePicker
+                label="End Date"
+                date={dateRange[1]}
+                setDate={(value) => handleDateRangeChange(value, 'end')}
+              />
+            </div>
 
-            <Button
-              onClick={handleApplyFilters}
-              variant="default"
-              size="sm"
-              className="h-8 p-3"
-            >
-              Apply
-            </Button>
-
-
-            {appliedDateRange[0] || appliedDateRange[1] ? (
+            <div className="flex items-center gap-2 w-full md:w-auto justify-end">
               <Button
-                onClick={handleClearFilters}
-                variant="ghost"
+                onClick={handleApplyFilters}
+                variant="default"
                 size="sm"
-                className="h-8 p-3 text-red-500 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/10"
+                className="h-8 px-4 flex-1 md:flex-none"
               >
-                Clear
+                Apply
               </Button>
-            ) : null}
+
+              {appliedDateRange[0] || appliedDateRange[1] ? (
+                <Button
+                  onClick={handleClearFilters}
+                  variant="ghost"
+                  size="sm"
+                  className="h-8 px-4 text-red-500 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/10 flex-1 md:flex-none"
+                >
+                  Clear
+                </Button>
+              ) : null}
+            </div>
           </div>
         )}
 
@@ -509,55 +525,54 @@ export default function OrdersPage({ fromCustomer, customerId }: { fromCustomer?
           onPageChange={setPage}
           onExport={handleExport}
           isExporting={exportOrders.isPending}
-          selectable={!fromCustomer && activeTab !== 'archived'}
+          selectable={!isAdmin && activeTab !== 'archived'}
           selectedRows={selectedRows}
           onSelectionChange={setSelectedRows}
           exportable={!fromCustomer && canReadWrite}
           customHeader={!fromCustomer && canReadWrite ? (() => (
-            <div className="flex items-center justify-between gap-2">
-
-              <Button
-                variant="outline"
-                className="gap-2 border-gray-200 dark:border-zinc-800 hover:bg-gray-50 dark:hover:bg-zinc-800 font-medium text-slate-700 dark:text-zinc-300 transition-colors"
-                onClick={() => setIsImportDialogOpen(true)}
-                disabled={importOrders.isPending}
-              >
-                {importOrders.isPending ? <Loader2 className="w-4 h-4 animate-spin" /> : <Download className="w-4 h-4" />}
-                <span>{importOrders.isPending ? 'Importing...' : 'Import'}</span>
-              </Button>
-              {/* <DropdownCustomMenu
-                menus={[
-                  {
-                    label: "Create an order",
-                    onClick: () => navigate(`${role === 'admin' ? '/admin' : ''}/orders/create`),
-                    className: 'font-medium',
-                    icon: Plus,
-                  },
-                  {
-                    label: "Create a Return Order",
-                    onClick: () => navigate(`${role === 'admin' ? '/admin' : ''}/orders/return`),
-                    className: 'font-medium',
-                    icon: Package,
-                  }
-                ]}
-              > */}
-              <Button
-                className="gap-2 bg-primary hover:bg-primary-hover text-white shadow-lg shadow-primary/20 dark:shadow-none transition-all active:scale-[0.98] font-semibold border-none px-4"
-                onClick={() => navigate(`${role === 'admin' ? '/admin' : ''}/orders/create`)}
-              >
-                <Plus className="w-4 h-4" />
-                <span>Create Order</span>
-                {/* <ChevronDown className="w-4 h-4 ml-1 opacity-70" /> */}
-              </Button>
-              {/* </DropdownCustomMenu> */}
-              {/* DO NOT REMOVE THIS BUTTON */}
-              {/* <Button
-                onClick={() => navigate(`${role === 'admin' ? '/admin' : ''}/orders/create`)}
-                className="gap-2 bg-primary hover:bg-primary-hover text-white shadow-lg shadow-primary/20 dark:shadow-none transition-all active:scale-[0.98] font-semibold border-none px-4"
-              >
-                <Plus className="w-4 h-4" />
-                <span>Create Order</span>
-              </Button> */}
+            <div className="flex items-center justify-between gap-2 w-full md:w-auto">
+              {!isAdmin && (
+                <Button
+                  variant="outline"
+                  className="h-8 flex-1 md:flex-none gap-2 border-gray-200 dark:border-zinc-800 hover:bg-gray-50 dark:hover:bg-zinc-800 font-medium text-slate-700 dark:text-zinc-300 transition-colors"
+                  onClick={() => setIsImportDialogOpen(true)}
+                  disabled={importOrders.isPending}
+                >
+                  {importOrders.isPending ? <Loader2 className="w-4 h-4 animate-spin" /> : <Download className="w-4 h-4" />}
+                  <span>{importOrders.isPending ? 'Importing...' : 'Import'}</span>
+                </Button>
+              )}
+              {isAdmin ? (
+                <DropdownCustomMenu
+                  menus={[
+                    {
+                      label: "Create an order",
+                      onClick: () => navigate(`${role === 'admin' ? '/admin' : ''}/orders/create`),
+                      className: 'font-medium',
+                    },
+                    {
+                      label: "Create a Manual Order",
+                      onClick: () => navigate(`${role === 'admin' ? '/admin' : ''}/orders/create-menual`),
+                      className: 'font-medium',
+                    }
+                  ]}
+                >
+                  <Button
+                    className="h-8 flex-1 md:flex-none w-full md:w-auto gap-2 bg-primary hover:bg-primary-hover text-white shadow-lg shadow-primary/20 dark:shadow-none transition-all active:scale-[0.98] font-semibold border-none px-4"
+                  >
+                    <span>Create Order</span>
+                    <ChevronDown className="w-4 h-4 ml-1 opacity-70" />
+                  </Button>
+                </DropdownCustomMenu>
+              ) : (
+                <Button
+                  className="h-8 flex-1 md:flex-none gap-2 bg-primary hover:bg-primary-hover text-white shadow-lg shadow-primary/20 dark:shadow-none transition-all active:scale-[0.98] font-semibold border-none px-4"
+                  onClick={() => navigate(`${role === 'admin' ? '/admin' : ''}/orders/create`)}
+                >
+                  <Plus className="w-4 h-4" />
+                  <span>Create Order</span>
+                </Button>
+              )}
             </div>
           )) : undefined}
         />
@@ -580,10 +595,10 @@ export default function OrdersPage({ fromCustomer, customerId }: { fromCustomer?
           <ConformationModal
             open={showCancelModal}
             onOpenChange={setShowCancelModal}
-            title="Cancel Selected Orders"
-            description={`Are you sure you want to cancel the ${selectedRows.length} selected order(s)? This action cannot be undone.`}
+            title={`${activeTab === 'new' ? 'Delete' : 'Cancel'} Selected Orders`}
+            description={`Are you sure you want to ${activeTab === 'new' ? 'delete' : 'cancel'} the ${selectedRows.length} selected order(s)? This action cannot be undone.`}
             onConfirm={handleCancelMultipleOrders}
-            confirmText="Yes, Cancel"
+            confirmText={`Yes, ${activeTab === 'new' ? 'Delete' : 'Cancel'}`}
             cancelText="No, Keep"
             confirmVariant="destructive"
             loading={isCancellingOrders}
@@ -602,7 +617,7 @@ export default function OrdersPage({ fromCustomer, customerId }: { fromCustomer?
             onConfirm={async () => {
               setIsCancellingOrders(true);
               try {
-                await cancelOrderMutation.mutateAsync({ orderId: orderToCancel, data: { manual: false } });
+                await cancelOrderMutation.mutateAsync({ orderId: orderToCancel, data: { manually: false } });
                 showToast(
                   activeTab === 'printed' || activeTab === 'shipped'
                     ? `Order ${orderToCancel} archived successfully.`
@@ -678,7 +693,37 @@ export default function OrdersPage({ fromCustomer, customerId }: { fromCustomer?
           walletBalance={walletCheckData.wallet_balance}
           orderTotal={orderToPrint.amount}
           isPending={printOrderMutation.isPending}
-          onConfirm={() => executePrint(orderToPrint.orderNumber)}
+          onConfirm={() => executePrint(orderToPrint.orderNumber, orderToPrint.canConsign)}
+        />
+      )}
+      {showItemCountModal && (
+        <ConformationModal
+          open={showItemCountModal}
+          onOpenChange={(open) => {
+            setShowItemCountModal(open);
+            if (!open) {
+              setPendingPrintArgs(null);
+            }
+          }}
+          title="Shipping Label Not Generated"
+          description={
+            <div className="space-y-4">
+              <p className="text-sm">The shipping label cannot be generated for this order at the moment.</p>
+              <p className="text-sm font-semibold">
+                The shipping label will be created by our support team once the payment has been successfully completed.
+              </p>
+            </div>
+          }
+          onConfirm={() => {
+            setShowItemCountModal(false);
+            if (pendingPrintArgs) {
+              proceedPrint(pendingPrintArgs.orderNumber, pendingPrintArgs.amount, pendingPrintArgs.row);
+              setPendingPrintArgs(null);
+            }
+          }}
+          confirmText="Continue"
+          cancelText="Cancel"
+          className="sm:max-w-[500px]"
         />
       )}
       {/* {showReceiverPhoneModal && (

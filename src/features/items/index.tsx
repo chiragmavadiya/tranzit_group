@@ -37,7 +37,6 @@ export default function MyItemsPage() {
   const { is_sub_user, team_access } = useAppSelector((state) => state.auth);
   const canReadWrite = useMemo(() => !is_sub_user || team_access?.permissions?.my_items === 'full', [is_sub_user, team_access]);
 
-  console.log(team_access?.permissions, is_sub_user)
   const { data: itemsData, isLoading } = useItems({
     search: debouncedSearch,
     per_page: pageSize,

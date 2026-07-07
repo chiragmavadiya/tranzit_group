@@ -26,6 +26,7 @@ export const API_ENDPOINTS = {
         PAYMENT_INFO: (id: string | number) => `/customer/orders/${id}/payment`,
         PAY_WITH_WALLET: (id: string | number) => `/customer/orders/${id}/pay-with-wallet`,
         WALLET_CHECK: "/customer/orders/wallet-check",
+        ADMIN_WALLET_CHECK: "/admin/wallet/check",
         IMPORT: "/orders/import",
         EXPORT: "/orders/export",
         CREATE_OWN_COURIER: "/orders/create-own-courier",
@@ -36,6 +37,8 @@ export const API_ENDPOINTS = {
         PRINT_ORDER: "/orders/print-label",
         UPDATE_COURIER: (orderNumber: string) => `/orders/${orderNumber}/courier`,
         AUSPOST_MANIFEST: "/customer/orders/auspost/manifests",
+        MANUAL_STORE: "/admin/orders/manual-store",
+        ADD_MANUAL_TRACKING_NUMBERS: (orderNumber: string) => `/admin/orders/${orderNumber}/tracking`,
     },
     DASHBOARD: {
         METRICS: "/dashboard/metrics",
@@ -78,6 +81,9 @@ export const API_ENDPOINTS = {
     ENQUIRIES: {
         BASE: "/customer/enquiries",
     },
+    CUSTOMER_BOOK_PICKUP: {
+        BASE: "/customer/book-pickup",
+    },
     HELP_CENTER: {
         LIST: "/customer/help-center",
         DETAILS: (slug: string) => `/customer/help-center/${slug}`,
@@ -100,6 +106,8 @@ export const API_ENDPOINTS = {
         INVOICE_EXPORT: (id: string | number) => `/admin/customers/${id}/invoice/export`,
         INTEGRATIONS: (id: string | number) => `/admin/customers/${id}/integrations`,
         WALLET_TOP_UP: "/admin/wallet/top-up",
+        CHANGE_PASSWORD: (id: string | number) => `/admin/customers/${id}/change-password`,
+        ME: (id: string | number) => `/admin/customers/${id}/me`,
     },
     ADMIN_STAFF: {
         BASE: "/admin/staff",
@@ -129,7 +137,7 @@ export const API_ENDPOINTS = {
         EXPORT: "/admin/quotes/export",
     },
     CUSTOMER_QUOTES: {
-        SERVICES: "/customer/get-quote/services",
+        SERVICES: "/get-quote/services",
         LOCALITIES_SEARCH: "/localities/search",
     },
     ADMIN_COURIER_SURCHARGES: {
@@ -154,6 +162,8 @@ export const API_ENDPOINTS = {
         UNDELIVERED_PARCELS_EXPORT: "/admin/reports/undelivered-parcels/export",
         DIRECT_FREIGHT_UPLOAD: "/admin/reports/customer-parcels/direct-freight-upload",
         AUSPOST_UPLOAD: "/admin/reports/customer-parcels/auspost-upload",
+        AUSPOST: "/admin/reports/auspost",
+        AUSPOST_EXPORT: "/admin/reports/auspost/export",
     },
     ADMIN_HELP_CENTER: {
         BASE: "/admin/help-center/articles",
@@ -166,6 +176,10 @@ export const API_ENDPOINTS = {
     ANNOUNCEMENTS: {
         BASE: "/admin/announcements",
         DETAILS: (id: string | number) => `/admin/announcements/${id}`,
+    },
+    BLACKOUT_DAYS: {
+        BASE: "/admin/blackout-days",
+        DETAILS: (id: string | number) => `/admin/blackout-days/${id}`,
     },
     SEARCH: {
         GLOBAL: "/globalsearch",
@@ -254,6 +268,7 @@ export const QUERY_KEYS = {
         INVOICE: ["reports", "invoice"],
         PARCELS: ["reports", "parcels"],
         AUSPOST_SUMMARY: ["reports", "auspost-summary"],
+        AUSPOST_REPORT: ["reports", "auspost-report"],
         UNDELIVERED_PARCELS: ["reports", "undelivered-parcels"],
         COUNTS: ["reports", "counts"],
     },
@@ -278,6 +293,7 @@ export const QUERY_KEYS = {
         TRANSACTION: (id: string | number) => ["admin", "customers", "transaction", id],
         INVOICE: (id: string | number) => ["admin", "customers", "invoice", id],
         INTEGRATIONS: (id: string | number) => ["admin", "customers", "integrations", id],
+        ME: (id: string | number) => ["admin", "customers", "me", id],
     },
     ADMIN_STAFF: {
         LIST: ["admin", "staff", "list"],
@@ -314,6 +330,10 @@ export const QUERY_KEYS = {
     ANNOUNCEMENTS: {
         LIST: ["admin", "announcements", "list"],
         DETAILS: (id: string | number) => ["admin", "announcements", "details", id],
+    },
+    BLACKOUT_DAYS: {
+        LIST: ["admin", "blackout-days", "list"],
+        DETAILS: (id: string | number) => ["admin", "blackout-days", "details", id],
     },
     SEARCH: {
         GLOBAL: (q: string) => ["search", "global", q],

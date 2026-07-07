@@ -201,7 +201,7 @@ function SelectComponent({ data, defaultValue, placeholder, className, value, on
           <SelectValue placeholder={placeholder} className="data-placeholder:font-normal data-placeholder:text-muted-foreground dark:placeholder:text-zinc-700" />
         </SelectTrigger>
         {allowClear && !disabled && value && <X className="hidden h-3.5 w-3.5 group-hover:block absolute right-[14px] top-[50%] disabled:hidden origin-center translate-y-[-50%] size-4 text-muted-foreground bg-white dark:bg-zinc-900 cursor-pointer" onClick={(e) => { console.log('cliecnk....'); e.preventDefault(); onValueChange?.(''); }} />}
-        <SelectContent alignItemWithTrigger={false} align="start" className="min-w-min dark:bg-zinc-900 dark:border-zinc-800 p-1 rounded-md max-h-[220px] flex flex-col">
+        <SelectContent alignItemWithTrigger={false} align="start" className="min-w-min dark:bg-zinc-900 dark:border-zinc-800 p-1 rounded-md max-h-[220px] border flex flex-col">
           {searchable && (
             <div className="px-1 py-1 pb-1.5 sticky top-0 bg-popover z-10 shrink-0">
               <input

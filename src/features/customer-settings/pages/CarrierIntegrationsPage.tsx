@@ -126,8 +126,8 @@ export default function CarrierIntegrationsPage() {
                   (c) => c.slug === selectedCarrier
                 );
                 return carrierIntegration?.logo_url ? (
-                  <div className="flex items-center h-8 shrink-0">
-                    <img src={carrierIntegration.logo_url} alt={carrierIntegration.name} className="h-6 w-auto object-contain max-w-[120px]" />
+                  <div className="flex items-center h-8 shrink-0 bg-white p-1 rounded-md border border-slate-100 dark:border-zinc-800/80 shadow-xs">
+                    <img src={carrierIntegration.logo_url} alt={carrierIntegration.name} className="h-6 w-auto object-contain max-w-[100px]" />
                   </div>
                 ) : null;
               })()}

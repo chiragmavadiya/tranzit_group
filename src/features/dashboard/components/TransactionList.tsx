@@ -11,7 +11,7 @@ import { CustomTooltip } from "@/components/common/CustomTooltip";
 interface TransactionListProps {
   // metrics: AdminMetrics | CustomerMetrics;
   className?: string;
-  transactions: TransactionMetrics;
+  transactions: TransactionMetrics | any[];
   loading?: boolean;
 }
 
@@ -46,78 +46,90 @@ const TransactionListSkeleton = () => (
 
 export function TransactionList({ transactions, className, loading }: TransactionListProps) {
   const [activePeriod, setActivePeriod] = useState<keyof typeof periodsKey>('last28Days');
-  // The error occurs because CustomerMetrics might not have these properties directly.
-  // We use type assertion to tell TypeScript that we expect these arrays to exist 
-  // on the object we're currently processing.
-  const currentTransactions = (transactions as any)?.[activePeriod.toLowerCase() as keyof typeof transactions] || [];
-  const currentCount = (transactions as any)?.[countKeys[activePeriod]] || currentTransactions.length || 0;
+
+  const isArray = Array.isArray(transactions);
+
+  const currentTransactions = isArray
+    ? (transactions || [])
+    : ((transactions as any)?.[activePeriod.toLowerCase() as keyof typeof transactions] || []);
+
+  const currentCount = isArray
+    ? currentTransactions.length
+    : ((transactions as any)?.[countKeys[activePeriod]] || currentTransactions.length || 0);
+
+  const subtitle = isArray
+    ? "Filtered activity"
+    : `${periodsKey[activePeriod]} activity`;
 
   return (
     <Card className={cn("border p-0 gap-0 ring-0 border-gray-200 dark:border-zinc-800 bg-white dark:bg-zinc-950 flex flex-col transition-colors duration-300", className)}>
-      <CardHeader className="flex flex-row items-center justify-between py-3 px-5 border-b border-gray-100 dark:border-zinc-800 bg-gray-50/50 dark:bg-transparent group-hover:bg-gray-50/50 dark:group-hover:bg-zinc-800/50 transition-colors">
+      <CardHeader className="flex flex-row items-center justify-between py-2 px-5 border-b border-gray-100 dark:border-zinc-800 bg-gray-50/50 dark:bg-transparent group-hover:bg-gray-50/50 dark:group-hover:bg-zinc-800/50 transition-colors">
         <div className="flex flex-col gap-0.5">
           <CardTitle className="text-lg font-bold text-gray-800 dark:text-zinc-100">
             Transactions ({currentCount})
           </CardTitle>
           <p className="text-sm text-gray-500 dark:text-zinc-500 mb-0">
-            {periodsKey[activePeriod]} activity
+            {subtitle}
           </p>
         </div>
 
-        <DropdownCustomMenu
-          menus={[
-            { label: "Last 28 Days", className: activePeriod == "last28Days" ? "bg-primary/10 text-primary font-medium" : "font-medium", onClick: () => { setActivePeriod('last28Days'); } },
-            { label: "Last month", className: activePeriod == "lastMonth" ? "bg-primary/10 text-primary font-medium" : "font-medium", onClick: () => { setActivePeriod('lastMonth'); } },
-            { label: "Last year", className: activePeriod == "lastYear" ? "bg-primary/10 text-primary font-medium" : "font-medium", onClick: () => { setActivePeriod('lastYear'); } },
-          ]}
-        >
-          <button className="text-slate-400 hover:text-primary transition-colors outline-none">
-            <MoreVertical className="w-5 h-5" />
-          </button>
-        </DropdownCustomMenu>
+        {!isArray && (
+          <DropdownCustomMenu
+            menus={[
+              { label: "Last 28 Days", className: activePeriod == "last28Days" ? "bg-primary/10 text-primary font-medium" : "font-medium", onClick: () => { setActivePeriod('last28Days'); } },
+              { label: "Last month", className: activePeriod == "lastMonth" ? "bg-primary/10 text-primary font-medium" : "font-medium", onClick: () => { setActivePeriod('lastMonth'); } },
+              { label: "Last year", className: activePeriod == "lastYear" ? "bg-primary/10 text-primary font-medium" : "font-medium", onClick: () => { setActivePeriod('lastYear'); } },
+            ]}
+          >
+            <button className="text-slate-400 hover:text-primary transition-colors outline-none">
+              <MoreVertical className="w-5 h-5" />
+            </button>
+          </DropdownCustomMenu>
+        )}
       </CardHeader>
       <CardContent className="flex-1 overflow-y-auto custom-scrollbar px-2 py-2">
         <div className="space-y-1">
           {loading && <TransactionListSkeleton />}
-          {!loading && currentTransactions?.map((tx: any) => (
-            <div
-              key={tx.id}
-              className="flex items-center justify-between p-3 rounded-xl hover:bg-gray-50 dark:hover:bg-zinc-900/50 transition-colors group cursor-default gap-3"
-            >
-              <div className="flex items-center gap-3 flex-1 min-w-0">
-                <div className={cn(
-                  "w-10 h-10 rounded-xl flex items-center justify-center transition-transform group-hover:scale-105 shrink-0",
-                  tx.transaction_type === 2 ? "bg-slate-50 dark:bg-zinc-900 text-slate-500" : "bg-primary/10 text-primary"
-                )}>
-                  <Wallet className="w-5 h-5" />
-                </div>
-                <div className="flex flex-col min-w-0 flex-1">
-                  <CustomTooltip title={tx.reason || tx.title} onlyOnOverflow>
-                    <span className="text-sm font-bold text-gray-700 dark:text-zinc-200 leading-tight truncate">
-                      {tx.reason || tx.title}
+          {!loading && currentTransactions?.map((tx: any) => {
+            const amountVal = Number(tx.amount) || 0;
+            return (
+              <div
+                key={tx.id}
+                className="flex items-center justify-between p-3 rounded-xl hover:bg-gray-50 dark:hover:bg-zinc-900/50 transition-colors group cursor-default gap-3"
+              >
+                <div className="flex items-center gap-3 flex-1 min-w-0">
+                  <div className={cn(
+                    "w-10 h-10 rounded-xl flex items-center justify-center transition-transform group-hover:scale-105 shrink-0",
+                    tx.transaction_type === 2 ? "bg-slate-50 dark:bg-zinc-900 text-slate-500" : "bg-primary/10 text-primary"
+                  )}>
+                    <Wallet className="w-5 h-5" />
+                  </div>
+                  <div className="flex flex-col min-w-0 flex-1">
+                    <CustomTooltip title={tx.reason || tx.title} onlyOnOverflow>
+                      <span className="text-sm font-bold text-gray-700 dark:text-zinc-200 leading-tight truncate">
+                        {tx.reason || tx.title}
+                      </span>
+                    </CustomTooltip>
+                    <span className="text-[11px] font-medium text-slate-400 dark:text-zinc-500 flex flex-wrap items-center gap-x-1.5 gap-y-0.5 min-w-0">
+                      {tx.customer_name && (
+                        <>
+                          <span className="text-slate-500 text-[11px] dark:text-zinc-400 font-semibold truncate max-w-[120px]" title={tx.customer_name}>{tx.customer_name}</span>
+                          <span className="text-slate-300 dark:text-zinc-600">•</span>
+                        </>
+                      )}
+                      <span className="shrink-0">{tx.transaction_time || tx.date}</span>
                     </span>
-                  </CustomTooltip>
-                  <span className="text-[11px] font-medium text-slate-400 dark:text-zinc-500 flex flex-wrap items-center gap-x-1.5 gap-y-0.5 min-w-0">
-                    {tx.customer_name && (
-                      <>
-                        <span className="text-slate-500 text-[11px] dark:text-zinc-400 font-semibold truncate max-w-[120px]" title={tx.customer_name}>{tx.customer_name}</span>
-                        <span className="text-slate-300 dark:text-zinc-600">•</span>
-                      </>
-                    )}
-                    {/* <span className="truncate max-w-[90px]">{tx.payment_method || tx.type}</span> */}
-                    {/* <span className="text-slate-300 dark:text-zinc-600">•</span> */}
-                    <span className="shrink-0">{tx.created_at || tx.date}</span>
-                  </span>
+                  </div>
                 </div>
+                <span className={cn(
+                  "text-sm font-bold tabular-nums shrink-0",
+                  tx.transaction_type === 2 ? "text-[#F35555]" : "text-[#10B981]"
+                )}>
+                  {tx.transaction_type === 2 ? '-' : '+'}${Math.abs(amountVal).toFixed(2)}
+                </span>
               </div>
-              <span className={cn(
-                "text-sm font-bold tabular-nums shrink-0",
-                tx.transaction_type === 2 ? "text-[#F35555]" : "text-[#10B981]"
-              )}>
-                {tx.transaction_type === 2 ? '-' : '+'}${Math.abs(tx.amount).toFixed(2)}
-              </span>
-            </div>
-          ))}
+            );
+          })}
           {!loading && (!currentTransactions || currentTransactions.length === 0) && (
             <div className="flex flex-col items-center justify-center py-12 text-center">
               <div className="w-12 h-12 rounded-full bg-slate-50 dark:bg-zinc-900 flex items-center justify-center mb-3">

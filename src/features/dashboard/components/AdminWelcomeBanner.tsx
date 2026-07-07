@@ -1,7 +1,8 @@
 import { cn } from "@/lib/utils";
-import { ShoppingBag, Users, FileText, Tag, Sparkles } from "lucide-react";
-import DatePicker from "@/components/common/DatePicker";
-import { Button } from "@/components/ui/button";
+import { ShoppingBag, Users, FileText, Sparkles } from "lucide-react";
+import { DateFilter } from "@/components/common/DateFilter";
+import type { DateFilterValue } from "@/components/common/DateFilter/types";
+import { NavLink } from "react-router-dom";
 
 interface AdminWelcomeBannerProps {
   userName: string;
@@ -9,15 +10,9 @@ interface AdminWelcomeBannerProps {
   customersCount: number;
   pendingInvoicesCount: number;
   undeliveredOrders: number;
-  periodLabels?: Record<string, string>;
   className?: string;
-  setActivePeriod: (period: string) => void;
-  activePeriod: string;
-  startDate?: Date;
-  setStartDate?: (date: Date | undefined) => void;
-  endDate?: Date;
-  setEndDate?: (date: Date | undefined) => void;
-  onApply?: () => void;
+  filterValue: DateFilterValue;
+  onFilterChange: (value: DateFilterValue) => void;
 }
 
 export function AdminWelcomeBanner({
@@ -25,20 +20,14 @@ export function AdminWelcomeBanner({
   ordersCount,
   customersCount,
   pendingInvoicesCount,
-  undeliveredOrders,
-  periodLabels,
+  // undeliveredOrders,
   className,
-  setActivePeriod,
-  activePeriod,
-  startDate,
-  setStartDate,
-  endDate,
-  setEndDate,
-  onApply
+  filterValue,
+  onFilterChange,
 }: AdminWelcomeBannerProps) {
   return (
     <div className={cn(
-      "relative overflow-hidden bg-white dark:bg-zinc-950 border border-slate-100 dark:border-zinc-800 rounded-3xl p-6 md:p-8 shadow-xl flex flex-col xl:flex-row items-center justify-between gap-6 transition-all duration-300",
+      "relative overflow-hidden bg-white dark:bg-zinc-950 border border-slate-100 dark:border-zinc-800 rounded-lg py-4 px-6 md:py-4 md:px-8 shadow-lg flex flex-col xl:flex-row items-center justify-between gap-6 transition-all duration-300",
       className
     )}>
       {/* Animated Background Elements */}
@@ -62,108 +51,61 @@ export function AdminWelcomeBanner({
       <div className="absolute top-0 right-0 w-80 h-80 bg-primary/5 rounded-full -mr-40 -mt-40 blur-3xl opacity-50 pointer-events-none" />
       <div className="absolute bottom-0 left-0 w-60 h-60 bg-purple-50/50 dark:bg-purple-900/10 rounded-full -ml-30 -mb-30 blur-3xl opacity-50 pointer-events-none" />
 
-      <div className="relative z-10 flex-1 space-y-3 text-center xl:text-left w-full">
-        {/* Eyebrow */}
-        <div className="flex items-center justify-center xl:justify-start gap-2 mb-1">
-          <div className="relative flex h-2 w-2">
-            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-            <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
-          </div>
-          <span className="text-[10px] font-black uppercase tracking-[0.15em] text-slate-400 dark:text-zinc-500">
-            Tranzit Group • Live Dashboard
-          </span>
-        </div>
-
+      <div className="relative z-10 flex-1 text-center xl:text-left w-full">
         {/* Heading */}
-        <h1 className="text-2xl md:text-3xl font-black text-slate-800 dark:text-white tracking-tight leading-tight">
+        <h1 className="my-0 text-xl md:text-2xl font-black text-slate-800 dark:text-white tracking-tight leading-tight">
           Welcome back, <span className="text-transparent pr-1 bg-clip-text bg-linear-to-r from-primary to-primary/80">{userName}</span> 👋
         </h1>
-
-        {/* Subtext */}
-        <p className="text-[15px] mb-3 md:text-[16px] leading-relaxed font-medium text-slate-600 dark:text-zinc-300 animate-in fade-in slide-in-from-bottom-4 duration-1000 max-w-lg mx-auto xl:mx-0">
-          Here's what's happening with your business today. You have <span className="font-bold text-slate-900 dark:text-zinc-200">{ordersCount} orders</span> this month and <span className="font-bold text-amber-600 dark:text-amber-400">{pendingInvoicesCount} pending invoices</span> that need attention.
-        </p>
       </div>
 
       {/* Stats and Period Selector */}
-      <div className="relative z-10 flex flex-col items-center xl:items-end gap-5 w-full xl:w-auto">
-        <div className="flex flex-col items-center gap-3">
-          {/* Period Selector - Top Right */}
-          <div className="flex bg-slate-50 dark:bg-zinc-900/50 p-1 rounded-xl border border-slate-100 dark:border-zinc-800 shadow-sm">
-            {Object.keys(periodLabels || {}).map((key) => (
-              <button
-                key={key}
-                onClick={() => setActivePeriod(key)}
-                className={cn(
-                  "px-4 py-1.5 text-[11px] font-bold rounded-lg transition-all duration-200",
-                  activePeriod === key
-                    ? "text-primary bg-white dark:bg-zinc-800 shadow-sm ring-1 ring-slate-200 dark:ring-zinc-700"
-                    : "text-slate-500 hover:text-slate-700 dark:hover:text-zinc-300"
-                )}
-              >
-                {periodLabels?.[key]}
-              </button>
-            ))}
-          </div>
-          {activePeriod === "all" && (
-            <div className="flex flex-wrap items-center gap-2 animate-in fade-in slide-in-from-right-4 duration-300">
-              <div className="flex items-center gap-1.5">
-                <span className="text-[10px] font-black uppercase tracking-wide text-slate-400 dark:text-zinc-500">From</span>
-                <DatePicker
-                  date={startDate}
-                  setDate={setStartDate || (() => { })}
-                  className="w-[125px] h-8 text-[12px]"
-                />
-              </div>
-              <div className="flex items-center gap-1.5">
-                <span className="text-[10px] font-black uppercase tracking-wide text-slate-400 dark:text-zinc-500">To</span>
-                <DatePicker
-                  date={endDate}
-                  setDate={setEndDate || (() => { })}
-                  className="w-[125px] h-8 text-[12px]"
-                  disabled={{ after: new Date() }}
-                />
-              </div>
-              <Button
-                onClick={onApply}
-                size="sm"
-                className="h-8 px-4 text-xs font-bold bg-primary hover:bg-primary/90 text-white rounded-md shadow-sm transition-all"
-              >
-                Apply
-              </Button>
-            </div>
-          )}
-        </div>
+      <div className="relative z-10 flex flex-col lg:flex-row items-center gap-4 w-full xl:w-auto">
+        <DateFilter
+          value={filterValue}
+          onChange={onFilterChange}
+        />
 
-        {/* Stats Badges - Bottom Row */}
-        <div className="flex flex-wrap justify-center xl:justify-end items-center gap-3 w-full">
-          <div className="group flex items-center gap-2.5 px-4 py-2 rounded-2xl bg-indigo-50/50 dark:bg-indigo-900/10 border border-indigo-100 dark:border-indigo-800/30 text-indigo-700 dark:text-indigo-300 transition-all hover:bg-indigo-50 dark:hover:bg-indigo-900/20 cursor-default shadow-sm hover:shadow-md">
-            <div className="w-8 h-8 rounded-full bg-indigo-600 text-white flex items-center justify-center shadow-md shrink-0 group-hover:scale-110 transition-transform">
-              <ShoppingBag className="w-4 h-4" />
-            </div>
-            <span className="text-[13px] font-bold whitespace-nowrap">{ordersCount} Orders</span>
-          </div>
+        {/* Separator line (visible only on desktop) */}
+        <div className="hidden lg:block h-6 w-px bg-slate-200 dark:bg-zinc-800" />
 
-          <div className="group flex items-center gap-2.5 px-4 py-2 rounded-2xl bg-primary/5 border border-primary/20 text-primary transition-all hover:bg-primary/10 cursor-default shadow-sm hover:shadow-md">
-            <div className="w-8 h-8 rounded-full bg-primary text-white flex items-center justify-center shadow-md shrink-0 group-hover:scale-110 transition-transform">
-              <Users className="w-4 h-4" />
+        {/* Stats Badges */}
+        <div className="flex flex-wrap justify-center items-center gap-2">
+          <NavLink
+            to={`/admin/orders?start_date=${encodeURIComponent(filterValue.from || '')}&end_date=${encodeURIComponent(filterValue.to || '')}`}
+            className="group flex items-center gap-2 px-3 py-1.5 rounded-xl bg-indigo-50/50 dark:bg-indigo-900/10 border border-indigo-100 dark:border-indigo-800/30 text-indigo-700 dark:text-indigo-300 transition-all hover:bg-indigo-50 dark:hover:bg-indigo-900/20 cursor-pointer shadow-sm hover:shadow-md"
+          >
+            <div className="w-5 h-5 rounded-full bg-indigo-600 text-white flex items-center justify-center shadow-md shrink-0 group-hover:scale-110 transition-transform">
+              <ShoppingBag className="w-3.5 h-3.5" />
             </div>
-            <span className="text-[13px] font-bold whitespace-nowrap">{customersCount} Customers</span>
-          </div>
+            <span className="text-xs font-bold whitespace-nowrap">{ordersCount} Orders</span>
+          </NavLink>
 
-          <div className="group flex items-center gap-2.5 px-4 py-2 rounded-2xl bg-amber-50/50 dark:bg-amber-900/10 border border-amber-100 dark:border-amber-800/30 text-amber-700 dark:text-amber-300 transition-all hover:bg-amber-50 dark:hover:bg-amber-900/20 cursor-default shadow-sm hover:shadow-md">
-            <div className="w-8 h-8 rounded-full bg-amber-600 text-white flex items-center justify-center shadow-md shrink-0 group-hover:scale-110 transition-transform">
-              <FileText className="w-4 h-4" />
+          <NavLink
+            to="/admin/customers"
+            className="group flex items-center gap-2 px-3 py-1.5 rounded-xl bg-primary/5 border border-primary/20 text-primary transition-all hover:bg-primary/10 cursor-pointer shadow-sm hover:shadow-md"
+          >
+            <div className="w-5 h-5 rounded-full bg-primary text-white flex items-center justify-center shadow-md shrink-0 group-hover:scale-110 transition-transform">
+              <Users className="w-3.5 h-3.5" />
             </div>
-            <span className="text-[13px] font-bold whitespace-nowrap">{pendingInvoicesCount} Invoices</span>
-          </div>
+            <span className="text-xs font-bold whitespace-nowrap">{customersCount} Customers</span>
+          </NavLink>
 
-          <div className="group flex items-center gap-2.5 px-4 py-2 rounded-2xl bg-rose-50/50 dark:bg-rose-900/10 border border-rose-100 dark:border-rose-800/30 text-rose-700 dark:text-rose-300 transition-all hover:bg-rose-50 dark:hover:bg-rose-900/20 cursor-default shadow-sm hover:shadow-md">
-            <div className="w-8 h-8 rounded-full bg-rose-600 text-white flex items-center justify-center shadow-md shrink-0 group-hover:scale-110 transition-transform">
-              <Tag className="w-4 h-4" />
+          <NavLink
+            to={`/admin/invoices?start_date=${encodeURIComponent(filterValue.from || '')}&end_date=${encodeURIComponent(filterValue.to || '')}`}
+            className="group flex items-center gap-2 px-3 py-1.5 rounded-xl bg-amber-50/50 dark:bg-amber-900/10 border border-amber-100 dark:border-amber-800/30 text-amber-700 dark:text-amber-300 transition-all hover:bg-amber-50 dark:hover:bg-amber-900/20 cursor-pointer shadow-sm hover:shadow-md"
+          >
+            <div className="w-5 h-5 rounded-full bg-amber-600 text-white flex items-center justify-center shadow-md shrink-0 group-hover:scale-110 transition-transform">
+              <FileText className="w-3.5 h-3.5" />
             </div>
-            <span className="text-[13px] font-bold whitespace-nowrap">{undeliveredOrders} Undelivered</span>
-          </div>
+            <span className="text-xs font-bold whitespace-nowrap">{pendingInvoicesCount} Invoices</span>
+          </NavLink>
+
+          {/* <div className="group flex items-center gap-2 px-3 py-1.5 rounded-xl bg-rose-50/50 dark:bg-rose-900/10 border border-rose-100 dark:border-rose-800/30 text-rose-700 dark:text-rose-300 transition-all hover:bg-rose-50 dark:hover:bg-rose-900/20 cursor-default shadow-sm hover:shadow-md">
+            <div className="w-5 h-5 rounded-full bg-rose-600 text-white flex items-center justify-center shadow-md shrink-0 group-hover:scale-110 transition-transform">
+              <Tag className="w-3.5 h-3.5" />
+            </div>
+            <span className="text-xs font-bold whitespace-nowrap">{undeliveredOrders} Undelivered</span>
+          </div> */}
         </div>
       </div>
     </div>

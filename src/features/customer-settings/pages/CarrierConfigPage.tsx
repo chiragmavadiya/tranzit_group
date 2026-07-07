@@ -1,11 +1,11 @@
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useMemo } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { ArrowLeft, Link2Off, Loader2, Check } from 'lucide-react';
 // import { useQueryClient } from '@tanstack/react-query';
 import {
   useConnectIntegration,
   useDisconnectIntegration,
-  useIntegrationStatusMutation,
+  useIntegrationStatus,
   useIntegrationsList,
   useSetDefaultIntegration,
   useRemoveDefaultIntegration
@@ -24,24 +24,22 @@ export default function CarrierConfigPage() {
 
   // const queryClient = useQueryClient();
   const [isLoading, setIsLoading] = useState(false);
-  const [formData, setFormData] = useState<any>({});
-  const [fetchingData, setFetchingData] = useState(true);
 
   const { data: listResponse } = useIntegrationsList();
-  const { mutate: getIntegrationStatus } = useIntegrationStatusMutation();
   const connectMutation = useConnectIntegration();
   const disconnectMutation = useDisconnectIntegration();
   const setDefaultMutation = useSetDefaultIntegration();
   const removeDefaultMutation = useRemoveDefaultIntegration();
 
   const currentSlug = slug || 'auspost';
+  const { data: statusResponse, isLoading: fetchingData } = useIntegrationStatus(currentSlug);
 
   const carrierIntegration = listResponse?.data?.courier_integrations?.find(
     (c) => c.slug === currentSlug
   );
   const logoUrl = carrierIntegration?.logo_url;
   const carrierName = carrierIntegration?.name || currentSlug;
-  const isConnected = formData?.connected ?? carrierIntegration?.connected;
+  const isConnected = statusResponse?.data?.connected ?? carrierIntegration?.connected;
   const isDefault = carrierIntegration?.is_default ?? false;
 
   const handleSetDefault = () => {
@@ -49,40 +47,14 @@ export default function CarrierConfigPage() {
   };
 
   const handleRemoveDefault = () => {
-    removeDefaultMutation.mutate(currentSlug, {
-      onSuccess: () => {
-        getIntegrationStatus(currentSlug, {
-          onSuccess: (response) => {
-            setFormData(response.data || {});
-          }
-        });
-      }
-    });
+    removeDefaultMutation.mutate(currentSlug);
   };
-
-  useEffect(() => {
-    setFetchingData(true);
-    getIntegrationStatus(currentSlug, {
-      onSuccess: (response) => {
-        setFormData(response.data || {});
-        setFetchingData(false);
-      },
-      onError: () => {
-        setFetchingData(false);
-      }
-    });
-  }, [getIntegrationStatus, currentSlug]);
 
   const handleConnect = (data: any) => {
     setIsLoading(true);
     connectMutation.mutate({ provider: currentSlug, data }, {
       onSuccess: () => {
         setIsLoading(false);
-        getIntegrationStatus(currentSlug, {
-          onSuccess: (response) => {
-            setFormData(response.data || {});
-          }
-        });
       },
       onError: () => {
         setIsLoading(false);
@@ -91,17 +63,7 @@ export default function CarrierConfigPage() {
   };
 
   const handleDisconnect = () => {
-    disconnectMutation.mutate(currentSlug, {
-      onSuccess: () => {
-        // queryClient.invalidateQueries({ queryKey: ["integration-status", currentSlug] });
-        getIntegrationStatus(currentSlug, {
-          onSuccess: (response) => {
-            setFormData(response.data || {});
-          }
-        });
-        // navigate('/settings/carriers');
-      }
-    });
+    disconnectMutation.mutate(currentSlug);
   };
 
   return (
@@ -180,8 +142,8 @@ export default function CarrierConfigPage() {
               <div>
                 {logoUrl && (
                   <div className="flex justify-center">
-                    <div className="bg-white dark:bg-zinc-950 p-2 rounded-xl border border-gray-250/60 dark:border-zinc-800 shadow-xs flex items-center justify-center">
-                      <img src={logoUrl} alt={carrierName} className="h-16! w-16! object-contain" />
+                    <div className="bg-white p-2.5 rounded-xl border border-gray-250/60 dark:border-zinc-800 shadow-xs flex items-center justify-center shrink-0">
+                      <img src={logoUrl} alt={carrierName} className="h-16 w-16 object-contain" />
                     </div>
                   </div>
                 )}
@@ -210,7 +172,7 @@ export default function CarrierConfigPage() {
                   )}
                 </div>
                 <p className="my-0 text-sm text-slate-500 dark:text-zinc-400 leading-normal mt-1">
-                  Connect your {carrierName} account to automate label generation, track shipments, and manage eParcel products directly from Tranzit.
+                  Connect your {carrierName} account to automate label generation, track shipments, and manage {currentSlug === 'auspost' ? 'eParcel' : 'shipping'} products directly from Tranzit.
                 </p>
               </div>
             </div>
@@ -225,7 +187,7 @@ export default function CarrierConfigPage() {
         ) : (
           <CarrierConfigForm
             selectedCarrier={currentSlug}
-            initialValues={formData}
+            initialValues={statusResponse?.data || {}}
             onSubmit={handleConnect}
             isLoading={isLoading}
             isConnected={isConnected}

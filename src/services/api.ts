@@ -1,5 +1,6 @@
 import { showToast, suspendToast } from "@/components/ui/custom-toast";
 import axios, { AxiosError, type InternalAxiosRequestConfig } from "axios";
+import * as Sentry from "@sentry/react";
 
 const baseURL = import.meta.env.VITE_API_BASE_URL || import.meta.env.VITE_API_URL || "http://127.0.0.1:8000/api";
 
@@ -39,6 +40,27 @@ api.interceptors.response.use(
         return response;
     },
     (error: AxiosError) => {
+        // Sentry.captureException(error);
+        // Sentry Log
+        if (axios.isAxiosError(error)) {
+            Sentry.withScope((scope) => {
+                scope.setTransactionName(
+                    `${error.config?.method?.toUpperCase()} ${error?.config?.url}`
+                );
+                scope.setContext("API", {
+                    url: error.config?.url,
+                    method: error.config?.method,
+                    status: error.response?.status,
+                    statusText: error.response?.statusText,
+                    response: error.response?.data,
+                    request: error.config?.data,
+                    params: error.config?.params,
+                });
+                Sentry.captureException(error);
+            });
+        } else {
+            Sentry.captureException(error);
+        }
         const data = error.response?.data as any;
         const message = data?.message || error.message || "An error occurred";
         if (data?.next_step === 'verify_email') {
@@ -60,7 +82,7 @@ api.interceptors.response.use(
             message,
             url: error.config?.url,
         });
-        if (error.message === 'Validation failed') {
+        if (error.message === 'Validation failed' || error.message === 'Order is missing required details.') {
             if (data?.errors) {
                 const beErrors = data.errors;
                 const formattedErrors: Record<string, string> = {};

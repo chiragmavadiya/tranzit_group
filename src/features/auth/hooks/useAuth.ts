@@ -146,6 +146,7 @@ export const useGetUserDetails = (enabled: boolean) => {
         queryFn: () => authService.getUserDetails(),
         enabled: !!(enabled && token),
         staleTime: Infinity,
+        refetchOnMount: false,
     });
 };
 

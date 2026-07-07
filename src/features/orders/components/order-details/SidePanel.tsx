@@ -8,11 +8,12 @@ import {
 // import SelectComponent from '@/components/ui/select'
 // import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
-import { Shield, CheckCircle2, ShieldOff } from 'lucide-react'
+import { Shield, CheckCircle2, ShieldOff, Info } from 'lucide-react'
 // import { Switch } from '@/components/ui/switch'
 // import DatePicker from '@/components/common/DatePicker';
 import type { QuoteCalculations } from '@/features/quote/types';
 import { memo, useMemo } from 'react';
+import { Tooltip, TooltipTrigger, TooltipContent } from '@/components/ui/tooltip';
 // import { CustomLabel } from '../OrderFormUI';
 import { cn } from '@/lib/utils';
 import { StatusBadge } from '../StatusBadge';
@@ -22,7 +23,7 @@ interface SidePanelProps {
   quoteData?: any;
   handleOptionalFieldsChange: (type: "insurance" | "signature" | "delivery_instructions", value: boolean | string) => void;
   insuranceSelected: boolean;
-  signatureSelected: boolean;
+  // signatureSelected: boolean;
   deliveryInstructions: string;
   orderType?: string;
   calculation: QuoteCalculations
@@ -34,6 +35,7 @@ interface SidePanelProps {
 
 export const SidePanel: React.FC<SidePanelProps> = memo(({
   calculation,
+  quoteData,
   handleOptionalFieldsChange,
   insuranceSelected,
   deliveryInstructions,
@@ -42,9 +44,34 @@ export const SidePanel: React.FC<SidePanelProps> = memo(({
   liabilityMessage,
   payment_status,
   shipping_activity = [],
-  signatureSelected,
+  // signatureSelected,
 }) => {
   const isCreate = useMemo(() => orderType === 'create' || orderType === 'create-menual' || orderType === 'consign' || orderType === 'return', [orderType]);
+
+  const surchargesList = useMemo(() => {
+    const list: any[] = [];
+    const seen = new Set<string>();
+
+    if (Array.isArray(quoteData?.surcharges)) {
+      quoteData.surcharges.forEach((charge: any) => {
+        if (charge && charge.name && !seen.has(charge.name)) {
+          seen.add(charge.name);
+          list.push(charge);
+        }
+      });
+    }
+
+    if (Array.isArray(quoteData?.courier?.applied_surcharges)) {
+      quoteData.courier.applied_surcharges.forEach((charge: any) => {
+        if (charge && charge.name && !seen.has(charge.name)) {
+          seen.add(charge.name);
+          list.push(charge);
+        }
+      });
+    }
+
+    return list;
+  }, [quoteData]);
 
   const timelineData = useMemo(() => {
     if (!Array.isArray(shipping_activity) || shipping_activity.length === 0) {
@@ -74,7 +101,7 @@ export const SidePanel: React.FC<SidePanelProps> = memo(({
         {/* TRANSIT TIMELINE */}
         {!isCreate && (
           <AccordionItem value="timeline" className="border border-gray-200 dark:border-zinc-800 rounded-xl bg-white dark:bg-zinc-950 shadow-xs px-5 border-b overflow-hidden transition-colors duration-300 [&>h3]:my-0">
-            <AccordionTrigger className="hover:no-underline py-3 px-0 [&>svg]:text-primary">
+            <AccordionTrigger className="hover:no-underline py-3 px-0 [&>svg]:text-primary cursor-pointer">
               <span className="text-base font-bold text-gray-900 dark:text-zinc-100 uppercase">Transit Timeline</span>
             </AccordionTrigger>
             <AccordionContent className="pb-4 pt-1">
@@ -169,7 +196,7 @@ export const SidePanel: React.FC<SidePanelProps> = memo(({
         {/* ORDER QUOTATION SUMMARY */}
         {orderType !== 'create-menual' && (
           <AccordionItem value="summary" className="border border-gray-200 dark:border-zinc-800 rounded-xl bg-white dark:bg-zinc-950 shadow-xs px-5 border-b overflow-hidden transition-colors duration-300 [&>h3]:my-0">
-            <AccordionTrigger className="hover:no-underline py-3 px-0 [&>svg]:text-primary">
+            <AccordionTrigger className="hover:no-underline py-3 px-0 [&>svg]:text-primary cursor-pointer">
               <div className="flex flex-wrap items-center gap-2.5 w-full text-left pr-6">
                 <span className="text-base font-bold text-gray-900 dark:text-zinc-100">
                   Quote Summary
@@ -200,7 +227,32 @@ export const SidePanel: React.FC<SidePanelProps> = memo(({
                 <span className="font-bold text-gray-900 dark:text-zinc-100">${calculation?.servicePrice?.toFixed(2)}</span>
               </div>
               <div className="flex justify-between items-center text-sm">
-                <span className="text-gray-500 dark:text-zinc-400 font-medium">Extra surcharges</span>
+                <div className="flex items-center gap-1.5">
+                  <span className="text-gray-500 dark:text-zinc-400 font-medium">Extra surcharges</span>
+                  {surchargesList.length > 0 && (
+                    // <TooltipProvider delay={100}>
+                    <Tooltip>
+                      <TooltipTrigger className="h-[14px]">
+                        <span className="inline-flex items-center justify-center text-gray-400 hover:text-primary dark:text-zinc-500 dark:hover:text-primary cursor-pointer transition-colors duration-200">
+                          <Info className="h-3.5 w-3.5" />
+                        </span>
+                      </TooltipTrigger>
+                      <TooltipContent side="top" align="center" className="flex flex-col gap-1.5 p-2.5 min-w-[180px] bg-gray-900 dark:bg-zinc-800 text-gray-100 border border-gray-800 dark:border-zinc-700">
+                        <div className="text-[10px] font-bold text-gray-400 dark:text-zinc-400 uppercase tracking-wide pb-1 border-b border-gray-800 dark:border-zinc-700 w-full">
+                          Surcharge Breakdown
+                        </div>
+                        <div className="flex flex-col gap-1 w-full max-h-32 overflow-y-auto no-scrollbar">
+                          {surchargesList.map((charge: any, idx: number) => (
+                            <div key={idx} className="flex justify-between items-center gap-3 text-[12px]">
+                              <span className="text-white font-medium dark:text-zinc-300">- {charge.name}</span>
+                            </div>
+                          ))}
+                        </div>
+                      </TooltipContent>
+                    </Tooltip>
+                    // </TooltipProvider>
+                  )}
+                </div>
                 <span className="font-bold text-gray-900 dark:text-zinc-100">${calculation?.totalSurcharges?.toFixed(2)}</span>
               </div>
               {calculation?.insurance && (
@@ -228,7 +280,7 @@ export const SidePanel: React.FC<SidePanelProps> = memo(({
         {(isCreate) && (
           <>
             <AccordionItem value="services" className="border border-gray-200 dark:border-zinc-800 rounded-xl bg-destructive/10 dark:bg-zinc-950 shadow-xs px-5 border-b overflow-hidden transition-colors duration-300 [&>h3]:my-0">
-              <AccordionTrigger className="hover:no-underline py-3 px-0 [&>svg]:text-primary">
+              <AccordionTrigger className="hover:no-underline py-3 px-0 [&>svg]:text-primary cursor-pointer">
                 <span className="text-base font-bold text-gray-900 dark:text-zinc-100">Liability Cover</span>
               </AccordionTrigger>
               <AccordionContent className="flex flex-col gap-5 pb-4 pt-1">
@@ -267,29 +319,14 @@ export const SidePanel: React.FC<SidePanelProps> = memo(({
             </AccordionItem>
           </>
         )}
-        {(isCreate) && (
+        {/* {(isCreate) && (
           <>
             <AccordionItem value="services" className="border border-gray-200 dark:border-zinc-800 rounded-xl bg-white dark:bg-zinc-950 shadow-xs px-5 border-b overflow-hidden transition-colors duration-300 [&>h3]:my-0">
               <AccordionTrigger className="hover:no-underline py-3 px-0 [&>svg]:text-primary">
                 <span className="text-sm font-bold text-gray-900 dark:text-zinc-100">Signature Required ?</span>
               </AccordionTrigger>
               <AccordionContent className="flex flex-col gap-5 pb-4 pt-1">
-                {/* Signature on Delivery */}
                 <div className="flex items-center justify-between">
-                  {/* <div className="flex items-center gap-3">
-                    <div className="p-1.5 bg-gray-200 dark:bg-zinc-900 rounded-md">
-                      <PenLine className="w-4 h-4 text-gray-600 dark:text-zinc-400" />
-                    </div>
-                    <div>
-                      <h4 className="text-xs font-bold text-gray-900 dark:text-zinc-100">Signature on Delivery</h4>
-                      <p className="my-0 text-[10px] text-gray-500 dark:text-zinc-400 font-medium">Ensure the parcel is handed over securely</p>
-                    </div>
-                  </div> */}
-                  {/* <Switch
-                    checked={signatureSelected}
-                    onCheckedChange={(value) => handleOptionalFieldsChange('signature', value)}
-                    className="data-[state=checked]:bg-primary shadow-sm"
-                  /> */}
                   <RadioGroup
                     value={signatureSelected ? "yes" : "no"}
                     name='signature_required'
@@ -311,19 +348,14 @@ export const SidePanel: React.FC<SidePanelProps> = memo(({
                     </div>
                   </RadioGroup>
                 </div>
-                {/* <div className="flex flex-col">
-                  <CustomLabel label='Pickup Date' />
-                  <DatePicker date={pickupDate} setDate={setPickupDate} className='w-full' disabled={{ before: new Date() }} />
-                </div> */}
-
               </AccordionContent>
             </AccordionItem>
           </>
-        )}
+        )} */}
         {/* NOTES */}
         <AccordionItem value="notes" className="border border-gray-200 dark:border-zinc-800 rounded-xl bg-white dark:bg-zinc-950 shadow-xs px-5 border-b overflow-hidden transition-colors duration-300 [&>h3]:my-0">
-          <AccordionTrigger className="hover:no-underline py-3 px-0 [&>svg]:text-primary items-center">
-            <span className="text-base font-bold text-gray-900 dark:text-zinc-100 uppercase">Delivery Instructions</span>
+          <AccordionTrigger className="hover:no-underline py-3 px-0 [&>svg]:text-primary items-center cursor-pointer">
+            <span className="text-base font-bold text-gray-900 dark:text-zinc-100">Delivery Instructions</span>
           </AccordionTrigger>
           <AccordionContent className="flex flex-col gap-2 pb-4">
             {!isCreate ? (
@@ -353,7 +385,7 @@ export const SidePanel: React.FC<SidePanelProps> = memo(({
               : "border-slate-200 dark:border-zinc-800 bg-slate-50 dark:bg-zinc-900/50"
           )}>
             <AccordionTrigger className={cn(
-              "hover:no-underline py-3 px-0",
+              "hover:no-underline py-3 px-0 cursor-pointer",
               liability ? "[&>svg]:text-emerald-600 dark:[&>svg]:text-emerald-500" : "[&>svg]:text-slate-400 dark:[&>svg]:text-zinc-500"
             )}>
               <div className={cn(

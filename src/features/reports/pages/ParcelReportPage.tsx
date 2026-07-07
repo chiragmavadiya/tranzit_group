@@ -68,14 +68,14 @@ export default function ParcelReportPage() {
     const baseStats = [
       {
         label: 'Total Order',
-        value: formateCurrency(data?.summary?.total_orders || 0),
+        value: data?.summary?.total_orders || 0,
         icon: ClipboardList,
         iconColor: 'text-rose-500',
         iconBg: 'bg-rose-50 dark:bg-rose-500/10 h-10 w-10',
       },
       {
         label: 'Total Amount Paid',
-        value: formateCurrency(data?.summary?.total_amount || 0),
+        value: formateCurrency(data?.summary?.total_amount || data?.summary?.total_amount_paid || 0),
         icon: DollarSign,
         iconColor: 'text-emerald-500',
         iconBg: 'bg-emerald-50 dark:bg-emerald-500/10 h-10 w-10',
@@ -304,7 +304,7 @@ export default function ParcelReportPage() {
         <DataTable
           columns={(isAdmin ? ADMIN_PARCEL_COLUMNS : PARCEL_COLUMNS) as any}
           data={data?.data || []}
-          headerTitle={isAdmin ? "Customer Parcel Report" : "Parcel Report"}
+          headerTitle={isAdmin ? "All Tranzit Group Courier Parcel Report" : "Parcel Report"}
           searchable
           searchValue={search}
           onSearchChange={(val) => { setSearch(val); setPage(1); }}

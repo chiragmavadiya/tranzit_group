@@ -1,13 +1,15 @@
-import { useState, useMemo, useEffect } from 'react';
+import { useState, useMemo, useEffect, useCallback } from 'react';
 import {
   Wallet,
   ArrowUpRight,
   ArrowDownLeft,
 } from 'lucide-react';
+import { format } from 'date-fns';
 import { DataTable } from '@/components/common/DataTable';
 import { StatCard } from '@/components/common/StatCard';
 import { ADMIN_TOPUP_COLUMNS, TRANSACTION_TYPES } from '../constants';
 import { FormSelect } from '@/features/orders/components/OrderFormUI';
+import DatePicker from '@/components/common/DatePicker';
 import { Button } from '@/components/ui/button';
 import { useAdminTopups, useExportAdminTopups } from '../hooks/useWallet';
 import { useDebounce } from '@/hooks/useDebounce';
@@ -20,15 +22,23 @@ export default function AdminTopUpPage() {
   const [selectedCustomer, setSelectedCustomer] = useState<string>('');
   const [pageSize, setPageSize] = useState(25);
   const [page, setPage] = useState(1);
+  const [startDate, setStartDate] = useState<Date | undefined>(undefined);
+  const [endDate, setEndDate] = useState<Date | undefined>(undefined);
 
   const debouncedSearch = useDebounce(search, 500);
+
+  const formatDate = useCallback((date?: Date) => {
+    return date ? format(date, 'dd-MM-yyyy') : undefined;
+  }, []);
 
   const { data: topupResponse, isLoading } = useAdminTopups({
     customer: selectedCustomer === 'all' ? undefined : selectedCustomer,
     status: transactionType === 'all' ? undefined : transactionType,
     search: debouncedSearch,
     page,
-    per_page: pageSize
+    per_page: pageSize,
+    start_date: startDate ? formatDate(startDate) : undefined,
+    end_date: endDate ? formatDate(endDate) : undefined,
   });
   const { data: customersData } = useCustomers({ per_page: 1000 });
 
@@ -38,12 +48,19 @@ export default function AdminTopUpPage() {
   // Reset page when filters change
   useEffect(() => {
     setPage(1);
-  }, [debouncedSearch, transactionType, selectedCustomer]);
+  }, [debouncedSearch, transactionType, selectedCustomer, startDate, endDate]);
 
   const { mutate: exportAdminTopups, isPending: isExporting } = useExportAdminTopups()
 
-  const onExport = (format: string) => {
-    exportAdminTopups({ format })
+  const onExport = (formatType: string) => {
+    exportAdminTopups({
+      format: formatType as any,
+      customer: selectedCustomer === 'all' ? undefined : selectedCustomer,
+      status: transactionType === 'all' ? undefined : transactionType,
+      search: debouncedSearch,
+      start_date: startDate ? formatDate(startDate) : undefined,
+      end_date: endDate ? formatDate(endDate) : undefined,
+    })
   }
 
   const stats = useMemo(() => [
@@ -84,7 +101,7 @@ export default function AdminTopUpPage() {
       {/* Filter Section */}
       <div className="bg-white dark:bg-zinc-950 p-4 rounded-2xl border border-slate-100 dark:border-zinc-800 shadow-sm print:hidden">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-4 items-end">
-          <div className="lg:col-span-4">
+          <div className="lg:col-span-3">
             <FormSelect
               label="Transaction Type"
               value={transactionType}
@@ -94,7 +111,7 @@ export default function AdminTopUpPage() {
               className="w-full space-y-0"
             />
           </div>
-          <div className="lg:col-span-4">
+          <div className="lg:col-span-3">
             {/* <FormSelect
               label="Select Customer"
               value={selectedCustomer}
@@ -118,14 +135,33 @@ export default function AdminTopUpPage() {
               })) || []}
             />
           </div>
-          <div className="lg:col-span-4 flex gap-3">
+          <div className="lg:col-span-2">
+            <DatePicker
+              label="Start Date"
+              date={startDate}
+              setDate={setStartDate}
+              showClear
+            />
+          </div>
+          <div className="lg:col-span-2">
+            <DatePicker
+              label="End Date"
+              date={endDate}
+              setDate={setEndDate}
+              disabled={startDate ? { before: startDate } : undefined}
+              showClear
+            />
+          </div>
+          <div className="lg:col-span-2 flex gap-3">
             <Button
               variant="outline"
-              className="h-8 max-w-42 flex-1 border-slate-200 dark:border-zinc-800 text-slate-500 dark:text-zinc-400 font-bold uppercase tracking-wide text-[10px]"
+              className="h-8 w-full border-slate-200 dark:border-zinc-800 text-slate-500 dark:text-zinc-400 font-bold uppercase tracking-wide text-[10px]"
               onClick={() => {
                 setSearch('');
                 setTransactionType('');
                 setSelectedCustomer('');
+                setStartDate(undefined);
+                setEndDate(undefined);
               }}
             >
               Reset

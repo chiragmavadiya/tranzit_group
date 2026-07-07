@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Loader2, Info, Search, Edit2, Trash2 } from 'lucide-react';
+import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { FormInput, FormSelect, FormTextarea } from '@/features/orders/components/OrderFormUI';
 import { Checkbox } from '@/components/ui/checkbox';
@@ -182,14 +183,24 @@ function CarrierConfigTip({ selectedCarrier }: CarrierConfigTipProps) {
   if (!tip) return null;
 
   return (
-    <div className="w-full bg-linear-to-r from-blue-50/70 via-indigo-50/40 to-blue-50/70 dark:from-blue-950/20 dark:via-indigo-950/10 dark:to-blue-950/20 border border-blue-100/50 dark:border-blue-900/30 rounded-sm p-3.5 shadow-sm ">
-      <div className='flex items-center mb-4 gap-3'>
-        <div className="bg-primary/10 dark:bg-blue-900/50 p-1.5 rounded-md text-primary dark:text-blue-400 shrink-0">
-          <Info className="w-4 h-4" />
+    <div className="w-full bg-slate-50 dark:bg-zinc-900/40 border border-slate-100 dark:border-zinc-800/80 rounded-xl p-6 md:p-8 shadow-xs text-left relative overflow-hidden transition-all duration-300 hover:shadow-sm">
+      <div className="absolute top-0 right-0 w-24 h-24 bg-primary/5 rounded-full blur-2xl pointer-events-none -z-10" />
+
+      <div className='flex items-center mb-5 gap-3'>
+        <div className="bg-primary/10 dark:bg-primary/20 p-2 rounded-lg text-primary dark:text-primary-foreground shrink-0">
+          <Info className="w-5 h-5 text-primary" />
         </div>
-        <span className="text-base font-bold text-slate-800 dark:text-zinc-200 block">{tip.title}</span>
+        <div>
+          <span className="text-sm font-bold text-slate-900 dark:text-zinc-50 block uppercase tracking-wide">
+            Setup Guide
+          </span>
+          <span className="text-xs text-slate-500 dark:text-zinc-400 block mt-0.5">
+            {tip.title}
+          </span>
+        </div>
       </div>
-      <div className="space-y-0.5">
+
+      <div className="text-[13px] text-slate-600 dark:text-zinc-400 space-y-4 leading-relaxed font-normal">
         {tip.content}
       </div>
     </div>
@@ -373,15 +384,27 @@ export default function CarrierConfigForm({
   // };
 
   const handleAdvancedSettingChange = (key: string, value: any) => {
-    setFormData((prev: any) => ({
-      ...prev,
-      advanced_settings: {
-        ...prev.advanced_settings,
-        settings: prev.advanced_settings?.settings?.map((s: any) =>
-          s.key === key ? { ...s, value } : s
-        ) || []
-      }
-    }));
+    setFormData((prev: any) => {
+      const mutuallyExclusive: Record<string, string> = {
+        authority_to_leave: 'signature_required',
+        signature_required: 'authority_to_leave',
+      };
+      const opposite = mutuallyExclusive[key];
+      const settings = prev.advanced_settings?.settings ?? [];
+      const hasOpposite = opposite && settings.some((s: any) => s.key === opposite);
+
+      return {
+        ...prev,
+        advanced_settings: {
+          ...prev.advanced_settings,
+          settings: settings.map((s: any) => {
+            if (s.key === key) return { ...s, value };
+            if (value && hasOpposite && s.key === opposite) return { ...s, value: false };
+            return s;
+          }),
+        },
+      };
+    });
   };
 
   const handleInputChange = (value: any, name: any) => {
@@ -399,7 +422,7 @@ export default function CarrierConfigForm({
     const newErrors: Record<string, string> = {};
     const requiredFields: Record<string, string[]> = {
       auspost: ['api_key', 'api_password', 'account_number', 'account_label'],
-      aramex: ['client_id', 'client_secret', 'account_name', 'account_label'],
+      aramex: ['client_id', 'client_secret'],
       mypostbusiness: ['merchant_token', 'account_label'],
       directfreight: ['token', 'account', 'site_id', 'base_url', 'consignment_token', 'account_label'],
       couriersplease: ['username', 'password', 'account_label']
@@ -439,7 +462,6 @@ export default function CarrierConfigForm({
   };
 
 
-  console.log(canReadWrite, 'canReadWritecanReadWrite')
   const commonProps = (name: string) => ({
     name,
     value: formData[name] || "",
@@ -447,9 +469,9 @@ export default function CarrierConfigForm({
     required: true,
     error: submitted && !!errors[name],
     errormsg: errors[name],
-    isHalf: true,
+    isHalf: false,
+    isFullWidth: true,
     disabled: !canReadWrite
-    // isFullWidth: name === 'base_url'
   });
 
   const getCredentialsFields = () => {
@@ -469,8 +491,8 @@ export default function CarrierConfigForm({
           <>
             <FormInput label="Client ID" {...commonProps("client_id")} placeholder="Enter your Client ID" />
             <FormInput label="Client Secret" {...commonProps("client_secret")} type="password" placeholder="Enter your Client Secret" />
-            <FormInput label="Account Name" {...commonProps("account_name")} placeholder="Enter your Account Name" />
-            <FormInput label="Account Label" {...commonProps("account_label")} placeholder="Enter your Account Label" />
+            {/* <FormInput label="Account Name" {...commonProps("account_name")} placeholder="Enter your Account Name" /> */}
+            {/* <FormInput label="Account Name" {...commonProps("account_label")} placeholder="Enter your Account Name" /> */}
           </>
         );
       case 'mypostbusiness':
@@ -501,12 +523,7 @@ export default function CarrierConfigForm({
           </>
         );
       default:
-        return null
-      // (
-      //   <div className="py-10 text-center col-span-12">
-      //     <p className="text-slate-500">Configuration is coming soon.</p>
-      //   </div>
-      // );
+        return null;
     }
   };
 
@@ -514,23 +531,37 @@ export default function CarrierConfigForm({
 
   return (
     <form id="carrier-config-form" onSubmit={handleSubmit} className="space-y-6 mt-4">
-      <div className="grid grid-cols-12 gap-x-6 gap-y-3.5 items-start">
+      <div className="grid grid-cols-12 gap-x-6 gap-y-6 items-start">
         {/* Left Column: Form Credentials Fields */}
-
         {tip && (
           <>
-            <div className="col-span-12 md:col-span-7 border flex flex-col h-full p-4 rounded-sm shadow-sm text-left">
+            <div className={cn(
+              "col-span-12 flex flex-col justify-between text-left transition-all duration-300",
+              tip ? "lg:col-span-7" : "lg:col-span-12",
+              "bg-white dark:bg-zinc-900 border border-slate-200/80 dark:border-zinc-850 rounded-xl shadow-xs p-6 md:p-8"
+            )}>
+              {/* Header inside the form card */}
+              <div className="mb-6">
+                <h3 className="text-base font-bold text-slate-900 dark:text-zinc-50 my-0 flex items-center gap-2">
+                  <span className="h-2 w-2 rounded-full bg-primary animate-pulse" />
+                  API Credentials & Authentication
+                </h3>
+                <p className="text-xs text-slate-500 dark:text-zinc-400 mt-1 my-0">
+                  Provide your API credentials below to authorize Tranzit to connect to your carrier account.
+                </p>
+              </div>
+
               <div className="flex-1 grid grid-cols-12 gap-x-4 gap-y-4">
                 {getCredentialsFields()}
               </div>
               {canReadWrite && (
-                <div className='mt-6 justify-end self-end'>
+                <div className='mt-8 flex justify-end'>
                   <Button
                     type="submit"
                     disabled={isLoading}
                     className="h-8 text-sm px-5 font-semibold"
                   >
-                    {isLoading ? <Loader2 className="w-3.5 h-3.5 animate-spin mr-2" /> : null}
+                    {isLoading ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : null}
                     {isConnected ? 'Save Changes' : 'Save & Connect'}
                   </Button>
                 </div>
@@ -539,30 +570,30 @@ export default function CarrierConfigForm({
 
             {/* Right Column: Config Tip */}
             {tip && (
-              <div className="col-span-12 md:col-span-5">
+              <div className="col-span-12 lg:col-span-5 h-full">
                 <CarrierConfigTip selectedCarrier={selectedCarrier} />
               </div>
             )}
 
-            {/* Devider */}
-            <div className="col-span-12 flex justify-start pb-4 border-b border-gray-200 dark:border-zinc-800" />
+            {/* Divider */}
+            <div className="col-span-12 border-b border-slate-100 dark:border-zinc-800/80 my-2" />
           </>
         )}
-
         {/* Advanced Settings Column (left) */}
         {formData.advanced_settings?.settings && formData.advanced_settings.settings.length > 0 && (
-          <div className="col-span-12 md:col-span-4 mt-4 space-y-4 text-left">
+          <div className="col-span-12 lg:col-span-4 bg-white dark:bg-zinc-900 border border-slate-200/80 dark:border-zinc-850 rounded-xl shadow-xs p-6 md:p-8 space-y-6 text-left transition-all duration-300 hover:shadow-sm">
             <div>
-              <h4 className="text-sm font-bold text-gray-900 dark:text-zinc-100 uppercase tracking-wide">Advanced Settings</h4>
-              <p className="text-xs text-slate-500 dark:text-zinc-400">Configure additional preferences for label printing and delivery defaults.</p>
+              <h4 className="text-base font-bold text-slate-900 dark:text-zinc-50 uppercase tracking-wide my-0">Advanced Settings</h4>
+              <p className="text-xs text-slate-500 dark:text-zinc-400 mt-1.5 my-0 leading-relaxed">Configure additional preferences for label printing and delivery defaults.</p>
             </div>
-            <div className="grid grid-cols-12 gap-x-4 gap-y-1 w-full">
+
+            <div className="space-y-4 w-full">
               {formData.advanced_settings.settings.map((setting: any) => {
                 if (setting.type === 'checkbox') {
                   return (
                     <div
                       key={setting.key}
-                      className="col-span-12 flex items-center gap-3 py-1 px-1"
+                      className="flex items-center gap-3 py-1 px-1"
                     >
                       <Checkbox
                         id={`setting-${setting.key}`}
@@ -585,16 +616,16 @@ export default function CarrierConfigForm({
                     value: opt
                   }));
                   return (
-                    <div className="col-span-12" key={setting.key}>
+                    <div key={setting.key} className="space-y-1">
                       <FormSelect
-                        label={setting.label + ':'}
+                        label={setting.label}
                         options={options}
                         value={setting.value || ''}
                         onValueChange={(val) => handleAdvancedSettingChange(setting.key, val)}
                         placeholder="Select format..."
-                        isHalf={true}
+                        isHalf={false}
+                        isFullWidth
                         allowClear={false}
-                        layout='horizontal'
                         selectClassName='w-full'
                         disabled={!isConnected || !canReadWrite}
                       />
@@ -602,12 +633,12 @@ export default function CarrierConfigForm({
                   );
                 } else if (setting.type === 'textarea') {
                   return (
-                    <div className="col-span-12" key={setting.key}>
+                    <div key={setting.key} className="space-y-1">
                       <FormTextarea
-                        label="Delivery Instruction:"
+                        label="Delivery Instruction"
                         value={setting.value || ''}
                         onChange={(val) => handleAdvancedSettingChange(setting.key, val)}
-                        placeholder="e.g. 3-5 business days delivery to your doorstep"
+                        placeholder="e.g. Leave in a safe place at the front door if not home."
                         rows={3}
                         isFullWidth
                         disabled={!isConnected || !canReadWrite}
@@ -617,19 +648,10 @@ export default function CarrierConfigForm({
                 }
                 return null;
               })}
-              {/* <FormInput
-                label='Delivery Instruction:'
-                value={formData.delivery_instruction || ""}
-                onChange={(val) => handleInputChange(val, 'delivery_instruction')}
-                placeholder="e.g. 3-5 business days delivery to your doorstep"
-                isFullWidth={true}
-                className="col-span-12"
-              /> */}
-
             </div>
 
             {isConnected && canReadWrite && (
-              <div className='flex mt-6'>
+              <div className='flex justify-end pt-2 border-t border-slate-100 dark:border-zinc-800/85'>
                 <Button
                   type="button"
                   className='h-8 text-sm rounded-sm px-5 font-semibold'
@@ -654,14 +676,18 @@ export default function CarrierConfigForm({
             );
           });
           return (
-            <div className="col-span-12 md:col-span-8 mt-4 space-y-4 text-left">
-              <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+            <div className={cn(
+              "col-span-12 text-left transition-all duration-300",
+              (formData.advanced_settings?.settings && formData.advanced_settings.settings.length > 0) ? "lg:col-span-8" : "lg:col-span-12",
+              "bg-white dark:bg-zinc-900 border border-slate-200/80 dark:border-zinc-850 rounded-xl shadow-xs p-6 md:p-8 space-y-6"
+            )}>
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                 <div>
-                  <h4 className="text-sm font-bold text-gray-900 dark:text-zinc-100 uppercase tracking-wide">Supported Products</h4>
-                  <p className="text-xs text-slate-500 dark:text-zinc-400">Enable or disable specific shipping products/services for this courier.</p>
+                  <h4 className="text-base font-bold text-slate-900 dark:text-zinc-50 uppercase tracking-wide my-0">Supported Products</h4>
+                  <p className="text-xs text-slate-500 dark:text-zinc-400 mt-1.5 my-0 leading-relaxed">Enable or disable specific shipping products/services for this courier.</p>
                 </div>
-                <div className="flex items-center gap-3 shrink-0 w-full md:w-auto">
-                  <div className="w-full md:w-60">
+                <div className="flex items-center gap-3 shrink-0 w-full sm:w-auto">
+                  <div className="w-full sm:w-60">
                     <FormInput
                       placeholder="Search products..."
                       value={productSearchTerm}
@@ -687,27 +713,27 @@ export default function CarrierConfigForm({
                   )}
                 </div>
               </div>
-              <div className="border border-gray-100 dark:border-zinc-800 rounded-lg overflow-hidden">
+              <div className="border border-slate-150 dark:border-zinc-800 rounded-lg overflow-hidden">
                 <div className="overflow-y-auto no-scrollbar">
                   <table className="w-full text-left border-collapse">
                     <thead>
-                      <tr className="border-b border-gray-100 dark:border-zinc-800 bg-gray-50/40 dark:bg-zinc-900/20 text-[11px] font-bold text-slate-500 dark:text-zinc-400 uppercase tracking-wide">
-                        <th className="py-2.5 px-4">Product Name</th>
-                        <th className="py-2.5 px-4 w-24">Code</th>
-                        <th className="py-2.5 px-4 w-20 text-center">Status</th>
-                        <th className="py-2.5 px-4 w-28 text-right"></th>
+                      <tr className="border-b border-slate-150 dark:border-zinc-800 bg-slate-50/50 dark:bg-zinc-900/40 text-[11px] font-bold text-slate-550 dark:text-zinc-450 uppercase tracking-wide">
+                        <th className="py-3 px-4">Product Name</th>
+                        <th className="py-3 px-4 w-28">Code</th>
+                        <th className="py-3 px-4 w-24 text-center">Status</th>
+                        <th className="py-3 px-4 w-28 text-right"></th>
                       </tr>
                     </thead>
-                    <tbody className="divide-y divide-gray-100 dark:divide-zinc-850">
+                    <tbody className="divide-y divide-slate-100 dark:divide-zinc-800">
                       {isAddingNewProduct && (
-                        <tr className="bg-slate-50/50 dark:bg-zinc-900/40 border-b border-gray-100 dark:border-zinc-800">
+                        <tr className="bg-slate-50/30 dark:bg-zinc-900/20 border-b border-slate-150 dark:border-zinc-800">
                           <td className="py-2.5 px-4">
                             <input
                               type="text"
                               value={newProductForm.product_name}
                               onChange={(e) => setNewProductForm(prev => ({ ...prev, product_name: e.target.value }))}
                               placeholder="Product Name"
-                              className="h-8 w-full bg-white dark:bg-zinc-950 border border-gray-250 dark:border-zinc-800 rounded px-2.5 text-sm text-slate-900 dark:text-zinc-100 focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary"
+                              className="h-8 w-full bg-white dark:bg-zinc-950 border border-slate-200 dark:border-zinc-800 rounded px-2.5 text-sm text-slate-900 dark:text-zinc-100 focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary"
                               disabled={addProductMut.isPending}
                               autoFocus
                             />
@@ -718,7 +744,7 @@ export default function CarrierConfigForm({
                               value={newProductForm.product_code}
                               onChange={(e) => setNewProductForm(prev => ({ ...prev, product_code: e.target.value }))}
                               placeholder="Code"
-                              className="h-8 w-full bg-white dark:bg-zinc-950 border border-gray-250 dark:border-zinc-800 rounded px-2.5 text-sm font-mono uppercase text-slate-900 dark:text-zinc-100 focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary"
+                              className="h-8 w-full bg-white dark:bg-zinc-950 border border-slate-200 dark:border-zinc-800 rounded px-2.5 text-sm font-mono uppercase text-slate-900 dark:text-zinc-100 focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary"
                               disabled={addProductMut.isPending}
                             />
                           </td>
@@ -775,7 +801,7 @@ export default function CarrierConfigForm({
                             return (
                               <tr
                                 key={product.product_code}
-                                className="bg-slate-50/50 dark:bg-zinc-900/40 border-b border-gray-100 dark:border-zinc-800"
+                                className="bg-slate-50/30 dark:bg-zinc-900/20 border-b border-slate-150 dark:border-zinc-800"
                               >
                                 <td className="py-2.5 px-4">
                                   <input
@@ -783,7 +809,7 @@ export default function CarrierConfigForm({
                                     value={editingProductForm.product_name}
                                     onChange={(e) => setEditingProductForm(prev => ({ ...prev, product_name: e.target.value }))}
                                     placeholder="Product Name"
-                                    className="h-8 w-full bg-white dark:bg-zinc-950 border border-gray-250 dark:border-zinc-800 rounded px-2.5 text-sm text-slate-900 dark:text-zinc-100 focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary"
+                                    className="h-8 w-full bg-white dark:bg-zinc-950 border border-slate-200 dark:border-zinc-800 rounded px-2.5 text-sm text-slate-900 dark:text-zinc-100 focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary"
                                     disabled={updateManualProductMut.isPending}
                                     autoFocus
                                   />
@@ -794,7 +820,7 @@ export default function CarrierConfigForm({
                                     value={editingProductForm.product_code}
                                     onChange={(e) => setEditingProductForm(prev => ({ ...prev, product_code: e.target.value }))}
                                     placeholder="Code"
-                                    className="h-8 w-full bg-white dark:bg-zinc-950 border border-gray-250 dark:border-zinc-800 rounded px-2.5 text-sm font-mono uppercase text-slate-900 dark:text-zinc-100 focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary"
+                                    className="h-8 w-full bg-white dark:bg-zinc-950 border border-slate-200 dark:border-zinc-800 rounded px-2.5 text-sm font-mono uppercase text-slate-900 dark:text-zinc-100 focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary"
                                     disabled={updateManualProductMut.isPending}
                                   />
                                 </td>
@@ -838,15 +864,15 @@ export default function CarrierConfigForm({
                           return (
                             <tr
                               key={product.product_code}
-                              className="hover:bg-gray-50/30 dark:hover:bg-zinc-900/10 transition-colors text-sm text-slate-700 dark:text-zinc-300"
+                              className="hover:bg-slate-50/20 dark:hover:bg-zinc-800/10 transition-colors text-sm text-slate-700 dark:text-zinc-355"
                             >
-                              <td className="py-2.5 px-4 font-medium text-slate-900 dark:text-zinc-100">
+                              <td className="py-3 px-4 font-medium text-slate-900 dark:text-zinc-100">
                                 {product.product_name}
                               </td>
-                              <td className="py-2.5 px-4 font-mono text-[13px] text-slate-600 dark:text-zinc-550">
+                              <td className="py-3 px-4 font-mono text-[13px] text-slate-600 dark:text-zinc-400">
                                 {product.product_code}
                               </td>
-                              <td className="py-2.5 px-4 text-center">
+                              <td className="py-3 px-4 text-center">
                                 <div className="flex items-center justify-center">
                                   <Checkbox
                                     checked={product.enabled}
@@ -855,14 +881,14 @@ export default function CarrierConfigForm({
                                   />
                                 </div>
                               </td>
-                              <td className="py-2.5 px-4 text-right">
+                              <td className="py-3 px-4 text-right">
                                 {isManual && canReadWrite ? (
                                   <div className="flex items-center justify-end gap-1">
                                     <Button
                                       type="button"
                                       variant="ghost"
                                       size="sm"
-                                      className="h-7 w-7 p-0 text-slate-500 hover:text-slate-700"
+                                      className="h-7 w-7 p-0 text-slate-500 hover:text-slate-700 hover:bg-slate-100 dark:hover:bg-zinc-800"
                                       onClick={() => {
                                         setEditingProductCode(product.product_code);
                                         setEditingProductForm({
@@ -879,7 +905,7 @@ export default function CarrierConfigForm({
                                       type="button"
                                       variant="ghost"
                                       size="sm"
-                                      className="h-7 w-7 p-0 text-red-500 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-950/20"
+                                      className="h-7 w-7 p-0 text-red-500 hover:text-red-650 hover:bg-red-50 dark:hover:bg-red-950/20"
                                       onClick={() => handleDeleteProduct(product.product_code, product.product_name)}
                                       disabled={updateManualProductMut.isPending || deleteManualProductMut.isPending}
                                     >
@@ -924,6 +950,6 @@ export default function CarrierConfigForm({
           />
         )
       }
-    </form >
+    </form>
   );
 }

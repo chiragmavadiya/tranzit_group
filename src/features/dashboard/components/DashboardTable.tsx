@@ -13,6 +13,10 @@ interface DashboardTableProps<T> {
   columns: Column<T>[];
   className?: string;
   pageSize?: number;
+  filterValue?: {
+    from: string;
+    to: string;
+  }
 }
 
 export function DashboardTable<T extends { id: number }>({
@@ -21,7 +25,8 @@ export function DashboardTable<T extends { id: number }>({
   role,
   className,
   columns,
-  pageSize: initialPageSize = 25
+  pageSize: initialPageSize = 25,
+  filterValue
 }: DashboardTableProps<T>) {
   const [search, setSearch] = useState<string>("");
   const [page, setPage] = useState<number>(1);
@@ -34,9 +39,11 @@ export function DashboardTable<T extends { id: number }>({
     search: debouncedSearch,
     page: page,
     per_page: pageSize,
+    date_from: filterValue?.from,
+    date_to: filterValue?.to,
     // Dashboard usually shows pending/recent activity
-    ...(role === 'admin' ? { status: 'pending' } : {})
-  }), [debouncedSearch, page, pageSize, role]);
+    ...(role === 'admin' ? { status: 'draft' } : {})
+  }), [debouncedSearch, page, pageSize, role, filterValue]);
 
   // Data fetching hooks
   const adminQuery = useAdminInvoices(params, role === 'admin');

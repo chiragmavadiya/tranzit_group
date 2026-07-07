@@ -6,7 +6,7 @@ export const SectionHeader = ({ title, icon: Icon }: { title: string, icon: any 
         <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary/10 text-primary">
             <Icon className="h-4 w-4" />
         </div>
-        <h3 className="text-sm font-bold text-slate-900 dark:text-zinc-100 uppercase tracking-wide my-0">{title}</h3>
+        <h3 className="text-sm font-bold text-slate-900 dark:text-zinc-100 tracking-wide my-0">{title}</h3>
     </div>
 );
 

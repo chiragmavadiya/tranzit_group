@@ -35,8 +35,8 @@ export const useWalletSummary = (enabled: boolean = true) => {
 
 export const useExportAdminTopups = () => {
   return useMutation({
-    mutationFn: ({ format }: { format: string; }) =>
-      walletService.exportAdminTopups({ format }),
+    mutationFn: (params: AdminTopupParams & { format: string }) =>
+      walletService.exportAdminTopups(params),
     onSuccess: ({ blob, filename }) => {
       downloadFile(blob, filename)
     }

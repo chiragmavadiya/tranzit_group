@@ -1,4 +1,4 @@
-import type { User, TeamAccess } from "@/features/auth/auth.types";
+import type { User, TeamAccess, BlackoutDay } from "@/features/auth/auth.types";
 
 export interface AuthState {
     user: User | null;
@@ -14,4 +14,6 @@ export interface AuthState {
     permissions: string[];
     team_access?: TeamAccess | null;
     is_sub_user: boolean;
+    courier_settings?: any | null;
+    blackout_days: BlackoutDay[];
 }

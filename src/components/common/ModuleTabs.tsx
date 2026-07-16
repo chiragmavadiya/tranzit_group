@@ -6,13 +6,15 @@ const ModuleTabs = ({
     onTabChange,
     isActive,
     count,
-    tabKey
+    tabKey,
+    showCount = true
 }: {
     tab: string;
     onTabChange: (tab: string) => void;
     isActive: boolean;
     count: number;
     tabKey?: string;
+    showCount?: boolean
 }) => {
     return (
         <button
@@ -25,7 +27,7 @@ const ModuleTabs = ({
             )}
         >
             {tabKey || tab}
-            {typeof count === 'number' && (
+            {showCount && typeof count === 'number' && (
                 <span className={cn(
                     "px-1.5 py-0.5 text-[10px] rounded-full transition-all duration-300",
                     isActive

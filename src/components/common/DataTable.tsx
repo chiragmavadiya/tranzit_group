@@ -221,7 +221,7 @@ const DataTableComponent = <T extends Record<string, any>>(props: DataTableProps
                   {typeof customHeader === 'function' ? (customHeader as () => ReactNode)() : customHeader}
                 </div>
               )}
-              
+
               {/* Page Size & Export Row */}
               <div className="flex items-center gap-3 w-full sm:w-auto justify-between sm:justify-start">
                 {pagination && !pageSizeInFooter && (
@@ -320,7 +320,7 @@ const DataTableComponent = <T extends Record<string, any>>(props: DataTableProps
                   <TableHead
                     key={`${column.key}-${originalIndex}`}
                     className={cn(
-                      "py-2 whitespace-normal text-[14px] font-bold text-gray-900 dark:text-zinc-100 uppercase tracking-wide px-3",
+                      "py-2 whitespace-normal text-[14px] font-bold text-gray-900 dark:text-zinc-100 capitalize tracking-wide px-3",
                       column.sortable !== false && sortable && "cursor-pointer hover:bg-muted/50",
                       column.sticky === 'left' && "sticky bg-white dark:bg-zinc-950 z-20 shadow-[inset_-1px_0_0_0_#ebe6e7] dark:shadow-[inset_-1px_0_0_0_#27272a]",
                       column.sticky === 'left' ? selectable ? 'left-[48px]' : 'left-0' : '',

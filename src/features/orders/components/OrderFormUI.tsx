@@ -1,5 +1,5 @@
-import React, { useMemo, useCallback, type ReactNode, memo } from "react";
-import { RefreshCw, CheckCircle2 } from "lucide-react";
+import React, { useMemo, useCallback, type ReactNode, memo, useState } from "react";
+import { RefreshCw, CheckCircle2, Info } from "lucide-react";
 import * as LucideIcons from "lucide-react";
 import { cn } from "@/lib/utils"
 import { Input } from "@/components/ui/input"
@@ -22,6 +22,7 @@ import type {
   FormCheckboxProps
 } from "./types/OrderFormUI.types";
 import { SelectSearch } from "@/components/ui/combobox";
+import { CustomTooltip } from "@/components/common/CustomTooltip";
 
 export const Required = () => {
   return (
@@ -57,6 +58,7 @@ export const FormInput = memo(React.forwardRef<HTMLInputElement, FormInputProps>
   error,
   errormsg,
   inputClassName,
+  info,
   // rightElement
 }, ref) => {
   const [showPassword, setShowPassword] = React.useState(false);
@@ -72,11 +74,18 @@ export const FormInput = memo(React.forwardRef<HTMLInputElement, FormInputProps>
       className
     )}>
       {label && (
-        <CustomLabel
-          label={label}
-          isHorizontal={isHorizontal}
-          required={required}
-        />
+        <div className="flex items-center gap-1">
+          <CustomLabel
+            label={label}
+            isHorizontal={isHorizontal}
+            required={required}
+          />
+          {info && (
+            <CustomTooltip title={info}>
+              <Info className="w-3.5 h-3.5 text-slate-400 dark:text-zinc-600 cursor-pointer" />
+            </CustomTooltip>
+          )}
+        </div>
       )}
       <div className="relative group/input">
         {Icon && (
@@ -188,6 +197,24 @@ export function ValidAddressBadge() {
 }
 
 
+const areOptionsEqual = (
+  prevOptions?: readonly { label: string; value: string | number }[],
+  nextOptions?: readonly { label: string; value: string | number }[]
+) => {
+  if (prevOptions === nextOptions) return true;
+  if (!prevOptions || !nextOptions) return false;
+  if (prevOptions.length !== nextOptions.length) return false;
+  for (let i = 0; i < prevOptions.length; i++) {
+    if (
+      prevOptions[i].value !== nextOptions[i].value ||
+      prevOptions[i].label !== nextOptions[i].label
+    ) {
+      return false;
+    }
+  }
+  return true;
+};
+
 export const FormSelect = memo(({
   label,
   value,
@@ -210,7 +237,13 @@ export const FormSelect = memo(({
   optionClassName
 }: FormSelectProps) => {
   const isHorizontal = useMemo(() => layout === 'horizontal', [layout]);
-  const memoizedData = useMemo(() => [...options], [options]);
+  
+  const [memoizedData, setMemoizedData] = useState(options);
+  const [prevOptions, setPrevOptions] = useState(options);
+  if (!areOptionsEqual(prevOptions, options)) {
+    setPrevOptions(options);
+    setMemoizedData(options);
+  }
 
   return (
     <div className={cn(
@@ -249,6 +282,23 @@ export const FormSelect = memo(({
         {error ? <div className="text-red-500 text-[11px] w-full">{errormsg}</div> : null}
       </div>
     </div>
+  );
+}, (prevProps, nextProps) => {
+  return (
+    prevProps.value === nextProps.value &&
+    prevProps.label === nextProps.label &&
+    prevProps.error === nextProps.error &&
+    prevProps.errormsg === nextProps.errormsg &&
+    prevProps.disabled === nextProps.disabled &&
+    prevProps.required === nextProps.required &&
+    prevProps.placeholder === nextProps.placeholder &&
+    prevProps.className === nextProps.className &&
+    prevProps.selectClassName === nextProps.selectClassName &&
+    prevProps.allowClear === nextProps.allowClear &&
+    prevProps.searchdisable === nextProps.searchdisable &&
+    prevProps.multiple === nextProps.multiple &&
+    prevProps.optionClassName === nextProps.optionClassName &&
+    areOptionsEqual(prevProps.options, nextProps.options)
   );
 });
 

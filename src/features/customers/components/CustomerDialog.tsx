@@ -16,11 +16,20 @@ import { CustomModel } from "@/components/ui/dialog"
 import { Switch } from "@/components/ui/switch"
 import { FormInput, FormSelect } from "@/features/orders/components/OrderFormUI"
 import { STATES, WEIGHT_TIERS } from "../constants"
+// import {
+//   Accordion,
+//   AccordionContent,
+//   AccordionItem,
+//   AccordionTrigger,
+// } from "@/components/ui/accordion"
 import { useCreateCustomer, useCustomerEditDetails, useUpdateCustomer } from "../hooks/useCustomers"
 import { showToast } from "@/components/ui/custom-toast"
 import { PlaceAutocomplete } from "@/components/common/AutoComplateAddress"
 import { Checkbox } from "@/components/ui/checkbox"
 import { cleanSpaces, isPhoneValid, cn } from "@/lib/utils";
+import directFreightLogo from "@/assets/coruiers_logo/direct-freight.png"
+import auspostLogo from "@/assets/coruiers_logo/logo-auspost.png"
+import courierspleaseLogo from "@/assets/coruiers_logo/couriersplease.png"
 
 interface CustomerDialogProps {
   open: boolean
@@ -76,7 +85,16 @@ const INITIAL_FORM_DATA = {
   topup_enable: false,
   order_prefix: "",
   markup_charges: buildInitialCharges(),
-  pickup_charges: buildInitialCharges()
+  pickup_charges: buildInitialCharges(),
+  byo_courier_invoice_enable: false,
+  byo_courier_pricing_tiers: [
+    { min_labels: 0, max_labels: 25, price_per_label: 0 },
+    { min_labels: 26, max_labels: 50, price_per_label: 0 },
+    { min_labels: 51, max_labels: 100, price_per_label: 0 },
+    { min_labels: 101, max_labels: 250, price_per_label: 0 },
+    { min_labels: 251, max_labels: 1000, price_per_label: 0 },
+    { min_labels: 1001, max_labels: null, price_per_label: 0 }
+  ]
 };
 
 export default function CustomerDialog({ open, onOpenChange, customerId }: CustomerDialogProps) {
@@ -97,7 +115,7 @@ export default function CustomerDialog({ open, onOpenChange, customerId }: Custo
     value: number
   ) => {
     const fieldName = type === 'markup' ? 'markup_charges' : 'pickup_charges';
-    setFormData((prev) => {
+    setFormData((prev: any) => {
       const arr = Array.isArray(prev[fieldName]) ? [...prev[fieldName]] : [];
       let index = arr.findIndex((item: any) => item.courier === courierName);
       if (index === -1) {
@@ -119,6 +137,20 @@ export default function CustomerDialog({ open, onOpenChange, customerId }: Custo
     });
   };
 
+  const handlePricingTierChange = (index: number, value: number) => {
+    setFormData((prev: any) => {
+      const updatedTiers = [...prev.byo_courier_pricing_tiers];
+      updatedTiers[index] = {
+        ...updatedTiers[index],
+        price_per_label: value
+      };
+      return {
+        ...prev,
+        byo_courier_pricing_tiers: updatedTiers
+      };
+    });
+  };
+
   const getChargeValue = (
     type: 'markup' | 'pickup',
     courierName: string,
@@ -135,7 +167,7 @@ export default function CustomerDialog({ open, onOpenChange, customerId }: Custo
       <div className="overflow-x-auto rounded-lg border border-slate-100 dark:border-zinc-800 bg-slate-50/30 dark:bg-zinc-950/20 mt-1">
         <table className="w-full text-left border-collapse text-xs">
           <thead>
-            <tr className="border-b border-slate-150 dark:border-zinc-800 bg-slate-50/50 dark:bg-zinc-900/50 text-slate-500 dark:text-zinc-400 font-bold uppercase tracking-wider text-[10px]">
+            <tr className="border-b border-slate-150 dark:border-zinc-800 bg-slate-50/50 dark:bg-zinc-900/50 text-slate-500 dark:text-zinc-400 font-bold uppercase tracking-wide text-[10px]">
               <th className="py-2.5 px-4">Weight Tier</th>
               <th className="py-2.5 px-4 w-[220px]">Markup Charge (%)</th>
               <th className="py-2.5 px-4 w-[220px]">Pickup Charge ($)</th>
@@ -201,6 +233,15 @@ export default function CustomerDialog({ open, onOpenChange, customerId }: Custo
         return loadedItem ? { ...defItem, ...loadedItem } : defItem;
       });
 
+      // const firstCharge = mergedPickupCharges[0] || {};
+      filteredData.byo_courier_invoice_enable = data.byo_courier_invoice_enable ?? false;
+
+      if (data.byo_courier_pricing_tiers && Array.isArray(data.byo_courier_pricing_tiers) && data.byo_courier_pricing_tiers.length > 0) {
+        filteredData.byo_courier_pricing_tiers = data.byo_courier_pricing_tiers;
+      } else {
+        filteredData.byo_courier_pricing_tiers = INITIAL_FORM_DATA.byo_courier_pricing_tiers;
+      }
+
       filteredData.markup_charges = mergedMarkupCharges;
       filteredData.pickup_charges = mergedPickupCharges;
       filteredData.country = "Australia";
@@ -258,31 +299,31 @@ export default function CustomerDialog({ open, onOpenChange, customerId }: Custo
   }
 
   const validateForm = () => {
-    const requiredFields: (keyof typeof formData)[] = [
+    const requiredFields: string[] = [
       "first_name",
       "last_name",
       "email",
       "mobile",
       "business_name",
       "order_prefix",
-      "billing_address_info",
+      // "billing_address_info",
       "billing_address",
       "billing_street_name",
-      "billing_street_number",
-      "billing_street_type",
+      // "billing_street_number",
+      // "billing_street_type",
       "billing_suburb",
       "billing_state",
       "billing_postcode",
       "billing_country",
-      "address_info",
+      // "address_info",
       "address",
       "street_name",
-      "street_number",
-      "street_type",
+      // "street_number",
+      // "street_type",
       "suburb",
       "state",
       "postcode",
-      "country",
+      "country"
     ];
 
     if (formData.mobile && !isPhoneValid(formData.mobile)) {
@@ -290,9 +331,59 @@ export default function CustomerDialog({ open, onOpenChange, customerId }: Custo
       return false;
     }
 
-    return requiredFields.every(
-      (field) => formData[field]?.toString().trim() !== ""
+    const missingFields = requiredFields.filter(
+      (field) => {
+        const val = (formData as any)[field];
+        return val === undefined || val === null || val.toString().trim() === "";
+      }
     );
+
+    if (missingFields.length > 0) {
+      const fieldLabels: Record<string, string> = {
+        first_name: "First Name",
+        last_name: "Last Name",
+        email: "Email",
+        mobile: "Mobile",
+        business_name: "Business Name",
+        order_prefix: "Order Prefix",
+        billing_address_info: "Billing Address Info",
+        billing_address: "Billing Address",
+        billing_street_name: "Billing Street Name",
+        billing_street_type: "Billing Street Type",
+        billing_suburb: "Billing Suburb",
+        billing_state: "Billing State",
+        billing_postcode: "Billing Postcode",
+        billing_country: "Billing Country",
+        address_info: "Address Info",
+        address: "Address",
+        street_name: "Street Name",
+        street_type: "Street Type",
+        suburb: "Suburb",
+        state: "State",
+        postcode: "Postcode",
+        country: "Country",
+      };
+
+      const labels = missingFields.map((field) => fieldLabels[field] || String(field).replace(/_/g, ' '));
+      if (labels.length <= 3) {
+        showToast(`Please fill in the required fields: ${labels.join(', ')}`, "error");
+      } else {
+        showToast(`Please fill in the required fields: ${labels.slice(0, 3).join(', ')} and ${labels.length - 3} more`, "error");
+      }
+      return false;
+    }
+
+    if (formData.byo_courier_invoice_enable) {
+      const hasEmptyPrice = formData.byo_courier_pricing_tiers.some(
+        (tier) => tier.price_per_label === undefined || tier.price_per_label === null || tier.price_per_label.toString().trim() === ""
+      );
+      if (hasEmptyPrice) {
+        showToast("Please enter prices for all volume tiers", "error");
+        return false;
+      }
+    }
+
+    return true;
   };
 
   const handleSubmit = () => {
@@ -303,7 +394,14 @@ export default function CustomerDialog({ open, onOpenChange, customerId }: Custo
 
     const payload = {
       ...formData,
-      mobile: cleanSpaces(formData.mobile)
+      mobile: cleanSpaces(formData.mobile),
+      byo_courier_invoice_enable: !!formData.byo_courier_invoice_enable,
+      byo_courier_pricing_tiers: !formData.byo_courier_invoice_enable
+        ? formData.byo_courier_pricing_tiers.map((tier: any) => ({
+          ...tier,
+          price_per_label: 0
+        }))
+        : formData.byo_courier_pricing_tiers
     };
 
     const mutation = isEdit ? updateCustomer : createCustomer;
@@ -443,10 +541,10 @@ export default function CustomerDialog({ open, onOpenChange, customerId }: Custo
                     handleChange('postcode', opt.post_code);
                   }}
                   onChange={(value) => handleChange('address_info', value)}
-                  error={submited && formData.address_info?.trim() === ''}
-                  errormsg='Please enter your address'
+                  // error={submited && formData.address_info?.trim() === ''}
+                  // errormsg='Please enter your address'
                   value={formData.address_info}
-                  required
+                // required
                 />
               </div>
               <FormInput
@@ -548,10 +646,10 @@ export default function CustomerDialog({ open, onOpenChange, customerId }: Custo
                     handleChange('billing_postcode', opt.post_code);
                   }}
                   onChange={(value) => handleChange('billing_address_info', value)}
-                  error={submited && formData.billing_address_info?.trim() === ''}
-                  errormsg='Please enter your billing address'
+                  // error={submited && formData.billing_address_info?.trim() === ''}
+                  // errormsg='Please enter your billing address'
                   value={formData.billing_address_info}
-                  required
+                  // required
                   disabled={sameAsShipping}
                 />
               </div>
@@ -631,6 +729,61 @@ export default function CustomerDialog({ open, onOpenChange, customerId }: Custo
             <h3 className="my-0 text-sm font-bold text-slate-800 dark:text-zinc-200">Courier Configuration</h3>
           </div>
 
+          <div className="border border-slate-200 dark:border-zinc-800 rounded-xl bg-white dark:bg-zinc-950 overflow-hidden shadow-xs">
+            <div className="flex items-center justify-between p-3 sm:p-4 bg-slate-50/50 dark:bg-zinc-900/50">
+              <div className="flex items-center gap-3">
+                <div className="w-8 h-8 rounded-lg bg-slate-100 dark:bg-zinc-800 text-slate-600 dark:text-zinc-400 flex items-center justify-center">
+                  <DollarSign className="w-4 h-4" />
+                </div>
+                <div className="text-left">
+                  <span className="text-sm font-bold text-slate-800 dark:text-zinc-200">BYO Courier Volume-Based Tiered Fees</span>
+                  <span className="block text-[10px] text-slate-500 font-medium">Configure flat weekly volume fees applied to Bring Your Own (BYO) courier accounts</span>
+                </div>
+              </div>
+              <Switch
+                checked={formData.byo_courier_invoice_enable}
+                onCheckedChange={(checked) => {
+                  handleChange("byo_courier_invoice_enable", checked);
+                  if (!checked) {
+                    setFormData((prev) => ({
+                      ...prev,
+                      byo_courier_pricing_tiers: prev.byo_courier_pricing_tiers.map((tier: any) => ({
+                        ...tier,
+                        price_per_label: 0,
+                      })),
+                    }));
+                  }
+                }}
+              />
+            </div>
+            {formData.byo_courier_invoice_enable && (
+              <div className="border-t border-slate-100 dark:border-zinc-800 p-3 sm:p-4 bg-white dark:bg-zinc-950 animate-in fade-in slide-in-from-top-2 duration-200">
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
+                  {formData.byo_courier_pricing_tiers.map((tier, index) => {
+                    const label = tier.max_labels !== null
+                      ? `${tier.min_labels}-${tier.max_labels} Labels`
+                      : `More Than ${tier.min_labels - 1} Labels`;
+                    return (
+                      <div key={index} className="space-y-1">
+                        <label className="text-[11px] font-semibold text-slate-600 dark:text-zinc-400 capitalize">{label}</label>
+                        <FormInput
+                          isCompact
+                          icon={DollarSign}
+                          type="number"
+                          step="0.01"
+                          value={tier.price_per_label?.toString() || "0"}
+                          onChange={(val) => handlePricingTierChange(index, Number(val) || 0)}
+                          error={submited && (tier.price_per_label === undefined || tier.price_per_label === null || tier.price_per_label.toString().trim() === "")}
+                          errormsg="Required"
+                        />
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
+          </div>
+
           <div className="space-y-3">
             {(() => {
               const couriersList = [
@@ -638,7 +791,7 @@ export default function CustomerDialog({ open, onOpenChange, customerId }: Custo
                   id: "direct_freight",
                   name: "Direct Freight Express",
                   activeKey: "direct_freight_active" as const,
-                  logo: "https://api.tranzit.digisite.net/assets/img/couriers/direct-freight.png",
+                  logo: directFreightLogo,
                   displayName: "Direct Freight Express",
                   courierKey: "DirectFreight"
                 },
@@ -646,7 +799,7 @@ export default function CustomerDialog({ open, onOpenChange, customerId }: Custo
                   id: "AusPost",
                   name: "Auspost Tranzit Group",
                   activeKey: "auspost_active" as const,
-                  logo: "https://api.tranzit.digisite.net/assets/img/couriers/logo-auspost.png",
+                  logo: auspostLogo,
                   displayName: "Auspost Tranzit Group",
                   courierKey: "AusPost"
                 },
@@ -654,7 +807,7 @@ export default function CustomerDialog({ open, onOpenChange, customerId }: Custo
                   id: "couriersplease",
                   name: "Courier Please",
                   activeKey: "couriersplease_active" as const,
-                  logo: "https://api.tranzit.digisite.net/assets/img/couriers/couriersplease.png",
+                  logo: courierspleaseLogo,
                   displayName: "Courier Please",
                   courierKey: "CouriersPlease"
                 },

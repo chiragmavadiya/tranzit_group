@@ -93,6 +93,7 @@ export const useCancelOrder = () => {
     mutationFn: ({ orderId, data }: { orderId: string | number; data?: any }) => ordersService.cancelOrder(orderId, data),
     onSuccess: (_, { orderId }) => {
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.ORDERS.LIST });
+      queryClient.invalidateQueries({ queryKey: ["orders", "counts"] });
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.ORDERS.DETAILS(orderId) });
     },
   });
@@ -370,6 +371,9 @@ export const usePrintOrder = () => {
       showToast('Order printed successfully', 'success');
     },
     onError: (error: any) => {
+      if (error?.response?.data?.requires_phone_or_email || error?.response?.data?.requires_phone) {
+        return;
+      }
       if (error?.errors) {
         const beErrors = error.errors;
         const formattedErrors: Record<string, string> = {};

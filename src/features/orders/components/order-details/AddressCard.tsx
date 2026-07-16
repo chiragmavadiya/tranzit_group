@@ -30,10 +30,10 @@ export const AddressCard: React.FC<AddressCardProps> = memo(({
     <Card className="w-full border ring-0 border-gray-200 dark:border-zinc-800 dark:bg-zinc-950 transition-colors duration-300">
       <CardContent className="p-0 bg-slate-50 dark:bg-zinc-900">
         <div className="flex items-center justify-between p-4 py-2.5">
-          <div className="flex flex-col md:flex-row md:items-center gap-2 md:gap-4 flex-1 min-h-8 mr-2">
+          <div className="flex flex-col md:flex-row md:items-center gap-2 md:gap-4 flex-1 mr-2">
             {/* Section Label */}
             <span className="text-sm font-bold flex items-center gap-1.5 text-slate-800 dark:text-zinc-400 shrink-0">
-              <User className="h-4 w-4 text-slate-600 dark:text-zinc-500" />
+              <User className="w-5 h-5 text-primary" />
               {title}
             </span>
 

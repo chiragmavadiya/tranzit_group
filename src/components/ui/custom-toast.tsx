@@ -102,7 +102,7 @@ export const suspendToast = () => {
  * @param type success | warning | error | default
  * @param title Optional title
  */
-export const showToast = (message: string, type: ToastType = "default", description?: string) => {
+export const showToast = (message: string, type: ToastType = "default", description?: string, duration: number = 4000) => {
   if (isGloballySuspended) return;
   toast.dismiss();
   toast.custom((t) => (
@@ -113,7 +113,7 @@ export const showToast = (message: string, type: ToastType = "default", descript
       t={t}
     />
   ), {
-    duration: 4000,
+    duration: duration,
     position: 'top-center'
   });
 };

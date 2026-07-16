@@ -27,6 +27,14 @@ type CancelRequest = {
     processed_by: ""
 }
 
+export type ShopifyItem = {
+    product_name: string
+    variant_title?: string | null
+    sku?: string | null
+    quantity: number
+    price: number
+}
+
 export type OrderDetailData = {
     order_number: string
     need_add_tracking?: boolean
@@ -45,6 +53,7 @@ export type OrderDetailData = {
         balance_due: number
         items: OrderItem[]
         surcharge_amount: number
+        shopify_items?: ShopifyItem[]
     }
     courier_details: {
         courier: string

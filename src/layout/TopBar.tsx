@@ -47,6 +47,8 @@ export default function TopBar({
   setIsMobileSidebarOpen?: (val: boolean) => void;
   bannerOpen?: boolean;
 }) {
+  console.log("Render Topbar")
+
   const { user, is_sub_user, team_access } = useAppSelector((state) => state.auth);
   const dispatch = useAppDispatch();
   const { id: customer_id } = useParams();

@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-import { Button } from '@/components/ui/button';
 import { Calendar as CalendarIcon, ChevronDown } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { parse, format, isValid } from 'date-fns';
@@ -21,11 +20,11 @@ const formatDateToString = (date: Date | undefined): string => {
   return format(date, 'dd/MM/yyyy');
 };
 
-export const DateFilter: React.FC<DateFilterProps> = ({
+export const DateFilter = React.memo(({
   value,
   onChange,
   className,
-}) => {
+}: DateFilterProps) => {
   const [open, setOpen] = useState(false);
 
   // Local temporary states for popover editing
@@ -74,13 +73,13 @@ export const DateFilter: React.FC<DateFilterProps> = ({
 
   const handleReset = () => {
     // Reset to default (thisMonth) and apply immediately
-    const defaultType = 'thisMonth';
-    const range = calculateDateRange(defaultType);
     onChange({
-      type: defaultType,
-      from: formatDateToString(range.from),
-      to: formatDateToString(range.to),
-      label: range.label,
+      type: 'custom',
+      from: undefined,
+      to: undefined,
+      // from: formatDateToString(range.from),
+      // to: formatDateToString(range.to),
+      label: "All Time",
     });
     setOpen(false);
   };
@@ -95,23 +94,47 @@ export const DateFilter: React.FC<DateFilterProps> = ({
   })();
 
   // Format label for display button
-  const displayLabel = value?.label || 'This Month';
+  const displayLabel = value?.label || 'All Time';
+
+  // Compact label for mobile screens
+  const compactLabel = React.useMemo(() => {
+    if (!value) return 'All Time';
+    if (value.type !== 'custom') return value.label;
+    if (!value.from || !value.to) return 'All Time';
+    
+    try {
+      const fromParts = value.from.split('/');
+      const toParts = value.to.split('/');
+      if (fromParts.length === 3 && toParts.length === 3) {
+        const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+        const fromMonthIdx = parseInt(fromParts[1], 10) - 1;
+        const toMonthIdx = parseInt(toParts[1], 10) - 1;
+        
+        const fromStr = `${fromParts[0]} ${months[fromMonthIdx] || fromParts[1]}`;
+        const toStr = `${toParts[0]} ${months[toMonthIdx] || toParts[1]}`;
+        return `${fromStr} - ${toStr}`;
+      }
+    } catch  {
+      // Fallback to default label if parsing fails
+    }
+    return value.label;
+  }, [value]);
 
   return (
     <Popover open={open} onOpenChange={setOpen}>
-      <PopoverTrigger className={className}>
-        <Button
-          variant="outline"
-          type="button"
-          className={cn(
-            "h-8 px-3 rounded-lg border border-slate-200 dark:border-zinc-800 bg-white dark:bg-zinc-950 text-xs font-semibold text-slate-700 dark:text-zinc-300 hover:bg-slate-50 dark:hover:bg-zinc-900 transition-all duration-200 focus-visible:ring-1 focus-visible:ring-primary gap-2 shadow-sm",
-            open && "border-primary ring-1 ring-primary/20"
-          )}
-        >
-          <CalendarIcon className="w-3.5 h-3.5 text-slate-400 dark:text-zinc-500" />
-          <span>{displayLabel}</span>
-          <ChevronDown className={cn("w-3.5 h-3.5 text-slate-400 dark:text-zinc-500 transition-transform duration-200", open && "transform rotate-180")} />
-        </Button>
+      <PopoverTrigger
+        className={cn(
+          "h-8 px-3 mb-0 rounded-sm border cursor-pointer border-slate-200 dark:border-zinc-800 bg-white dark:bg-zinc-950 text-xs font-semibold text-slate-700 dark:text-zinc-300 hover:bg-slate-50 dark:hover:bg-zinc-900 transition-all duration-200 focus-visible:ring-1 focus-visible:ring-primary gap-2 shadow-sm justify-between w-full inline-flex items-center",
+          open && "border-primary ring-1 ring-primary/20",
+          className
+        )}
+      >
+        <span className="flex items-center gap-2 flex-1 min-w-0">
+          <CalendarIcon className="w-3.5 h-3.5 text-slate-400 dark:text-zinc-500 shrink-0" />
+          <span className="text-center truncate hidden sm:inline">{displayLabel}</span>
+          <span className="text-center truncate sm:hidden">{compactLabel}</span>
+        </span>
+        <ChevronDown className={cn("w-3.5 h-3.5 text-slate-400 dark:text-zinc-500 shrink-0 transition-transform duration-200", open && "transform rotate-180")} />
       </PopoverTrigger>
       <PopoverContent
         className="w-[340px] sm:w-[360px] max-w-[calc(100vw-32px)] p-0 rounded-2xl border border-slate-200/80 dark:border-zinc-800 bg-white dark:bg-zinc-950 shadow-lg z-9999"
@@ -148,4 +171,4 @@ export const DateFilter: React.FC<DateFilterProps> = ({
       </PopoverContent>
     </Popover>
   );
-};
+});

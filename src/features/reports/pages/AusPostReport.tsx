@@ -1,12 +1,13 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect, useCallback } from 'react';
 import { ClipboardList, DollarSign, Receipt, Banknote, Coins } from 'lucide-react';
-import { format, parse, isValid } from 'date-fns';
+import { format } from 'date-fns';
 import { useSearchParams } from 'react-router-dom';
 import { DataTable } from '@/components/common/DataTable';
 import { StatCard } from '@/components/common/StatCard';
 import { AUSPOST_REPORT_COLUMNS } from '../constants';
 import { useAuspostReport, useExportAuspostReport } from '../hooks/useReports';
-import DatePicker from '@/components/common/DatePicker';
+import { DateFilter } from '@/components/common/DateFilter';
+import type { DateFilterValue } from '@/components/common/DateFilter/types';
 import { formateCurrency } from '@/lib/utils';
 import { useAppSelector } from '@/hooks/store.hooks';
 import { CustomLabel } from '@/features/orders/components/OrderFormUI';
@@ -15,38 +16,112 @@ export default function AuspostReportPage() {
   const { is_sub_user, team_access } = useAppSelector((state) => state.auth);
   const canReadWrite = useMemo(() => !is_sub_user || team_access?.permissions?.report === 'full', [is_sub_user, team_access]);
 
-  const [searchParams] = useSearchParams();
+  const [searchParams, setSearchParams] = useSearchParams();
 
-  const [startDate, setStartDate] = useState<Date | undefined>(() => {
-    const fromParam = searchParams.get('start_date');
-    if (fromParam) {
-      const parsed = parse(fromParam, 'dd/MM/yyyy', new Date());
-      return isValid(parsed) ? parsed : undefined;
+  const parseLocalDate = useCallback((dateStr?: string | null) => {
+    if (!dateStr) return undefined;
+    const parts = dateStr.includes('/') ? dateStr.split('/') : dateStr.split('-');
+    if (parts.length === 3) {
+      const day = parseInt(parts[0], 10);
+      const month = parseInt(parts[1], 10) - 1; // 0-based
+      const year = parseInt(parts[2], 10);
+      return new Date(year, month, day);
     }
     return undefined;
+  }, []);
+
+  const [dateRange, setDateRange] = useState<DateFilterValue>(() => {
+    const sDate = parseLocalDate(searchParams.get('start_date'));
+    const eDate = parseLocalDate(searchParams.get('end_date'));
+    if (sDate && eDate) {
+      return {
+        type: 'custom',
+        from: format(sDate, 'dd/MM/yyyy'),
+        to: format(eDate, 'dd/MM/yyyy'),
+        label: `${format(sDate, 'dd MMM yyyy')} - ${format(eDate, 'dd MMM yyyy')}`,
+      };
+    }
+    return {
+      type: 'custom',
+      from: undefined,
+      to: undefined,
+      label: 'All Time',
+    };
   });
 
-  const [endDate, setEndDate] = useState<Date | undefined>(() => {
-    const toParam = searchParams.get('end_date');
-    if (toParam) {
-      const parsed = parse(toParam, 'dd/MM/yyyy', new Date());
-      return isValid(parsed) ? parsed : undefined;
-    }
-    return undefined;
-  });
   const [search, setSearch] = useState('');
   const [pageSize, setPageSize] = useState(25);
   const [page, setPage] = useState(1);
 
-  const formatDateStr = (date?: Date) => date ? format(date, 'dd/MM/yyyy') : undefined;
+  // Synchronize searchParams back to dateRange state
+  useEffect(() => {
+    const sDate = parseLocalDate(searchParams.get('start_date'));
+    const eDate = parseLocalDate(searchParams.get('end_date'));
+    if (sDate && eDate) {
+      const fromStr = format(sDate, 'dd/MM/yyyy');
+      const toStr = format(eDate, 'dd/MM/yyyy');
+
+      if (dateRange.from !== fromStr || dateRange.to !== toStr) {
+        setDateRange({
+          type: 'custom',
+          from: fromStr,
+          to: toStr,
+          label: `${format(sDate, 'dd MMM yyyy')} - ${format(eDate, 'dd MMM yyyy')}`,
+        });
+      }
+    } else {
+      if (dateRange.from !== undefined || dateRange.to !== undefined) {
+        setDateRange({
+          type: 'custom',
+          from: undefined,
+          to: undefined,
+          label: 'All Time',
+        });
+      }
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [searchParams, parseLocalDate]);
+
+  // Synchronize dateRange state to URL searchParams
+  useEffect(() => {
+    setSearchParams((prev) => {
+      let hasChanged = false;
+
+      const currentStartDate = prev.get('start_date') || undefined;
+      const newStartDate = dateRange.from;
+
+      if (currentStartDate !== newStartDate) {
+        if (newStartDate) {
+          prev.set('start_date', newStartDate);
+        } else {
+          prev.delete('start_date');
+        }
+        hasChanged = true;
+      }
+
+      const currentEndDate = prev.get('end_date') || undefined;
+      const newEndDate = dateRange.to;
+
+      if (currentEndDate !== newEndDate) {
+        if (newEndDate) {
+          prev.set('end_date', newEndDate);
+        } else {
+          prev.delete('end_date');
+        }
+        hasChanged = true;
+      }
+
+      return hasChanged ? prev : prev;
+    }, { replace: true });
+  }, [dateRange, setSearchParams]);
 
   const filters = useMemo(() => ({
-    start_date: formatDateStr(startDate),
-    end_date: formatDateStr(endDate),
+    start_date: dateRange.from,
+    end_date: dateRange.to,
     search: search || undefined,
     per_page: pageSize,
     page: page,
-  }), [startDate, endDate, search, pageSize, page]);
+  }), [dateRange, search, pageSize, page]);
 
   const { data, isLoading } = useAuspostReport(filters);
   const exportMutation = useExportAuspostReport();
@@ -93,7 +168,7 @@ export default function AuspostReportPage() {
   }, [data?.summary]);
 
   return (
-    <div className="flex flex-col flex-1 gap-4 p-page-padding min-h-0 animate-in fade-in slide-in-from-bottom-2 duration-500 bg-slate-50/30 dark:bg-zinc-950/30">
+    <div className="flex flex-col flex-1 gap-4 p-page-padding animate-in fade-in slide-in-from-bottom-2 duration-500 bg-slate-50/30 dark:bg-zinc-950/30 overflow-y-auto">
 
       {/* Summary Section */}
       <div className="space-y-3 print:hidden">
@@ -105,7 +180,7 @@ export default function AuspostReportPage() {
       </div>
 
       {/* Table Section */}
-      <div className="rounded-lg min-h-[300px] shadow-md flex-1 flex flex-col border border-gray-100 dark:border-zinc-800 bg-white dark:bg-zinc-950 overflow-hidden">
+      <div className="rounded-lg min-h-[300px] shadow-md border border-gray-100 dark:border-zinc-800 bg-white dark:bg-zinc-950 overflow-hidden flex-none h-auto">
         <DataTable
           columns={AUSPOST_REPORT_COLUMNS as any}
           data={data?.data || []}
@@ -115,7 +190,7 @@ export default function AuspostReportPage() {
           onSearchChange={(val) => { setSearch(val); setPage(1); }}
           pageSize={pageSize}
           onPageSizeChange={(val) => { setPageSize(Number(val)); setPage(1); }}
-          className="pb-3 text-xs"
+          className="pb-3 text-xs flex-none h-auto"
           totalItems={data?.meta?.total || 0}
           currentPage={page}
           onPageChange={setPage}
@@ -125,27 +200,13 @@ export default function AuspostReportPage() {
           isExporting={exportMutation.isPending}
           exportable={canReadWrite}
           headerPosition='left'
-          customHeader={<div className="flex gap-2 mr-4">
-            <div className="flex gap-1 items-center">
-              <CustomLabel label="From:" />
-              <DatePicker
-                date={startDate}
-                setDate={setStartDate}
-                placeholder="Start Date"
-                className="w-full h-8"
-                showClear={true}
-              />
-            </div>
-            <div className="flex gap-1 items-center">
-              <CustomLabel label="To:" />
-              <DatePicker
-                date={endDate}
-                setDate={setEndDate}
-                placeholder="End Date"
-                className="w-full h-8"
-                showClear={true}
-              />
-            </div>
+          customHeader={<div className="flex gap-2 mr-4 w-64 items-center">
+            <CustomLabel label="Date Range:" />
+            <DateFilter
+              value={dateRange}
+              onChange={setDateRange}
+              className="w-full"
+            />
           </div>}
         />
       </div>

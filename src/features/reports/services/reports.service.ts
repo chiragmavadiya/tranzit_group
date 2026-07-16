@@ -128,4 +128,21 @@ export const reportsService = {
         const filename = getFileName(response) || `AusPost_Report_${new Date().getTime()}.${formatted}`;
         return { blob: response.data, filename };
     },
+
+    getOrderLabelChargesReport: async (filters: ReportFilters): Promise<PaginatedResponse<any>> => {
+        const endpoint = API_ENDPOINTS.ADMIN_REPORTS.ORDER_LABEL_CHARGES;
+        const response = await api.get(endpoint, { params: filters });
+        return response.data;
+    },
+
+    exportOrderLabelChargesReport: async (filters: ReportFilters & { format: string }): Promise<{ blob: Blob; filename: string }> => {
+        const endpoint = API_ENDPOINTS.ADMIN_REPORTS.ORDER_LABEL_CHARGES_EXPORT;
+        const response = await api.get(endpoint, {
+            params: filters,
+            responseType: 'blob',
+        });
+        const formatted = filters.format === 'csv' ? 'csv' : filters.format === 'excel' ? 'xlsx' : 'pdf';
+        const filename = getFileName(response) || `Order_Label_Charges_Report_${new Date().getTime()}.${formatted}`;
+        return { blob: response.data, filename };
+    },
 };

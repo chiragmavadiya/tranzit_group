@@ -192,3 +192,25 @@ export const useExportAuspostReport = () => {
   });
 };
 
+export const useOrderLabelChargesReport = (filters: ReportFilters, enabled: boolean = true) => {
+  return useQuery({
+    queryKey: [...QUERY_KEYS.REPORTS.ORDER_LABEL_CHARGES, filters],
+    queryFn: () => reportsService.getOrderLabelChargesReport(filters),
+    placeholderData: keepPreviousData,
+    enabled,
+  });
+};
+
+export const useExportOrderLabelChargesReport = () => {
+  return useMutation({
+    mutationFn: (filters: ReportFilters & { format: string }) =>
+      reportsService.exportOrderLabelChargesReport(filters),
+    onSuccess: ({ blob, filename }) => {
+      downloadFile(blob, filename)
+    },
+    onError: (error: any) => {
+      showToast(error?.response?.data?.message || "Failed to export Order Label Charges report", "error");
+    },
+  });
+};
+

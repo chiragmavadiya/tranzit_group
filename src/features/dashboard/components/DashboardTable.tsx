@@ -14,8 +14,8 @@ interface DashboardTableProps<T> {
   className?: string;
   pageSize?: number;
   filterValue?: {
-    from: string;
-    to: string;
+    from?: string;
+    to?: string;
   }
 }
 

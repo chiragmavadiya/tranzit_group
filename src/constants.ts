@@ -215,6 +215,10 @@ export const STATUS_STYLE: Record<string, string> = {
     completed: 'bg-primary/10 text-primary',
     cancelled: 'bg-red-100 text-red-800 dark:bg-red-900/20 dark:text-red-400',
     draft1: 'bg-gray-100 text-gray-800 dark:bg-gray-900/20 dark:text-gray-400',
+    success: 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300 border-green-200 dark:border-green-800',
+    failed: 'bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-300 border-red-200 dark:border-red-800',
+    processing: 'bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 border-blue-200 dark:border-blue-800',
+
 }
 
 export const ADMIN_ROLES = ['admin', 'Staff', 'Operation Manager', 'It Manager', 'Super Admin'];

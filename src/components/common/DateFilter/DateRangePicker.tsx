@@ -20,7 +20,7 @@ export const DateRangePicker: React.FC<DateRangePickerProps> = ({
     <div className="flex flex-col gap-2 px-3 pb-3 pt-2 border-t border-slate-100 dark:border-zinc-900 bg-slate-50/20 dark:bg-zinc-950/5">
       <div className="grid grid-cols-2 gap-2.5">
         <div className="space-y-1">
-          <span className="block text-[10px] font-bold text-slate-400 dark:text-zinc-500 uppercase tracking-wider">
+          <span className="block text-[10px] font-bold text-slate-400 dark:text-zinc-500 uppercase tracking-wide">
             From Date
           </span>
           <DatePicker
@@ -32,7 +32,7 @@ export const DateRangePicker: React.FC<DateRangePickerProps> = ({
           />
         </div>
         <div className="space-y-1">
-          <span className="block text-[10px] font-bold text-slate-400 dark:text-zinc-500 uppercase tracking-wider">
+          <span className="block text-[10px] font-bold text-slate-400 dark:text-zinc-500 uppercase tracking-wide">
             To Date
           </span>
           <DatePicker

@@ -131,7 +131,9 @@ export default function CarrierIntegrationsPage() {
                   </div>
                 ) : null;
               })()}
-              <span className="text-lg font-bold text-gray-900 dark:text-zinc-100">Configure {carriers.find(c => c.id === selectedCarrier)?.name}</span>
+              <span className="text-lg font-bold text-gray-900 dark:text-zinc-100">
+                {selectedCarrier === 'auspost' ? 'Connect your Australia Post eParcel account' : `Connect your ${carriers.find(c => c.id === selectedCarrier)?.name} account`}
+              </span>
             </div>
           ) : (
             "Add Shipping Carrier"

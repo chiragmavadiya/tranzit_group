@@ -42,11 +42,24 @@ api.interceptors.response.use(
     (error: AxiosError) => {
         // Sentry.captureException(error);
         // Sentry Log
+        const data = error.response?.data as any;
+        console.log(data, 'data.....')
+        const message = data?.message || error.message || "An error occurred";
         if (axios.isAxiosError(error)) {
+            console.log("Set axios error", {
+                url: error.config?.url,
+                method: error.config?.method,
+                status: error.response?.status,
+                statusText: error.response?.statusText,
+                response: error.response?.data,
+                request: error.config?.data,
+                params: error.config?.params,
+            })
             Sentry.withScope((scope) => {
                 scope.setTransactionName(
                     `${error.config?.method?.toUpperCase()} ${error?.config?.url}`
                 );
+                // scope.setExtra("requestId", requestId);
                 scope.setContext("API", {
                     url: error.config?.url,
                     method: error.config?.method,
@@ -59,10 +72,10 @@ api.interceptors.response.use(
                 Sentry.captureException(error);
             });
         } else {
+            console.log("Set normal error")
             Sentry.captureException(error);
         }
-        const data = error.response?.data as any;
-        const message = data?.message || error.message || "An error occurred";
+
         if (data?.next_step === 'verify_email') {
             // navigate("/verify-email" + '/' + data.user.id + '/' + data.token);
             return Promise.reject(data);
@@ -75,6 +88,13 @@ api.interceptors.response.use(
         if (error.response?.status === 401 && error.message !== 'Invalid credentials') {
             localStorage.removeItem("auth_token");
             window.location.href = "/login";
+        }
+
+        const requestId = error.response?.headers['x-request-id'] || error.response?.headers['X-Request-Id'] || data?.trace_id;
+        if (requestId && ((data?.validation_error === undefined) || (error?.response?.status && error?.response?.status >= 500))) {
+            showToast(`Something went wrong. Please contact support with Request ID: ${requestId}`, 'error', '', Infinity)
+            suspendToast()
+            return
         }
 
         console.error("[API Error]:", {

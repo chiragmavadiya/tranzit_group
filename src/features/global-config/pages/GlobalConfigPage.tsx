@@ -236,6 +236,7 @@ export default function GlobalConfigPage() {
       {
         header: 'CUSTOMER',
         key: 'customerId',
+        width: '130px',
         cell: (value: string[] | string) => {
           const ids = Array.isArray(value) ? value : [value || 'all'];
           if (ids.length === 0 || ids.includes('all')) {
@@ -493,7 +494,7 @@ export default function GlobalConfigPage() {
               <label className="text-[13px] font-semibold text-slate-800 dark:text-zinc-200">
                 Active Status
               </label>
-              <p className="text-[11px] text-slate-500 dark:text-zinc-400">
+              <p className="text-[11px] text-slate-500 dark:text-zinc-400 my-0">
                 Determine if this announcement is active and visible.
               </p>
             </div>

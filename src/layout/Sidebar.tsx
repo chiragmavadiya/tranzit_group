@@ -28,6 +28,8 @@ const Sidebar = ({
   setIsMobileSidebarOpen = () => { },
   bannerOpen = false,
 }: SidebarProps) => {
+  console.log("Render Sidebar")
+
   const [activeSubmenu, setActiveSubmenu] = useState<string | null>(null);
   const [expandedItems, setExpandedItems] = useState<string[]>([]);
   const { role, team_access } = useAppSelector((state) => state.auth);
@@ -105,8 +107,13 @@ const Sidebar = ({
     if (item.isExternal) return false;
 
     // Fix double active highlight for base orders menu vs create order
-    if ((item.name === 'Orders' || item.name === 'Order Management') && location.pathname.includes('/orders/create')) {
-      return false;
+    if (item.name === 'Orders' || item.name === 'Order Management') {
+      if (role === 'admin' && (location.pathname === '/admin/orders' || location.pathname.startsWith('/admin/orders/'))) {
+        return true;
+      }
+      if (role !== 'admin' && location.pathname.includes('/orders/create')) {
+        return false;
+      }
     }
 
     // If the item has a dropdown, ignore the default NavLink isActive (which triggers for '#' paths).
@@ -177,14 +184,6 @@ const Sidebar = ({
     }
   }, [location.pathname, sidebarItems]);
 
-  // Track the last non-settings/non-submenu path to return to when backing out of settings
-  useEffect(() => {
-    const isSubmenuPage = location.pathname.includes('/settings');
-    if (!isSubmenuPage) {
-      sessionStorage.setItem('last_non_settings_path', location.pathname + location.search);
-    }
-  }, [location]);
-
   const toggleExpand = (name: string) => {
     setExpandedItems(prev =>
       prev.includes(name) ? prev.filter(i => i !== name) : [...prev, name]
@@ -208,12 +207,7 @@ const Sidebar = ({
 
   const handleBackFromSubmenu = () => {
     setActiveSubmenu(null);
-    const lastPath = sessionStorage.getItem('last_non_settings_path');
-    if (lastPath) {
-      navigate(lastPath);
-    } else {
-      navigate(`${role === 'admin' ? '/admin' : ''}/orders`);
-    }
+    navigate(`${role === 'admin' ? '/admin' : ''}/orders`);
   };
 
   const currentSubmenuData = sidebarItems.find(i => i.name === activeSubmenu);
@@ -333,21 +327,14 @@ const Sidebar = ({
                       return;
                     }
                     if (item.hasDropdown) {
-                      // e.preventDefault();
+                      if (!item.subGroups) {
+                        e.preventDefault();
+                      }
                       handleItemClick(item);
+                      return;
                     }
-                    if (sessionStorage.getItem('quote_courier')) {
-                      sessionStorage.removeItem('quote_courier');
-                    }
-                    if (sessionStorage.getItem('quote_items')) {
-                      sessionStorage.removeItem('quote_items');
-                    }
-                    if (sessionStorage.getItem('quote_sender')) {
-                      sessionStorage.removeItem('quote_sender');
-                    }
-                    if (sessionStorage.getItem('quote_receiver')) {
-                      sessionStorage.removeItem('quote_receiver');
-                    }
+                    const itemsToRemove = ['quote_courier', 'quote_items', 'quote_sender', 'quote_receiver'];
+                    itemsToRemove.forEach(key => sessionStorage.removeItem(key));
                   }}
                   className={({ isActive }) => {
                     const active = isItemActive(item, isActive);

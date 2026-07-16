@@ -35,7 +35,7 @@ export default function AccountSettingsPage() {
   const [isPasswordOpen, setIsPasswordOpen] = useState(false);
   const [isPlanModalOpen, setIsPlanModalOpen] = useState(false);
   // const { user } = useAppSelector((state) => state.auth);
-  const { summary } = useAppSelector((state) => state.wallet);
+  // const { summary } = useAppSelector((state) => state.wallet);
   const { is_sub_user, team_access } = useAppSelector((state) => state.auth)
   const canReadWrite = useMemo(() => !is_sub_user || team_access?.permissions?.settings_account_detail === 'full', [is_sub_user, team_access]);
 
@@ -248,7 +248,7 @@ export default function AccountSettingsPage() {
   }, [profile]);
 
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 w-full items-start">
+    <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 w-full items-stretch">
 
       <div className="col-span-12 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
@@ -362,28 +362,134 @@ export default function AccountSettingsPage() {
         </Card>
       </motion.div>
 
-      {/* Balance Card */}
-      <motion.div
-        custom={1}
-        initial="hidden"
-        animate="visible"
-        variants={cardVariants}
-        className="col-span-12 lg:col-span-4 flex h-fit"
-      >
-        <Card className="w-full border-gray-200 shadow-xs">
-          <CardHeader className="flex flex-row items-center justify-between px-6 py-4 border-b border-gray-100 dark:border-zinc-800 bg-slate-50/30 dark:bg-zinc-950 space-y-0 rounded-t-md">
-            <CardTitle className="text-base font-medium text-gray-800 dark:text-zinc-200">Balance</CardTitle>
-          </CardHeader>
-          <CardContent className="p-6 pt-6 flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <span className="text-[13px] font-semibold text-slate-500">Current Balance:</span>
-              <span className="text-[13px] font-bold text-emerald-700 bg-emerald-50 dark:bg-emerald-950/50 dark:text-emerald-400 px-2 py-0.5 rounded-sm">
-                {new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(Number(summary?.wallet_balance || 0))}
-              </span>
-            </div>
-          </CardContent>
-        </Card>
-      </motion.div>
+      {/* Balance & Weekly Label Usage Container */}
+      <div className="col-span-12 lg:col-span-4 flex">
+        {/* Balance Card */}
+        {/* <motion.div
+          custom={1}
+          initial="hidden"
+          animate="visible"
+          variants={cardVariants}
+          className="w-full flex h-fit"
+        >
+          <Card className="w-full border-gray-200 shadow-xs gap-0">
+            <CardHeader className="flex flex-row items-center justify-between px-6 py-4 border-b border-gray-100 dark:border-zinc-800 bg-slate-50/30 dark:bg-zinc-950 space-y-0 rounded-t-md">
+              <CardTitle className="text-base font-medium text-gray-800 dark:text-zinc-200">Balance</CardTitle>
+            </CardHeader>
+            <CardContent className="p-6 pt-6 flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <span className="text-[13px] font-semibold text-slate-500">Current Balance:</span>
+                <span className="text-[13px] font-bold text-emerald-700 bg-emerald-50 dark:bg-emerald-950/50 dark:text-emerald-400 px-2 py-0.5 rounded-sm">
+                  {new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(Number(summary?.wallet_balance || 0))}
+                </span>
+              </div>
+            </CardContent>
+          </Card>
+        </motion.div> */}
+
+        {/* Weekly Label Usage Card */}
+        {profile?.weekly_label_usage && (
+          <motion.div
+            custom={2}
+            initial="hidden"
+            animate="visible"
+            variants={cardVariants}
+            className="w-full flex"
+          >
+            <Card className="w-full border-gray-200 shadow-xs rounded-md gap-0 flex flex-col h-full hover:shadow-md transition-shadow duration-300">
+              <CardHeader className="flex flex-row items-center justify-between px-6 py-4 border-b border-gray-100 dark:border-zinc-800 bg-slate-50/30 dark:bg-zinc-950 space-y-0 rounded-t-md">
+                <CardTitle className="text-base font-medium text-gray-800 dark:text-zinc-200">Weekly Label Usage</CardTitle>
+                <span className="text-[10px] font-bold text-slate-400 dark:text-zinc-500 uppercase tracking-wide">
+                  {profile.weekly_label_usage.week_start} - {profile.weekly_label_usage.week_end}
+                </span>
+              </CardHeader>
+              <CardContent className="p-6 space-y-2 flex-1 flex flex-col justify-between">
+                {/* Metrics Row */}
+                <div className="flex items-start justify-between">
+                  <div>
+                    <p className="text-[10px] font-bold text-slate-400 dark:text-zinc-500 uppercase tracking-wide mb-1">
+                      Labels Printed
+                    </p>
+                    <h3 className="my-0 text-xl font-black text-slate-800 dark:text-zinc-100 tracking-tight leading-none">
+                      {profile.weekly_label_usage.total_labels_printed}
+                    </h3>
+                  </div>
+                  <div className="text-right">
+                    <p className="text-[10px] font-bold text-slate-400 dark:text-zinc-500 uppercase tracking-wide mb-1">
+                      Current Rate
+                    </p>
+                    <div className="flex items-center gap-1.5 justify-end">
+                      <span className="text-[10px] font-bold text-primary-600 bg-primary/5 dark:bg-primary/10 border border-primary/20 px-2 py-0.5 rounded-full">
+                        Tier {profile.weekly_label_usage.current_tier.label}
+                      </span>
+                      <span className="text-sm font-black text-slate-800 dark:text-zinc-200">
+                        ${Number(profile.weekly_label_usage.current_tier.rate).toFixed(2)}/label
+                      </span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Print Breakdown */}
+                <div className="grid grid-cols-2 gap-3 pt-2 border-t border-slate-100 dark:border-zinc-800/80">
+                  <div className="p-3 rounded-xl bg-slate-50/50 dark:bg-zinc-900/30 border border-slate-100/50 dark:border-zinc-800/50">
+                    <span className="text-[9px] font-bold text-slate-400 dark:text-zinc-500 uppercase tracking-wide">
+                      BYO Labels
+                    </span>
+                    <p className="my-0 text-base font-black text-slate-700 dark:text-zinc-300 mt-0.5 leading-none">
+                      {profile.weekly_label_usage.byo_labels_printed}
+                    </p>
+                  </div>
+                  <div className="p-3 rounded-xl bg-slate-50/50 dark:bg-zinc-900/30 border border-slate-100/50 dark:border-zinc-800/50">
+                    <span className="text-[9px] font-bold text-slate-400 dark:text-zinc-500 uppercase tracking-wide">
+                      Tranzit Labels
+                    </span>
+                    <p className="my-0  text-base font-black text-slate-700 dark:text-zinc-300 mt-0.5 leading-none">
+                      {profile.weekly_label_usage.tr_labels_printed}
+                    </p>
+                  </div>
+                </div>
+
+                {/* Next Tier Progress */}
+                {profile.weekly_label_usage.next_tier ? (
+                  <div className="space-y-2 pt-2 border-t border-slate-100 dark:border-zinc-800/80">
+                    <div className="flex items-center justify-between text-xs">
+                      <span className="font-semibold text-slate-500">Progress to Next Tier</span>
+                      <span className="font-bold text-slate-700 dark:text-zinc-300">
+                        {profile.weekly_label_usage.labels_needed_for_next_tier} more for ${Number(profile.weekly_label_usage.next_tier.rate).toFixed(2)} rate
+                      </span>
+                    </div>
+                    <div className="w-full h-2 bg-slate-100 dark:bg-zinc-800 rounded-full overflow-hidden">
+                      <div
+                        className="h-full bg-gradient-to-r from-primary to-emerald-500 rounded-full transition-all duration-500"
+                        style={{
+                          width: `${Math.min(
+                            100,
+                            Math.round(
+                              (Number(profile.weekly_label_usage.total_labels_printed) /
+                                (Number(profile.weekly_label_usage.current_tier.max) || 1)) *
+                              100
+                            )
+                          )}%`,
+                        }}
+                      />
+                    </div>
+                    <div className="flex items-center justify-between text-[10px] text-slate-500 font-bold">
+                      <span>Tier {profile.weekly_label_usage.current_tier.label}</span>
+                      <span>Tier {profile.weekly_label_usage.next_tier.label}</span>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="pt-2 border-t border-slate-100 dark:border-zinc-800/80 text-center py-2 bg-emerald-50/50 dark:bg-emerald-950/20 rounded-xl border border-emerald-100/50 dark:border-emerald-900/30">
+                    <p className="text-xs font-black text-emerald-700 dark:text-emerald-400 m-0 uppercase tracking-wide">
+                      🎉 You are on the best rate tier!
+                    </p>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          </motion.div>
+        )}
+      </div>
       <motion.div
         custom={3}
         initial="hidden"
@@ -519,7 +625,7 @@ export default function AccountSettingsPage() {
                   <div className="p-1 rounded-md bg-blue-100/80 dark:bg-blue-950/60 text-blue-600 dark:text-blue-400 shrink-0">
                     <Info className="w-4 h-4" />
                   </div>
-                  <div className="text-[13px] text-slate-600 dark:text-zinc-400 leading-relaxed font-medium">
+                  <div className="text-[13px] text-slate-600 dark:text-zinc-400 leading-relaxed font-medium flex gap-2 items-center">
                     To change the Pickup address, please email us at{' '}
                     <a
                       href="mailto:info@tranzitgroup.com.au"

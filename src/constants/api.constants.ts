@@ -164,6 +164,8 @@ export const API_ENDPOINTS = {
         AUSPOST_UPLOAD: "/admin/reports/customer-parcels/auspost-upload",
         AUSPOST: "/admin/reports/auspost",
         AUSPOST_EXPORT: "/admin/reports/auspost/export",
+        ORDER_LABEL_CHARGES: "/admin/reports/order-label-charges",
+        ORDER_LABEL_CHARGES_EXPORT: "/admin/reports/order-label-charges/export",
     },
     ADMIN_HELP_CENTER: {
         BASE: "/admin/help-center/articles",
@@ -234,6 +236,18 @@ export const API_ENDPOINTS = {
         BASE: "/customer/rule-management",
         OPTIONS: "/customer/rule-management/options",
         DETAILS: (id: string | number) => `/customer/rule-management/${id}`,
+    },
+    ADMIN_DEBUG_CENTRE: {
+        BASE: "/admin/debug-centre",
+        STATS: "/admin/debug-centre/counts",
+        TRACES: "/admin/debug-centre/traces",
+        ALERTS: "/admin/debug-centre/alerts",
+        FAILED_JOBS: "/admin/debug-centre/failed-jobs",
+        EXTERNAL_API_FAILURES: "/admin/debug-centre/external-api-failures",
+        SLOW_REQUESTS: "/admin/debug-centre/slow-requests",
+        SLOW_EXTERNAL_CALLS: "/admin/debug-centre/slow-external-calls",
+        CUSTOMER_ACTIVITY: "/admin/debug-centre/customer-activity",
+        TRACE_DETAIL: (id: string | number) => `/admin/debug-centre/traces/${id}`,
     }
 };
 
@@ -271,6 +285,7 @@ export const QUERY_KEYS = {
         AUSPOST_REPORT: ["reports", "auspost-report"],
         UNDELIVERED_PARCELS: ["reports", "undelivered-parcels"],
         COUNTS: ["reports", "counts"],
+        ORDER_LABEL_CHARGES: ["reports", "order-label-charges"],
     },
     ADMIN_HELP_CENTER: {
         LIST: ["admin", "help-center", "list"],
@@ -367,5 +382,16 @@ export const QUERY_KEYS = {
         LIST: ["rules", "list"],
         DETAILS: (id: string | number) => ["rules", "details", id],
         OPTIONS: ["rules", "options"],
+    },
+    ADMIN_DEBUG_CENTRE: {
+        STATS: ["admin", "debug-centre", "stats"],
+        TRACES: ["admin", "debug-centre", "traces"],
+        ALERTS: ["admin", "debug-centre", "alerts"],
+        FAILED_JOBS: ["admin", "debug-centre", "failed-jobs"],
+        EXTERNAL_API_FAILURES: ["admin", "debug-centre", "external-api-failures"],
+        SLOW_REQUESTS: ["admin", "debug-centre", "slow-requests"],
+        SLOW_EXTERNAL_CALLS: ["admin", "debug-centre", "slow-external-calls"],
+        CUSTOMER_ACTIVITY: ["admin", "debug-centre", "customer-activity"],
+        TRACE_DETAIL: (id: string | number) => ["admin", "debug-centre", "trace", id],
     }
 };

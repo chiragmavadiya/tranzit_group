@@ -1,6 +1,6 @@
 import { useState, useMemo } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { ArrowLeft, Link2Off, Loader2, Check } from 'lucide-react';
+import { ArrowLeft, Link2Off, Loader2, Check, X } from 'lucide-react';
 // import { useQueryClient } from '@tanstack/react-query';
 import {
   useConnectIntegration,
@@ -71,7 +71,7 @@ export default function CarrierConfigPage() {
       {/* Top Header Bar */}
       <div className='min-h-[calc(100vh-120px)] bg-white dark:bg-zinc-900 border border-gray-250 dark:border-zinc-800 p-page-padding rounded-sm flex flex-col flex-1'>
         <div className="flex flex-col gap-4 pb-4 border-b border-gray-100 dark:border-zinc-800">
-          <div className="flex items-center justify-between">
+          <div className="flex flex-wrap items-center justify-between gap-4">
             <Button
               onClick={() => navigate('/settings/carriers')}
               variant={'ghost'}
@@ -97,7 +97,7 @@ export default function CarrierConfigPage() {
                     ) : (
                       <Check className="w-3.5 h-3.5 mr-1.5" />
                     )}
-                    Set Default
+                    Set as Default
                   </Button>
                 )}
                 {isConnected && isDefault && (
@@ -109,13 +109,14 @@ export default function CarrierConfigPage() {
                     disabled={removeDefaultMutation.isPending}
                   >
                     {removeDefaultMutation.isPending ? (
-                      <Loader2 className="w-3.5 h-3.5 animate-spin mr-1.5" />
+                      <Loader2 className="w-3.5 h-3.5 mr-1.5 animate-spin" />
                     ) : (
-                      <Link2Off className="w-3.5 h-3.5 mr-1.5" />
+                      <X className="w-3.5 h-3.5 mr-1.5" />
                     )}
                     Remove Default
                   </Button>
                 )}
+
                 {isConnected && (
                   <Button
                     variant="outline"
@@ -138,10 +139,10 @@ export default function CarrierConfigPage() {
 
           {/* Centered Logo & Header */}
           {!fetchingData && (
-            <div className="flex gap-3">
+            <div className="flex flex-col sm:flex-row items-start gap-4">
               <div>
                 {logoUrl && (
-                  <div className="flex justify-center">
+                  <div className="flex justify-start sm:justify-center">
                     <div className="bg-white p-2.5 rounded-xl border border-gray-250/60 dark:border-zinc-800 shadow-xs flex items-center justify-center shrink-0">
                       <img src={logoUrl} alt={carrierName} className="h-16 w-16 object-contain" />
                     </div>
@@ -149,9 +150,9 @@ export default function CarrierConfigPage() {
                 )}
               </div>
               <div className='flex flex-col justify-center text-left'>
-                <div className="flex items-center gap-3">
+                <div className="flex flex-wrap items-center gap-2 sm:gap-3">
                   <h1 className="text-2xl font-extrabold text-slate-900 dark:text-zinc-100 tracking-tight my-0">
-                    Configure {carrierName}
+                    {currentSlug === 'auspost' ? 'Connect your Australia Post eParcel account' : `Connect your ${carrierName} account`}
                   </h1>
                   <Badge
                     variant={isConnected ? "default" : "secondary"}
@@ -172,7 +173,9 @@ export default function CarrierConfigPage() {
                   )}
                 </div>
                 <p className="my-0 text-sm text-slate-500 dark:text-zinc-400 leading-normal mt-1">
-                  Connect your {carrierName} account to automate label generation, track shipments, and manage {currentSlug === 'auspost' ? 'eParcel' : 'shipping'} products directly from Tranzit.
+                  {currentSlug === 'auspost'
+                    ? 'Connect your existing Australia Post eParcel contract account to Tranzit to access your contracted rates, create shipments, generate shipping labels and track parcels.'
+                    : `Connect your existing ${carrierName} account to Tranzit to access your contracted rates, generate shipping labels, track consignments and use the services enabled on your courier account.`}
                 </p>
               </div>
             </div>

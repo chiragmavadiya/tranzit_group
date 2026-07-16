@@ -9,6 +9,7 @@ import { SidePanel } from '@/features/orders/components/order-details/SidePanel'
 import { StickyFooter } from '@/features/orders/components/order-details/StickyFooter';
 import CreateOrderDialog from '@/features/orders/components/CreateOrderDialog';
 import { ItemsTable } from '@/features/orders/components/order-details/ItemsTable';
+import { ShopifyItemsCard } from '@/features/orders/components/order-details/ShopifyItemsCard';
 import WalletCheckDialog from '@/features/orders/components/WalletCheckDialog';
 import { Button } from '@/components/ui/button';
 import { ConformationModal } from '@/components/common/ConformationModal';
@@ -20,6 +21,7 @@ import { showToast } from '@/components/ui/custom-toast';
 import { CustomModel } from '@/components/ui/dialog';
 import { FormInput } from '@/features/orders/components/OrderFormUI';
 import { isPhoneValid } from '@/lib/utils';
+import { getDisplayCourierName } from '../utils/order-details.utils';
 
 const OrderDetailsSkeleton: React.FC = () => {
   return (
@@ -254,18 +256,9 @@ const OrderDetailsPage: React.FC = () => {
     }
   }, [showReceiverPhoneModal, addressData.receiver.phone]);
 
-  const getDisplayCourierName = () => {
-    const rawName = quoteData?.courier?.carrier || orderDetail?.courier_details?.courier || courierData?.courier || '';
-    if (!rawName) return '';
-    if (rawName === 'auspost') return 'Australia Post';
-    if (rawName === 'direct-freight') return 'Direct Freight Express';
-    if (rawName === 'aramex') return 'Aramex';
-    if (rawName === 'couriersplease' || rawName === 'couriers-please') return 'Couriers Please';
-    return rawName
-      .split('-')
-      .map((word: string) => word.charAt(0).toUpperCase() + word.slice(1))
-      .join(' ');
-  };
+  const displayCourierName = getDisplayCourierName(
+    quoteData?.courier?.carrier || orderDetail?.courier_details?.courier || courierData?.courier
+  );
 
   const handleConsignClick = () => {
     if (!termsAccepted || !ratesAccepted || !dangerousGoodsAccepted) {
@@ -510,6 +503,9 @@ const OrderDetailsPage: React.FC = () => {
                     orderType={orderType}
                     customerId={selectedCustomer}
                   />
+                  {orderDetail?.order_details?.shopify_items && orderDetail.order_details.shopify_items.length > 0 && (
+                    <ShopifyItemsCard items={orderDetail.order_details.shopify_items} />
+                  )}
                   {orderType !== 'create-menual' && (
                     <CarrierCard
                       itemData={itemsData}
@@ -639,10 +635,10 @@ const OrderDetailsPage: React.FC = () => {
           description={
             <div className="space-y-4 pt-2">
               <p className="text-sm text-slate-600 dark:text-zinc-400">
-                You're about to create this shipment using your connected <strong className="font-bold text-slate-800 dark:text-zinc-200">{getDisplayCourierName()}</strong> account.
+                You're about to create this shipment using your connected <strong className="font-bold text-slate-800 dark:text-zinc-200">{displayCourierName}</strong> account.
               </p>
               <p className="text-sm text-slate-500 dark:text-zinc-400">
-                Shipping charges will be billed according to your {getDisplayCourierName()} account and contract setup.
+                Shipping charges will be billed according to your {displayCourierName} account and contract setup.
               </p>
             </div>
           }

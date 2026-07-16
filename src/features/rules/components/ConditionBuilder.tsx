@@ -127,7 +127,7 @@ export default function ConditionBuilder({ conditions, onChange }: ConditionBuil
                     {attr.type === 'boolean' ? (
                       // Boolean fields don't need a value input if operator is Yes/No
                       <div className="h-8 flex items-center">
-                        <span className="text-xs text-gray-400 dark:text-zinc-500 bg-gray-50 dark:bg-zinc-950 px-2.5 py-1.5 rounded-sm border border-gray-150 dark:border-zinc-850 font-semibold w-full">
+                        <span className="text-xs text-gray-400 dark:text-zinc-500 bg-gray-50 dark:bg-zinc-950 px-2.5 py-1.5 rounded-sm border border-gray-150 dark:border-zinc-800 font-semibold w-full">
                           Condition matched if state is {cond.operator === 'yes' ? 'Yes' : 'No'}
                         </span>
                       </div>

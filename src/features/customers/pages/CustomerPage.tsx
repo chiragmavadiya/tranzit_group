@@ -141,7 +141,7 @@ export default function CustomerPage() {
     const columns = useMemo(() => getCustomerColumns(handleEdit, handleDelete, navigate, handleChangePassword), [navigate]);
 
     return (
-        <div className="flex flex-col flex-1 gap-3 p-page-padding min-h-0 animate-in fade-in slide-in-from-bottom-2 duration-500 bg-slate-50/30 dark:bg-zinc-950/30">
+        <div className="flex flex-col flex-1 gap-3 p-page-padding animate-in fade-in slide-in-from-bottom-2 duration-500 bg-slate-50/30 dark:bg-zinc-950/30 overflow-y-auto">
 
             {/* Compact Stats Ribbon */}
             <div className="grid grid-cols-3 gap-2 sm:gap-3 shrink-0">
@@ -156,7 +156,7 @@ export default function CustomerPage() {
                                 <Icon className={`w-3.5 h-3.5 sm:w-4.5 sm:h-4.5 ${stat.iconColor}`} />
                             </div>
                             <div className="flex flex-col min-w-0 flex-1">
-                                <span className="text-[8px] sm:text-[11px] font-bold text-slate-400 dark:text-zinc-500 uppercase tracking-wider truncate">
+                                <span className="text-[8px] sm:text-[11px] font-bold text-slate-400 dark:text-zinc-500 uppercase tracking-wide truncate">
                                     {stat.label}
                                 </span>
                                 <span className="text-xs sm:text-base md:text-lg font-extrabold text-slate-900 dark:text-white leading-tight truncate">
@@ -169,11 +169,11 @@ export default function CustomerPage() {
             </div>
 
             {/* Table Section */}
-            <div className="rounded-xl shadow-md flex-1 flex flex-col min-h-0 border border-gray-100 dark:border-zinc-800 bg-white dark:bg-zinc-950 overflow-hidden">
+            <div className="rounded-xl shadow-md border border-gray-100 dark:border-zinc-800 bg-white dark:bg-zinc-950 overflow-hidden flex-none h-auto">
                 <DataTable
                     columns={columns as any}
                     data={customers}
-                    headerTitle="Customer"
+                    // headerTitle="Customer"
                     searchable
                     searchValue={search}
                     onSearchChange={(val) => { setSearch(val); setCurrentPage(1); }}
@@ -185,7 +185,7 @@ export default function CustomerPage() {
                     exportable
                     isExporting={isExporting}
                     onExport={handleExport}
-                    className="pb-3"
+                    className="pb-3 flex-none h-auto"
                     customHeader={(
                         <div className="flex flex-wrap sm:flex-nowrap items-center gap-2 justify-end w-full sm:w-auto">
                             <FormSelect

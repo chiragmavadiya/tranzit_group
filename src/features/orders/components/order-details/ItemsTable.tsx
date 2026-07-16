@@ -84,15 +84,15 @@ export const ItemsTable: React.FC<ItemsTableProps> = React.memo(({
     }
   }
   return (
-    <Accordion multiple defaultValue={['notes', 'services', 'summary', 'pickup_date']} className="flex flex-col gap-3">
+    <Accordion multiple defaultValue={['items_table']} className="flex flex-col gap-3">
 
       {/* ORDER ITEMS */}
-      <AccordionItem value="summary" className="border border-gray-200 dark:border-zinc-800 rounded-md bg-white dark:bg-zinc-950 shadow-xs border-b overflow-hidden transition-colors duration-300 [&>h3]:my-0">
-        <AccordionTrigger className="hover:no-underline py-3 px-4 [&>svg]:text-primary items-center bg-slate-50 dark:bg-zinc-900 rounded-none cursor-pointer">
+      <AccordionItem value="items_table" className="border border-gray-200 dark:border-zinc-800 rounded-md bg-white dark:bg-zinc-950 shadow-xs border-b overflow-hidden transition-colors duration-300 [&>h3]:my-0">
+        <AccordionTrigger className="hover:no-underline py-[10px] px-4 [&>svg]:text-primary items-center bg-slate-50 dark:bg-zinc-900 rounded-none cursor-pointer">
           <div className="flex items-center w-full justify-between ">
             <div className="flex items-center gap-2 text-gray-600 dark:text-zinc-300">
               <Box className="w-5 h-5 text-primary" />
-              <h3 className="my-0 text-base font-bold text-slate-800 dark:text-zinc-400 ">Parcel Details {items.length > 0 && ` (${items.length})`}
+              <h3 className="my-0 text-sm font-bold text-slate-800 dark:text-zinc-400 ">Parcel Details {items.length > 0 && ` (${items.length})`}
 
                 {items.length > 0 && (
                   <span className="inline-flex group-aria-expanded/accordion-trigger:hidden normal-case font-medium text-xs  dark:text-zinc-500 ml-2 pt-0.5 leading-relaxed">
@@ -145,10 +145,10 @@ export const ItemsTable: React.FC<ItemsTableProps> = React.memo(({
                             </div>
                             <div>
                               <div className="text-xs font-bold text-gray-400 uppercase">Packing Type</div>
-                              <div className="text-sm font-bold text-gray-900 dark:text-zinc-100">
+                              <div className="text-sm font-bold capitalize text-gray-900 dark:text-zinc-100">
                                 {item.type === 'my_item' ? (
                                   predefinedItems.find(i => i.id.toString() === item.item_id?.toString())?.item_name || 'My Item'
-                                ) : 'Standard Parcel'}
+                                ) : (item.type || 'Box')}
                               </div>
                             </div>
                           </div>

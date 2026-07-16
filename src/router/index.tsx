@@ -1,7 +1,6 @@
 import { lazy, Suspense, useEffect, useState } from 'react';
 import { Routes, Route, useNavigate, useLocation } from 'react-router-dom';
 import PublicRoute from '@/router/PublicRoute';
-import PageViewTracker from '@/analytics/PageViewTracker';
 import brandLogo from '@/assets/Tranzit_Logo.svg';
 import brandLogoDark from '@/assets/Tranzit_Logo_dark.svg';
 import { useTheme } from '@/app/providers/theme-provider';
@@ -17,6 +16,8 @@ import ShopifyAutoLoginPage from '@/features/shopifyAutoLogin';
 import { showToast } from '@/components/ui/custom-toast';
 import { DO_NOT_REDIRECT_URLS } from '@/constants';
 import * as Sentry from "@sentry/react";
+import PageViewTracker from '@/analytics/PageViewTracker';
+import { setAnalyticsUser } from '@/analytics';
 
 
 // Lazy load page components
@@ -52,6 +53,8 @@ const PageLoader = () => (
 );
 
 export const AppRouter = () => {
+  console.log("Render AppRouter")
+
   const { isAuthenticated, userID, token, next_step } = useAppSelector((state) => state.auth);
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
@@ -64,6 +67,7 @@ export const AppRouter = () => {
 
   // Sync user details to Redux when query data updates
   useEffect(() => {
+    console.log("Render AppRouter Useefect 1 start")
     if (userData?.user && !isPending) {
       const add = userData?.address_detail ? [userData.address_detail.default, userData.address_detail.billing] : []
       Sentry.setUser({
@@ -81,16 +85,21 @@ export const AppRouter = () => {
         blackout_days: userData.blackout_days || []
       }));
 
+      // Set user ID in Google Analytics for tracking
+      setAnalyticsUser(userData.user.id);
+
 
 
       if (userData.next_step === 'purchase_plan' && userData.user.role !== 'admin') {
         setShowSubscriptionModal(true);
       }
     }
+    console.log("Render AppRouter Useefect 1 END")
   }, [userData, isPending, dispatch]);
 
   // Handle redirects based on next_step state and location.pathname
   useEffect(() => {
+    console.log("Render AppRouter Useefect 2 start")
     if (isAuthenticated && !DO_NOT_REDIRECT_URLS.includes(location.pathname)) {
       if ((next_step === 'onboarding' || next_step === 'verify_email') && !location.pathname.includes('/on-board')) {
         navigate('/on-board/' + userID + '/' + token);
@@ -100,6 +109,7 @@ export const AppRouter = () => {
         navigate('/orders?tab=new');
       }
     }
+    console.log("Render AppRouter Useefect 2 end")
   }, [next_step, location.pathname, isAuthenticated, userID, token, navigate]);
 
   if (isError && !location.pathname.includes('/on-board')) {

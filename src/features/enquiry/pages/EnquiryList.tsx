@@ -84,8 +84,8 @@ export default function EnquiryListPage() {
     ], []);
 
     return (
-        <div className="flex flex-col flex-1 gap-4 p-page-padding min-h-0 animate-in fade-in slide-in-from-bottom-2 duration-500 bg-slate-50/30 dark:bg-zinc-950/30 overflow-y-auto">
-            <div className='rounded-2xl min-h-[500px] shadow-[0_8px_30px_rgba(0,0,0,0.04)] flex-1 flex flex-col border border-slate-100 dark:border-zinc-800 bg-white dark:bg-zinc-950 overflow-hidden'>
+        <div className="flex flex-col flex-1 gap-4 p-page-padding animate-in fade-in slide-in-from-bottom-2 duration-500 bg-slate-50/30 dark:bg-zinc-950/30 overflow-y-auto">
+            <div className='rounded-2xl shadow-[0_8px_30px_rgba(0,0,0,0.04)] border border-slate-100 dark:border-zinc-800 bg-white dark:bg-zinc-950 overflow-hidden flex-none h-auto'>
                 <DataTable
                     columns={columns as any}
                     data={enquiriesResponse?.data || []}
@@ -94,7 +94,7 @@ export default function EnquiryListPage() {
                     onSearchChange={(val) => { setSearch(val); setPage(1); }}
                     pageSize={pageSize}
                     onPageSizeChange={(val) => { setPageSize(Number(val)); setPage(1); }}
-                    className="pb-3 text-xs"
+                    className="pb-3 text-xs flex-none h-auto"
                     totalItems={enquiriesResponse?.meta?.total || 0}
                     currentPage={page}
                     onPageChange={setPage}

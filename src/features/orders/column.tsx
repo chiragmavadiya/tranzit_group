@@ -186,8 +186,8 @@ export const getOrdersColumns = (
         // width: '140px',
         cell: (value: string, row: Order) => (
           <div className="flex items-center gap-2">
-            <img src={row?.order_source_icon || Favicon} className="h-4 w-4" alt="" />
-            <span className="capitalize">{value}</span>
+            <img src={row?.order_source_icon || Favicon} className="h-5" alt="" />
+            {!row?.order_source_icon && <span className="capitalize">{value}</span>}
           </div>
         )
       },
@@ -232,11 +232,11 @@ export const getOrdersColumns = (
                 <>
                   {((role === 'admin' && !row.is_own_courier) || (role !== 'admin')) && (
                     <Button
-                      className="h-9 px-4 font-normal"
+                      className="h-8 px-4 font-normal"
                       onClick={() => onPrint?.(row.order_number, Number(row.amount), row)}
-                      disabled={printingOrderId === row.order_number}
+                      disabled={String(printingOrderId) === String(row.order_number)}
                     >
-                      {printingOrderId === row.order_number ? (
+                      {String(printingOrderId) === String(row.order_number) ? (
                         <Loader2 className="h-4 w-4 mr-2 animate-spin" />
                       ) : (
                         <Printer className="h-4 w-4 mr-2" />

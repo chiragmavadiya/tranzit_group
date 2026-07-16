@@ -1,7 +1,7 @@
 import { useCustomers } from '@/features/customers/hooks/useCustomers';
 import { FormSelect } from '@/features/orders/components/OrderFormUI';
-import DatePicker from '@/components/common/DatePicker';
-import { Button } from '@/components/ui/button';
+import { DateFilter } from '@/components/common/DateFilter';
+import type { DateFilterValue } from '@/components/common/DateFilter/types';
 
 interface InvoiceFiltersProps {
   searchTerm: string;
@@ -11,24 +11,16 @@ interface InvoiceFiltersProps {
   isAdmin?: boolean;
   selectedCustomer?: string;
   onCustomerChange?: (value: string | null) => void;
-  startDate?: Date;
-  endDate?: Date;
-  onStartDateChange: (date: Date | undefined) => void;
-  onEndDateChange: (date: Date | undefined) => void;
-  onApply: () => void;
-  onClear: () => void;
+  dateRange: DateFilterValue;
+  onDateRangeChange: (val: DateFilterValue) => void;
 }
 
 export function InvoiceFilters({
   isAdmin,
   selectedCustomer,
   onCustomerChange,
-  startDate,
-  endDate,
-  onStartDateChange,
-  onEndDateChange,
-  onApply,
-  onClear,
+  dateRange,
+  onDateRangeChange,
 }: InvoiceFiltersProps) {
   const { data: customersData } = useCustomers({ per_page: 1000 }, !!isAdmin);
   return (
@@ -48,42 +40,13 @@ export function InvoiceFilters({
         </div>
       )}
 
-      <div className="grid grid-cols-2 gap-3 w-full md:w-auto md:flex md:items-end md:gap-4">
-        <DatePicker
-          label="Start Date"
-          date={startDate}
-          setDate={onStartDateChange}
-          className="w-full md:w-[180px]"
+      <div className="w-full md:w-64 space-y-1">
+        <span className="text-xs font-semibold text-slate-600 dark:text-zinc-400">Date Range</span>
+        <DateFilter
+          value={dateRange}
+          onChange={onDateRangeChange}
+          className="w-full"
         />
-
-        <DatePicker
-          label="End Date"
-          date={endDate}
-          setDate={onEndDateChange}
-          className="w-full md:w-[180px]"
-        />
-      </div>
-
-      <div className="flex items-center gap-2 w-full md:w-auto justify-end">
-        <Button
-          onClick={onApply}
-          variant="default"
-          size="sm"
-          className="h-8 px-4 flex-1 md:flex-none"
-        >
-          Apply
-        </Button>
-
-        {(startDate || endDate) && (
-          <Button
-            onClick={onClear}
-            variant="destructive"
-            size="sm"
-            className="h-8 px-4 flex-1 md:flex-none"
-          >
-            Clear
-          </Button>
-        )}
       </div>
     </div>
   );

@@ -9,7 +9,7 @@ Sentry.init({
 
     environment: import.meta.env.MODE,
 
-    tracesSampleRate: import.meta.env.DEV ? 0.1 : 1,
+    tracesSampleRate: import.meta.env.DEV ? 1 : 1,
 
     tracePropagationTargets: [
         "localhost",

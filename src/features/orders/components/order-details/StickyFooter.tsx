@@ -27,7 +27,7 @@ export const StickyFooter: React.FC<StickyFooterProps> = ({ orderType, onSave, s
             onClick={() => onSave?.('saveAsDraft')}
             variant="default"
             disabled={isSavingDraft || isServicePending}
-            className="flex items-center gap-2 h-8 px-4 uppercase text-[11px] font-bold tracking-wider w-full sm:w-auto"
+            className="flex items-center gap-2 h-8 px-4 uppercase text-[11px] font-bold tracking-wide w-full sm:w-auto"
           >
             {isSavingDraft ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Save className="h-3.5 w-3.5" />}
             Save Draft
@@ -37,7 +37,7 @@ export const StickyFooter: React.FC<StickyFooterProps> = ({ orderType, onSave, s
             variant="default"
             disabled={isCreatingConsignment || isServicePending}
             onClick={() => onSave?.(false)}
-            className="flex items-center gap-2 h-8 px-4 uppercase text-[11px] font-bold tracking-wider w-full sm:w-auto"
+            className="flex items-center gap-2 h-8 px-4 uppercase text-[11px] font-bold tracking-wide w-full sm:w-auto"
           >
             {isCreatingConsignment ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Printer className="h-3.5 w-3.5" />}
             Create Consignment & Download Label
@@ -50,7 +50,7 @@ export const StickyFooter: React.FC<StickyFooterProps> = ({ orderType, onSave, s
             onClick={() => onSave?.('saveAsDraft')}
             variant="default"
             disabled={isCreatingConsignment || isServicePending}
-            className="flex items-center gap-2 h-8 px-4 uppercase text-[11px] font-bold tracking-wider w-full sm:w-auto"
+            className="flex items-center gap-2 h-8 px-4 uppercase text-[11px] font-bold tracking-wide w-full sm:w-auto"
           >
             {isCreatingConsignment ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Save className="h-3.5 w-3.5" />}
             Create Manual Order
@@ -64,7 +64,7 @@ export const StickyFooter: React.FC<StickyFooterProps> = ({ orderType, onSave, s
             onClick={() => onSave?.('saveAsDraft')}
             variant="default"
             disabled={isSavingDraft || isServicePending}
-            className="flex items-center gap-2 h-8 px-4 uppercase text-[11px] font-bold tracking-wider w-full sm:w-auto"
+            className="flex items-center gap-2 h-8 px-4 uppercase text-[11px] font-bold tracking-wide w-full sm:w-auto"
           >
             {isSavingDraft ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Save className="h-3.5 w-3.5" />}
             Save Draft
@@ -73,7 +73,7 @@ export const StickyFooter: React.FC<StickyFooterProps> = ({ orderType, onSave, s
             onClick={onConsign}
             variant="default"
             disabled={saveLoading || isConsigning || isServicePending}
-            className="flex items-center gap-2 h-8 px-4 uppercase text-[11px] font-bold tracking-wider w-full sm:w-auto bg-primary hover:bg-primary-hover text-white shadow-sm"
+            className="flex items-center gap-2 h-8 px-4 uppercase text-[11px] font-bold tracking-wide w-full sm:w-auto bg-primary hover:bg-primary-hover text-white shadow-sm"
           >
             {saveLoading || isConsigning ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Save className="h-3.5 w-3.5" />}
             Create Consignment & Download Label

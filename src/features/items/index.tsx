@@ -277,8 +277,8 @@ export default function MyItemsPage() {
   ], [setDefaultItemMutation, unsetDefaultItemMutation, toggleItemStatusMutation, handleEditItem, handleDeleteClick, canReadWrite]);
 
   return (
-    <div className="flex flex-col flex-1 gap-2 p-page-padding min-h-0 animate-in fade-in slide-in-from-bottom-2 duration-500">
-      <div className='rounded-lg shadow-sm flex-1 flex flex-col min-h-0 border border-gray-100 dark:border-zinc-800 bg-white dark:bg-zinc-950 '>
+    <div className="flex flex-col flex-1 gap-2 p-page-padding animate-in fade-in slide-in-from-bottom-2 duration-500 overflow-y-auto">
+      <div className='rounded-lg shadow-sm border border-gray-100 dark:border-zinc-800 bg-white dark:bg-zinc-950 flex-none h-auto'>
         <DataTable
           columns={columns}
           data={itemsData?.data || []}
@@ -293,7 +293,7 @@ export default function MyItemsPage() {
           headerTitle='My Items'
           headerDescription='Manage your shipping items, dimensions, and cubic measurements.'
           headerClass="h-20"
-          className='pb-3'
+          className='pb-3 flex-none h-auto [&_div.overflow-auto]:flex-none [&_div.overflow-auto]:h-auto [&_div.overflow-auto]:min-h-0 [&_div.overflow-auto]:overflow-y-visible [&_div.overflow-auto]:overflow-x-auto'
           totalItems={itemsData?.meta?.total || 0}
           currentPage={currentPage}
           onPageChange={setCurrentPage}

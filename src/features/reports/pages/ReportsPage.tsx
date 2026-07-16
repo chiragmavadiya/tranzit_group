@@ -257,8 +257,8 @@ export default function ReportsPage() {
   // }, [startDate, setStartDate, endDate, setEndDate, handleClearFilters])
 
   return (
-    <div className="flex flex-col flex-1 gap-2 p-page-padding min-h-0 overflow-auto animate-in fade-in slide-in-from-bottom-2 duration-500 bg-slate-50/30 dark:bg-zinc-950/30">
-      <div className='rounded-xl shadow-sm flex-1 flex flex-col min-h-0 border border-gray-100 dark:border-zinc-800 bg-white dark:bg-zinc-950 overflow-hidden'>
+    <div className="flex flex-col flex-1 gap-2 p-page-padding overflow-y-auto animate-in fade-in slide-in-from-bottom-2 duration-500 bg-slate-50/30 dark:bg-zinc-950/30">
+      <div className='rounded-xl shadow-sm border border-gray-100 dark:border-zinc-800 bg-white dark:bg-zinc-950 overflow-hidden flex-none h-auto'>
         <ReportsHeader
           startDate={dateRange[0]}
           endDate={dateRange[1]}
@@ -269,7 +269,7 @@ export default function ReportsPage() {
           handleClearFilters={handleClearFilters}
         />
 
-        <div className="flex-1 flex flex-col min-h-0">
+        <div className="flex-none h-auto">
           <DataTable
             key={activeTab}
             headerTitle={`${activeTab} Reports`}
@@ -283,7 +283,7 @@ export default function ReportsPage() {
             pageSize={pageSize}
             onPageSizeChange={handlePageSizeChange}
             // pageSizeInFooter
-            className="pb-3"
+            className="pb-3 flex-none h-auto [&_div.overflow-auto]:flex-none [&_div.overflow-auto]:h-auto [&_div.overflow-auto]:min-h-0 [&_div.overflow-auto]:overflow-y-visible [&_div.overflow-auto]:overflow-x-auto"
             totalItems={total}
             currentPage={page}
             onPageChange={setPage}

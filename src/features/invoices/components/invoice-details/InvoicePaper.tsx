@@ -22,6 +22,7 @@ import {
   DropdownCustomMenu,
 } from '@/components/ui/dropdown-menu';
 import { FormInput, FormSelect } from '@/features/orders/components/OrderFormUI'
+import { Textarea } from '@/components/ui/textarea'
 import { BANKING_DETAILS, COMPANY_DETAILS, TERMS_CONDITIONS } from '../../constants'
 import { format } from 'date-fns'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
@@ -495,13 +496,22 @@ export const InvoicePaper: React.FC<InvoicePaperProps> = ({
                       </TableCell>
                       <TableCell className="py-4 min-w-[110px]">
                         {isEditing ? (
-                          <FormInput
-                            className="w-full min-w-[150px] shadow-none col-span-12"
-                            inputClassName="h-8 text-sm bg-white dark:bg-zinc-900 border border-slate-200 dark:border-zinc-800 focus:ring-1 focus:ring-primary rounded-md px-3"
-                            value={itemType === 'order' ? item.order_number : item.description || ''}
-                            placeholder={itemType === 'order' ? 'Order Number' : itemType === 'credit' ? 'Credit description' : 'Description'}
-                            onChange={(val) => updateItemsData(item.id, itemType === 'order' ? 'order_number' : 'description', val)}
-                          />
+                          itemType === 'order' ? (
+                            <FormInput
+                              className="w-full min-w-[150px] shadow-none col-span-12"
+                              inputClassName="h-8 text-sm bg-white dark:bg-zinc-900 border border-slate-200 dark:border-zinc-800 focus:ring-1 focus:ring-primary rounded-md px-3"
+                              value={item.order_number || ''}
+                              placeholder="Order Number"
+                              onChange={(val) => updateItemsData(item.id, 'order_number', val)}
+                            />
+                          ) : (
+                            <Textarea
+                              className="w-full min-w-[150px] shadow-none bg-white dark:bg-zinc-900 border border-slate-200 dark:border-zinc-800 focus:ring-1 focus:ring-primary rounded-md px-3 py-1.5 text-sm min-h-[40px] resize-y"
+                              value={item.description || ''}
+                              placeholder={itemType === 'credit' ? 'Credit description' : 'Description'}
+                              onChange={(e) => updateItemsData(item.id, 'description', e.target.value)}
+                            />
+                          )
                         ) : (
                           <span className="text-[12px] font-bold text-slate-700 dark:text-zinc-200">{itemType === 'order' ? item.order_number : item.description || '-'}</span>
                         )}

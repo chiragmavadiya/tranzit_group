@@ -290,43 +290,51 @@ export default function CreateOrderDialog({ onOpenChange, type, open, initialDat
           />
         )}
 
-        <div className="flex flex-col md:flex-row gap-0 border border-slate-200 dark:border-zinc-800 rounded-sm overflow-hidden focus-within:border-primary dark:focus-within:border-primary transition-all md:h-8">
-          <div className="flex w-full md:w-auto shrink-0 h-8 bg-slate-50 dark:bg-zinc-900 border-b md:border-b-0 md:border-r border-slate-200 dark:border-zinc-800">
-            <button
-              onClick={() => setActiveLookup('contact')}
-              type="button"
-              className={cn(
-                "flex-1 md:flex-none justify-center px-4 md:px-6 py-2 text-[12px] font-bold tracking-wide transition-colors border-r border-slate-200 dark:border-zinc-800 flex items-center h-full",
-                activeLookup === 'contact' ? "bg-primary text-white" : "bg-transparent text-slate-600 dark:text-zinc-400 hover:bg-slate-100 dark:hover:bg-zinc-800/50"
-              )}
-            >
-              Search by Contact
-            </button>
+        <div className="flex flex-col gap-2">
+          {/* Segmented Control (Tabs) */}
+          <div className="inline-flex h-8 items-center justify-center rounded-lg bg-slate-100 dark:bg-zinc-900 p-0.5 text-slate-500 dark:text-zinc-400 w-full sm:w-auto self-start">
             <button
               onClick={() => setActiveLookup('address')}
               type="button"
               className={cn(
-                "flex-1 md:flex-none justify-center px-4 md:px-6 py-2 text-[12px] font-bold tracking-wide transition-colors flex items-center h-full",
-                activeLookup === 'address' ? "bg-primary text-white" : "bg-transparent text-slate-600 dark:text-zinc-400 hover:bg-slate-100 dark:hover:bg-zinc-800/50"
+                "flex-1 sm:flex-none inline-flex items-center justify-center whitespace-nowrap rounded-md px-4 py-1 text-xs font-bold transition-all h-7 cursor-pointer",
+                activeLookup === 'address'
+                  ? "bg-white dark:bg-zinc-800 text-slate-900 dark:text-zinc-50 shadow-sm border border-slate-100/50 dark:border-zinc-700/30"
+                  : "bg-transparent text-slate-600 dark:text-zinc-400 hover:text-slate-900 dark:hover:text-zinc-50"
               )}
             >
               Search by Address
             </button>
+            <button
+              onClick={() => setActiveLookup('contact')}
+              type="button"
+              className={cn(
+                "flex-1 sm:flex-none inline-flex items-center justify-center whitespace-nowrap rounded-md px-4 py-1 text-xs font-bold transition-all h-7 cursor-pointer",
+                activeLookup === 'contact'
+                  ? "bg-white dark:bg-zinc-800 text-slate-900 dark:text-zinc-50 shadow-sm border border-slate-100/50 dark:border-zinc-700/30"
+                  : "bg-transparent text-slate-600 dark:text-zinc-400 hover:text-slate-900 dark:hover:text-zinc-50"
+              )}
+            >
+              Search by Contact
+            </button>
           </div>
-          <div className="flex-1 relative md:h-8 [&_[data-slot=input-group]]:border-0 [&_[data-slot=input-group]]:rounded-none [&_[data-slot=input-group]]:shadow-none [&_[data-slot=input-group]]:h-8 [&_[data-slot=input-group]]:bg-transparent [&_[data-slot=input-group]]:dark:bg-transparent [&_[data-slot=input]]:border-0 [&_[data-slot=input]]:rounded-none [&_[data-slot=input]]:h-8 [&_[data-slot=input]]:bg-transparent [&_[data-slot=input]]:dark:bg-transparent [&_[data-slot=input]]:focus-visible:ring-0 [&_[data-slot=input]]:focus-visible:border-transparent">
+
+          {/* Search Input Container */}
+          <div className="relative border border-slate-200 dark:border-zinc-800 rounded-md overflow-hidden bg-white dark:bg-zinc-950 focus-within:border-primary dark:focus-within:border-primary focus-within:ring-1 focus-within:ring-primary/20 transition-all h-8 [&_[data-slot=input-group]]:border-0 [&_[data-slot=input-group]]:rounded-none [&_[data-slot=input-group]]:shadow-none [&_[data-slot=input-group]]:h-8 [&_[data-slot=input-group]]:bg-transparent [&_[data-slot=input-group]]:dark:bg-transparent [&_[data-slot=input]]:border-0 [&_[data-slot=input]]:rounded-none [&_[data-slot=input]]:h-8 [&_[data-slot=input]]:bg-transparent [&_[data-slot=input]]:dark:bg-transparent [&_[data-slot=input]]:focus-visible:ring-0 [&_[data-slot=input]]:focus-visible:border-transparent">
             {activeLookup === 'address' ? (
               <PlaceAutocomplete
                 onPlaceSelect={(opt) => {
                   updateField('address_info', opt.formatted_address);
                   updateField('address1', opt.street);
                   updateField('suburb', opt.suburb);
-                  updateField('unit_number', opt.unit_number);
+                  if (opt.unit_number) {
+                    updateField('unit_number', opt.unit_number);
+                  }
                   updateField('street_name', opt.street_name!);
                   updateField('street_number', opt.street_number!);
                   updateField('state', opt.state);
                   updateField('postcode', opt.post_code);
                   setIsSelected(true);
-                  // updateField('country', opt.country);
                 }}
                 onChange={(value) => { updateField('address_info', value!); setIsSelected(false) }}
                 value={formData.address_info}
@@ -346,16 +354,16 @@ export default function CreateOrderDialog({ onOpenChange, type, open, initialDat
                     updateField('email', option.email);
                     updateField('address_info', option.address);
                     updateField('address1', option.address1);
-                    updateField('unit_number', option.unit_number);
+                    if (option.unit_number) {
+                      updateField('unit_number', option.unit_number);
+                    }
                     updateField('street_name', option.street_name!);
                     updateField('street_number', option.street_number!);
                     updateField('suburb', option.suburb);
                     updateField('state', option.state);
                     updateField('postcode', option.postcode);
                     updateField('company', option.company_name);
-
                     setIsSelected(true);
-                    // updateField('country', option.country);
                   }
                 }}
                 options={options}

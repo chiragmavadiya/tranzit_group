@@ -113,7 +113,7 @@ export default function RuleForm({
             </div>
             {formData.action_type === 'set_cheapest_carrier_service' && (
               <div className="w-full md:col-span-2 h-8 flex items-center">
-                <span className="text-xs text-gray-400 dark:text-zinc-500 bg-gray-50 dark:bg-zinc-950 px-2.5 py-1.5 rounded-sm border border-gray-150 dark:border-zinc-850 font-semibold">
+                <span className="text-xs text-gray-400 dark:text-zinc-500 bg-gray-50 dark:bg-zinc-950 px-2.5 py-1.5 rounded-sm border border-gray-150 dark:border-zinc-800 font-semibold">
                   No parameters required for this action
                 </span>
               </div>

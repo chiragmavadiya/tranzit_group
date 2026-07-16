@@ -35,6 +35,8 @@ const SettingForm = ({ category }: { category: any }) => {
         return key.split('_').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
     };
 
+    console.log(payload, 'payload')
+
     useEffect(() => {
         if (detailResponse?.data) {
             const initialPayload: Record<string, any> = {};
@@ -47,6 +49,7 @@ const SettingForm = ({ category }: { category: any }) => {
             setPayload(initialPayload);
         }
     }, [detailResponse]);
+
 
 
 
@@ -87,7 +90,7 @@ const SettingForm = ({ category }: { category: any }) => {
                                         <div key={key} className="relative">
                                             <FormInput
                                                 label={formatLabel(key)}
-                                                value={payload[key]}
+                                                value={payload[key] || ''}
                                                 onChange={(val) => handlePayloadChange(key, val)}
                                                 placeholder={`Enter new ${formatLabel(key).toLowerCase()}`}
                                                 type="password"

@@ -269,8 +269,8 @@ export function InvoiceTable({
 
   return (
 
-    <div className="w-full flex-1 flex flex-col min-h-0 overflow-hidden rounded-lg border border-gray-100 dark:border-zinc-800 bg-white dark:bg-zinc-950">
-      <div className="flex flex-col h-full min-h-0">
+    <div className="w-full rounded-lg border border-gray-100 dark:border-zinc-800 bg-white dark:bg-zinc-950 flex-none h-auto">
+      <div className="flex flex-col h-auto">
         <DataTable
           columns={columns}
           data={invoices}
@@ -280,7 +280,7 @@ export function InvoiceTable({
           pageSize={pageSize}
           onPageSizeChange={onPageSizeChange}
           headerTitle="Customer Invoice Management"
-          className='pb-3'
+          className='pb-3 flex-none h-auto'
           customHeader={isAdmin ? customHeader : undefined}
           totalItems={totalItems}
           currentPage={currentPage}

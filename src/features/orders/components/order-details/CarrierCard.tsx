@@ -90,6 +90,9 @@ export const CarrierCard: React.FC<CarrierCardProps> = memo((props) => {
             return {
               ...courier,
               price: matchingService.price,
+              base: matchingService.base,
+              gst: matchingService.gst,
+
             };
           }
           return courier;
@@ -399,7 +402,7 @@ export const CarrierCard: React.FC<CarrierCardProps> = memo((props) => {
           <div className="absolute inset-0 bg-white/40 dark:bg-zinc-950/40 flex items-center justify-center z-10 transition-all duration-300 rounded-b-xl">
             <div className="flex flex-col items-center gap-2 bg-white dark:bg-zinc-900 px-6 py-4 rounded-2xl shadow-xl border border-gray-100 dark:border-zinc-800 animate-in fade-in zoom-in-95 duration-200">
               <RefreshCw className="h-6 w-6 animate-spin text-primary" />
-              <span className="text-[10px] font-bold text-gray-700 dark:text-zinc-300 uppercase tracking-wider">Recalculating Rates...</span>
+              <span className="text-[10px] font-bold text-gray-700 dark:text-zinc-300 uppercase tracking-wide">Recalculating Rates...</span>
             </div>
           </div>
         )}
@@ -517,7 +520,7 @@ export const CarrierCard: React.FC<CarrierCardProps> = memo((props) => {
                     onClick={() => setSelectedServiceId(serviceId)}
                     className={`relative flex flex-col p-4 rounded-xl border-2 cursor-pointer transition-all duration-200 ${isSelected
                       ? 'border-primary bg-primary/5 dark:bg-primary/10'
-                      : 'border-slate-200 border-2 bg-white dark:bg-zinc-900 hover:border-gray-200 dark:hover:border-zinc-700 shadow-sm'
+                      : 'border-slate-200/80 dark:border-zinc-800 bg-white dark:bg-zinc-900 hover:border-gray-200 dark:hover:border-zinc-700 shadow-sm'
                       }`}
                   >
                     {/* Recommended Badge (Example logic: lowest price) */}
@@ -638,7 +641,7 @@ export const CarrierCard: React.FC<CarrierCardProps> = memo((props) => {
             </div>
             {selectedServiceId && module !== 'quote' && (
               <div className="col-span-12 lg:col-span-4 flex flex-col gap-3 bg-slate-50/50 dark:bg-zinc-900/10 p-4 rounded-xl border border-slate-100 dark:border-zinc-800/60 lg:sticky lg:top-0 h-fit mt-4 lg:mt-0">
-                <div className="text-[11px] font-bold text-gray-500 dark:text-zinc-400 uppercase tracking-wider">
+                <div className="text-[11px] font-bold text-gray-500 dark:text-zinc-400 uppercase tracking-wide">
                   OPTIONS
                 </div>
                 <div className="border-t border-gray-200 dark:border-zinc-800 my-1" />

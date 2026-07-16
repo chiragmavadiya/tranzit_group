@@ -15,6 +15,7 @@ import { useEffect, useState } from "react";
 import { Spinner } from "@/components/ui/spinner";
 import { showToast } from "@/components/ui/custom-toast";
 import { useLoginRedirectHandler } from "@/features/shopifyLink/Loginredirechandler";
+import { trackLogin } from "@/analytics";
 
 export default function SignIn({ role = "customer" }: { role?: string }) {
   const navigate = useNavigate();
@@ -51,6 +52,9 @@ export default function SignIn({ role = "customer" }: { role?: string }) {
             next_step: response.next_step,
             team_access: response.team_access,
           }));
+
+          // Track login event in Google Analytics
+          trackLogin(response.user.id, response.user.email, role);
 
           showToast(response?.message || "Logged in successfully", "success");
 

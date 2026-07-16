@@ -11,8 +11,8 @@ export type DateFilterType =
 
 export interface DateFilterValue {
   type: DateFilterType;
-  from: string;
-  to: string;
+  from: string | undefined;
+  to: string | undefined;
   label: string;
 }
 

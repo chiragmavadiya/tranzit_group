@@ -163,14 +163,26 @@ export const useOrderWorkflow = () => {
       ]);
     }
   })
+  const isValidItems = useEffectEvent(() => {
+    return itemsData && itemsData.length > 0 && itemsData.some((item) =>
+      (Number(item.height) > 0 || Number(item.width) > 0 || Number(item.length) > 0 || Number(item.weight) > 0)
+    );
+  })
   useEffect(() => {
-    if (defaultItem && (orderType === 'create' || orderType === 'create-menual' || orderType === 'return') && !localStorage.getItem('quote_to_clone') && !localStorage.getItem('quote_items')) {
+    if (defaultItem && !isValidItems() && (orderType === 'create' || orderType === 'create-menual' || orderType === 'return') && !localStorage.getItem('quote_to_clone') && !localStorage.getItem('quote_items')) {
       setDefaultItemData(defaultItem.data)
     }
   }, [defaultItem, setItemsData, orderType]);
 
+
+
   useEffect(() => {
     if (!customerMeData) return;
+
+    dispatch(setCourierSettings({
+      courier_settings: customerMeData.courier
+    }));
+    if (!customerMeData || (orderType !== 'create' && orderType !== 'create-menual')) return;
     const addr = customerMeData.address_detail.default;
     setAddressData((prev) => ({
       ...prev,
@@ -191,10 +203,9 @@ export const useOrderWorkflow = () => {
         country: addr?.country || 'AU',
       },
     }));
-    dispatch(setCourierSettings({
-      courier_settings: customerMeData.courier
-    }));
-    if (customerMeData.default_item) {
+
+    const anc = !isValidItems();
+    if (customerMeData.default_item && anc) {
       setItemsData([{
         weight: Number(customerMeData.default_item?.item_weight) || 0,
         length: Number(customerMeData.default_item?.item_length) || 0,
@@ -204,7 +215,7 @@ export const useOrderWorkflow = () => {
         quantity: 1,
       }])
     }
-  }, [customerMeData, dispatch, setItemsData]);
+  }, [customerMeData, dispatch, orderType, setItemsData]);
 
   const isValidConsignOrder = useCallback((orderStatus: string | undefined) => {
     if (orderStatus !== 'new' && orderType === 'consign') {
@@ -485,7 +496,7 @@ export const useOrderWorkflow = () => {
       return;
     }
     // if any item have weight above 28kg then will show itemCount model
-    if (quoteData?.courier?.courierCode === 'direct_freight_express_tranzit_group' && (itemsData.length >= 4 || itemsData?.some((item) => Number(item.quantity) >= 4) || itemsData?.some((item) => Number(item.weight) >= 28)) && skipWalletCheckArg !== true && skipWalletCheckArg !== 'skipItemCountCheck' && skipWalletCheckArg !== 'saveAsDraft' && !skipItemCountCheckRef.current) {
+    if (quoteData?.courier?.courierCode === 'direct_freight_express_tranzit_group' && (itemsData.length >= 6 || itemsData?.some((item) => Number(item.quantity) >= 6) || itemsData?.some((item) => Number(item.weight) >= 28)) && skipWalletCheckArg !== true && skipWalletCheckArg !== 'skipItemCountCheck' && skipWalletCheckArg !== 'saveAsDraft' && !skipItemCountCheckRef.current) {
       setShowItemCountModal(true);
       return;
     }

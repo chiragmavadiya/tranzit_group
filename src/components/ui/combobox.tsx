@@ -299,7 +299,7 @@ export const SelectSearch = ({
   multiple,
   optionClassName,
 }: {
-  options: options[]
+  options: readonly options[]
   value?: any
   onValueChange?: (value: any) => void
   defaultValue?: any

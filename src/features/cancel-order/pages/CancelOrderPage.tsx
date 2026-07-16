@@ -63,9 +63,9 @@ export default function CancelOrderPage() {
 
 
     return (
-        <div className="flex flex-col flex-1 gap-6 p-page-padding min-h-0 animate-in fade-in slide-in-from-bottom-4 duration-700 bg-slate-50/30 dark:bg-zinc-950/30">
+        <div className="flex flex-col flex-1 gap-6 p-page-padding animate-in fade-in slide-in-from-bottom-4 duration-700 bg-slate-50/30 dark:bg-zinc-950/30 overflow-y-auto">
             {/* Table Section */}
-            <div className="rounded-lg shadow-sm flex-1 flex flex-col min-h-0 border border-gray-100 dark:border-zinc-800 bg-white dark:bg-zinc-950 ">
+            <div className="rounded-lg shadow-sm border border-gray-100 dark:border-zinc-800 bg-white dark:bg-zinc-950 flex-none h-auto">
                 <DataTable
                     columns={columns}
                     data={orders}
@@ -78,7 +78,7 @@ export default function CancelOrderPage() {
                     searchable={true}
                     headerTitle={headerTitle}
                     emptyMessage="No data available in table"
-                    className='pb-3'
+                    className='pb-3 flex-none h-auto'
                     searchPlaceholder="Search orders..."
                     onSearchChange={(val) => { setSearch(val); setPage(1); }}
                     searchValue={search}

@@ -48,7 +48,7 @@ export function getPickupDateOptions(
   );
 
   const options: DateOption[] = [];
-  
+
   // Rule: If current time is at or after 11:00 AM, do not display today's date. Start from Tomorrow.
   const currentHour = baseDate.getHours();
   let daysAdded = currentHour >= 11 ? 1 : 0;
@@ -59,7 +59,7 @@ export function getPickupDateOptions(
 
   while (options.length < 2) {
     const candidateDate = addDays(baseDate, daysAdded);
-    
+
     // Rule: Do not display Saturday (6) and Sunday (0) dates
     const dayOfWeek = candidateDate.getDay();
     const isWeekend = dayOfWeek === 0 || dayOfWeek === 6;
@@ -82,7 +82,7 @@ export function getPickupDateOptions(
       options.push({ label, value: candidateStr });
     }
     daysAdded++;
-    
+
     // Safety break to prevent infinite loops
     if (daysAdded > 365) {
       break;
@@ -91,4 +91,3 @@ export function getPickupDateOptions(
 
   return options;
 }
-export default getPickupDateOptions;

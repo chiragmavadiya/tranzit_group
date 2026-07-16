@@ -11,6 +11,8 @@ import { useGetUserDetails } from '@/features/auth/hooks/useAuth';
 import { ChevronLeftIcon, ChevronRightIcon } from 'lucide-react';
 
 export default function Layout() {
+  console.log("Render Layout")
+
   const [isCollapsed, setIsCollapsed] = useState(window.innerWidth <= 1280);
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
   const [isMobile, setIsMobile] = useState(window.innerWidth < 1024);

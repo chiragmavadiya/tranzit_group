@@ -66,7 +66,7 @@ export const CustomerNameCell = ({
                 </div>
               </div>
 
-              <div className="h-px bg-slate-100 dark:bg-zinc-850" />
+              <div className="h-px bg-slate-100 dark:bg-zinc-800" />
 
               <div className="flex items-center gap-3">
                 <Phone className="w-4 h-4 text-primary/80 shrink-0" />

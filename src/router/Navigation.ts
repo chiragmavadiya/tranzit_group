@@ -25,7 +25,8 @@ import {
   BarChart3,
   MessageSquareMore,
   PackageMinus,
-  Route
+  Route,
+  Bug,
 } from 'lucide-react';
 import type { SidebarItem } from '../layout/types/Sidebar.types';
 import { MODULE_PERMISSIONS } from '../constants';
@@ -52,6 +53,7 @@ export const adminSidebarItems: SidebarItem[] = [
       { name: 'Auspost Report', path: '/admin/auspost-report', permissions: MODULE_PERMISSIONS.report },
       { name: 'All Tranzit Group Courier Parcel Report', path: '/admin/customer-parcel-report', permissions: MODULE_PERMISSIONS['Customer Parcel Report'] },
       { name: 'Custom Integrated Courier Parcel Report', path: '/admin/integrated-parcel-report', permissions: MODULE_PERMISSIONS.report },
+      { name: 'Order Label Charges', path: '/admin/order-label-charges', permissions: MODULE_PERMISSIONS.report },
     ]
   },
 
@@ -79,6 +81,8 @@ export const adminSidebarItems: SidebarItem[] = [
       { name: 'Courier base Postcode', key: 'Courier Base Postcode', path: '/admin/courier-postcode', permissions: MODULE_PERMISSIONS['Courier Base Postcode'] },
     ]
   },
+
+  { name: 'Debug Centre', key: 'debug_centre', icon: Bug, path: '/admin/debug-centre', permissions: [] },
 
   {
     name: 'Global Settings',

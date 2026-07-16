@@ -1,9 +1,82 @@
-import type { ReportTab, ShipmentReport, TransactionReport, InvoiceReport, ParcelReport } from './types';
+import type { ReportTab, ShipmentReport, TransactionReport, InvoiceReport, ParcelReport, OrderLabelCharge } from './types';
 import type { Column } from '@/components/common/types/DataTable.types';
 import { LinkCell } from '@/components/common/DataTableCells';
 import { StatusBadge } from '../orders/components/StatusBadge';
 import { NavLink } from 'react-router-dom';
 import { formateCurrency } from '@/lib/utils';
+
+export const ORDER_LABEL_CHARGES_COLUMNS: Column<OrderLabelCharge>[] = [
+  {
+    key: 'tranzit_group_order_number',
+    header: 'ORDER NUMBER',
+    width: '120px',
+    className: 'text-[13px]',
+    cell: (value) => (
+      <LinkCell value={value} className="font-bold text-primary" path={`/admin/orders/view/${value}`} />
+    )
+  },
+  { key: 'consignment_date', header: 'CONSIGNMENT DATE', className: 'text-[13px]' },
+  { key: 'receiver_name', header: 'RECEIVER NAME', className: 'text-[13px]' },
+  {
+    key: 'receiver_full_address',
+    header: 'RECEIVER FULL ADDRESS',
+    className: 'text-[13px]',
+    width: '200px',
+    cell: (val) => <span className="text-[13px] text-slate-600 max-w-[200px] inline-block">{val}</span>
+  },
+  {
+    key: 'receiver_suburb',
+    header: 'RECEIVER SUBURB',
+    className: 'text-[13px]',
+    cell: (val) => <span className="text-sm text-slate-600 max-w-[200px] inline-block">{val}</span>
+  },
+  { key: 'actual_parcel_tracking_number', className: 'text-[13px]', header: 'TRACKING NUMBER' },
+  {
+    key: 'courier_and_product',
+    header: 'COURIER & PRODUCT',
+    className: 'text-[13px]',
+    width: '160px',
+    cell: (value, row) => (
+      <div className="flex items-center gap-2">
+        {row?.courier_logo_url && (
+          <div className="shrink-0">
+            <img src={row.courier_logo_url} className="h-6! object-contain" />
+          </div>
+        )}
+        <span className="break-normal min-w-[60px] font-normal">{value && value !== 'unknown' ? value : '-'}</span>
+      </div>
+    )
+  },
+  {
+    key: 'is_byo',
+    header: 'BYO',
+    className: 'text-[13px]',
+    cell: (val) => val ? (
+      <span className="whitespace-nowrap inline-flex items-center px-2 py-0.5 rounded text-[13px] font-medium bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300">Yes</span>
+    ) : (
+      <span className="whitespace-nowrap inline-flex items-center px-2 py-0.5 rounded text-[13px] font-medium bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-300">No</span>
+    )
+  },
+  // { key: 'label_count', header: 'LABEL COUNT', sortable: true },
+  {
+    key: 'rate_per_label',
+    header: 'RATE PER LABEL',
+    className: 'text-[13px]',
+    cell: (val) => val !== undefined && val !== null ? formateCurrency(val) : '-'
+  },
+  // {
+  //   key: 'total_charge',
+  //   header: 'TOTAL CHARGE',
+  //   sortable: true,
+  //   cell: (val) => val !== undefined && val !== null ? formateCurrency(val) : '-'
+  // },
+  {
+    key: 'billing_period_start',
+    header: 'BILLING PERIOD',
+    className: 'text-[13px] break-normal',
+    cell: (_, row) => row.billing_period_start && row.billing_period_end ? `${row.billing_period_start} - ${row.billing_period_end}` : '-'
+  }
+];
 
 export const REPORT_TABS: ReportTab[] = [
   { id: 'shipment', label: 'Shipment', count: 9 },
@@ -15,13 +88,14 @@ export const REPORT_TABS: ReportTab[] = [
 export const SHIPMENT_COLUMNS: Column<ShipmentReport>[] = [
   {
     key: 'order_number', header: 'ORDER #',
+    width: '120px',
     cell: (value: string) => (
       <NavLink to={`/orders/view/${value}`} className="font-bold text-primary underline">
         {value}
       </NavLink>
     )
   },
-  { key: 'parcel_type', header: 'TYPE', sortable: true, cell: (value: string) => value === "box" ? "Parcel" : value },
+  { key: 'parcel_type', header: 'TYPE', width: '90px', sortable: true, cell: (value: string) => value === "box" ? "Parcel" : value },
   { key: 'description', header: 'DESCRIPTION' },
   { key: 'quantity', header: 'QTY', sortable: true },
   { key: 'weight', header: 'WEIGHT (KG)', sortable: true },
@@ -112,6 +186,7 @@ export const ADMIN_PARCEL_COLUMNS: Column<ParcelReport>[] = [
     header: 'RECEIVER FULL ADDRESS',
     cell: (val) => <span className="text-sm text-slate-600 max-w-[200px] inline-block">{val}</span>
   },
+  { key: 'receiver_suburb', header: 'RECEIVER SUBURB', sortable: true, searchable: true },
   {
     key: 'tranzit_group_order_number',
     header: 'TRANZIT GROUP ORDER NUMBER',
@@ -174,6 +249,8 @@ export const ADMIN_INTEGRATED_PARCEL_COLUMNS: Column<ParcelReport>[] = [
     searchable: true,
     cell: (val) => <span className="text-sm text-slate-600 max-w-[200px] inline-block">{val}</span>
   },
+  { key: 'receiver_suburb', header: 'RECEIVER SUBURB', sortable: true, searchable: true },
+
   {
     key: 'tranzit_group_order_number',
     header: 'TRANZIT GROUP ORDER NUMBER',

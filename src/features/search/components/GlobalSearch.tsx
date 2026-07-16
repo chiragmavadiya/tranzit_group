@@ -82,7 +82,8 @@ export const GlobalSearch: React.FC<GlobalSearchProps> = ({
     }, [searchResults]);
 
     const handleSearchSelect = (value: string) => {
-        const [type, id] = value.split('-');
+        const [type, ...rest] = value.split('-');
+        const id = rest.join('-');
         const option = searchOptions.find(opt => opt.value === value);
 
         const prefix = isAdmin ? '/admin' : '';

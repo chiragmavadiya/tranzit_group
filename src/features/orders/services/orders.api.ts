@@ -210,10 +210,9 @@ export const ordersService = {
     /**
      * Print order label
      */
-    printOrder: async (orderNumber: string | number): Promise<any> => {
-        const response = await api.post(API_ENDPOINTS.ORDERS.PRINT_ORDER, {
-            order_number: orderNumber,
-        });
+    printOrder: async (data: string | number | { order_number: string | number; phone?: string }): Promise<any> => {
+        const payload = typeof data === 'object' ? data : { order_number: data };
+        const response = await api.post(API_ENDPOINTS.ORDERS.PRINT_ORDER, payload);
         return response.data;
     },
 

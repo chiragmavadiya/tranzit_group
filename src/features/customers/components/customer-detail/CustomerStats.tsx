@@ -61,7 +61,7 @@ export const CustomerStats = ({ customer }: { customer: any }) => {
                         </div>
                         <div className="flex flex-col min-w-0 flex-1">
                             <span
-                                className="text-[10px] font-bold text-slate-400 dark:text-zinc-500 uppercase tracking-wider truncate"
+                                className="text-[10px] font-bold text-slate-400 dark:text-zinc-500 uppercase tracking-wide truncate"
                                 title={stat.label}
                             >
                                 {stat.label}

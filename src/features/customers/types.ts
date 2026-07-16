@@ -73,6 +73,12 @@ export interface CustomerFormData {
     additional_high_kg_weight_rate: number;
     markup_charges?: CourierWeightCharge[];
     pickup_charges?: CourierWeightCharge[];
+    byo_courier_invoice_enable?: boolean;
+    byo_courier_pricing_tiers?: Array<{
+        min_labels: number;
+        max_labels: number | null;
+        price_per_label: number;
+    }>;
 }
 
 export interface CustomerDetails {
@@ -158,6 +164,12 @@ export interface CustomerProfile {
     markup_charges?: CourierWeightCharge[];
     pickup_charges?: CourierWeightCharge[];
     activity_timeline: CustomerProfileActivity[];
+    byo_courier_invoice_enable?: boolean;
+    byo_courier_pricing_tiers?: Array<{
+        min_labels: number;
+        max_labels: number | null;
+        price_per_label: number;
+    }>;
 }
 
 export interface CustomerProfileResponse {

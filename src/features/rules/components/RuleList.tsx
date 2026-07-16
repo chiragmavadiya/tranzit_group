@@ -85,7 +85,7 @@ export default function RuleList({
   return (
     <div className="space-y-4">
       {/* Rules Table container */}
-      <div className="border border-gray-200 dark:border-zinc-850 rounded-md overflow-hidden bg-white dark:bg-zinc-900/60 shadow-xs">
+      <div className="border border-gray-200 dark:border-zinc-800 rounded-md overflow-hidden bg-white dark:bg-zinc-900/60 shadow-xs">
         <DataTable
           columns={columns}
           data={rules}

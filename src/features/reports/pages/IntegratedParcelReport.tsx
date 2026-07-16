@@ -1,4 +1,4 @@
-import { useState, useCallback, useMemo } from 'react';
+import { useState, useCallback, useMemo, useEffect } from 'react';
 import {
   ClipboardList, DollarSign, Users,
   // Upload, Loader2
@@ -16,7 +16,9 @@ import {
 } from '../hooks/useReports';
 import { FormSelect } from '@/features/orders/components/OrderFormUI';
 // import { Input } from '@/components/ui/input';
-import DatePicker from '@/components/common/DatePicker';
+import { DateFilter } from '@/components/common/DateFilter';
+import type { DateFilterValue } from '@/components/common/DateFilter/types';
+import { useSearchParams } from 'react-router-dom';
 import { useCustomers } from '@/features/customers/hooks/useCustomers';
 // import { showToast } from '@/components/ui/custom-toast';
 import { useAppSelector } from '@/hooks/store.hooks';
@@ -28,8 +30,39 @@ export default function IntegratedParcelReportPage() {
   const { role } = useAppSelector((state) => state.auth);
   const isAdmin = role === "admin";
 
-  const [startDate, setStartDate] = useState<Date | undefined>();
-  const [endDate, setEndDate] = useState<Date | undefined>();
+  const [searchParams, setSearchParams] = useSearchParams();
+
+  const parseLocalDate = useCallback((dateStr?: string | null) => {
+    if (!dateStr) return undefined;
+    const parts = dateStr.includes('/') ? dateStr.split('/') : dateStr.split('-');
+    if (parts.length === 3) {
+      const day = parseInt(parts[0], 10);
+      const month = parseInt(parts[1], 10) - 1; // 0-based
+      const year = parseInt(parts[2], 10);
+      return new Date(year, month, day);
+    }
+    return undefined;
+  }, []);
+
+  const [dateRange, setDateRange] = useState<DateFilterValue>(() => {
+    const sDate = parseLocalDate(searchParams.get('start_date'));
+    const eDate = parseLocalDate(searchParams.get('end_date'));
+    if (sDate && eDate) {
+      return {
+        type: 'custom',
+        from: format(sDate, 'dd/MM/yyyy'),
+        to: format(eDate, 'dd/MM/yyyy'),
+        label: `${format(sDate, 'dd MMM yyyy')} - ${format(eDate, 'dd MMM yyyy')}`,
+      };
+    }
+    return {
+      type: 'custom',
+      from: undefined,
+      to: undefined,
+      label: 'All Time',
+    };
+  });
+
   const [search, setSearch] = useState('');
   const [pageSize, setPageSize] = useState(25);
   const [page, setPage] = useState(1);
@@ -39,17 +72,77 @@ export default function IntegratedParcelReportPage() {
   const [invoiceType, setInvoiceType] = useState<string>('');
   // const [selectedFile, setSelectedFile] = useState<File | null>(null);
 
-  const formatDate = (date?: Date) => date ? format(date, 'dd/MM/yyyy') : undefined;
+  // Synchronize searchParams back to dateRange state
+  useEffect(() => {
+    const sDate = parseLocalDate(searchParams.get('start_date'));
+    const eDate = parseLocalDate(searchParams.get('end_date'));
+    if (sDate && eDate) {
+      const fromStr = format(sDate, 'dd/MM/yyyy');
+      const toStr = format(eDate, 'dd/MM/yyyy');
+
+      if (dateRange.from !== fromStr || dateRange.to !== toStr) {
+        setDateRange({
+          type: 'custom',
+          from: fromStr,
+          to: toStr,
+          label: `${format(sDate, 'dd MMM yyyy')} - ${format(eDate, 'dd MMM yyyy')}`,
+        });
+      }
+    } else {
+      if (dateRange.from !== undefined || dateRange.to !== undefined) {
+        setDateRange({
+          type: 'custom',
+          from: undefined,
+          to: undefined,
+          label: 'All Time',
+        });
+      }
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [searchParams, parseLocalDate]);
+
+  // Synchronize dateRange state to URL searchParams
+  useEffect(() => {
+    setSearchParams((prev) => {
+      let hasChanged = false;
+
+      const currentStartDate = prev.get('start_date') || undefined;
+      const newStartDate = dateRange.from;
+
+      if (currentStartDate !== newStartDate) {
+        if (newStartDate) {
+          prev.set('start_date', newStartDate);
+        } else {
+          prev.delete('start_date');
+        }
+        hasChanged = true;
+      }
+
+      const currentEndDate = prev.get('end_date') || undefined;
+      const newEndDate = dateRange.to;
+
+      if (currentEndDate !== newEndDate) {
+        if (newEndDate) {
+          prev.set('end_date', newEndDate);
+        } else {
+          prev.delete('end_date');
+        }
+        hasChanged = true;
+      }
+
+      return hasChanged ? prev : prev;
+    }, { replace: true });
+  }, [dateRange, setSearchParams]);
 
   const filters = useMemo(() => ({
-    start_date: formatDate(startDate),
-    end_date: formatDate(endDate),
+    start_date: dateRange.from,
+    end_date: dateRange.to,
     search: search || undefined,
     per_page: pageSize,
     page: page,
     customer: isAdmin && selectedCustomer !== '' ? selectedCustomer : undefined,
     invoice_type: isAdmin ? invoiceType : undefined,
-  }), [startDate, endDate, search, pageSize, page, isAdmin, selectedCustomer, invoiceType]);
+  }), [dateRange, search, pageSize, page, isAdmin, selectedCustomer, invoiceType]);
 
   const { data, isLoading } = useIntegratedParcelReport(filters);
   const exportMutation = useExportIntegratedParcelReport();
@@ -94,8 +187,12 @@ export default function IntegratedParcelReportPage() {
   }, [data?.summary, isAdmin]);
 
   const handleReset = useCallback(() => {
-    setStartDate(undefined);
-    setEndDate(undefined);
+    setDateRange({
+      type: 'custom',
+      from: undefined,
+      to: undefined,
+      label: 'All Time',
+    });
     setSearch('');
     setPage(1);
     setSelectedCustomer('');
@@ -121,7 +218,7 @@ export default function IntegratedParcelReportPage() {
   // };
 
   return (
-    <div className="flex flex-col flex-1 gap-4 p-page-padding min-h-0 animate-in fade-in slide-in-from-bottom-2 duration-500 bg-slate-50/30 dark:bg-zinc-950/30">
+    <div className="flex flex-col flex-1 gap-4 p-page-padding animate-in fade-in slide-in-from-bottom-2 duration-500 bg-slate-50/30 dark:bg-zinc-950/30 overflow-y-auto">
 
       {/* Summary Section */}
       <div className="space-y-3 print:hidden">
@@ -135,20 +232,11 @@ export default function IntegratedParcelReportPage() {
       {/* Filter Section */}
       <div className="bg-white dark:bg-zinc-950 px-4 py-3 rounded-sm border border-gray-100 dark:border-zinc-800 shadow-sm flex flex-col print:hidden">
         <div className="grid grid-cols-1 md:grid-cols-12 gap-4 items-end">
-          <div className="md:col-span-3">
-            <DatePicker
-              // label="From Date"
-              date={startDate}
-              setDate={setStartDate}
-              placeholder="Start Date"
-            />
-          </div>
-          <div className="md:col-span-3">
-            <DatePicker
-              // label="To Date"
-              date={endDate}
-              setDate={setEndDate}
-              placeholder="End Date"
+          <div className="md:col-span-6">
+            <DateFilter
+              value={dateRange}
+              onChange={setDateRange}
+              className="w-full"
             />
           </div>
 
@@ -231,7 +319,7 @@ export default function IntegratedParcelReportPage() {
       </div>
 
       {/* Table Section */}
-      <div className='rounded-lg min-h-[300px] shadow-md flex-1 flex flex-col border border-gray-100 dark:border-zinc-800 bg-white dark:bg-zinc-950 overflow-hidden'>
+      <div className='rounded-lg min-h-[300px] shadow-md border border-gray-100 dark:border-zinc-800 bg-white dark:bg-zinc-950 overflow-hidden flex-none h-auto'>
         <DataTable
           columns={ADMIN_INTEGRATED_PARCEL_COLUMNS}
           data={data?.data || []}
@@ -241,7 +329,7 @@ export default function IntegratedParcelReportPage() {
           onSearchChange={(val) => { setSearch(val); setPage(1); }}
           pageSize={pageSize}
           onPageSizeChange={(val) => { setPageSize(Number(val)); setPage(1); }}
-          className="pb-3 text-xs"
+          className="pb-3 text-xs flex-none h-auto"
           totalItems={data?.meta?.total || 0}
           currentPage={page}
           onPageChange={setPage}

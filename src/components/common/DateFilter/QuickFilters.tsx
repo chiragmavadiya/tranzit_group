@@ -24,7 +24,7 @@ export const QuickFilters: React.FC<QuickFiltersProps> = ({ selectedType, onSele
               "justify-between h-8.5 px-3 text-[12px] font-medium rounded-lg transition-all duration-200 border border-slate-100/50 dark:border-zinc-800/50",
               isActive
                 ? "bg-primary text-white hover:bg-primary/95 hover:text-white shadow-sm"
-                : "bg-slate-50/50 hover:bg-slate-100/70 text-slate-700 dark:bg-zinc-900/40 dark:hover:bg-zinc-900/80 dark:text-zinc-300"
+                : "bg-slate-200/50 hover:bg-slate-100/70 text-slate-700 dark:bg-zinc-900/40 dark:hover:bg-zinc-900/80 dark:text-zinc-300"
             )}
             onClick={() => onSelect(option.type)}
           >

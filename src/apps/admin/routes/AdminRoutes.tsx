@@ -15,6 +15,7 @@ const InvoiceDetails = lazy(() => import('@/features/invoices/pages/InvoiceDocum
 const ParcelReport = lazy(() => import('@/features/reports/pages/ParcelReportPage'));
 const AuspostReportPage = lazy(() => import('@/features/reports/pages/AusPostReport'));
 const IntegratedParcelReport = lazy(() => import('@/features/reports/pages/IntegratedParcelReport'));
+const OrderLabelChargesReport = lazy(() => import('@/features/reports/pages/OrderLabelChargesReport'));
 const CustomerManagement = lazy(() => import('@/features/customers/pages/CustomerPage'));
 const CustomerDetailPage = lazy(() => import('@/features/customers/pages/CustomerDetailPage'));
 const CancelOrderPage = lazy(() => import('@/features/cancel-order/pages/CancelOrderPage'));
@@ -37,6 +38,8 @@ const HelpCenterAdminPage = lazy(() => import('@/features/help-center-admin/page
 const SettingsLayout = lazy(() => import('@/features/settings/components/SettingsLayout'));
 const CategorySettingsPage = lazy(() => import('@/features/settings/pages/CategorySettingsPage'));
 const ActivityLogPage = lazy(() => import('@/features/activity-log/pages/ActivityLogPage'));
+const DebugCentrePage = lazy(() => import('@/features/debug-centre/pages/DebugCentrePage'));
+const TraceDetailPage = lazy(() => import('@/features/debug-centre/pages/TraceDetailPage'));
 
 const withSuspense = (Component: React.ReactNode) => (
     <Suspense
@@ -49,6 +52,8 @@ const withSuspense = (Component: React.ReactNode) => (
 
 
 export default function AdminRoutes() {
+    console.log("Render AdminRoutes")
+
     return (
         <Routes>
             <Route element={<ProtectedRoute role="admin" />}>
@@ -99,6 +104,7 @@ export default function AdminRoutes() {
                     <Route path="auspost-report" element={withSuspense(<AuspostReportPage />)} />
                     <Route path="customer-parcel-report" element={withSuspense(<ParcelReport />)} />
                     <Route path="integrated-parcel-report" element={withSuspense(<IntegratedParcelReport />)} />
+                    <Route path="order-label-charges" element={withSuspense(<OrderLabelChargesReport />)} />
 
                     {/* Order Summary */}
                     <Route path="order-summary" element={withSuspense(<AuspostOrderSummaryPage />)} />
@@ -120,6 +126,12 @@ export default function AdminRoutes() {
 
                     {/* Activity Log */}
                     <Route path="activity-log" element={withSuspense(<ActivityLogPage />)} />
+
+                    {/* Debug Centre */}
+                    <Route path="debug-centre">
+                        <Route index element={withSuspense(<DebugCentrePage />)} />
+                        <Route path=":traceId" element={withSuspense(<TraceDetailPage />)} />
+                    </Route>
 
                     {/* Others */}
                     <Route path="setup" element={withSuspense(<Setup />)} />

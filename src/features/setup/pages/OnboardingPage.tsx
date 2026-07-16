@@ -115,7 +115,7 @@ export default function OnboardingPage() {
     const requiredFields = [
       'first_name', 'last_name', 'mobile',
       'business_name', 'gst_number',
-      'street_number', 'street_name', 'street_type', 'suburb', 'state', 'postcode'
+      'street_name', 'suburb', 'state', 'postcode'
     ];
 
     for (const field of requiredFields) {
@@ -126,7 +126,7 @@ export default function OnboardingPage() {
 
     if (formData.hasBillingAddress) {
       const billingRequired = [
-        'billing_street_number', 'billing_street_name', 'billing_street_type',
+        'billing_street_name',
         'billing_suburb', 'billing_state', 'billing_postcode'
       ];
       for (const field of billingRequired) {
@@ -227,13 +227,42 @@ export default function OnboardingPage() {
     }
   })
   useEffect(() => {
+    const addressData: any = {};
     if (user) {
+      if (user.addresses && user.addresses.length > 0 && user?.addresses[0]) {
+        addressData.address_info = user?.addresses && user?.addresses[0]?.address_info;
+        addressData.address = user?.addresses && user?.addresses[0]?.address;
+        addressData.unit_number = user?.addresses && user?.addresses[0]?.unit_number;
+        addressData.street_number = user?.addresses && user?.addresses[0]?.street_number;
+        addressData.street_name = user?.addresses && user?.addresses[0]?.street_name;
+        addressData.street_type = user?.addresses && user?.addresses[0]?.street_type;
+        addressData.suburb = user?.addresses && user?.addresses[0]?.suburb;
+        addressData.state = user?.addresses && user?.addresses[0]?.state;
+        addressData.postcode = user?.addresses && user?.addresses[0]?.postcode;
+      }
+      if (user.addresses && user.addresses.length > 0 && user.addresses[1]) {
+        addressData.billing_address_info = user?.addresses && user?.addresses[1]?.address_info;
+        addressData.billing_address = user?.addresses && user?.addresses[1]?.address;
+        addressData.billing_unit_number = user?.addresses && user?.addresses[1]?.unit_number;
+        addressData.billing_street_number = user?.addresses && user?.addresses[1]?.street_number;
+        addressData.billing_street_name = user?.addresses && user?.addresses[1]?.street_name;
+        addressData.billing_street_type = user?.addresses && user?.addresses[1]?.street_type;
+        addressData.billing_suburb = user?.addresses && user?.addresses[1]?.suburb;
+        addressData.billing_state = user?.addresses && user?.addresses[1]?.state;
+        addressData.billing_postcode = user?.addresses && user?.addresses[1]?.postcode;
+      }
+
       setFormData((prev) => {
         return {
           ...prev,
           email: user.email,
           first_name: user.first_name,
           last_name: user.last_name,
+          mobile: user.personal_mobile || '',
+          business_name: user?.addresses && user?.addresses[0]?.company_name,
+          gst_number: user.gst_number || '',
+
+          ...addressData,
         }
       })
     }
@@ -329,7 +358,8 @@ export default function OnboardingPage() {
 
       <form onSubmit={handleSubmit} className="flex-1 flex flex-col min-h-0">
         <main className="flex-1 overflow-y-auto">
-          <div className="max-w-full sm:max-w-xl md:max-w-3xl lg:max-w-5xl xl:max-w-7xl 2xl:max-w-400 mx-auto w-full p-6 space-y-4 animate-in fade-in slide-in-from-top-4 duration-700">
+          <div className="max-w-[98vw] mx-auto w-full p-6 space-y-4 animate-in fade-in slide-in-from-top-4 duration-700">
+            {/* <div className="max-w-full sm:max-w-xl md:max-w-3xl lg:max-w-5xl xl:max-w-7xl 2xl:max-w-400 mx-auto w-full p-6 space-y-4 animate-in fade-in slide-in-from-top-4 duration-700"> */}
             {/* Banner */}
             <div className="bg-primary/5 border border-primary/20 p-5 rounded-2xl flex items-center gap-4 shadow-sm">
               <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary text-white shadow-lg shadow-primary/20">
@@ -453,7 +483,7 @@ export default function OnboardingPage() {
                         handleChange('postcode', opt.post_code);
                         handleChange('addressSelected', true);
                       }}
-                      onChange={(value) => handleChange('address_info', value)}
+                      onChange={(value) => { handleChange('address_info', value); handleChange('addressSelected', false) }}
                       error={isSubmitted && formData.address_info?.trim() === ''}
                       errormsg='Please enter your address'
                       placeholder='Search your address'
@@ -468,14 +498,13 @@ export default function OnboardingPage() {
                       placeholder="Enter your unit number"
                       value={formData.unit_number}
                       onChange={(val) => handleChange('unit_number', val)}
-                      disabled={formData.addressSelected}
                     />
                     <FormInput
                       isHalf
                       label="Street"
                       placeholder="Street address"
                       value={formData.address}
-                      onChange={(val) => handleChange('address', val)}
+                      onChange={(val) => { handleChange('address', val); handleChange('street_name', val); }}
                       required
                       error={isSubmitted && formData.address?.trim() === ''}
                       disabled={formData.addressSelected}
@@ -573,7 +602,7 @@ export default function OnboardingPage() {
                         handleChange('billing_postcode', opt.post_code);
                         handleChange('billingAddressSelected', true);
                       }}
-                      onChange={(value) => handleChange('billing_address_info', value)}
+                      onChange={(value) => { handleChange('billing_address_info', value); handleChange('billingAddressSelected', false) }}
                       error={isSubmitted && formData.hasBillingAddress && formData.billing_address_info?.trim() === ''}
                       errormsg='Please enter your billing address'
                       value={formData.billing_address_info}
@@ -590,14 +619,14 @@ export default function OnboardingPage() {
                       placeholder="Enter your unit number"
                       value={formData.billing_unit_number}
                       onChange={(val) => handleChange('billing_unit_number', val)}
-                      disabled={!formData.hasBillingAddress || formData.billingAddressSelected}
+                      disabled={!formData.hasBillingAddress}
                     />
                     <FormInput
                       isHalf
                       label="Billing Street"
                       placeholder="Street address"
                       value={formData.billing_address}
-                      onChange={(val) => handleChange('billing_address', val)}
+                      onChange={(val) => { handleChange('billing_address', val); handleChange('billing_street_name', val) }}
                       required
                       error={isSubmitted && formData.hasBillingAddress && formData.billing_address?.trim() === ''}
                       errormsg="Please enter your street"
@@ -622,6 +651,7 @@ export default function OnboardingPage() {
                     <div className="col-span-12 md:col-span-3">
                       <FormSelect
                         label="State"
+                        placeholder='Select State'
                         options={STATES}
                         value={formData.billing_state}
                         onValueChange={(val) => handleChange('billing_state', val)}
@@ -649,12 +679,12 @@ export default function OnboardingPage() {
                         isFullWidth
                         label="Country"
                         placeholder="Australia"
-                        value={formData.billing_country}
-                        onChange={(val) => handleChange('billing_country', val)}
+                        value={formData.billing_country || "Australia"}
+                        // onChange={(val) => handleChange('billing_country', val)}
                         required
                         error={isSubmitted && formData.hasBillingAddress && formData.billing_country?.trim() === ''}
                         errormsg="Please enter your country"
-                        disabled={!formData.hasBillingAddress || formData.billingAddressSelected}
+                        disabled
                       />
                     </div>
 

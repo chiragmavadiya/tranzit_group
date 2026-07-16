@@ -1,7 +1,6 @@
 import React, { useState } from 'react'
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card'
 import { ChevronDown, ChevronUp, History } from 'lucide-react'
-import { Button } from '@/components/ui/button'
 
 interface HistoryCardProps {
   history?: {
@@ -40,7 +39,7 @@ export const HistoryCard: React.FC<HistoryCardProps> = ({ history }) => {
         <div className="flex items-center gap-2">
           <History className="h-4 w-4 text-primary" />
           <CardTitle className="text-base font-bold text-gray-900 dark:text-zinc-100 tracking-wide">
-            HISTORY
+            History
           </CardTitle>
         </div>
         <div className="flex items-center gap-2">
@@ -62,44 +61,46 @@ export const HistoryCard: React.FC<HistoryCardProps> = ({ history }) => {
                   <div
                     className="flex items-center justify-between px-4 py-0 transition-colors"
                   >
-                    <div className="flex items-center gap-4 flex-1">
-                      <Button
+                    <div className="flex items-center gap-4 flex-1 cursor-pointer" onClick={() => toggleItem(item.id)}>
+                      {/* <Button
                         variant="ghost"
                         size="icon"
-                        className="h-4 w-4 p-0 text-primary hover:bg-transparent"
-                        onClick={() => toggleItem(item.id)}
-                      >
-                        {isExpanded ? (
-                          <ChevronUp className="h-4 w-4" />
-                        ) : (
-                          <ChevronDown className="h-4 w-4" />
-                        )}
-                      </Button>
+                        className="h-4 p-0 text-primary hover:bg-transparent"
+                      > */}
+                      {isExpanded ? (
+                        <ChevronUp className="h-4 w-4" />
+                      ) : (
+                        <ChevronDown className="h-4 w-4" />
+                      )}
                       {/* <span className="text-xs font-medium text-gray-500 dark:text-zinc-400 whitespace-nowrap">
                         {item.timestamp}
-                      </span> */}
+                        </span> */}
                       <span className="text-sm font-bold text-gray-900 dark:text-zinc-100">
                         {item.action}
                       </span>
+                      {/* </Button> */}
                     </div>
                     <span className="text-xs font-medium text-gray-500 dark:text-zinc-400 whitespace-nowrap">
                       {item.timestamp}
                     </span>
                   </div>
 
-                  {isExpanded && item.details && (
-                    <div className="px-5 pl-[52px]">
-                      <p className="my-0 text-[13px] text-gray-500 dark:text-zinc-500">
-                        {item.details}
-                      </p>
-                    </div>
-                  )}
+                  {
+                    isExpanded && item.details && (
+                      <div className="px-5 pl-[52px]">
+                        <p className="my-0 text-[13px] text-gray-500 dark:text-zinc-500">
+                          {item.details}
+                        </p>
+                      </div>
+                    )
+                  }
                 </div>
               )
             })}
           </div>
         </CardContent>
-      )}
-    </Card>
+      )
+      }
+    </Card >
   )
 }

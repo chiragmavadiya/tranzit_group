@@ -89,6 +89,10 @@ export interface InvoiceSummary {
   paid_invoices: number;
   amount_pending: number;
   amount_paid: number;
+  total_invoice: number;
+  invoice_pending: number;
+  invoice_partial: number;
+  invoice_paid: number;
 }
 export interface InvoiceFormData {
   invoice_number: string;

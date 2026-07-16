@@ -25,6 +25,7 @@ export interface FormInputProps extends Omit<InputHTMLAttributes<HTMLInputElemen
   error?: boolean;
   errormsg?: string;
   inputClassName?: string;
+  info?: string;
 }
 
 export interface FormTextareaProps extends Omit<FormInputProps, 'type'> {
@@ -49,6 +50,7 @@ export interface FormSelectProps extends Omit<FormInputProps, 'value' | 'onChang
   allowClear?: boolean;
   searchdisable?: boolean;
   multiple?: boolean;
+  optionClassName?: string;
 }
 
 export interface SummaryCardProps {

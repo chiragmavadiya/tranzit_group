@@ -1,10 +1,11 @@
 import { useCallback, useMemo, useState, useEffect, useEffectEvent, useRef } from 'react';
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
-import { useAppSelector } from '@/hooks/store.hooks';
+import { useAppDispatch, useAppSelector } from '@/hooks/store.hooks';
 import { showToast } from '@/components/ui/custom-toast';
 import { useOrderItems } from './useOrderItems';
 import {
   useCreateOrder,
+  useCreateManualOrder,
   useOrderDetails,
   useDownloadLabel,
   useWalletCheck,
@@ -14,10 +15,11 @@ import {
   useUpdateOrder,
   // useOrderDetailsForClone,
 } from './useOrders';
-import { useGlobalCouriers } from '@/features/courier-surcharge/hooks/useGlobalCouriers';
 import type { AddressData, OrderDetailData, WalletCheckResponse } from '../types';
 import { useDefaultItem } from '@/features/items/hooks/useItems';
 import { cleanSpaces, removeEmptyFields } from '@/lib/utils';
+import { useCustomerMe } from '@/features/customers/hooks/useCustomers';
+import { setCourierSettings } from '@/features/auth/authSlice';
 
 // address1 = street
 const initialAddressData = {
@@ -42,14 +44,15 @@ const initialAddressData = {
 export const useOrderWorkflow = () => {
   const { orderType, orderID } = useParams<{ orderType: string; orderID: string }>();
   const [searchParams] = useSearchParams();
-  console.log("searchParams", Boolean(searchParams.get("require_phone") === 'true'))
   const { role, user, default_courier, default_item, team_access } = useAppSelector((state) => state.auth);
   const navigate = useNavigate();
   const isSubUser = useMemo(() => (role === 'customer' && team_access?.is_sub_user), [role, team_access]);
   const canReadWrite = useMemo(() => !isSubUser || team_access?.permissions?.order === 'full', [isSubUser, team_access]);
+  const dispatch = useAppDispatch();
 
   // API Hooks
   const { mutate: createOrder, isPending: saveLoading } = useCreateOrder();
+  const { mutate: createManualOrder, isPending: manualSaveLoading } = useCreateManualOrder();
   const { mutate: updateOrder, isPending: updateLoading } = useUpdateOrder();
   const { mutate: checkWallet, isPending: walletLoading } = useWalletCheck();
   const { data: orderResponse, isLoading: isOrderLoading } = useOrderDetails(orderID || localStorage.getItem('order_to_clone') || '');
@@ -57,8 +60,6 @@ export const useOrderWorkflow = () => {
   const { mutate: printLabel } = useDownloadLabel(true);
   const { mutate: cancelOrder, isPending: isCancelling } = useCancelOrder();
   const { mutate: consignOrder, isPending: isConsigning } = useConsignOrder(role === 'admin');
-  const { data: globalCouriers } = useGlobalCouriers(role === 'admin' && orderType === 'create-menual');
-
   const orderDetail = orderResponse?.data;
   const isEditable = orderType === 'create' || orderType === 'consign' || orderType === 'create-menual' || orderType === 'return';
   const isCreate = orderType === 'create' || orderType === 'create-menual' || orderType === 'return';
@@ -71,7 +72,9 @@ export const useOrderWorkflow = () => {
   const [courierData, setCourierData] = useState<any>(null);
   // const [isSaveAsDraft, setIsSaveAsDraft] = useState(false);
   const isSaveAsDraft = useRef(false);
+  const skipItemCountCheckRef = useRef(false);
   const [saveAction, setSaveAction] = useState<'draft' | 'consignment' | null>(null);
+  const [activeSettings, setActiveSettings] = useState<any>({})
 
   useEffect(() => {
     if (!saveLoading && !walletLoading && !updateLoading) {
@@ -119,6 +122,7 @@ export const useOrderWorkflow = () => {
   const [ratesAccepted, setRatesAccepted] = useState(true);
   const [dangerousGoodsAccepted, setDangerousGoodsAccepted] = useState(false);
   const [selectedCustomer, setSelectedCustomer] = useState<number>();
+  const { data: customerMeData } = useCustomerMe(role === 'admin' ? selectedCustomer : undefined);
   const [showReceiverPhoneModal, setShowReceiverPhoneModal] = useState(false);
   const [receiverPhone, setReceiverPhone] = useState('');
 
@@ -140,6 +144,10 @@ export const useOrderWorkflow = () => {
     },
   ]);
 
+  useEffect(() => {
+    skipItemCountCheckRef.current = false;
+  }, [itemsData]);
+
   const setDefaultItemData = useEffectEvent((data: any) => {
     if ((itemsData.length === 1) || itemsData.length === 0) {
       setItemsData([
@@ -155,11 +163,59 @@ export const useOrderWorkflow = () => {
       ]);
     }
   })
+  const isValidItems = useEffectEvent(() => {
+    return itemsData && itemsData.length > 0 && itemsData.some((item) =>
+      (Number(item.height) > 0 || Number(item.width) > 0 || Number(item.length) > 0 || Number(item.weight) > 0)
+    );
+  })
   useEffect(() => {
-    if (defaultItem && (orderType === 'create' || orderType === 'create-menual' || orderType === 'return') && !localStorage.getItem('quote_to_clone') && !localStorage.getItem('quote_items')) {
+    if (defaultItem && !isValidItems() && (orderType === 'create' || orderType === 'create-menual' || orderType === 'return') && !localStorage.getItem('quote_to_clone') && !localStorage.getItem('quote_items')) {
       setDefaultItemData(defaultItem.data)
     }
   }, [defaultItem, setItemsData, orderType]);
+
+
+
+  useEffect(() => {
+    if (!customerMeData) return;
+
+    dispatch(setCourierSettings({
+      courier_settings: customerMeData.courier
+    }));
+    if (!customerMeData || (orderType !== 'create' && orderType !== 'create-menual')) return;
+    const addr = customerMeData.address_detail.default;
+    setAddressData((prev) => ({
+      ...prev,
+      sender: {
+        ...prev.sender,
+        name: `${customerMeData.user.first_name || ''} ${customerMeData.user.last_name || ''}`.trim(),
+        email: customerMeData.user.email || '',
+        phone: customerMeData.user.office_number || customerMeData.user.personal_mobile || '',
+        company: customerMeData.user.company_name || '',
+        address_info: addr?.address_info || `${addr?.address}, ${addr?.suburb} ${addr?.state} ${addr?.postcode}` || '',
+        address1: addr?.address || '',
+        unit_number: addr?.unit_number || '',
+        street_name: addr?.street_name || '',
+        street_number: addr?.street_number || '',
+        suburb: addr?.suburb || '',
+        state: addr?.state || '',
+        postcode: addr?.postcode || '',
+        country: addr?.country || 'AU',
+      },
+    }));
+
+    const anc = !isValidItems();
+    if (customerMeData.default_item && anc) {
+      setItemsData([{
+        weight: Number(customerMeData.default_item?.item_weight) || 0,
+        length: Number(customerMeData.default_item?.item_length) || 0,
+        width: Number(customerMeData.default_item?.item_width) || 0,
+        height: Number(customerMeData.default_item?.item_height) || 0,
+        type: 'box',
+        quantity: 1,
+      }])
+    }
+  }, [customerMeData, dispatch, orderType, setItemsData]);
 
   const isValidConsignOrder = useCallback((orderStatus: string | undefined) => {
     if (orderStatus !== 'new' && orderType === 'consign') {
@@ -170,7 +226,6 @@ export const useOrderWorkflow = () => {
   // Sync user profile sender address (Create Mode)
   useEffect(() => {
     if (role === 'customer' && user && (orderType === 'create' || orderType === 'create-menual' || orderType === 'return') && !localStorage.getItem('order_to_clone')) {
-      console.log(user, 'user')
       const key = orderType === 'return' ? 'receiver' : 'sender';
       setAddressData((prev) => ({
         ...prev,
@@ -247,6 +302,7 @@ export const useOrderWorkflow = () => {
     setCourierData(data.courier_details);
     setQuoteData(data.order_details);
     isValidConsignOrder(data.order_status_category);
+    setSelectedCustomer(data.customer_id)
   }, [isValidConsignOrder, setItemsData])
 
   // Sync existing order details (Edit/Consign Mode)
@@ -277,7 +333,6 @@ export const useOrderWorkflow = () => {
       setDeliveryInstructions(value as string);
     }
   }, []);
-
   // Summary Metrics calculations
   const calculation = useMemo(() => {
     const totalItems = itemsData?.reduce((acc, item) => acc + (Number(item.quantity) || 1), 0) || 0;
@@ -309,15 +364,107 @@ export const useOrderWorkflow = () => {
   }, [itemsData, quoteData, isEditable, orderDetail?.order_details?.surcharge_amount, insuranceSelected, orderType]);
 
   const requiresManualLabel = useMemo(() => {
-    if (orderType !== 'edit') return false;
-    const noTrackingNumber = !orderDetail?.courier_details?.tracking_number;
-    const hasManyItems = calculation.totalItems > 4;
-    const hasHeavyItem = itemsData?.some((item) => Number(item.weight) > 28);
-    return hasManyItems || hasHeavyItem || noTrackingNumber;
-  }, [orderType, calculation.totalItems, itemsData, orderDetail?.courier_details?.tracking_number]);
+    const noTrackingNumber = orderDetail?.need_add_tracking;
+    return noTrackingNumber;
+  }, [orderDetail?.need_add_tracking]);
 
   // Order Submission/Saving Flow
   const handleOnSave = useCallback((skipWalletCheckArg?: any, overrideReceiverPhone?: string) => {
+    if (skipWalletCheckArg === 'skipItemCountCheck') {
+      skipItemCountCheckRef.current = true;
+    }
+    if (orderType === 'create-menual') {
+      if (role === 'admin' && !selectedCustomer) {
+        showToast('Please select a customer.', 'error');
+        return;
+      }
+      if (!manualOrderData.trackingNumber || !manualOrderData.courierId || !manualOrderData.amount) {
+        showToast('Please fill out all manual order details.', 'error');
+        return;
+      }
+      const isValidItems = itemsData && itemsData.length > 0 && itemsData.every((item) =>
+        item.type !== 'box' ||
+        (Number(item.height) > 0 && Number(item.width) > 0 && Number(item.length) > 0 && Number(item.weight) > 0 && Number(item.quantity) > 0)
+      );
+      const hasSenderAddress = Boolean(addressData?.sender?.address1);
+      const hasReceiverAddress = Boolean(addressData?.receiver?.address1);
+
+      if (!isValidItems || !hasSenderAddress || !hasReceiverAddress) {
+        showToast('Please fill out item dimensions and complete both addresses.', 'error');
+        return;
+      }
+      if (!termsAccepted || !ratesAccepted) {
+        showToast('You must accept all Terms & Conditions and Futile Pickup declarations.', 'error');
+        return;
+      }
+      if (!dangerousGoodsAccepted) {
+        showToast("Please confirm that this consignment does not contain dangerous goods", 'error');
+        return;
+      }
+
+      setSaveAction('consignment');
+
+      const manualPayload = {
+        customer_id: Number(selectedCustomer),
+        label_number: manualOrderData.trackingNumber,
+        amount: Number(manualOrderData.amount),
+        courier: Number(manualOrderData.courierId),
+        sender: {
+          name: addressData.sender.name,
+          phone: cleanSpaces(addressData.sender.phone),
+          email: addressData.sender.email,
+          company: addressData.sender.company || '',
+          address1: addressData.sender.address1 || '',
+          unit_number: addressData.sender.unit_number || '',
+          suburb: addressData.sender.suburb,
+          state: addressData.sender.state,
+          postcode: addressData.sender.postcode,
+        },
+        receiver: {
+          name: addressData.receiver.name,
+          phone: cleanSpaces(overrideReceiverPhone || addressData.receiver.phone),
+          email: addressData.receiver.email,
+          company: addressData.receiver.company || '',
+          address1: addressData.receiver.address1 || '',
+          unit_number: addressData.receiver.unit_number || '',
+          suburb: addressData.receiver.suburb,
+          state: addressData.receiver.state,
+          postcode: addressData.receiver.postcode,
+        },
+        parcels: itemsData.map(p => ({
+          type: p.type || 'box',
+          quantity: Number(p.quantity) || 1,
+          weight: Number(p.weight) || 0,
+          length: Number(p.length) || 0,
+          width: Number(p.width) || 0,
+          height: Number(p.height) || 0,
+        })),
+      };
+
+      createManualOrder(manualPayload, {
+        onSuccess: (response) => {
+          if (response.status || response.ok) {
+            showToast('Manual order created successfully', 'success');
+            // navigate(`${role === 'admin' ? '/admin' : ''}/orders`);
+            navigate(`${role === 'admin' ? '/admin' : ''}/orders/view/${response?.data?.order_number}`);
+            if (response?.data?.order_number) {
+              printLabel(response?.data?.order_number);
+            }
+          } else {
+            showToast(response.message || 'Failed to create manual order', 'error');
+          }
+        },
+        onError: (err: any) => {
+          if (err?.response?.data?.receiver_contact_required) {
+            setShowReceiverPhoneModal(true);
+            return;
+          }
+          showToast(err?.response?.data?.message || 'Failed to create manual order', 'error');
+        },
+      });
+      return;
+    }
+
     const isValidItems = itemsData && itemsData.length > 0 && itemsData.every((item) =>
       item.type !== 'box' ||
       Number(item.height) > 0 && Number(item.width) > 0 && Number(item.length) > 0 && Number(item.weight) > 0 && Number(item.quantity) > 0
@@ -348,8 +495,8 @@ export const useOrderWorkflow = () => {
       showToast("Please confirm that this consignment does not contain dangerous goods", 'error');
       return;
     }
-
-    if (calculation.totalItems > 4 && skipWalletCheckArg !== 'skipItemCountCheck' && skipWalletCheckArg !== 'saveAsDraft') {
+    // if any item have weight above 28kg then will show itemCount model
+    if (quoteData?.courier?.courierCode === 'direct_freight_express_tranzit_group' && (itemsData.length >= 6 || itemsData?.some((item) => Number(item.quantity) >= 6) || itemsData?.some((item) => Number(item.weight) >= 28)) && skipWalletCheckArg !== true && skipWalletCheckArg !== 'skipItemCountCheck' && skipWalletCheckArg !== 'saveAsDraft' && !skipItemCountCheckRef.current) {
       setShowItemCountModal(true);
       return;
     }
@@ -358,10 +505,17 @@ export const useOrderWorkflow = () => {
     setSaveAction(action);
 
     const getCapture = () => {
-      if (role === 'admin') return true;
       if (skipWalletCheckArg == 'saveAsDraft') return false;
       if ((walletCheckData?.wallet_balance ?? 0) > calculation.grandTotal) return true;
+      if (role === 'admin') return true;
     }
+
+    const formattedActiveSettings = Object.fromEntries(
+      Object.entries(activeSettings || {}).map(([key, val]) => [
+        key,
+        typeof val === 'boolean' ? (val ? 1 : 0) : val
+      ])
+    );
 
     const payload: any = {
       ...addressData,
@@ -373,19 +527,23 @@ export const useOrderWorkflow = () => {
       service: {
         ...courierData,
         cover_limited_liability: insuranceSelected ? 1 : 0,
-        signature_required: signatureSelected ? 1 : 0,
+        ...formattedActiveSettings,
+        signature_required: activeSettings?.signature_required ? 1 : 0,
       },
       surcharges: quoteData?.surcharges || [],
       delivery_instructions: deliveryInstructions,
       terms_and_conditions: termsAccepted,
       totals: {
         subtotal: quoteData?.courier?.base || 0,
-        gst: quoteData?.courier?.gst || 0,
+        gst: quoteData?.gst || 0,
         extra_surcharge: calculation.totalSurcharges,
         total: calculation.grandTotal || 0,
         freight_levy: quoteData?.courier?.freight_levy || 0,
+        markup_charge: quoteData?.courier?.markup_charge || 0,
+        pickup_value: quoteData?.courier?.pickup_value || 0,
       },
       capture: getCapture(),
+      order_type: orderDetail?.order_type,
       save_address: addressData?.receiver?.saveToAddressBook ? 1 : 0,
       customer_id: selectedCustomer || undefined,
       ...(orderType === 'create-menual' ? {
@@ -393,6 +551,7 @@ export const useOrderWorkflow = () => {
         courier_id: manualOrderData.courierId,
         amount: manualOrderData.amount,
       } : {}),
+      is_own_courier: courierData.is_own_courier ? 1 : 0,
     };
 
     const executeCreateOrder = (is_own_courier?: boolean) => {
@@ -407,9 +566,6 @@ export const useOrderWorkflow = () => {
                 navigate(`${role === 'admin' ? '/admin' : ''}/orders/${response?.data?.order_status_category !== 'new' ? 'view' : 'consign'}/${response?.data?.order_number}`);
               }
               setWalletCheckOpen(false);
-              if (response?.data?.order_number && (response?.data?.order_status_category !== 'new' || role === 'admin')) {
-                printLabel(response?.data?.order_number);
-              }
             } else {
               showToast(response.message || 'Failed to create orders', 'error');
             }
@@ -438,7 +594,7 @@ export const useOrderWorkflow = () => {
                 navigate(`${role === 'admin' ? '/admin' : ''}/orders/${response?.data?.order_status_category !== 'new' ? 'view' : 'consign'}/${response?.data?.order_number}`);
               }
               setWalletCheckOpen(false);
-              if (response?.data?.order_number && (response?.data?.order_status_category !== 'new' || role === 'admin')) {
+              if (response?.data?.order_number && (response?.data?.order_status_category !== 'new') && !response?.data?.need_add_tracking) {
                 printLabel(response?.data?.order_number);
               }
             } else {
@@ -459,15 +615,15 @@ export const useOrderWorkflow = () => {
       }
     };
 
-    if (skipWalletCheckArg === 'saveAsDraft' || skipWalletCheckArg === true || role === 'admin' || courierData?.is_own_courier) {
+    if (skipWalletCheckArg === 'saveAsDraft' || skipWalletCheckArg === true || courierData?.is_own_courier) {
       executeCreateOrder(courierData?.is_own_courier);
       return;
     }
 
-    checkWallet(calculation.grandTotal, {
+    checkWallet({ total: calculation.grandTotal, customer_id: selectedCustomer || '', role }, {
       onSuccess: (res) => {
         if (res.ok) {
-          setWalletCheckData(res);
+          setWalletCheckData({ ...res, skipWalletCheckArg: true });
           setWalletCheckOpen(true);
         } else {
           executeCreateOrder();
@@ -477,14 +633,29 @@ export const useOrderWorkflow = () => {
         showToast('Failed to create orders', 'error');
       },
     });
-  }, [itemsData, addressData, role, selectedCustomer, courierData, termsAccepted, ratesAccepted, dangerousGoodsAccepted, calculation.totalItems, calculation.totalSurcharges, calculation.grandTotal, insuranceSelected, signatureSelected, quoteData?.surcharges, quoteData?.courier?.base, quoteData?.courier?.gst, quoteData?.courier?.freight_levy, deliveryInstructions, orderType, manualOrderData.trackingNumber, manualOrderData.courierId, manualOrderData.amount, checkWallet, walletCheckData?.wallet_balance, orderID, updateOrder, navigate, printLabel, createOrder]);
+  }, [orderType, itemsData, addressData, role, selectedCustomer, courierData, termsAccepted, ratesAccepted, dangerousGoodsAccepted, quoteData?.courier?.courierCode, quoteData?.courier?.base, quoteData?.courier?.freight_levy, quoteData?.courier?.markup_charge, quoteData?.courier?.pickup_value, quoteData?.surcharges, quoteData?.gst, activeSettings, insuranceSelected, deliveryInstructions, calculation.totalSurcharges, calculation.grandTotal, orderDetail?.order_type, manualOrderData.trackingNumber, manualOrderData.courierId, manualOrderData.amount, checkWallet, createManualOrder, navigate, printLabel, walletCheckData?.wallet_balance, orderID, updateOrder, createOrder]);
 
   // Order Consignment Flow
   const handleConsign = useCallback((skipWalletCheckArg?: any, overrideReceiverPhone?: string) => {
+    if (skipWalletCheckArg === 'skipItemCountCheck') {
+      skipItemCountCheckRef.current = true;
+    }
     if (!termsAccepted || !ratesAccepted || !dangerousGoodsAccepted) {
       showToast('You must accept all Terms & Conditions, Dangerous Goods, and Futile Pickup declarations.', 'error');
       return;
     }
+
+    if (quoteData?.courier?.courierCode === 'direct_freight_express_tranzit_group' && (itemsData.length >= 4 || itemsData?.some((item) => Number(item.quantity) >= 4) || itemsData?.some((item) => Number(item.weight) >= 28)) && skipWalletCheckArg !== true && skipWalletCheckArg !== 'skipItemCountCheck' && !skipItemCountCheckRef.current) {
+      setShowItemCountModal(true);
+      return;
+    }
+
+    const formattedActiveSettings = Object.fromEntries(
+      Object.entries(activeSettings || {}).map(([key, val]) => [
+        key,
+        typeof val === 'boolean' ? (val ? 1 : 0) : val
+      ])
+    );
 
     const payload = {
       customer_id: selectedCustomer || orderDetail?.sender_details?.customer_id,
@@ -521,15 +692,21 @@ export const useOrderWorkflow = () => {
       service: {
         ...courierData,
         cover_limited_liability: insuranceSelected ? 1 : 0,
+        ...formattedActiveSettings,
         signature_required: signatureSelected ? 1 : 0,
       },
       surcharges: quoteData?.surcharges || [],
       delivery_instructions: deliveryInstructions,
       terms_and_conditions: termsAccepted,
+      order_type: orderDetail?.order_type,
       totals: {
         subtotal: quoteData?.courier?.base || calculation.servicePrice,
-        gst: quoteData?.courier?.gst || calculation.gst,
-        total: quoteData?.courier?.price || calculation.grandTotal,
+        gst: quoteData?.gst || calculation.gst,
+        total: calculation.grandTotal,
+        extra_surcharge: calculation.totalSurcharges,
+        freight_levy: quoteData?.courier?.freight_levy || 0,
+        markup_charge: quoteData?.courier?.markup_charge || 0,
+        pickup_value: quoteData?.courier?.pickup_value || 0,
       },
       capture: role === 'admin' || !skipWalletCheckArg || (walletCheckData?.wallet_balance ?? 0) > calculation.grandTotal,
       ...(orderType === 'create-menual' ? {
@@ -569,7 +746,7 @@ export const useOrderWorkflow = () => {
       return;
     }
 
-    checkWallet(calculation.grandTotal, {
+    checkWallet({ total: calculation.grandTotal, customer_id: selectedCustomer || '', role }, {
       onSuccess: (res) => {
         if (res.ok) {
           setWalletCheckData(res);
@@ -583,7 +760,7 @@ export const useOrderWorkflow = () => {
       },
     });
 
-  }, [termsAccepted, ratesAccepted, dangerousGoodsAccepted, selectedCustomer, orderDetail?.sender_details?.customer_id, addressData.sender.name, addressData.sender.company, addressData.sender.phone, addressData.sender.email, addressData.sender.address1, addressData.sender.suburb, addressData.sender.state, addressData.sender.postcode, addressData.sender.country, addressData.receiver.name, addressData.receiver.company, addressData.receiver.phone, addressData.receiver.email, addressData.receiver.address1, addressData.receiver.suburb, addressData.receiver.state, addressData.receiver.postcode, addressData.receiver.country, itemsData, courierData, insuranceSelected, signatureSelected, deliveryInstructions, quoteData?.courier?.base, quoteData?.courier?.gst, quoteData?.courier?.price, quoteData?.surcharges, calculation.servicePrice, calculation.gst, calculation.grandTotal, orderType, manualOrderData.trackingNumber, manualOrderData.courierId, manualOrderData.amount, orderID, consignOrder, navigate, role, printLabel, checkWallet, walletCheckData?.wallet_balance]);
+  }, [termsAccepted, ratesAccepted, dangerousGoodsAccepted, quoteData?.courier?.courierCode, quoteData?.courier?.base, quoteData?.courier?.freight_levy, quoteData?.courier?.markup_charge, quoteData?.courier?.pickup_value, quoteData?.surcharges, quoteData?.gst, itemsData, activeSettings, selectedCustomer, orderDetail?.sender_details?.customer_id, orderDetail?.order_type, addressData.sender.name, addressData.sender.company, addressData.sender.phone, addressData.sender.email, addressData.sender.address1, addressData.sender.suburb, addressData.sender.state, addressData.sender.postcode, addressData.sender.country, addressData.receiver.name, addressData.receiver.company, addressData.receiver.phone, addressData.receiver.email, addressData.receiver.address1, addressData.receiver.suburb, addressData.receiver.state, addressData.receiver.postcode, addressData.receiver.country, courierData, insuranceSelected, signatureSelected, deliveryInstructions, calculation.servicePrice, calculation.gst, calculation.grandTotal, calculation.totalSurcharges, role, walletCheckData?.wallet_balance, orderType, manualOrderData.trackingNumber, manualOrderData.courierId, manualOrderData.amount, checkWallet, orderID, consignOrder, navigate, printLabel]);
 
 
   const handleReceiverPhoneSubmit = useCallback((phone: string) => {
@@ -606,7 +783,7 @@ export const useOrderWorkflow = () => {
   const onCancelOrder = useCallback((manual: boolean = false) => {
     if (orderID) {
       cancelOrder(
-        { orderId: orderID, data: { manual: typeof manual === 'boolean' ? manual : false } },
+        { orderId: orderID, data: { manually: typeof manual === 'boolean' ? manual : false } },
         {
           onSuccess: (response) => {
             showToast(response?.message || 'Order cancelled successfully', 'success');
@@ -732,20 +909,20 @@ export const useOrderWorkflow = () => {
   }, [setItemsData, setQuoteData, setCourierData]);
 
   useEffect(() => {
-    document.title = orderType === 'create' ? "Create Order | Tranzit" : `Order ${orderID} | Tranzit`;
+    document.title = orderType === 'create' || orderType === 'create-menual' ? "Create Order | Tranzit" : `Order ${orderID} | Tranzit`;
   }, [orderType, orderID])
 
 
   const hasDefaultItemAndCourier = useMemo(() => Boolean(default_courier) && Boolean(default_item), [default_courier, default_item]);
 
   const isSavingDraft = useMemo(() => (saveLoading || updateLoading) && saveAction === 'draft', [saveLoading, saveAction, updateLoading]);
-  const isCreatingConsignment = useMemo(() => (saveLoading && saveAction === 'consignment') || walletLoading, [saveLoading, saveAction, walletLoading]);
+  const isCreatingConsignment = useMemo(() => (saveLoading && saveAction === 'consignment') || walletLoading || manualSaveLoading, [saveLoading, saveAction, walletLoading, manualSaveLoading]);
   return {
     orderType,
     orderID,
     role,
     user,
-    saveLoading,
+    saveLoading: saveLoading || manualSaveLoading,
     isSavingDraft,
     isCreatingConsignment,
     walletLoading,
@@ -753,7 +930,6 @@ export const useOrderWorkflow = () => {
     isDownloadingLabel,
     isCancelling,
     isConsigning,
-    globalCouriers,
     orderDetail,
     isEditable,
     walletCheckOpen,
@@ -812,5 +988,8 @@ export const useOrderWorkflow = () => {
     handleReceiverPhoneSubmit,
     // isCloning,
     canReadWrite,
+    setDeliveryInstructions,
+    setActiveSettings,
+    activeSettings
   };
 };

@@ -27,12 +27,24 @@ type CancelRequest = {
     processed_by: ""
 }
 
+export type ShopifyItem = {
+    product_name: string
+    variant_title?: string | null
+    sku?: string | null
+    quantity: number
+    price: number
+}
+
 export type OrderDetailData = {
     order_number: string
+    need_add_tracking?: boolean
     order_type: string
     created_at: string
     created_human: string
     order_reference: string
+    customer_reference?: string | null
+    external_reference?: string | null
+    external_order_id?: string | null
     order_details: {
         subtotal: number
         tax: number
@@ -41,6 +53,7 @@ export type OrderDetailData = {
         balance_due: number
         items: OrderItem[]
         surcharge_amount: number
+        shopify_items?: ShopifyItem[]
     }
     courier_details: {
         courier: string
@@ -49,6 +62,9 @@ export type OrderDetailData = {
         product_id: string
         courier_code: string
         is_own_courier: boolean
+        external_reference?: string | null
+        external_order_id?: string | null
+        tracking_url?: string | null
     }
     sender_details: {
         name: string
@@ -106,6 +122,7 @@ export type OrderDetailData = {
     signature_required: string
     shipping_activity: ShippingActivity[]
     cancel_request: CancelRequest | null
+    customer_id: number
     transit_timeline?: {
         events: any[]
     }

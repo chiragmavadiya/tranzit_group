@@ -132,6 +132,7 @@ export const getFirstAllowedPath = (
     { key: 'manifest_order', path: '/manifest' },
     { key: 'my_items', path: '/items' },
     { key: 'my_address_book', path: '/address-book' },
+    { key: 'report', path: '/reports' },
     { key: 'my_wallet', path: '/wallet/transactions' },
     { key: 'invoice', path: '/invoices' },
     { key: 'enquiry', path: '/enquiry' },

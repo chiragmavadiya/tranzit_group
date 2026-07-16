@@ -126,12 +126,14 @@ export default function CarrierIntegrationsPage() {
                   (c) => c.slug === selectedCarrier
                 );
                 return carrierIntegration?.logo_url ? (
-                  <div className="flex items-center h-8 shrink-0">
-                    <img src={carrierIntegration.logo_url} alt={carrierIntegration.name} className="h-6 w-auto object-contain max-w-[120px]" />
+                  <div className="flex items-center h-8 shrink-0 bg-white p-1 rounded-md border border-slate-100 dark:border-zinc-800/80 shadow-xs">
+                    <img src={carrierIntegration.logo_url} alt={carrierIntegration.name} className="h-6 w-auto object-contain max-w-[100px]" />
                   </div>
                 ) : null;
               })()}
-              <span className="text-lg font-bold text-gray-900 dark:text-zinc-100">Configure {carriers.find(c => c.id === selectedCarrier)?.name}</span>
+              <span className="text-lg font-bold text-gray-900 dark:text-zinc-100">
+                {selectedCarrier === 'auspost' ? 'Connect your Australia Post eParcel account' : `Connect your ${carriers.find(c => c.id === selectedCarrier)?.name} account`}
+              </span>
             </div>
           ) : (
             "Add Shipping Carrier"

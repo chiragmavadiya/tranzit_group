@@ -107,8 +107,42 @@ export const reportsService = {
         return response.data;
     },
 
-    getReportCounts: async (): Promise<ReportCountsResponse> => {
-        const response = await api.get<ReportCountsResponse>(API_ENDPOINTS.REPORTS.COUNTS);
+    getReportCounts: async (filters?: ReportFilters): Promise<ReportCountsResponse> => {
+        const response = await api.get<ReportCountsResponse>(API_ENDPOINTS.REPORTS.COUNTS, { params: filters });
         return response.data;
+    },
+
+    getAuspostReport: async (filters: ReportFilters): Promise<PaginatedResponse<any>> => {
+        const endpoint = API_ENDPOINTS.ADMIN_REPORTS.AUSPOST;
+        const response = await api.get(endpoint, { params: filters });
+        return response.data;
+    },
+
+    exportAuspostReport: async (filters: ReportFilters & { format: string }): Promise<{ blob: Blob; filename: string }> => {
+        const endpoint = API_ENDPOINTS.ADMIN_REPORTS.AUSPOST_EXPORT;
+        const response = await api.get(endpoint, {
+            params: filters,
+            responseType: 'blob',
+        });
+        const formatted = filters.format === 'csv' ? 'csv' : filters.format === 'excel' ? 'xlsx' : 'pdf';
+        const filename = getFileName(response) || `AusPost_Report_${new Date().getTime()}.${formatted}`;
+        return { blob: response.data, filename };
+    },
+
+    getOrderLabelChargesReport: async (filters: ReportFilters): Promise<PaginatedResponse<any>> => {
+        const endpoint = API_ENDPOINTS.ADMIN_REPORTS.ORDER_LABEL_CHARGES;
+        const response = await api.get(endpoint, { params: filters });
+        return response.data;
+    },
+
+    exportOrderLabelChargesReport: async (filters: ReportFilters & { format: string }): Promise<{ blob: Blob; filename: string }> => {
+        const endpoint = API_ENDPOINTS.ADMIN_REPORTS.ORDER_LABEL_CHARGES_EXPORT;
+        const response = await api.get(endpoint, {
+            params: filters,
+            responseType: 'blob',
+        });
+        const formatted = filters.format === 'csv' ? 'csv' : filters.format === 'excel' ? 'xlsx' : 'pdf';
+        const filename = getFileName(response) || `Order_Label_Charges_Report_${new Date().getTime()}.${formatted}`;
+        return { blob: response.data, filename };
     },
 };

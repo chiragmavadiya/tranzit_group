@@ -9,7 +9,7 @@ const useSessionStorage = <T>(
             const item = sessionStorage.getItem(key);
             return item !== null && item !== 'undefined' && item !== '{}' ? JSON.parse(item) : initialValue;
         } catch (error) {
-            console.error(error);
+            console.error("error", error);
             return initialValue;
         }
     };

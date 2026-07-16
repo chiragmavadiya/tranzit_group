@@ -55,6 +55,24 @@ export interface ProfileResponse {
   message: string;
 }
 
+export interface WeeklyLabelUsageTier {
+  min: number;
+  max: number;
+  rate: number | string;
+  label: string;
+}
+
+export interface WeeklyLabelUsage {
+  week_start: string;
+  week_end: string;
+  byo_labels_printed: number;
+  tr_labels_printed: number;
+  total_labels_printed: number;
+  current_tier: WeeklyLabelUsageTier;
+  next_tier: WeeklyLabelUsageTier | null;
+  labels_needed_for_next_tier: number;
+}
+
 export interface ProfileDetails {
   id?: number;
   first_name: string;
@@ -69,6 +87,7 @@ export interface ProfileDetails {
     default?: AddressDetailItem;
     billing?: AddressDetailItem;
   };
+  weekly_label_usage?: WeeklyLabelUsage;
 }
 
 export interface GetProfileResponse {

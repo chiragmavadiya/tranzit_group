@@ -2,7 +2,7 @@ import { Routes, Route, Navigate } from "react-router-dom";
 import ProtectedRoute from "@/router/ProtectedRoute";
 import { lazy, Suspense } from "react";
 import Layout from "@/layout";
-import { Loader2 } from "lucide-react";
+import PageLoading from "@/components/common/Loader";
 
 // Lazy load page components
 const Dashboard = lazy(() => import('@/features/dashboard/pages/Dashboard'));
@@ -13,7 +13,9 @@ const Setup = lazy(() => import('@/features/setup/pages/SetupPage'));
 const Invoices = lazy(() => import('@/features/invoices/pages/InvoicesPage'));
 const InvoiceDetails = lazy(() => import('@/features/invoices/pages/InvoiceDocumentView'));
 const ParcelReport = lazy(() => import('@/features/reports/pages/ParcelReportPage'));
+const AuspostReportPage = lazy(() => import('@/features/reports/pages/AusPostReport'));
 const IntegratedParcelReport = lazy(() => import('@/features/reports/pages/IntegratedParcelReport'));
+const OrderLabelChargesReport = lazy(() => import('@/features/reports/pages/OrderLabelChargesReport'));
 const CustomerManagement = lazy(() => import('@/features/customers/pages/CustomerPage'));
 const CustomerDetailPage = lazy(() => import('@/features/customers/pages/CustomerDetailPage'));
 const CancelOrderPage = lazy(() => import('@/features/cancel-order/pages/CancelOrderPage'));
@@ -30,16 +32,19 @@ const GetQuote = lazy(() => import('@/features/quote/pages/GetQuotePage'));
 const QuoteList = lazy(() => import('@/features/customer-quote/pages/QuoteListPage'));
 const ProfilePage = lazy(() => import('@/features/profile/pages/ProfilePage'));
 const GlobalConfigPage = lazy(() => import('@/features/global-config/pages/GlobalConfigPage'));
+const BlackoutDaysPage = lazy(() => import('@/features/blackout-days/pages/BlackoutDaysPage'));
 
 const HelpCenterAdminPage = lazy(() => import('@/features/help-center-admin/pages/HelpCenterAdminPage'));
 const SettingsLayout = lazy(() => import('@/features/settings/components/SettingsLayout'));
 const CategorySettingsPage = lazy(() => import('@/features/settings/pages/CategorySettingsPage'));
 const ActivityLogPage = lazy(() => import('@/features/activity-log/pages/ActivityLogPage'));
+const DebugCentrePage = lazy(() => import('@/features/debug-centre/pages/DebugCentrePage'));
+const TraceDetailPage = lazy(() => import('@/features/debug-centre/pages/TraceDetailPage'));
 
 const withSuspense = (Component: React.ReactNode) => (
     <Suspense
         fallback={<div className="flex items-center justify-center h-full w-full">
-            <Loader2 className="animate-spin text-primary h-10 w-10" />
+            <PageLoading />
         </div>}>
         {Component}
     </Suspense>
@@ -47,12 +52,13 @@ const withSuspense = (Component: React.ReactNode) => (
 
 
 export default function AdminRoutes() {
+    console.log("Render AdminRoutes")
+
     return (
         <Routes>
             <Route element={<ProtectedRoute role="admin" />}>
                 <Route element={<Layout />}>
                     <Route path="dashboard" element={withSuspense(<Dashboard />)} />
-
                     <Route path="orders">
                         <Route index element={withSuspense(<Orders />)} />
                         <Route path=":orderType" element={withSuspense(<OrderDetails />)} />
@@ -79,6 +85,7 @@ export default function AdminRoutes() {
                     {/* Zoho Integration, Global Settings */}
                     <Route path="zoho-integration" element={withSuspense(<ZohoIntegrationPage />)} />
                     <Route path="global-config" element={withSuspense(<GlobalConfigPage />)} />
+                    <Route path="blackout-days" element={withSuspense(<BlackoutDaysPage />)} />
                     <Route path="settings" element={withSuspense(<SettingsLayout />)}>
                         <Route path=":categoryId" element={withSuspense(<CategorySettingsPage />)} />
                     </Route>
@@ -94,8 +101,10 @@ export default function AdminRoutes() {
                     <Route path="enquiry" element={withSuspense(<EnquiryPage />)} />
 
                     {/* Reports */}
+                    <Route path="auspost-report" element={withSuspense(<AuspostReportPage />)} />
                     <Route path="customer-parcel-report" element={withSuspense(<ParcelReport />)} />
                     <Route path="integrated-parcel-report" element={withSuspense(<IntegratedParcelReport />)} />
+                    <Route path="order-label-charges" element={withSuspense(<OrderLabelChargesReport />)} />
 
                     {/* Order Summary */}
                     <Route path="order-summary" element={withSuspense(<AuspostOrderSummaryPage />)} />
@@ -117,6 +126,12 @@ export default function AdminRoutes() {
 
                     {/* Activity Log */}
                     <Route path="activity-log" element={withSuspense(<ActivityLogPage />)} />
+
+                    {/* Debug Centre */}
+                    <Route path="debug-centre">
+                        <Route index element={withSuspense(<DebugCentrePage />)} />
+                        <Route path=":traceId" element={withSuspense(<TraceDetailPage />)} />
+                    </Route>
 
                     {/* Others */}
                     <Route path="setup" element={withSuspense(<Setup />)} />

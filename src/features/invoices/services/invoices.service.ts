@@ -4,7 +4,7 @@ import type { PaginatedInvoicesResponse, Invoice } from '../types';
 import { getFileName } from '@/lib/utils';
 
 export const invoicesService = {
-  getCustomerInvoices: async (params?: { search?: string; page?: number; per_page?: number }): Promise<PaginatedInvoicesResponse> => {
+  getCustomerInvoices: async (params?: { search?: string; page?: number; per_page?: number; start_date?: string; end_date?: string }): Promise<PaginatedInvoicesResponse> => {
     const response = await api.get(API_ENDPOINTS.INVOICES.BASE, { params });
     return response.data;
   },
@@ -14,7 +14,7 @@ export const invoicesService = {
     return response.data;
   },
 
-  exportCustomerInvoices: async (params: { format: string; search?: string }): Promise<{ blob: Blob; filename: string }> => {
+  exportCustomerInvoices: async (params: { format: string; search?: string; start_date?: string; end_date?: string }): Promise<{ blob: Blob; filename: string }> => {
     const response = await api.get(API_ENDPOINTS.INVOICES.EXPORT, {
       params,
       responseType: 'blob',
@@ -38,7 +38,7 @@ export const invoicesService = {
     return response.data;
   },
 
-  getAdminInvoices: async (params?: { search?: string; page?: number; per_page?: number; customer?: string }): Promise<PaginatedInvoicesResponse> => {
+  getAdminInvoices: async (params?: { search?: string; page?: number; per_page?: number; customer?: string; start_date?: string; end_date?: string }): Promise<PaginatedInvoicesResponse> => {
     const response = await api.get(API_ENDPOINTS.ADMIN_INVOICES.BASE, { params });
     return response.data;
   },
@@ -96,7 +96,7 @@ export const invoicesService = {
     return response.data;
   },
 
-  exportAdminInvoices: async (params: { format: string; customer?: string; search?: string }): Promise<{ blob: Blob; filename: string }> => {
+  exportAdminInvoices: async (params: { format: string; customer?: string; search?: string; start_date?: string; end_date?: string }): Promise<{ blob: Blob; filename: string }> => {
     const response = await api.get(API_ENDPOINTS.ADMIN_INVOICES.EXPORT, {
       params,
       responseType: 'blob',

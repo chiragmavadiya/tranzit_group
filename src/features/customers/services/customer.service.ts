@@ -49,6 +49,14 @@ export const customerService = {
     },
 
     /**
+     * Get customer me (profile for order pre-fill)
+     */
+    getMe: async (id: number | string): Promise<any> => {
+        const response = await api.get(API_ENDPOINTS.ADMIN_CUSTOMERS.ME(id));
+        return response.data;
+    },
+
+    /**
      * Get customer edit details
      */
     getEditDetails: async (id: number | string): Promise<GenericDataResponse<CustomerFormData>> => {
@@ -224,6 +232,14 @@ export const customerService = {
                 transaction_type: data.transaction_type
             }
         });
+        return response.data;
+    },
+
+    /**
+     * Change customer password
+     */
+    changePassword: async (id: number | string, data: any): Promise<GenericResponse> => {
+        const response = await api.post<GenericResponse>(API_ENDPOINTS.ADMIN_CUSTOMERS.CHANGE_PASSWORD(id), data);
         return response.data;
     },
 };

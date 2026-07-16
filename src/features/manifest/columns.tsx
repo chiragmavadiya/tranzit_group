@@ -18,6 +18,7 @@ export const getManifestColumns = (
       header: 'ORDER #',
       key: 'order_number',
       className: 'text-primary font-bold',
+      width: '120px',
       sticky: 'left',
       cell: (value: string) => {
         if (!canOrderView) {
@@ -33,7 +34,6 @@ export const getManifestColumns = (
     },
     {
       header: 'SHIPPED', key: 'consignment_date',
-      width: '200px',
       cell: (value: string) => value || '-'
     },
     {
@@ -47,7 +47,7 @@ export const getManifestColumns = (
       )
     },
     {
-      header: 'SUBURB', key: 'suburb', width: '140px'
+      header: 'SUBURB', key: 'suburb',
     },
     {
       header: 'CARRIER & PRODUCT', key: 'courier',
@@ -83,7 +83,7 @@ export const getManifestColumns = (
     },
     ...(canReadWrite ? [{
       key: 'actions',
-      header: 'ACTION',
+      header: '',
       sticky: 'right' as const,
       cell: (_: any, row: Manifest) => {
         const isDownloading = downloadingId === row?.order_number;

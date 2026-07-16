@@ -124,7 +124,7 @@ export default function ActionBuilder({ actions, onChange }: ActionBuilderProps)
                 <div className="flex-1 w-full flex flex-col md:flex-row items-end gap-3">
                   {actType.fields.length === 0 ? (
                     <div className="w-full md:w-2/3 h-8 flex items-center">
-                      <span className="text-xs text-gray-400 dark:text-zinc-500 bg-gray-50 dark:bg-zinc-950 px-2.5 py-1.5 rounded-sm border border-gray-150 dark:border-zinc-850 font-semibold">
+                      <span className="text-xs text-gray-400 dark:text-zinc-500 bg-gray-50 dark:bg-zinc-950 px-2.5 py-1.5 rounded-sm border border-gray-150 dark:border-zinc-800 font-semibold">
                         No parameters required for this action
                       </span>
                     </div>

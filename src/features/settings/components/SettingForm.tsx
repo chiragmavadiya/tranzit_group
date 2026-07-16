@@ -35,6 +35,8 @@ const SettingForm = ({ category }: { category: any }) => {
         return key.split('_').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
     };
 
+    console.log(payload, 'payload')
+
     useEffect(() => {
         if (detailResponse?.data) {
             const initialPayload: Record<string, any> = {};
@@ -50,10 +52,11 @@ const SettingForm = ({ category }: { category: any }) => {
 
 
 
+
     if (isLoading) {
         return (
             <div className="flex items-center justify-center  w-full h-full">
-                <Loader2 className="animate-spin text-blue-400 h-10 w-10" />
+                <Loader2 className="animate-spin text-primary h-10 w-10" />
             </div>
         );
     }
@@ -87,7 +90,7 @@ const SettingForm = ({ category }: { category: any }) => {
                                         <div key={key} className="relative">
                                             <FormInput
                                                 label={formatLabel(key)}
-                                                value={payload[key]}
+                                                value={payload[key] || ''}
                                                 onChange={(val) => handlePayloadChange(key, val)}
                                                 placeholder={`Enter new ${formatLabel(key).toLowerCase()}`}
                                                 type="password"

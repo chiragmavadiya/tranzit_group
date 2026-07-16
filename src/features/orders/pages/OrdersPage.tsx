@@ -2,35 +2,46 @@
 
 import { useState, useMemo, useCallback, useEffect, lazy, Suspense } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { format } from 'date-fns';
+import { format, parse, isValid } from 'date-fns';
 import type { Order, TabType } from '@/features/orders/types';
 import { useOrders, useExportOrders, useImportOrders, useDownloadLabel, useCancelOrder, useArchiveOrder, usePrintOrder, useWalletCheck, useCreateAuspostManifest } from '@/features/orders/hooks/useOrders';
 import WalletCheckDialog from '@/features/orders/components/WalletCheckDialog';
 import { DataTable } from '@/components/common/DataTable';
 import { getOrdersColumns } from '../column';
-import DatePicker from '@/components/common/DatePicker';
+import { DateFilter } from '@/components/common/DateFilter';
+import type { DateFilterValue } from '@/components/common/DateFilter/types';
+// import { calculateDateRange } from '@/components/common/DateFilter/utils';
 import { Button } from '@/components/ui/button';
 import {
   Download, Plus, Loader2,
   Zap,
-  // ChevronDown,
-  // Package
+  ChevronDown,
+  Search,
+  Printer,
+  File,
+  FileText,
+  Upload,
+  Trash2,
+  X
 } from 'lucide-react';
-// import { DropdownCustomMenu } from '@/components/ui/dropdown-menu';
 import { useAppSelector } from '@/hooks/store.hooks';
+import { DEFAULT_PAGE_SIZES } from '@/constants/global.constants';
 import { showToast } from '@/components/ui/custom-toast';
-// import { ImportOrdersDialog } from '../components/ImportOrdersDialog';
 import { ConformationModal } from '@/components/common/ConformationModal';
-// import CreateOrderDialog from '../components/CreateOrderDialog';
 import { useDebounce } from '@/hooks/useDebounce';
-import { FormSelect } from '../components/OrderFormUI';
+import { FormSelect, FormInput } from '../components/OrderFormUI';
+import { CustomModel } from '@/components/ui/dialog';
+import { isPhoneValid } from '@/lib/utils';
 import { useCustomers } from '@/features/customers/hooks/useCustomers';
-// import UpdateCourierModal from '../components/UpdateCourierModal';
+import { DropdownCustomMenu } from '@/components/ui/dropdown-menu';
+import { getDisplayCourierName } from '../utils/order-details.utils';
 
 const ImportOrdersDialog = lazy(() => import('@/features/orders/components/ImportOrdersDialog'));
 const CreateOrderDialog = lazy(() => import('@/features/orders/components/CreateOrderDialog'));
 
 export default function OrdersPage({ fromCustomer, customerId }: { fromCustomer?: boolean, customerId?: string }) {
+  console.log("Render OrdersPage")
+
   const [searchParams, setSearchParams] = useSearchParams();
   const activeTab = (searchParams.get('tab')?.toLowerCase() as TabType) || 'new';
   const { role, team_access } = useAppSelector((state) => state.auth);
@@ -48,7 +59,7 @@ export default function OrdersPage({ fromCustomer, customerId }: { fromCustomer?
 
   const parseLocalDate = useCallback((dateStr?: string | null) => {
     if (!dateStr) return undefined;
-    const parts = dateStr.split('-');
+    const parts = dateStr.includes('/') ? dateStr.split('/') : dateStr.split('-');
     if (parts.length === 3) {
       const day = parseInt(parts[0], 10);
       const month = parseInt(parts[1], 10) - 1; // 0-based
@@ -58,20 +69,26 @@ export default function OrdersPage({ fromCustomer, customerId }: { fromCustomer?
     return undefined;
   }, []);
 
-  const formatDate = useCallback((date?: Date) => {
-    return date ? format(date, 'dd-MM-yyyy') : undefined;
-  }, []);
-
-  const initialStartDate = useMemo(() => {
-    return parseLocalDate(searchParams.get('start_date'));
+  const initialDateFilter = useMemo<DateFilterValue>(() => {
+    const sDate = parseLocalDate(searchParams.get('start_date'));
+    const eDate = parseLocalDate(searchParams.get('end_date'));
+    if (sDate && eDate) {
+      return {
+        type: 'custom',
+        from: format(sDate, 'dd/MM/yyyy'),
+        to: format(eDate, 'dd/MM/yyyy'),
+        label: `${format(sDate, 'dd MMM yyyy')} - ${format(eDate, 'dd MMM yyyy')}`,
+      };
+    }
+    return {
+      type: 'custom',
+      from: '',
+      to: '',
+      label: 'All Time',
+    };
   }, [searchParams, parseLocalDate]);
 
-  const initialEndDate = useMemo(() => {
-    return parseLocalDate(searchParams.get('end_date'));
-  }, [searchParams, parseLocalDate]);
-
-  const [dateRange, setDateRange] = useState<[Date | undefined, Date | undefined]>(() => [initialStartDate, initialEndDate]);
-  const [appliedDateRange, setAppliedDateRange] = useState<[Date | undefined, Date | undefined]>(() => [initialStartDate, initialEndDate]);
+  const [dateRange, setDateRange] = useState<DateFilterValue>(() => initialDateFilter);
   const [selectedRows, setSelectedRows] = useState<string[]>([]);
   const [isDownloadingLabels, setIsDownloadingLabels] = useState(false);
   const [isCancellingOrders, setIsCancellingOrders] = useState(false);
@@ -94,14 +111,50 @@ export default function OrdersPage({ fromCustomer, customerId }: { fromCustomer?
     });
   }, [setSearchParams]);
 
-  // Synchronize search and date range filters with URL searchParams
+  // Synchronize searchParams back to dateRange state (e.g. on navigation or direct link clicks)
   useEffect(() => {
-    setSelectedRows([])
+    const sDate = parseLocalDate(searchParams.get('start_date'));
+    const eDate = parseLocalDate(searchParams.get('end_date'));
+    if (sDate && eDate) {
+      const fromStr = format(sDate, 'dd/MM/yyyy');
+      const toStr = format(eDate, 'dd/MM/yyyy');
+
+      if (dateRange.from !== fromStr || dateRange.to !== toStr) {
+        setDateRange({
+          type: 'custom',
+          from: fromStr,
+          to: toStr,
+          label: `${format(sDate, 'dd MMM yyyy')} - ${format(eDate, 'dd MMM yyyy')}`,
+        });
+      }
+    } else {
+      if (dateRange.from !== '' || dateRange.to !== '') {
+        setDateRange({
+          type: 'custom',
+          from: '',
+          to: '',
+          label: 'All Time',
+        });
+      }
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [searchParams, parseLocalDate]);
+
+  // Synchronize dateRange state to URL searchParams
+  useEffect(() => {
+    setSelectedRows([]);
     setSearchParams((prev) => {
       let hasChanged = false;
 
       const currentStartDate = prev.get('start_date') || undefined;
-      const newStartDate = formatDate(appliedDateRange[0]);
+      let newStartDate: string | undefined;
+      if (dateRange.from) {
+        const parsedFrom = parse(dateRange.from, 'dd/MM/yyyy', new Date());
+        if (isValid(parsedFrom)) {
+          newStartDate = format(parsedFrom, 'dd-MM-yyyy');
+        }
+      }
+
       if (currentStartDate !== newStartDate) {
         if (newStartDate) {
           prev.set('start_date', newStartDate);
@@ -112,7 +165,14 @@ export default function OrdersPage({ fromCustomer, customerId }: { fromCustomer?
       }
 
       const currentEndDate = prev.get('end_date') || undefined;
-      const newEndDate = formatDate(appliedDateRange[1]);
+      let newEndDate: string | undefined;
+      if (dateRange.to) {
+        const parsedTo = parse(dateRange.to, 'dd/MM/yyyy', new Date());
+        if (isValid(parsedTo)) {
+          newEndDate = format(parsedTo, 'dd-MM-yyyy');
+        }
+      }
+
       if (currentEndDate !== newEndDate) {
         if (newEndDate) {
           prev.set('end_date', newEndDate);
@@ -124,7 +184,7 @@ export default function OrdersPage({ fromCustomer, customerId }: { fromCustomer?
 
       return hasChanged ? prev : prev;
     }, { replace: true });
-  }, [debouncedSearch, appliedDateRange, setSearchParams, formatDate]);
+  }, [dateRange, setSearchParams]);
 
   const downloadLabelMutation = useDownloadLabel();
   const cancelOrderMutation = useCancelOrder();
@@ -135,36 +195,59 @@ export default function OrdersPage({ fromCustomer, customerId }: { fromCustomer?
 
   const [walletCheckOpen, setWalletCheckOpen] = useState(false);
   const [walletCheckData, setWalletCheckData] = useState<any>(null);
-  const [orderToPrint, setOrderToPrint] = useState<{ orderNumber: string | number; amount: number } | null>(null);
+  const [orderToPrint, setOrderToPrint] = useState<{ orderNumber: string | number; amount: number; canConsign: boolean } | null>(null);
+  const [showItemCountModal, setShowItemCountModal] = useState(false);
+  const [pendingPrintArgs, setPendingPrintArgs] = useState<{ orderNumber: string | number; amount: number; row: Order } | null>(null);
+  const [showCarrierConfirm, setShowCarrierConfirm] = useState(false);
+  const [carrierConfirmData, setCarrierConfirmData] = useState<{ orderNumber: string | number; canConsign: boolean; courier: string } | null>(null);
+  const [showReceiverPhoneModal, setShowReceiverPhoneModal] = useState(false);
+  const [receiverPhoneInput, setReceiverPhoneInput] = useState('');
+  const [phoneModalData, setPhoneModalData] = useState<{ orderNumber: string | number; canConsign: boolean } | null>(null);
 
   const { mutate: checkWallet, isPending: walletLoading } = useWalletCheck();
   const { mutate: printLabel } = useDownloadLabel(true);
 
-  const executePrint = useCallback((orderNumber: string | number) => {
-    printOrderMutation.mutate(orderNumber, {
+  const executePrint = useCallback((orderNumber: string | number, canConsign: boolean = true, phone?: string) => {
+    printOrderMutation.mutate({ order_number: orderNumber, phone }, {
       onSuccess: () => {
         setWalletCheckOpen(false);
-        printLabel(orderNumber);
+        setShowReceiverPhoneModal(false);
+        if (canConsign) {
+          printLabel(orderNumber);
+        }
         setOrderToPrint(null);
       },
       onError: (err: any) => {
-        if (err?.response?.data?.need_edit) {
-          navigate(`/orders/consign/${orderNumber}?require_phone=true`)
+        if (err?.response?.data?.requires_phone_or_email || err.response?.data?.requires_phone) {
+          setPhoneModalData({ orderNumber, canConsign });
+          setReceiverPhoneInput('');
+          setShowReceiverPhoneModal(true);
+        } else if (err?.response?.data?.need_edit) {
+          navigate(`${isAdmin ? '/admin' : ''}/orders/consign/${orderNumber}`);
         }
         setOrderToPrint(null);
       }
     });
-  }, [printOrderMutation, printLabel, navigate]);
+  }, [printOrderMutation, printLabel, navigate, isAdmin]);
 
-  const handlePrintClick = useCallback((orderNumber: string | number, amount: number, row: Order) => {
-    setOrderToPrint({ orderNumber, amount });
 
-    if (role === 'admin' || row.is_own_courier) {
-      executePrint(orderNumber);
+
+  const proceedPrint = useCallback((orderNumber: string | number, amount: number, row: Order) => {
+    setOrderToPrint({ orderNumber, amount, canConsign: row.can_consign });
+
+    if (!row.courier) {
+      showToast('Courier is not selected', 'error');
+      navigate(`${isAdmin ? '/admin' : ''}/orders/consign/${orderNumber}`);
       return;
     }
 
-    checkWallet(amount, {
+    if (row.is_own_courier) {
+      setCarrierConfirmData({ orderNumber, canConsign: row.can_consign, courier: row.courier });
+      setShowCarrierConfirm(true);
+      return;
+    }
+
+    checkWallet({ total: amount, customer_id: row.customer_id || '', role }, {
       onSuccess: (res) => {
         if (res.ok) {
           setWalletCheckData(res);
@@ -179,7 +262,17 @@ export default function OrdersPage({ fromCustomer, customerId }: { fromCustomer?
         setOrderToPrint(null);
       }
     });
-  }, [role, checkWallet, executePrint]);
+  }, [role, checkWallet, navigate, isAdmin]);
+
+  const handlePrintClick = useCallback((orderNumber: string | number, amount: number, row: Order) => {
+    if (row.can_consign === false) {
+      setPendingPrintArgs({ orderNumber, amount, row });
+      setShowItemCountModal(true);
+      return;
+    }
+
+    proceedPrint(orderNumber, amount, row);
+  }, [proceedPrint]);
 
 
   // Reset page when tab changes
@@ -190,15 +283,33 @@ export default function OrdersPage({ fromCustomer, customerId }: { fromCustomer?
   }, [activeTab]);
 
   // Memoized filters for useOrders
-  const filters = useMemo(() => ({
-    status: activeTab.toLowerCase(),
-    per_page: pageSize,
-    page: page,
-    search: debouncedSearch || undefined,
-    start_date: formatDate(appliedDateRange[0]),
-    end_date: formatDate(appliedDateRange[1]),
-    customer: selectedCustomer || customerId || undefined,
-  }), [activeTab, pageSize, page, debouncedSearch, appliedDateRange, selectedCustomer, customerId, formatDate]);
+  const filters = useMemo(() => {
+    let start_date: string | undefined;
+    let end_date: string | undefined;
+
+    if (dateRange.from) {
+      const parsedFrom = parse(dateRange.from, 'dd/MM/yyyy', new Date());
+      if (isValid(parsedFrom)) {
+        start_date = format(parsedFrom, 'dd-MM-yyyy');
+      }
+    }
+    if (dateRange.to) {
+      const parsedTo = parse(dateRange.to, 'dd/MM/yyyy', new Date());
+      if (isValid(parsedTo)) {
+        end_date = format(parsedTo, 'dd-MM-yyyy');
+      }
+    }
+
+    return {
+      status: activeTab.toLowerCase(),
+      per_page: pageSize,
+      page: page,
+      search: debouncedSearch || undefined,
+      start_date,
+      end_date,
+      customer: selectedCustomer || customerId || undefined,
+    };
+  }, [activeTab, pageSize, page, debouncedSearch, dateRange, selectedCustomer, customerId]);
 
   // Fetch orders data
   const { data: ordersData, isLoading } = useOrders(filters);
@@ -226,24 +337,7 @@ export default function OrdersPage({ fromCustomer, customerId }: { fromCustomer?
     });
   }, [filters, exportOrders]);
 
-  const handleDateRangeChange = useCallback((value: Date | undefined, key: 'start' | 'end') => {
-    setDateRange((prev) => {
-      return key === 'start' ? [value, prev[1]] : [prev[0], value];
-    });
-  }, []);
 
-  const handleApplyFilters = useCallback(() => {
-    setAppliedDateRange(dateRange);
-    setPage(1);
-    setSelectedRows([]);
-  }, [dateRange]);
-
-  const handleClearFilters = useCallback(() => {
-    setDateRange([undefined, undefined]);
-    setAppliedDateRange([undefined, undefined]);
-    setPage(1);
-    setSelectedRows([]);
-  }, []);
 
   const handleImportOrders = useCallback((file: File, customerId?: string) => {
     importOrders.mutate({ file, customerId }, {
@@ -300,10 +394,11 @@ export default function OrdersPage({ fromCustomer, customerId }: { fromCustomer?
     let failCount = 0;
     for (const orderId of selectedRows) {
       try {
-        if (activeTab === 'new') {
+        const order = ordersData?.data.find((order) => order.order_number === orderId);
+        if (order?.is_own_courier || activeTab === 'new') {
           await archiveOrderMutation.mutateAsync(orderId);
         } else {
-          await cancelOrderMutation.mutateAsync({ orderId, data: { manual: false } });
+          await cancelOrderMutation.mutateAsync({ orderId, data: { manually: false } });
 
         }
         successCount++;
@@ -320,7 +415,7 @@ export default function OrdersPage({ fromCustomer, customerId }: { fromCustomer?
     setSelectedRows([]);
     setShowCancelModal(false);
     setIsCancellingOrders(false);
-  }, [selectedRows, cancelOrderMutation, archiveOrderMutation, activeTab]);
+  }, [selectedRows, ordersData, activeTab, archiveOrderMutation, cancelOrderMutation]);
 
   const handleCustomerEdit = useCallback((id: string) => {
     setAddressEditModal(id);
@@ -341,7 +436,7 @@ export default function OrdersPage({ fromCustomer, customerId }: { fromCustomer?
       await downloadLabelMutation.mutateAsync(orderId);
       showToast(`Label for order ${orderId} downloaded successfully.`, "success");
     } catch {
-      showToast(`Failed to download label for order ${orderId}.`, "error");
+      // showToast(`Failed to download label for order ${orderId}.`, "error");
     }
   }, [downloadLabelMutation]);
 
@@ -385,108 +480,234 @@ export default function OrdersPage({ fromCustomer, customerId }: { fromCustomer?
     handleArchiveOrder,
     updateToArchiveId,
     handlePrintClick,
-    printOrderMutation.isPending ? printOrderMutation.variables : (walletLoading ? orderToPrint?.orderNumber : null),
+    printOrderMutation.isPending
+      ? (printOrderMutation.variables && typeof printOrderMutation.variables === 'object' && 'order_number' in printOrderMutation.variables
+        ? (printOrderMutation.variables as any).order_number
+        : printOrderMutation.variables)
+      : (walletLoading ? orderToPrint?.orderNumber : null),
     canReadWrite
   ), [role, activeTab, navigate, handleCustomerEdit, handleCourierEdit, handleDownloadSingleLabel, handleCancelSingleOrderClick, downloadingLabelId, fromCustomer, handleArchiveOrder, updateToArchiveId, handlePrintClick, printOrderMutation.isPending, printOrderMutation.variables, walletLoading, orderToPrint?.orderNumber, canReadWrite]);
 
   return (
-    <div className={`${fromCustomer ? "p-0" : "p-page-padding"} flex-1 flex flex-col space-y-4 animate-in fade-in slide-in-from-bottom-2 duration-300 h-full overflow-hidden min-h-0`}>
+    <div className={`${fromCustomer ? "p-0" : "p-page-padding"} flex-1 flex flex-col space-y-4 animate-in fade-in slide-in-from-bottom-2 duration-300 overflow-y-auto`}>
 
-      <div className='rounded-lg shadow-sm flex-1 flex flex-col min-h-0 border border-gray-100 dark:border-zinc-800 bg-white dark:bg-zinc-950 '>
+      <div className='rounded-lg shadow-sm border border-gray-100 dark:border-zinc-800 bg-white dark:bg-zinc-950 flex-none h-auto'>
         {!fromCustomer && (
-          <div className="flex flex-wrap items-end justify-end gap-4 p-4 pb-0 print:hidden">
-            {isAdmin && (
-              <FormSelect
-                label="Customer"
-                placeholder="Select Customer"
-                value={selectedCustomer || ''}
-                onValueChange={(val) => {
-                  const selectedCustomer = customersData?.data?.find((c: any) => c.id.toString() === val);
-                  if (selectedCustomer) {
-                    setSelectedCustomer(selectedCustomer.id.toString());
-                  } else {
-                    setSelectedCustomer(undefined);
-                  }
-                }}
-                options={customersData?.data?.map((c: any) => ({
-                  value: c.id.toString(),
-                  label: `${c.first_name} ${c.last_name} (${c.email})`
-                })) || []}
-              />
-            )}
-            {selectedRows.length > 0 && (
-              <div className="flex items-center gap-2 mr-2 border-r border-gray-200 dark:border-zinc-800 pr-4">
-                <span className="text-xs text-slate-500 dark:text-zinc-400 font-medium mr-2 whitespace-nowrap">
-                  {selectedRows.length} Selected
-                </span>
-                {activeTab === 'printed' && (
-                  <Button
-                    variant="default"
-                    size="sm"
-                    className="h-8 gap-2 bg-primary hover:bg-primary-hover text-white transition-colors font-semibold shadow-lg shadow-primary/20 dark:shadow-none"
-                    onClick={handleDownloadMultipleLabels}
-                    disabled={isDownloadingLabels || isCancellingOrders}
-                  >
-                    {isDownloadingLabels ? <Loader2 className="w-4 h-4 animate-spin" /> : <Download className="w-4 h-4" />}
-                    <span>Download Labels</span>
-                  </Button>
+          <div className="flex flex-col gap-3 p-4 border-b border-gray-100 dark:border-zinc-800 bg-white dark:bg-zinc-950 rounded-t-lg print:hidden">
+            {/* Row 1: Filters & Search */}
+            <div className="flex flex-wrap items-center gap-2.5 w-full">
+              {/* Search & Date Filter Group */}
+              <div className="flex items-center gap-2 w-full sm:w-auto flex-1 sm:flex-initial">
+                <div className="flex-1 sm:w-64 md:w-72">
+                  <FormInput
+                    placeholder="Search orders..."
+                    value={search}
+                    onChange={handleSearch}
+                    icon={Search}
+                    className="w-full h-8"
+                  />
+                </div>
+                <div className="flex-1 sm:w-60 md:w-64">
+                  <DateFilter
+                    value={dateRange}
+                    onChange={setDateRange}
+                    className="w-full h-8"
+                  />
+                </div>
+              </div>
+
+              {/* Customer Select (Admin Only) */}
+              {isAdmin && (
+                <div className="w-full sm:w-60 md:w-64 flex-none sm:flex-initial">
+                  <FormSelect
+                    placeholder="Select Customer"
+                    value={selectedCustomer || ''}
+                    onValueChange={(val) => {
+                      const customer = customersData?.data?.find((c: any) => c.id.toString() === val);
+                      if (customer) {
+                        setSelectedCustomer(customer.id.toString());
+                      } else {
+                        setSelectedCustomer(undefined);
+                      }
+                    }}
+                    options={customersData?.data?.map((c: any) => ({
+                      value: c.id.toString(),
+                      label: `${c.first_name} ${c.last_name} (${c.email})`
+                    })) || []}
+                    selectClassName="h-8"
+                  />
+                </div>
+              )}
+
+              {/* Actions Row (Page Size, Export, Import, Create Order) */}
+              <div className="flex flex-wrap sm:flex-nowrap items-center gap-2 w-full sm:w-auto ml-auto">
+                {/* Page Size Selector */}
+                <div className="flex items-center gap-1.5 h-8 shrink-0">
+                  <span className="text-xs font-semibold text-slate-500 dark:text-zinc-400">Show:</span>
+                  <FormSelect
+                    className="w-[80px]"
+                    selectClassName="h-8 text-xs font-bold"
+                    value={pageSize.toString()}
+                    onValueChange={(value) => value && handlePageSizeChange(Number(value))}
+                    options={DEFAULT_PAGE_SIZES}
+                    placeholder="Select Page Size"
+                    allowClear={false}
+                    searchdisable
+                  />
+                </div>
+
+                {canReadWrite && (
+                  <>
+                    {/* Export */}
+                    <DropdownCustomMenu
+                      menus={[
+                        {
+                          label: "Print",
+                          onClick: () => window.print(),
+                          icon: Printer,
+                        },
+                        {
+                          label: "CSV",
+                          onClick: () => handleExport('csv'),
+                          icon: File,
+                        },
+                        {
+                          label: "Excel",
+                          onClick: () => handleExport('excel'),
+                          icon: Upload,
+                        },
+                        {
+                          label: "PDF",
+                          onClick: () => handleExport('pdf'),
+                          icon: FileText,
+                        },
+                      ]}
+                    >
+                      <Button
+                        variant="outline"
+                        className="h-8 px-2.5 sm:px-3 gap-1.5 sm:gap-2 border-gray-200 dark:border-zinc-800 hover:bg-gray-50 dark:hover:bg-zinc-800 font-medium text-slate-700 dark:text-zinc-300 transition-colors shrink-0"
+                        disabled={exportOrders.isPending}
+                      >
+                        {exportOrders.isPending ? <Loader2 className="w-4 h-4 animate-spin" /> : <Upload className="w-4 h-4" />}
+                        <span className="hidden sm:inline">Export</span>
+                      </Button>
+                    </DropdownCustomMenu>
+
+                    {/* Import */}
+                    {!isAdmin && (
+                      <Button
+                        variant="outline"
+                        className="h-8 px-2.5 sm:px-3 gap-1.5 sm:gap-2 border-gray-200 dark:border-zinc-800 hover:bg-gray-50 dark:hover:bg-zinc-800 font-medium text-slate-700 dark:text-zinc-300 transition-colors shrink-0"
+                        onClick={() => setIsImportDialogOpen(true)}
+                        disabled={importOrders.isPending}
+                      >
+                        {importOrders.isPending ? <Loader2 className="w-4 h-4 animate-spin" /> : <Download className="w-4 h-4" />}
+                        <span className="hidden sm:inline">Import</span>
+                      </Button>
+                    )}
+
+                    {/* Create Order */}
+                    {isAdmin ? (
+                      <div className="flex-1 sm:flex-initial min-w-[90px] sm:min-w-0">
+                        <DropdownCustomMenu
+                          menus={[
+                            {
+                              label: "Create an order",
+                              onClick: () => navigate(`${role === 'admin' ? '/admin' : ''}/orders/create`),
+                              className: 'font-medium',
+                            },
+                            {
+                              label: "Create a Manual Order",
+                              onClick: () => navigate(`${role === 'admin' ? '/admin' : ''}/orders/create-menual`),
+                              className: 'font-medium',
+                            }
+                          ]}
+                        >
+                          <Button
+                            className="h-8 w-full px-3 sm:px-4 gap-1.5 sm:gap-2 bg-primary hover:bg-primary-hover text-white shadow-sm transition-all active:scale-[0.98] font-semibold border-none flex items-center justify-center shrink-0"
+                          >
+                            <span className="hidden sm:inline">Create Order</span>
+                            <span className="inline sm:hidden">Create</span>
+                            <ChevronDown className="w-4 h-4 ml-1 opacity-70" />
+                          </Button>
+                        </DropdownCustomMenu>
+                      </div>
+                    ) : (
+                      <Button
+                        className="h-8 px-3 sm:px-4 gap-1.5 sm:gap-2 bg-primary hover:bg-primary-hover text-white shadow-sm transition-all active:scale-[0.98] font-semibold border-none flex-1 sm:flex-none flex items-center justify-center shrink-0"
+                        onClick={() => navigate(`${role === 'admin' ? '/admin' : ''}/orders/create`)}
+                      >
+                        <Plus className="w-4 h-4" />
+                        <span className="hidden sm:inline">Create Order</span>
+                        <span className="inline sm:hidden">Create</span>
+                      </Button>
+                    )}
+                  </>
                 )}
-                <Button
-                  variant="outline"
-                  size="sm"
-                  className="h-8 gap-2 border-red-200 dark:border-red-900/30 hover:border-red-300 hover:bg-red-50 dark:hover:bg-red-900/10 text-red-600 dark:text-red-400 transition-colors font-semibold"
-                  onClick={() => setShowCancelModal(true)}
-                  disabled={isCancellingOrders || isDownloadingLabels}
-                >
-                  {isCancellingOrders ? <Loader2 className="w-4 h-4 animate-spin" /> : null}
-                  <span>{activeTab === 'new' ? 'Delete' : 'Cancel'} Orders</span>
-                </Button>
-                {activeTab === 'printed' && (
+              </div>
+            </div>
+
+            {/* Bulk Actions (Shown only when rows are selected) */}
+            {selectedRows.length > 0 && (
+              <div className="flex items-center justify-between gap-2.5 p-1.5 px-3 bg-primary/5 dark:bg-primary/10 border border-primary/20 dark:border-primary/30 rounded-lg w-full transition-all">
+                <div className="flex items-center gap-1.5 shrink-0">
+                  <span className="h-2 w-2 rounded-full bg-primary animate-pulse" />
+                  <span className="text-xs font-semibold text-primary dark:text-primary-foreground/90">
+                    <span className="hidden sm:inline">{selectedRows.length} {selectedRows.length === 1 ? 'order' : 'orders'} selected</span>
+                    <span className="inline sm:hidden">{selectedRows.length} selected</span>
+                  </span>
+                </div>
+
+                <div className="flex items-center gap-1.5 ml-auto shrink-0">
+                  {activeTab === 'printed' && (
+                    <Button
+                      variant="default"
+                      size="sm"
+                      className="h-8 px-2.5 sm:px-3 gap-1.5 bg-primary hover:bg-primary-hover text-white transition-colors font-semibold shadow-sm"
+                      onClick={handleDownloadMultipleLabels}
+                      disabled={isDownloadingLabels || isCancellingOrders}
+                    >
+                      {isDownloadingLabels ? <Loader2 className="w-4 h-4 animate-spin" /> : <Download className="w-4 h-4" />}
+                      <span className="hidden sm:inline">Download Labels</span>
+                    </Button>
+                  )}
+
+                  {activeTab === 'printed' && (
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="h-8 px-2.5 sm:px-3 gap-1.5 border-gray-200 dark:border-zinc-800 hover:bg-gray-50 dark:hover:bg-zinc-800 text-slate-700 dark:text-zinc-300 transition-colors font-semibold"
+                      onClick={handleManifestOrders}
+                      disabled={createAuspostManifestMutation.isPending}
+                    >
+                      {createAuspostManifestMutation.isPending ? <Loader2 className="w-4 h-4 animate-spin" /> : <Zap className="w-4 h-4 text-amber-500" />}
+                      <span className="hidden sm:inline">Manifest</span>
+                    </Button>
+                  )}
+
                   <Button
                     variant="outline"
                     size="sm"
-                    className="h-8 gap-2"
-                    onClick={handleManifestOrders}
-                    disabled={createAuspostManifestMutation.isPending}
+                    className="h-8 px-2.5 sm:px-3 gap-1.5 border-red-200 dark:border-red-950/30 hover:border-red-300 hover:bg-red-50/50 dark:hover:bg-red-950/20 text-red-600 dark:text-red-400 transition-colors font-semibold"
+                    onClick={() => setShowCancelModal(true)}
+                    disabled={isCancellingOrders || isDownloadingLabels}
                   >
-                    {createAuspostManifestMutation.isPending ? <Loader2 className="w-4 h-4 animate-spin" /> : <Zap className="w-4 h-4" />}
-                    <span>Manifest orders ({selectedRows.length})</span>
+                    {isCancellingOrders ? <Loader2 className="w-4 h-4 animate-spin" /> : <Trash2 className="w-4 h-4" />}
+                    <span className="hidden sm:inline">{activeTab === 'new' ? 'Delete' : 'Cancel'}</span>
                   </Button>
-                )}
+
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="h-8 px-2 text-slate-500 hover:text-slate-700 dark:text-zinc-400 dark:hover:text-zinc-200 text-xs font-semibold gap-1"
+                    onClick={() => setSelectedRows([])}
+                  >
+                    <X className="w-4 h-4 sm:hidden" />
+                    <span className="hidden sm:inline">Clear</span>
+                  </Button>
+                </div>
               </div>
             )}
-            <DatePicker
-              label="Start Date"
-              date={dateRange[0]}
-              setDate={(value) => handleDateRangeChange(value, 'start')}
-            />
-
-            <DatePicker
-              label="End Date"
-              date={dateRange[1]}
-              setDate={(value) => handleDateRangeChange(value, 'end')}
-            />
-
-            <Button
-              onClick={handleApplyFilters}
-              variant="default"
-              size="sm"
-              className="h-8 p-3"
-            >
-              Apply
-            </Button>
-
-
-            {appliedDateRange[0] || appliedDateRange[1] ? (
-              <Button
-                onClick={handleClearFilters}
-                variant="ghost"
-                size="sm"
-                className="h-8 p-3 text-red-500 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/10"
-              >
-                Clear
-              </Button>
-            ) : null}
           </div>
         )}
 
@@ -500,66 +721,18 @@ export default function OrdersPage({ fromCustomer, customerId }: { fromCustomer?
           searchValue={search}
           pageSize={pageSize}
           onPageSizeChange={handlePageSizeChange}
-          headerTitle='Orders'
-          headerDescription='Manage and track your customer orders across all channels.'
           headerClass="h-20"
-          className='pb-3'
+          className='pb-3 flex-none h-auto [&_div.overflow-auto]:flex-none [&_div.overflow-auto]:h-auto [&_div.overflow-auto]:min-h-0 [&_div.overflow-auto]:overflow-y-visible [&_div.overflow-auto]:overflow-x-auto'
           totalItems={ordersData?.meta?.total || 0}
           currentPage={page}
           onPageChange={setPage}
           onExport={handleExport}
           isExporting={exportOrders.isPending}
-          selectable={!fromCustomer && activeTab !== 'archived'}
+          selectable={!isAdmin && activeTab !== 'archived'}
           selectedRows={selectedRows}
           onSelectionChange={setSelectedRows}
           exportable={!fromCustomer && canReadWrite}
-          customHeader={!fromCustomer && canReadWrite ? (() => (
-            <div className="flex items-center justify-between gap-2">
-
-              <Button
-                variant="outline"
-                className="gap-2 border-gray-200 dark:border-zinc-800 hover:bg-gray-50 dark:hover:bg-zinc-800 font-medium text-slate-700 dark:text-zinc-300 transition-colors"
-                onClick={() => setIsImportDialogOpen(true)}
-                disabled={importOrders.isPending}
-              >
-                {importOrders.isPending ? <Loader2 className="w-4 h-4 animate-spin" /> : <Download className="w-4 h-4" />}
-                <span>{importOrders.isPending ? 'Importing...' : 'Import'}</span>
-              </Button>
-              {/* <DropdownCustomMenu
-                menus={[
-                  {
-                    label: "Create an order",
-                    onClick: () => navigate(`${role === 'admin' ? '/admin' : ''}/orders/create`),
-                    className: 'font-medium',
-                    icon: Plus,
-                  },
-                  {
-                    label: "Create a Return Order",
-                    onClick: () => navigate(`${role === 'admin' ? '/admin' : ''}/orders/return`),
-                    className: 'font-medium',
-                    icon: Package,
-                  }
-                ]}
-              > */}
-              <Button
-                className="gap-2 bg-primary hover:bg-primary-hover text-white shadow-lg shadow-primary/20 dark:shadow-none transition-all active:scale-[0.98] font-semibold border-none px-4"
-                onClick={() => navigate(`${role === 'admin' ? '/admin' : ''}/orders/create`)}
-              >
-                <Plus className="w-4 h-4" />
-                <span>Create Order</span>
-                {/* <ChevronDown className="w-4 h-4 ml-1 opacity-70" /> */}
-              </Button>
-              {/* </DropdownCustomMenu> */}
-              {/* DO NOT REMOVE THIS BUTTON */}
-              {/* <Button
-                onClick={() => navigate(`${role === 'admin' ? '/admin' : ''}/orders/create`)}
-                className="gap-2 bg-primary hover:bg-primary-hover text-white shadow-lg shadow-primary/20 dark:shadow-none transition-all active:scale-[0.98] font-semibold border-none px-4"
-              >
-                <Plus className="w-4 h-4" />
-                <span>Create Order</span>
-              </Button> */}
-            </div>
-          )) : undefined}
+          header={!!fromCustomer}
         />
       </div>
       {
@@ -580,10 +753,10 @@ export default function OrdersPage({ fromCustomer, customerId }: { fromCustomer?
           <ConformationModal
             open={showCancelModal}
             onOpenChange={setShowCancelModal}
-            title="Cancel Selected Orders"
-            description={`Are you sure you want to cancel the ${selectedRows.length} selected order(s)? This action cannot be undone.`}
+            title={`${activeTab === 'new' ? 'Delete' : 'Cancel'} Selected Orders`}
+            description={`Are you sure you want to ${activeTab === 'new' ? 'delete' : 'cancel'} the ${selectedRows.length} selected order(s)? This action cannot be undone.`}
             onConfirm={handleCancelMultipleOrders}
-            confirmText="Yes, Cancel"
+            confirmText={`Yes, ${activeTab === 'new' ? 'Delete' : 'Cancel'}`}
             cancelText="No, Keep"
             confirmVariant="destructive"
             loading={isCancellingOrders}
@@ -602,7 +775,7 @@ export default function OrdersPage({ fromCustomer, customerId }: { fromCustomer?
             onConfirm={async () => {
               setIsCancellingOrders(true);
               try {
-                await cancelOrderMutation.mutateAsync({ orderId: orderToCancel, data: { manual: false } });
+                await cancelOrderMutation.mutateAsync({ orderId: orderToCancel, data: { manually: false } });
                 showToast(
                   activeTab === 'printed' || activeTab === 'shipped'
                     ? `Order ${orderToCancel} archived successfully.`
@@ -678,10 +851,66 @@ export default function OrdersPage({ fromCustomer, customerId }: { fromCustomer?
           walletBalance={walletCheckData.wallet_balance}
           orderTotal={orderToPrint.amount}
           isPending={printOrderMutation.isPending}
-          onConfirm={() => executePrint(orderToPrint.orderNumber)}
+          onConfirm={() => executePrint(orderToPrint.orderNumber, orderToPrint.canConsign)}
         />
       )}
-      {/* {showReceiverPhoneModal && (
+      {showItemCountModal && (
+        <ConformationModal
+          open={showItemCountModal}
+          onOpenChange={(open) => {
+            setShowItemCountModal(open);
+            if (!open) {
+              setPendingPrintArgs(null);
+            }
+          }}
+          title="Shipping Label Not Generated"
+          description={
+            <div className="space-y-4">
+              <p className="text-sm">The shipping label cannot be generated for this order at the moment.</p>
+              <p className="text-sm font-semibold">
+                The shipping label will be created by our support team once the payment has been successfully completed.
+              </p>
+            </div>
+          }
+          onConfirm={() => {
+            setShowItemCountModal(false);
+            if (pendingPrintArgs) {
+              proceedPrint(pendingPrintArgs.orderNumber, pendingPrintArgs.amount, pendingPrintArgs.row);
+              setPendingPrintArgs(null);
+            }
+          }}
+          confirmText="Continue"
+          cancelText="Cancel"
+          className="sm:max-w-[500px]"
+        />
+      )}
+      {showCarrierConfirm && (
+        <ConformationModal
+          open={showCarrierConfirm}
+          onOpenChange={setShowCarrierConfirm}
+          title="Confirm carrier"
+          description={
+            <div className="space-y-4 pt-2">
+              <p className="text-sm text-slate-600 dark:text-zinc-400">
+                You're about to create this shipment using your connected <strong className="font-bold text-slate-800 dark:text-zinc-200">{getDisplayCourierName(carrierConfirmData?.courier)}</strong> account.
+              </p>
+              <p className="text-sm text-slate-500 dark:text-zinc-400">
+                Shipping charges will be billed according to your {getDisplayCourierName(carrierConfirmData?.courier)} account and contract setup.
+              </p>
+            </div>
+          }
+          onConfirm={() => {
+            setShowCarrierConfirm(false);
+            if (carrierConfirmData) {
+              executePrint(carrierConfirmData.orderNumber, carrierConfirmData.canConsign);
+            }
+          }}
+          confirmText={`Continue`}
+          cancelText="Cancel"
+          className='sm:max-w-[500px]'
+        />
+      )}
+      {showReceiverPhoneModal && (
         <CustomModel
           open={showReceiverPhoneModal}
           onOpenChange={setShowReceiverPhoneModal}
@@ -692,11 +921,15 @@ export default function OrdersPage({ fromCustomer, customerId }: { fromCustomer?
               showToast("Please enter a valid phone number", "error");
               return;
             }
-            handleReceiverPhoneSubmit(receiverPhoneInput);
+            setShowReceiverPhoneModal(false);
+            if (phoneModalData) {
+              executePrint(phoneModalData.orderNumber, phoneModalData.canConsign, receiverPhoneInput);
+            }
           }}
           submitText="Print Order"
           cancelText="Cancel"
           contentClass="sm:max-w-[450px]"
+          isLoading={printOrderMutation.isPending}
         >
           <div className="p-4 space-y-4">
             <FormInput
@@ -706,11 +939,12 @@ export default function OrdersPage({ fromCustomer, customerId }: { fromCustomer?
               placeholder="e.g. 0412345678"
               required
               isFullWidth
-              error={!receiverPhoneInput.trim() || !isPhoneValid(receiverPhoneInput)}
+              error={receiverPhoneInput.trim() !== '' && !isPhoneValid(receiverPhoneInput)}
+              errormsg="Please enter a valid phone number"
             />
           </div>
         </CustomModel>
-      )} */}
+      )}
     </div>
   );
 }

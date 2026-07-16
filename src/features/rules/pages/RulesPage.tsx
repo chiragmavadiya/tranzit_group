@@ -35,7 +35,6 @@ export default function RulesPage() {
 
   // Queries & Mutations
   const { data: rulesData, isLoading } = useRules();
-  console.log(rulesData, 'data')
   // useRuleOptions();
   const createRuleMutation = useCreateRule();
   const updateRuleMutation = useUpdateRule();
@@ -184,7 +183,7 @@ export default function RulesPage() {
         <div className="lg:col-span-4 space-y-4">
 
           {/* Rules Overview Info Card */}
-          <Card className="border border-gray-200 dark:border-zinc-850 shadow-xs overflow-hidden bg-white dark:bg-zinc-900">
+          <Card className="border border-gray-200 dark:border-zinc-800 shadow-xs overflow-hidden bg-white dark:bg-zinc-900">
             <CardContent className="p-5 space-y-4">
               <h2 className="text-base font-bold text-gray-950 dark:text-zinc-100 my-0 mb-1">
                 Rules
@@ -216,22 +215,22 @@ export default function RulesPage() {
                 </div>
               )} */}
               {/* YouTube Video Preview */}
-              <div className="pt-2 hidden">
+              {/* <div className="pt-2 hidden">
                 <iframe
-                  className="w-full aspect-video rounded-lg border border-slate-200 dark:border-zinc-850"
+                  className="w-full aspect-video rounded-lg border border-slate-200 dark:border-zinc-800"
                   src="https://www.youtube.com/embed/MpV5FDCaLE4"
                   title="YouTube video player"
                   allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
                   allowFullScreen
                 ></iframe>
-              </div>
+              </div> */}
             </CardContent>
           </Card>
 
           {/* Accordions Section */}
           {canReadWrite && (
             <Accordion className="w-full space-y-2">
-              <AccordionItem value="how-to" className="border border-gray-200 dark:border-zinc-850 rounded-md bg-white dark:bg-zinc-900 px-4">
+              <AccordionItem value="how-to" className="border border-gray-200 dark:border-zinc-800 rounded-md bg-white dark:bg-zinc-900 px-4">
                 <AccordionTrigger className="my-0 text-[15px] font-bold text-gray-800 dark:text-zinc-200 py-3 hover:no-underline flex items-center gap-2">
                   <HelpCircle className="w-4 h-4 text-gray-500" />
                   How to create a rule
@@ -244,7 +243,7 @@ export default function RulesPage() {
                 </AccordionContent>
               </AccordionItem>
 
-              <AccordionItem value="running-order" className="border border-gray-200 dark:border-zinc-850 rounded-md bg-white dark:bg-zinc-900 px-4">
+              <AccordionItem value="running-order" className="border border-gray-200 dark:border-zinc-800 rounded-md bg-white dark:bg-zinc-900 px-4">
                 <AccordionTrigger className="text-[15px] font-bold text-gray-800 dark:text-zinc-200 py-3 hover:no-underline flex items-center gap-2">
                   <Layers className="w-4 h-4 text-gray-500" />
                   Running order
@@ -256,7 +255,7 @@ export default function RulesPage() {
             </Accordion>
           )}
           {/* Run Rules Manual Triggers */}
-          {/* <Card className="border gap-0 border-gray-200 dark:border-zinc-850 shadow-xs overflow-hidden bg-white dark:bg-zinc-900">
+          {/* <Card className="border gap-0 border-gray-200 dark:border-zinc-800 shadow-xs overflow-hidden bg-white dark:bg-zinc-900">
             <CardHeader className="px-5 py-4 border-b border-gray-100 dark:border-zinc-800">
               <CardTitle className="text-[15px] font-bold text-gray-800 dark:text-zinc-200 uppercase tracking-wide my-0">
                 Run rules
@@ -314,7 +313,6 @@ export default function RulesPage() {
 
         {/* Right Column: Rules list & Inline builder */}
         <div className="lg:col-span-8 space-y-6">
-          {/* {console.log(rules, "rules")} */}
           <RuleList
             rules={rulesData?.data || []}
             onCreateClick={() => {

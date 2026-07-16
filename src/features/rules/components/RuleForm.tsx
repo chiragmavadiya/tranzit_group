@@ -56,7 +56,7 @@ export default function RuleForm({
     }
     onSave(formData);
   };
-  console.log(formData, 'formData')
+
   return (
     <Card className="border gap-0 border-gray-200 dark:border-zinc-800 shadow-sm rounded-md overflow-hidden mt-6 bg-white dark:bg-zinc-950">
       <CardHeader className="px-6 py-4 border-b border-gray-100 dark:border-zinc-800 bg-slate-50/50 dark:bg-zinc-950/40">
@@ -93,10 +93,10 @@ export default function RuleForm({
             Actions (executed in order)
           </h3>
           <div
-            className="flex flex-col md:flex-row gap-3 w-full mt-4"
+            className="grid grid-cols-1 md:grid-cols-3 gap-3 w-full mt-4 items-end"
           >
             {/* Action Type Select */}
-            <div className="w-full md:w-1/3">
+            <div className="w-full">
               <FormSelect
                 label="Action Type"
                 placeholder='Select Action'
@@ -112,15 +112,15 @@ export default function RuleForm({
               />
             </div>
             {formData.action_type === 'set_cheapest_carrier_service' && (
-              <div className="w-full md:w-2/3 h-8 flex items-center">
-                <span className="text-xs text-gray-400 dark:text-zinc-500 bg-gray-50 dark:bg-zinc-950 px-2.5 py-1.5 rounded-sm border border-gray-150 dark:border-zinc-850 font-semibold">
+              <div className="w-full md:col-span-2 h-8 flex items-center">
+                <span className="text-xs text-gray-400 dark:text-zinc-500 bg-gray-50 dark:bg-zinc-950 px-2.5 py-1.5 rounded-sm border border-gray-150 dark:border-zinc-800 font-semibold">
                   No parameters required for this action
                 </span>
               </div>
             )}
             {formData.action_type === 'set_courier_product_code' && (
               <>
-                <div className="w-full md:w-1/2">
+                <div className="w-full">
                   <FormSelect
                     label="Courier"
                     value={String(formData.global_courier_id)}
@@ -133,7 +133,7 @@ export default function RuleForm({
                     errormsg="Please select courier"
                   />
                 </div>
-                <div className="w-full md:w-1/2">
+                <div className="w-full">
                   <FormSelect
                     label="Product Code"
                     value={formData.product_code || ''}

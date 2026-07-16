@@ -297,8 +297,9 @@ export const SelectSearch = ({
   name,
   searchdisable,
   multiple,
+  optionClassName,
 }: {
-  options: options[]
+  options: readonly options[]
   value?: any
   onValueChange?: (value: any) => void
   defaultValue?: any
@@ -309,6 +310,7 @@ export const SelectSearch = ({
   name?: string
   searchdisable?: boolean
   multiple?: boolean
+  optionClassName?: string
 }) => {
   const inputRef = React.useRef<HTMLInputElement>(null)
   const containerRef = React.useRef<HTMLDivElement>(null)
@@ -405,7 +407,7 @@ export const SelectSearch = ({
         <ComboboxContent
           align="start"
           anchor={containerRef}
-          className="max-w-max dark:bg-zinc-900 dark:border-zinc-800 p-1 rounded-md max-h-[220px] flex flex-col"
+          className="max-w-max dark:bg-zinc-900 dark:border-zinc-800 p-1 rounded-md max-h-[220px] border flex flex-col"
         >
           <ComboboxEmpty className="py-2 text-center text-xs text-muted-foreground">
             No results found.
@@ -415,7 +417,7 @@ export const SelectSearch = ({
               <ComboboxItem
                 key={item.value}
                 value={item}
-                className="min-h-7 word-break text-sm font-medium data-highlighted:bg-primary/20 data-selected:bg-primary"
+                className={cn("min-h-7 word-break text-sm font-medium data-highlighted:bg-primary/20 data-selected:bg-primary", optionClassName)}
               >
                 {item.label}
               </ComboboxItem>
@@ -446,7 +448,7 @@ export const SelectSearch = ({
       />
       <ComboboxContent
         align="start"
-        className="max-w-max dark:bg-zinc-900 dark:border-zinc-800 p-1 rounded-md max-h-[220px] flex flex-col"
+        className="max-w-max dark:bg-zinc-900 dark:border-zinc-800 p-1 rounded-md max-h-[220px] border flex flex-col"
       >
         <ComboboxEmpty className="py-2 text-center text-xs text-muted-foreground">
           No results found.
@@ -456,7 +458,7 @@ export const SelectSearch = ({
             <ComboboxItem
               key={item.value}
               value={item}
-              className="min-h-7 word-break text-sm font-medium data-highlighted:bg-primary/20 data-selected:bg-primary"
+              className={cn("min-h-7 word-break text-sm font-medium cursor-pointer data-highlighted:bg-primary/20 data-selected:bg-primary", optionClassName)}
             >
               {item.label}
             </ComboboxItem>

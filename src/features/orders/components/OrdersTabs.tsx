@@ -5,6 +5,9 @@ import { useOrderCounts } from '@/features/orders/hooks/useOrders';
 import { useAppSelector } from '@/hooks/store.hooks';
 import ModuleTabs from '@/components/common/ModuleTabs';
 import { useSearchParams } from 'react-router-dom';
+import { LayoutGroup } from 'framer-motion';
+
+import { FormSelect } from '@/features/orders/components/OrderFormUI';
 
 interface OrdersTabsProps {
   activeTab: TabType;
@@ -37,23 +40,50 @@ export function OrdersTabs({ activeTab, onTabChange, className, customerId }: Or
   }, !!role);
 
   return (
-    <nav className={cn("flex space-x-0 h-full items-end", className)} aria-label="Tabs">
-      {TABS.map((tab) => {
-        const key = tab.toLowerCase();
-        const count = countsData?.data?.[key] ?? countsData?.data?.[tab] ?? 0;
-        const isActive = activeTab === key;
+    <>
+      <LayoutGroup id="orders-tabs">
+        <nav className={cn("hidden tablet:flex space-x-0 h-full items-end gap-6", className)} aria-label="Tabs">
+          {TABS.map((tab) => {
+            const key = tab.toLowerCase();
+            const count = countsData?.data?.[key] ?? countsData?.data?.[tab] ?? 0;
+            const isActive = activeTab === key;
 
-        return (
-          <ModuleTabs
-            key={tab}
-            tab={tab}
-            tabKey={tabsMap[tab]}
-            onTabChange={(tabStr) => onTabChange(tabStr.toLowerCase() as TabType)}
-            isActive={isActive}
-            count={Number(count)}
-          />
-        );
-      })}
-    </nav>
+            return (
+              <ModuleTabs
+                key={tab}
+                tab={tab}
+                tabKey={tabsMap[tab]}
+                onTabChange={(tabStr) => onTabChange(tabStr.toLowerCase() as TabType)}
+                isActive={isActive}
+                count={Number(count)}
+              />
+            );
+          })}
+        </nav>
+      </LayoutGroup>
+
+      <div className="flex tablet:hidden h-full items-center px-1">
+        <FormSelect
+          value={activeTab}
+          onValueChange={(val) => {
+            if (val) onTabChange(val as TabType);
+          }}
+          options={TABS.map((tab) => {
+            const key = tab.toLowerCase();
+            const count = countsData?.data?.[key] ?? countsData?.data?.[tab] ?? 0;
+            return {
+              label: `${tabsMap[tab] || tab} (${count})`,
+              value: key,
+            };
+          })}
+          placeholder="Select status"
+          allowClear={false}
+          searchdisable={true}
+          className="w-[160px]"
+          selectClassName="h-8 [&_input]:text-[12px]! font-semibold"
+          optionClassName="text-[12px]!"
+        />
+      </div>
+    </>
   );
 }

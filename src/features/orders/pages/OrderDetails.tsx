@@ -9,6 +9,7 @@ import { SidePanel } from '@/features/orders/components/order-details/SidePanel'
 import { StickyFooter } from '@/features/orders/components/order-details/StickyFooter';
 import CreateOrderDialog from '@/features/orders/components/CreateOrderDialog';
 import { ItemsTable } from '@/features/orders/components/order-details/ItemsTable';
+import { ShopifyItemsCard } from '@/features/orders/components/order-details/ShopifyItemsCard';
 import WalletCheckDialog from '@/features/orders/components/WalletCheckDialog';
 import { Button } from '@/components/ui/button';
 import { ConformationModal } from '@/components/common/ConformationModal';
@@ -20,6 +21,7 @@ import { showToast } from '@/components/ui/custom-toast';
 import { CustomModel } from '@/components/ui/dialog';
 import { FormInput } from '@/features/orders/components/OrderFormUI';
 import { isPhoneValid } from '@/lib/utils';
+import { getDisplayCourierName } from '../utils/order-details.utils';
 
 const OrderDetailsSkeleton: React.FC = () => {
   return (
@@ -184,7 +186,6 @@ const OrderDetailsPage: React.FC = () => {
     isDownloadingLabel,
     isCancelling,
     isConsigning,
-    globalCouriers,
     orderDetail,
     isEditable,
     walletCheckOpen,
@@ -239,11 +240,15 @@ const OrderDetailsPage: React.FC = () => {
     default_courier,
     default_item,
     canReadWrite,
+    setDeliveryInstructions,
+    setActiveSettings,
+    activeSettings
     // isCloning,
   } = useOrderWorkflow();
 
   const [showCarrierConfirm, setShowCarrierConfirm] = useState(false);
   const [receiverPhoneInput, setReceiverPhoneInput] = useState('');
+  const [isQuoteLoading, setIsQuoteLoading] = useState(false);
 
   React.useEffect(() => {
     if (showReceiverPhoneModal) {
@@ -251,18 +256,9 @@ const OrderDetailsPage: React.FC = () => {
     }
   }, [showReceiverPhoneModal, addressData.receiver.phone]);
 
-  const getDisplayCourierName = () => {
-    const rawName = quoteData?.courier?.carrier || orderDetail?.courier_details?.courier || courierData?.courier || '';
-    if (!rawName) return '';
-    if (rawName === 'auspost') return 'Australia Post';
-    if (rawName === 'direct-freight') return 'Direct Freight Express';
-    if (rawName === 'aramex') return 'Aramex';
-    if (rawName === 'couriersplease' || rawName === 'couriers-please') return 'Couriers Please';
-    return rawName
-      .split('-')
-      .map((word: string) => word.charAt(0).toUpperCase() + word.slice(1))
-      .join(' ');
-  };
+  const displayCourierName = getDisplayCourierName(
+    quoteData?.courier?.carrier || orderDetail?.courier_details?.courier || courierData?.courier
+  );
 
   const handleConsignClick = () => {
     if (!termsAccepted || !ratesAccepted || !dangerousGoodsAccepted) {
@@ -394,25 +390,36 @@ const OrderDetailsPage: React.FC = () => {
               insuranceSelected={insuranceSelected}
               deliveryInstructions={deliveryInstructions}
               canReadWrite={canReadWrite}
+              activeSettings={activeSettings}
+              quoteData={quoteData}
             />
 
             {requiresManualLabel && (
-              <div className="mb-4 mt-3 py-2 px-4  bg-red-50 dark:bg-red-900/10 border border-red-200 dark:border-red-900/30 rounded-xl flex flex-col md:flex-row items-start md:items-center justify-between gap-4 animate-in slide-in-from-top-2 duration-500 shadow-sm">
-                <div className="flex items-center gap-4">
-                  <div className="h-8 w-8 rounded-full bg-red-100 dark:bg-red-900/40 flex items-center justify-center text-red-600 dark:text-red-400 shrink-0">
-                    <AlertTriangle size={20} />
-                  </div>
+              <>
+                {role === 'admin' ? (
                   <div>
-                    <h3 className="mt-0 mb-0 text-[14px] font-bold text-red-900 dark:text-red-100 uppercase tracking-wide">
-                      Manual Label Required
-                    </h3>
-                    <p className="mt-0 text-[14px] text-red-700 dark:text-red-300 mb-0 ">
-                      The shipping label cannot be generated for this order at the moment, this order requires manual label
-                      creation by admin.
-                    </p>
+
                   </div>
-                </div>
-              </div>
+                ) : (
+                  <div className="mb-4 mt-3 py-2 px-4  bg-red-50 dark:bg-red-900/10 border border-red-200 dark:border-red-900/30 rounded-xl flex flex-col md:flex-row items-start md:items-center justify-between gap-4 animate-in slide-in-from-top-2 duration-500 shadow-sm">
+                    <div className="flex items-center gap-4">
+                      <div className="h-8 w-8 rounded-full bg-red-100 dark:bg-red-900/40 flex items-center justify-center text-red-600 dark:text-red-400 shrink-0">
+                        <AlertTriangle size={20} />
+                      </div>
+                      <div>
+                        <h3 className="mt-0 mb-0 text-[14px] font-bold text-red-900 dark:text-red-100 uppercase tracking-wide">
+                          Manual Label Required
+                        </h3>
+                        <p className="mt-0 text-[14px] text-red-700 dark:text-red-300 mb-0 ">
+                          The shipping label cannot be generated for this order at the moment, this order requires manual label
+                          creation by admin.
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </>
+
             )}
 
             {orderDetail?.cancel_request && orderDetail.status !== 'Cancelled' && (
@@ -461,25 +468,25 @@ const OrderDetailsPage: React.FC = () => {
                 <ManualOrderDetails
                   manualOrderData={manualOrderData}
                   setManualOrderData={setManualOrderData}
-                  globalCouriers={globalCouriers}
                 />
               )}
 
-              <div className="grid grid-cols-1 lg:grid-cols-[1fr_380px] gap-4 items-start">
-                <div className="flex flex-col gap-3 overflow-hidden">
+              <div className={`grid grid-cols-1 ${orderType !== 'create-menual' ? 'lg:grid-cols-[1fr_380px]' : ''} gap-4 items-start`}>
+                <div className="flex flex-col gap-3 overflow-hidden lg:col-start-1 lg:row-start-1">
                   <AddressCard
-                    title="SENDER"
+                    title="Sender"
                     name={addressData.sender.name}
-                    address={addressData.sender.address_info || addressData.sender.address || ''}
+                    // address={addressData.sender.address_info || addressData.sender.address || ''}
+                    address={`${addressData.sender?.unit_number && addressData.sender?.unit_number + '-'}${addressData.sender?.address1}, ${addressData?.sender?.suburb} ${addressData?.sender?.state} ${addressData?.sender?.postcode} Australia`}
                     email={addressData.sender.email}
                     editable={isEditable && (role === 'admin' || orderType === 'return')}
                     onEditClick={() => onEditClick('sender')}
                     phone={addressData.sender.phone}
                   />
                   <AddressCard
-                    title="RECEIVER"
+                    title="Receiver"
                     name={addressData.receiver.name}
-                    address={addressData.receiver.address_info || addressData.receiver.address1 || ''}
+                    address={`${addressData.receiver?.unit_number && addressData.receiver?.unit_number + '-'}${addressData.receiver?.address1}, ${addressData?.receiver?.suburb} ${addressData?.receiver?.state} ${addressData?.receiver?.postcode} Australia`}
                     email={addressData.receiver.email}
                     instruction={addressData.receiver.instructions || ''}
                     editable={isEditable && orderType !== 'return'}
@@ -496,6 +503,9 @@ const OrderDetailsPage: React.FC = () => {
                     orderType={orderType}
                     customerId={selectedCustomer}
                   />
+                  {orderDetail?.order_details?.shopify_items && orderDetail.order_details.shopify_items.length > 0 && (
+                    <ShopifyItemsCard items={orderDetail.order_details.shopify_items} />
+                  )}
                   {orderType !== 'create-menual' && (
                     <CarrierCard
                       itemData={itemsData}
@@ -509,13 +519,38 @@ const OrderDetailsPage: React.FC = () => {
                       default_courier={default_courier}
                       initialSelectedCourierId={orderDetail?.courier_details && `${orderDetail?.courier_details?.courier_code || ''}${orderDetail?.courier_details?.product_id || ''}`}
                       signatureSelected={signatureSelected}
+                      setDeliveryInstructions={setDeliveryInstructions}
+                      activeSettings={activeSettings}
+                      setActiveSettings={setActiveSettings}
+                      onLoadingChange={setIsQuoteLoading}
                     />
                   )}
                   {!isCreate && (
                     <HistoryCard history={orderDetail?.shipping_activity} />
                   )}
+                </div>
 
-                  {isEditable && (
+                {orderType !== 'create-menual' && (
+                  <div className="lg:col-start-2 lg:row-start-1 w-full">
+                    <SidePanel
+                      calculation={calculation}
+                      itemsData={itemsData}
+                      quoteData={quoteData}
+                      handleOptionalFieldsChange={handleOptionalFieldsChange}
+                      insuranceSelected={insuranceSelected}
+                      // signatureSelected={signatureSelected}
+                      deliveryInstructions={deliveryInstructions}
+                      orderType={orderType}
+                      liabilityMessage={orderDetail?.limited_liability_cover?.message}
+                      liability={orderDetail?.limited_liability_cover?.covered || false}
+                      payment_status={orderDetail?.payment_status}
+                      shipping_activity={orderDetail?.transit_timeline?.events?.reverse()}
+                    />
+                  </div>
+                )}
+
+                {isEditable && (
+                  <div className="lg:col-start-1 lg:row-start-2 w-full">
                     <ConfirmContinue
                       termsAccepted={termsAccepted}
                       setTermsAccepted={setTermsAccepted}
@@ -524,23 +559,8 @@ const OrderDetailsPage: React.FC = () => {
                       dangerousGoodsAccepted={dangerousGoodsAccepted}
                       setDangerousGoodsAccepted={setDangerousGoodsAccepted}
                     />
-                  )}
-                </div>
-
-                <SidePanel
-                  calculation={calculation}
-                  itemsData={itemsData}
-                  quoteData={quoteData}
-                  handleOptionalFieldsChange={handleOptionalFieldsChange}
-                  insuranceSelected={insuranceSelected}
-                  signatureSelected={signatureSelected}
-                  deliveryInstructions={deliveryInstructions}
-                  orderType={orderType}
-                  liabilityMessage={orderDetail?.limited_liability_cover?.message}
-                  liability={orderDetail?.limited_liability_cover?.covered || false}
-                  payment_status={orderDetail?.payment_status}
-                  shipping_activity={orderDetail?.transit_timeline?.events?.reverse()}
-                />
+                  </div>
+                )}
               </div>
             </main>
           </div>
@@ -552,6 +572,7 @@ const OrderDetailsPage: React.FC = () => {
             isCreatingConsignment={isCreatingConsignment}
             onConsign={handleConsignClick}
             isConsigning={isConsigning}
+            isServicePending={isQuoteLoading}
           />
         </>
       )}
@@ -568,7 +589,8 @@ const OrderDetailsPage: React.FC = () => {
           hasDefaultItemAndCourier={hasDefaultItemAndCourier}
           default_courier={default_courier}
           default_item={default_item}
-
+          selectedCustomer={selectedCustomer}
+          onCustomerSelect={setSelectedCustomer}
         />
       )}
       {walletCheckOpen && walletCheckData && (
@@ -578,7 +600,7 @@ const OrderDetailsPage: React.FC = () => {
           walletBalance={walletCheckData.wallet_balance}
           orderTotal={calculation.grandTotal}
           isPending={isCreate ? saveLoading : isConsigning}
-          onConfirm={() => isCreate ? handleOnSave(true) : handleConsign(true)}
+          onConfirm={() => isCreate ? handleOnSave(walletCheckData?.skipWalletCheckArg || quoteData.courier.is_own_courier) : handleConsign(true)}
         />
       )}
       <ConformationModal
@@ -595,7 +617,11 @@ const OrderDetailsPage: React.FC = () => {
         }
         onConfirm={() => {
           setShowItemCountModal(false);
-          handleOnSave('skipItemCountCheck');
+          if (isCreate) {
+            handleOnSave('skipItemCountCheck');
+          } else {
+            handleConsign('skipItemCountCheck');
+          }
         }}
         confirmText="Continue"
         cancelText="Cancel"
@@ -609,10 +635,10 @@ const OrderDetailsPage: React.FC = () => {
           description={
             <div className="space-y-4 pt-2">
               <p className="text-sm text-slate-600 dark:text-zinc-400">
-                You're about to create this shipment using your connected <strong className="font-bold text-slate-800 dark:text-zinc-200">{getDisplayCourierName()}</strong> account.
+                You're about to create this shipment using your connected <strong className="font-bold text-slate-800 dark:text-zinc-200">{displayCourierName}</strong> account.
               </p>
               <p className="text-sm text-slate-500 dark:text-zinc-400">
-                Shipping charges will be billed according to your {getDisplayCourierName()} account and contract setup.
+                Shipping charges will be billed according to your {displayCourierName} account and contract setup.
               </p>
             </div>
           }

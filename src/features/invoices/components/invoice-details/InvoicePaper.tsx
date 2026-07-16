@@ -22,6 +22,7 @@ import {
   DropdownCustomMenu,
 } from '@/components/ui/dropdown-menu';
 import { FormInput, FormSelect } from '@/features/orders/components/OrderFormUI'
+import { Textarea } from '@/components/ui/textarea'
 import { BANKING_DETAILS, COMPANY_DETAILS, TERMS_CONDITIONS } from '../../constants'
 import { format } from 'date-fns'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
@@ -49,19 +50,41 @@ const calculateGSTBreakdown = (finalAmount: number, gstPercent: number) => {
   };
 };
 
-const formatDate = (dateStr: string) => {
+const formatDate = (dateStr: any) => {
   if (!dateStr) return '';
-  if (/^\d{2}\/\d{2}\/\d{4}$/.test(dateStr)) return dateStr;
-  try {
-    const d = new Date(dateStr);
-    if (isNaN(d.getTime())) return dateStr;
-    const day = String(d.getDate()).padStart(2, '0');
-    const month = String(d.getMonth() + 1).padStart(2, '0');
-    const year = d.getFullYear();
+  const str = String(dateStr).trim();
+
+  // Match dd/MM/yy or dd/MM/yyyy or dd-MM-yy or dd-MM-yyyy
+  const ddMMyyRegex = /^(\d{1,2})[/-](\d{1,2})[/-](\d{2,4})$/;
+  const match = str.match(ddMMyyRegex);
+  if (match) {
+    const day = match[1].padStart(2, '0');
+    const month = match[2].padStart(2, '0');
+    let year = match[3];
+    if (year.length === 2) {
+      year = `20${year}`;
+    }
     return `${day}/${month}/${year}`;
-  } catch {
-    return dateStr;
   }
+
+  // Match yyyy-MM-dd
+  if (/^\d{4}-\d{2}-\d{2}$/.test(str)) {
+    const [year, month, day] = str.split('-');
+    return `${day}/${month}/${year}`;
+  }
+
+  try {
+    const d = new Date(str);
+    if (!isNaN(d.getTime())) {
+      const day = String(d.getDate()).padStart(2, '0');
+      const month = String(d.getMonth() + 1).padStart(2, '0');
+      const year = d.getFullYear();
+      return `${day}/${month}/${year}`;
+    }
+  } catch {
+    // fallback
+  }
+  return str;
 };
 
 export const InvoicePaper: React.FC<InvoicePaperProps> = ({
@@ -391,11 +414,11 @@ export const InvoicePaper: React.FC<InvoicePaperProps> = ({
       <div className="mb-4grow" ref={editingRowRef}>
         <h3 className="text-base font-bold text-slate-800 dark:text-white mb-1">Items</h3>
 
-        <div className="border border-slate-100 dark:border-zinc-800 rounded-xl overflow-hidden">
+        <div className="border border-slate-200 dark:border-zinc-800 shadow-sm rounded-md overflow-hidden">
           <div className="overflow-x-auto">
             <Table className="min-w-[1000px]">
               <TableHeader className="bg-transparent">
-                <TableRow className="hover:bg-transparent border-y border-slate-200 dark:border-zinc-800 bg-transparent">
+                <TableRow className="hover:bg-transparent dark:border-zinc-800 bg-transparent">
                   <TableHead className="w-[130px] text-sm font-medium uppercase text-slate-600 dark:text-zinc-400 py-3">Type</TableHead>
                   <TableHead className="w-[135px] text-sm font-medium uppercase text-slate-600 dark:text-zinc-400 py-3">Date</TableHead>
                   <TableHead className="min-w-[110px] text-sm font-medium uppercase text-slate-600 dark:text-zinc-400 py-3">Order Number / Description</TableHead>
@@ -463,7 +486,7 @@ export const InvoicePaper: React.FC<InvoicePaperProps> = ({
                         {isEditing && itemType === 'order' ? (
                           <DatePicker
                             date={item.date || ''}
-                            setDate={(val) => updateItemsData(item.id, 'date', val!)}
+                            setDate={(val) => updateItemsData(item.id, 'date', val ? format(val, 'yyyy-MM-dd') : '')}
                             className="h-8 w-[130px] border-slate-200 dark:border-zinc-800 text-sm bg-white dark:bg-zinc-900"
                             placeholder="dd/mm/yyyy"
                           />
@@ -473,13 +496,22 @@ export const InvoicePaper: React.FC<InvoicePaperProps> = ({
                       </TableCell>
                       <TableCell className="py-4 min-w-[110px]">
                         {isEditing ? (
-                          <FormInput
-                            className="w-full min-w-[150px] shadow-none col-span-12"
-                            inputClassName="h-8 text-sm bg-white dark:bg-zinc-900 border border-slate-200 dark:border-zinc-800 focus:ring-1 focus:ring-primary rounded-md px-3"
-                            value={itemType === 'order' ? item.order_number : item.description || ''}
-                            placeholder={itemType === 'order' ? 'Order Number' : itemType === 'credit' ? 'Credit description' : 'Description'}
-                            onChange={(val) => updateItemsData(item.id, itemType === 'order' ? 'order_number' : 'description', val)}
-                          />
+                          itemType === 'order' ? (
+                            <FormInput
+                              className="w-full min-w-[150px] shadow-none col-span-12"
+                              inputClassName="h-8 text-sm bg-white dark:bg-zinc-900 border border-slate-200 dark:border-zinc-800 focus:ring-1 focus:ring-primary rounded-md px-3"
+                              value={item.order_number || ''}
+                              placeholder="Order Number"
+                              onChange={(val) => updateItemsData(item.id, 'order_number', val)}
+                            />
+                          ) : (
+                            <Textarea
+                              className="w-full min-w-[150px] shadow-none bg-white dark:bg-zinc-900 border border-slate-200 dark:border-zinc-800 focus:ring-1 focus:ring-primary rounded-md px-3 py-1.5 text-sm min-h-[40px] resize-y"
+                              value={item.description || ''}
+                              placeholder={itemType === 'credit' ? 'Credit description' : 'Description'}
+                              onChange={(e) => updateItemsData(item.id, 'description', e.target.value)}
+                            />
+                          )
                         ) : (
                           <span className="text-[12px] font-bold text-slate-700 dark:text-zinc-200">{itemType === 'order' ? item.order_number : item.description || '-'}</span>
                         )}
@@ -700,10 +732,10 @@ export const InvoicePaper: React.FC<InvoicePaperProps> = ({
           <div>
             <h3 className="text-base font-bold text-slate-800 dark:text-white mb-3 mt-0">Banking Details</h3>
             <div className="space-y-1.5 text-sm text-slate-600 dark:text-zinc-400 font-medium">
-              <p>Bank Name: <span className="text-slate-800 dark:text-zinc-200">{BANKING_DETAILS.bank_name || 'Commonwealth Bank'}</span></p>
-              <p>Account Name: <span className="text-slate-800 dark:text-zinc-200">{BANKING_DETAILS.account_name || 'Tranzit Group Pty Ltd'}</span></p>
-              <p>BSB: <span className="text-slate-800 dark:text-zinc-200">{BANKING_DETAILS.bsb || '063 138'}</span></p>
-              <p>Account Number: <span className="text-slate-800 dark:text-zinc-200">{BANKING_DETAILS.account_number || '1112 4733'}</span></p>
+              <p>Bank Name: <span className="text-primary font-bold dark:text-zinc-200">{BANKING_DETAILS.bank_name || 'Commonwealth Bank'}</span></p>
+              <p>Account Name: <span className="text-primary font-bold dark:text-zinc-200">{BANKING_DETAILS.account_name || 'Tranzit Group Pty Ltd'}</span></p>
+              <p>BSB: <span className="text-primary font-bold dark:text-zinc-200">{BANKING_DETAILS.bsb || '063 138'}</span></p>
+              <p>Account Number: <span className="text-primary font-bold dark:text-zinc-200">{BANKING_DETAILS.account_number || '1112 4733'}</span></p>
             </div>
           </div>
 

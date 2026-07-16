@@ -14,6 +14,7 @@ export default function ResetPassword() {
   const { token } = useParams<{ token: string }>();
   const [searchParams] = useSearchParams();
   const email = searchParams.get("email");
+
   const navigate = useNavigate();
   const [password, setPassword] = useState("");
   const { mutate: resetPassword, isPending } = useResetPassword();

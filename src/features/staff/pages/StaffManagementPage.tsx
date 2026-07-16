@@ -181,6 +181,7 @@ export default function StaffManagementPage() {
     {
       key: 'first_name',
       header: 'DETAILS',
+      width: '260px',
       cell: (_, row) => {
         const initials = getInitials(row.first_name, row.last_name);
         const initialsBg = getBgColor(row.email);
@@ -201,14 +202,17 @@ export default function StaffManagementPage() {
     {
       key: 'role',
       header: 'ROLE',
+      width: '140px',
     },
     {
       key: 'last_login_at',
       header: 'LAST LOGIN',
+      width: '180px',
     },
     {
       key: 'created_at',
       header: 'CREATED AT',
+      width: '180px',
       // cell: (_, row: any) => {
       //   const dateStr = row.created_at;
       //   return (
@@ -221,11 +225,13 @@ export default function StaffManagementPage() {
     {
       key: 'status_code',
       header: 'STATUS',
+      width: '120px',
       cell: (_, row) => <StatusSwitch user={row} />
     },
     {
       key: 'actions',
       header: 'ACTIONS',
+      width: '120px',
       cell: (_, row) => (
         <div className="flex items-center gap-2">
           <Button
@@ -255,7 +261,7 @@ export default function StaffManagementPage() {
   const pendingUsers = countsResponse?.data?.pending_users?.count;
 
   return (
-    <div className="flex flex-col flex-1 gap-6 p-page-padding min-h-0 animate-in fade-in slide-in-from-bottom-4 duration-700 bg-slate-50/30 dark:bg-zinc-950/30">
+    <div className="flex flex-col flex-1 gap-6 p-page-padding animate-in fade-in slide-in-from-bottom-4 duration-700 bg-slate-50/30 dark:bg-zinc-950/30 overflow-y-auto">
 
       {/* Stats Section */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 print:hidden">
@@ -283,7 +289,7 @@ export default function StaffManagementPage() {
       </div>
 
       {/* Table Section */}
-      <div className="rounded-lg shadow-sm flex-1 flex flex-col min-h-0 border border-gray-100 dark:border-zinc-800 bg-white dark:bg-zinc-950">
+      <div className="rounded-lg shadow-sm border border-gray-100 dark:border-zinc-800 bg-white dark:bg-zinc-950 flex-none h-auto">
         <DataTable
           columns={columns}
           data={staffData}
@@ -295,7 +301,7 @@ export default function StaffManagementPage() {
           searchable={true}
           headerTitle="SubUser"
           emptyMessage="No users found"
-          className="pb-3"
+          className="pb-3 flex-none h-auto"
           searchPlaceholder="Search users..."
           onSearchChange={(val) => { setSearch(val); setPage(1); }}
           searchValue={search}

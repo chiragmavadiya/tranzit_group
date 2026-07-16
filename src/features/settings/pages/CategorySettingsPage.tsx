@@ -22,7 +22,7 @@ export default function CategorySettingsPage() {
   if (isLoading) {
     return (
       <div className="flex h-full items-center justify-center">
-        <Loader2 className="animate-spin text-blue-400 h-10 w-10" />
+        <Loader2 className="animate-spin text-primary h-10 w-10" />
       </div>
     );
   }

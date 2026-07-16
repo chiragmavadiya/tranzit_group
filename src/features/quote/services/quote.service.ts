@@ -43,7 +43,8 @@ export const quoteService = {
         return response.data;
     },
     getServices: async (data: GetQuoteServicesPayload, role: string): Promise<QuoteServicesResponse> => {
-        const url = role === 'customer' ? API_ENDPOINTS.CUSTOMER_QUOTES.SERVICES : API_ENDPOINTS.ADMIN_QUOTES.SERVICES;
+        const url = role === 'admin' && data.is_order === 'no' ? API_ENDPOINTS.ADMIN_QUOTES.SERVICES : API_ENDPOINTS.CUSTOMER_QUOTES.SERVICES;
+        // const url = role === 'customer' ? API_ENDPOINTS.CUSTOMER_QUOTES.SERVICES : API_ENDPOINTS.ADMIN_QUOTES.SERVICES;
         const response = await api.post<QuoteServicesResponse>(url, data);
         return response.data;
     },

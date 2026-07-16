@@ -72,18 +72,24 @@ const RenderIntegrationSection = ({
                             const isTranzit = provider.slug.includes('tranzit') || false;
                             return (
                                 <Card key={provider.slug} className="py-4 group justify-between relative overflow-hidden transition-all hover:shadow-md border-slate-200 dark:border-zinc-800 bg-white dark:bg-zinc-950">
-                                    <CardHeader className="pb-4 bg-transparent">
+                                    <CardHeader className="pb-4 bg-transparent dark:bg-transparent">
                                         <div className="flex justify-between items-start">
-                                            <div className="w-16 h-16 rounded-xl flex items-center justify-center mb-3 group-hover:scale-110 transition-transform">
+                                            <div className="w-16 h-16 rounded-xl bg-white p-2.5 border border-slate-100 dark:border-zinc-800/85 flex items-center justify-center mb-3 group-hover:scale-105 transition-all shadow-sm shrink-0">
                                                 <img src={provider.logo_url} alt={provider.name} className="h-full w-full object-contain" />
                                             </div>
                                             <div className="flex flex-col gap-1.5 items-end">
                                                 <Badge variant={isConnected ? "default" : "secondary"} className={cn(
-                                                    "font-semibold text-[12px] pt-1 uppercase leading-100 tracking-wide flex items-center justify-center",
+                                                    "font-semibold text-[12px] pt-1 leading-100 tracking-wide flex items-center justify-center",
                                                     isConnected ? "bg-emerald-50 text-emerald-600 border-emerald-100 dark:bg-emerald-900/20 dark:text-emerald-400 dark:border-emerald-900/30" : "bg-slate-50 text-slate-400 border-slate-100 dark:bg-zinc-900 dark:text-zinc-500 dark:border-zinc-800"
                                                 )}>
-                                                    {isConnected ? "Connected" : "Not Connected"}
+                                                    {isConnected && <span className="w-1.5 h-1.5 rounded-full shrink-0 mb-px animate-pulse bg-green-400" />}
+                                                    <span> {isConnected ? "Connected" : "Not Connected"}</span>
                                                 </Badge>
+                                                {isTranzit && (
+                                                    <Badge variant="outline" className="font-semibold text-[10px] uppercase tracking-wide text-indigo-600 dark:text-indigo-400 border-indigo-200 dark:border-indigo-900/50 bg-indigo-50/50 dark:bg-indigo-950/20 py-0.5 px-1.5 rounded-sm">
+                                                        Platform Integration
+                                                    </Badge>
+                                                )}
                                                 {isDefault ? (
                                                     <div className="flex flex-col items-end gap-1">
                                                         <Badge variant="default" className="font-medium text-[12px] px-2.5  leading-relaxed tracking-wide flex items-center gap-1 bg-blue-600 text-white hover:bg-blue-600 dark:bg-blue-500 dark:hover:bg-blue-500 border-none shadow-sm rounded-full">

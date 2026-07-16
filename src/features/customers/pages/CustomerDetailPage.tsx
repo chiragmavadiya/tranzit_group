@@ -12,6 +12,7 @@ import { InvoiceManagementTab } from '../components/customer-detail/InvoiceManag
 import { useCustomerDetails } from '../hooks/useCustomers';
 import CustomerDialog from '../components/CustomerDialog';
 import { CustomerIntegrationTab } from '../components/customer-detail/CustomerIntegrationTab';
+import PageLoading from '@/components/common/Loader';
 
 export default function CustomerDetailPage() {
     const { id } = useParams();
@@ -24,11 +25,7 @@ export default function CustomerDetailPage() {
     const customer = response?.data;
 
     if (isLoading) {
-        return (
-            <div className="flex flex-col flex-1 items-center justify-center p-page-padding h-full">
-                <span className="w-8 h-8 border-4 border-primary/30 border-t-primary rounded-full animate-spin" />
-            </div>
-        );
+        return <PageLoading />
     }
 
     if (!customer) {
@@ -40,7 +37,7 @@ export default function CustomerDetailPage() {
     }
 
     return (
-        <div className="flex flex-col flex-1 gap-4 p-page-padding min-h-0 animate-in fade-in slide-in-from-bottom-4 duration-700 bg-slate-50/30 dark:bg-zinc-950/30 overflow-y-auto scrollbar-hide">
+        <div className="flex flex-col flex-1 gap-3 p-page-padding min-h-0 animate-in fade-in slide-in-from-bottom-4 duration-700 bg-slate-50/30 dark:bg-zinc-950/30 overflow-y-auto scrollbar-hide">
 
             <CustomerHeader
                 customer={customer as any}

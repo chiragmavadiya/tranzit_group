@@ -16,6 +16,7 @@ export interface ShipmentReport {
   receiver_suburb: string;
   status: string;
   created_at: string;
+  product_id: string;
 }
 
 export interface TransactionReport {
@@ -52,6 +53,25 @@ export interface ParcelReport {
   tranzit_group_markup?: number;
   total: number;
   create_date: string;
+  product_id: string;
+}
+
+export interface OrderLabelCharge {
+  customer_name: string;
+  receiver_name: string;
+  receiver_full_address: string;
+  receiver_suburb: string;
+  tranzit_group_order_number: string;
+  actual_parcel_tracking_number: string;
+  courier_and_product: string;
+  is_byo: boolean;
+  label_count: number;
+  rate_per_label: number;
+  total_charge: number;
+  billing_period_start: string;
+  billing_period_end: string;
+  consignment_date: string;
+  courier_logo_url?: string;
 }
 
 export interface ReportTab {
@@ -68,6 +88,7 @@ export interface ReportFilters {
   page?: number;
   customer_id?: string;
   invoice_type?: string;
+  user_id?: string;
 }
 
 export interface PaginatedResponse<T> {
@@ -81,6 +102,7 @@ export interface PaginatedResponse<T> {
     total_markup: number;
     total_pickup: number;
     total_surcharge: number;
+    total_amount_paid?: number;
 
   }
   meta: {

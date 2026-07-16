@@ -189,9 +189,9 @@ export const STATES = [
     { value: 'WA', label: 'WA' }
 ]
 
-export const TERMS_CONDITIONS_URL = "https://tranzit.digisite.net/terms-conditions"
-export const PRIVACY_POLICY_URL = "https://tranzit.digisite.net/privacy-policy"
-export const DANGEROUS_GOODS_URL = "https://tranzit.digisite.net/dangerous-goods"
+export const TERMS_CONDITIONS_URL = "/terms-and-conditions"
+export const PRIVACY_POLICY_URL = "/privacy-policy"
+export const DANGEROUS_GOODS_URL = "/dangerous-goods"
 
 export const PHONE_REGEX = /^(\+61|0)[2-478](\d{8})$/;
 export const PHONE_REGEX_WITH_SPACE = /^(\+61|0)[2-478](\s?\d){8}$/;
@@ -215,6 +215,10 @@ export const STATUS_STYLE: Record<string, string> = {
     completed: 'bg-primary/10 text-primary',
     cancelled: 'bg-red-100 text-red-800 dark:bg-red-900/20 dark:text-red-400',
     draft1: 'bg-gray-100 text-gray-800 dark:bg-gray-900/20 dark:text-gray-400',
+    success: 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300 border-green-200 dark:border-green-800',
+    failed: 'bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-300 border-red-200 dark:border-red-800',
+    processing: 'bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 border-blue-200 dark:border-blue-800',
+
 }
 
 export const ADMIN_ROLES = ['admin', 'Staff', 'Operation Manager', 'It Manager', 'Super Admin'];
@@ -330,3 +334,5 @@ export const MODULE_PERMISSIONS: Record<string, string[]> = {
         'delete_help_center'
     ]
 }
+
+export const DO_NOT_REDIRECT_URLS: string[] = ['/terms-and-conditions', '/privacy-policy', '/dangerous-goods']

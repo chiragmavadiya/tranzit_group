@@ -25,7 +25,8 @@ import {
   BarChart3,
   MessageSquareMore,
   PackageMinus,
-  Route
+  Route,
+  Bug,
 } from 'lucide-react';
 import type { SidebarItem } from '../layout/types/Sidebar.types';
 import { MODULE_PERMISSIONS } from '../constants';
@@ -35,6 +36,7 @@ export const adminSidebarItems: SidebarItem[] = [
   { name: 'Customer Management', key: 'customer', icon: Users, path: '/admin/customers', permissions: MODULE_PERMISSIONS.customer },
   { name: 'Order Management', key: 'order', icon: Package, path: '/admin/orders', permissions: MODULE_PERMISSIONS.order },
   { name: 'Cancel Order', key: 'cancel_order', icon: PackageX, path: '/admin/cancel-order', permissions: ['view_cancel_order'] },
+  { name: 'Customer Quote', key: 'Customer Quote', icon: FileQuestion, path: '/admin/quotes', permissions: MODULE_PERMISSIONS['Customer Quote'] },
   { name: 'Book a pickup', key: 'book_pickup', icon: Truck, path: '/admin/book-pickup', permissions: MODULE_PERMISSIONS['Book a Pickup'] },
   { name: 'Staff / Sub User Management', key: 'subuser', icon: UserCog, path: '/admin/staff', permissions: MODULE_PERMISSIONS.subuser },
 
@@ -48,15 +50,17 @@ export const adminSidebarItems: SidebarItem[] = [
     hasDropdown: true,
     permissions: [...(MODULE_PERMISSIONS['Customer Parcel Report'] || []), ...(MODULE_PERMISSIONS.report || [])],
     subItems: [
+      { name: 'Auspost Report', path: '/admin/auspost-report', permissions: MODULE_PERMISSIONS.report },
       { name: 'All Tranzit Group Courier Parcel Report', path: '/admin/customer-parcel-report', permissions: MODULE_PERMISSIONS['Customer Parcel Report'] },
       { name: 'Custom Integrated Courier Parcel Report', path: '/admin/integrated-parcel-report', permissions: MODULE_PERMISSIONS.report },
+      { name: 'Order Label Charges', path: '/admin/order-label-charges', permissions: MODULE_PERMISSIONS.report },
     ]
   },
 
 
   { name: 'Invoice Management', key: "invoice", icon: FileText, path: '/admin/invoices', permissions: MODULE_PERMISSIONS.invoice },
   // { name: 'Zoho Invoice Integration', icon: Link, path: '/admin/zoho-integration' },
-  { name: 'Topup Management', key: 'topup', icon: Wallet, path: '/admin/topup', permissions: MODULE_PERMISSIONS.topup },
+  { name: 'Transaction Management', key: 'topup', icon: Wallet, path: '/admin/topup', permissions: MODULE_PERMISSIONS.topup },
   // { name: 'Courier Surcharge', icon: Percent, path: '/admin/courier-surcharge' },
   // { name: 'Courier base Postcode', icon: MapPin, path: '/admin/courier-postcode' },
   { name: 'Enquiry Management', key: 'Enquiry Management', icon: MessageSquareMore, path: '/admin/enquiry', permissions: MODULE_PERMISSIONS['Enquiry Management'] },
@@ -65,7 +69,6 @@ export const adminSidebarItems: SidebarItem[] = [
   // { name: 'Admin Activity Log', icon: Activity, path: '/admin/activity-log' },
   { name: 'Order Summary For Auspost', key: 'AusPost Order Summary', icon: ClipboardList, path: '/admin/order-summary', permissions: MODULE_PERMISSIONS['AusPost Order Summary'] },
   { name: 'Undelivered Parcel', key: 'Un-Delivered Parcel', icon: PackageMinus, path: '/admin/undelivered', permissions: MODULE_PERMISSIONS['Un-Delivered Parcel'] },
-  { name: 'Customer Quote', key: 'Customer Quote', icon: FileQuestion, path: '/admin/quotes', permissions: MODULE_PERMISSIONS['Customer Quote'] },
 
   {
     name: 'Courier Global Settings',
@@ -79,6 +82,8 @@ export const adminSidebarItems: SidebarItem[] = [
     ]
   },
 
+  { name: 'Debug Centre', key: 'debug_centre', icon: Bug, path: '/admin/debug-centre', permissions: [] },
+
   {
     name: 'Global Settings',
     icon: Globe,
@@ -90,6 +95,7 @@ export const adminSidebarItems: SidebarItem[] = [
       { name: 'Admin Activity Log', key: 'Admin Activity Log', path: '/admin/activity-log', permissions: MODULE_PERMISSIONS['Admin Activity Log'] },
       { name: 'Profile', key: 'profile', path: '/admin/profile', permissions: MODULE_PERMISSIONS.profile },
       { name: 'Global Configuration', key: 'setting', path: '/admin/global-config', permissions: MODULE_PERMISSIONS.setting },
+      { name: 'Blackout Days', key: 'setting', path: '/admin/blackout-days', permissions: MODULE_PERMISSIONS.setting },
     ]
   },
 

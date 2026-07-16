@@ -59,20 +59,21 @@ export default function BookPickupPage() {
     };
 
     const columns: Column<BookPickup>[] = [
-        { key: 'customer_name', header: 'CUSTOMER NAME' },
-        { key: 'order_number', header: 'ORDER NUMBER' },
+        { key: 'customer_name', header: 'CUSTOMER NAME', width: '180px' },
+        { key: 'order_number', header: 'ORDER NUMBER', width: '160px' },
         {
             key: 'amount',
             header: 'AMOUNT',
+            width: '110px',
             cell: (val: number) => <span className="font-bold">${Number(val).toFixed(2)}</span>
         },
-        { key: 'shipping_address', header: 'SHIPPING ADDRESS' },
-        { key: 'order_created_date', header: 'ORDER CREATED DATE' },
+        { key: 'shipping_address', header: 'SHIPPING ADDRESS', width: '280px' },
+        { key: 'order_created_date', header: 'ORDER CREATED DATE', width: '160px' },
     ];
 
     return (
-        <div className="flex flex-col flex-1 gap-6 p-page-padding min-h-0 animate-in fade-in slide-in-from-bottom-4 duration-700 bg-slate-50/30 dark:bg-zinc-950/30">
-            <div className="rounded-lg shadow-sm flex-1 flex flex-col min-h-0 border border-gray-100 dark:border-zinc-800 bg-white dark:bg-zinc-950">
+        <div className="flex flex-col flex-1 gap-6 p-page-padding animate-in fade-in slide-in-from-bottom-4 duration-700 bg-slate-50/30 dark:bg-zinc-950/30 overflow-y-auto">
+            <div className="rounded-lg shadow-sm border border-gray-100 dark:border-zinc-800 bg-white dark:bg-zinc-950 flex-none h-auto">
                 <DataTable
                     columns={columns}
                     data={pickups}
@@ -88,7 +89,7 @@ export default function BookPickupPage() {
                     onSelectionChange={setSelectedRows}
                     headerTitle={activeTab === 'new' ? "New Pickups" : "Booked Pickups"}
                     emptyMessage="No pickups available"
-                    className="pb-3"
+                    className="pb-3 flex-none h-auto"
                     searchPlaceholder="Search pickups..."
                     onSearchChange={(val) => {
                         setSearch(val);

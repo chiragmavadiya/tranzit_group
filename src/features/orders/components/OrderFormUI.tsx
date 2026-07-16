@@ -1,5 +1,5 @@
-import React, { useMemo, useCallback, type ReactNode, memo } from "react";
-import { RefreshCw, CheckCircle2 } from "lucide-react";
+import React, { useMemo, useCallback, type ReactNode, memo, useState } from "react";
+import { RefreshCw, CheckCircle2, Info } from "lucide-react";
 import * as LucideIcons from "lucide-react";
 import { cn } from "@/lib/utils"
 import { Input } from "@/components/ui/input"
@@ -22,6 +22,7 @@ import type {
   FormCheckboxProps
 } from "./types/OrderFormUI.types";
 import { SelectSearch } from "@/components/ui/combobox";
+import { CustomTooltip } from "@/components/common/CustomTooltip";
 
 export const Required = () => {
   return (
@@ -57,6 +58,7 @@ export const FormInput = memo(React.forwardRef<HTMLInputElement, FormInputProps>
   error,
   errormsg,
   inputClassName,
+  info,
   // rightElement
 }, ref) => {
   const [showPassword, setShowPassword] = React.useState(false);
@@ -67,16 +69,23 @@ export const FormInput = memo(React.forwardRef<HTMLInputElement, FormInputProps>
 
   return (
     <div className={cn(
-      isHorizontal ? "grid grid-cols-[160px_1fr] items-center gap-4" : "space-y-0",
+      isHorizontal ? "grid grid-cols-1 md:grid-cols-[160px_1fr] items-start md:items-center gap-1 md:gap-4" : "space-y-0",
       isFullWidth ? "col-span-12" : isHalf ? "col-span-12 md:col-span-6" : isCompact ? "col-span-6 md:col-span-3" : "col-span-12 md:col-span-6",
       className
     )}>
       {label && (
-        <CustomLabel
-          label={label}
-          isHorizontal={isHorizontal}
-          required={required}
-        />
+        <div className="flex items-center gap-1">
+          <CustomLabel
+            label={label}
+            isHorizontal={isHorizontal}
+            required={required}
+          />
+          {info && (
+            <CustomTooltip title={info}>
+              <Info className="w-3.5 h-3.5 text-slate-400 dark:text-zinc-600 cursor-pointer" />
+            </CustomTooltip>
+          )}
+        </div>
       )}
       <div className="relative group/input">
         {Icon && (
@@ -146,7 +155,7 @@ export function FormTextarea({
 
   return (
     <div className={cn(
-      isHorizontal ? "grid grid-cols-[160px_1fr] items-start gap-4" : "space-y-2",
+      isHorizontal ? "grid grid-cols-1 md:grid-cols-[160px_1fr] items-start gap-1 md:gap-4" : "space-y-2",
       isFullWidth ? "col-span-12" : "col-span-12 md:col-span-6"
     )}>
       {/* <Label className={cn(
@@ -188,6 +197,24 @@ export function ValidAddressBadge() {
 }
 
 
+const areOptionsEqual = (
+  prevOptions?: readonly { label: string; value: string | number }[],
+  nextOptions?: readonly { label: string; value: string | number }[]
+) => {
+  if (prevOptions === nextOptions) return true;
+  if (!prevOptions || !nextOptions) return false;
+  if (prevOptions.length !== nextOptions.length) return false;
+  for (let i = 0; i < prevOptions.length; i++) {
+    if (
+      prevOptions[i].value !== nextOptions[i].value ||
+      prevOptions[i].label !== nextOptions[i].label
+    ) {
+      return false;
+    }
+  }
+  return true;
+};
+
 export const FormSelect = memo(({
   label,
   value,
@@ -206,14 +233,21 @@ export const FormSelect = memo(({
   selectClassName,
   allowClear = true,
   searchdisable = false,
-  multiple = false
+  multiple = false,
+  optionClassName
 }: FormSelectProps) => {
   const isHorizontal = useMemo(() => layout === 'horizontal', [layout]);
-  const memoizedData = useMemo(() => [...options], [options]);
+  
+  const [memoizedData, setMemoizedData] = useState(options);
+  const [prevOptions, setPrevOptions] = useState(options);
+  if (!areOptionsEqual(prevOptions, options)) {
+    setPrevOptions(options);
+    setMemoizedData(options);
+  }
 
   return (
     <div className={cn(
-      isHorizontal ? "grid grid-cols-[160px_1fr] items-center gap-4" : "space-y-1",
+      isHorizontal ? "grid grid-cols-1 md:grid-cols-[160px_1fr] items-start md:items-center gap-1 md:gap-4" : "space-y-1",
       isHalf ? "col-span-12 md:col-span-6" : isCompact ? "col-span-6 md:col-span-3" : "col-span-12 md:col-span-6",
       className
     )}>
@@ -240,13 +274,31 @@ export const FormSelect = memo(({
           name={name}
           disabled={disabled}
           allowClear={allowClear}
-          searchdisable={searchdisable}
+          searchdisable={(memoizedData.length < 6 || searchdisable)}
           multiple={multiple}
+          optionClassName={optionClassName}
         />
         {/* <SelectSearch options={memoizedData} /> */}
         {error ? <div className="text-red-500 text-[11px] w-full">{errormsg}</div> : null}
       </div>
     </div>
+  );
+}, (prevProps, nextProps) => {
+  return (
+    prevProps.value === nextProps.value &&
+    prevProps.label === nextProps.label &&
+    prevProps.error === nextProps.error &&
+    prevProps.errormsg === nextProps.errormsg &&
+    prevProps.disabled === nextProps.disabled &&
+    prevProps.required === nextProps.required &&
+    prevProps.placeholder === nextProps.placeholder &&
+    prevProps.className === nextProps.className &&
+    prevProps.selectClassName === nextProps.selectClassName &&
+    prevProps.allowClear === nextProps.allowClear &&
+    prevProps.searchdisable === nextProps.searchdisable &&
+    prevProps.multiple === nextProps.multiple &&
+    prevProps.optionClassName === nextProps.optionClassName &&
+    areOptionsEqual(prevProps.options, nextProps.options)
   );
 });
 

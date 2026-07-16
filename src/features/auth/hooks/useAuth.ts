@@ -3,6 +3,8 @@ import { useCallback } from "react";
 import { authService } from "@/features/auth/services/auth.service";
 import { QUERY_KEYS } from "@/constants/api.constants";
 import type { ForgotPasswordRequest, LoginRequest, RegisterRequest, OnboardingRequest, ResetPasswordRequest, EmailVerifyRequest } from "@/features/auth/auth.types";
+import { useAppSelector } from "@/hooks/store.hooks";
+import { trackLogout } from "@/analytics";
 
 /**
  * Hook for customer login
@@ -114,9 +116,14 @@ export const useVerificationStatus = () => {
 // logout api 
 export const useLogout = () => {
     const queryClient = useQueryClient();
+    const { user } = useAppSelector((state) => state.auth);
+
     return useMutation({
         mutationFn: useCallback(() => authService.logout(), []),
         onSuccess: () => {
+            // Track logout event in Google Analytics
+            trackLogout(user?.id, user?.email);
+
             // Clear all sensitive data and query cache on logout
             localStorage.clear();
             sessionStorage.clear();
@@ -146,6 +153,7 @@ export const useGetUserDetails = (enabled: boolean) => {
         queryFn: () => authService.getUserDetails(),
         enabled: !!(enabled && token),
         staleTime: Infinity,
+        refetchOnMount: false,
     });
 };
 

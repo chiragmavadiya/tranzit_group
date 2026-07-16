@@ -15,6 +15,7 @@ export interface Column<T> {
   resizable?: boolean;
   minWidth?: number;
   maxWidth?: number;
+  disableToggle?: boolean;
 }
 
 export interface SortConfig {

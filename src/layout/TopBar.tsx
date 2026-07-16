@@ -1,7 +1,7 @@
 "use client";
 
-import { LogOut, Sun, Moon, Monitor, Loader2, HelpCircle, User, Wallet, Menu, Search, ArrowLeft } from 'lucide-react';
-import { useNavigate, useLocation, useSearchParams } from 'react-router-dom';
+import { LogOut, Sun, Moon, Monitor, Loader2, User, Wallet, Menu, Search, ArrowLeft } from 'lucide-react';
+import { useNavigate, useLocation, useSearchParams, useParams } from 'react-router-dom';
 import DropdownCustomContent, {
   DropdownCustomMenu,
   DropdownMenuItem,
@@ -23,10 +23,13 @@ import type { BookPickupTabType } from '@/features/book-pickup/constants/book-pi
 import type { ReportType } from '@/features/reports/types';
 import { useLogout } from '@/features/auth/hooks/useAuth';
 import { GlobalSearch } from '@/features/search/components/GlobalSearch';
-import { lazy, Suspense, useCallback, useState } from 'react';
+import { lazy, Suspense, useCallback, useMemo, useState } from 'react';
 import { useWalletSummary } from '@/features/wallet/hooks/useWallet';
 import { AccountSwitchDialog } from '@/features/profile/components/AccountSwitchDialog';
+import { BookPickupDialog } from '@/features/book-pickup/components/BookPickupDialog';
 import { cn, formateCurrency } from '@/lib/utils';
+import { Package } from 'lucide-react';
+import * as Sentry from "@sentry/react";
 
 const OrdersTabs = lazy(() => import('@/features/orders/components/OrdersTabs').then(module => ({ default: module.OrdersTabs })));
 const ReportsTabs = lazy(() => import('@/features/reports/components/ReportsTabs').then(module => ({ default: module.ReportsTabs })));
@@ -44,15 +47,20 @@ export default function TopBar({
   setIsMobileSidebarOpen?: (val: boolean) => void;
   bannerOpen?: boolean;
 }) {
-  const { user } = useAppSelector((state) => state.auth);
+  console.log("Render Topbar")
+
+  const { user, is_sub_user, team_access } = useAppSelector((state) => state.auth);
   const dispatch = useAppDispatch();
+  const { id: customer_id } = useParams();
   const navigate = useNavigate();
   const location = useLocation();
   const [searchParams, setSearchParams] = useSearchParams();
+  const canReadWriteProfile = useMemo(() => !is_sub_user || team_access?.permissions?.settings_account_detail !== 'no_access', [is_sub_user, team_access]);
 
   const { theme, setTheme } = useTheme();
   const [isAccountSwitchOpen, setIsAccountSwitchOpen] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
+  const [isBookPickupOpen, setIsBookPickupOpen] = useState(false);
 
   const logoutMutation = useLogout();
   const role = localStorage.getItem("user_role") || "customer";
@@ -63,16 +71,17 @@ export default function TopBar({
     logoutMutation.mutate(undefined, {
       onSuccess: () => {
         localStorage.clear();
+        Sentry.setUser(null);
         dispatch(logout());
         navigate('/login');
       }
     });
   };
 
-  const handleFaq = () => {
-    // open new window
-    window.open('https://tranzitgroup.com.au/faq', '_blank');
-  }
+  // const handleFaq = () => {
+  //   // open new window
+  //   window.open(import.meta.env.TRANZIRGROUP_FAQ_URL || 'https://tranzitgroup.com.au/faq', '_blank');
+  // }
 
   const handleTabChange = useCallback((tab: string) => {
     setSearchParams(prev => {
@@ -82,7 +91,12 @@ export default function TopBar({
   }, [setSearchParams]);
   const handleProfile = () => {
     // open new window
-    navigate('/settings/account');
+    if (role === 'admin') {
+      navigate('/admin/profile');
+    } else {
+      navigate('/settings/account');
+
+    }
   }
 
   const redirectToHome = () => {
@@ -92,7 +106,7 @@ export default function TopBar({
     <header
       style={bannerOpen ? { top: '36px' } : {}}
       className={cn(
-        "print:hidden h-16 bg-white dark:bg-zinc-950 border-b border-gray-200 dark:border-zinc-800 flex items-center justify-between px-4 sm:px-6 fixed top-0 right-0 z-10 transition-[left,top] duration-300 ease-in-out",
+        "print:hidden h-16 bg-white dark:bg-zinc-950 border-b border-gray-200 dark:border-zinc-800 flex items-center justify-between px-2 sm:px-4 fixed top-0 right-0 z-10 transition-[left,top] duration-300 ease-in-out",
         isMobile
           ? "left-0"
           : (isCollapsed ? 'left-[64px]' : 'left-[240px]')
@@ -114,7 +128,24 @@ export default function TopBar({
             ? "w-[32px] tablet:w-[120px] opacity-100 mr-2 sm:mr-4"
             : (isCollapsed ? 'w-[120px] opacity-100 mr-4' : 'w-0 opacity-0 pointer-events-none overflow-hidden mr-0')
         )}>
-          <img src={theme === "dark" ? tranzit_logo_dark : tranzit_logo} alt="Tranzit" className="hidden tablet:block h-8 sm:h-10 max-w-none cursor-pointer" onClick={redirectToHome} />
+          <div className="relative hidden tablet:block h-8 sm:h-10 w-28 cursor-pointer shrink-0" onClick={redirectToHome}>
+            <img
+              src={tranzit_logo}
+              alt="Tranzit"
+              className={cn(
+                "absolute inset-0 h-full w-full object-contain transition-all duration-500 ease-in-out",
+                theme === "dark" ? "opacity-0 scale-95 pointer-events-none" : "opacity-100 scale-100"
+              )}
+            />
+            <img
+              src={tranzit_logo_dark}
+              alt="Tranzit"
+              className={cn(
+                "absolute inset-0 h-full w-full object-contain transition-all duration-500 ease-in-out",
+                theme === "dark" ? "opacity-100 scale-100" : "opacity-0 scale-95 pointer-events-none"
+              )}
+            />
+          </div>
           <img src={theme === "dark" ? Favicon : Favicon} alt="Tranzit" className="rounded block tablet:hidden h-8 sm:h-10 max-w-none cursor-pointer" onClick={redirectToHome} />
         </div>
       </div>
@@ -127,7 +158,7 @@ export default function TopBar({
               <OrdersTabs
                 activeTab={(searchParams.get('tab') as TabType) || 'new'}
                 onTabChange={handleTabChange}
-                customerId={searchParams.get('customerId') as string}
+                customerId={customer_id || searchParams.get('customerId') as string}
               />
             </div>
           )}
@@ -163,11 +194,22 @@ export default function TopBar({
 
       {/* Right Portion: Action Buttons */}
       <div className="flex items-center gap-2 sm:gap-3 shrink-0 ml-2">
+        {role === 'customer' && (
+          <button
+            onClick={() => setIsBookPickupOpen(true)}
+            className="flex items-center justify-center sm:gap-1.5 w-8 sm:w-auto h-8 px-0 sm:px-3 rounded-md bg-primary hover:bg-primary-hover text-white text-[12px] sm:text-[13px] font-semibold shadow-sm transition-all active:scale-[0.97] shrink-0 cursor-pointer"
+            title="Book a Pickup"
+          >
+            <Package className="w-3.5 h-3.5" />
+            <span className="hidden sm:inline">Book a Pickup</span>
+          </button>
+        )}
+
         {role === 'customer' && walletData?.data && (() => {
           const isZero = Number(walletData.data.wallet_balance) <= 0;
           return (
             <div className={cn(
-              "flex items-center gap-1.5 sm:gap-2 px-2 sm:px-3 h-8 rounded-md border text-[11px] sm:text-[13px] font-bold shadow-sm transition-all duration-300 cursor-default select-none shrink-0",
+              "hidden tablet:flex items-center gap-1.5 sm:gap-2 px-2 sm:px-3 h-8 rounded-md border text-[11px] sm:text-[13px] font-bold shadow-sm transition-all duration-300 cursor-default select-none shrink-0",
               isZero
                 ? "bg-red-50 dark:bg-red-950/30 border-red-200/50 dark:border-red-900/30 text-red-500 dark:text-red-400 hover:bg-red-100/50 dark:hover:bg-red-950/50"
                 : "bg-emerald-50 dark:bg-emerald-950/30 border-emerald-200/50 dark:border-emerald-900/30 text-emerald-700 dark:text-emerald-400 hover:bg-emerald-100/50 dark:hover:bg-emerald-950/50"
@@ -255,18 +297,20 @@ export default function TopBar({
                   <DropdownMenuSeparator className="bg-slate-100 dark:bg-zinc-800" />
                 </>
               )}
-              <DropdownMenuItem variant={"default"} onClick={handleProfile} className={"cursor-pointer py-2 px-3 text-[13px]"}>
-                {<User className="w-4 h-4 mr-2" />}
-                Edit Profile
-              </DropdownMenuItem>
+              {canReadWriteProfile && (
+                <DropdownMenuItem variant={"default"} onClick={handleProfile} className={"cursor-pointer py-2 px-3 text-[13px]"}>
+                  {<User className="w-4 h-4 mr-2" />}
+                  Edit Profile
+                </DropdownMenuItem>
+              )}
               {/* <DropdownMenuItem variant={"default"} onClick={() => setIsAccountSwitchOpen(true)} className={"cursor-pointer py-2 px-3 text-[13px]"}>
                 {<ArrowLeftRight className="w-4 h-4 mr-2" />}
                 Account Switch
               </DropdownMenuItem> */}
-              <DropdownMenuItem variant={"default"} onClick={handleFaq} className={"cursor-pointer py-2 px-3 text-[13px]"}>
+              {/* <DropdownMenuItem variant={"default"} onClick={handleFaq} className={"cursor-pointer py-2 px-3 text-[13px]"}>
                 {<HelpCircle className="w-4 h-4 mr-2" />}
                 FAQ
-              </DropdownMenuItem>
+              </DropdownMenuItem> */}
               <DropdownMenuItem variant={"destructive"} onClick={handleLogout} className={"cursor-pointer py-2 px-3 text-[13px]"}>
                 {<LogOut className="w-4 h-4 mr-2" />}
                 Logout
@@ -301,6 +345,13 @@ export default function TopBar({
         open={isAccountSwitchOpen}
         onOpenChange={setIsAccountSwitchOpen}
       />
+      {role === 'customer' && isBookPickupOpen && (
+        <BookPickupDialog
+          open={isBookPickupOpen}
+          onOpenChange={setIsBookPickupOpen}
+          defaultAddress={(user?.addresses[0]?.address_info || `${user?.addresses[0]?.address}, ${user?.addresses[0]?.suburb} ${user?.addresses[0]?.state} ${user?.addresses[0]?.postcode} `) ?? ''}
+        />
+      )}
     </header>
   );
 }

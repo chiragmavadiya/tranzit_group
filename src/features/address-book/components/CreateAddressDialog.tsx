@@ -253,7 +253,7 @@ export function CreateAddressDialog({
                 layout="horizontal"
                 label="Street"
                 value={formData.address || ''}
-                onChange={(val) => handleChange('address', val)}
+                onChange={(val) => { handleChange('address', val); handleChange('street_name', val); }}
                 placeholder="e.g. George"
                 required
                 error={submited && formData.address.length < 1}

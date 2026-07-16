@@ -86,6 +86,6 @@ export const removeEmptyFields = <T extends Record<string, any>>(obj: T): Partia
     )
   ) as Partial<T>;
 };
-export const cleanSpaces = (value: string) => value.replace(/[^\d+]/g, '');
+export const cleanSpaces = (value: string) => value?.replace(/[^\d+]/g, '');
 export const isEmailValid = (email: string) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 export const isPhoneValid = (phone: string) => PHONE_REGEX_WITH_SPACE.test(cleanSpaces(phone));

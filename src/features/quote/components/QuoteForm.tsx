@@ -6,6 +6,7 @@ import type { QuoteLocation } from "../types";
 import { memo, useState, useMemo } from "react";
 import AutoComplete from "@/components/common/AutoComplate2";
 import { useSearchLocalities } from "../hooks/useQuote";
+import { CustomLabel } from "@/features/orders/components/OrderFormUI";
 
 interface QuoteFormProps {
   locations: {
@@ -78,7 +79,10 @@ export const QuoteForm = memo(({ locations, setLocations }: QuoteFormProps) => {
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="space-y-0.5">
+            <div className="space-y-1.5">
+              <CustomLabel
+                label="Sender Suburb / Postcode"
+              />
               <LocalityAutoComplete
                 label="Sender Location"
                 placeholder="Start typing suburb or postcode"
@@ -112,9 +116,12 @@ export const QuoteForm = memo(({ locations, setLocations }: QuoteFormProps) => {
                   }));
                 }}
               />
-              <p className="text-xs mt-0 mb-2 text-slate-500 dark:text-zinc-500">Select by suburb or enter postcode to filter</p>
+              <p className="text-xs mt-1 text-slate-500 dark:text-zinc-500">Select by suburb or enter postcode to filter</p>
             </div>
-            <div className="space-y-0.5">
+            <div className="space-y-1.5">
+              <CustomLabel
+                label="Receiver Suburb / Postcode"
+              />
               <LocalityAutoComplete
                 label="Receiver Location"
                 placeholder="Start typing suburb or postcode"
@@ -148,7 +155,7 @@ export const QuoteForm = memo(({ locations, setLocations }: QuoteFormProps) => {
                   }));
                 }}
               />
-              <p className="text-xs mt-0 mb-2 text-slate-500 dark:text-zinc-500">Select by suburb or enter postcode to filter</p>
+              <p className="text-xs mt-1 text-slate-500 dark:text-zinc-500">Select by suburb or enter postcode to filter</p>
             </div>
           </div>
         </CardContent>

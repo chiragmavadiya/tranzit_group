@@ -13,25 +13,25 @@ export const AUSPOST_COLUMNS: Column<AuspostOrder>[] = [
     key: 'customer_name',
     header: 'CUSTOMER NAME',
     sortable: true,
-    cell: (val) => <span className="text-slate-600 font-medium text-[12px]">{val}</span>
+    // cell: (val) => <span className="text-slate-600 font-medium text-[12px]">{val}</span>
   },
   {
     key: 'suburb',
     header: 'SUBURB',
     sortable: true,
-    cell: (val) => <span className="text-slate-500 font-medium text-[12px]">{val}</span>
+    // cell: (val) => <span className="text-slate-500 font-medium text-[12px]">{val}</span>
   },
   {
     key: 'postcode',
     header: 'POSTCODE',
     sortable: true,
-    cell: (val) => <span className="text-slate-500 font-medium text-[12px]">{val}</span>
+    // cell: (val) => <span className="text-slate-500 font-medium text-[12px]">{val}</span>
   },
   {
     key: 'order_date',
     header: 'ORDER DATE',
     sortable: true,
     noPrint: true,
-    cell: (val) => <span className="text-slate-500 font-medium text-[12px]">{val}</span>
+    // cell: (val) => <span className="text-slate-500 font-medium text-[12px]">{val}</span>
   }
 ];

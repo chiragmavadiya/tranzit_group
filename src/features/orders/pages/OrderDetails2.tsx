@@ -69,8 +69,11 @@ const OrderDetails2: React.FC = () => {
             <CourierSnapshot
               courier={data.courier_details.courier}
               trackingNumber={data.courier_details.tracking_number}
-              reference={data.courier_details.customer_reference}
+              reference={data.courier_details.customer_reference || data.customer_reference}
               instructions={data.delivery_instructions}
+              externalReference={data.courier_details.external_reference || data.external_reference}
+              externalOrderId={data.courier_details.external_order_id || data.external_order_id}
+              trackingUrl={data.courier_details.tracking_url}
             />
 
             <LiabilityCover

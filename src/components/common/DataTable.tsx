@@ -1,6 +1,6 @@
-import { useState, memo } from 'react';
+import { useState, useEffect, memo } from 'react';
 import type { ReactNode } from 'react'
-import { ArrowUp, ArrowDown, Search, FileText, Upload, File, Loader2, Printer } from 'lucide-react';
+import { ArrowUp, ArrowDown, Search, FileText, Upload, File, Loader2, Printer, Settings } from 'lucide-react';
 import {
   Table,
   TableBody,
@@ -17,8 +17,8 @@ import { TableSkeleton } from './TableSkeleton';
 import { DEFAULT_PAGE_SIZES } from '@/constants/global.constants';
 import type { Column, DataTableProps, SortConfig } from './types/DataTable.types';
 import { Button } from '../ui/button';
-import { DropdownCustomMenu } from '../ui/dropdown-menu';
-import { FormInput, FormSelect } from '@/features/orders/components/OrderFormUI';
+import DropdownCustomContent, { DropdownCustomMenu } from '../ui/dropdown-menu';
+import { CustomLabel, FormInput, FormSelect } from '@/features/orders/components/OrderFormUI';
 
 const DataTableComponent = <T extends Record<string, any>>(props: DataTableProps<T>) => {
   const {
@@ -74,6 +74,27 @@ const DataTableComponent = <T extends Record<string, any>>(props: DataTableProps
   const [internalSearch, setInternalSearch] = useState('');
   const [internalSortConfig, setInternalSortConfig] = useState<SortConfig>({ key: null, direction: null });
   const [internalSelectedRows, setInternalSelectedRows] = useState<string[]>([]);
+  const [visibleColumns, setVisibleColumns] = useState<string[]>(columns.map(c => c.key));
+  const [colDropdownOpen, setColDropdownOpen] = useState(false);
+
+  useEffect(() => {
+    setVisibleColumns(columns.map(c => c.key));
+  }, [columns]);
+
+  const handleToggleColumn = (columnKey: string) => {
+    setVisibleColumns(prev => {
+      if (prev.includes(columnKey)) {
+        if (prev.length <= 1) return prev;
+        return prev.filter(k => k !== columnKey);
+      } else {
+        return [...prev, columnKey];
+      }
+    });
+  };
+
+  const renderedColumns = columns.length > 7
+    ? columns.filter(c => visibleColumns.includes(c.key))
+    : columns;
 
   // Use controlled or uncontrolled values
   const currentSearch = searchValue !== undefined ? searchValue : internalSearch;
@@ -178,9 +199,12 @@ const DataTableComponent = <T extends Record<string, any>>(props: DataTableProps
   return (
     <div className={cn("flex flex-col group flex-1 min-h-0", className)}>
       {header && (
-        <div className={cn("flex w-full border-b justify-between gap-4 px-4 py-2", headerClass)}>
+        <div className={cn(
+          "flex flex-col lg:flex-row w-full border-b justify-between gap-3 px-4 py-3 lg:items-center min-h-[3.5rem] h-auto print:hidden",
+          headerClass?.replace(/\bh-\d+\b/g, '')
+        )}>
           <div className="flex flex-col justify-center">
-            <h1 className={`text-lg font-bold text-gray-800 dark:text-zinc-200 my-0`}>
+            <h1 className="text-lg font-bold text-gray-800 dark:text-zinc-200 my-0">
               {headerTitle}
             </h1>
             {headerDescription && (
@@ -191,71 +215,84 @@ const DataTableComponent = <T extends Record<string, any>>(props: DataTableProps
           </div>
           {/* Header with search and controls */}
           {(searchable || customHeader) && (
-            <div className="flex items-center justify-between gap-4 relative print:hidden">
-              <div className="flex items-center gap-2 ml-auto">
-                {headerPosition == 'left' && customHeader && (typeof customHeader === 'function' ? (customHeader as () => ReactNode)() : customHeader)}
+            <div className="flex flex-wrap items-center gap-3 relative print:hidden w-full lg:w-auto justify-start lg:justify-end lg:ml-auto">
+              {headerPosition === 'left' && customHeader && (
+                <div className="w-full sm:w-auto">
+                  {typeof customHeader === 'function' ? (customHeader as () => ReactNode)() : customHeader}
+                </div>
+              )}
+
+              {/* Page Size & Export Row */}
+              <div className="flex items-center gap-3 w-full sm:w-auto justify-between sm:justify-start">
                 {pagination && !pageSizeInFooter && (
-                  <FormSelect
-                    className='w-[90px] h-8 text-xs font-bold'
-                    value={pageSize.toString()}
-                    onValueChange={(value: string | null) => value && setPaginationPageSize(Number(value))}
-                    options={DEFAULT_PAGE_SIZES}
-                    placeholder="Select Page Size"
-                    allowClear={false}
-                  />
-                )}
-                {searchable && (
-                  <FormInput
-                    placeholder={searchPlaceholder}
-                    value={currentSearch}
-                    onChange={handleSearch}
-                    icon={Search}
-                    className="w-62 h-8"
-                  />
+                  <div className="flex items-center gap-1.5 shrink-0">
+                    <CustomLabel label="Show:" required={false} />
+                    <FormSelect
+                      className="w-[90px] h-8 text-xs font-bold"
+                      value={pageSize.toString()}
+                      onValueChange={(value: string | null) => value && setPaginationPageSize(Number(value))}
+                      options={DEFAULT_PAGE_SIZES}
+                      placeholder="Select Page Size"
+                      allowClear={false}
+                      searchdisable
+                    />
+                  </div>
                 )}
                 {exportable && data.length > 0 && (
-                  <DropdownCustomMenu
-                    menus={[
-                      ...(print ? [{
-                        label: "Print",
-                        onClick: () => window.print(),
-                        icon: Printer,
-                      }] : []),
-                      {
-                        label: "CSV",
-                        onClick: onExport ? () => onExport('csv') : () => { },
-                        icon: File,
-                      },
-                      {
-                        label: "Excel",
-                        onClick: onExport ? () => onExport('excel') : () => { },
-                        icon: Upload,
-                      },
-                      {
-                        label: "PDF",
-                        onClick: onExport ? () => onExport('pdf') : () => { },
-                        icon: FileText,
-                      },
-                      // {
-                      //   label: "Copy",
-                      //   onClick: () => { },
-                      //   icon: ClipboardCopy,
-                      // },
-                    ]}
-                  >
-                    <Button
-                      variant="outline"
-                      className="gap-2 border-gray-200 dark:border-zinc-800 hover:bg-gray-50 dark:hover:bg-zinc-800 font-medium text-slate-700 dark:text-zinc-300 transition-colors"
-                      disabled={isExporting}
+                  <div className="shrink-0">
+                    <DropdownCustomMenu
+                      menus={[
+                        ...(print ? [{
+                          label: "Print",
+                          onClick: () => window.print(),
+                          icon: Printer,
+                        }] : []),
+                        {
+                          label: "CSV",
+                          onClick: onExport ? () => onExport('csv') : () => { },
+                          icon: File,
+                        },
+                        {
+                          label: "Excel",
+                          onClick: onExport ? () => onExport('excel') : () => { },
+                          icon: Upload,
+                        },
+                        {
+                          label: "PDF",
+                          onClick: onExport ? () => onExport('pdf') : () => { },
+                          icon: FileText,
+                        },
+                      ]}
                     >
-                      {isExporting && <Loader2 className="w-4 h-4 animate-spin" />}
-                      {!isExporting && <Upload className="w-4 h-4" />}
-                      <span>Export</span>
-                    </Button>
-                  </DropdownCustomMenu>
+                      <Button
+                        variant="outline"
+                        className="gap-2 h-8 border-gray-200 dark:border-zinc-800 hover:bg-gray-50 dark:hover:bg-zinc-800 font-medium text-slate-700 dark:text-zinc-300 transition-colors"
+                        disabled={isExporting}
+                      >
+                        {isExporting && <Loader2 className="w-4 h-4 animate-spin" />}
+                        {!isExporting && <Upload className="w-4 h-4" />}
+                        <span>Export</span>
+                      </Button>
+                    </DropdownCustomMenu>
+                  </div>
                 )}
-                {headerPosition == 'right' && customHeader && (typeof customHeader === 'function' ? (customHeader as () => ReactNode)() : customHeader)}
               </div>
+
+              {searchable && (
+                <FormInput
+                  placeholder={searchPlaceholder}
+                  value={currentSearch}
+                  onChange={handleSearch}
+                  icon={Search}
+                  className="w-full sm:w-62 h-8"
+                />
+              )}
+
+              {headerPosition === 'right' && customHeader && (
+                <div className="w-full sm:w-auto">
+                  {typeof customHeader === 'function' ? (customHeader as () => ReactNode)() : customHeader}
+                </div>
+              )}
             </div>
           )}
         </div>)}
@@ -266,7 +303,10 @@ const DataTableComponent = <T extends Record<string, any>>(props: DataTableProps
           <TableHeader className={cn("bg-white dark:bg-zinc-950 sticky top-0 z-10 shadow-sm", headerClassName)}>
             <TableRow className="hover:bg-transparent border-b border-gray-100 dark:border-zinc-800">
               {selectable && (
-                <TableHead className="sticky left-0 bg-white dark:bg-zinc-950 h-9 text-[14px] font-bold text-gray-900 dark:text-zinc-100 uppercase tracking-wide px-5 pr-3! print:hidden border-b border-gray-100 dark:border-zinc-800">
+                <TableHead
+                  className="sticky left-0 z-20 bg-white dark:bg-zinc-950 h-9 text-[14px] font-bold text-gray-900 dark:text-zinc-100 uppercase tracking-wide px-5 pr-3! print:hidden border-b border-gray-100 dark:border-zinc-800"
+                  style={{ minWidth: '50px', width: '50px', maxWidth: '50px' }}
+                >
                   <Checkbox
                     checked={currentSelectedRows.length === displayData.length && displayData.length > 0}
                     onCheckedChange={handleSelectAll}
@@ -274,41 +314,99 @@ const DataTableComponent = <T extends Record<string, any>>(props: DataTableProps
                 </TableHead>
               )}
 
-              {columns.map((column, index) => (
-                <TableHead
-                  key={`${column.key}-${index}`}
-                  className={cn(
-                    "h-9 text-[14px] font-bold text-gray-900 dark:text-zinc-100 uppercase tracking-wide px-4",
-                    column.sortable !== false && sortable && "cursor-pointer hover:bg-muted/50",
-                    column.sticky === 'left' && "sticky bg-white dark:bg-zinc-950 z-20 shadow-[inset_-1px_0_0_0_#ebe6e7] dark:shadow-[inset_-1px_0_0_0_#27272a]",
-                    column.sticky === 'left' ? selectable ? 'left-[48px]' : 'left-0' : '',
-                    column.sticky === 'right' && "sticky right-0 bg-white dark:bg-zinc-950 z-20 shadow-[inset_1px_0_0_0_#ebe6e7] dark:shadow-[inset_1px_0_0_0_#27272a]",
-                    column.className,
-                    column.noPrint && 'print:hidden'
-                  )}
-                  style={{ minWidth: column.width, width: column.width }}
-                  onClick={() => column.sortable !== false && handleSort(column.key)}
-                >
-                  <div className="flex items-center gap-2">
-                    {column.header}
-                    {sortable && column.sortable !== false && currentSortConfig.key === column.key && (
-                      currentSortConfig.direction === 'asc'
-                        ? <ArrowUp className="w-4 h-4" />
-                        : <ArrowDown className="w-4 h-4" />
+              {renderedColumns.map((column, index) => {
+                const originalIndex = columns.indexOf(column);
+                return (
+                  <TableHead
+                    key={`${column.key}-${originalIndex}`}
+                    className={cn(
+                      "py-2 whitespace-normal text-[14px] font-bold text-gray-900 dark:text-zinc-100 capitalize tracking-wide px-3",
+                      column.sortable !== false && sortable && "cursor-pointer hover:bg-muted/50",
+                      column.sticky === 'left' && "sticky bg-white dark:bg-zinc-950 z-20 shadow-[inset_-1px_0_0_0_#ebe6e7] dark:shadow-[inset_-1px_0_0_0_#27272a]",
+                      column.sticky === 'left' ? selectable ? 'left-[48px]' : 'left-0' : '',
+                      column.sticky === 'right' && "sticky right-0 bg-white dark:bg-zinc-950 z-20 shadow-[inset_1px_0_0_0_#ebe6e7] dark:shadow-[inset_1px_0_0_0_#27272a]",
+                      column.className,
+                      column.noPrint && 'print:hidden'
                     )}
-                  </div>
-                </TableHead>
-              ))}
+                    style={{ minWidth: column.width }}
+                    onClick={() => column.sortable !== false && handleSort(column.key)}
+                  >
+                    <div className="flex items-center justify-between gap-2 w-full">
+                      {column.header && <div className="flex items-center gap-2">
+                        {column.header}
+                        {sortable && column.sortable !== false && currentSortConfig.key === column.key && (
+                          currentSortConfig.direction === 'asc'
+                            ? <ArrowUp className="w-4 h-4" />
+                            : <ArrowDown className="w-4 h-4" />
+                        )}
+                      </div>}
+                      {columns.length > 7 && index === renderedColumns.length - 1 && (
+                        <div onClick={(e) => e.stopPropagation()} className="ml-auto flex items-center print:hidden">
+                          <DropdownCustomContent
+                            open={colDropdownOpen}
+                            onOpenChange={setColDropdownOpen}
+                            triggerClassName="p-1 rounded-md hover:bg-gray-100 dark:hover:bg-zinc-800 text-gray-500 dark:text-zinc-400 hover:text-gray-900 dark:hover:text-zinc-100 transition-colors cursor-pointer outline-none"
+                            contentClassName="border border-gray-200 dark:border-zinc-800 shadow-lg"
+                            content={
+                              <div
+                                className="flex flex-col max-h-[300px] overflow-y-auto p-2 bg-white dark:bg-zinc-950 text-gray-800 dark:text-zinc-200"
+                                onClick={(e) => e.stopPropagation()}
+                              >
+                                <div className="px-2 py-1.5 text-xs font-semibold text-gray-500 dark:text-zinc-400 uppercase tracking-wide">
+                                  Toggle Columns
+                                </div>
+                                <div className="h-px my-1 bg-gray-100 dark:bg-zinc-800" />
+                                {columns.filter((c) => !c.disableToggle).map((col) => {
+                                  const isChecked = visibleColumns.includes(col.key);
+                                  const isDisabled = isChecked && visibleColumns.length <= 1;
+                                  return (
+                                    <div
+                                      key={col.key}
+                                      className={cn(
+                                        "flex items-center gap-2.5 px-2 py-1.5 rounded-md hover:bg-slate-50 dark:hover:bg-zinc-900 cursor-pointer text-sm font-medium transition-colors select-none",
+                                        isDisabled && "opacity-50 cursor-not-allowed"
+                                      )}
+                                      onClick={() => {
+                                        if (!isDisabled) {
+                                          handleToggleColumn(col.key);
+                                        }
+                                      }}
+                                    >
+                                      <Checkbox
+                                        checked={isChecked}
+                                        onCheckedChange={() => {
+                                          if (!isDisabled) {
+                                            handleToggleColumn(col.key);
+                                          }
+                                        }}
+                                        onClick={(e) => e.stopPropagation()}
+                                        disabled={isDisabled}
+                                      />
+                                      <span className="truncate">{col.header || col.key}</span>
+                                    </div>
+                                  );
+                                })}
+                              </div>
+                            }
+                          >
+                            <Settings className="w-4 h-4" />
+                          </DropdownCustomContent>
+                        </div>
+                      )}
+                    </div>
+                  </TableHead>
+                );
+              })}
             </TableRow>
           </TableHeader>
 
           <TableBody>
             {loading ? (
-              <TableSkeleton columns={columns.length} selectable={selectable} rows={pageSize} />
+              <TableSkeleton columns={renderedColumns.length} selectable={selectable} rows={pageSize} />
             ) : displayData.length === 0 ? (
               <TableRow>
                 <TableCell
-                  colSpan={columns.length + (selectable ? 1 : 0)}
+                  colSpan={renderedColumns.length + (selectable ? 1 : 0)}
                   className="h-32 text-center text-muted-foreground"
                 >
                   {emptyMessage}
@@ -333,7 +431,7 @@ const DataTableComponent = <T extends Record<string, any>>(props: DataTableProps
                   >
                     {selectable && (
                       <TableCell className={cn(
-                        "sticky left-0 px-4 py-[5px] text-sm font-medium text-gray-700 dark:text-zinc-300 print:hidden transition-colors",
+                        "sticky left-0 z-[2] px-2 pl-5 py-[5px] text-sm font-medium text-gray-700 dark:text-zinc-300 print:hidden transition-colors",
                         isSelected
                           ? "bg-slate-100 dark:bg-zinc-900"
                           : "bg-white dark:bg-zinc-950 group-hover/row:bg-slate-50 dark:group-hover/row:bg-zinc-900/50"
@@ -346,34 +444,38 @@ const DataTableComponent = <T extends Record<string, any>>(props: DataTableProps
                       </TableCell>
                     )}
 
-                    {columns.map((column, colIndex) => (
-                      <TableCell
-                        key={`${column.key}-${rowId}-${colIndex}`}
-                        className={cn(
-                          `px-4 py-[10px] min-h-12 text-sm text-gray-800 dark:text-zinc-300 whitespace-normal transition-colors`,
-                          column.sticky === 'left' && cn(
-                            "sticky left-0 shadow-[inset_-1px_0_0_0_#ebe6e7] dark:shadow-[inset_-1px_0_0_0_#27272a]",
-                            isSelected
-                              ? "bg-slate-100 dark:bg-zinc-900"
-                              : "bg-white dark:bg-zinc-950 group-hover/row:bg-slate-50 dark:group-hover/row:bg-zinc-900/50"
-                          ),
-                          column.sticky === 'left' ? selectable ? 'left-[48px]' : 'left-0' : '',
+                    {renderedColumns.map((column) => {
+                      const originalIndex = columns.indexOf(column);
+                      return (
+                        <TableCell
+                          key={`${column.key}-${rowId}-${originalIndex}`}
+                          className={cn(
+                            `px-3 break-all py-[10px] min-h-12 text-sm text-gray-800 dark:text-zinc-300 whitespace-normal transition-colors`,
+                            column.sticky === 'left' && cn(
+                              "sticky left-0 shadow-[inset_-1px_0_0_0_#ebe6e7] dark:shadow-[inset_-1px_0_0_0_#27272a]",
+                              isSelected
+                                ? "bg-slate-100 dark:bg-zinc-900"
+                                : "bg-white dark:bg-zinc-950 group-hover/row:bg-slate-50 dark:group-hover/row:bg-zinc-900/50"
+                            ),
+                            column.sticky === 'left' ? selectable ? 'left-[48px] z-[2]' : 'left-0 z-[2]' : '',
 
-                          column.sticky === 'right' && cn(
-                            "sticky right-0 shadow-[inset_1px_0_0_0_#ebe6e7] dark:shadow-[inset_1px_0_0_0_#27272a]",
-                            isSelected
-                              ? "bg-slate-100 dark:bg-zinc-900"
-                              : "bg-white dark:bg-zinc-950 group-hover/row:bg-slate-50 dark:group-hover/row:bg-zinc-900/50"
-                          ),
-                          isSelected && "font-semibold",
-                          column.className,
-                          cellClassName,
-                          column.noPrint && 'print:hidden'
-                        )}
-                      >
-                        {renderCell(column, row, index)}
-                      </TableCell>
-                    ))}
+                            column.sticky === 'right' && cn(
+                              "sticky right-0 z-[2] shadow-[inset_1px_0_0_0_#ebe6e7] dark:shadow-[inset_1px_0_0_0_#27272a]",
+                              isSelected
+                                ? "bg-slate-100 dark:bg-zinc-900"
+                                : "bg-white dark:bg-zinc-950 group-hover/row:bg-slate-50 dark:group-hover/row:bg-zinc-900/50"
+                            ),
+                            isSelected && "font-semibold",
+                            column.className,
+                            cellClassName,
+                            column.noPrint && 'print:hidden'
+                          )}
+                          style={{ minWidth: column.width }}
+                        >
+                          {renderCell(column, row, index)}
+                        </TableCell>
+                      );
+                    })}
                   </TableRow>
                 );
               })

@@ -117,6 +117,7 @@ export interface SearchAddressBookListResponse {
             unit_number: string;
             street_name: string;
             street_number: string;
+            company_name: string;
         };
     }[];
 }

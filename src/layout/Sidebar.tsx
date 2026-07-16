@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { NavLink, useLocation, useNavigate } from 'react-router-dom';
 import { Menu, ArrowLeft, ChevronDown, X } from 'lucide-react';
 import type { SidebarItem } from './types/Sidebar.types';
@@ -20,14 +20,16 @@ interface SidebarProps {
   bannerOpen?: boolean;
 }
 
-export default function Sidebar({
+const Sidebar = ({
   isCollapsed,
   setIsCollapsed,
   isMobile = false,
   isMobileSidebarOpen = false,
   setIsMobileSidebarOpen = () => { },
   bannerOpen = false,
-}: SidebarProps) {
+}: SidebarProps) => {
+  console.log("Render Sidebar")
+
   const [activeSubmenu, setActiveSubmenu] = useState<string | null>(null);
   const [expandedItems, setExpandedItems] = useState<string[]>([]);
   const { role, team_access } = useAppSelector((state) => state.auth);
@@ -105,8 +107,13 @@ export default function Sidebar({
     if (item.isExternal) return false;
 
     // Fix double active highlight for base orders menu vs create order
-    if ((item.name === 'Orders' || item.name === 'Order Management') && location.pathname.includes('/orders/create')) {
-      return false;
+    if (item.name === 'Orders' || item.name === 'Order Management') {
+      if (role === 'admin' && (location.pathname === '/admin/orders' || location.pathname.startsWith('/admin/orders/'))) {
+        return true;
+      }
+      if (role !== 'admin' && location.pathname.includes('/orders/create')) {
+        return false;
+      }
     }
 
     // If the item has a dropdown, ignore the default NavLink isActive (which triggers for '#' paths).
@@ -198,6 +205,11 @@ export default function Sidebar({
     navigate(`${role === 'admin' ? '/admin' : ''}/orders`);
   };
 
+  const handleBackFromSubmenu = () => {
+    setActiveSubmenu(null);
+    navigate(`${role === 'admin' ? '/admin' : ''}/orders`);
+  };
+
   const currentSubmenuData = sidebarItems.find(i => i.name === activeSubmenu);
 
   return (
@@ -206,7 +218,7 @@ export default function Sidebar({
       className={cn(
         "print:hidden h-screen bg-white dark:bg-zinc-950 border-r border-gray-200 dark:border-zinc-800 flex flex-col justify-between fixed top-0 left-0 transition-all duration-300 ease-in-out z-20",
         isMobile
-          ? "w-[240px] z-50 shadow-2xl"
+          ? "w-[240px] z-50"
           : "z-20",
         isMobile
           ? (isMobileSidebarOpen ? "translate-x-0" : "-translate-x-full")
@@ -217,8 +229,7 @@ export default function Sidebar({
       <div className="flex-1 overflow-y-auto overflow-x-hidden w-full no-scrollbar">
         {/* Main Menu Header */}
         {!activeSubmenu && (
-          <div className={`flex items-center h-16 px-4 sticky top-0 z-20 bg-white dark:bg-zinc-950 ${isMobile ? 'justify-between' : (isCollapsed ? 'justify-center' : 'justify-between')
-            }`}>
+          <div className={`flex items-center h-16 px-4 sticky top-0 z-20 bg-white dark:bg-zinc-950`}>
             <button
               onClick={() => isMobile ? setIsMobileSidebarOpen(false) : setIsCollapsed(!isCollapsed)}
               className="p-2 hover:bg-gray-100 dark:hover:bg-zinc-900 rounded-md text-primary transition-colors"
@@ -228,7 +239,24 @@ export default function Sidebar({
             <div className={`flex items-center transition-all duration-300 ease-in-out ${isMobile ? 'w-auto opacity-100' : (isCollapsed ? 'w-0 opacity-0 pointer-events-none overflow-hidden' : 'w-auto opacity-100')
               }`}>
               {/* brand logo */}
-              <img src={theme === "dark" ? tranzit_logo_dark : tranzit_logo} alt="Tranzit" className="h-15 cursor-pointer" onClick={handleBackToMainMenu} />
+              <div className="relative h-12 w-28 cursor-pointer shrink-0" onClick={handleBackToMainMenu}>
+                <img
+                  src={tranzit_logo}
+                  alt="Tranzit"
+                  className={cn(
+                    "absolute inset-0 h-full w-full object-contain transition-all duration-500 ease-in-out",
+                    theme === "dark" ? "opacity-0 scale-95 pointer-events-none" : "opacity-100 scale-100"
+                  )}
+                />
+                <img
+                  src={tranzit_logo_dark}
+                  alt="Tranzit"
+                  className={cn(
+                    "absolute inset-0 h-full w-full object-contain transition-all duration-500 ease-in-out",
+                    theme === "dark" ? "opacity-100 scale-100" : "opacity-0 scale-95 pointer-events-none"
+                  )}
+                />
+              </div>
             </div>
           </div>
         )}
@@ -237,7 +265,7 @@ export default function Sidebar({
         {activeSubmenu && (!isCollapsed || isMobile) && (
           <div className="flex flex-col pt-2 animate-in slide-in-from-left-4 duration-300">
             <button
-              onClick={handleBackToMainMenu}
+              onClick={handleBackFromSubmenu}
               className="flex items-center cursor-pointer gap-2 px-4 py-2 text-[13px] text-gray-500 dark:text-zinc-400 hover:text-gray-900 dark:hover:text-zinc-100 transition-colors"
             >
               <ArrowLeft className="w-4 h-4" />
@@ -299,21 +327,14 @@ export default function Sidebar({
                       return;
                     }
                     if (item.hasDropdown) {
-                      // e.preventDefault();
+                      if (!item.subGroups) {
+                        e.preventDefault();
+                      }
                       handleItemClick(item);
+                      return;
                     }
-                    if (sessionStorage.getItem('quote_courier')) {
-                      sessionStorage.removeItem('quote_courier');
-                    }
-                    if (sessionStorage.getItem('quote_items')) {
-                      sessionStorage.removeItem('quote_items');
-                    }
-                    if (sessionStorage.getItem('quote_sender')) {
-                      sessionStorage.removeItem('quote_sender');
-                    }
-                    if (sessionStorage.getItem('quote_receiver')) {
-                      sessionStorage.removeItem('quote_receiver');
-                    }
+                    const itemsToRemove = ['quote_courier', 'quote_items', 'quote_sender', 'quote_receiver'];
+                    itemsToRemove.forEach(key => sessionStorage.removeItem(key));
                   }}
                   className={({ isActive }) => {
                     const active = isItemActive(item, isActive);
@@ -380,3 +401,6 @@ export default function Sidebar({
     </aside>
   );
 }
+
+
+export default React.memo(Sidebar);

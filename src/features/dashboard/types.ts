@@ -53,30 +53,58 @@ export interface CustomerMetrics {
   };
 }
 
+export interface BarChartData {
+  label: string;
+  total_orders: number;
+  total_tranzit_group_orders: number;
+  total_byo_courier_orders: number;
+  total_paid_amount: number;
+  total_tranzit_group_markup: number;
+  total_tranzit_group_pickup_charge: number;
+  total_tranzit_group_revenue: number;
+  total_customer_spending: number;
+}
+
 export interface AdminMetrics {
   totalOrder: number;
   totalCustomers: number;
-  pendingInvoiceCount: number;
-  undeliveredOrder: number;
-  last28Days: any[];
-  lastMonth: any[];
-  lastYear: any[];
+  pendingInvoiceCount?: number;
+  totalInvoiceCount?: number;
+  undeliveredOrder?: number;
+  totalUndeliveredOrder?: number;
+  last28Days?: any[];
+  lastMonth?: any[];
+  lastYear?: any[];
   last28DaysCount?: number;
   lastMonthCount?: number;
   lastYearCount?: number;
-  totalMarginAmount: string;
-  totalOrderAmount: string;
-  totalInvoiceAmount: string;
-  totalPaidInvoiceAmount: string;
-  totalUnpaidInvoiceAmount: string;
-  totalTopupAmount: number;
-  periodLabels: Record<string, string>;
-  statsByPeriod: Record<string, any>;
-  financeByPeriod: Record<string, any>;
-  toDateFrom: string;
-  toDateTo: string;
-  toDateError: null | string;
-  activePeriod: string;
+  totalMarginAmount: string | number;
+  totalOrderAmount: string | number;
+  totalInvoiceAmount: string | number;
+  totalPaidInvoiceAmount: string | number;
+  totalUnpaidInvoiceAmount: string | number;
+  totalTopupAmount: string | number;
+  totalPickupChargeAmount?: string | number;
+  australia_post_estimated_billing?: string | number;
+  dateFrom?: string;
+  dateTo?: string;
+  dateError?: null | string;
+  transactions?: any[];
+  periodLabels?: Record<string, string>;
+  statsByPeriod?: Record<string, any>;
+  financeByPeriod?: Record<string, any>;
+  toDateFrom?: string;
+  toDateTo?: string;
+  toDateError?: null | string;
+  activePeriod?: string;
+  chart?: {
+    bars: BarChartData[];
+    summary?: {
+      total_orders: number;
+      total_customer_spending: number;
+      total_tranzit_group_revenue: number;
+    };
+  }
 }
 
 export type DashboardMetrics = CustomerMetrics | AdminMetrics;

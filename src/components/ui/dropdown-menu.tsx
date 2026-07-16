@@ -266,9 +266,27 @@ const DropdownCustomMenu = ({ menus, children, contentClassName }: { menus: { la
 }
 
 
-function DropdownCustomContent({ content, children, contentClassName, triggerClassName }: { content: React.ReactNode, children: React.ReactNode, contentClassName?: string, triggerClassName?: string }) {
+function DropdownCustomContent({ 
+  content, 
+  children, 
+  contentClassName, 
+  triggerClassName,
+  open,
+  onOpenChange
+}: { 
+  content: React.ReactNode, 
+  children: React.ReactNode, 
+  contentClassName?: string, 
+  triggerClassName?: string,
+  open?: boolean,
+  onOpenChange?: (open: boolean) => void
+}) {
+  const dropdownProps: { open?: boolean; onOpenChange?: (open: boolean) => void } = {};
+  if (open !== undefined) dropdownProps.open = open;
+  if (onOpenChange !== undefined) dropdownProps.onOpenChange = onOpenChange;
+
   return (
-    <DropdownMenu>
+    <DropdownMenu {...dropdownProps}>
       <DropdownMenuTrigger className={cn("hover:bg-gray-100 dark:hover:bg-zinc-800 rounded transition-colors outline-none cursor-pointer", triggerClassName)}>
         {children}
       </DropdownMenuTrigger>

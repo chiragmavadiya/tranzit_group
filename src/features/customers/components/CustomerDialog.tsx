@@ -7,17 +7,29 @@ import {
   Mail,
   Receipt,
   Wallet,
-  Loader2
+  Loader2,
+  DollarSign,
+  Percent
 } from "lucide-react"
 import Favicon from '@/assets/favicon.png';
 import { CustomModel } from "@/components/ui/dialog"
 import { Switch } from "@/components/ui/switch"
 import { FormInput, FormSelect } from "@/features/orders/components/OrderFormUI"
-import { STATES } from "../constants"
-import { useCreateCustomer, useUpdateCustomer, useCustomerEditDetails } from "../hooks/useCustomers"
+import { STATES, WEIGHT_TIERS } from "../constants"
+// import {
+//   Accordion,
+//   AccordionContent,
+//   AccordionItem,
+//   AccordionTrigger,
+// } from "@/components/ui/accordion"
+import { useCreateCustomer, useCustomerEditDetails, useUpdateCustomer } from "../hooks/useCustomers"
 import { showToast } from "@/components/ui/custom-toast"
 import { PlaceAutocomplete } from "@/components/common/AutoComplateAddress"
 import { Checkbox } from "@/components/ui/checkbox"
+import { cleanSpaces, isPhoneValid, cn } from "@/lib/utils";
+import directFreightLogo from "@/assets/coruiers_logo/direct-freight.png"
+import auspostLogo from "@/assets/coruiers_logo/logo-auspost.png"
+import courierspleaseLogo from "@/assets/coruiers_logo/couriersplease.png"
 
 interface CustomerDialogProps {
   open: boolean
@@ -26,6 +38,17 @@ interface CustomerDialogProps {
 }
 
 const STATE_OPTIONS = STATES.map(s => ({ label: s, value: s }));
+
+const buildInitialCharges = () => {
+  const couriers = ["AusPost", "DirectFreight", "CouriersPlease", "Pallet"]; //MyPostBusiness
+  return couriers.map(courier => {
+    const chargeObj: any = { courier };
+    WEIGHT_TIERS.forEach(tier => {
+      chargeObj[tier.key] = 0;
+    });
+    return chargeObj;
+  });
+};
 
 const INITIAL_FORM_DATA = {
   first_name: "",
@@ -55,23 +78,29 @@ const INITIAL_FORM_DATA = {
   postcode: "",
   country: "Australia",
   direct_freight_active: 0,
-  direct_freight_markup_charge: 0,
-  direct_freight_pickup_charge: 0,
   auspost_active: 0,
-  auspost_markup_charge: 0,
-  auspost_pickup_charge: 0,
+  couriersplease_active: 0,
+  // mypostbusiness_active: 0,
   pallet_active: 0,
-  pallet_markup_charge: 0,
-  pallet_pickup_charge: 0,
   topup_enable: false,
-  order_prefix: ""
+  order_prefix: "",
+  markup_charges: buildInitialCharges(),
+  pickup_charges: buildInitialCharges(),
+  byo_courier_invoice_enable: false,
+  byo_courier_pricing_tiers: [
+    { min_labels: 0, max_labels: 25, price_per_label: 0 },
+    { min_labels: 26, max_labels: 50, price_per_label: 0 },
+    { min_labels: 51, max_labels: 100, price_per_label: 0 },
+    { min_labels: 101, max_labels: 250, price_per_label: 0 },
+    { min_labels: 251, max_labels: 1000, price_per_label: 0 },
+    { min_labels: 1001, max_labels: null, price_per_label: 0 }
+  ]
 };
 
 export default function CustomerDialog({ open, onOpenChange, customerId }: CustomerDialogProps) {
   const isEdit = !!customerId
   const [formData, setFormData] = useState(INITIAL_FORM_DATA)
   const [submited, setSubmited] = useState(false)
-  // const [errors, setErrors] = useState<Record<string, string>>({})
 
   const { mutate: createCustomer, isPending: isCreating } = useCreateCustomer();
   const { mutate: updateCustomer, isPending: isUpdating } = useUpdateCustomer();
@@ -79,10 +108,146 @@ export default function CustomerDialog({ open, onOpenChange, customerId }: Custo
 
   const [sameAsShipping, setSameAsShipping] = useState(false);
 
+  const handleChargeChange = (
+    type: 'markup' | 'pickup',
+    courierName: string,
+    key: string,
+    value: number
+  ) => {
+    const fieldName = type === 'markup' ? 'markup_charges' : 'pickup_charges';
+    setFormData((prev: any) => {
+      const arr = Array.isArray(prev[fieldName]) ? [...prev[fieldName]] : [];
+      let index = arr.findIndex((item: any) => item.courier === courierName);
+      if (index === -1) {
+        const newObj: any = { courier: courierName };
+        WEIGHT_TIERS.forEach(tier => {
+          newObj[tier.key] = 0;
+        });
+        arr.push(newObj);
+        index = arr.length - 1;
+      }
+      arr[index] = {
+        ...arr[index],
+        [key]: value
+      };
+      return {
+        ...prev,
+        [fieldName]: arr
+      };
+    });
+  };
+
+  const handlePricingTierChange = (index: number, value: number) => {
+    setFormData((prev: any) => {
+      const updatedTiers = [...prev.byo_courier_pricing_tiers];
+      updatedTiers[index] = {
+        ...updatedTiers[index],
+        price_per_label: value
+      };
+      return {
+        ...prev,
+        byo_courier_pricing_tiers: updatedTiers
+      };
+    });
+  };
+
+  const getChargeValue = (
+    type: 'markup' | 'pickup',
+    courierName: string,
+    key: string
+  ): string => {
+    const fieldName = type === 'markup' ? 'markup_charges' : 'pickup_charges';
+    const arr = formData[fieldName] || [];
+    const item = arr.find((item: any) => item.courier === courierName);
+    return item ? (item[key] ?? 0).toString() : '0';
+  };
+
+  const renderChargeTable = (courierName: string) => {
+    return (
+      <div className="overflow-x-auto rounded-lg border border-slate-100 dark:border-zinc-800 bg-slate-50/30 dark:bg-zinc-950/20 mt-1">
+        <table className="w-full text-left border-collapse text-xs">
+          <thead>
+            <tr className="border-b border-slate-150 dark:border-zinc-800 bg-slate-50/50 dark:bg-zinc-900/50 text-slate-500 dark:text-zinc-400 font-bold uppercase tracking-wide text-[10px]">
+              <th className="py-2.5 px-4">Weight Tier</th>
+              <th className="py-2.5 px-4 w-[220px]">Markup Charge (%)</th>
+              <th className="py-2.5 px-4 w-[220px]">Pickup Charge ($)</th>
+            </tr>
+          </thead>
+          <tbody className="divide-y divide-slate-100 dark:divide-zinc-800/50">
+            {WEIGHT_TIERS.map((tier) => (
+              <tr key={tier.key} className="hover:bg-slate-50/50 dark:hover:bg-zinc-900/30 transition-colors">
+                <td className="py-2 px-4 text-xs font-semibold text-slate-700 dark:text-zinc-300">{tier.label}</td>
+                <td className="py-1 px-4 max-w-[120px]">
+                  <FormInput
+                    isCompact
+                    type="number"
+                    step="0.01"
+                    icon={Percent}
+                    value={getChargeValue('markup', courierName, tier.key)}
+                    onChange={(val) => handleChargeChange('markup', courierName, tier.key, Number(val) || 0)}
+                  />
+                </td>
+                <td className="py-1 px-4 max-w-[120px]">
+                  <FormInput
+                    isCompact
+                    icon={DollarSign}
+                    type="number"
+                    step="0.01"
+                    value={getChargeValue('pickup', courierName, tier.key)}
+                    onChange={(val) => handleChargeChange('pickup', courierName, tier.key, Number(val) || 0)}
+                  />
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    );
+  };
+
   useEffect(() => {
     if (isEdit && editData?.data) {
-      setFormData({ ...editData.data, country: "Australia", billing_country: "Australia" });
       const data = editData.data;
+      let loadedMarkupCharges = INITIAL_FORM_DATA.markup_charges;
+      if (data.markup_charges && Array.isArray(data.markup_charges) && data.markup_charges.length > 0) {
+        loadedMarkupCharges = data.markup_charges;
+      }
+
+      let loadedPickupCharges = INITIAL_FORM_DATA.pickup_charges;
+      if (data.pickup_charges && Array.isArray(data.pickup_charges) && data.pickup_charges.length > 0) {
+        loadedPickupCharges = data.pickup_charges;
+      }
+
+      const filteredData: any = {};
+      Object.keys(INITIAL_FORM_DATA).forEach((key) => {
+        filteredData[key] = (data as any)[key] !== undefined ? (data as any)[key] : (INITIAL_FORM_DATA as any)[key];
+      });
+      // Merge with INITIAL_FORM_DATA to ensure all 4 couriers are always present
+      const mergedMarkupCharges = INITIAL_FORM_DATA.markup_charges.map((defItem: any) => {
+        const loadedItem = loadedMarkupCharges.find((item: any) => item.courier === defItem.courier);
+        return loadedItem ? { ...defItem, ...loadedItem } : defItem;
+      });
+
+      const mergedPickupCharges = INITIAL_FORM_DATA.pickup_charges.map((defItem: any) => {
+        const loadedItem = loadedPickupCharges.find((item: any) => item.courier === defItem.courier);
+        return loadedItem ? { ...defItem, ...loadedItem } : defItem;
+      });
+
+      // const firstCharge = mergedPickupCharges[0] || {};
+      filteredData.byo_courier_invoice_enable = data.byo_courier_invoice_enable ?? false;
+
+      if (data.byo_courier_pricing_tiers && Array.isArray(data.byo_courier_pricing_tiers) && data.byo_courier_pricing_tiers.length > 0) {
+        filteredData.byo_courier_pricing_tiers = data.byo_courier_pricing_tiers;
+      } else {
+        filteredData.byo_courier_pricing_tiers = INITIAL_FORM_DATA.byo_courier_pricing_tiers;
+      }
+
+      filteredData.markup_charges = mergedMarkupCharges;
+      filteredData.pickup_charges = mergedPickupCharges;
+      filteredData.country = "Australia";
+      filteredData.billing_country = "Australia";
+
+      setFormData(filteredData);
       const isSame =
         data.billing_address === data.address &&
         data.billing_street_name === data.street_name &&
@@ -134,36 +299,91 @@ export default function CustomerDialog({ open, onOpenChange, customerId }: Custo
   }
 
   const validateForm = () => {
-    const requiredFields: (keyof typeof formData)[] = [
+    const requiredFields: string[] = [
       "first_name",
       "last_name",
       "email",
       "mobile",
       "business_name",
       "order_prefix",
-      "billing_address_info",
+      // "billing_address_info",
       "billing_address",
       "billing_street_name",
-      "billing_street_number",
-      "billing_street_type",
+      // "billing_street_number",
+      // "billing_street_type",
       "billing_suburb",
       "billing_state",
       "billing_postcode",
       "billing_country",
-      "address_info",
+      // "address_info",
       "address",
       "street_name",
-      "street_number",
-      "street_type",
+      // "street_number",
+      // "street_type",
       "suburb",
       "state",
       "postcode",
-      "country",
+      "country"
     ];
 
-    return requiredFields.every(
-      (field) => formData[field]?.toString().trim() !== ""
+    if (formData.mobile && !isPhoneValid(formData.mobile)) {
+      showToast("Please enter a valid phone number", "error");
+      return false;
+    }
+
+    const missingFields = requiredFields.filter(
+      (field) => {
+        const val = (formData as any)[field];
+        return val === undefined || val === null || val.toString().trim() === "";
+      }
     );
+
+    if (missingFields.length > 0) {
+      const fieldLabels: Record<string, string> = {
+        first_name: "First Name",
+        last_name: "Last Name",
+        email: "Email",
+        mobile: "Mobile",
+        business_name: "Business Name",
+        order_prefix: "Order Prefix",
+        billing_address_info: "Billing Address Info",
+        billing_address: "Billing Address",
+        billing_street_name: "Billing Street Name",
+        billing_street_type: "Billing Street Type",
+        billing_suburb: "Billing Suburb",
+        billing_state: "Billing State",
+        billing_postcode: "Billing Postcode",
+        billing_country: "Billing Country",
+        address_info: "Address Info",
+        address: "Address",
+        street_name: "Street Name",
+        street_type: "Street Type",
+        suburb: "Suburb",
+        state: "State",
+        postcode: "Postcode",
+        country: "Country",
+      };
+
+      const labels = missingFields.map((field) => fieldLabels[field] || String(field).replace(/_/g, ' '));
+      if (labels.length <= 3) {
+        showToast(`Please fill in the required fields: ${labels.join(', ')}`, "error");
+      } else {
+        showToast(`Please fill in the required fields: ${labels.slice(0, 3).join(', ')} and ${labels.length - 3} more`, "error");
+      }
+      return false;
+    }
+
+    if (formData.byo_courier_invoice_enable) {
+      const hasEmptyPrice = formData.byo_courier_pricing_tiers.some(
+        (tier) => tier.price_per_label === undefined || tier.price_per_label === null || tier.price_per_label.toString().trim() === ""
+      );
+      if (hasEmptyPrice) {
+        showToast("Please enter prices for all volume tiers", "error");
+        return false;
+      }
+    }
+
+    return true;
   };
 
   const handleSubmit = () => {
@@ -172,8 +392,20 @@ export default function CustomerDialog({ open, onOpenChange, customerId }: Custo
       return;
     }
 
+    const payload = {
+      ...formData,
+      mobile: cleanSpaces(formData.mobile),
+      byo_courier_invoice_enable: !!formData.byo_courier_invoice_enable,
+      byo_courier_pricing_tiers: !formData.byo_courier_invoice_enable
+        ? formData.byo_courier_pricing_tiers.map((tier: any) => ({
+          ...tier,
+          price_per_label: 0
+        }))
+        : formData.byo_courier_pricing_tiers
+    };
+
     const mutation = isEdit ? updateCustomer : createCustomer;
-    const variables = isEdit ? { id: customerId!, data: formData as any } : (formData as any);
+    const variables = isEdit ? { id: customerId!, data: payload as any } : payload as any;
 
     mutation(variables, {
       onSuccess: () => {
@@ -183,15 +415,9 @@ export default function CustomerDialog({ open, onOpenChange, customerId }: Custo
       onError: (error: any) => {
         if (error?.response?.data?.errors) {
           const beErrors = error.response.data.errors;
-          const formattedErrors: Record<string, string> = {};
           Object.keys(beErrors).forEach(key => {
             showToast(beErrors[key][0], "error");
-            formattedErrors[key] = beErrors[key][0];
           });
-          // setErrors(formattedErrors);
-          // if (formattedErrors.email || formattedErrors.order_prefix) {
-          //   setCurrentStep(0);
-          // }
         } else {
           showToast(error.message || `Failed to ${isEdit ? 'update' : 'add'} customer. Please check the form.`, "error");
         }
@@ -209,25 +435,10 @@ export default function CustomerDialog({ open, onOpenChange, customerId }: Custo
       open={open}
       isLoading={isPending}
       onOpenChange={onOpenChange}
-      contentClass="min-w-4xl overflow-y-auto no-scrollbar"
+      contentClass="w-[95vw] sm:max-w-none md:w-full md:max-w-3xl md:min-w-[720px] lg:min-w-[850px] lg:max-w-4xl"
       submitText={isEdit ? "Update Customer" : "Add Customer"}
     >
-      {/* <DialogContent className="sm:max-w-2xl gap-0 overflow-hidden bg-white dark:bg-zinc-950 border-none shadow-2xl">
-        <DialogHeader className="px-6 pt-6 pb-2">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-2xl bg-blue-50 dark:bg-blue-500/10 flex items-center justify-center text-blue-600 dark:text-blue-400">
-              {isEdit ? <Pencil className="w-5 h-5" /> : <Plus className="w-5 h-5" />}
-            </div>
-            <div>
-              <DialogTitle className="text-xl font-bold">{isEdit ? "Update Customer" : "Add New Customer"}</DialogTitle>
-              <p className="text-xs text-muted-foreground mt-1">
-                {isEdit ? "Update the customer profile details." : "Fill in the details to onboard a new customer."}
-              </p>
-            </div>
-          </div>
-        </DialogHeader> */}
-
-      <div className="px-4 py-2 max-h-[60vh] overflow-y-auto  space-y-8">
+      <div className="px-1 sm:px-4 py-2 space-y-6 sm:space-y-8">
         {isLoadingDetails && (
           <div className="absolute inset-0 z-50 flex items-center justify-center bg-white/60 dark:bg-zinc-900/60 backdrop-blur-[1px]">
             <div className="flex flex-col items-center gap-2">
@@ -236,7 +447,7 @@ export default function CustomerDialog({ open, onOpenChange, customerId }: Custo
             </div>
           </div>
         )}
-        <div className="grid grid-cols-12 gap-x-5 gap-y-4 animate-in fade-in slide-in-from-right-4 duration-300">
+        <div className="grid grid-cols-12 gap-x-3 sm:gap-x-5 gap-y-4 animate-in fade-in slide-in-from-right-4 duration-300">
           <FormInput
             label="First Name"
             icon={User}
@@ -288,9 +499,9 @@ export default function CustomerDialog({ open, onOpenChange, customerId }: Custo
             errormsg="Please enter business name"
           />
           <FormInput
-            label="GST Number"
+            label="ABN / ACN"
             icon={Receipt}
-            placeholder="ABN / GST"
+            placeholder="ABN / ACN"
             value={formData.gst_number}
             onChange={(val) => handleChange("gst_number", val)}
           />
@@ -313,17 +524,7 @@ export default function CustomerDialog({ open, onOpenChange, customerId }: Custo
               <Truck className="w-4 h-4 text-emerald-600" />
               <h3 className="my-0 text-sm font-bold text-slate-900 dark:text-zinc-100">Shipping Address</h3>
             </div>
-            <div className="grid grid-cols-12 gap-x-4 gap-y-4">
-              {/* <FormInput
-                label="Full Address"
-                placeholder="Start typing address..."
-                isFullWidth
-                value={formData.address}
-                onChange={(val) => handleChange("address", val)}
-                required
-                error={submited && !formData.address?.trim()}
-                errormsg="Please enter shipping address"
-              /> */}
+            <div className="grid grid-cols-12 gap-x-3 sm:gap-x-4 gap-y-4">
               <div className="col-span-12">
                 <PlaceAutocomplete
                   label="Address Information"
@@ -340,10 +541,10 @@ export default function CustomerDialog({ open, onOpenChange, customerId }: Custo
                     handleChange('postcode', opt.post_code);
                   }}
                   onChange={(value) => handleChange('address_info', value)}
-                  error={submited && formData.address_info?.trim() === ''}
-                  errormsg='Please enter your address'
+                  // error={submited && formData.address_info?.trim() === ''}
+                  // errormsg='Please enter your address'
                   value={formData.address_info}
-                  required
+                // required
                 />
               </div>
               <FormInput
@@ -358,7 +559,7 @@ export default function CustomerDialog({ open, onOpenChange, customerId }: Custo
                 isHalf
                 placeholder="e.g. 123 Main St"
                 value={formData.address}
-                onChange={(val) => handleChange("address", val)}
+                onChange={(val) => { handleChange("address", val); handleChange("street_name", val); }}
                 required
                 error={submited && !formData.address?.trim()}
                 errormsg="Please enter street"
@@ -375,6 +576,7 @@ export default function CustomerDialog({ open, onOpenChange, customerId }: Custo
               />
               <FormSelect
                 label="State"
+                placeholder="Select State"
                 isCompact
                 options={STATE_OPTIONS}
                 value={formData.state}
@@ -427,17 +629,7 @@ export default function CustomerDialog({ open, onOpenChange, customerId }: Custo
                 </label>
               </div>
             </div>
-            <div className="grid grid-cols-12 gap-x-4 gap-y-4">
-              {/* <FormInput
-                label="Full Address"
-                placeholder="Start typing address..."
-                isFullWidth
-                value={formData.billing_address}
-                onChange={(val) => handleChange("billing_address", val)}
-                required
-                error={submited && !formData.billing_address?.trim()}
-                errormsg="Please enter billing address"
-              /> */}
+            <div className="grid grid-cols-12 gap-x-3 sm:gap-x-4 gap-y-4">
               <div className="col-span-12">
                 <PlaceAutocomplete
                   label="Address Information"
@@ -454,10 +646,10 @@ export default function CustomerDialog({ open, onOpenChange, customerId }: Custo
                     handleChange('billing_postcode', opt.post_code);
                   }}
                   onChange={(value) => handleChange('billing_address_info', value)}
-                  error={submited && formData.billing_address_info?.trim() === ''}
-                  errormsg='Please enter your billing address'
+                  // error={submited && formData.billing_address_info?.trim() === ''}
+                  // errormsg='Please enter your billing address'
                   value={formData.billing_address_info}
-                  required
+                  // required
                   disabled={sameAsShipping}
                 />
               </div>
@@ -476,7 +668,7 @@ export default function CustomerDialog({ open, onOpenChange, customerId }: Custo
                 isHalf
                 placeholder="e.g. 123 Main St"
                 value={formData.billing_address}
-                onChange={(val) => handleChange("billing_address", val)}
+                onChange={(val) => { handleChange("billing_address", val); handleChange("billing_street_name", val) }}
                 required
                 error={submited && !formData.billing_address?.trim()}
                 errormsg="Please enter street"
@@ -496,6 +688,7 @@ export default function CustomerDialog({ open, onOpenChange, customerId }: Custo
               <FormSelect
                 label="State"
                 isCompact
+                placeholder="Select State"
                 options={STATE_OPTIONS}
                 value={formData.billing_state}
                 onValueChange={(val) => handleChange("billing_state", val)}
@@ -531,137 +724,195 @@ export default function CustomerDialog({ open, onOpenChange, customerId }: Custo
         </div>
 
         <div className="space-y-4 animate-in fade-in slide-in-from-right-4 duration-300 pb-4">
-          <FormInput
-            label="Additional Above 5KG Weight Rate"
-            value=""
-            placeholder="Enter weight rate"
-            onChange={() => { }}
-          />
-          <div className="grid grid-cols-1 gap-4">
-            {/* Direct Freight */}
-            <div className="p-4 rounded-2xl border border-slate-100 dark:border-zinc-800 bg-slate-50/50 dark:bg-zinc-900/50 space-y-4">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                  <div className="flex items-center justify-center text-primary">
-                    {/* <Truck className="w-4 h-4" /> */}
-                    <img src="https://api.tranzit.digisite.net/assets/img/couriers/direct-freight.png" className="w-14 " alt="" />
-                  </div>
-                  <span className="text-sm font-bold">Direct Freight Express</span>
-                </div>
-                <Switch
-                  checked={formData.direct_freight_active === 1}
-                  onCheckedChange={(checked) => handleChange("direct_freight_active", checked ? 1 : 0)}
-                />
-              </div>
-              {formData.direct_freight_active === 1 && (
-                <div className="grid grid-cols-12 gap-4 animate-in fade-in zoom-in-95 duration-200">
-                  <FormInput
-                    label="Markup Charge (%)"
-                    isHalf
-                    type="number"
-                    step='0.01'
-                    value={formData.direct_freight_markup_charge}
-                    onChange={(val) => handleChange("direct_freight_markup_charge", Number(val) || 0)}
-                  />
-                  <FormInput
-                    label="Pickup Charge ($)"
-                    isHalf
-                    step='0.01'
-                    type="number"
-                    value={formData.direct_freight_pickup_charge}
-                    onChange={(val) => handleChange("direct_freight_pickup_charge", Number(val) || 0)}
-                  />
-                </div>
-              )}
-            </div>
+          {/* Courier Configuration Header */}
+          <div className="border-b border-slate-100 dark:border-zinc-800 pb-3 pt-2">
+            <h3 className="my-0 text-sm font-bold text-slate-800 dark:text-zinc-200">Courier Configuration</h3>
+          </div>
 
-            {/* AusPost */}
-            <div className="p-4 rounded-2xl border border-slate-100 dark:border-zinc-800 bg-slate-50/50 dark:bg-zinc-900/50 space-y-4">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                  <div className="flex items-center justify-center text-rose-600 dark:text-rose-400">
-                    {/* <Mail className="w-4 h-4" /> */}
-                    <img src="https://api.tranzit.digisite.net/assets/img/couriers/logo-auspost.png" className="w-14 " alt="" />
-                  </div>
-                  <span className="text-sm font-bold">Auspost Tranzit Group</span>
-                </div>
-                <Switch
-                  checked={formData.auspost_active === 1}
-                  onCheckedChange={(checked) => handleChange("auspost_active", checked ? 1 : 0)}
-                />
-              </div>
-              {formData.auspost_active === 1 && (
-                <div className="grid grid-cols-12 gap-4 animate-in fade-in zoom-in-95 duration-200">
-                  <FormInput
-                    label="Markup Charge (%)"
-                    isHalf
-                    type="number"
-                    value={formData.auspost_markup_charge?.toString()}
-                    onChange={(val) => handleChange("auspost_markup_charge", Number(val) || 0)}
-                  />
-                  <FormInput
-                    label="Pickup Charge ($)"
-                    isHalf
-                    type="number"
-                    value={formData.auspost_pickup_charge?.toString()}
-                    onChange={(val) => handleChange("auspost_pickup_charge", Number(val) || 0)}
-                  />
-                </div>
-              )}
-            </div>
-
-            {/* Pallet */}
-            <div className="p-4 rounded-2xl border border-slate-100 dark:border-zinc-800 bg-slate-50/50 dark:bg-zinc-900/50 space-y-4">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                  <div className="flex items-center justify-center text-amber-600 dark:text-amber-400">
-                    {/* <Box className="w-4 h-4" /> */}
-                    <img src={Favicon} className="w-6 " alt="" />
-
-                  </div>
-                  <span className="text-sm font-bold">Pallet Tranzit Group</span>
-                </div>
-                <Switch
-                  checked={formData.pallet_active === 1}
-                  onCheckedChange={(checked) => handleChange("pallet_active", checked ? 1 : 0)}
-                />
-              </div>
-              {formData.pallet_active === 1 && (
-                <div className="grid grid-cols-12 gap-4 animate-in fade-in zoom-in-95 duration-200">
-                  <FormInput
-                    label="Markup Charge (%)"
-                    isHalf
-                    type="number"
-                    value={formData.pallet_markup_charge}
-                    onChange={(val) => handleChange("pallet_markup_charge", Number(val) || 0)}
-                  />
-                  <FormInput
-                    label="Pickup Charge ($)"
-                    isHalf
-                    type="number"
-                    value={formData.pallet_pickup_charge}
-                    onChange={(val) => handleChange("pallet_pickup_charge", Number(val) || 0)}
-                  />
-                </div>
-              )}
-            </div>
-
-            {/* Account Settings */}
-            <div className="p-4 rounded-2xl border border-primary/20 dark:border-primary/50 bg-primary/5 dark:bg-primary/10 flex items-center justify-between">
+          <div className="border border-slate-200 dark:border-zinc-800 rounded-xl bg-white dark:bg-zinc-950 overflow-hidden shadow-xs">
+            <div className="flex items-center justify-between p-3 sm:p-4 bg-slate-50/50 dark:bg-zinc-900/50">
               <div className="flex items-center gap-3">
-                <div className="w-8 h-8 rounded-lg bg-primary text-white flex items-center justify-center">
-                  <Wallet className="w-4 h-4" />
+                <div className="w-8 h-8 rounded-lg bg-slate-100 dark:bg-zinc-800 text-slate-600 dark:text-zinc-400 flex items-center justify-center">
+                  <DollarSign className="w-4 h-4" />
                 </div>
-                <div>
-                  <span className="text-sm font-bold">Enable Wallet Top-up</span>
-                  <p className="my-0 text-[10px] text-primary font-medium">Allow customer to add funds to balance</p>
+                <div className="text-left">
+                  <span className="text-sm font-bold text-slate-800 dark:text-zinc-200">BYO Courier Volume-Based Tiered Fees</span>
+                  <span className="block text-[10px] text-slate-500 font-medium">Configure flat weekly volume fees applied to Bring Your Own (BYO) courier accounts</span>
                 </div>
               </div>
               <Switch
-                checked={formData.topup_enable}
-                onCheckedChange={(checked) => handleChange("topup_enable", checked)}
+                checked={formData.byo_courier_invoice_enable}
+                onCheckedChange={(checked) => {
+                  handleChange("byo_courier_invoice_enable", checked);
+                  if (!checked) {
+                    setFormData((prev) => ({
+                      ...prev,
+                      byo_courier_pricing_tiers: prev.byo_courier_pricing_tiers.map((tier: any) => ({
+                        ...tier,
+                        price_per_label: 0,
+                      })),
+                    }));
+                  }
+                }}
               />
             </div>
+            {formData.byo_courier_invoice_enable && (
+              <div className="border-t border-slate-100 dark:border-zinc-800 p-3 sm:p-4 bg-white dark:bg-zinc-950 animate-in fade-in slide-in-from-top-2 duration-200">
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
+                  {formData.byo_courier_pricing_tiers.map((tier, index) => {
+                    const label = tier.max_labels !== null
+                      ? `${tier.min_labels}-${tier.max_labels} Labels`
+                      : `More Than ${tier.min_labels - 1} Labels`;
+                    return (
+                      <div key={index} className="space-y-1">
+                        <label className="text-[11px] font-semibold text-slate-600 dark:text-zinc-400 capitalize">{label}</label>
+                        <FormInput
+                          isCompact
+                          icon={DollarSign}
+                          type="number"
+                          step="0.01"
+                          value={tier.price_per_label?.toString() || "0"}
+                          onChange={(val) => handlePricingTierChange(index, Number(val) || 0)}
+                          error={submited && (tier.price_per_label === undefined || tier.price_per_label === null || tier.price_per_label.toString().trim() === "")}
+                          errormsg="Required"
+                        />
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
+          </div>
+
+          <div className="space-y-3">
+            {(() => {
+              const couriersList = [
+                {
+                  id: "direct_freight",
+                  name: "Direct Freight Express",
+                  activeKey: "direct_freight_active" as const,
+                  logo: directFreightLogo,
+                  displayName: "Direct Freight Express",
+                  courierKey: "DirectFreight"
+                },
+                {
+                  id: "AusPost",
+                  name: "Auspost Tranzit Group",
+                  activeKey: "auspost_active" as const,
+                  logo: auspostLogo,
+                  displayName: "Auspost Tranzit Group",
+                  courierKey: "AusPost"
+                },
+                {
+                  id: "couriersplease",
+                  name: "Courier Please",
+                  activeKey: "couriersplease_active" as const,
+                  logo: courierspleaseLogo,
+                  displayName: "Courier Please",
+                  courierKey: "CouriersPlease"
+                },
+                // {
+                //   id: "mypostbusiness",
+                //   name: "MyPost Business",
+                //   activeKey: "mypostbusiness_active" as const,
+                //   logo: "https://api.tranzit.digisite.net/assets/img/couriers/aus_post_logo_small.png",
+                //   displayName: "MyPost Business",
+                //   courierKey: "MyPostBusiness"
+                // },
+                {
+                  // id: "pallet",
+                  name: "Pallet Tranzit Group",
+                  activeKey: "pallet_active" as const,
+                  logo: Favicon,
+                  displayName: "Pallet Tranzit Group",
+                  courierKey: "Pallet"
+                }
+              ];
+
+              return couriersList.map((courier) => {
+                const isActive = formData[courier.activeKey] === 1;
+
+                return (
+                  <div
+                    key={courier.id}
+                    className={cn(
+                      "rounded-xl border transition-all duration-200 overflow-hidden",
+                      isActive
+                        ? "border-slate-200 dark:border-zinc-800 bg-white dark:bg-zinc-950/40 shadow-xs"
+                        : "border-slate-100 dark:border-zinc-900 bg-slate-50/50 dark:bg-zinc-900/10 opacity-70"
+                    )}
+                  >
+                    {/* Header */}
+                    <div
+                      className="px-3 sm:px-4 py-2.5 flex items-center justify-between select-none"
+                    >
+                      <div className="flex items-center gap-3">
+                        <div className="flex items-center justify-center w-14 h-8 bg-slate-50 dark:bg-zinc-900 rounded-md p-1">
+                          <img src={courier.logo} className="max-h-full max-w-full object-contain" alt={courier.name} />
+                        </div>
+                        <span className="text-sm font-bold text-slate-800 dark:text-zinc-200">{courier.displayName}</span>
+                      </div>
+
+                      <div className="flex items-center gap-3.5">
+                        {/* Toggle Switch */}
+                        <Switch
+                          checked={isActive}
+                          onCheckedChange={(checked) => {
+                            const newActive = checked ? 1 : 0;
+                            handleChange(courier.activeKey, newActive);
+                            if (!checked) {
+                              setFormData((prev) => {
+                                const resetCharges = (chargesArr: any[]) => {
+                                  const arr = Array.isArray(chargesArr) ? [...chargesArr] : [];
+                                  const index = arr.findIndex((item: any) => item.courier === courier.courierKey);
+                                  if (index !== -1) {
+                                    const resetObj: any = { courier: courier.courierKey };
+                                    WEIGHT_TIERS.forEach((tier) => {
+                                      resetObj[tier.key] = 0;
+                                    });
+                                    arr[index] = resetObj;
+                                  }
+                                  return arr;
+                                };
+                                return {
+                                  ...prev,
+                                  markup_charges: resetCharges(prev.markup_charges),
+                                  pickup_charges: resetCharges(prev.pickup_charges)
+                                };
+                              });
+                            }
+                          }}
+                        />
+                      </div>
+                    </div>
+
+                    {/* Content (Expanded only when active) */}
+                    {isActive && (
+                      <div className="border-t border-slate-100 dark:border-zinc-800 p-3 sm:p-4 bg-white dark:bg-zinc-950 animate-in fade-in slide-in-from-top-2 duration-200">
+                        {renderChargeTable(courier.courierKey)}
+                      </div>
+                    )}
+                  </div>
+                );
+              });
+            })()}
+          </div>
+
+          {/* Account Settings */}
+          <div className="p-3 sm:p-4 rounded-xl border border-primary/20 dark:border-primary/50 bg-primary/5 dark:bg-primary/10 flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className="w-8 h-8 rounded-lg bg-primary text-white flex items-center justify-center">
+                <Wallet className="w-4 h-4" />
+              </div>
+              <div>
+                <span className="text-sm font-bold">Enable Wallet Top-up</span>
+                <p className="my-0 text-[10px] text-primary font-medium">Allow customer to add funds to balance</p>
+              </div>
+            </div>
+            <Switch
+              checked={formData.topup_enable}
+              onCheckedChange={(checked) => handleChange("topup_enable", checked)}
+            />
           </div>
         </div>
       </div>

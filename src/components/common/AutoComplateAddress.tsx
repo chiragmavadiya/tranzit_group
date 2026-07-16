@@ -25,7 +25,7 @@ interface PlaceAutocompleteProps extends FormInputProps {
     onPlaceSelect: (data: AddressData) => void
 }
 
-export const PlaceAutocomplete = ({ onPlaceSelect, ...rest }: PlaceAutocompleteProps) => {
+export const PlaceAutocomplete = ({ onPlaceSelect, value, ...rest }: PlaceAutocompleteProps) => {
     // 1. Fix the 'never' type error by adding the Google Autocomplete type
     const [placeAutocomplete, setPlaceAutocomplete] = useState<google.maps.places.Autocomplete | null>(null);
     const inputRef = useRef<HTMLInputElement>(null);
@@ -101,15 +101,17 @@ export const PlaceAutocomplete = ({ onPlaceSelect, ...rest }: PlaceAutocompleteP
     }, [onPlaceSelect, placeAutocomplete]);
 
     return (
-        <div className="autocomplete-container w-full">
+        <div className="autocomplete-container w-full relative">
             <FormInput
                 ref={inputRef}
                 placeholder="Search street address"
                 className="address-input"
                 icon={Search}
                 autoFocus={false}
+                value={value}
                 {...rest}
             />
+            {/* {value && <CircleX className='absolute h-4 w-4 top-1/2 text-gray-400 right-2' />} */}
         </div>
     );
 };

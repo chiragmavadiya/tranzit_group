@@ -2,6 +2,10 @@ import { cn } from '@/lib/utils';
 import { BOOK_PICKUP_TABS } from '../constants/book-pickup.constants';
 import type { BookPickupTabType } from '../constants/book-pickup.constants';
 import { useBookPickupCounts } from '../hooks/useBookPickup';
+import ModuleTabs from '@/components/common/ModuleTabs';
+import { LayoutGroup } from 'framer-motion';
+
+import { FormSelect } from '@/features/orders/components/OrderFormUI';
 
 interface BookPickupTabsProps {
     activeTab: BookPickupTabType;
@@ -13,36 +17,52 @@ export function BookPickupTabs({ activeTab, onTabChange, className }: BookPickup
     const { data: countsData } = useBookPickupCounts();
 
     return (
-        <nav className={cn("flex space-x-6 h-full items-end", className)} aria-label="Book Pickup Tabs">
-            {BOOK_PICKUP_TABS.map((tab) => {
-                const isActive = activeTab === tab.id;
-                const count = tab.id === 'new'
-                    ? (countsData?.data?.new ?? 0)
-                    : (countsData?.data?.booked ?? 0);
+        <>
+            <LayoutGroup id="book-pickup-tabs">
+                <nav className={cn("hidden tablet:flex h-full items-end gap-6", className)} aria-label="Book Pickup Tabs">
+                    {BOOK_PICKUP_TABS.map((tab) => {
+                        const isActive = activeTab === tab.id;
+                        const count = tab.id === 'new'
+                            ? (countsData?.data?.new ?? 0)
+                            : (countsData?.data?.booked ?? 0);
 
-                return (
-                    <button
-                        key={tab.id}
-                        onClick={() => onTabChange(tab.id as BookPickupTabType)}
-                        className={cn(
-                            "h-10 px-6 border font-semibold text-[13px] rounded-t-md transition-all duration-200 relative flex items-center gap-2 outline-none whitespace-nowrap",
-                            isActive
-                                ? "border-gray-200 border-b-white text-primary dark:border-zinc-800 dark:border-b-zinc-950"
-                                : "border-transparent text-gray-500 dark:text-zinc-400 hover:text-gray-700 dark:hover:text-zinc-200 hover:border-gray-200 dark:hover:border-zinc-600"
-                        )}
-                    >
-                        {tab.label}
-                        <span className={cn(
-                            "px-1.5 py-0.5 text-[10px] rounded-full transition-all duration-300",
-                            isActive
-                                ? "bg-primary/10 text-primary"
-                                : "bg-gray-100 dark:bg-zinc-800 text-gray-400 dark:text-zinc-500"
-                        )}>
-                            {count}
-                        </span>
-                    </button>
-                );
-            })}
-        </nav>
+                        return (
+                            <ModuleTabs
+                                key={tab.id}
+                                tab={tab.id}
+                                tabKey={tab.label}
+                                onTabChange={(tabId) => onTabChange(tabId as BookPickupTabType)}
+                                isActive={isActive}
+                                count={Number(count)}
+                            />
+                        );
+                    })}
+                </nav>
+            </LayoutGroup>
+
+            <div className="flex tablet:hidden h-full items-center px-1">
+                <FormSelect
+                    value={activeTab}
+                    onValueChange={(val) => {
+                        if (val) onTabChange(val as BookPickupTabType);
+                    }}
+                    options={BOOK_PICKUP_TABS.map((tab) => {
+                        const count = tab.id === 'new'
+                            ? (countsData?.data?.new ?? 0)
+                            : (countsData?.data?.booked ?? 0);
+                        return {
+                            label: `${tab.label} (${count})`,
+                            value: tab.id,
+                        };
+                    })}
+                    placeholder="Select tab"
+                    allowClear={false}
+                    searchdisable={true}
+                    className="w-[160px]"
+                    selectClassName="h-8 [&_input]:text-[12px]! font-semibold"
+                    optionClassName="text-[12px]!"
+                />
+            </div>
+        </>
     );
 }

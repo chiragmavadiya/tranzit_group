@@ -1,14 +1,19 @@
-import { useState, useMemo, useCallback } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useState, useMemo, useCallback, useEffect } from 'react';
+import { useNavigate, useSearchParams } from 'react-router-dom';
+import { format, parse, isValid } from 'date-fns';
 import { useAppSelector } from '@/hooks/store.hooks';
+import { useDebounce } from '@/hooks/useDebounce';
 import { InvoiceStats } from '../components/InvoiceStats';
 import { InvoiceFilters } from '../components/InvoiceFilters';
 import { InvoiceTable } from '../components/InvoiceTable';
 import { useAdminInvoices, useCustomerInvoices, useExportAdminInvoices, useExportCustomerInvoices, useDeleteAdminInvoice, useRemindAdminInvoice, useDownloadAdminInvoice, useDownloadCustomerInvoice } from '../hooks/useInvoices';
 import { ConformationModal } from '@/components/common/ConformationModal';
+import type { DateFilterValue } from '@/components/common/DateFilter/types';
 
 export default function InvoicesPage() {
+  const [searchParams, setSearchParams] = useSearchParams();
   const [searchTerm, setSearchTerm] = useState('');
+  const debouncedSearchTerm = useDebounce(searchTerm, 500);
   const [pageSize, setPageSize] = useState(25);
   const [page, setPage] = useState(1);
   const [selectedCustomer, setSelectedCustomer] = useState('');
@@ -18,18 +23,129 @@ export default function InvoicesPage() {
   const isAdmin = useMemo(() => role === 'admin', [role]);
   const navigate = useNavigate();
 
+  // Helper date parsing and formatting methods matching ReportsPage reference
+  const parseLocalDate = useCallback((dateStr?: string | null) => {
+    if (!dateStr) return undefined;
+    const parts = dateStr.includes('/') ? dateStr.split('/') : dateStr.split('-');
+    if (parts.length === 3) {
+      const day = parseInt(parts[0], 10);
+      const month = parseInt(parts[1], 10) - 1; // 0-based
+      const year = parseInt(parts[2], 10);
+      return new Date(year, month, day);
+    }
+    return undefined;
+  }, []);
+
+  const initialDateFilter = useMemo<DateFilterValue>(() => {
+    const sDate = parseLocalDate(searchParams.get('start_date'));
+    const eDate = parseLocalDate(searchParams.get('end_date'));
+    if (sDate && eDate) {
+      return {
+        type: 'custom',
+        from: format(sDate, 'dd/MM/yyyy'),
+        to: format(eDate, 'dd/MM/yyyy'),
+        label: `${format(sDate, 'dd MMM yyyy')} - ${format(eDate, 'dd MMM yyyy')}`,
+      };
+    }
+    return {
+      type: 'custom',
+      from: '',
+      to: '',
+      label: 'All Time',
+    };
+  }, [searchParams, parseLocalDate]);
+
+  const [dateRange, setDateRange] = useState<DateFilterValue>(() => initialDateFilter);
+
+  // Synchronize date range filters with URL searchParams
+  useEffect(() => {
+    const sDate = parseLocalDate(searchParams.get('start_date'));
+    const eDate = parseLocalDate(searchParams.get('end_date'));
+    if (sDate && eDate) {
+      const fromStr = format(sDate, 'dd/MM/yyyy');
+      const toStr = format(eDate, 'dd/MM/yyyy');
+
+      if (dateRange.from !== fromStr || dateRange.to !== toStr) {
+        setDateRange({
+          type: 'custom',
+          from: fromStr,
+          to: toStr,
+          label: `${format(sDate, 'dd MMM yyyy')} - ${format(eDate, 'dd MMM yyyy')}`,
+        });
+      }
+    } else {
+      if (dateRange.from !== '' || dateRange.to !== '') {
+        setDateRange({
+          type: 'custom',
+          from: '',
+          to: '',
+          label: 'All Time',
+        });
+      }
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [searchParams, parseLocalDate]);
+
+  useEffect(() => {
+    setSearchParams((prev) => {
+      let hasChanged = false;
+
+      const currentStartDate = prev.get('start_date') || undefined;
+      let newStartDate: string | undefined;
+      if (dateRange.from) {
+        const parsedFrom = parse(dateRange.from, 'dd/MM/yyyy', new Date());
+        if (isValid(parsedFrom)) {
+          newStartDate = format(parsedFrom, 'dd-MM-yyyy');
+        }
+      }
+
+      if (currentStartDate !== newStartDate) {
+        if (newStartDate) {
+          prev.set('start_date', newStartDate);
+        } else {
+          prev.delete('start_date');
+        }
+        hasChanged = true;
+      }
+
+      const currentEndDate = prev.get('end_date') || undefined;
+      let newEndDate: string | undefined;
+      if (dateRange.to) {
+        const parsedTo = parse(dateRange.to, 'dd/MM/yyyy', new Date());
+        if (isValid(parsedTo)) {
+          newEndDate = format(parsedTo, 'dd-MM-yyyy');
+        }
+      }
+
+      if (currentEndDate !== newEndDate) {
+        if (newEndDate) {
+          prev.set('end_date', newEndDate);
+        } else {
+          prev.delete('end_date');
+        }
+        hasChanged = true;
+      }
+
+      return hasChanged ? prev : prev;
+    }, { replace: true });
+  }, [dateRange, setSearchParams]);
+
   // Connect to API hooks
   const { data: adminData, isLoading: isAdminLoading } = useAdminInvoices({
-    search: searchTerm || undefined,
+    search: debouncedSearchTerm || undefined,
     page: page,
     per_page: pageSize,
     customer: selectedCustomer || undefined,
+    date_from: dateRange.from || undefined,
+    date_to: dateRange.to || undefined,
   }, isAdmin);
 
   const { data: customerData, isLoading: isCustomerLoading } = useCustomerInvoices({
-    search: searchTerm || undefined,
+    search: debouncedSearchTerm || undefined,
     page: page,
     per_page: pageSize,
+    date_from: dateRange.from || undefined,
+    date_to: dateRange.to || undefined,
   }, !isAdmin);
 
   const deleteMutation = useDeleteAdminInvoice();
@@ -67,21 +183,22 @@ export default function InvoicesPage() {
 
   const handleExport = useCallback((format: string) => {
     if (isAdmin) {
-      adminExportMutation.mutate({ format, search: searchTerm || undefined, customer: selectedCustomer || undefined });
+      adminExportMutation.mutate({
+        format,
+        search: debouncedSearchTerm || undefined,
+        customer: selectedCustomer || undefined,
+        date_from: dateRange.from || undefined,
+        date_to: dateRange.to || undefined,
+      });
     } else {
-      customerExportMutation.mutate({ format, search: searchTerm || undefined });
+      customerExportMutation.mutate({
+        format,
+        search: debouncedSearchTerm || undefined,
+        date_from: dateRange.from || undefined,
+        date_to: dateRange.to || undefined,
+      });
     }
-  }, [isAdmin, adminExportMutation, customerExportMutation, searchTerm, selectedCustomer]);
-
-  // Transform the API summary object to match InvoiceStats expected props
-  // const stats = data?.summary ? {
-  //   total_invoices: data.summary.total_invoice,
-  //   invoice_pending: data.summary.invoice_pending,
-  //   invoice_partial: data.summary.invoice_partial,
-  //   invoice_paid: data.summary.invoice_paid,
-  //   amount_pending: data.summary.amount_pending,
-  //   amount_paid: data.summary.amount_paid,
-  // } : undefined;
+  }, [isAdmin, adminExportMutation, customerExportMutation, debouncedSearchTerm, selectedCustomer, dateRange]);
 
   const handleSearchChange = useCallback((value: string) => {
     setSearchTerm(value);
@@ -106,14 +223,14 @@ export default function InvoicesPage() {
   }, [isAdmin, navigate]);
 
   return (
-    <div className="flex flex-col flex-1 gap-4 p-page-padding min-h-0 animate-in fade-in slide-in-from-bottom-2 duration-500 bg-slate-50/30 dark:bg-zinc-950/30">
+    <div className="flex flex-col flex-1 gap-4 p-page-padding animate-in fade-in slide-in-from-bottom-2 duration-500 bg-slate-50/30 dark:bg-zinc-950/30 overflow-y-auto">
 
       {/* Stats Cards */}
       <InvoiceStats stats={data?.summary} />
 
       {/* Main Content Area */}
-      <div className="flex-1 flex flex-col min-h-0 bg-white dark:bg-zinc-900 rounded-xl shadow-sm p-0">
-        {isAdmin && <InvoiceFilters
+      <div className="bg-white dark:bg-zinc-900 rounded-xl shadow-sm p-0 flex-none h-auto">
+        <InvoiceFilters
           searchTerm={searchTerm}
           onSearchChange={handleSearchChange}
           pageSize={pageSize.toString()}
@@ -121,7 +238,9 @@ export default function InvoicesPage() {
           isAdmin={isAdmin}
           selectedCustomer={selectedCustomer}
           onCustomerChange={handleCustomerChange}
-        />}
+          dateRange={dateRange}
+          onDateRangeChange={setDateRange}
+        />
 
         <InvoiceTable
           invoices={data?.data || []}

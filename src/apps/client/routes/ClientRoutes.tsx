@@ -2,10 +2,10 @@ import { Routes, Route, Navigate, useParams } from "react-router-dom";
 import ProtectedRoute from "@/router/ProtectedRoute";
 import { lazy, Suspense } from "react";
 import Layout from "@/layout";
-import { Loader2 } from "lucide-react";
 import { useAppSelector } from "@/hooks/store.hooks";
 import { getFirstAllowedSettingsPath } from "@/utils/permission";
 import EnquiryListPage from "@/features/enquiry/pages/EnquiryList";
+import PageLoading from "@/components/common/Loader";
 // import IntegrationsPage from "@/features/integrations/pages/IntegrationPage";
 
 // Lazy load page components
@@ -47,7 +47,7 @@ function SettingsIndexRedirect() {
 const withSuspense = (Component: React.ReactNode) => (
   <Suspense
     fallback={<div className="flex items-center justify-center h-full w-full">
-      <Loader2 className="animate-spin text-primary h-10 w-10" />
+      <PageLoading />
     </div>}>
     {Component}
   </Suspense>

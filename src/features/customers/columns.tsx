@@ -61,12 +61,14 @@ const StatusSwitch = ({ customer }: { customer: Customer }) => {
 export const getCustomerColumns = (
     onEdit: (id: string | number) => void,
     handleDelete: (id: string | number) => void,
-    navigate: any
+    navigate: any,
+    onChangePassword?: (id: string | number) => void
 ): Column<Customer>[] => [
         {
             key: 'name',
             header: 'NAME',
             sticky: "left",
+            width: "260px",
             cell: (_, customer) => {
                 const fullName = `${customer.first_name} ${customer.last_name}`;
 
@@ -88,43 +90,51 @@ export const getCustomerColumns = (
         {
             key: 'mobile',
             header: 'MOBILE',
+            width: '140px',
             cell: (_, customer) => <span className="text-xs text-slate-600">{customer.personal_mobile || customer.office_number || '-'}</span>,
         },
         {
             key: 'business_name',
             header: 'BUSINESS NAME',
+            width: '200px',
             // cell: (_, customer) => <span className="text-sm text-slate-600">{customer.business_name}</span>,
         },
         {
             key: 'id',
             header: 'CUSTOMER ID',
+            width: '160px',
             cell: (val) => <NavLink className='text-sm font-semibold text-primary hover:underline' to={`/admin/customers/${val}`}>{val}</NavLink>
             // cell: (_, customer) => <span className="text-sm font-mono text-slate-600">{customer.id}</span>,
         },
         {
             key: 'suburb',
             header: 'SUBURB',
+            width: '140px',
             // cell: (_, customer) => <span className="text-sm text-slate-600">{customer.suburb}</span>,
         },
         {
             key: 'state',
             header: 'STATE',
+            width: '100px',
             // cell: (_, customer) => <span className="text-sm text-slate-600">{customer.state}</span>,
         },
         {
             key: 'status',
             header: 'STATUS',
+            width: '150px',
             cell: (_, customer) => <StatusSwitch customer={customer} />,
         },
         {
             key: 'created_at',
             header: 'CREATED AT',
+            width: '160px',
             // cell: (_, customer) => <span className="text-sm text-slate-600">{customer.created_at}</span>,
         },
         {
             key: 'actions',
-            header: 'ACTIONS',
+            header: '',
             sticky: "right",
+            disableToggle: true,
             cell: (_, customer) => {
                 const menus = [
                     {
@@ -134,6 +144,10 @@ export const getCustomerColumns = (
                     {
                         label: "Edit customer",
                         onClick: () => onEdit(customer.id),
+                    },
+                    {
+                        label: "Change password",
+                        onClick: () => onChangePassword?.(customer.id),
                     },
                     {
                         label: "Delete customer",

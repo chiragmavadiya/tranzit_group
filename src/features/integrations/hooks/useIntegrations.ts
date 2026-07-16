@@ -93,6 +93,7 @@ export const useUpdateAdvancedSettings = () => {
             integrationService.updateAdvancedSettings(provider, settings),
         onSuccess: (_, variables) => {
             queryClient.invalidateQueries({ queryKey: QUERY_KEYS.INTEGRATIONS.STATUS(variables.provider) });
+            queryClient.invalidateQueries({ queryKey: QUERY_KEYS.AUTH.USER_DETAILS });
             showToast("Advanced settings updated", "success");
         },
         onError: (error: any) => {
@@ -256,6 +257,20 @@ export const useToggleEbayAutoFulfillment = () => {
         },
         onError: (error: any) => {
             showToast(error.message || "Failed to update eBay Auto-fulfillment status", "error");
+        }
+    });
+};
+
+export const useToggleShopifyAutoFulfillment = () => {
+    const queryClient = useQueryClient();
+    return useMutation({
+        mutationFn: (enabled: boolean) => integrationService.toggleAutoFulfillment(enabled),
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: QUERY_KEYS.INTEGRATIONS.STATUS("shopify") });
+            showToast("Shopify Auto-fulfillment status updated", "success");
+        },
+        onError: (error: any) => {
+            showToast(error.message || "Failed to update Shopify Auto-fulfillment status", "error");
         }
     });
 };

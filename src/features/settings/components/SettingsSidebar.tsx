@@ -4,6 +4,7 @@ import { cn } from '@/lib/utils';
 import { Skeleton } from '@/components/ui/skeleton';
 import type { SettingCategory } from '../types';
 import { Settings2, Mail, Truck, Layout, ShieldCheck, Globe } from "lucide-react";
+import { CustomTooltip } from '@/components/common/CustomTooltip';
 
 interface SettingsSidebarProps {
   categories: SettingCategory[];
@@ -45,7 +46,9 @@ const SettingsSidebar: React.FC<SettingsSidebarProps> = ({ categories, isLoading
         )}>
           <Icon className="w-4 h-4 shrink-0" />
         </div>
-        <span className="truncate">{category.name}</span>
+        <CustomTooltip title={category.name} onlyOnOverflow>
+          <span className="truncate">{category.name}</span>
+        </CustomTooltip>
       </NavLink>
     );
   };

@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { motion } from 'framer-motion';
-import { Edit2, Loader2 } from 'lucide-react';
+import { Edit2, Loader2, Info, Mail } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { FormInput, FormSelect } from '@/features/orders/components/OrderFormUI';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
@@ -34,9 +34,8 @@ export default function AccountSettingsPage() {
   const [isEditingProfile, setIsEditingProfile] = useState(false);
   const [isPasswordOpen, setIsPasswordOpen] = useState(false);
   const [isPlanModalOpen, setIsPlanModalOpen] = useState(false);
-  const [sameAsShipping, setSameAsShipping] = useState(false);
   // const { user } = useAppSelector((state) => state.auth);
-  const { summary } = useAppSelector((state) => state.wallet);
+  // const { summary } = useAppSelector((state) => state.wallet);
   const { is_sub_user, team_access } = useAppSelector((state) => state.auth)
   const canReadWrite = useMemo(() => !is_sub_user || team_access?.permissions?.settings_account_detail === 'full', [is_sub_user, team_access]);
 
@@ -213,22 +212,6 @@ export default function AccountSettingsPage() {
   useEffect(() => {
     const shAddr = profile?.address_detail?.default;
     const billAddr = profile?.address_detail?.billing;
-    // const shAddr = profile?.address_detail?.default || user.addresses?.[0];
-    // const billAddr = profile?.address_detail?.billing || user.addresses?.[0];
-
-    const isIdentical = shAddr && billAddr && (
-      (shAddr.address === billAddr.address) &&
-      (shAddr.unit_number === billAddr.unit_number) &&
-      (shAddr.suburb === billAddr.suburb) &&
-      (shAddr.state === billAddr.state) &&
-      (shAddr.postcode === billAddr.postcode)
-    );
-    setSameAsShipping(!!isIdentical);
-    // firstName: profile?.first_name || user.first_name || '',
-    // lastName: profile?.last_name || user.last_name || '',
-    // email: profile?.personal_email || user.personal_email || user.email || '',
-    // phone: profile?.mobile || user.personal_mobile || user.mobile || '',
-    // companyName: profile?.business_name || user.business_name || '',
 
     const data = {
       firstName: profile?.first_name || '',
@@ -264,36 +247,8 @@ export default function AccountSettingsPage() {
     setBackupData(data);
   }, [profile]);
 
-  useEffect(() => {
-    if (sameAsShipping) {
-      setFormData(prev => ({
-        ...prev,
-        billing_address_info: prev.shipping_address_info,
-        billing_address: prev.shipping_address,
-        billing_unit_number: prev.shipping_unit_number,
-        billing_street_number: prev.shipping_street_number,
-        billing_street_name: prev.shipping_street_name,
-        billing_street_type: prev.shipping_street_type,
-        billing_suburb: prev.shipping_suburb,
-        billing_state: prev.shipping_state,
-        billing_postcode: prev.shipping_postcode,
-      }));
-    }
-  }, [
-    sameAsShipping,
-    formData.shipping_address_info,
-    formData.shipping_address,
-    formData.shipping_unit_number,
-    formData.shipping_street_number,
-    formData.shipping_street_name,
-    formData.shipping_street_type,
-    formData.shipping_suburb,
-    formData.shipping_state,
-    formData.shipping_postcode,
-  ]);
-
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 w-full items-start">
+    <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 w-full items-stretch">
 
       <div className="col-span-12 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
@@ -407,28 +362,134 @@ export default function AccountSettingsPage() {
         </Card>
       </motion.div>
 
-      {/* Balance Card */}
-      <motion.div
-        custom={1}
-        initial="hidden"
-        animate="visible"
-        variants={cardVariants}
-        className="col-span-12 lg:col-span-4 flex h-fit"
-      >
-        <Card className="w-full border-gray-200 shadow-xs">
-          <CardHeader className="flex flex-row items-center justify-between px-6 py-4 border-b border-gray-100 dark:border-zinc-800 bg-slate-50/30 dark:bg-zinc-950 space-y-0 rounded-t-md">
-            <CardTitle className="text-base font-medium text-gray-800 dark:text-zinc-200">Balance</CardTitle>
-          </CardHeader>
-          <CardContent className="p-6 pt-6 flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <span className="text-[13px] font-semibold text-slate-500">Current Balance:</span>
-              <span className="text-[13px] font-bold text-emerald-700 bg-emerald-50 dark:bg-emerald-950/50 dark:text-emerald-400 px-2 py-0.5 rounded-sm">
-                {new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(Number(summary?.wallet_balance || 0))}
-              </span>
-            </div>
-          </CardContent>
-        </Card>
-      </motion.div>
+      {/* Balance & Weekly Label Usage Container */}
+      <div className="col-span-12 lg:col-span-4 flex">
+        {/* Balance Card */}
+        {/* <motion.div
+          custom={1}
+          initial="hidden"
+          animate="visible"
+          variants={cardVariants}
+          className="w-full flex h-fit"
+        >
+          <Card className="w-full border-gray-200 shadow-xs gap-0">
+            <CardHeader className="flex flex-row items-center justify-between px-6 py-4 border-b border-gray-100 dark:border-zinc-800 bg-slate-50/30 dark:bg-zinc-950 space-y-0 rounded-t-md">
+              <CardTitle className="text-base font-medium text-gray-800 dark:text-zinc-200">Balance</CardTitle>
+            </CardHeader>
+            <CardContent className="p-6 pt-6 flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <span className="text-[13px] font-semibold text-slate-500">Current Balance:</span>
+                <span className="text-[13px] font-bold text-emerald-700 bg-emerald-50 dark:bg-emerald-950/50 dark:text-emerald-400 px-2 py-0.5 rounded-sm">
+                  {new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(Number(summary?.wallet_balance || 0))}
+                </span>
+              </div>
+            </CardContent>
+          </Card>
+        </motion.div> */}
+
+        {/* Weekly Label Usage Card */}
+        {profile?.weekly_label_usage && (
+          <motion.div
+            custom={2}
+            initial="hidden"
+            animate="visible"
+            variants={cardVariants}
+            className="w-full flex"
+          >
+            <Card className="w-full border-gray-200 shadow-xs rounded-md gap-0 flex flex-col h-full hover:shadow-md transition-shadow duration-300">
+              <CardHeader className="flex flex-row items-center justify-between px-6 py-4 border-b border-gray-100 dark:border-zinc-800 bg-slate-50/30 dark:bg-zinc-950 space-y-0 rounded-t-md">
+                <CardTitle className="text-base font-medium text-gray-800 dark:text-zinc-200">Weekly Label Usage</CardTitle>
+                <span className="text-[10px] font-bold text-slate-400 dark:text-zinc-500 uppercase tracking-wide">
+                  {profile.weekly_label_usage.week_start} - {profile.weekly_label_usage.week_end}
+                </span>
+              </CardHeader>
+              <CardContent className="p-6 space-y-2 flex-1 flex flex-col justify-between">
+                {/* Metrics Row */}
+                <div className="flex items-start justify-between">
+                  <div>
+                    <p className="text-[10px] font-bold text-slate-400 dark:text-zinc-500 uppercase tracking-wide mb-1">
+                      Labels Printed
+                    </p>
+                    <h3 className="my-0 text-xl font-black text-slate-800 dark:text-zinc-100 tracking-tight leading-none">
+                      {profile.weekly_label_usage.total_labels_printed}
+                    </h3>
+                  </div>
+                  <div className="text-right">
+                    <p className="text-[10px] font-bold text-slate-400 dark:text-zinc-500 uppercase tracking-wide mb-1">
+                      Current Rate
+                    </p>
+                    <div className="flex items-center gap-1.5 justify-end">
+                      <span className="text-[10px] font-bold text-primary-600 bg-primary/5 dark:bg-primary/10 border border-primary/20 px-2 py-0.5 rounded-full">
+                        Tier {profile.weekly_label_usage.current_tier.label}
+                      </span>
+                      <span className="text-sm font-black text-slate-800 dark:text-zinc-200">
+                        ${Number(profile.weekly_label_usage.current_tier.rate).toFixed(2)}/label
+                      </span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Print Breakdown */}
+                <div className="grid grid-cols-2 gap-3 pt-2 border-t border-slate-100 dark:border-zinc-800/80">
+                  <div className="p-3 rounded-xl bg-slate-50/50 dark:bg-zinc-900/30 border border-slate-100/50 dark:border-zinc-800/50">
+                    <span className="text-[9px] font-bold text-slate-400 dark:text-zinc-500 uppercase tracking-wide">
+                      BYO Labels
+                    </span>
+                    <p className="my-0 text-base font-black text-slate-700 dark:text-zinc-300 mt-0.5 leading-none">
+                      {profile.weekly_label_usage.byo_labels_printed}
+                    </p>
+                  </div>
+                  <div className="p-3 rounded-xl bg-slate-50/50 dark:bg-zinc-900/30 border border-slate-100/50 dark:border-zinc-800/50">
+                    <span className="text-[9px] font-bold text-slate-400 dark:text-zinc-500 uppercase tracking-wide">
+                      Tranzit Labels
+                    </span>
+                    <p className="my-0  text-base font-black text-slate-700 dark:text-zinc-300 mt-0.5 leading-none">
+                      {profile.weekly_label_usage.tr_labels_printed}
+                    </p>
+                  </div>
+                </div>
+
+                {/* Next Tier Progress */}
+                {profile.weekly_label_usage.next_tier ? (
+                  <div className="space-y-2 pt-2 border-t border-slate-100 dark:border-zinc-800/80">
+                    <div className="flex items-center justify-between text-xs">
+                      <span className="font-semibold text-slate-500">Progress to Next Tier</span>
+                      <span className="font-bold text-slate-700 dark:text-zinc-300">
+                        {profile.weekly_label_usage.labels_needed_for_next_tier} more for ${Number(profile.weekly_label_usage.next_tier.rate).toFixed(2)} rate
+                      </span>
+                    </div>
+                    <div className="w-full h-2 bg-slate-100 dark:bg-zinc-800 rounded-full overflow-hidden">
+                      <div
+                        className="h-full bg-gradient-to-r from-primary to-emerald-500 rounded-full transition-all duration-500"
+                        style={{
+                          width: `${Math.min(
+                            100,
+                            Math.round(
+                              (Number(profile.weekly_label_usage.total_labels_printed) /
+                                (Number(profile.weekly_label_usage.current_tier.max) || 1)) *
+                              100
+                            )
+                          )}%`,
+                        }}
+                      />
+                    </div>
+                    <div className="flex items-center justify-between text-[10px] text-slate-500 font-bold">
+                      <span>Tier {profile.weekly_label_usage.current_tier.label}</span>
+                      <span>Tier {profile.weekly_label_usage.next_tier.label}</span>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="pt-2 border-t border-slate-100 dark:border-zinc-800/80 text-center py-2 bg-emerald-50/50 dark:bg-emerald-950/20 rounded-xl border border-emerald-100/50 dark:border-emerald-900/30">
+                    <p className="text-xs font-black text-emerald-700 dark:text-emerald-400 m-0 uppercase tracking-wide">
+                      🎉 You are on the best rate tier!
+                    </p>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          </motion.div>
+        )}
+      </div>
       <motion.div
         custom={3}
         initial="hidden"
@@ -468,7 +529,7 @@ export default function AccountSettingsPage() {
                       className="w-full col-span-12"
                       inputClassName="w-full col-span-12"
                       isFullWidth
-                      disabled={!isEditingProfile || sameAsShipping}
+                      disabled={!isEditingProfile}
                       value={formData.billing_address_info}
                       onChange={(val) => { handleInputChange(val, 'billing_address_info'); setDisabledAddress(false) }}
                       onPlaceSelect={(opt) => {
@@ -493,7 +554,7 @@ export default function AccountSettingsPage() {
                     <FormInput
                       label="Unit Number"
                       placeholder='Unit Number'
-                      disabled={!isEditingProfile || sameAsShipping || disabledAddress}
+                      disabled={!isEditingProfile}
                       value={formData.billing_unit_number}
                       onChange={(val) => handleInputChange(val, 'billing_unit_number')}
                     />
@@ -503,9 +564,9 @@ export default function AccountSettingsPage() {
                       label="Street"
                       placeholder='Street Address'
                       required
-                      disabled={!isEditingProfile || sameAsShipping || disabledAddress}
+                      disabled={!isEditingProfile || disabledAddress}
                       value={formData.billing_address}
-                      onChange={(val) => handleInputChange(val, 'billing_address')}
+                      onChange={(val) => { handleInputChange(val, 'billing_address'); handleInputChange(val, 'billing_street_name'); }}
                       error={submit && !formData.billing_address}
                       errormsg="Please enter street address"
                     />
@@ -516,7 +577,7 @@ export default function AccountSettingsPage() {
                       label="Suburb"
                       placeholder='Suburb'
                       required
-                      disabled={!isEditingProfile || sameAsShipping || disabledAddress}
+                      disabled={!isEditingProfile || disabledAddress}
                       value={formData.billing_suburb}
                       onChange={(val) => handleInputChange(val, 'billing_suburb')}
                       error={submit && !formData.billing_suburb}
@@ -529,7 +590,7 @@ export default function AccountSettingsPage() {
                       placeholder='Select State'
                       required
                       options={STATES}
-                      disabled={!isEditingProfile || sameAsShipping || disabledAddress}
+                      disabled={!isEditingProfile || disabledAddress}
                       value={formData.billing_state}
                       onValueChange={(val) => handleInputChange(val, 'billing_state')}
                       error={submit && !formData.billing_state}
@@ -542,7 +603,7 @@ export default function AccountSettingsPage() {
                       label="Postcode"
                       placeholder='Postcode'
                       required
-                      disabled={!isEditingProfile || sameAsShipping || disabledAddress}
+                      disabled={!isEditingProfile || disabledAddress}
                       value={formData.billing_postcode}
                       onChange={(val) => handleInputChange(val, 'billing_postcode')}
                       error={submit && !formData.billing_postcode}
@@ -554,10 +615,26 @@ export default function AccountSettingsPage() {
 
               {/* Pickup Address Column */}
               <div className="space-y-4">
-                <div className="border-b pb-2">
+                <div className="flex items-center justify-between border-b pb-2">
                   <h4 className="text-base font-semibold text-gray-700 dark:text-zinc-300">
                     Pickup Address
                   </h4>
+                </div>
+
+                <div className="bg-blue-50/40 dark:bg-blue-950/10 border border-blue-100/80 dark:border-blue-900/30 rounded-lg p-3.5 flex items-start gap-3 shadow-2xs">
+                  <div className="p-1 rounded-md bg-blue-100/80 dark:bg-blue-950/60 text-blue-600 dark:text-blue-400 shrink-0">
+                    <Info className="w-4 h-4" />
+                  </div>
+                  <div className="text-[13px] text-slate-600 dark:text-zinc-400 leading-relaxed font-medium flex gap-2 items-center">
+                    To change the Pickup address, please email us at{' '}
+                    <a
+                      href="mailto:info@tranzitgroup.com.au"
+                      className="inline-flex items-center gap-1 font-semibold text-blue-600 dark:text-blue-400 hover:underline transition-all"
+                    >
+                      <Mail className="w-3.5 h-3.5 inline" />
+                      info@tranzitgroup.com.au
+                    </a>
+                  </div>
                 </div>
                 <div className="grid grid-cols-12 gap-x-4 gap-y-3.5">
                   <div className="col-span-12">

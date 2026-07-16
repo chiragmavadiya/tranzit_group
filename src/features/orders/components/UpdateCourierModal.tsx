@@ -138,7 +138,7 @@ const UpdateCourierModal = (props: UpdateCourierModalProps) => {
             open={open}
             onOpenChange={onOpenChange}
             title={`Update carrier and product`}
-            contentClass='min-w-5xl'
+            contentClass="w-[95vw] sm:max-w-none md:w-full md:max-w-3xl md:min-w-[720px] lg:min-w-[850px] lg:max-w-4xl"
             submitText={'Update'}
             onSubmit={handleSubmit}
             isLoading={updateCourier.isPending}

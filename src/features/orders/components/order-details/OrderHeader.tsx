@@ -9,10 +9,12 @@ import type { OrderDetailData } from '../../types/order-details.types'
 import { cn } from '@/lib/utils'
 import { Order_status_styles } from '../../constants'
 import { useAppSelector } from '@/hooks/store.hooks'
-import { FormSelect } from '../OrderFormUI'
+import { FormSelect, FormInput } from '../OrderFormUI'
 import { useCustomers } from '@/features/customers/hooks/useCustomers'
 import { CustomTooltip } from '@/components/common/CustomTooltip'
 import type { AddressData } from '../../types'
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog'
+import { useAddManualTrackingNumbers } from '../../hooks/useOrders'
 
 
 interface OrderHeaderProps {
@@ -33,7 +35,7 @@ interface OrderHeaderProps {
   showCancelModal: boolean
   showArchiveModal: boolean
   setShowArchiveModal: React.Dispatch<React.SetStateAction<boolean>>
-  requiresManualLabel: boolean
+  requiresManualLabel?: boolean
   // for clone
   itemsData: any;
   courierData: any;
@@ -45,6 +47,8 @@ interface OrderHeaderProps {
   insuranceSelected: boolean;
   deliveryInstructions: string
   canReadWrite: boolean;
+  activeSettings: Record<string, boolean>;
+  quoteData?: any;
 }
 
 
@@ -75,11 +79,43 @@ export const OrderHeader: React.FC<OrderHeaderProps> = ({
   insuranceSelected,
   deliveryInstructions,
   canReadWrite = true,
+  activeSettings,
+  quoteData
 }) => {
-
   const navigate = useNavigate()
   const { role } = useAppSelector((state) => state.auth)
   const [showConfirm, setShowConfirm] = useState(false)
+
+  const [isTrackingModalOpen, setIsTrackingModalOpen] = useState(false)
+  const [trackingNumber, setTrackingNumber] = useState('')
+  const [trackingError, setTrackingError] = useState(false)
+
+  const addTrackingMutation = useAddManualTrackingNumbers()
+
+  const handleOpenTrackingModal = () => {
+    setTrackingNumber('')
+    setTrackingError(false)
+    setIsTrackingModalOpen(true)
+  }
+
+  const handleTrackingSubmit = (e: React.FormEvent) => {
+    e.preventDefault()
+    if (!trackingNumber.trim()) {
+      setTrackingError(true)
+      return
+    }
+
+    addTrackingMutation.mutate({
+      orderNumber: orderDetail.order_number,
+      data: {
+        tracking_number: trackingNumber.trim()
+      }
+    }, {
+      onSuccess: () => {
+        setIsTrackingModalOpen(false)
+      }
+    })
+  }
 
   const { data: customersData } = useCustomers({ per_page: 1000 }, role === 'admin' && (orderType === 'create' || orderType === 'consign'));
 
@@ -120,6 +156,10 @@ export const OrderHeader: React.FC<OrderHeaderProps> = ({
       localStorage.setItem('quote_insurance', String(insuranceSelected));
       localStorage.setItem('quote_signature', String(signatureSelected));
       localStorage.setItem('quote_delivery_instructions', String(deliveryInstructions));
+      localStorage.setItem('quote_active_settings', JSON.stringify(activeSettings));
+      if (quoteData?.surcharges && quoteData?.surcharges.length > 0) {
+        localStorage.setItem('quote_surcharges', JSON.stringify(quoteData.surcharges));
+      }
 
     } else {
       localStorage.setItem('order_to_clone', orderDetail.order_number)
@@ -199,6 +239,15 @@ export const OrderHeader: React.FC<OrderHeaderProps> = ({
           )}
           {canReadWrite && orderType !== 'create' && orderType !== 'create-menual' && orderType !== 'return' && (
             <>
+              {role === 'admin' && requiresManualLabel && (
+                <Button
+                  onClick={handleOpenTrackingModal}
+                  className="flex items-center gap-2 border-gray-200 dark:border-zinc-800 text-gray-700 dark:text-zinc-300 font-bold h-8 px-4 text-xs hover:bg-gray-50 dark:hover:bg-zinc-900 transition-colors"
+                  variant="outline"
+                >
+                  Add Tracking number
+                </Button>
+              )}
               {(orderDetail?.order_status_category !== 'new' && orderDetail?.order_status_category !== 'archived') && (
                 <Button
                   variant="outline"
@@ -222,7 +271,7 @@ export const OrderHeader: React.FC<OrderHeaderProps> = ({
               )}
               {(orderDetail?.order_status_category === 'new' || orderDetail?.order_status_category === 'printed' || orderDetail?.status.toLocaleLowerCase() === 'new' || orderDetail?.status.toLowerCase() === 'printed') && (
                 <>
-                  {orderDetail?.order_status_category === 'new' || orderDetail?.status.toLocaleLowerCase() === 'new' || orderDetail?.courier_details?.is_own_courier ? (
+                  {orderDetail?.order_status_category === 'new' || orderDetail?.status.toLocaleLowerCase() === 'new' || (orderDetail?.courier_details?.is_own_courier) ? (
                     <Button
                       variant="outline"
                       onClick={() => setShowArchiveModal(true)}
@@ -230,7 +279,9 @@ export const OrderHeader: React.FC<OrderHeaderProps> = ({
                       disabled={orderDetail?.cancel_request !== null}
                     >
                       <Trash2 className="h-4 w-4" />
-                      {orderDetail?.cancel_request !== null ? 'CANCEL REQUESTED' : 'DELETE ORDER'}
+                      <span>
+                        {orderDetail?.cancel_request !== null ? 'CANCEL REQUESTED' : 'DELETE ORDER'}
+                      </span>
                     </Button>
                   ) : (
                     <Button
@@ -240,12 +291,28 @@ export const OrderHeader: React.FC<OrderHeaderProps> = ({
                       disabled={orderDetail?.cancel_request !== null}
                     >
                       <Trash2 className="h-4 w-4" />
-                      {orderDetail?.cancel_request !== null ? 'CANCEL REQUESTED' : 'DELETE ORDER'}
+                      <span>
+                        {orderDetail?.cancel_request !== null ? 'CANCEL REQUESTED' : 'DELETE ORDER'}
+                      </span>
                     </Button>
                   )}
                 </>
               )}
             </>
+          )}
+          {role === 'admin' && (orderType === 'create' || orderType === 'create-menual') && (
+            <FormSelect
+              label="Customer"
+              placeholder="Select Customer"
+              value={selectedCustomer?.toString() || ''}
+              onValueChange={(val) => setSelectedCustomer(val ? Number(val) : undefined)}
+              options={customersData?.data?.filter((c: any) => c.status_code === "1").map((c: any) => ({
+                value: c.id.toString(),
+                label: `${c.first_name} ${c.last_name} (${c.email})`
+              })) || []}
+              className='w-70'
+              allowClear={false}
+            />
           )}
           <ConformationModal
             open={showCancelModal}
@@ -256,7 +323,7 @@ export const OrderHeader: React.FC<OrderHeaderProps> = ({
                 <p className="text-sm mb-0 font-medium text-slate-900">Are you sure you want to cancel this order?</p>
                 <p className="text-sm mb-0 font-medium text-slate-900"> This action can’t be undone once the cancellation is processed.</p>
                 <div className="my-3 bg-amber-50 dark:bg-amber-900/20 p-3 rounded-lg border border-amber-100 dark:border-amber-900/30">
-                  <p className="mb-0 text-amber-800 dark:text-amber-400 font-semibold text-xs">Important: A $3 cancellation service fee applies to Direct Freight bookings.</p>
+                  <p className="mb-0 text-amber-800 dark:text-amber-400 font-semibold text-xs">Important: A $3 cancellation service fee applies to {orderDetail?.courier_details?.courier || 'Direct Freight'} bookings.</p>
                 </div>
                 <div className="space-y-2">
                   <p className="font-semibold text-slate-900 text-sm mb-0">If the cancellation is successful:</p>
@@ -290,20 +357,6 @@ export const OrderHeader: React.FC<OrderHeaderProps> = ({
             className="max-w-[440px] sm:max-w-[500px]"
           />
 
-          {role === 'admin' && (orderType === "create" || orderType === "create-menual") && (
-            <FormSelect
-              label={(orderType !== "create" && orderType !== "create-menual") ? "" : "Customer"}
-              placeholder="Select Customer"
-              value={selectedCustomer?.toString() || ""}
-              onValueChange={(val) => setSelectedCustomer(val ? Number(val) : undefined)}
-              options={customersData?.data?.map((c: any) => ({
-                value: c.id.toString(),
-                label: `${c.first_name} ${c.last_name} (${c.email})`
-              })) || []}
-              className='w-70'
-              disabled={orderType !== "create" && orderType !== "create-menual"}
-            />
-          )}
         </div>
       </div>
 
@@ -320,13 +373,68 @@ export const OrderHeader: React.FC<OrderHeaderProps> = ({
               <span className="text-gray-700 dark:text-zinc-300">{orderDetail?.created_human}</span>
             </CustomTooltip>
           </div>
-          <Badge variant="secondary" className={cn("border-none rounded-sm px-2 py-0 h-5 uppercase font-bold", Order_status_styles[orderDetail?.status || 'New'])}>
+          <Badge variant="secondary" className={cn("border-none rounded-sm px-2 py-0 h-5 uppercase font-bold", Order_status_styles[orderDetail?.status?.toLocaleLowerCase() || 'New'])}>
             {orderDetail?.status || 'NEW'}
           </Badge>
-          {orderDetail.order_reference && <span className="text-sm text-gray-900 dark:text-zinc-100"> Order Referance - <span className='font-bold'>{orderDetail.order_reference}</span></span>}
+          {orderDetail.order_reference && <span className="text-sm text-gray-900 dark:text-zinc-100"> Order Referance - <span className='font-bold'>{orderDetail?.order_reference}</span></span>}
+          {orderDetail.customer_reference && <span className="text-sm text-gray-900 dark:text-zinc-100"> Customer Reference - <span className='font-bold'>{orderDetail.courier_details?.customer_reference}</span></span>}
+          {/* {orderDetail.external_reference && <span className="text-sm text-gray-900 dark:text-zinc-100"> External Reference - <span className='font-bold'>{orderDetail.courier_details?.external_reference}</span></span>} */}
+          {/* {orderDetail.external_order_id && <span className="text-sm text-gray-900 dark:text-zinc-100"> External Order ID - <span className='font-bold'>{orderDetail.courier_details?.external_order_id}</span></span>} */}
 
         </div>)
       }
+
+      {isTrackingModalOpen && (
+        <Dialog open={isTrackingModalOpen} onOpenChange={setIsTrackingModalOpen}>
+          <DialogContent className="w-full sm:max-w-[450px] p-0 overflow-hidden bg-white dark:bg-zinc-950 border border-gray-200 dark:border-zinc-800 rounded-xl shadow-xl gap-0">
+            <DialogHeader className="px-6 py-4 gap-0 border-b border-gray-150 dark:border-zinc-800 bg-white dark:bg-zinc-950">
+              <DialogTitle className="text-base font-bold text-slate-900 dark:text-zinc-100 my-0 uppercase tracking-wide">
+                Add Tracking Number
+              </DialogTitle>
+              <DialogDescription className="text-xs text-slate-500 dark:text-zinc-400 my-0">
+                Enter the manual shipping tracking number for order #{orderDetail?.order_number}.
+              </DialogDescription>
+            </DialogHeader>
+
+            <form onSubmit={handleTrackingSubmit}>
+              <div className="px-6 py-6 space-y-4 bg-slate-50/50 dark:bg-zinc-900/30">
+                <FormInput
+                  label="Tracking Number"
+                  value={trackingNumber}
+                  onChange={(val) => {
+                    setTrackingNumber(val)
+                    if (val.trim()) setTrackingError(false)
+                  }}
+                  placeholder="Enter tracking number"
+                  required
+                  error={trackingError}
+                  errormsg="Please enter a valid tracking number"
+                  isFullWidth
+                />
+              </div>
+
+              <div className="px-6 py-3 border-t border-gray-150 dark:border-zinc-800 bg-white dark:bg-zinc-950 flex items-center justify-end gap-2">
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => setIsTrackingModalOpen(false)}
+                  className="h-8 px-4 text-xs font-semibold"
+                >
+                  Cancel
+                </Button>
+                <Button
+                  type="submit"
+                  disabled={addTrackingMutation.isPending}
+                  className="h-8 px-4 text-xs font-semibold flex items-center gap-1.5"
+                >
+                  {addTrackingMutation.isPending && <Loader2 className="h-3.5 w-3.5 animate-spin" />}
+                  Submit
+                </Button>
+              </div>
+            </form>
+          </DialogContent>
+        </Dialog>
+      )}
     </div >
   )
 }

@@ -63,10 +63,10 @@ export function CreditDebitWalletDialog({ isOpen, onOpenChange, customerId }: Cr
           <FormInput
             label="Amount"
             value={formData.amount}
-            onChange={(val) => setFormData({
-              ...formData,
+            onChange={(val) => setFormData((prev) => ({
+              ...prev,
               amount: val,
-            })}
+            }))}
             placeholder="Enter amount"
             type="number"
             step="0.01"
@@ -85,10 +85,10 @@ export function CreditDebitWalletDialog({ isOpen, onOpenChange, customerId }: Cr
             ]}
             label='Transaction Type'
             value={formData.transaction_type}
-            onValueChange={(val) => setFormData({
-              ...formData,
+            onValueChange={(val) => setFormData((prev) => ({
+              ...prev,
               transaction_type: val || '',
-            })}
+            }))}
             placeholder="Select type"
             error={submitted && !formData.transaction_type}
             errormsg='Please select transaction type'
@@ -100,10 +100,10 @@ export function CreditDebitWalletDialog({ isOpen, onOpenChange, customerId }: Cr
           <FormTextarea
             label="Description"
             value={formData.description}
-            onChange={(val) => setFormData({
-              ...formData,
+            onChange={(val) => setFormData((prev) => ({
+              ...prev,
               description: val || '',
-            })}
+            }))}
             placeholder="Enter reason or description..."
             rows={3}
           // error={submitted && !formData.description}

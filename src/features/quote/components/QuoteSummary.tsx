@@ -1,11 +1,12 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { FileText, Percent, Mail, Truck } from "lucide-react";
+import { FileText, Percent, Mail, Truck, Info } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { FormInput } from "@/features/orders/components/OrderFormUI";
 import type { QuoteCalculations } from "../types";
-import { memo } from "react";
+import { Tooltip, TooltipTrigger, TooltipContent } from '@/components/ui/tooltip';
+import { memo, useMemo } from "react";
 interface QuoteSummaryProps {
-  // quoteData: QuoteCalculations;
+  quoteData: any;
   isAdmin?: boolean;
   margin?: string;
   setMargin?: (val: string) => void;
@@ -18,7 +19,7 @@ interface QuoteSummaryProps {
 
 export const QuoteSummary = memo(({
   calculation,
-  // quoteData,
+  quoteData,
   isAdmin = false,
   margin = '0',
   setMargin,
@@ -30,6 +31,30 @@ export const QuoteSummary = memo(({
   const formatCurrency = (val: number) =>
     new Intl.NumberFormat('en-AU', { style: 'currency', currency: 'AUD' }).format(val) || 0;
 
+  const surchargesList = useMemo(() => {
+    const list: any[] = [];
+    const seen = new Set<string>();
+
+    if (Array.isArray(quoteData?.surcharges)) {
+      quoteData.surcharges.forEach((charge: any) => {
+        if (charge && charge.name && !seen.has(charge.name)) {
+          seen.add(charge.name);
+          list.push(charge);
+        }
+      });
+    }
+
+    if (Array.isArray(quoteData?.courier?.applied_surcharges)) {
+      quoteData.courier.applied_surcharges.forEach((charge: any) => {
+        if (charge && charge.name && !seen.has(charge.name)) {
+          seen.add(charge.name);
+          list.push(charge);
+        }
+      });
+    }
+
+    return list;
+  }, [quoteData]);
   return (
     <Card className="sticky top-20 p-0 gap-0 shadow-sm border-slate-200 dark:border-zinc-800 bg-white dark:bg-zinc-950 overflow-hidden">
       <CardHeader className="rounded-t-lg py-4 border-b border-slate-100 dark:border-zinc-800">
@@ -89,7 +114,32 @@ export const QuoteSummary = memo(({
           <span className="font-semibold text-slate-700 dark:text-zinc-200">{formatCurrency(calculation?.servicePrice || 0)}</span>
         </div>
         <div className="flex justify-between items-center text-sm">
-          <span className="text-slate-500 dark:text-zinc-400">Extra surcharges</span>
+          <div className="flex items-center gap-1.5">
+            <span className="text-slate-500 dark:text-zinc-400">Extra surcharges</span>
+            {surchargesList.length > 0 && (
+              // <TooltipProvider delay={100}>
+              <Tooltip>
+                <TooltipTrigger className="h-[14px]">
+                  <span className="inline-flex items-center justify-center text-gray-400 hover:text-primary dark:text-zinc-500 dark:hover:text-primary cursor-pointer transition-colors duration-200">
+                    <Info className="h-3.5 w-3.5" />
+                  </span>
+                </TooltipTrigger>
+                <TooltipContent side="top" align="center" className="flex flex-col gap-1.5 p-2.5 min-w-[180px] bg-gray-900 dark:bg-zinc-800 text-gray-100 border border-gray-800 dark:border-zinc-700">
+                  <div className="text-[10px] font-bold text-gray-400 dark:text-zinc-400 uppercase tracking-wide pb-1 border-b border-gray-800 dark:border-zinc-700 w-full">
+                    Surcharge Breakdown
+                  </div>
+                  <div className="flex flex-col gap-1 w-full max-h-32 overflow-y-auto no-scrollbar">
+                    {surchargesList.map((charge: any, idx: number) => (
+                      <div key={idx} className="flex justify-between items-center gap-3 text-[12px]">
+                        <span className="text-white font-medium dark:text-zinc-300">- {charge.name}</span>
+                      </div>
+                    ))}
+                  </div>
+                </TooltipContent>
+              </Tooltip>
+              // </TooltipProvider>
+            )}
+          </div>
           <span className="font-semibold text-slate-700 dark:text-zinc-200">{formatCurrency(calculation?.totalSurcharges || 0)}</span>
         </div>
         <div className="flex justify-between items-center text-sm">

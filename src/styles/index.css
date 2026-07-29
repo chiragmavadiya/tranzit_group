@@ -145,6 +145,13 @@
     @apply font-sans;
   }
 
+  html.app-layout,
+  html.app-layout body {
+    /* height: 100dvh; */
+    height: 100dvh;
+    overflow: hidden;
+  }
+
   h1 {
     @apply text-3xl font-bold mb-4 mt-6;
   }

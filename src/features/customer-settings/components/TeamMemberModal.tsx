@@ -308,8 +308,8 @@ export function TeamMemberModal({
             ) : (
               <>
                 <div className="grid grid-cols-12 bg-gray-50 dark:bg-zinc-900 p-3 border-b border-gray-200 dark:border-zinc-800 text-[11px] font-bold text-gray-500 uppercase tracking-wide items-center">
-                  <div className="col-span-6">Module</div>
-                  <div className="col-span-2 flex items-center justify-start gap-1.5">
+                  <div className="col-span-3 md:col-span-6">Module</div>
+                  <div className="col-span-3 md:col-span-2 flex items-center justify-start gap-1.5">
                     <Checkbox
                       checked={isAllActionSelected('no_access')}
                       onCheckedChange={(checked) => {
@@ -318,7 +318,7 @@ export function TeamMemberModal({
                     />
                     <span>No Access</span>
                   </div>
-                  <div className="col-span-2 flex items-center justify-start gap-1.5">
+                  <div className="col-span-3 md:col-span-2 flex items-center justify-start gap-1.5">
                     <Checkbox
                       checked={isAllActionSelected('read_only')}
                       onCheckedChange={(checked) => {
@@ -327,7 +327,7 @@ export function TeamMemberModal({
                     />
                     <span>Read Only</span>
                   </div>
-                  <div className="col-span-2 flex items-center justify-start gap-1.5">
+                  <div className="col-span-3 md:col-span-2 flex items-center justify-start gap-1.5">
                     <Checkbox
                       checked={isAllActionSelected('full')}
                       onCheckedChange={(checked) => {
@@ -343,14 +343,14 @@ export function TeamMemberModal({
                     const Icon = iconMap[mod.key] || Settings2;
                     return (
                       <div key={mod.key} className="grid grid-cols-12 p-3 items-center hover:bg-gray-50/50 dark:hover:bg-zinc-900/50 transition-colors">
-                        <div className="col-span-6 flex items-center gap-3">
-                          <Icon className="w-4 h-4 text-gray-400" />
-                          <span className="text-[13px] font-semibold text-gray-700 dark:text-zinc-300">{mod.label}</span>
+                        <div className="col-span-3 md:col-span-6 flex items-center gap-2 md:gap-3 min-w-0">
+                          <Icon className="w-4 h-4 text-gray-400 shrink-0 hidden sm:block" />
+                          <span className="text-[13px] font-semibold text-gray-700 dark:text-zinc-300 break-words">{mod.label}</span>
                         </div>
                         <RadioGroup
                           value={permissions[mod.key] || 'no_access'}
                           onValueChange={(val) => handleRadioChange(mod.key, val)}
-                          className="col-span-6 grid grid-cols-6 gap-0"
+                          className="col-span-9 md:col-span-6 grid grid-cols-6 gap-0"
                         >
                           <div className="col-span-2 flex justify-start">
                             <RadioGroupItem value="no_access" />

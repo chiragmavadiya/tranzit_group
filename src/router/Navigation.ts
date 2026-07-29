@@ -59,7 +59,6 @@ export const adminSidebarItems: SidebarItem[] = [
 
 
   { name: 'Invoice Management', key: "invoice", icon: FileText, path: '/admin/invoices', permissions: MODULE_PERMISSIONS.invoice },
-  // { name: 'Zoho Invoice Integration', icon: Link, path: '/admin/zoho-integration' },
   { name: 'Transaction Management', key: 'topup', icon: Wallet, path: '/admin/topup', permissions: MODULE_PERMISSIONS.topup },
   // { name: 'Courier Surcharge', icon: Percent, path: '/admin/courier-surcharge' },
   // { name: 'Courier base Postcode', icon: MapPin, path: '/admin/courier-postcode' },
@@ -87,11 +86,11 @@ export const adminSidebarItems: SidebarItem[] = [
   {
     name: 'Global Settings',
     icon: Globe,
-    path: '/admin/zoho-integration',
+    path: '/admin/xero-integration',
     hasDropdown: true,
     permissions: [...(MODULE_PERMISSIONS.setting || []), ...(MODULE_PERMISSIONS['Admin Activity Log'] || []), ...(MODULE_PERMISSIONS.profile || [])],
     subItems: [
-      { name: 'Zoho Invoice Integration', key: 'setting', path: '/admin/zoho-integration', permissions: MODULE_PERMISSIONS.setting },
+      { name: 'Xero Integration', key: 'setting', path: '/admin/xero-integration', permissions: MODULE_PERMISSIONS.setting },
       { name: 'Admin Activity Log', key: 'Admin Activity Log', path: '/admin/activity-log', permissions: MODULE_PERMISSIONS['Admin Activity Log'] },
       { name: 'Profile', key: 'profile', path: '/admin/profile', permissions: MODULE_PERMISSIONS.profile },
       { name: 'Global Configuration', key: 'setting', path: '/admin/global-config', permissions: MODULE_PERMISSIONS.setting },

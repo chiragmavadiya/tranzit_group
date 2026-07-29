@@ -22,8 +22,8 @@ export const ACTIVITY_COLUMNS: Column<ActivityLog>[] = [
         header: 'ADMIN',
         cell: (_, row) => (
             <div className="flex flex-col gap-1">
-                <span className="font-bold text-slate-700 dark:text-zinc-300">{row.admin}</span>
-                <span className="text-[10px] text-slate-500">{row.email}</span>
+                <span className="font-bold text-slate-700 dark:text-zinc-300 break-normal">{row.admin}</span>
+                <span className="text-[10px] text-slate-500 break-normal">{row.email}</span>
             </div>
         ),
     },
@@ -54,7 +54,7 @@ export const ACTIVITY_COLUMNS: Column<ActivityLog>[] = [
         header: 'DESCRIPTION',
         cell: (_, row) => (
             <div className="flex flex-col gap-1 max-w-[300px]">
-                <span className="text-slate-600 dark:text-zinc-400 leading-relaxed">{row.description}</span>
+                <span className="text-slate-600 dark:text-zinc-400 leading-relaxed break-normal">{row.description}</span>
                 {row.changes && (
                     <div className="flex items-center gap-1.5 text-[10px]">
                         <span className="text-slate-400 line-through">{row.changes.old_status}</span>
@@ -87,8 +87,8 @@ export const ACTIVITY_COLUMNS: Column<ActivityLog>[] = [
                     <span className="text-slate-500 truncate max-w-[150px]">{row.route || 'N/A'}</span>
                 </div>
                 <div className="flex gap-1.5">
-                    <span className="font-bold text-slate-700 dark:text-zinc-300">IP:</span>
-                    <span className="text-slate-500">{row.ip_address}</span>
+                    <span className="font-bold text-slate-700 dark:text-zinc-300 break-normal">IP:</span>
+                    <span className="text-slate-500 break-normal">{row.ip_address}</span>
                 </div>
             </div>
         ),

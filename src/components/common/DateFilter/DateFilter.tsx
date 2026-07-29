@@ -24,6 +24,7 @@ export const DateFilter = React.memo(({
   value,
   onChange,
   className,
+  fromDashboard = false
 }: DateFilterProps) => {
   const [open, setOpen] = useState(false);
 
@@ -72,15 +73,26 @@ export const DateFilter = React.memo(({
   };
 
   const handleReset = () => {
-    // Reset to default (thisMonth) and apply immediately
-    onChange({
-      type: 'custom',
-      from: undefined,
-      to: undefined,
-      // from: formatDateToString(range.from),
-      // to: formatDateToString(range.to),
-      label: "All Time",
-    });
+    if (fromDashboard) {
+      const range = calculateDateRange('thisMonth');
+      onChange({
+        type: 'thisMonth',
+        from: formatDateToString(range.from),
+        to: formatDateToString(range.to),
+        label: 'This Month',
+      });
+    } else {
+
+      // Reset to default (thisMonth) and apply immediately
+      onChange({
+        type: 'custom',
+        from: undefined,
+        to: undefined,
+        // from: formatDateToString(range.from),
+        // to: formatDateToString(range.to),
+        label: "All Time",
+      });
+    };
     setOpen(false);
   };
 
@@ -101,7 +113,7 @@ export const DateFilter = React.memo(({
     if (!value) return 'All Time';
     if (value.type !== 'custom') return value.label;
     if (!value.from || !value.to) return 'All Time';
-    
+
     try {
       const fromParts = value.from.split('/');
       const toParts = value.to.split('/');
@@ -109,13 +121,13 @@ export const DateFilter = React.memo(({
         const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
         const fromMonthIdx = parseInt(fromParts[1], 10) - 1;
         const toMonthIdx = parseInt(toParts[1], 10) - 1;
-        
+
         const fromStr = `${fromParts[0]} ${months[fromMonthIdx] || fromParts[1]}`;
         const toStr = `${toParts[0]} ${months[toMonthIdx] || toParts[1]}`;
         return `${fromStr} - ${toStr}`;
       }
-    } catch  {
-      // Fallback to default label if parsing fails
+    } catch {
+      return value?.label;
     }
     return value.label;
   }, [value]);

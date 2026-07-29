@@ -26,7 +26,7 @@ export function EnquiryDetailsDialog({ enquiry, onClose }: EnquiryDetailsDialogP
       contentClass="sm:max-w-[600px]"
     >
       <div className="flex flex-col gap-6 text-slate-800 dark:text-zinc-100">
-        <div className="grid grid-cols-2 gap-x-12 gap-y-4 text-xs">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-12 gap-y-4 text-xs">
           <div className="space-y-1">
             <Label className="mb-0 text-[11px] font-extrabold uppercase text-slate-500 dark:text-zinc-400 tracking-wide">
               Issue Type
@@ -39,7 +39,7 @@ export function EnquiryDetailsDialog({ enquiry, onClose }: EnquiryDetailsDialogP
             <Label className="mb-0 text-[11px] font-extrabold uppercase text-slate-500 dark:text-zinc-400 tracking-wide">
               Reply Email
             </Label>
-            <p className="mb-1 mt-0 text-[13px] font-medium text-slate-700 dark:text-zinc-200">
+            <p className="mb-1 mt-0 text-[13px] font-medium text-slate-700 dark:text-zinc-200 break-words">
               {enquiry.email || enquiry.reply_email || ''}
             </p>
           </div>

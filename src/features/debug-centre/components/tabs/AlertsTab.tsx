@@ -9,6 +9,7 @@ import { Check, EyeOff, Loader2 } from 'lucide-react';
 
 interface AlertsTabProps {
   filters: DebugFilters;
+  searchValue: string;
   onPageChange: (page: number) => void;
   onPageSizeChange: (pageSize: number) => void;
   onSearchChange: (search: string) => void;
@@ -78,7 +79,7 @@ const AlertActionsCell = ({ alert }: { alert: DebugAlert }) => {
   );
 };
 
-export const AlertsTab = ({ filters, onPageChange, onPageSizeChange, onSearchChange }: AlertsTabProps) => {
+export const AlertsTab = ({ filters, searchValue, onPageChange, onPageSizeChange, onSearchChange }: AlertsTabProps) => {
   const { data: alertsData, isLoading } = useDebugAlerts(filters);
   const alerts = alertsData?.data || [];
   const totalItems = alertsData?.meta?.total || 0;
@@ -104,7 +105,7 @@ export const AlertsTab = ({ filters, onPageChange, onPageSizeChange, onSearchCha
       onPageChange={onPageChange}
       onPageSizeChange={onPageSizeChange}
       sortable
-      searchValue={filters.search}
+      searchValue={searchValue}
       onSearchChange={onSearchChange}
       headerTitle="Alerts"
       exportable={false}

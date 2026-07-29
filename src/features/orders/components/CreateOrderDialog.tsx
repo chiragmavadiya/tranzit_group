@@ -210,7 +210,7 @@ export default function CreateOrderDialog({ onOpenChange, type, open, initialDat
       return
     }
     if (value) return
-    navigate(-1);
+    navigate(`${role === 'admin' ? '/admin' : ''}/orders`);
   }
 
   useEffect(() => {

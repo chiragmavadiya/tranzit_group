@@ -64,7 +64,7 @@ export function AuthLayout({ children }: AuthLayoutProps) {
   return (
     <div className="grid min-h-screen grid-cols-1 lg:grid-cols-12">
       {/* Left Column (Brand/Info) */}
-      <div className="relative hidden lg:flex flex-col justify-between p-12 lg:p-16 text-white overflow-hidden lg:col-span-6">
+      <div className="relative hidden lg:flex flex-col justify-between lg:p-8 xl:p-12 2xl:p-16 text-white overflow-hidden lg:col-span-6">
         {/* Background Image */}
         <div
           className="absolute inset-0 bg-cover bg-center bg-no-repeat"
@@ -79,7 +79,7 @@ export function AuthLayout({ children }: AuthLayoutProps) {
         <div className="relative z-10 flex flex-col justify-between h-full">
           <div>
             {/* Title */}
-            <h1 className="text-4xl font-extrabold text-white lg:text-5xl leading-tight max-w-xl">
+            <h1 className="text-xl lg:text-3xl xl:text-4xl 2xl:text-5xl font-extrabold text-white leading-tight max-w-xl">
               Shipping automation that just works
             </h1>
             {/* Description */}

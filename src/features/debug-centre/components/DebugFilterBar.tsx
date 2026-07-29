@@ -23,16 +23,16 @@ export const DebugFilterBar = ({
 }: DebugFilterBarProps) => {
   const statusOptions = activeTab === 'alerts'
     ? [
-        { label: 'All Statuses', value: 'all' },
-        { label: 'Open', value: 'open' },
-        { label: 'Resolved', value: 'resolved' },
-        { label: 'Ignored', value: 'ignored' },
-      ]
+      { label: 'All Statuses', value: 'all' },
+      { label: 'Open', value: 'open' },
+      { label: 'Resolved', value: 'resolved' },
+      { label: 'Ignored', value: 'ignored' },
+    ]
     : [
-        { label: 'All Statuses', value: 'all' },
-        { label: 'Success', value: 'success' },
-        { label: 'Failed', value: 'failed' },
-      ];
+      { label: 'All Statuses', value: 'all' },
+      { label: 'Success', value: 'success' },
+      { label: 'Failed', value: 'failed' },
+    ];
 
   const [dateRange, setDateRange] = useState<DateFilterValue>({
     type: 'custom',
@@ -85,7 +85,7 @@ export const DebugFilterBar = ({
         </div> */}
 
         {customerOptions.length > 0 && (
-          <div className="lg:col-span-2">
+          <div className="lg:col-span-3">
             <FormSelect
               label="Customer"
               value={filters.user_id || 'all'}
@@ -99,7 +99,7 @@ export const DebugFilterBar = ({
         )}
 
         {endpointOptions.length > 0 && (
-          <div className="lg:col-span-2">
+          <div className="lg:col-span-3">
             <FormSelect
               label="Endpoint"
               value={filters.endpoint || 'all'}
@@ -112,7 +112,7 @@ export const DebugFilterBar = ({
         )}
 
         {activeTab !== 'failed-jobs' && activeTab !== 'external-api-failures' && statusOptions.length > 0 && (
-          <div className="lg:col-span-2">
+          <div className="lg:col-span-3">
             <FormSelect
               label="Status"
               value={filters.status || 'all'}
@@ -126,7 +126,7 @@ export const DebugFilterBar = ({
         )}
 
         {/* {sourceOptions.length > 0 && (
-          <div className="lg:col-span-2">
+          <div className="lg:col-span-3">
             <FormSelect
               label="Source"
               value={filters.source || 'all'}
@@ -139,7 +139,7 @@ export const DebugFilterBar = ({
           </div>
         )} */}
 
-        <div className="lg:col-span-2 flex flex-col">
+        <div className="lg:col-span-3 flex flex-col">
           <CustomLabel label="Date Range" />
           <DateFilter value={dateRange} onChange={handleDateRangeChange} className="w-full" />
         </div>

@@ -28,3 +28,5 @@ export { default as AutoComplete } from './AutoComplate';
 export { default as ErrorBoundary } from './ErrorBoundary';
 export { default as PasswordInput } from './password-input';
 export { StatCard } from './StatCard';
+export { ExportMenu } from './ExportMenu';
+export type { ExportFormat } from './ExportMenu';

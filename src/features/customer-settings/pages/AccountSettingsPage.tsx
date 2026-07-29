@@ -289,7 +289,7 @@ export default function AccountSettingsPage() {
         initial="hidden"
         animate="visible"
         variants={cardVariants}
-        className="col-span-12 lg:col-span-8 flex"
+        className="col-span-12 xl:col-span-8 flex"
       >
         <Card className="flex flex-col w-full hover:shadow-md transition-shadow duration-300 border-gray-200 shadow-xs rounded-md">
           <CardHeader className="flex flex-row items-center justify-between px-6 py-4 border-b border-gray-100 dark:border-zinc-800 bg-slate-50/30 dark:bg-zinc-950 space-y-0 rounded-t-md">
@@ -363,7 +363,7 @@ export default function AccountSettingsPage() {
       </motion.div>
 
       {/* Balance & Weekly Label Usage Container */}
-      <div className="col-span-12 lg:col-span-4 flex">
+      <div className="col-span-12 xl:col-span-4 flex">
         {/* Balance Card */}
         {/* <motion.div
           custom={1}
@@ -625,7 +625,7 @@ export default function AccountSettingsPage() {
                   <div className="p-1 rounded-md bg-blue-100/80 dark:bg-blue-950/60 text-blue-600 dark:text-blue-400 shrink-0">
                     <Info className="w-4 h-4" />
                   </div>
-                  <div className="text-[13px] text-slate-600 dark:text-zinc-400 leading-relaxed font-medium flex gap-2 items-center">
+                  <div className="text-[13px] text-slate-600 dark:text-zinc-400 leading-relaxed font-medium flex flex-wrap gap-2 items-center">
                     To change the Pickup address, please email us at{' '}
                     <a
                       href="mailto:info@tranzitgroup.com.au"

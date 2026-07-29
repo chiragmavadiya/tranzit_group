@@ -103,7 +103,8 @@ export interface PaginatedResponse<T> {
     total_pickup: number;
     total_surcharge: number;
     total_amount_paid?: number;
-
+    total_label_count?: number;
+    total_charge?: number;
   }
   meta: {
     current_page: number;

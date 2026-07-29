@@ -12,11 +12,12 @@ import {
 } from '../hooks/useCourierSurcharge';
 import type { CourierSurcharge } from '../types';
 import { useDebounce } from '@/hooks/useDebounce';
+import useLocalStorage from '@/hooks/useLocalStorage';
 
 export default function CourierSurchargePage() {
-  const [search, setSearch] = useState('');
-  const [page, setPage] = useState(1);
-  const [pageSize, setPageSize] = useState(25);
+  const [search, setSearch] = useLocalStorage('courier-surcharge-search', '');
+  const [page, setPage] = useLocalStorage('courier-surcharge-page', 1);
+  const [pageSize, setPageSize] = useLocalStorage('courier-surcharge-page-size', 25);
 
   const { data: listResponse, isLoading } = useCourierSurcharges({
     search: useDebounce(search, 500),
@@ -65,8 +66,8 @@ export default function CourierSurchargePage() {
   ), [onAddSurcharge]);
 
   return (
-    <div className="flex flex-col flex-1 gap-6 p-page-padding min-h-0 animate-in fade-in slide-in-from-bottom-2 duration-500 bg-slate-50/30 dark:bg-zinc-950/30 overflow-y-auto">
-      <div className="rounded-2xl shadow-sm border border-slate-100 dark:border-zinc-800 bg-white dark:bg-zinc-950 overflow-hidden flex-1 flex flex-col min-h-[500px]">
+    <div className="flex flex-col flex-1 gap-6 p-page-padding animate-in fade-in slide-in-from-bottom-2 duration-500 bg-slate-50/30 dark:bg-zinc-950/30 overflow-y-auto">
+      <div className="rounded-2xl shadow-sm border border-slate-100 dark:border-zinc-800 bg-white dark:bg-zinc-950 flex-none h-auto">
         <DataTable
           headerTitle="Courier Surcharge List"
           columns={columns}
@@ -82,7 +83,7 @@ export default function CourierSurchargePage() {
           onPageSizeChange={setPageSize}
           onExport={onExport}
           isExporting={isPending}
-          className="text-xs pb-3"
+          className="text-xs pb-3 flex-none h-auto [&_div.overflow-auto]:flex-none [&_div.overflow-auto]:h-auto [&_div.overflow-auto]:min-h-0 [&_div.overflow-auto]:overflow-y-visible [&_div.overflow-auto]:overflow-x-auto"
           customHeader={headerContent}
         />
       </div>

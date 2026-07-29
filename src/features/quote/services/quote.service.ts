@@ -42,10 +42,10 @@ export const quoteService = {
         const response = await api.get<QuoteDetailsResponse>(API_ENDPOINTS.ADMIN_QUOTES.DETAILS(id));
         return response.data;
     },
-    getServices: async (data: GetQuoteServicesPayload, role: string): Promise<QuoteServicesResponse> => {
-        const url = role === 'admin' && data.is_order === 'no' ? API_ENDPOINTS.ADMIN_QUOTES.SERVICES : API_ENDPOINTS.CUSTOMER_QUOTES.SERVICES;
+    getServices: async (data: GetQuoteServicesPayload, fromAdminQuot: boolean, signal?: AbortSignal): Promise<QuoteServicesResponse> => {
+        const url = fromAdminQuot ? API_ENDPOINTS.ADMIN_QUOTES.SERVICES : API_ENDPOINTS.CUSTOMER_QUOTES.SERVICES;
         // const url = role === 'customer' ? API_ENDPOINTS.CUSTOMER_QUOTES.SERVICES : API_ENDPOINTS.ADMIN_QUOTES.SERVICES;
-        const response = await api.post<QuoteServicesResponse>(url, data);
+        const response = await api.post<QuoteServicesResponse>(url, data, { signal });
         return response.data;
     },
     create: async (data: CreateQuotePayload): Promise<{ status: boolean; message: string; data: any }> => {

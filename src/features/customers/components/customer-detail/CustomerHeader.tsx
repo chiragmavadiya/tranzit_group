@@ -1,9 +1,9 @@
 import { useState } from 'react';
-import { CheckCircle2, MapPin, Calendar, Wallet, UserMinus, RefreshCw, ShieldCheck, ChevronLeft, Loader2, Pencil, Check } from 'lucide-react';
+import { CheckCircle2, MapPin, Calendar, Wallet, UserMinus, ShieldCheck, ChevronLeft, Loader2, Pencil, Check } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import type { CustomerDetails } from '../../types';
-import { useVerifyCustomer, useZohoSyncCustomer, useToggleCustomerStatus } from '../../hooks/useCustomers';
+import { useVerifyCustomer,  useToggleCustomerStatus } from '../../hooks/useCustomers';
 import { useNavigate } from 'react-router-dom';
 import { showToast } from '@/components/ui/custom-toast';
 import { cn, formateCurrency } from '@/lib/utils';
@@ -30,20 +30,12 @@ export const CustomerHeader = ({ customer, onEdit }: CustomerHeaderProps) => {
     const [isConfirmOpen, setIsConfirmOpen] = useState(false);
 
     const { mutate: verify, isPending: isVerifying } = useVerifyCustomer();
-    const { mutate: zohoSync, isPending: isSyncing } = useZohoSyncCustomer();
     const { mutate: toggleStatus, isPending: isToggling } = useToggleCustomerStatus();
 
     const handleVerify = () => {
         verify(customer.id, {
             onSuccess: (res) => showToast(res.message || 'Customer verified successfully', 'success'),
             onError: (err: any) => showToast(err?.response?.data?.message || 'Failed to verify customer', "error"),
-        });
-    };
-
-    const handleZohoSync = () => {
-        zohoSync({ id: customer.id }, {
-            onSuccess: (res) => showToast(res.message || 'Synced with Zoho successfully', 'success'),
-            onError: (err: any) => showToast(err?.response?.data?.message || 'Failed to sync with Zoho', "error"),
         });
     };
 
@@ -149,15 +141,6 @@ export const CustomerHeader = ({ customer, onEdit }: CustomerHeaderProps) => {
                             Verify
                         </Button>
                     )}
-                    <Button
-                        variant="outline"
-                        className="h-8 rounded-lg gap-1.5 bg-indigo-50/50 hover:bg-indigo-50 text-indigo-600 border-indigo-200/80 hover:border-indigo-300 dark:bg-indigo-950/30 dark:text-indigo-400 dark:border-indigo-900/50 text-xs font-semibold px-3 shadow-2xs"
-                        onClick={handleZohoSync}
-                        disabled={isSyncing}
-                    >
-                        {isSyncing ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <RefreshCw className="h-3.5 w-3.5" />}
-                        Zoho Sync
-                    </Button>
                     <Button
                         variant="outline"
                         className="h-8 rounded-lg gap-1.5 border-slate-200 hover:bg-slate-50 dark:border-zinc-800 dark:hover:bg-zinc-900 text-xs font-semibold text-slate-700 dark:text-zinc-300 px-3 shadow-2xs"

@@ -90,6 +90,7 @@ export const getOrdersColumns = (
         header: orderType === 'new' ? 'ORDER DATE' : 'SHIPPED',
         key: 'consignment_date',
         // width: '140px',
+        className: 'break-normal',
         cell: (value: string) => value
       },
       {
@@ -117,6 +118,7 @@ export const getOrdersColumns = (
         header: 'SUBURB',
         key: 'suburb',
         // width: '120px',
+        className: 'break-normal'
       },
       {
         header: 'CARRIER & PRODUCT', key: 'courier',
@@ -143,7 +145,7 @@ export const getOrdersColumns = (
                     <img src={row?.courier_logo || row?.courier_logo_url} className="h-6! min-w-[60px] object-contain" />
                   </div>
                 )}
-                <div className="whitespace-normal break-words font-normal leading-tight text-slate-800 dark:text-zinc-200">
+                <div className="whitespace-normal break-normal font-normal leading-tight text-slate-800 dark:text-zinc-200">
                   <span>{value && value !== 'unknown' ? value : '-'}</span>
                   {row.product_id && <span className="font-normal text-xs text-slate-500 dark:text-zinc-400"> - {row.product_id}</span>}
                 </div>
@@ -183,7 +185,7 @@ export const getOrdersColumns = (
       {
         header: 'ORDER SOURCE',
         key: 'order_type',
-        // width: '140px',
+        width: '110px',
         cell: (value: string, row: Order) => (
           <div className="flex items-center gap-2">
             <img src={row?.order_source_icon || Favicon} className="h-5" alt="" />

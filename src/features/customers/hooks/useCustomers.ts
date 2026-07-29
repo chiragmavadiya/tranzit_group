@@ -149,12 +149,6 @@ export const useToggleCustomerStatus = () => {
     });
 };
 
-export const useZohoSyncCustomer = () => {
-    return useMutation({
-        mutationFn: ({ id, syncData }: { id: number | string; syncData?: any }) => customerService.zohoSync(id, syncData),
-    });
-};
-
 export const useExportCustomers = () => {
     return useMutation({
         mutationFn: ({ format, params }: { format: string; params?: Record<string, any> }) => customerService.exportList(format, params),

@@ -5,12 +5,13 @@ import type { DebugFilters } from '../../types';
 
 interface SlowRequestsTabProps {
   filters: DebugFilters;
+  searchValue: string;
   onPageChange: (page: number) => void;
   onPageSizeChange: (pageSize: number) => void;
   onSearchChange: (search: string) => void;
 }
 
-export const SlowRequestsTab = ({ filters, onPageChange, onPageSizeChange, onSearchChange }: SlowRequestsTabProps) => {
+export const SlowRequestsTab = ({ filters, searchValue, onPageChange, onPageSizeChange, onSearchChange }: SlowRequestsTabProps) => {
   const { data: requestsData, isLoading } = useSlowRequests(filters);
   const requests = requestsData?.data || [];
   const totalItems = requestsData?.meta?.total || 0;
@@ -26,7 +27,7 @@ export const SlowRequestsTab = ({ filters, onPageChange, onPageSizeChange, onSea
       onPageChange={onPageChange}
       onPageSizeChange={onPageSizeChange}
       sortable
-      searchValue={filters.search}
+      searchValue={searchValue}
       onSearchChange={onSearchChange}
       headerTitle="Slow Requests"
       exportable={false}

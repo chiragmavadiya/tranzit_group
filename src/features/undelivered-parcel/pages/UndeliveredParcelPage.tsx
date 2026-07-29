@@ -1,15 +1,26 @@
-import { useState } from 'react';
+import { useCallback } from 'react';
 import { DataTable } from '@/components/common/DataTable';
 import { UNDELIVERED_COLUMNS } from '../columns';
 import { useUndeliveredParcels, useExportUndeliveredParcels } from '../hooks/useUndeliveredParcel';
 import { useDebounce } from '@/hooks/useDebounce';
+import useLocalStorage from '@/hooks/useLocalStorage';
 
 export default function UndeliveredParcelPage() {
-  const [search, setSearch] = useState('');
-  const [page, setPage] = useState(1);
-  const [pageSize, setPageSize] = useState(25);
+  const [search, setSearch] = useLocalStorage<string>('undelivered_parcel_search', '');
+  const [page, setPage] = useLocalStorage<number>('undelivered_parcel_page', 1);
+  const [pageSize, setPageSize] = useLocalStorage<number>('undelivered_parcel_page_size', 25);
 
   const debouncedSearch = useDebounce(search, 500);
+
+  const handleSearchChange = useCallback((val: string) => {
+    setPage(1);
+    setSearch(val);
+  }, [setPage, setSearch]);
+
+  const handlePageSizeChange = useCallback((val: number) => {
+    setPage(1);
+    setPageSize(val);
+  }, [setPage, setPageSize]);
 
   const { data: response, isLoading } = useUndeliveredParcels({
     search: debouncedSearch,
@@ -29,14 +40,14 @@ export default function UndeliveredParcelPage() {
           loading={isLoading}
           searchable
           searchValue={search}
-          onSearchChange={setSearch}
+          onSearchChange={handleSearchChange}
           totalItems={response?.meta?.total || 0}
           currentPage={page}
           onPageChange={setPage}
           pageSize={pageSize}
-          onPageSizeChange={setPageSize}
+          onPageSizeChange={handlePageSizeChange}
           className="text-xs pb-3 flex-none h-auto"
-          onExport={(format) => exportMutation.mutate({ format, search })}
+          onExport={(format) => exportMutation.mutate({ format, search: debouncedSearch })}
           isExporting={exportMutation.isPending}
         />
       </div>

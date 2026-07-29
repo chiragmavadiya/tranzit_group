@@ -7,7 +7,11 @@ import TopBar from './TopBar';
 import { adminSidebarItems, clientSidebarItems } from '../router/Navigation';
 import { useAppSelector } from '@/hooks/store.hooks';
 import SubscriptionPlanModal from '@/features/customer-settings/components/SubscriptionPlanModal';
+import LowBalanceModal from '@/features/wallet/components/LowBalanceModal';
 import { useGetUserDetails } from '@/features/auth/hooks/useAuth';
+import { useWalletSummary } from '@/features/wallet/hooks/useWallet';
+import useLocalStorage from '@/hooks/useLocalStorage';
+import { LOW_BALANCE_THRESHOLD } from '@/constants';
 import { ChevronLeftIcon, ChevronRightIcon } from 'lucide-react';
 
 export default function Layout() {
@@ -15,7 +19,7 @@ export default function Layout() {
 
   const [isCollapsed, setIsCollapsed] = useState(window.innerWidth <= 1280);
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
-  const [isMobile, setIsMobile] = useState(window.innerWidth < 1024);
+  const [isMobile, setIsMobile] = useState(window.innerWidth < 667);
   const location = useLocation();
   const { role } = useAppSelector((state) => state.auth);
   const [showSubscriptionModal, setShowSubscriptionModal] = useState(false);
@@ -27,6 +31,23 @@ export default function Layout() {
 
   const handleDismissAnnouncement = () => {
     setIsDismissed(true);
+  };
+
+  // Low balance reminder (shown once per session to customers below the threshold)
+  const { data: walletData } = useWalletSummary(role === 'customer');
+  const walletBalance = Number(walletData?.data?.wallet_balance ?? 0);
+  const [lowBalanceDismissed, setLowBalanceDismissed] = useLocalStorage('low_balance_dismissed', false);
+  const [showLowBalanceModal, setShowLowBalanceModal] = useState(false);
+
+  useEffect(() => {
+    if (role === 'customer' && walletData?.data && walletBalance < LOW_BALANCE_THRESHOLD && !lowBalanceDismissed) {
+      setShowLowBalanceModal(true);
+    }
+  }, [role, walletData, walletBalance, lowBalanceDismissed]);
+
+  const handleLowBalanceOpenChange = (open: boolean) => {
+    setShowLowBalanceModal(open);
+    if (!open) setLowBalanceDismissed(true);
   };
 
   const activeAnnouncements = useMemo(() => {
@@ -56,7 +77,7 @@ export default function Layout() {
 
   useEffect(() => {
     const handleResize = () => {
-      const mobile = window.innerWidth < 1024;
+      const mobile = window.innerWidth < 667;
       setIsMobile(mobile);
       if (mobile) {
         setIsMobileSidebarOpen(false);
@@ -67,6 +88,13 @@ export default function Layout() {
 
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
+  useEffect(() => {
+    document.documentElement.classList.add('app-layout');
+    return () => {
+      document.documentElement.classList.remove('app-layout');
+    };
   }, []);
 
   useEffect(() => {
@@ -112,7 +140,7 @@ export default function Layout() {
   const hasAnnouncements = activeAnnouncements.length > 0 && !!currentAnnouncement;
 
   return (
-    <div className="min-h-screen bg-white dark:bg-zinc-950 transition-colors duration-300">
+    <div className="min-h-dvh bg-white dark:bg-zinc-950 transition-colors duration-300">
       {hasAnnouncements && (
         <div
           style={{
@@ -187,8 +215,8 @@ export default function Layout() {
         bannerOpen={hasAnnouncements}
       />
       <main
-        style={hasAnnouncements ? { height: 'calc(100vh - 36px)' } : {}}
-        className={`h-screen flex flex-col transition-[margin,padding-top,height] duration-300 ease-in-out pt-16 z-0 relative print:ml-0 print:pt-0 print:h-auto ${isMobile ? 'ml-0' : (isCollapsed ? 'ml-[64px]' : 'ml-[240px]')
+        style={hasAnnouncements ? { height: 'calc(100dvh - 36px)' } : {}}
+        className={`h-dvh flex flex-col transition-[margin,padding-top,height] duration-300 ease-in-out pt-16 z-0 relative print:ml-0 print:pt-0 print:h-auto ${isMobile ? 'ml-0' : (isCollapsed ? 'ml-[64px]' : 'ml-[240px]')
           }`}
       >
         <div className="mx-auto w-full flex-1 flex flex-col bg-slate-100 dark:bg-zinc-900/10 print:bg-transparent print:p-0 overflow-hidden min-h-0">
@@ -199,6 +227,11 @@ export default function Layout() {
         open={showSubscriptionModal}
         onOpenChange={setShowSubscriptionModal}
         closeable={true}
+      />
+      <LowBalanceModal
+        open={showLowBalanceModal}
+        onOpenChange={handleLowBalanceOpenChange}
+        balance={walletBalance}
       />
     </div>
   );

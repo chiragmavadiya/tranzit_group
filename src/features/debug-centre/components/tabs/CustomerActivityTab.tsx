@@ -2,18 +2,28 @@ import { DataTable } from '@/components/common/DataTable';
 import { useCustomerActivity } from '../../hooks';
 import { CUSTOMER_ACTIVITY_COLUMNS } from '../../constants/columns';
 import type { DebugFilters } from '../../types';
+import { showToast, suspendToast } from '@/components/ui/custom-toast';
+import { useEffect } from 'react';
 
 interface CustomerActivityTabProps {
   filters: DebugFilters;
+  searchValue: string;
   onPageChange: (page: number) => void;
   onPageSizeChange: (pageSize: number) => void;
   onSearchChange: (search: string) => void;
 }
 
-export const CustomerActivityTab = ({ filters, onPageChange, onPageSizeChange, onSearchChange }: CustomerActivityTabProps) => {
-  const { data: activityData, isLoading } = useCustomerActivity(filters);
+export const CustomerActivityTab = ({ filters, searchValue, onPageChange, onPageSizeChange, onSearchChange }: CustomerActivityTabProps) => {
+  const { data: activityData, isLoading } = useCustomerActivity(filters, Boolean(filters.user_id));
   const activity = activityData?.data || [];
   const totalItems = activityData?.meta?.total || 0;
+
+  useEffect(() => {
+    if (!filters.user_id) {
+      showToast("Please select a customer to view their activity.", "error");
+      suspendToast();
+    }
+  },[filters.user_id]);  
 
   return (
     <DataTable
@@ -26,7 +36,7 @@ export const CustomerActivityTab = ({ filters, onPageChange, onPageSizeChange, o
       onPageChange={onPageChange}
       onPageSizeChange={onPageSizeChange}
       sortable
-      searchValue={filters.search}
+      searchValue={searchValue}
       onSearchChange={onSearchChange}
       headerTitle="Customer Activity"
       exportable={false}

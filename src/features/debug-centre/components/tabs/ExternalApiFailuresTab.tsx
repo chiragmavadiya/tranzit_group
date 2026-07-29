@@ -5,12 +5,13 @@ import type { DebugFilters } from '../../types';
 
 interface ExternalApiFailuresTabProps {
   filters: DebugFilters;
+  searchValue: string;
   onPageChange: (page: number) => void;
   onPageSizeChange: (pageSize: number) => void;
   onSearchChange: (search: string) => void;
 }
 
-export const ExternalApiFailuresTab = ({ filters, onPageChange, onPageSizeChange, onSearchChange }: ExternalApiFailuresTabProps) => {
+export const ExternalApiFailuresTab = ({ filters, searchValue, onPageChange, onPageSizeChange, onSearchChange }: ExternalApiFailuresTabProps) => {
   const { data: failuresData, isLoading } = useExternalApiFailures(filters);
   const failures = failuresData?.data || [];
   const totalItems = failuresData?.meta?.total || 0;
@@ -26,7 +27,7 @@ export const ExternalApiFailuresTab = ({ filters, onPageChange, onPageSizeChange
       onPageChange={onPageChange}
       onPageSizeChange={onPageSizeChange}
       sortable
-      searchValue={filters.search}
+      searchValue={searchValue}
       onSearchChange={onSearchChange}
       headerTitle="External API Failures"
       exportable={false}

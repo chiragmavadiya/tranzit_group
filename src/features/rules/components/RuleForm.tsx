@@ -7,7 +7,6 @@ import { useRuleOptions } from '../hooks/useRules';
 import { Loader2 } from 'lucide-react';
 
 interface RuleFormProps {
-  initialData?: any;
   prefilledData?: ShippingRule | null;
   onSave: (data: RuleFormType) => void;
   onCancel: () => void;
@@ -15,7 +14,6 @@ interface RuleFormProps {
 }
 
 export default function RuleForm({
-  initialData,
   prefilledData,
   onSave,
   onCancel,
@@ -29,17 +27,13 @@ export default function RuleForm({
     product_code: '',
   })
   const [submitted, setSubmitted] = useState<boolean>(false)
-
+  console.log(formData, 'formData')
   // Initialize form
   useEffect(() => {
-    if (initialData) {
-      setFormData(initialData)
-    } else if (prefilledData) {
+   if (prefilledData) {
       setFormData(prefilledData)
-    } else {
-      // Show exactly one condition and action by default
     }
-  }, [initialData, prefilledData]);
+  }, [prefilledData]);
 
   const handleCancelClick = () => {
     onCancel();
@@ -61,7 +55,7 @@ export default function RuleForm({
     <Card className="border gap-0 border-gray-200 dark:border-zinc-800 shadow-sm rounded-md overflow-hidden mt-6 bg-white dark:bg-zinc-950">
       <CardHeader className="px-6 py-4 border-b border-gray-100 dark:border-zinc-800 bg-slate-50/50 dark:bg-zinc-950/40">
         <CardTitle className="text-[14px] font-bold text-gray-800 dark:text-zinc-200 my-0 uppercase tracking-wide">
-          {initialData ? 'Edit rule' : 'Add new rule'}
+          {prefilledData? 'Edit rule' : 'Add new rule'}
         </CardTitle>
       </CardHeader>
       <CardContent className="py-4 px-6 space-y-4">
@@ -75,7 +69,7 @@ export default function RuleForm({
             label="Attribute"
             placeholder='Select Attribute'
             value={formData.condition_type}
-            onValueChange={(val) => setFormData({ ...formData, condition_type: val || '' })}
+            onValueChange={(val) => setFormData((prev)=>({ ...prev, condition_type: val || '' }))}
             options={ruleOptions?.data?.condition_types?.map((item: any) => ({ label: item.label, value: item.key })) || []}
             isFullWidth
             allowClear={false}
@@ -101,7 +95,7 @@ export default function RuleForm({
                 label="Action Type"
                 placeholder='Select Action'
                 value={formData.action_type}
-                onValueChange={(val) => setFormData({ ...formData, action_type: val || '' })}
+                onValueChange={(val) => setFormData((prev) => ({ ...prev, action_type: val || '' }))}
                 options={ruleOptions?.data?.action_types?.map((item: any) => ({ label: item.label, value: item.key })) || []}
                 isFullWidth
                 allowClear={false}
@@ -124,7 +118,7 @@ export default function RuleForm({
                   <FormSelect
                     label="Courier"
                     value={String(formData.global_courier_id)}
-                    onValueChange={(newVal) => setFormData({ ...formData, global_courier_id: newVal || '' })}
+                    onValueChange={(newVal) => setFormData((prev) => ({ ...prev, global_courier_id: newVal || '' }))}
                     options={ruleOptions?.data?.carriers?.map((item: any) => ({ label: item.account_label, value: item.id })) || []}
                     allowClear={false}
                     placeholder='Select courier'
@@ -137,7 +131,7 @@ export default function RuleForm({
                   <FormSelect
                     label="Product Code"
                     value={formData.product_code || ''}
-                    onValueChange={(newVal) => setFormData({ ...formData, product_code: newVal || '' })}
+                    onValueChange={(newVal) => setFormData((prev) => ({ ...prev, product_code: newVal || '' }))}
                     options={ruleOptions?.data?.products?.filter((item: any) => item.carrier_id === Number(formData.global_courier_id)).map((item: any) => ({ label: item.product_name + " - " + item.product_code, value: item.product_code })) || []}
                     allowClear={false}
                     placeholder='Select Product Code'

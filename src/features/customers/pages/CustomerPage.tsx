@@ -13,13 +13,14 @@ import { ConformationModal } from '@/components/common/ConformationModal';
 import { showToast } from '@/components/ui/custom-toast';
 import { FormSelect } from '@/features/orders/components/OrderFormUI';
 import ChangePasswordModal from '../components/ChangePasswordModal';
+import useLocalStorage from '@/hooks/useLocalStorage';
 
 export default function CustomerPage() {
-    const [suburb, setSuburb] = useState('');
-    const [state, setState] = useState('');
-    const [search, setSearch] = useState('');
-    const [pageSize, setPageSize] = useState(25);
-    const [currentPage, setCurrentPage] = useState(1);
+    const [suburb, setSuburb] = useLocalStorage<string>('customer_suburb', '');
+    const [state, setState] = useLocalStorage<string>('customer_state', '');
+    const [search, setSearch] = useLocalStorage<string>('customer_search', '');
+    const [pageSize, setPageSize] = useLocalStorage<number>('customer_page_size', 25);
+    const [currentPage, setCurrentPage] = useLocalStorage<number>('customer_page', 1);
     const [isDialogOpen, setIsDialogOpen] = useState(false);
     const [editCustomerId, setEditCustomerId] = useState<string | number | undefined>(undefined);
 
@@ -54,7 +55,7 @@ export default function CustomerPage() {
             return;
         }
 
-        exportCustomers({ format, params: queryParams }, {
+        exportCustomers({ format, params: { search, suburb, state } }, {
             onSuccess: ({ blob, filename }) => {
                 downloadFile(blob, filename);
             },

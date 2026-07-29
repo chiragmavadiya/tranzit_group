@@ -70,6 +70,7 @@ export interface CustomerFormData {
     pallet_active: number;
     topup_enable: boolean;
     order_prefix: string;
+    xero_contact_id?: string | null;
     additional_high_kg_weight_rate: number;
     markup_charges?: CourierWeightCharge[];
     pickup_charges?: CourierWeightCharge[];

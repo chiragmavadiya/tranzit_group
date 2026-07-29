@@ -303,7 +303,10 @@ export const useOrderWorkflow = () => {
     setQuoteData(data.order_details);
     isValidConsignOrder(data.order_status_category);
     setSelectedCustomer(data.customer_id)
-  }, [isValidConsignOrder, setItemsData])
+    if (sessionStorage.getItem(`order_${data?.order_number}_confirmed`) === 'true') {
+      setDangerousGoodsAccepted(true)
+    }
+  }, [isValidConsignOrder, setItemsData, setDangerousGoodsAccepted])
 
   // Sync existing order details (Edit/Consign Mode)
   useEffect(() => {
@@ -566,6 +569,7 @@ export const useOrderWorkflow = () => {
                 navigate(`${role === 'admin' ? '/admin' : ''}/orders/${response?.data?.order_status_category !== 'new' ? 'view' : 'consign'}/${response?.data?.order_number}`);
               }
               setWalletCheckOpen(false);
+              sessionStorage.setItem(`order_${orderID}_confirmed`, 'true');
             } else {
               showToast(response.message || 'Failed to create orders', 'error');
             }
@@ -583,11 +587,9 @@ export const useOrderWorkflow = () => {
         });
 
       } else {
-
         createOrder({ ...payload, is_own_courier }, {
           onSuccess: (response) => {
             if (response.status || response.ok) {
-              showToast('Orders Created successfully', 'success');
               if (skipWalletCheckArg === 'saveAsDraft') {
                 navigate(`${role === 'admin' ? '/admin' : ''}/orders`);
               } else {
@@ -596,7 +598,10 @@ export const useOrderWorkflow = () => {
               setWalletCheckOpen(false);
               if (response?.data?.order_number && (response?.data?.order_status_category !== 'new') && !response?.data?.need_add_tracking) {
                 printLabel(response?.data?.order_number);
+              } else {
+                sessionStorage.setItem(`order_${response?.data?.order_number}_confirmed`, 'true');
               }
+              showToast('Orders Created successfully', 'success');
             } else {
               showToast(response.message || 'Failed to create orders', 'error');
             }
@@ -802,8 +807,7 @@ export const useOrderWorkflow = () => {
   const onArchiveOrder = useCallback(() => {
     if (orderID) {
       archiveOrderMutation.mutate(orderID, {
-        onSuccess: (response) => {
-          showToast(response?.message || 'Order archived successfully', 'success');
+        onSuccess: () => {
           setShowArchiveModal(false);
           navigate(`${role === 'admin' ? '/admin' : ''}/orders`);
         },

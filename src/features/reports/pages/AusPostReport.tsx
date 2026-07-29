@@ -1,8 +1,9 @@
-import { useState, useMemo, useEffect, useCallback } from 'react';
-import { ClipboardList, DollarSign, Receipt, Banknote, Coins } from 'lucide-react';
+import { useMemo, useEffect, useCallback } from 'react';
+import { ClipboardList, DollarSign, Receipt, Banknote, Coins, Search } from 'lucide-react';
 import { format } from 'date-fns';
 import { useSearchParams } from 'react-router-dom';
 import { DataTable } from '@/components/common/DataTable';
+import { ExportMenu } from '@/components/common/ExportMenu';
 import { StatCard } from '@/components/common/StatCard';
 import { AUSPOST_REPORT_COLUMNS } from '../constants';
 import { useAuspostReport, useExportAuspostReport } from '../hooks/useReports';
@@ -10,7 +11,10 @@ import { DateFilter } from '@/components/common/DateFilter';
 import type { DateFilterValue } from '@/components/common/DateFilter/types';
 import { formateCurrency } from '@/lib/utils';
 import { useAppSelector } from '@/hooks/store.hooks';
-import { CustomLabel } from '@/features/orders/components/OrderFormUI';
+import { FormInput, FormSelect } from '@/features/orders/components/OrderFormUI';
+
+import useLocalStorage from '@/hooks/useLocalStorage';
+import { DEFAULT_PAGE_SIZES } from '@/constants/global.constants';
 
 export default function AuspostReportPage() {
   const { is_sub_user, team_access } = useAppSelector((state) => state.auth);
@@ -30,7 +34,7 @@ export default function AuspostReportPage() {
     return undefined;
   }, []);
 
-  const [dateRange, setDateRange] = useState<DateFilterValue>(() => {
+  const initialDateFilter = useMemo<DateFilterValue>(() => {
     const sDate = parseLocalDate(searchParams.get('start_date'));
     const eDate = parseLocalDate(searchParams.get('end_date'));
     if (sDate && eDate) {
@@ -47,13 +51,19 @@ export default function AuspostReportPage() {
       to: undefined,
       label: 'All Time',
     };
-  });
+  }, [searchParams, parseLocalDate]);
 
-  const [search, setSearch] = useState('');
-  const [pageSize, setPageSize] = useState(25);
-  const [page, setPage] = useState(1);
+  const [dateRange, setDateRange] = useLocalStorage<DateFilterValue>('auspost_report_date_range', initialDateFilter);
+  const [search, setSearch] = useLocalStorage<string>('auspost_report_search', '');
+  const [pageSize, setPageSize] = useLocalStorage<number>('auspost_report_page_size', 100);
+  const [page, setPage] = useLocalStorage<number>('auspost_report_page', 1);
 
-  // Synchronize searchParams back to dateRange state
+  const handleDateRangeChange = useCallback((val: DateFilterValue) => {
+    setPage(1);
+    setDateRange(val);
+  }, [setDateRange, setPage]);
+
+  // If URL has start_date & end_date (e.g. redirected from Dashboard), synchronize dateRange state
   useEffect(() => {
     const sDate = parseLocalDate(searchParams.get('start_date'));
     const eDate = parseLocalDate(searchParams.get('end_date'));
@@ -67,15 +77,6 @@ export default function AuspostReportPage() {
           from: fromStr,
           to: toStr,
           label: `${format(sDate, 'dd MMM yyyy')} - ${format(eDate, 'dd MMM yyyy')}`,
-        });
-      }
-    } else {
-      if (dateRange.from !== undefined || dateRange.to !== undefined) {
-        setDateRange({
-          type: 'custom',
-          from: undefined,
-          to: undefined,
-          label: 'All Time',
         });
       }
     }
@@ -171,43 +172,87 @@ export default function AuspostReportPage() {
     <div className="flex flex-col flex-1 gap-4 p-page-padding animate-in fade-in slide-in-from-bottom-2 duration-500 bg-slate-50/30 dark:bg-zinc-950/30 overflow-y-auto">
 
       {/* Summary Section */}
-      <div className="space-y-3 print:hidden">
-        <div className="grid grid-cols-1 md:grid-cols-5  gap-4">
+      <div className="print:hidden">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
           {stats.map((stat, idx) => (
-            <StatCard key={idx} {...stat} className="shadow-sm border-gray-100 dark:border-zinc-800" contentClassName="py-4" />
+            <StatCard key={idx} {...stat} className="shadow-sm border-gray-100 dark:border-zinc-800" contentClassName="py-3" />
           ))}
         </div>
       </div>
 
       {/* Table Section */}
       <div className="rounded-lg min-h-[300px] shadow-md border border-gray-100 dark:border-zinc-800 bg-white dark:bg-zinc-950 overflow-hidden flex-none h-auto">
+        <div className="flex flex-col gap-3 p-4 border-b border-gray-100 dark:border-zinc-800 bg-white dark:bg-zinc-950 rounded-t-lg print:hidden">
+          {/* Row 1: Title */}
+          <div className="flex items-center justify-between">
+            <h1 className="text-base font-bold text-gray-800 dark:text-zinc-200 my-0">
+              Australia Post Report
+            </h1>
+          </div>
+
+          {/* Row 2: Filters & Actions */}
+          <div className="flex flex-wrap items-center gap-2.5 w-full">
+            {/* Search & Date Filter Group */}
+            <div className="flex items-center gap-2 w-full sm:w-auto flex-1 sm:flex-1">
+              <div className="flex-1 sm:w-64 md:w-72">
+                <FormInput
+                  placeholder="Search..."
+                  value={search}
+                  onChange={(value) => { setSearch(value); setPage(1); }}
+                  icon={Search}
+                  className="w-full h-8"
+                />
+              </div>
+              <div className="flex-1 sm:w-60 md:w-64">
+                <DateFilter
+                  value={dateRange}
+                  onChange={handleDateRangeChange}
+                  className="w-full h-8"
+                />
+              </div>
+            </div>
+
+            {/* Actions Row */}
+            <div className="flex items-center gap-2 w-full sm:w-auto justify-between sm:justify-start">
+              <div className="flex items-center gap-1.5 h-8 shrink-0">
+                <span className="text-xs font-semibold text-slate-500 dark:text-zinc-400">Show:</span>
+                <FormSelect
+                  className="w-[80px]"
+                  selectClassName="h-8 text-xs font-bold"
+                  value={pageSize.toString()}
+                  onValueChange={(val) => { if (val) { setPageSize(Number(val)); setPage(1); } }}
+                  options={DEFAULT_PAGE_SIZES}
+                  allowClear={false}
+                  searchdisable
+                />
+              </div>
+
+              {canReadWrite && (
+                <ExportMenu
+                  className="text-xs"
+                  isExporting={exportMutation.isPending}
+                  onExport={(format) => exportMutation.mutate({
+                    start_date: dateRange.from,
+                    end_date: dateRange.to,
+                    search: search || undefined, format
+                  })}
+                />
+              )}
+            </div>
+          </div>
+        </div>
+
         <DataTable
           columns={AUSPOST_REPORT_COLUMNS as any}
           data={data?.data || []}
-          headerTitle="Australia Post Report"
-          searchable
-          searchValue={search}
-          onSearchChange={(val) => { setSearch(val); setPage(1); }}
-          pageSize={pageSize}
-          onPageSizeChange={(val) => { setPageSize(Number(val)); setPage(1); }}
+          header={false}
           className="pb-3 text-xs flex-none h-auto"
           totalItems={data?.meta?.total || 0}
           currentPage={page}
           onPageChange={setPage}
+          pageSize={pageSize}
           rowKey="order_number"
           loading={isLoading}
-          onExport={(format) => exportMutation.mutate({ ...filters, format })}
-          isExporting={exportMutation.isPending}
-          exportable={canReadWrite}
-          headerPosition='left'
-          customHeader={<div className="flex gap-2 mr-4 w-64 items-center">
-            <CustomLabel label="Date Range:" />
-            <DateFilter
-              value={dateRange}
-              onChange={setDateRange}
-              className="w-full"
-            />
-          </div>}
         />
       </div>
     </div>

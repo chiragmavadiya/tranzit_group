@@ -20,7 +20,8 @@ const CARRIER_NAMES: Record<string, string> = {
   aramex: "Aramex",
   mypostbusiness: "MyPost Business",
   directfreight: "Direct Freight",
-  couriersplease: "CouriersPlease"
+  couriersplease: "CouriersPlease",
+  startrack: "StarTrack"
 };
 
 const GUIDE_TIPS: Record<string, {
@@ -34,85 +35,191 @@ const GUIDE_TIPS: Record<string, {
     portalName: "Australia Post Developer Centre",
     portalUrl: "https://developers.auspost.com.au/",
     supportUrl: "https://auspost.com.au/help-and-support",
-    credentialsList: "API Key, API Password, and Account Number",
+    credentialsList: "API Key, API Password and Account Number",
+
     customGuide: (
       <div className="space-y-4 text-left font-normal">
-        <ol className="list-decimal pl-4 space-y-2 text-[13px] text-slate-600 dark:text-zinc-400">
+        <ol className="list-decimal space-y-3 pl-4 text-[13px] leading-relaxed text-slate-600 dark:text-zinc-400">
           <li>
             Sign in to the{" "}
             <a
               href="https://developers.auspost.com.au/"
               target="_blank"
               rel="noopener noreferrer"
-              className="text-primary hover:underline font-semibold"
+              className="font-semibold text-primary hover:underline"
             >
               Australia Post Developer Centre
-            </a>.
+            </a>
+            .
           </li>
-          <li>Register for access to the Shipping and Tracking APIs.</li>
-          <li>Create a production API key and API password.</li>
-          <li>Confirm that the API key is linked to your eParcel charge account.</li>
-          <li>Enter the details in Tranzit and select <strong>Save & test connection</strong>.</li>
-          <li>Review and enable your available Australia Post services.</li>
+
+          <li>
+            Ensure your <strong>eParcel Account</strong> has API access enabled.
+            If API access has not been enabled, contact your Australia Post
+            Account Manager or Customer Support.
+          </li>
+
+          <li>
+            Navigate to your API credentials or application settings within the
+            Developer Centre.
+          </li>
+
+          <li>
+            Locate or generate your production{" "}
+            <strong>API Key</strong> and{" "}
+            <strong>API Password</strong>.
+          </li>
+
+          <li>
+            Copy your <strong>API Key</strong>,{" "}
+            <strong>API Password</strong>, and{" "}
+            <strong>Account Number</strong>.
+          </li>
+
+          <li>
+            Return to Tranzit and enter the credentials into the corresponding
+            fields.
+          </li>
+
+          <li>
+            Enter an account label, then select{" "}
+            <strong>Connect Account</strong> or{" "}
+            <strong>Save Changes</strong>.
+          </li>
         </ol>
 
-        <p className="text-[12px] text-slate-400 dark:text-zinc-500 leading-normal italic mt-2">
-          Australia Post asks customers to have their billing account numbers and integration details ready when registering for API access.
-        </p>
+        <div className="mt-4 space-y-2 rounded-lg border border-amber-200 bg-amber-50 p-3 dark:border-amber-900/50 dark:bg-amber-950/20">
+          <p className="text-[13px] font-bold text-amber-900 dark:text-amber-200">
+            Important
+          </p>
 
-        <div className="pt-4 border-t border-slate-100 dark:border-zinc-800/80 mt-4">
+          <p className="text-[12px] leading-relaxed text-amber-800 dark:text-amber-300">
+            Ensure the API credentials belong to the same{" "}
+            <strong>eParcel Account Number</strong> that you intend to use with
+            Tranzit. Incorrect or inactive credentials will cause the connection
+            test to fail.
+          </p>
+        </div>
+
+        <div className="mt-4 space-y-1 border-t border-slate-100 pt-4 dark:border-zinc-800/80">
+          <p className="text-[13px] font-bold text-slate-800 dark:text-zinc-200">
+            Don't have an eParcel account?
+          </p>
+
+          <p className="text-[13px] leading-normal text-slate-500 dark:text-zinc-400">
+            Contact Australia Post to apply for an eParcel business account. Once
+            your account has been activated and API access has been enabled, you
+            can connect it to Tranzit.
+          </p>
+
+          <p className="mt-1 text-[12px] italic leading-normal text-slate-400 dark:text-zinc-500">
+            API credentials are only available for eligible Australia Post
+            business accounts with eParcel API access enabled.
+          </p>
+        </div>
+
+        <div className="mt-4 border-t border-slate-100 pt-4 dark:border-zinc-800/80">
           <a
             href="https://developers.auspost.com.au/"
             target="_blank"
             rel="noopener noreferrer"
-            className="text-primary hover:underline font-semibold text-[13px]"
+            className="text-[13px] font-semibold text-primary hover:underline"
           >
-            How to obtain Australia Post eParcel API credentials
+            Visit the Australia Post Developer Centre
           </a>
         </div>
       </div>
     )
   },
   aramex: {
-    portalName: "Aramex Connect portal",
+    portalName: "Aramex Connect Portal",
     portalUrl: "https://identity.aramexconnect.com.au/Account/Login",
     supportUrl: "https://www.aramex.com.au/contact-us/",
     credentialsList: "Client ID and Client Secret",
+
     customGuide: (
       <div className="space-y-4 text-left font-normal">
-        <ol className="list-decimal pl-4 space-y-2 text-[13px] text-slate-600 dark:text-zinc-400">
+        <ol className="list-decimal space-y-3 pl-4 text-[13px] leading-relaxed text-slate-600 dark:text-zinc-400">
           <li>
             Sign in to your{" "}
             <a
               href="https://identity.aramexconnect.com.au/Account/Login"
               target="_blank"
               rel="noopener noreferrer"
-              className="text-primary hover:underline font-semibold"
+              className="font-semibold text-primary hover:underline"
             >
-              Aramex Australia account
-            </a>.
+              Aramex Connect Portal
+            </a>
+            .
           </li>
-          <li>Open Administration.</li>
-          <li>Select API Keys.</li>
-          <li>Choose Create Key.</li>
-          <li>Enter a description for the key and save it.</li>
-          <li>Copy the Client ID and Client Secret.</li>
-          <li>Return to Tranzit and enter the credentials.</li>
-          <li>Select <strong>Save & Test Connection</strong>.</li>
+
+          <li>
+            From the dashboard, open <strong>Administration</strong>.
+          </li>
+
+          <li>
+            Select <strong>API Keys</strong>.
+          </li>
+
+          <li>
+            Select <strong>Create Key</strong>.
+          </li>
+
+          <li>
+            Enter a name or description for the API key, then create the key.
+          </li>
+
+          <li>
+            Copy the generated <strong>Client ID</strong> and{" "}
+            <strong>Client Secret</strong>.
+          </li>
+
+          <li>
+            Return to Tranzit and enter the Client ID and Client Secret into the
+            corresponding fields.
+          </li>
+
+          <li>
+            Enter an account label, then select{" "}
+            <strong>Connect Account</strong> or{" "}
+            <strong>Save Changes</strong>.
+          </li>
         </ol>
 
-        <p className="text-[12px] text-amber-600 dark:text-amber-500 leading-normal mt-2 bg-amber-50/50 dark:bg-amber-950/10 border border-amber-100/50 dark:border-amber-900/30 rounded-lg p-2.5">
-          <strong>Security warning:</strong> Store your Client Secret securely. Aramex may only display it when the API key is created.
-        </p>
+        <div className="mt-4 space-y-2 rounded-lg border border-amber-200 bg-amber-50 p-3 dark:border-amber-900/50 dark:bg-amber-950/20">
+          <p className="text-[13px] font-bold text-amber-900 dark:text-amber-200">
+            Important
+          </p>
 
-        <div className="pt-4 border-t border-slate-100 dark:border-zinc-800/80 mt-4">
+          <p className="text-[12px] leading-relaxed text-amber-800 dark:text-amber-300">
+            Your <strong>Client Secret</strong> may only be displayed once when
+            the API key is created. Store it securely before leaving the page.
+          </p>
+        </div>
+
+        <div className="mt-4 space-y-1 border-t border-slate-100 pt-4 dark:border-zinc-800/80">
+          <p className="text-[13px] font-bold text-slate-800 dark:text-zinc-200">
+            Don't have an Aramex account?
+          </p>
+
+          <p className="text-[13px] leading-normal text-slate-500 dark:text-zinc-400">
+            Contact Aramex Australia to create a business account and request API
+            access before connecting your account to Tranzit.
+          </p>
+
+          <p className="mt-1 text-[12px] italic leading-normal text-slate-400 dark:text-zinc-500">
+            API access is available only for eligible Aramex business accounts.
+          </p>
+        </div>
+
+        <div className="mt-4 border-t border-slate-100 pt-4 dark:border-zinc-800/80">
           <a
             href="https://identity.aramexconnect.com.au/Account/Login"
             target="_blank"
             rel="noopener noreferrer"
-            className="text-primary hover:underline font-semibold text-[13px]"
+            className="text-[13px] font-semibold text-primary hover:underline"
           >
-            How to generate Aramex API credentials
+            Sign in to the Aramex Connect Portal
           </a>
         </div>
       </div>
@@ -122,84 +229,381 @@ const GUIDE_TIPS: Record<string, {
     portalName: "MyPost Business Portal",
     portalUrl: "https://mypostbusiness.auspost.com.au/",
     supportUrl: "https://auspost.com.au/help-and-support",
-    credentialsList: "Merchant Token",
+    credentialsList: "Partners Token",
+
     customGuide: (
       <div className="space-y-4 text-left font-normal">
-        <ol className="list-decimal pl-4 space-y-2 text-[13px] text-slate-600 dark:text-zinc-400">
-          <li>Select <strong>Connect with Australia Post</strong>.</li>
+        <ol className="list-decimal space-y-3 pl-4 text-[13px] leading-relaxed text-slate-600 dark:text-zinc-400">
           <li>
-            Sign in to your MyPost Business account on the{" "}
+            Log in to your{" "}
             <a
               href="https://mypostbusiness.auspost.com.au/"
               target="_blank"
               rel="noopener noreferrer"
-              className="text-primary hover:underline font-semibold"
+              className="font-semibold text-primary hover:underline"
             >
-              Australia Post website
-            </a>.
+              MyPost Business account
+            </a>
+            .
           </li>
-          <li>Review the permissions requested by Tranzit.</li>
-          <li>Approve the connection.</li>
-          <li>Return to Tranzit.</li>
-          <li>Confirm your sending address and shipping preferences.</li>
+
+          <li>
+            Select the downward arrow next to your name in the top-right corner,
+            then select <strong>Business details</strong>.
+          </li>
+
+          <li>
+            From the left-hand navigation menu, select{" "}
+            <strong>eCommerce Partners</strong>.
+          </li>
+
+          <li>
+            Find <strong>Tranzit Group</strong> in the list of authorised
+            eCommerce Partners and select <strong>Connect</strong>.
+          </li>
+
+          <li>
+            Review and accept the Australia Post terms and conditions.
+            While your account is being set up, do not close the page or navigate
+            away.
+          </li>
+
+          <li>
+            Add a valid <strong>Visa</strong> or <strong>Mastercard</strong> if
+            your MyPost Business account does not already have a payment card.
+            Orders created through Tranzit may fail without a valid payment card.
+          </li>
+
+          <li>
+            Once the connection is completed, Australia Post will generate a{" "}
+            <strong>Partners Token</strong>.
+          </li>
+
+          <li>
+            Select <strong>Copy Token</strong> to copy the complete Partners
+            Token to your clipboard.
+          </li>
+
+          <li>
+            Return to Tranzit and paste the copied token into the{" "}
+            <strong>Partners Token</strong> field.
+          </li>
+
+          <li>
+            Enter an account label, then select <strong>Connect Account</strong>{" "}
+            or <strong>Save Changes</strong>.
+          </li>
         </ol>
 
-        <div className="pt-4 border-t border-slate-100 dark:border-zinc-800/80 mt-4 space-y-1">
+        <div className="mt-4 space-y-2 rounded-lg border border-amber-200 bg-amber-50 p-3 dark:border-amber-900/50 dark:bg-amber-950/20">
+          <p className="text-[13px] font-bold text-amber-900 dark:text-amber-200">
+            Important
+          </p>
+
+          <p className="text-[12px] leading-relaxed text-amber-800 dark:text-amber-300">
+            Always use the <strong>Copy Token</strong> button in MyPost Business.
+            Do not manually copy the token displayed on the screen, as the full
+            token may not be visible.
+          </p>
+        </div>
+
+        <div className="mt-4 space-y-1 border-t border-slate-100 pt-4 dark:border-zinc-800/80">
           <p className="text-[13px] font-bold text-slate-800 dark:text-zinc-200">
             Don’t have a MyPost Business account?
           </p>
-          <p className="text-[13px] text-slate-500 dark:text-zinc-400 leading-normal">
-            Create one with{" "}
+
+          <p className="text-[13px] leading-normal text-slate-500 dark:text-zinc-400">
+            Create an account with{" "}
             <a
               href="https://mypostbusiness.auspost.com.au/"
               target="_blank"
               rel="noopener noreferrer"
-              className="text-primary hover:underline font-semibold"
+              className="font-semibold text-primary hover:underline"
             >
               Australia Post
-            </a>, then return here to connect it.
+            </a>
+            , then return to Tranzit and follow the steps above.
           </p>
-          <p className="text-[12px] text-slate-400 dark:text-zinc-550 leading-normal mt-1 italic">
-            MyPost Business is free to join and its discounts are based on eligible shipping spend.
+
+          <p className="mt-1 text-[12px] italic leading-normal text-slate-400 dark:text-zinc-500">
+            MyPost Business is free to join. Available rates and discounts are
+            determined by Australia Post based on eligible shipping activity.
           </p>
+        </div>
+
+        <div className="mt-4 border-t border-slate-100 pt-4 dark:border-zinc-800/80">
+          <a
+            href="https://auspost.com.au/content/dam/auspost_corp/media/documents/mypost-business-ecommerce-partner-integration-guide.pdf"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-[13px] font-semibold text-primary hover:underline"
+          >
+            View the official Australia Post integration guide
+          </a>
         </div>
       </div>
     )
   },
   directfreight: {
-    portalName: "Direct Freight Portal",
+    portalName: "Direct Freight",
     portalUrl: "https://www.directfreight.com.au/",
     supportUrl: "https://www.directfreight.com.au/Contact.aspx",
-    credentialsList: "Token, Account number, Site ID, and Consignment Token",
+    credentialsList: "Token, Site ID, Account Number and Consignment Token",
     customGuide: (
       <div className="space-y-4 text-left font-normal">
-        <ol className="list-decimal pl-4 space-y-2 text-[13px] text-slate-600 dark:text-zinc-400">
+        <ol className="list-decimal space-y-3 pl-4 text-[13px] leading-relaxed text-slate-600 dark:text-zinc-400">
           <li>
             Contact{" "}
             <a
               href="https://www.directfreight.com.au/Contact.aspx"
               target="_blank"
               rel="noopener noreferrer"
-              className="text-primary hover:underline font-semibold"
+              className="font-semibold text-primary hover:underline"
             >
               Direct Freight
             </a>{" "}
-            to request API access.
+            and request API access for your business account.
           </li>
-          <li>Obtain your API credentials.</li>
-          <li>Enter your account details into Tranzit.</li>
-          <li>Select <strong>Save & Test Connection</strong>.</li>
-          <li>Review your available freight services.</li>
-          <li>Configure your default delivery preferences.</li>
+
+          <li>
+            Once your API access has been approved, Direct Freight will provide
+            your <strong>Token</strong>, <strong>Site ID</strong>,{" "}
+            <strong>Account Number</strong>, and{" "}
+            <strong>Consignment Token</strong>.
+          </li>
+
+          <li>
+            Return to Tranzit and enter the credentials into the corresponding
+            fields.
+          </li>
+
+          <li>
+            Enter an account label, then select{" "}
+            <strong>Connect Account</strong> or{" "}
+            <strong>Save Changes</strong>.
+          </li>
         </ol>
+
+        <div className="mt-4 space-y-2 rounded-lg border border-amber-200 bg-amber-50 p-3 dark:border-amber-900/50 dark:bg-amber-950/20">
+          <p className="text-[13px] font-bold text-amber-900 dark:text-amber-200">
+            Important
+          </p>
+
+          <p className="text-[12px] leading-relaxed text-amber-800 dark:text-amber-300">
+            These credentials are issued by Direct Freight and cannot be generated
+            from the customer portal. If you don't have them, please contact your
+            Direct Freight Account Manager or Customer Support.
+          </p>
+        </div>
+
+        <div className="mt-4 space-y-1 border-t border-slate-100 pt-4 dark:border-zinc-800/80">
+          <p className="text-[13px] font-bold text-slate-800 dark:text-zinc-200">
+            Don't have a Direct Freight account?
+          </p>
+
+          <p className="text-[13px] leading-normal text-slate-500 dark:text-zinc-400">
+            Contact Direct Freight to open a business account before requesting
+            API access.
+          </p>
+
+          <p className="mt-1 text-[12px] italic leading-normal text-slate-400 dark:text-zinc-500">
+            API credentials are provided only after your Direct Freight account
+            has been approved for API integration.
+          </p>
+        </div>
+
+        <div className="mt-4 border-t border-slate-100 pt-4 dark:border-zinc-800/80">
+          <a
+            href="https://www.directfreight.com.au/Contact.aspx"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-[13px] font-semibold text-primary hover:underline"
+          >
+            Contact Direct Freight
+          </a>
+        </div>
       </div>
     )
   },
   couriersplease: {
-    portalName: "CouriersPlease portal",
+    portalName: "CouriersPlease",
     portalUrl: "https://www.couriersplease.com.au/",
     supportUrl: "https://www.couriersplease.com.au/contact-us",
-    credentialsList: "account number and API password"
+    credentialsList: "Account Number and API Password",
+
+    customGuide: (
+      <div className="space-y-4 text-left font-normal">
+        <ol className="list-decimal space-y-3 pl-4 text-[13px] leading-relaxed text-slate-600 dark:text-zinc-400">
+          <li>
+            Ensure you have an active{" "}
+            <a
+              href="https://www.couriersplease.com.au/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="font-semibold text-primary hover:underline"
+            >
+              CouriersPlease
+            </a>{" "}
+            business account.
+          </li>
+
+          <li>
+            Contact your <strong>CouriersPlease Account Manager</strong> or
+            Customer Support and request API / EDI access for your account.
+          </li>
+
+          <li>
+            Once your request has been approved, CouriersPlease will provide your{" "}
+            <strong>Account Number</strong> and{" "}
+            <strong>API Password</strong>.
+          </li>
+
+          <li>
+            Return to Tranzit and enter the Account Number and API Password into
+            the corresponding fields.
+          </li>
+
+          <li>
+            Enter an account label, then select{" "}
+            <strong>Connect Account</strong> or{" "}
+            <strong>Save Changes</strong>.
+          </li>
+        </ol>
+
+        <div className="mt-4 space-y-2 rounded-lg border border-amber-200 bg-amber-50 p-3 dark:border-amber-900/50 dark:bg-amber-950/20">
+          <p className="text-[13px] font-bold text-amber-900 dark:text-amber-200">
+            Important
+          </p>
+
+          <p className="text-[12px] leading-relaxed text-amber-800 dark:text-amber-300">
+            API credentials are issued by CouriersPlease after API / EDI access
+            has been enabled for your business account. If you have not received
+            your credentials, please contact your Account Manager or
+            CouriersPlease Customer Support.
+          </p>
+        </div>
+
+        <div className="mt-4 space-y-1 border-t border-slate-100 pt-4 dark:border-zinc-800/80">
+          <p className="text-[13px] font-bold text-slate-800 dark:text-zinc-200">
+            Don't have a CouriersPlease account?
+          </p>
+
+          <p className="text-[13px] leading-normal text-slate-500 dark:text-zinc-400">
+            Contact CouriersPlease to open a business account before requesting
+            API access.
+          </p>
+
+          <p className="mt-1 text-[12px] italic leading-normal text-slate-400 dark:text-zinc-500">
+            API integration is available for eligible business accounts with EDI
+            access enabled.
+          </p>
+        </div>
+
+        <div className="mt-4 border-t border-slate-100 pt-4 dark:border-zinc-800/80">
+          <a
+            href="https://www.couriersplease.com.au/contact-us"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-[13px] font-semibold text-primary hover:underline"
+          >
+            Contact CouriersPlease
+          </a>
+        </div>
+      </div>
+    )
+  },
+  startrack: {
+    portalName: "Australia Post Developer Centre",
+    portalUrl: "https://developers.auspost.com.au/",
+    supportUrl: "https://auspost.com.au/help-and-support",
+    credentialsList: "API Key, Password and StarTrack Account Number",
+
+    customGuide: (
+      <div className="space-y-4 text-left font-normal">
+        <ol className="list-decimal space-y-3 pl-4 text-[13px] leading-relaxed text-slate-600 dark:text-zinc-400">
+          <li>
+            Sign in to the{" "}
+            <a
+              href="https://developers.auspost.com.au/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="font-semibold text-primary hover:underline"
+            >
+              Australia Post Developer Centre
+            </a>
+            .
+          </li>
+
+          <li>
+            Register for the <strong>Shipping &amp; Tracking API</strong> using
+            your <strong>StarTrack Account Number</strong>.
+          </li>
+
+          <li>
+            If you already have a Shipping &amp; Tracking API key, you can add
+            your StarTrack account to your existing API credentials instead of
+            creating a new integration.
+          </li>
+
+          <li>
+            Once your registration has been approved, Australia Post will provide
+            your <strong>API Key</strong> and <strong>Password</strong>.
+          </li>
+
+          <li>
+            Return to Tranzit and enter your{" "}
+            <strong>API Key</strong>, <strong>Password</strong>, and{" "}
+            <strong>StarTrack Account Number</strong> into the corresponding
+            fields.
+          </li>
+
+          <li>
+            Enter an account label, then select{" "}
+            <strong>Connect Account</strong> or{" "}
+            <strong>Save Changes</strong>.
+          </li>
+        </ol>
+
+        <div className="mt-4 space-y-2 rounded-lg border border-amber-200 bg-amber-50 p-3 dark:border-amber-900/50 dark:bg-amber-950/20">
+          <p className="text-[13px] font-bold text-amber-900 dark:text-amber-200">
+            Important
+          </p>
+
+          <p className="text-[12px] leading-relaxed text-amber-800 dark:text-amber-300">
+            Shipping &amp; Tracking API access is available only for eligible
+            Australia Post or StarTrack contract customers. API credentials are
+            issued after your registration has been reviewed and approved.
+          </p>
+        </div>
+
+        <div className="mt-4 space-y-1 border-t border-slate-100 pt-4 dark:border-zinc-800/80">
+          <p className="text-[13px] font-bold text-slate-800 dark:text-zinc-200">
+            Don't have a StarTrack account?
+          </p>
+
+          <p className="text-[13px] leading-normal text-slate-500 dark:text-zinc-400">
+            Contact Australia Post or StarTrack to establish a contract account
+            before requesting Shipping &amp; Tracking API access.
+          </p>
+
+          <p className="mt-1 text-[12px] italic leading-normal text-slate-400 dark:text-zinc-500">
+            A valid StarTrack contract account is required before API credentials
+            can be issued.
+          </p>
+        </div>
+
+        <div className="mt-4 border-t border-slate-100 pt-4 dark:border-zinc-800/80">
+          <a
+            href="https://developers.auspost.com.au/apis/st-registration"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-[13px] font-semibold text-primary hover:underline"
+          >
+            Register for the Shipping &amp; Tracking API
+          </a>
+        </div>
+      </div>
+    )
   }
 };
 
@@ -230,7 +634,8 @@ function CarrierConfigTip({ selectedCarrier }: CarrierConfigTipProps) {
             {selectedCarrier === 'mypostbusiness' && "Make sure you have an active MyPost Business account and access to the email address registered with Australia Post."}
             {selectedCarrier === 'aramex' && "You will need an active Aramex Australia account and API credentials generated from your Aramex account portal."}
             {selectedCarrier === 'directfreight' && "To connect your Direct Freight account, ensure that API access has been enabled by Direct Freight."}
-            {selectedCarrier !== 'auspost' && selectedCarrier !== 'mypostbusiness' && selectedCarrier !== 'aramex' && selectedCarrier !== 'directfreight' && `Make sure you have an active ${displayName} account with API access enabled.`}
+            {selectedCarrier === 'startrack' && "You will need an active StarTrack account and approved Shipping and Tracking API credentials."}
+            {selectedCarrier !== 'auspost' && selectedCarrier !== 'mypostbusiness' && selectedCarrier !== 'aramex' && selectedCarrier !== 'directfreight' && selectedCarrier !== 'startrack' && `Make sure you have an active ${displayName} account with API access enabled.`}
           </span>
         </div>
       </div>
@@ -285,6 +690,9 @@ function CarrierConfigTip({ selectedCarrier }: CarrierConfigTipProps) {
             </div>
           </div>
         )}
+        <p className="my-0 text-[12px] text-slate-400 dark:text-zinc-500 leading-normal italic mt-4 pt-4 border-t border-slate-100 dark:border-zinc-800/80">
+          If you cannot locate these credentials, please contact your courier account manager or customer support.
+        </p>
       </div>
     </div>
   );
@@ -508,12 +916,13 @@ export default function CarrierConfigForm({
       aramex: ['client_id', 'client_secret'],
       mypostbusiness: ['merchant_token'],
       directfreight: ['token', 'account', 'site_id', 'base_url', 'consignment_token'],
-      couriersplease: ['username', 'password']
+      couriersplease: ['username', 'password'],
+      startrack: ['api_key', 'api_password', 'account_number']
     };
 
     const fieldLabelMap: Record<string, string> = {
       api_key: 'API Key',
-      api_password: 'API Secret',
+      api_password: selectedCarrier === 'startrack' ? 'API Password' : 'API Secret',
       account_number: 'Account number',
       client_id: 'Client ID',
       client_secret: 'Client Secret',
@@ -606,7 +1015,7 @@ export default function CarrierConfigForm({
         return (
           <>
             <div className="col-span-12 space-y-1">
-              <FormInput label="Merchant token" {...commonProps("merchant_token")} placeholder="Enter your Merchant Token" info="Enter your MyPost Business Merchant token." />
+              <FormInput label="Partners Token" {...commonProps("merchant_token")} placeholder="Enter your Partners Token" info="Enter your MyPost Business Partners Token." />
             </div>
             <div className="col-span-12 space-y-1">
               <FormInput label="Account label" {...commonProps("account_label")} required={false} placeholder="Enter your Account label" info="Enter a label for this account (optional)." />
@@ -641,6 +1050,23 @@ export default function CarrierConfigForm({
             </div>
             <div className="col-span-12 space-y-1">
               <FormInput label="API Secret" {...commonProps("password")} type="password" placeholder="Enter your API Secret" info="Enter the API Secret provided or enabled for your CouriersPlease account. This may be different from the Secret you use to sign in to the CouriersPlease portal." />
+            </div>
+          </>
+        );
+      case 'startrack':
+        return (
+          <>
+            <div className="col-span-12 space-y-1">
+              <FormInput label="Account number" {...commonProps("account_number")} placeholder="For example: 2004912892" info="Enter the StarTrack charge account number linked to your contract." />
+            </div>
+            <div className="col-span-12 space-y-1">
+              <FormInput label="API key" {...commonProps("api_key")} placeholder="Enter your API Key" info="Enter the StarTrack account number linked to your freight contract." />
+            </div>
+            <div className="col-span-12 space-y-1">
+              <FormInput label="API Password" {...commonProps("api_password")} type="password" placeholder="Enter your API Password" info="Enter the API Password associated with your StarTrack API account." />
+            </div>
+            <div className="col-span-12 space-y-1">
+              <FormInput label="Account label" {...commonProps("account_label")} required={false} placeholder="Enter your Account label" info="Enter a label for this account (optional)." />
             </div>
           </>
         );

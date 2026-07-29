@@ -24,16 +24,17 @@ import { useDebounce } from '@/hooks/useDebounce';
 import { CustomTooltip } from '@/components/common/CustomTooltip';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import { useAppSelector } from '@/hooks/store.hooks';
+import useLocalStorage from '@/hooks/useLocalStorage';
 
 export default function MyItemsPage() {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [itemToDelete, setItemToDelete] = useState<number | null>(null);
   const [editingItemId, setEditingItemId] = useState<number | null>(null);
-  const [search, setSearch] = useState('');
+  const [search, setSearch] = useLocalStorage<string>('items_search', '');
   const debouncedSearch = useDebounce(search, 500); // 500ms delay
-  const [pageSize, setPageSize] = useState(25);
-  const [currentPage, setCurrentPage] = useState(1);
+  const [pageSize, setPageSize] = useLocalStorage<number>('items_page_size', 25);
+  const [currentPage, setCurrentPage] = useLocalStorage<number>('items_current_page', 1);
   const { is_sub_user, team_access } = useAppSelector((state) => state.auth);
   const canReadWrite = useMemo(() => !is_sub_user || team_access?.permissions?.my_items === 'full', [is_sub_user, team_access]);
 
@@ -55,12 +56,12 @@ export default function MyItemsPage() {
   const handleSearch = useCallback((search: string) => {
     setSearch(search);
     setCurrentPage(1);
-  }, []);
+  }, [setSearch, setCurrentPage]);
 
   const handlePageSizeChange = useCallback((pageSize: number) => {
     setPageSize(pageSize);
     setCurrentPage(1);
-  }, []);
+  }, [setPageSize, setCurrentPage]);
 
   const handleAddItem = useCallback(() => {
     setEditingItemId(null);
@@ -153,7 +154,7 @@ export default function MyItemsPage() {
                     }
                   }}
                   disabled={setDefaultItemMutation.isPending || unsetDefaultItemMutation.isPending}
-                  className="p-0 bg-transparent border-none outline-none focus:outline-none transition-transform active:scale-95 cursor-pointer hover:scale-110"
+                  className="mt-1.5 bg-transparent border-none outline-none focus:outline-none transition-transform active:scale-95 cursor-pointer hover:scale-110"
                 >
                   {(setDefaultItemMutation.isPending && setDefaultItemMutation.variables === row.id) ||
                     (unsetDefaultItemMutation.isPending && unsetDefaultItemMutation.variables === row.id) ? (
@@ -197,7 +198,12 @@ export default function MyItemsPage() {
               </TooltipContent>
             </Tooltip>)}
           {/* </CustomTooltip> */}
-          <span className='text-xs font-medium'>{val}</span>
+          <div className='min-w-0'>
+            <span className='text-[13px] xl:text-sm font-medium'>{val}</span>
+            <p className='md:hidden m-0 text-[11px] text-gray-500 dark:text-zinc-400'>
+              {row.item_code} · {row.item_length} × {row.item_width} × {row.item_height} cm · {typeof row.item_weight === 'number' ? row.item_weight.toFixed(2) : row.item_weight} kg
+            </p>
+          </div>
         </div>
       )
     },
@@ -207,17 +213,20 @@ export default function MyItemsPage() {
       header: "Item Code",
       sortable: true,
       searchable: true,
+      className: "hidden md:table-cell",
     },
     {
       key: "dimensions",
       accessor: "dimensions",
       header: "Dimensions",
+      className: "hidden md:table-cell",
       cell: (_, row) => `${row.item_length} × ${row.item_width} × ${row.item_height}`
     },
     {
       key: "item_weight",
       accessor: "item_weight",
       header: "Weight",
+      className: "hidden md:table-cell",
       cell: (val) => typeof val === 'number' ? val.toFixed(2) + ' kg' : val
     },
     {
@@ -225,6 +234,7 @@ export default function MyItemsPage() {
       accessor: "item_cubic",
       header: "Item Cubic",
       sortable: true,
+      className: "hidden lg:table-cell",
       cell: (val) => typeof val === 'number' ? val.toFixed(4) : val
     },
     {
@@ -259,15 +269,15 @@ export default function MyItemsPage() {
       header: "ACTIONS",
       className: "w-20 px-0 pr-3 print:hidden",
       cell: (_: any, row: any) => (
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-2">
           <CustomTooltip title="Edit item">
-            <Button variant="ghost" size="sm" className="p-0 hover:text-primary bg-transparent dark:hover:bg-transparent" onClick={() => handleEditItem(row)}>
+            <Button variant="ghost" size="sm" className="h-8 w-8 p-0 hover:text-primary bg-transparent dark:hover:bg-transparent" onClick={() => handleEditItem(row)}>
               <Pencil className='h-4 w-4' />
             </Button>
           </CustomTooltip>
 
           <CustomTooltip title="Delete item">
-            <Button variant="ghost" size="sm" className="p-0 hover:text-red-600 bg-transparent dark:hover:bg-transparent" onClick={() => handleDeleteClick(row.id)}>
+            <Button variant="ghost" size="sm" className="h-8 w-8 p-0 hover:text-red-600 bg-transparent dark:hover:bg-transparent" onClick={() => handleDeleteClick(row.id)}>
               <Trash className='h-4 w-4' />
             </Button>
           </CustomTooltip>

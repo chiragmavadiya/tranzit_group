@@ -27,13 +27,7 @@ export interface AnnouncementResponse {
 export interface AnnouncementListApiResponse {
   status: boolean;
   message: string;
-  data: AnnouncementResponse[] | {
-    data: AnnouncementResponse[];
-    total: number;
-    current_page: number;
-    per_page: number;
-    last_page: number;
-  };
+  data: AnnouncementResponse[];
   meta: {
     current_page: number;
     last_page: number;
@@ -51,6 +45,7 @@ export interface AnnouncementSingleApiResponse {
 export const announcementService = {
   getAnnouncements: async (params?: { page?: number; per_page?: number; search?: string }): Promise<AnnouncementListApiResponse> => {
     const response = await api.get<AnnouncementListApiResponse>(API_ENDPOINTS.ANNOUNCEMENTS.BASE, { params });
+    console.log(response, 'announcementService.getAnnouncements response.data');
     return response.data;
   },
 

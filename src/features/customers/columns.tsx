@@ -79,7 +79,7 @@ export const getCustomerColumns = (
                                 <img className='w-[32px] h-[32px] object-cover rounded-full' src={`https://ui-avatars.com/api/?format=svg&name=${fullName}&background=random&rounded=true&font-size=0.33&bold=true`} alt={fullName} />
                             </div>
                             <div className="flex flex-col">
-                                <span className="text-sm font-semibold text-slate-900">{fullName}</span>
+                                <span className="text-sm font-semibold text-slate-900 break-normal">{fullName}</span>
                                 <span className="text-xs text-muted-foreground">{customer.email}</span>
                             </div>
                         </div>
@@ -91,12 +91,13 @@ export const getCustomerColumns = (
             key: 'mobile',
             header: 'MOBILE',
             width: '140px',
-            cell: (_, customer) => <span className="text-xs text-slate-600">{customer.personal_mobile || customer.office_number || '-'}</span>,
+            cell: (_, customer) => <span className="text-xs text-slate-600 break-normal">{customer.personal_mobile || customer.office_number || '-'}</span>,
         },
         {
             key: 'business_name',
             header: 'BUSINESS NAME',
             width: '200px',
+            className: 'break-normal',
             // cell: (_, customer) => <span className="text-sm text-slate-600">{customer.business_name}</span>,
         },
         {
@@ -110,6 +111,7 @@ export const getCustomerColumns = (
             key: 'suburb',
             header: 'SUBURB',
             width: '140px',
+            className: 'break-normal',
             // cell: (_, customer) => <span className="text-sm text-slate-600">{customer.suburb}</span>,
         },
         {

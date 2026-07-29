@@ -549,7 +549,7 @@ const OrderDetailsPage: React.FC = () => {
                   </div>
                 )}
 
-                {isEditable && (
+                {isEditable && !sessionStorage.getItem(`order_${orderDetail?.order_number}_confirmed`) && (
                   <div className="lg:col-start-1 lg:row-start-2 w-full">
                     <ConfirmContinue
                       termsAccepted={termsAccepted}

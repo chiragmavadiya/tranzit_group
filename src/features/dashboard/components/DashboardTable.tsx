@@ -1,10 +1,11 @@
-import { useState, useMemo } from "react";
+import { useMemo } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 import { DataTable, type Column } from "@/components/common";
 import { useAdminInvoices, useExportAdminInvoices } from "@/features/invoices/hooks/useInvoices";
 import { useOrders, useExportOrders } from "@/features/orders/hooks/useOrders";
 import { useDebounce } from "@/hooks/useDebounce";
+import useLocalStorage from "@/hooks/useLocalStorage";
 
 interface DashboardTableProps<T> {
   title: string;
@@ -28,9 +29,9 @@ export function DashboardTable<T extends { id: number }>({
   pageSize: initialPageSize = 25,
   filterValue
 }: DashboardTableProps<T>) {
-  const [search, setSearch] = useState<string>("");
-  const [page, setPage] = useState<number>(1);
-  const [pageSize, setPageSize] = useState<number>(initialPageSize);
+  const [search, setSearch] = useLocalStorage<string>('dashboard_search',"");
+  const [page, setPage] = useLocalStorage<number>('dashboard_page',1);
+  const [pageSize, setPageSize] = useLocalStorage<number>('dashboard_pageSize',initialPageSize);
 
   const debouncedSearch = useDebounce(search, 500);
 

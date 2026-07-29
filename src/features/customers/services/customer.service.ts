@@ -129,14 +129,6 @@ export const customerService = {
     },
 
     /**
-     * Sync customer to Zoho
-     */
-    zohoSync: async (id: number | string, syncData?: any): Promise<GenericResponse> => {
-        const response = await api.post(API_ENDPOINTS.ADMIN_CUSTOMERS.ZOHO_SYNC(id), { syncData });
-        return response.data;
-    },
-
-    /**
      * Export list of customers
      */
     exportList: async (format: string, params?: Record<string, any>): Promise<{ blob: Blob; filename: string }> => {

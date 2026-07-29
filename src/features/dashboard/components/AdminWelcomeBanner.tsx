@@ -63,6 +63,7 @@ export function AdminWelcomeBanner({
         <DateFilter
           value={filterValue}
           onChange={onFilterChange}
+          fromDashboard={true}
         />
 
         {/* Separator line (visible only on desktop) */}

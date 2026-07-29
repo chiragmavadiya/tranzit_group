@@ -76,11 +76,6 @@ export const invoicesService = {
     return response.data;
   },
 
-  zohoSyncAdminInvoice: async (id: string | number): Promise<{ status: boolean; message: string }> => {
-    const response = await api.post(API_ENDPOINTS.ADMIN_INVOICES.ZOHO_SYNC(id));
-    return response.data;
-  },
-
   addAdminInvoicePayment: async (id: string | number, data: any): Promise<{ status: boolean; message: string; data: any }> => {
     const response = await api.post(API_ENDPOINTS.ADMIN_INVOICES.PAYMENTS(id), data);
     return response.data;

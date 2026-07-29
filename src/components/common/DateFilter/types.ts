@@ -20,4 +20,5 @@ export interface DateFilterProps {
   value: DateFilterValue;
   onChange: (value: DateFilterValue) => void;
   className?: string;
+  fromDashboard?: boolean;
 }

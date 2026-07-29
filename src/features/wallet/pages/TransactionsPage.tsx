@@ -1,6 +1,5 @@
-import { useState, useMemo, useCallback, useEffect } from 'react';
+import { useState, useMemo, useCallback } from 'react';
 import { TrendingDown, TrendingUp, Wallet } from 'lucide-react';
-import { useSearchParams } from 'react-router-dom';
 import { format, parse, isValid } from 'date-fns';
 import { DataTable } from '@/components/common/DataTable';
 import { StatCard } from '@/components/common/StatCard';
@@ -13,123 +12,23 @@ import { useWalletTransactions, useWalletExport, useDownloadReceipt } from '../h
 import type { WalletTransaction } from '../types';
 import { useAppSelector } from '@/hooks/store.hooks';
 import { formateCurrency } from '@/lib/utils';
+import useLocalStorage from '@/hooks/useLocalStorage';
 
 export default function TransactionsPage() {
   const { is_sub_user, team_access } = useAppSelector((state) => state.auth);
   const canReadWrite = useMemo(() => !is_sub_user || team_access?.permissions?.get_quote === 'full', [is_sub_user, team_access]);
-  const [searchParams, setSearchParams] = useSearchParams();
-  const [transactionType, setTransactionType] = useState('all');
-  const [search, setSearch] = useState('');
-  const [pageSize, setPageSize] = useState(25);
-  const [currentPage, setCurrentPage] = useState(1);
+  const [transactionType, setTransactionType] = useLocalStorage<string>('wallet_transaction_type', 'all');
+  const [search, setSearch] = useLocalStorage<string>('wallet_search', '');
+  const [pageSize, setPageSize] = useLocalStorage<number>('wallet_page_size', 25);
+  const [currentPage, setCurrentPage] = useLocalStorage<number>('wallet_current_page', 1);
   const [downloadingId, setDownloadingId] = useState<string | number | null>(null);
 
-  const parseLocalDate = useCallback((dateStr?: string | null) => {
-    if (!dateStr) return undefined;
-    const parts = dateStr.includes('/') ? dateStr.split('/') : dateStr.split('-');
-    if (parts.length === 3) {
-      const day = parseInt(parts[0], 10);
-      const month = parseInt(parts[1], 10) - 1; // 0-based
-      const year = parseInt(parts[2], 10);
-      return new Date(year, month, day);
-    }
-    return undefined;
-  }, []);
-
-  const initialDateFilter = useMemo<DateFilterValue>(() => {
-    const sDate = parseLocalDate(searchParams.get('start_date'));
-    const eDate = parseLocalDate(searchParams.get('end_date'));
-    if (sDate && eDate) {
-      return {
-        type: 'custom',
-        from: format(sDate, 'dd/MM/yyyy'),
-        to: format(eDate, 'dd/MM/yyyy'),
-        label: `${format(sDate, 'dd MMM yyyy')} - ${format(eDate, 'dd MMM yyyy')}`,
-      };
-    }
-    return {
-      type: 'custom',
-      from: '',
-      to: '',
-      label: 'All Time',
-    };
-  }, [searchParams, parseLocalDate]);
-
-  const [dateRange, setDateRange] = useState<DateFilterValue>(() => initialDateFilter);
-
-  // Sync url params back to state
-  useEffect(() => {
-    const sDate = parseLocalDate(searchParams.get('start_date'));
-    const eDate = parseLocalDate(searchParams.get('end_date'));
-    if (sDate && eDate) {
-      const fromStr = format(sDate, 'dd/MM/yyyy');
-      const toStr = format(eDate, 'dd/MM/yyyy');
-
-      if (dateRange.from !== fromStr || dateRange.to !== toStr) {
-        setDateRange({
-          type: 'custom',
-          from: fromStr,
-          to: toStr,
-          label: `${format(sDate, 'dd MMM yyyy')} - ${format(eDate, 'dd MMM yyyy')}`,
-        });
-      }
-    } else {
-      if (dateRange.from !== '' || dateRange.to !== '') {
-        setDateRange({
-          type: 'custom',
-          from: '',
-          to: '',
-          label: 'All Time',
-        });
-      }
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [searchParams, parseLocalDate]);
-
-  // Sync state to url params
-  useEffect(() => {
-    setSearchParams((prev) => {
-      let hasChanged = false;
-
-      const currentStartDate = prev.get('start_date') || undefined;
-      let newStartDate: string | undefined;
-      if (dateRange.from) {
-        const parsedFrom = parse(dateRange.from, 'dd/MM/yyyy', new Date());
-        if (isValid(parsedFrom)) {
-          newStartDate = format(parsedFrom, 'dd-MM-yyyy');
-        }
-      }
-
-      if (currentStartDate !== newStartDate) {
-        if (newStartDate) {
-          prev.set('start_date', newStartDate);
-        } else {
-          prev.delete('start_date');
-        }
-        hasChanged = true;
-      }
-
-      const currentEndDate = prev.get('end_date') || undefined;
-      let newEndDate: string | undefined;
-      if (dateRange.to) {
-        const parsedTo = parse(dateRange.to, 'dd/MM/yyyy', new Date());
-        if (isValid(parsedTo)) {
-          newEndDate = format(parsedTo, 'dd-MM-yyyy');
-        }
-      }
-
-      if (currentEndDate !== newEndDate) {
-        if (newEndDate) {
-          prev.set('end_date', newEndDate);
-        } else {
-          prev.delete('end_date');
-        }
-        hasChanged = true;
-      }
-
-      return hasChanged ? prev : prev;
-    }, { replace: true });
-  }, [dateRange, setSearchParams]);
+  const [dateRange, setDateRange] = useLocalStorage<DateFilterValue>('wallet_date_range', {
+    type: 'custom',
+    from: '',
+    to: '',
+    label: 'All Time',
+  });
 
   const formattedStartDate = useMemo(() => {
     if (!dateRange.from) return undefined;
@@ -219,32 +118,6 @@ export default function TransactionsPage() {
   return (
     <div className="flex flex-col flex-1 gap-4 p-page-padding animate-in fade-in slide-in-from-bottom-2 duration-500 bg-slate-50/30 dark:bg-zinc-950/30 overflow-y-auto">
 
-      <div className="flex flex-wrap items-end justify-end gap-3 print:hidden">
-        <div className="w-60 space-y-1 text-left">
-          <span className="text-xs font-semibold text-slate-600 dark:text-zinc-400">Date Range</span>
-          <DateFilter
-            value={dateRange}
-            onChange={setDateRange}
-            className="w-full"
-          />
-        </div>
-
-        {/* Devider */}
-        <div className="w-[2px] h-8 bg-gray-400 dark:bg-zinc-800" />
-
-        <div className="w-60 space-y-1 text-left">
-          <span className="text-xs font-semibold text-slate-600 dark:text-zinc-400">Transaction Type</span>
-          <FormSelect
-            options={TRANSACTION_TYPES}
-            value={transactionType}
-            onValueChange={(val) => handleTransactionTypeChange(val as any)}
-            placeholder="Select Transaction Type"
-            className="h-8 w-full"
-            searchdisable
-            allowClear={false}
-          />
-        </div>
-      </div>
 
 
       {/* Summary Section */}
@@ -258,6 +131,32 @@ export default function TransactionsPage() {
 
       {/* Table Section */}
       <div className="rounded-xl shadow-md border border-gray-100 dark:border-zinc-800 bg-white dark:bg-zinc-950 overflow-hidden flex-none h-auto">
+        <div className="flex flex-wrap items-end justify-end gap-3 px-4 pt-3 sm:pt-0 print:hidden">
+          <div className="w-full sm:w-60 space-y-1 text-left">
+            <span className="text-xs font-semibold text-slate-600 dark:text-zinc-400">Date Range</span>
+            <DateFilter
+              value={dateRange}
+              onChange={setDateRange}
+              className="w-full"
+            />
+          </div>
+
+          {/* Devider */}
+          <div className="hidden sm:block w-[2px] h-8 bg-gray-400 dark:bg-zinc-800" />
+
+          <div className="w-full sm:w-60 space-y-1 text-left">
+            <span className="text-xs font-semibold text-slate-600 dark:text-zinc-400">Transaction Type</span>
+            <FormSelect
+              options={TRANSACTION_TYPES}
+              value={transactionType}
+              onValueChange={(val) => handleTransactionTypeChange(val as any)}
+              placeholder="Select Transaction Type"
+              className="h-8 w-full"
+              searchdisable
+              allowClear={false}
+            />
+          </div>
+        </div>
         <DataTable
           columns={columns as any}
           data={transactionsData?.data || []}

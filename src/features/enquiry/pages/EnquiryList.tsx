@@ -39,11 +39,19 @@ export default function EnquiryListPage() {
         {
             key: 'issue_type',
             header: 'ISSUE TYPE',
-            cell: (val: any) => <span className="text-slate-500 font-semibold capitalize">{val}</span>
+            cell: (val: any, row: any) => (
+                <div className="min-w-0">
+                    <span className="text-slate-500 font-semibold capitalize">{val}</span>
+                    <p className="md:hidden m-0 text-[11px] text-gray-500 dark:text-zinc-400 break-words">
+                        {row.email || row.reply_email || ''}{(row.date || row.created_at) ? ` · ${row.date || row.created_at}` : ''}
+                    </p>
+                </div>
+            )
         },
         {
             key: 'email',
             header: 'EMAIL',
+            className: 'hidden md:table-cell',
             cell: (val: any, row: any) => <span className="text-slate-500 font-medium">{val || row.reply_email || ''}</span>
         },
         {
@@ -62,6 +70,7 @@ export default function EnquiryListPage() {
             key: 'date',
             header: 'DATE',
             sortable: true,
+            className: 'hidden md:table-cell',
             cell: (val: any, row: any) => <span className="text-slate-600 font-medium">{val || row.created_at || ''}</span>
         },
         {
@@ -103,7 +112,7 @@ export default function EnquiryListPage() {
                     customHeader={
                         <Button
                             onClick={() => navigate('/enquiry')}
-                            className="gap-2 bg-primary hover:bg-primary-hover text-white shadow-lg shadow-blue-100 dark:shadow-none transition-all active:scale-[0.98] font-semibold border-none px-4 h-8"
+                            className="w-full sm:w-auto gap-2 bg-primary hover:bg-primary-hover text-white shadow-lg shadow-blue-100 dark:shadow-none transition-all active:scale-[0.98] font-semibold border-none px-4 h-8"
                         >
                             <Plus className="w-4 h-4" />
                             <span className="text-xs uppercase tracking-wide font-bold">New Enquiry</span>

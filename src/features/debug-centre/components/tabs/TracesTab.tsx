@@ -6,12 +6,13 @@ import type { DebugFilters } from '../../types';
 
 interface TracesTabProps {
   filters: DebugFilters;
+  searchValue: string;
   onPageChange: (page: number) => void;
   onPageSizeChange: (pageSize: number) => void;
   onSearchChange: (search: string) => void;
 }
 
-export const TracesTab = ({ filters, onPageChange, onPageSizeChange, onSearchChange }: TracesTabProps) => {
+export const TracesTab = ({ filters, searchValue, onPageChange, onPageSizeChange, onSearchChange }: TracesTabProps) => {
   const navigate = useNavigate();
   const { data: tracesData, isLoading } = useDebugTraces(filters);
   const traces = tracesData?.data || [];
@@ -29,7 +30,7 @@ export const TracesTab = ({ filters, onPageChange, onPageSizeChange, onSearchCha
       onPageSizeChange={onPageSizeChange}
       onRowClick={(row) => navigate(`/admin/debug-centre/${row.trace_id}`)}
       sortable
-      searchValue={filters.search}
+      searchValue={searchValue}
       onSearchChange={onSearchChange}
       headerTitle="Traces"
       emptyMessage="No traces found"

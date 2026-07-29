@@ -123,11 +123,11 @@ export const Pagination: React.FC<PaginationProps> = ({
         </div>
       )}
       <div className="flex items-center gap-1.5">
-        {/* First Page */}
+        {/* First Page - Hidden on small screens */}
         <Button
           variant="ghost"
           className={cn(
-            "h-8 w-8 p-0 text-xs font-semibold rounded-lg bg-slate-100 hover:bg-primary/10 hover:text-primary dark:bg-zinc-800 dark:text-zinc-300 transition-colors border-none",
+            "h-8 w-8 p-0 text-xs font-semibold rounded-lg bg-slate-100 hover:bg-primary/10 hover:text-primary dark:bg-zinc-800 dark:text-zinc-300 transition-colors border-none hidden md:inline-flex",
             currentPage === 1 && "opacity-40 pointer-events-none"
           )}
           onClick={() => onPageChange(1)}
@@ -155,7 +155,7 @@ export const Pagination: React.FC<PaginationProps> = ({
             return (
               <div
                 key={`dots-${idx}`}
-                className="h-8 w-8 flex items-center justify-center text-xs font-semibold rounded-lg bg-slate-50 dark:bg-zinc-900/50 text-slate-400 dark:text-zinc-600 select-none"
+                className="h-8 w-8 hidden md:flex items-center justify-center text-xs font-semibold rounded-lg bg-slate-50 dark:bg-zinc-900/50 text-slate-400 dark:text-zinc-600 select-none"
               >
                 ...
               </div>
@@ -163,6 +163,8 @@ export const Pagination: React.FC<PaginationProps> = ({
           }
 
           const isActive = pageNumber === currentPage;
+          const isFirst = pageNumber === 1;
+          const isLast = pageNumber === totalPages;
           return (
             <Button
               key={pageNumber}
@@ -171,7 +173,8 @@ export const Pagination: React.FC<PaginationProps> = ({
                 "h-8 w-8 p-0 text-xs font-semibold rounded-lg transition-colors border-none",
                 isActive
                   ? "bg-primary text-white hover:bg-primary/95"
-                  : "bg-slate-100 hover:bg-primary/10 hover:text-primary dark:bg-zinc-800 dark:text-zinc-300"
+                  : "bg-slate-100 hover:bg-primary/10 hover:text-primary dark:bg-zinc-800 dark:text-zinc-300",
+                (!isActive && !isFirst && !isLast) && "hidden md:inline-flex"
               )}
               onClick={() => onPageChange(Number(pageNumber))}
             >
@@ -193,11 +196,11 @@ export const Pagination: React.FC<PaginationProps> = ({
           ›
         </Button>
 
-        {/* Last Page */}
+        {/* Last Page - Hidden on small screens */}
         <Button
           variant="ghost"
           className={cn(
-            "h-8 w-8 p-0 text-xs font-semibold rounded-lg bg-slate-100 hover:bg-primary/10 hover:text-primary dark:bg-zinc-800 dark:text-zinc-300 transition-colors border-none",
+            "h-8 w-8 p-0 text-xs font-semibold rounded-lg bg-slate-100 hover:bg-primary/10 hover:text-primary dark:bg-zinc-800 dark:text-zinc-300 transition-colors border-none hidden md:inline-flex",
             currentPage >= totalPages && "opacity-40 pointer-events-none"
           )}
           onClick={() => onPageChange(totalPages)}
@@ -205,6 +208,11 @@ export const Pagination: React.FC<PaginationProps> = ({
         >
           »
         </Button>
+
+        {/* Mobile page indicator */}
+        <span className="md:hidden text-xs font-medium text-slate-500 dark:text-zinc-400 ml-2">
+          {currentPage} of {totalPages}
+        </span>
       </div>
       {/* </div> */}
     </div>

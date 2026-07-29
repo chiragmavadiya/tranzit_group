@@ -15,8 +15,8 @@ export const ENQUIRY_COLUMNS = (onView: (row: Enquiry) => void): Column<Enquiry>
   {
     key: 'customer',
     header: 'CUSTOMER',
-    sortable: true,
-    cell: (val) => <span className="font-bold uppercase">{val}</span>
+    className: 'break-normal',
+    cell: (val) => <span className="font-bold uppercase break-normal">{val}</span>
   },
   {
     key: 'issue_type',
@@ -33,7 +33,7 @@ export const ENQUIRY_COLUMNS = (onView: (row: Enquiry) => void): Column<Enquiry>
     header: 'STATUS',
     cell: (val: EnquiryStatus) => (
       <div className={cn(
-        "inline-flex items-center px-2.5 py-0.5 rounded-full text-[12px] font-medium tracking-wide border transition-all",
+        "inline-flex items-center break-normal px-2.5 py-0.5 rounded-full text-[12px] font-medium tracking-wide border transition-all",
         ENQUIRY_STATUS_CONFIG[val.toLowerCase() as EnquiryStatus]?.className || 'bg-gray-50 text-gray-600'
       )}>
         {val}

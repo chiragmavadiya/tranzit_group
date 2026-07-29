@@ -1,15 +1,26 @@
-import { useState } from 'react';
+import { useCallback } from 'react';
 import { DataTable } from '@/components/common/DataTable';
 import { AUSPOST_COLUMNS } from '../columns';
 import { useAuspostOrderSummary, useExportAuspostOrderSummary } from '../hooks/useAuspostOrderSummary';
 import { useDebounce } from '@/hooks/useDebounce';
+import useLocalStorage from '@/hooks/useLocalStorage';
 
 export default function AuspostOrderSummaryPage() {
-  const [search, setSearch] = useState('');
-  const [page, setPage] = useState(1);
-  const [pageSize, setPageSize] = useState(25);
+  const [search, setSearch] = useLocalStorage<string>('auspost_order_summary_search', '');
+  const [page, setPage] = useLocalStorage<number>('auspost_order_summary_page', 1);
+  const [pageSize, setPageSize] = useLocalStorage<number>('auspost_order_summary_page_size', 25);
 
   const debouncedSearch = useDebounce(search, 500);
+
+  const handleSearchChange = useCallback((val: string) => {
+    setPage(1);
+    setSearch(val);
+  }, [setPage, setSearch]);
+
+  const handlePageSizeChange = useCallback((val: number) => {
+    setPage(1);
+    setPageSize(val);
+  }, [setPage, setPageSize]);
 
   const { data: response, isLoading } = useAuspostOrderSummary({
     search: debouncedSearch,
@@ -33,12 +44,12 @@ export default function AuspostOrderSummaryPage() {
           loading={isLoading}
           searchable
           searchValue={search}
-          onSearchChange={setSearch}
+          onSearchChange={handleSearchChange}
           totalItems={response?.meta?.total || 0}
           currentPage={page}
           onPageChange={setPage}
           pageSize={pageSize}
-          onPageSizeChange={setPageSize}
+          onPageSizeChange={handlePageSizeChange}
           className="text-xs pb-3 flex-none h-auto"
           onExport={handleExport}
           isExporting={isExporting}

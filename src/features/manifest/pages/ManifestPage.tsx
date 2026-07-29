@@ -5,11 +5,12 @@ import { useManifests, useExportManifests, useDownloadManifestPDF } from '../hoo
 import { useDebounce } from '@/hooks/useDebounce';
 import type { Manifest } from '../types';
 import { useAppSelector } from '@/hooks/store.hooks';
+import useLocalStorage from '@/hooks/useLocalStorage';
 
 export default function ManifestPage() {
-  const [search, setSearch] = useState('');
-  const [page, setPage] = useState(1);
-  const [pageSize, setPageSize] = useState(25);
+  const [search, setSearch] = useLocalStorage<string>('manifest_search', '');
+  const [page, setPage] = useLocalStorage<number>('manifest_current_page', 1);
+  const [pageSize, setPageSize] = useLocalStorage<number>('manifest_page_size', 25);
   const [downloadingId, setDownloadingId] = useState<string | null>(null);
 
   const debouncedSearch = useDebounce(search, 500);

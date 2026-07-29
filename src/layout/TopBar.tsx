@@ -201,7 +201,7 @@ export default function TopBar({
             title="Book a Pickup"
           >
             <Package className="w-3.5 h-3.5" />
-            <span className="hidden sm:inline">Book a Pickup</span>
+            <span className="hidden xl:inline">Book a Pickup</span>
           </button>
         )}
 

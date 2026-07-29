@@ -13,7 +13,7 @@ export function AddressBookHeader({ onAddAddress }: AddressBookHeaderProps) {
       <div className="flex items-center gap-2">
         <Button
           onClick={onAddAddress}
-          className="global-btn"
+          className="global-btn w-full sm:w-auto"
         >
           <Plus className="w-4 h-4" />
           <span className="text-xs uppercase tracking-wide font-bold">Add Address</span>

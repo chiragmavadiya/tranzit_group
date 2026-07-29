@@ -5,12 +5,13 @@ import type { DebugFilters } from '../../types';
 
 interface SlowExternalCallsTabProps {
   filters: DebugFilters;
+  searchValue: string;
   onPageChange: (page: number) => void;
   onPageSizeChange: (pageSize: number) => void;
   onSearchChange: (search: string) => void;
 }
 
-export const SlowExternalCallsTab = ({ filters, onPageChange, onPageSizeChange, onSearchChange }: SlowExternalCallsTabProps) => {
+export const SlowExternalCallsTab = ({ filters, searchValue, onPageChange, onPageSizeChange, onSearchChange }: SlowExternalCallsTabProps) => {
   const { data: callsData, isLoading } = useSlowExternalCalls(filters);
   const calls = callsData?.data || [];
   const totalItems = callsData?.meta?.total || 0;
@@ -26,7 +27,7 @@ export const SlowExternalCallsTab = ({ filters, onPageChange, onPageSizeChange, 
       onPageChange={onPageChange}
       onPageSizeChange={onPageSizeChange}
       sortable
-      searchValue={filters.search}
+      searchValue={searchValue}
       onSearchChange={onSearchChange}
       headerTitle="Slow External Calls"
       exportable={false}

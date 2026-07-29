@@ -18,6 +18,7 @@ import {
   useToggleAnnouncementStatus,
 } from '../hooks/useAnnouncement';
 import type { AnnouncementPayload } from '../services/announcement.service';
+import useLocalStorage from '@/hooks/useLocalStorage';
 
 interface GlobalConfigItem {
   id: string;
@@ -41,9 +42,9 @@ const DEFAULT_FORM_STATE = {
 };
 
 export default function GlobalConfigPage() {
-  const [search, setSearch] = useState('');
-  const [page, setPage] = useState(1);
-  const [pageSize, setPageSize] = useState(25);
+  const [search, setSearch] = useLocalStorage<string>('global_config_search', '');
+  const [page, setPage] = useLocalStorage<number>('global_config_current_page', 1);
+  const [pageSize, setPageSize] = useLocalStorage<number>('global_config_page_size', 25);
 
   const debouncedSearch = useDebounce(search, 400);
 
@@ -77,7 +78,7 @@ export default function GlobalConfigPage() {
   const configs = useMemo<GlobalConfigItem[]>(() => {
     const rawData = apiData?.data;
     if (!rawData) return [];
-    const items = Array.isArray(rawData) ? rawData : (rawData.data || []);
+    const items = rawData;
     return items.map((item) => ({
       id: item.id.toString(),
       name: item.text,
@@ -210,26 +211,26 @@ export default function GlobalConfigPage() {
   const handleSearchChange = useCallback((val: string) => {
     setSearch(val);
     setPage(1);
-  }, []);
+  }, [setSearch, setPage]);
 
   const handlePageSizeChange = useCallback((size: number) => {
     setPageSize(size);
     setPage(1);
-  }, []);
+  }, [setPageSize, setPage]);
 
-  const paginatedConfigs = useMemo(() => {
-    const rawData = apiData?.data;
-    if (!rawData) return [];
+  // const paginatedConfigs = useMemo(() => {
+  //   const rawData = apiData?.data;
+  //   if (!rawData) return [];
 
-    if (Array.isArray(rawData)) {
-      const filtered = configs.filter(item =>
-        item.text.toLowerCase().includes(search.toLowerCase())
-      );
-      const startIndex = (page - 1) * pageSize;
-      return filtered.slice(startIndex, startIndex + pageSize);
-    }
-    return configs;
-  }, [apiData, configs, page, pageSize, search]);
+  //   if (Array.isArray(rawData)) {
+  //     const filtered = configs.filter(item =>
+  //       item.text.toLowerCase().includes(search.toLowerCase())
+  //     );
+  //     const startIndex = (page - 1) * pageSize;
+  //     return filtered.slice(startIndex, startIndex + pageSize);
+  //   }
+  //   return configs;
+  // }, [apiData, configs, page, pageSize, search]);
 
   const columns = useMemo<Column<GlobalConfigItem>[]>(
     () => [
@@ -276,6 +277,7 @@ export default function GlobalConfigPage() {
       {
         header: 'EXPIRY DATE',
         key: 'expiryDate',
+        className: 'break-normal',
         cell: (value: string) => {
           if (!value) return '-';
           const date = new Date(value);
@@ -331,15 +333,15 @@ export default function GlobalConfigPage() {
     ],
     [handleDeleteClick, handleOpenModal, customersData, toggleStatusMutation]
   );
-
+  console.log(apiData, 'apiData.data')
   return (
-    <div className="flex flex-col flex-1 gap-6 p-page-padding min-h-0 animate-in fade-in slide-in-from-bottom-2 duration-500 bg-slate-50/30 dark:bg-zinc-950/30 overflow-y-auto">
-      <div className="rounded-2xl shadow-sm border border-slate-100 dark:border-zinc-800 bg-white dark:bg-zinc-950 overflow-hidden flex-1 flex flex-col min-h-[500px]">
-        <div className="flex-1 p-0">
+    <div className="flex flex-col flex-1 gap-6 p-page-padding animate-in fade-in slide-in-from-bottom-2 duration-500 bg-slate-50/30 dark:bg-zinc-950/30 overflow-y-auto">
+      <div className="rounded-2xl shadow-sm border border-slate-100 dark:border-zinc-800 bg-white dark:bg-zinc-950 flex-none h-auto">
+        <div className="p-0">
           <DataTable
             headerTitle='Global Configuration'
             headerDescription="Manage global notification text, colors, and expiry configurations"
-            data={paginatedConfigs}
+            data={configs}
             columns={columns}
             loading={isLoading}
             searchable
@@ -350,7 +352,7 @@ export default function GlobalConfigPage() {
             onPageChange={setPage}
             pageSize={pageSize}
             onPageSizeChange={handlePageSizeChange}
-            className="text-xs pb-3"
+            className="text-xs pb-3 flex-none h-auto [&_div.overflow-auto]:flex-none [&_div.overflow-auto]:h-auto [&_div.overflow-auto]:min-h-0 [&_div.overflow-auto]:overflow-y-visible [&_div.overflow-auto]:overflow-x-auto"
             exportable={false}
             customHeader={<Button
               onClick={() => handleOpenModal()}

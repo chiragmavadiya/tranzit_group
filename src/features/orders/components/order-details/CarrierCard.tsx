@@ -11,6 +11,7 @@ import type { QuoteLocation } from '@/features/quote/types'
 import { Checkbox } from '@/components/ui/checkbox'
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
+import { StatusBadge } from '../StatusBadge'
 
 interface CarrierCardProps {
   itemData: ItemData[];
@@ -29,11 +30,15 @@ interface CarrierCardProps {
   activeSettings?: any;
   setActiveSettings?: React.Dispatch<React.SetStateAction<any>>;
   onLoadingChange?: (loading: boolean) => void;
+  fromAdminQuot?: boolean;
 }
 
+// Saved settings round-trip through the API as numbers (1/0), so accept every truthy form.
+const settingOn = (v: any) => v === true || v === 1 || v === '1' || v === 'yes';
+
 export const CarrierCard: React.FC<CarrierCardProps> = memo((props) => {
-  const { itemData, addresses, onQuoteChange, setCourierData, orderDetail, module, orderType = 'create', initialSelectedCourierId = null, signatureSelected = false, isLoading = false, selectedCustomer, setDeliveryInstructions, activeSettings, setActiveSettings, onLoadingChange } = props
-  const { role, default_courier, courier_settings } = useAppSelector((state) => state.auth);
+  const { itemData, addresses, onQuoteChange, setCourierData, orderDetail, module, orderType = 'create', initialSelectedCourierId = null, signatureSelected = false, isLoading = false, selectedCustomer, setDeliveryInstructions, activeSettings, setActiveSettings, onLoadingChange, fromAdminQuot } = props
+  const { default_courier, courier_settings } = useAppSelector((state) => state.auth);
   const [selectedServiceId, setSelectedServiceId] = useState<string>(initialSelectedCourierId || '')
   const [couriers, setCouriers] = useState<any[]>([]);
   const [surchargesMap, setSurchargesMap] = useState<Record<string, any[]>>({});
@@ -49,6 +54,7 @@ export const CarrierCard: React.FC<CarrierCardProps> = memo((props) => {
   // const [advanceSetting, setAdvanceSetting] = useState([])
   const mount = useRef(false);
   const settingsInitializedForRef = useRef<string | null>(null);
+  const savedSettingsAppliedRef = useRef(false);
   const lastApiSigReqRef = useRef<boolean>(false);
   const prevSettingsRef = useRef({
     signature_required: activeSettings?.signature_required,
@@ -65,7 +71,25 @@ export const CarrierCard: React.FC<CarrierCardProps> = memo((props) => {
     }, 2000);
   };
 
-  const { mutate: getServices, isPending: loading } = useGetQuoteServices(role);
+  const { mutate: getServices, isPending: loading } = useGetQuoteServices(fromAdminQuot);
+  const abortControllerRef = useRef<AbortController | null>(null);
+
+  // Abort any previous in-flight getServices request and return a signal for the new one
+  const createRequestSignal = () => {
+    abortControllerRef.current?.abort();
+    const controller = new AbortController();
+    abortControllerRef.current = controller;
+    return controller.signal;
+  };
+
+  const isAbortError = (err: any) =>
+    err?.code === 'ERR_CANCELED' || err?.name === 'CanceledError' || err?.name === 'AbortError';
+
+  useEffect(() => {
+    return () => {
+      abortControllerRef.current?.abort();
+    };
+  }, []);
 
   useEffect(() => {
     onLoadingChange?.(loading);
@@ -79,6 +103,7 @@ export const CarrierCard: React.FC<CarrierCardProps> = memo((props) => {
     }
     return location?.label || `${location?.suburb} ${location?.state} ${location?.postcode}, AU` || "";
   }, [module]);
+
   const handleServiceSuccess = useEffectEvent((data: any, onlyChangeSettings = false) => {
     if (onlyChangeSettings) {
       setCouriers((prevCouriers) => {
@@ -92,7 +117,7 @@ export const CarrierCard: React.FC<CarrierCardProps> = memo((props) => {
               price: matchingService.price,
               base: matchingService.base,
               gst: matchingService.gst,
-
+              product_type: matchingService.product_type,
             };
           }
           return courier;
@@ -144,27 +169,31 @@ export const CarrierCard: React.FC<CarrierCardProps> = memo((props) => {
         if (selectedFromQuote) {
           const courier = JSON.parse(selectedFromQuote);
           setSelectedServiceId(courier.courier.courierCode + (courier.courier.product_id || '') || '');
+          mount.current = true;
         } else if (!selectedServiceId || !allCourierIds.includes(selectedServiceId)) {
           setSelectedServiceId((prev) => {
-            if ((prev && allCourierIds.includes(prev)) || !mount.current) return prev;
+            console.log(prev, allCourierIds.includes(prev),allCourierIds,  !mount.current, 'select condition ::', prev)
+            if ((prev && allCourierIds.includes(prev)) && !mount.current) return prev;
             if (data.services.some((c: any) => c.rule_applied)) {
+              console.log("select condition :: rule_applied")
               const findCourier = data.services.find((courier: any) => courier.rule_applied);
               if (findCourier) {
                 return findCourier.courierCode + (findCourier.product_id || '') || '';
               }
             }
             if (default_courier && default_courier.courier_id) {
+              console.log("select condition :: default_courier")
               const findCourier = data.services.find((courier: any) => courier.carrier_id === default_courier.courier_id);
               if (findCourier) {
                 return findCourier.courierCode + (findCourier.product_id || '') || '';
               }
             }
+            mount.current = true;
             return minItem.courierCode + (minItem.product_id || '') || '';
           });
         }
       }
     }
-    mount.current = true;
   })
 
   const fetchServices = () => {
@@ -177,6 +206,12 @@ export const CarrierCard: React.FC<CarrierCardProps> = memo((props) => {
       showToast("Please add valid items with dimensions", "error");
       return;
     };
+    if (itemData.some(item =>
+      Number(item.height) < 1 || Number(item.width) < 1 || Number(item.length) < 1
+    )) {
+      showToast("Please Enter Valid Dimensions, Dimensions cannot be less than 1", "error");
+      return;
+    }
 
     // Check if we have both addresses
     const sender = addresses?.sender;
@@ -199,15 +234,17 @@ export const CarrierCard: React.FC<CarrierCardProps> = memo((props) => {
       is_order: module === 'quote' ? "no" as const : "yes" as const,
       signature_required: (activeSettings?.signature_required ?? signatureSelected) ? 1 : 0,
       customer_id: selectedCustomer,
-      atl: activeSettings?.authority_to_leave ? 1 : 0,
+      atl: (activeSettings?.authority_to_leave ?? settingOn(orderDetail?.courier_details?.advanced_settings?.authority_to_leave)) ? 1 : 0,
+      priority: (activeSettings?.priority ?? settingOn(orderDetail?.courier_details?.advanced_settings?.priority)) ? 1 : 0,
     }
 
-    getServices(payload, {
+    getServices({ payload, signal: createRequestSignal() }, {
       onSuccess: (data) => {
         // eslint-disable-next-line react-hooks/rules-of-hooks
         handleServiceSuccess(data);
       },
       onError: (err: any) => {
+        if (isAbortError(err)) return;
         showToast(err?.response?.data?.message || 'Failed to fetch rates', "error");
       }
     });
@@ -220,6 +257,13 @@ export const CarrierCard: React.FC<CarrierCardProps> = memo((props) => {
       Number(item.height) > 0 && Number(item.width) > 0 && Number(item.length) > 0 && Number(item.weight) > 0 && Number(item.quantity) > 0
     );
     if (!isValidItems) return;
+
+    if (itemData.some(item =>
+      Number(item.height) < 1 || Number(item.width) < 1 || Number(item.length) < 1
+    )) {
+      // showToast("Please Enter Valid Dimensions, Dimensions cannot be less than 1", "error");
+      return;
+    }
 
     // Check if we have both addresses
     const sender_addr1 = getAddress(addresses?.sender || {});
@@ -252,15 +296,17 @@ export const CarrierCard: React.FC<CarrierCardProps> = memo((props) => {
         is_order: module === 'quote' ? "no" as const : "yes" as const,
         signature_required: sigReq ? 1 : 0,
         customer_id: selectedCustomer,
-        atl: activeSettings?.authority_to_leave ? 1 : 0,
+        priority: (activeSettings?.priority ?? settingOn(orderDetail?.courier_details?.advanced_settings?.priority)) ? 1 : 0,
+        atl: (activeSettings?.authority_to_leave ?? settingOn(orderDetail?.courier_details?.advanced_settings?.authority_to_leave)) ? 1 : 0,
         ...(onlyChangeSettings && { courier_code: selectedCourier?.courierCode || "couriersplease_tranzit_group" }),
       };
 
-      getServices(payload, {
+      getServices({ payload, signal: createRequestSignal() }, {
         onSuccess: (data) => {
           handleServiceSuccess(data, onlyChangeSettings);
         },
         onError: (err: any) => {
+          if (isAbortError(err)) return;
           showToast(err?.response?.data?.message || 'Failed to fetch rates', "error");
         }
       });
@@ -277,7 +323,7 @@ export const CarrierCard: React.FC<CarrierCardProps> = memo((props) => {
     // Cleanup previous timer
     return () => clearTimeout(timer);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [itemData, addresses?.sender?.suburb, addresses?.sender?.state, addresses?.sender?.postcode, addresses?.receiver?.suburb, addresses?.receiver?.state, addresses?.receiver?.postcode, getServices, orderType, module, getAddress, activeSettings?.signature_required, activeSettings?.authority_to_leave, selectedCustomer])
+  }, [itemData, addresses?.sender?.suburb, addresses?.sender?.state, addresses?.sender?.postcode, addresses?.receiver?.suburb, addresses?.receiver?.state, addresses?.receiver?.postcode, getServices, orderType, module, getAddress, activeSettings?.signature_required, activeSettings?.authority_to_leave, activeSettings?.priority, selectedCustomer])
 
   useEffect(() => {
     if (couriers.length > 0 && selectedServiceId) {
@@ -328,6 +374,35 @@ export const CarrierCard: React.FC<CarrierCardProps> = memo((props) => {
         localStorage.removeItem('quote_active_settings');
         return;
       }
+
+      // Restore settings saved on an existing order (draft/consign) so the user's previously
+      // chosen options win over the courier defaults. The order's own advanced_settings carries
+      // both the keys and the saved values, so we seed from there once for the saved courier.
+      const savedCourierId = orderDetail?.courier_details
+        ? `${orderDetail.courier_details.courier_code || ''}${orderDetail.courier_details.product_id || ''}`
+        : '';
+      const savedAdvanced = orderDetail?.courier_details?.advanced_settings;
+      if (savedAdvanced && !savedSettingsAppliedRef.current && selectedServiceId === savedCourierId) {
+        savedSettingsAppliedRef.current = true;
+        settingsInitializedForRef.current = selectedServiceId;
+        const restored: Record<string, any> = {};
+        if (Array.isArray(savedAdvanced.settings)) {
+          savedAdvanced.settings.forEach((item: any) => {
+            if (item && item.key && item.key !== 'delivery_instruction' && item.key !== 'delivery_instructions' && item.type === 'checkbox') {
+              restored[item.key] = settingOn(item.value);
+            }
+          });
+        } else {
+          Object.keys(savedAdvanced).forEach((key) => {
+            if (key !== 'delivery_instruction' && key !== 'delivery_instructions' && key !== 'settings' && typeof savedAdvanced[key] === 'boolean') {
+              restored[key] = settingOn(savedAdvanced[key]);
+            }
+          });
+        }
+        setActiveSettings?.(restored);
+        return;
+      }
+
       // Skip re-initializing settings if already done for this courier (e.g. couriers refreshed due to API call)
       if (settingsInitializedForRef.current === selectedServiceId) return;
       settingsInitializedForRef.current = selectedServiceId;
@@ -424,7 +499,7 @@ export const CarrierCard: React.FC<CarrierCardProps> = memo((props) => {
 
 
                   </div>
-                  <div>
+                  <div className="flex-1">
                     <h4 className="text-sm font-bold text-gray-900 dark:text-zinc-100 uppercase tracking-tight">
                       {orderDetail.courier_details?.courier || 'Standard Delivery'}
                     </h4>
@@ -457,6 +532,12 @@ export const CarrierCard: React.FC<CarrierCardProps> = memo((props) => {
                         </button>
                       )}
                     </div>
+                    {orderDetail?.tracking_status && (
+                      <div className="flex items-center gap-2 mt-2">
+                        <span className="text-xs font-bold text-gray-500 dark:text-zinc-400 uppercase">Status:</span>
+                        <StatusBadge compact={false} status={orderDetail.tracking_status} />
+                      </div>
+                    )}
                   </div>
                 </div>
                 <div className="text-right">
@@ -532,9 +613,9 @@ export const CarrierCard: React.FC<CarrierCardProps> = memo((props) => {
                       </div>
                     )}
 
-                    <div className="flex items-center justify-between gap-4">
+                    <div className="flex items-center justify-between gap-3 sm:gap-4">
                       {/* Left Side: Logo & Info */}
-                      <div className="flex items-center gap-4">
+                      <div className="flex items-center gap-3 sm:gap-4 min-w-0">
                         {/* Radio Button Visual */}
                         <div className={`w-4 h-4 rounded-full border flex items-center justify-center shrink-0 ${isSelected ? 'border-primary bg-primary' : 'border-gray-300 dark:border-zinc-600'
                           }`}>
@@ -542,7 +623,7 @@ export const CarrierCard: React.FC<CarrierCardProps> = memo((props) => {
                         </div>
 
                         {/* Logo Container */}
-                        <div className="w-16 h-10 bg-white dark:bg-white rounded-md border border-gray-100 dark:border-zinc-200 flex items-center justify-center p-1 shrink-0 overflow-hidden">
+                        <div className="w-12 sm:w-16 h-10 bg-white dark:bg-white rounded-md border border-gray-100 dark:border-zinc-200 flex items-center justify-center p-1 shrink-0 overflow-hidden">
                           <img
                             src={courier.image}
                             alt={courier.carrier}
@@ -554,7 +635,7 @@ export const CarrierCard: React.FC<CarrierCardProps> = memo((props) => {
                         </div>
 
                         {/* Carrier Info */}
-                        <div className="flex flex-col">
+                        <div className="flex flex-col min-w-0">
                           <span className="font-bold text-gray-900 dark:text-zinc-100 text-sm">
                             {courier.carrier}
 
@@ -566,16 +647,16 @@ export const CarrierCard: React.FC<CarrierCardProps> = memo((props) => {
                           </span>
                         </div>
                         {serviceId === selectedServiceId && (
-                          <Badge className="leading-100 font-bold px-2 py-0.5 shadow-sm">
+                          <Badge className="hidden sm:inline-flex leading-100 font-bold px-2 py-0.5 shadow-sm">
                             Selected
                           </Badge>
                         )}
                       </div>
 
                       {/* Right Side: Pricing */}
-                      <div className='flex gap-4 items-center'>
+                      <div className='flex gap-4 items-center shrink-0'>
                         <div className="flex flex-col items-end justify-center">
-                          <span className="text-lg font-bold text-gray-900 dark:text-zinc-100">
+                          <span className="text-lg font-bold text-gray-900 dark:text-zinc-100 whitespace-nowrap">
                             ${courier.price.toFixed(2)}
                           </span>
                         </div>
@@ -583,7 +664,7 @@ export const CarrierCard: React.FC<CarrierCardProps> = memo((props) => {
                     </div>
 
                     {/* Surcharges list with checkboxes if selected */}
-                    {isSelected && courierSurcharges.length > 0 && (
+                    {isSelected && courierSurcharges.length > 0 && courierSurcharges.some((surcharges) => surcharges.is_customer_selectable) && (
                       <div className="mt-3 pt-3 border-t border-dashed border-gray-200 dark:border-zinc-800 flex flex-col gap-2">
                         <div className="text-[11px] font-bold text-gray-500 dark:text-zinc-400 uppercase">
                           Surcharge Options
@@ -592,14 +673,14 @@ export const CarrierCard: React.FC<CarrierCardProps> = memo((props) => {
                           {courierSurcharges.map((charge, index) => {
                             const isChecked = selectedNames.includes(charge.name);
 
-                            const displaySurcharges = [
-                              "airport_delivery_surcharge",
-                              "exhibition_centre_surcharge",
-                              "hand_unload",
-                              "palletising",
-                              "tailgate_pickup_delivery"
-                            ]
-                            if (!displaySurcharges.includes(charge.code)) return;
+                            // const displaySurcharges = [
+                            //   "airport_delivery_surcharge",
+                            //   "exhibition_centre_surcharge",
+                            //   "hand_unload",
+                            //   "palletising",
+                            //   "tailgate_pickup_delivery"
+                            // ]
+                            if (!charge.is_customer_selectable) return;
                             return (
                               <label
                                 key={index}

@@ -249,7 +249,14 @@ export const ItemsTable: React.FC<ItemsTableProps> = React.memo(({
                                     className="h-8 text-sm font-medium px-2"
                                     min="0"
                                     step="0.01"
+                                    onBlur={(e) => {
+                                      const val = e.target.value;
+                                      if (val.startsWith(".")) {
+                                        e.target.value = `0${val}`;
+                                      }
+                                    }}
                                     placeholder='kg'
+                                    error={!item.weight}
                                   />
                                 </div>
                                 <div className="flex flex-col gap-1">
@@ -259,8 +266,17 @@ export const ItemsTable: React.FC<ItemsTableProps> = React.memo(({
                                     value={item.length || ''}
                                     onChange={(e) => onUpdateItem?.(idx, 'length', Number(e.target.value) || 0)}
                                     className="h-8 text-sm font-medium px-2"
-                                    min="0"
+                                    min="1"
+                                    step="0.01"
                                     placeholder='cm'
+                                    error={Number(item.length) < 1}
+                                    // errormsg='Length cannot be less than 1 cm. Please enter a valid length.'
+                                    // onBlur={(e) => {
+                                    //   const val = e.target.value;
+                                    //   if (val.startsWith(".")) {
+                                    //     e.target.value = `0${val}`;
+                                    //   }
+                                    // }}
                                   />
                                 </div>
                                 <div className="flex flex-col gap-1">
@@ -270,8 +286,16 @@ export const ItemsTable: React.FC<ItemsTableProps> = React.memo(({
                                     value={item.width || ''}
                                     onChange={(e) => onUpdateItem?.(idx, 'width', Number(e.target.value) || 0)}
                                     className="h-8 text-sm font-medium px-2"
-                                    min="0"
+                                    min="1"
                                     placeholder='cm'
+                                    step="0.01"
+                                    error={Number(item.width) < 1}
+                                    // onBlur={(e) => {
+                                    //   const val = e.target.value;
+                                    //   if (val.startsWith(".")) {
+                                    //     e.target.value = `0${val}`;
+                                    //   }
+                                    // }}
                                   />
                                 </div>
                                 <div className="flex flex-col gap-1">
@@ -281,8 +305,16 @@ export const ItemsTable: React.FC<ItemsTableProps> = React.memo(({
                                     value={item.height || ''}
                                     onChange={(e) => onUpdateItem?.(idx, 'height', Number(e.target.value) || 0)}
                                     className="h-8 text-sm font-medium px-2"
-                                    min="0"
+                                    min="1"
                                     placeholder='cm'
+                                    step="0.01"
+                                    error={Number(item.height) < 1}
+                                    // onBlur={(e) => {
+                                    //   const val = e.target.value;
+                                    //   if (val.startsWith(".")) {
+                                    //     e.target.value = `0${val}`;
+                                    //   }
+                                    // }}
                                   />
                                 </div>
                               </div>
@@ -307,24 +339,24 @@ export const ItemsTable: React.FC<ItemsTableProps> = React.memo(({
 
                   {/* Summary Row */}
                   {items && items.length > 0 && (
-                    <div className="pt-4 border-t border-gray-100 dark:border-zinc-800/80 flex items-center justify-baseline gap-4 text-[13px] font-medium">
-                      <div className="flex items-center gap-1 text-gray-500 dark:text-zinc-400">
-                        <Box className="w-3.5 h-3.5 text-emerald-500 dark:text-emerald-400" />
+                    <div className="pt-4 border-t border-gray-100 dark:border-zinc-800/80 flex flex-wrap items-center justify-baseline gap-x-4 gap-y-2 text-[13px] font-medium">
+                      <div className="flex items-center gap-1 whitespace-nowrap text-gray-500 dark:text-zinc-400">
+                        <Box className="w-3.5 h-3.5 shrink-0 text-emerald-500 dark:text-emerald-400" />
                         <span className='leading-none'>Total Quantity:</span>
                         <span className="leading-none font-semibold text-gray-950 dark:text-zinc-100">
                           {totalQuantity} {totalQuantity === 1 ? 'Unit' : 'Units'}
                         </span>
                       </div>
-                      <div className="h-3 w-px bg-gray-200 dark:bg-zinc-800" />
-                      <div className="flex items-center gap-1 text-gray-500 dark:text-zinc-400">
-                        <Scale className="w-3.5 h-3.5 text-orange-500 dark:text-orange-400" />
+                      <div className="hidden sm:block h-3 w-px bg-gray-200 dark:bg-zinc-800" />
+                      <div className="flex items-center gap-1 whitespace-nowrap text-gray-500 dark:text-zinc-400">
+                        <Scale className="w-3.5 h-3.5 shrink-0 text-orange-500 dark:text-orange-400" />
                         <span className='leading-none'>Total Weight:</span>
                         <span className="leading-none font-semibold text-gray-950 dark:text-zinc-100">
                           {totalWeight.toFixed(2)} kg
                         </span>
                       </div>
-                      <div className="flex items-center gap-1 text-gray-500 dark:text-zinc-400">
-                        <Weight className="w-3.5 h-3.5 text-orange-500 dark:text-orange-400" />
+                      <div className="flex items-center gap-1 whitespace-nowrap text-gray-500 dark:text-zinc-400">
+                        <Weight className="w-3.5 h-3.5 shrink-0 text-orange-500 dark:text-orange-400" />
                         <span className='leading-none'>Total Volumetric Weight:</span>
                         <span className="leading-none font-semibold text-gray-950 dark:text-zinc-100">
                           {totalVolumetricWeight.toFixed(2)} kg

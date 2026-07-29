@@ -83,6 +83,7 @@ const DatePicker = memo(({ date, setDate, label, className, placeholder = 'DD/MM
             selected={parsedDate}
             onSelect={handleDateChange}
             disabled={disabled as any}
+            captionLayout="dropdown"
           />
         </PopoverContent>
       </Popover>

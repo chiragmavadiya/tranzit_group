@@ -41,7 +41,7 @@ export function InvoiceFilters({
       )}
 
       <div className="w-full md:w-64 space-y-1">
-        <span className="text-xs font-semibold text-slate-600 dark:text-zinc-400">Date Range</span>
+        {/* <span className="text-xs font-semibold text-slate-600 dark:text-zinc-400">Date Range</span> */}
         <DateFilter
           value={dateRange}
           onChange={onDateRangeChange}

@@ -19,9 +19,10 @@ export const useQuoteDetails = (id: number | string | undefined) => {
     });
 };
 
-export const useGetQuoteServices = (role: string = 'customer') => {
+export const useGetQuoteServices = (fromAdminQuot: boolean = false) => {
     return useMutation({
-        mutationFn: (data: GetQuoteServicesPayload) => quoteService.getServices(data, role),
+        mutationFn: ({ payload, signal }: { payload: GetQuoteServicesPayload; signal?: AbortSignal }) =>
+            quoteService.getServices(payload, fromAdminQuot, signal),
     });
 };
 

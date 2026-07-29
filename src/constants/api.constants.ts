@@ -59,7 +59,7 @@ export const API_ENDPOINTS = {
         TRANSACTION_EXPORT: "/customer/report/transection/export",
         INVOICE: "/customer/report/invoice",
         PARCELS: "/customer/report/parcels",
-        PARCELS_EXPORT: "/customer/report/parcels/Export",
+        PARCELS_EXPORT: "/customer/report/parcels/export",
         COUNTS: "/customer/report/counts",
     },
     INVOICES: {
@@ -75,7 +75,6 @@ export const API_ENDPOINTS = {
         REMIND: (id: string | number) => `/admin/customer-invoice-management/${id}/remind`,
         PAYMENTS: (id: string | number) => `/admin/customer-invoice-management/${id}/payments`,
         PAYMENT_DETAILS: (invoiceId: string | number, paymentId: string | number) => `/admin/customer-invoice-management/${invoiceId}/payments/${paymentId}`,
-        ZOHO_SYNC: (id: string | number) => `/admin/customer-invoice-management/${id}/zoho-sync`,
         EXPORT: "/admin/customer-invoice-management/export",
     },
     ENQUIRIES: {
@@ -99,7 +98,6 @@ export const API_ENDPOINTS = {
         INVOICE: (id: string | number) => `/admin/customers/${id}/invoice`,
         VERIFY: (id: string | number) => `/admin/customers/${id}/verify`,
         TOGGLE_STATUS: (id: string | number) => `/admin/customers/${id}/toggle-status`,
-        ZOHO_SYNC: (id: string | number) => `/admin/customers/${id}/zoho-sync`,
         EXPORT: "/admin/customers/export",
         ORDERS_EXPORT: (id: string | number) => `/admin/customers/${id}/orders/export`,
         TRANSACTION_EXPORT: (id: string | number) => `/admin/customers/${id}/transaction/export`,
@@ -186,10 +184,12 @@ export const API_ENDPOINTS = {
     SEARCH: {
         GLOBAL: "/globalsearch",
     },
-    ZOHO: {
-        GET_CONFIG: "/admin/zoho",
-        SAVE_CONFIG: "/admin/zoho/save",
-        GET_REDIRECT_URL: "/admin/zoho/redirect",
+    XERO: {
+        CONNECT: "/admin/xero/connect",
+        STATUS: "/admin/xero/status",
+        DISCONNECT: "/admin/xero/disconnect",
+        CONTACTS: "/admin/xero/contacts",
+        SYNC_INVOICE: (id: string | number) => `/admin/xero/invoices/${id}/sync`,
     },
     PROFILE: {
         GET: "/profile",
@@ -382,6 +382,10 @@ export const QUERY_KEYS = {
         LIST: ["rules", "list"],
         DETAILS: (id: string | number) => ["rules", "details", id],
         OPTIONS: ["rules", "options"],
+    },
+    XERO: {
+        STATUS: ["admin", "xero", "status"],
+        CONTACTS: (xeroContactId?: string) => ["admin", "xero", "contacts", xeroContactId || "all"],
     },
     ADMIN_DEBUG_CENTRE: {
         STATS: ["admin", "debug-centre", "stats"],

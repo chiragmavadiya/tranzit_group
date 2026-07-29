@@ -1,6 +1,6 @@
 import { useState, useEffect, memo } from 'react';
 import type { ReactNode } from 'react'
-import { ArrowUp, ArrowDown, Search, FileText, Upload, File, Loader2, Printer, Settings } from 'lucide-react';
+import { ArrowUp, ArrowDown, Search, Settings } from 'lucide-react';
 import {
   Table,
   TableBody,
@@ -16,9 +16,9 @@ import { Pagination } from './Pagination';
 import { TableSkeleton } from './TableSkeleton';
 import { DEFAULT_PAGE_SIZES } from '@/constants/global.constants';
 import type { Column, DataTableProps, SortConfig } from './types/DataTable.types';
-import { Button } from '../ui/button';
-import DropdownCustomContent, { DropdownCustomMenu } from '../ui/dropdown-menu';
+import DropdownCustomContent from '../ui/dropdown-menu';
 import { CustomLabel, FormInput, FormSelect } from '@/features/orders/components/OrderFormUI';
+import { ExportMenu } from './ExportMenu';
 
 const DataTableComponent = <T extends Record<string, any>>(props: DataTableProps<T>) => {
   const {
@@ -240,40 +240,11 @@ const DataTableComponent = <T extends Record<string, any>>(props: DataTableProps
                 )}
                 {exportable && data.length > 0 && (
                   <div className="shrink-0">
-                    <DropdownCustomMenu
-                      menus={[
-                        ...(print ? [{
-                          label: "Print",
-                          onClick: () => window.print(),
-                          icon: Printer,
-                        }] : []),
-                        {
-                          label: "CSV",
-                          onClick: onExport ? () => onExport('csv') : () => { },
-                          icon: File,
-                        },
-                        {
-                          label: "Excel",
-                          onClick: onExport ? () => onExport('excel') : () => { },
-                          icon: Upload,
-                        },
-                        {
-                          label: "PDF",
-                          onClick: onExport ? () => onExport('pdf') : () => { },
-                          icon: FileText,
-                        },
-                      ]}
-                    >
-                      <Button
-                        variant="outline"
-                        className="gap-2 h-8 border-gray-200 dark:border-zinc-800 hover:bg-gray-50 dark:hover:bg-zinc-800 font-medium text-slate-700 dark:text-zinc-300 transition-colors"
-                        disabled={isExporting}
-                      >
-                        {isExporting && <Loader2 className="w-4 h-4 animate-spin" />}
-                        {!isExporting && <Upload className="w-4 h-4" />}
-                        <span>Export</span>
-                      </Button>
-                    </DropdownCustomMenu>
+                    <ExportMenu
+                      onExport={onExport}
+                      isExporting={isExporting}
+                      print={print}
+                    />
                   </div>
                 )}
               </div>
@@ -298,7 +269,7 @@ const DataTableComponent = <T extends Record<string, any>>(props: DataTableProps
         </div>)}
 
       {/* Table */}
-      <div className={`flex-1 min-h-[200px] ${!loading ? 'overflow-auto' : ''}`}>
+      <div className="flex-1 min-h-[200px] overflow-auto">
         <Table className={cn("min-w-full", tableClassName)}>
           <TableHeader className={cn("bg-white dark:bg-zinc-950 sticky top-0 z-10 shadow-sm", headerClassName)}>
             <TableRow className="hover:bg-transparent border-b border-gray-100 dark:border-zinc-800">
@@ -320,10 +291,10 @@ const DataTableComponent = <T extends Record<string, any>>(props: DataTableProps
                   <TableHead
                     key={`${column.key}-${originalIndex}`}
                     className={cn(
-                      "py-2 whitespace-normal text-[14px] font-bold text-gray-900 dark:text-zinc-100 capitalize tracking-wide px-3",
+                      "py-2 whitespace-normal break-normal text-[13px] xl:text-sm font-bold text-gray-900 dark:text-zinc-100 capitalize tracking-wide px-3",
                       column.sortable !== false && sortable && "cursor-pointer hover:bg-muted/50",
                       column.sticky === 'left' && "sticky bg-white dark:bg-zinc-950 z-20 shadow-[inset_-1px_0_0_0_#ebe6e7] dark:shadow-[inset_-1px_0_0_0_#27272a]",
-                      column.sticky === 'left' ? selectable ? 'left-[48px]' : 'left-0' : '',
+                      column.sticky === 'left' ? selectable ? 'left-[50px]' : 'left-0' : '',
                       column.sticky === 'right' && "sticky right-0 bg-white dark:bg-zinc-950 z-20 shadow-[inset_1px_0_0_0_#ebe6e7] dark:shadow-[inset_1px_0_0_0_#27272a]",
                       column.className,
                       column.noPrint && 'print:hidden'
@@ -450,14 +421,14 @@ const DataTableComponent = <T extends Record<string, any>>(props: DataTableProps
                         <TableCell
                           key={`${column.key}-${rowId}-${originalIndex}`}
                           className={cn(
-                            `px-3 break-all py-[10px] min-h-12 text-sm text-gray-800 dark:text-zinc-300 whitespace-normal transition-colors`,
+                            `px-3 break-normal py-[10px] min-h-12 text-[13px] xl:text-sm text-gray-800 dark:text-zinc-300 whitespace-normal transition-colors`,
                             column.sticky === 'left' && cn(
                               "sticky left-0 shadow-[inset_-1px_0_0_0_#ebe6e7] dark:shadow-[inset_-1px_0_0_0_#27272a]",
                               isSelected
                                 ? "bg-slate-100 dark:bg-zinc-900"
                                 : "bg-white dark:bg-zinc-950 group-hover/row:bg-slate-50 dark:group-hover/row:bg-zinc-900/50"
                             ),
-                            column.sticky === 'left' ? selectable ? 'left-[48px] z-[2]' : 'left-0 z-[2]' : '',
+                            column.sticky === 'left' ? selectable ? 'left-[50px] z-[2]' : 'left-0 z-[2]' : '',
 
                             column.sticky === 'right' && cn(
                               "sticky right-0 z-[2] shadow-[inset_1px_0_0_0_#ebe6e7] dark:shadow-[inset_1px_0_0_0_#27272a]",

@@ -90,18 +90,13 @@ api.interceptors.response.use(
             window.location.href = "/login";
         }
 
-        const requestId = error.response?.headers['x-request-id'] || error.response?.headers['X-Request-Id'] || data?.trace_id;
-        if (requestId && ((data?.validation_error === undefined) || (error?.response?.status && error?.response?.status >= 500))) {
-            showToast(`Something went wrong. Please contact support with Request ID: ${requestId}`, 'error', '', Infinity)
-            suspendToast()
-            return
-        }
-
         console.error("[API Error]:", {
             status: error.response?.status,
             message,
             url: error.config?.url,
         });
+
+        // Handle validation errors - show specific validation messages
         if (error.message === 'Validation failed' || error.message === 'Order is missing required details.') {
             if (data?.errors) {
                 const beErrors = data.errors;
@@ -112,7 +107,27 @@ api.interceptors.response.use(
                     suspendToast();
                 });
             }
+            return Promise.reject(error);
         }
+
+        // Handle server errors (5xx) - show generic message with requestId for support
+        const requestId = error.response?.headers['x-request-id'] || error.response?.headers['X-Request-Id'] || data?.trace_id;
+        if (error.response?.status && error.response.status >= 500) {
+            if (requestId) {
+                showToast(`Something went wrong. Please contact support with Request ID: ${requestId}`, 'error', '', Infinity)
+            } else {
+                showToast("Something went wrong. Please try again later.", 'error', '', Infinity)
+            }
+            suspendToast()
+            return Promise.reject(error);
+        }
+
+        // Show actual error message for other errors (4xx)
+        if (message && message !== 'canceled' && (data?.validation_error === undefined)) {
+            showToast(message, 'error');
+            suspendToast();
+        }
+
         return Promise.reject(error);
     }
 );

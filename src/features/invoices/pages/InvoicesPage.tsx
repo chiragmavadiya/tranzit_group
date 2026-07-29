@@ -9,14 +9,15 @@ import { InvoiceTable } from '../components/InvoiceTable';
 import { useAdminInvoices, useCustomerInvoices, useExportAdminInvoices, useExportCustomerInvoices, useDeleteAdminInvoice, useRemindAdminInvoice, useDownloadAdminInvoice, useDownloadCustomerInvoice } from '../hooks/useInvoices';
 import { ConformationModal } from '@/components/common/ConformationModal';
 import type { DateFilterValue } from '@/components/common/DateFilter/types';
+import useLocalStorage from '@/hooks/useLocalStorage';
 
 export default function InvoicesPage() {
   const [searchParams, setSearchParams] = useSearchParams();
-  const [searchTerm, setSearchTerm] = useState('');
+  const [searchTerm, setSearchTerm] = useLocalStorage<string>('invoice_search', '');
   const debouncedSearchTerm = useDebounce(searchTerm, 500);
-  const [pageSize, setPageSize] = useState(25);
-  const [page, setPage] = useState(1);
-  const [selectedCustomer, setSelectedCustomer] = useState('');
+  const [pageSize, setPageSize] = useLocalStorage<number>('invoice_page_size', 25);
+  const [page, setPage] = useLocalStorage<number>('invoice_page', 1);
+  const [selectedCustomer, setSelectedCustomer] = useLocalStorage<string>('invoice_selected_customer', '');
   const [invoiceToDelete, setInvoiceToDelete] = useState<number | null>(null);
 
   const { role } = useAppSelector((state) => state.auth);
@@ -55,9 +56,9 @@ export default function InvoicesPage() {
     };
   }, [searchParams, parseLocalDate]);
 
-  const [dateRange, setDateRange] = useState<DateFilterValue>(() => initialDateFilter);
+  const [dateRange, setDateRange] = useLocalStorage<DateFilterValue>('invoice_date_range', initialDateFilter);
 
-  // Synchronize date range filters with URL searchParams
+  // Synchronize date range filters from URL searchParams (e.g. Dashboard redirect)
   useEffect(() => {
     const sDate = parseLocalDate(searchParams.get('start_date'));
     const eDate = parseLocalDate(searchParams.get('end_date'));
@@ -71,15 +72,6 @@ export default function InvoicesPage() {
           from: fromStr,
           to: toStr,
           label: `${format(sDate, 'dd MMM yyyy')} - ${format(eDate, 'dd MMM yyyy')}`,
-        });
-      }
-    } else {
-      if (dateRange.from !== '' || dateRange.to !== '') {
-        setDateRange({
-          type: 'custom',
-          from: '',
-          to: '',
-          label: 'All Time',
         });
       }
     }
@@ -200,22 +192,27 @@ export default function InvoicesPage() {
     }
   }, [isAdmin, adminExportMutation, customerExportMutation, debouncedSearchTerm, selectedCustomer, dateRange]);
 
+  const handleDateRangeChange = useCallback((value: DateFilterValue) => {
+    setPage(1);
+    setDateRange(value);
+  }, [setPage, setDateRange]);
+
   const handleSearchChange = useCallback((value: string) => {
+    setPage(1);
     setSearchTerm(value);
-    setPage(1); // Reset to first page on search
-  }, []);
+  }, [setPage, setSearchTerm]);
 
   const handlePageSizeChange = useCallback((value: string | number | null) => {
     if (value) {
+      setPage(1);
       setPageSize(Number(value));
-      setPage(1); // Reset to first page on page size change
     }
-  }, []);
+  }, [setPage, setPageSize]);
 
   const handleCustomerChange = useCallback((value: string | null) => {
-    setSelectedCustomer(value || '');
     setPage(1);
-  }, []);
+    setSelectedCustomer(value || '');
+  }, [setPage, setSelectedCustomer]);
 
   const handleView = useCallback((invoiceNumber: string) => {
     const path = isAdmin ? `/admin/invoices/${invoiceNumber}` : `/invoices/${invoiceNumber}`;
@@ -239,7 +236,7 @@ export default function InvoicesPage() {
           selectedCustomer={selectedCustomer}
           onCustomerChange={handleCustomerChange}
           dateRange={dateRange}
-          onDateRangeChange={setDateRange}
+          onDateRangeChange={handleDateRangeChange}
         />
 
         <InvoiceTable

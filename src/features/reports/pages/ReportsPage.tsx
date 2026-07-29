@@ -1,7 +1,8 @@
 import { useState, useCallback, useMemo, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import { format } from 'date-fns';
+import { format, parse, isValid } from 'date-fns';
 import { ReportsHeader } from '../components/ReportsHeader';
+import type { DateFilterValue } from '@/components/common/DateFilter/types';
 import {
   SHIPMENT_COLUMNS,
   TRANSACTION_COLUMNS,
@@ -19,6 +20,7 @@ import {
   useExportTransactionReport,
   useExportParcelReport
 } from '../hooks/useReports';
+import useLocalStorage from '@/hooks/useLocalStorage';
 import { useAppSelector } from '@/hooks/store.hooks';
 
 export default function ReportsPage() {
@@ -28,42 +30,16 @@ export default function ReportsPage() {
   const { is_sub_user, team_access } = useAppSelector((state) => state.auth);
   const canReadWrite = useMemo(() => !is_sub_user || team_access?.permissions?.report === 'full', [is_sub_user, team_access]);
 
-  // const parseLocalDate = useCallback((dateStr?: string | null) => {
-  //   if (!dateStr) return undefined;
-  //   const parts = dateStr.split('-');
-  //   if (parts.length === 3) {
-  //     const day = parseInt(parts[0], 10);
-  //     const month = parseInt(parts[1], 10) - 1; // 0-based
-  //     const year = parseInt(parts[2], 10);
-  //     return new Date(year, month, day);
-  //   }
-  //   return undefined;
-  // }, []);
+  const [dateRange, setDateRange] = useLocalStorage<DateFilterValue>('reports_date_range', {
+    type: 'custom',
+    from: undefined,
+    to: undefined,
+    label: 'All Time',
+  });
 
-  const formatUrlDate = useCallback((date?: Date) => {
-    return date ? format(date, 'dd-MM-yyyy') : undefined;
-  }, []);
-
-  const formatDate = useCallback((date?: Date) => {
-    return date ? format(date, 'dd/MM/yyyy') : undefined;
-  }, []);
-
-  // const initialStartDate = useMemo(() => {
-  //   const s = searchParams.get('start_date');
-  //   return s ? parseLocalDate(s) : subDays(new Date(), 7);
-  // }, [searchParams, parseLocalDate]);
-
-  // const initialEndDate = useMemo(() => {
-  //   const e = searchParams.get('end_date');
-  //   return e ? parseLocalDate(e) : new Date();
-  // }, [searchParams, parseLocalDate]);
-
-  const [dateRange, setDateRange] = useState<[Date | undefined, Date | undefined]>(() => [undefined, undefined]);
-  const [appliedDateRange, setAppliedDateRange] = useState<[Date | undefined, Date | undefined]>(() => [undefined, undefined]);
-
-  const [pageSize, setPageSize] = useState(25);
-  const [page, setPage] = useState(1);
-  const [search, setSearch] = useState(() => searchParams.get('search') || '');
+  const [pageSize, setPageSize] = useLocalStorage<number>('reports_page_size', 100);
+  const [page, setPage] = useLocalStorage<number>('reports_page', 1);
+  const [search, setSearch] = useLocalStorage<string>('reports_search', '');
 
   // Synchronize search and date range filters with URL searchParams
   useEffect(() => {
@@ -81,7 +57,13 @@ export default function ReportsPage() {
       }
 
       const currentStartDate = prev.get('start_date') || undefined;
-      const newStartDate = formatUrlDate(appliedDateRange[0]);
+      let newStartDate: string | undefined;
+      if (dateRange.from) {
+        const parsedFrom = parse(dateRange.from, 'dd/MM/yyyy', new Date());
+        if (isValid(parsedFrom)) {
+          newStartDate = format(parsedFrom, 'dd-MM-yyyy');
+        }
+      }
       if (currentStartDate !== newStartDate) {
         if (newStartDate) {
           prev.set('start_date', newStartDate);
@@ -92,7 +74,13 @@ export default function ReportsPage() {
       }
 
       const currentEndDate = prev.get('end_date') || undefined;
-      const newEndDate = formatUrlDate(appliedDateRange[1]);
+      let newEndDate: string | undefined;
+      if (dateRange.to) {
+        const parsedTo = parse(dateRange.to, 'dd/MM/yyyy', new Date());
+        if (isValid(parsedTo)) {
+          newEndDate = format(parsedTo, 'dd-MM-yyyy');
+        }
+      }
       if (currentEndDate !== newEndDate) {
         if (newEndDate) {
           prev.set('end_date', newEndDate);
@@ -104,15 +92,15 @@ export default function ReportsPage() {
 
       return hasChanged ? prev : prev;
     }, { replace: true });
-  }, [search, appliedDateRange, setSearchParams, formatUrlDate]);
+  }, [search, dateRange, setSearchParams]);
 
   const filters: ReportFilters = useMemo(() => ({
-    start_date: formatDate(appliedDateRange[0]),
-    end_date: formatDate(appliedDateRange[1]),
+    start_date: dateRange.from || undefined,
+    end_date: dateRange.to || undefined,
     search: search || undefined,
     per_page: pageSize,
     page: page,
-  }), [appliedDateRange, search, pageSize, page, formatDate]);
+  }), [dateRange.from, dateRange.to, search, pageSize, page]);
 
   // Mutations
   const exportShipment = useExportShipmentReport();
@@ -132,29 +120,28 @@ export default function ReportsPage() {
     setPage(1);
   }
 
-  const handleApplyFilters = useCallback(() => {
-    setAppliedDateRange(dateRange);
+  const handleDateRangeChange = useCallback((value: DateFilterValue) => {
+    setDateRange(value);
     setPage(1);
-  }, [dateRange]);
-
-  const handleClearFilters = useCallback(() => {
-    setDateRange([undefined, undefined]);
-    setAppliedDateRange([undefined, undefined]);
-    setPage(1);
-  }, []);
+  }, [setDateRange, setPage]);
 
   const handleSearch = useCallback((val: string) => {
     setSearch(val);
     setPage(1);
-  }, []);
+  }, [setSearch, setPage]);
 
   const handlePageSizeChange = useCallback((size: number) => {
     setPageSize(size);
     setPage(1);
-  }, []);
+  }, [setPageSize, setPage]);
 
   const handleExport = useCallback((format: string) => {
-    const exportFilters = { ...filters, format };
+    const exportFilters = {
+      start_date: dateRange.from || undefined,
+      end_date: dateRange.to || undefined,
+      search,
+      format
+    };
     switch (activeTab) {
       case 'shipment':
         exportShipment.mutate(exportFilters);
@@ -166,7 +153,7 @@ export default function ReportsPage() {
         exportParcel.mutate(exportFilters);
         break;
     }
-  }, [activeTab, filters, exportShipment, exportTransaction, exportParcel]);
+  }, [dateRange.from, dateRange.to, search, activeTab, exportShipment, exportTransaction, exportParcel]);
 
   const { data, columns, isLoading, total, isExporting } = useMemo(() => {
     switch (activeTab) {
@@ -260,13 +247,9 @@ export default function ReportsPage() {
     <div className="flex flex-col flex-1 gap-2 p-page-padding overflow-y-auto animate-in fade-in slide-in-from-bottom-2 duration-500 bg-slate-50/30 dark:bg-zinc-950/30">
       <div className='rounded-xl shadow-sm border border-gray-100 dark:border-zinc-800 bg-white dark:bg-zinc-950 overflow-hidden flex-none h-auto'>
         <ReportsHeader
-          startDate={dateRange[0]}
-          endDate={dateRange[1]}
-          setStartDate={(d) => setDateRange(prev => [d, prev[1]])}
-          setEndDate={(d) => setDateRange(prev => [prev[0], d])}
-          onApply={handleApplyFilters}
+          dateRange={dateRange}
+          onDateRangeChange={handleDateRangeChange}
           activeTab={activeTab}
-          handleClearFilters={handleClearFilters}
         />
 
         <div className="flex-none h-auto">
@@ -274,7 +257,7 @@ export default function ReportsPage() {
             key={activeTab}
             headerTitle={`${activeTab} Reports`}
             headerClass='capitalize'
-            headerDescription={() => <>Reports generated from <span className="font-semibold text-gray-900 dark:text-zinc-200">{dateRange[0] ? dateRange[0].toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' }) : 'Start Date'}</span> to <span className="font-semibold text-gray-900 dark:text-zinc-200">{dateRange[1] ? dateRange[1].toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' }) : 'End Date'}</span></>}
+            headerDescription={() => <>Reports generated for <span className="font-semibold text-gray-900 dark:text-zinc-200">{dateRange.label || 'All Time'}</span></>}
             columns={columns as any}
             data={data as any}
             searchPlaceholder={`Search ${activeTab} reports...`}

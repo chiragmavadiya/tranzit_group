@@ -120,7 +120,7 @@ export default function StaffManagementPage() {
   }, []);
 
   const handleExport = useCallback((format: string) => {
-    exportMutation.mutate({ format, params: queryParams }, {
+    exportMutation.mutate({ format, params: { search } }, {
       onSuccess: ({ blob, filename }) => {
         const url = window.URL.createObjectURL(blob);
         const link = document.createElement('a');
@@ -135,7 +135,7 @@ export default function StaffManagementPage() {
         showToast("Export failed", "error");
       }
     });
-  }, [exportMutation, queryParams]);
+  }, [exportMutation, search]);
 
   const confirmDelete = useCallback(() => {
     if (userToDelete) {

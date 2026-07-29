@@ -4,6 +4,17 @@ import { LinkCell } from '@/components/common/DataTableCells';
 import { StatusBadge } from '../orders/components/StatusBadge';
 import { NavLink } from 'react-router-dom';
 import { formateCurrency } from '@/lib/utils';
+import { CustomTooltip } from '@/components/common/CustomTooltip';
+import { CourierProductCell } from './components/CourierProductCell';
+
+// eslint-disable-next-line react-refresh/only-export-components
+const ReceiverAddressCell = (val?: string, className = 'text-sm') => (
+  val ? (
+    <CustomTooltip title={val} placement="top">
+      <span className={`${className} text-slate-600 max-w-[200px] line-clamp-3 break-words`}>{val}</span>
+    </CustomTooltip>
+  ) : '-'
+);
 
 export const ORDER_LABEL_CHARGES_COLUMNS: Column<OrderLabelCharge>[] = [
   {
@@ -22,7 +33,7 @@ export const ORDER_LABEL_CHARGES_COLUMNS: Column<OrderLabelCharge>[] = [
     header: 'RECEIVER FULL ADDRESS',
     className: 'text-[13px]',
     width: '200px',
-    cell: (val) => <span className="text-[13px] text-slate-600 max-w-[200px] inline-block">{val}</span>
+    cell: (val) => ReceiverAddressCell(val, 'text-[13px]')
   },
   {
     key: 'receiver_suburb',
@@ -30,21 +41,18 @@ export const ORDER_LABEL_CHARGES_COLUMNS: Column<OrderLabelCharge>[] = [
     className: 'text-[13px]',
     cell: (val) => <span className="text-sm text-slate-600 max-w-[200px] inline-block">{val}</span>
   },
-  { key: 'actual_parcel_tracking_number', className: 'text-[13px]', header: 'TRACKING NUMBER' },
+  { key: 'actual_parcel_tracking_number', className: 'text-[13px] break-normal', header: 'TRACKING NUMBER' },
   {
     key: 'courier_and_product',
     header: 'COURIER & PRODUCT',
     className: 'text-[13px]',
-    width: '160px',
+    width: '220px',
     cell: (value, row) => (
-      <div className="flex items-center gap-2">
-        {row?.courier_logo_url && (
-          <div className="shrink-0">
-            <img src={row.courier_logo_url} className="h-6! object-contain" />
-          </div>
-        )}
-        <span className="break-normal min-w-[60px] font-normal">{value && value !== 'unknown' ? value : '-'}</span>
-      </div>
+      <CourierProductCell
+        courierName={value}
+        courierLogoUrl={row?.courier_logo_url}
+        gap="gap-2"
+      />
     )
   },
   {
@@ -102,19 +110,18 @@ export const SHIPMENT_COLUMNS: Column<ShipmentReport>[] = [
   { key: 'dimensions', header: 'DIMENSIONS (L X W X H)' },
   { key: 'tracking_number', header: 'TRACKING #', sortable: true, searchable: true },
   {
-    key: 'courier', header: 'COURIER & PRODUCT', sortable: true, searchable: true, width: '200px',
+    key: 'courier',
+    header: 'COURIER',
+    sortable: true,
+    searchable: true,
+    width: '220px',
     cell: (value: string, row: ShipmentReport) => (
-      <div className="flex items-center gap-2">
-        {(row?.courier_logo_url) && (
-          <div className="">
-            <img src={row?.courier_logo_url} className="h-6! min-w-[60px] object-contain" />
-          </div>
-        )}
-        <div className="flex">
-          <span className="whitespace-nowrap font-normal">{value && value !== 'unknown' ? value : '-'}</span>
-          {row.product_id && <span className="font-normal text-sm whitespace-nowrap"> - {row.product_id}</span>}
-        </div>
-      </div>
+      <CourierProductCell
+        courierName={value}
+        courierLogoUrl={row?.courier_logo_url}
+        productId={row?.product_id}
+        gap="gap-2"
+      />
     )
   },
   { key: 'receiver_name', header: 'RECEIVER', sortable: true, searchable: true, width: '160px' },
@@ -139,8 +146,6 @@ export const INVOICE_COLUMNS: Column<InvoiceReport>[] = [
 ];
 
 export const PARCEL_COLUMNS: Column<ParcelReport>[] = [
-  { key: 'receiver_name', header: 'RECEIVER NAME', sortable: true, searchable: true },
-  { key: 'receiver_full_address', header: 'RECEIVER FULL ADDRESS', sortable: true, searchable: true },
   {
     key: 'tranzit_group_order_number',
     header: 'TRANZIT GROUP ORDER NUMBER',
@@ -150,24 +155,23 @@ export const PARCEL_COLUMNS: Column<ParcelReport>[] = [
       <LinkCell value={value} className="font-bold" path={`/orders/view/${record.tranzit_group_order_number}`} />
     )
   },
+  { key: 'receiver_name', header: 'RECEIVER NAME', sortable: true, searchable: true },
+  { key: 'receiver_full_address', header: 'RECEIVER FULL ADDRESS', sortable: true, searchable: true, width: '200px', cell: (val) => ReceiverAddressCell(val) },
   {
-    key: 'actual_parcel_tracking_number', header: 'ACTUAL PARCEL TRACKING NUMBER',
+    key: 'actual_parcel_tracking_number', header: 'ACTUAL PARCEL TRACKING NUMBER', className: 'break-normal'
   },
   { key: 'parcel_status', header: 'PARCEL STATUS', cell: (value: string) => <StatusBadge status={value} /> },
   {
-    key: 'courier', header: 'COURIER & PRODUCT', width: '200px',
+    key: 'courier',
+    header: 'COURIER & PRODUCT',
+    width: '220px',
     cell: (value: string, row: ParcelReport) => (
-      <div className="flex items-center gap-2">
-        {(row?.courier_logo_url) && (
-          <div className="">
-            <img src={row?.courier_logo_url} className="h-6! min-w-[60px] object-contain" />
-          </div>
-        )}
-        <div className="">
-          <span className=" font-normal">{value && value !== 'unknown' ? value : '-'}</span>
-          {row.product_id && <span className="font-normal text-sm "> - {row.product_id}</span>}
-        </div>
-      </div>
+      <CourierProductCell
+        courierName={value}
+        courierLogoUrl={row?.courier_logo_url}
+        productId={row?.product_id}
+        gap="gap-2"
+      />
     )
   },
   { key: 'total', header: 'TOTAL', sortable: true, cell: (val) => val ? formateCurrency(val) : '-' },
@@ -176,36 +180,43 @@ export const PARCEL_COLUMNS: Column<ParcelReport>[] = [
 
 export const ADMIN_PARCEL_COLUMNS: Column<ParcelReport>[] = [
   {
-    key: 'customer_name',
-    header: 'CUSTOMER NAME (SENDER NAME)',
-    cell: (val) => <span className="font-medium text-slate-700 dark:text-zinc-300">{val || '-'}</span>
-  },
-  { key: 'receiver_name', header: 'RECEIVER NAME', sortable: true, searchable: true },
-  {
-    key: 'receiver_full_address',
-    header: 'RECEIVER FULL ADDRESS',
-    cell: (val) => <span className="text-sm text-slate-600 max-w-[200px] inline-block">{val}</span>
-  },
-  { key: 'receiver_suburb', header: 'RECEIVER SUBURB', sortable: true, searchable: true },
-  {
     key: 'tranzit_group_order_number',
-    header: 'TRANZIT GROUP ORDER NUMBER',
-    sortable: true,
-    searchable: true,
+    header: 'ORDER NUMBER',
+    width: '160px',
     cell: (value) => (
       <LinkCell value={value} className="font-bold text-primary" path={`/admin/orders/view/${value}`} />
     )
   },
-  { key: 'actual_parcel_tracking_number', header: 'ACTUAL PARCEL TRACKING NUMBER', sortable: true, searchable: true },
-  { key: 'actual_australia_post_mailing_statement_no', header: 'ACTUAL AUSTRALIA POST MAILING STATEMENT NO', sortable: true },
+  {
+    key: 'customer_name',
+    header: 'CUSTOMER NAME (SENDER NAME)',
+    className: 'break-normal',
+    cell: (val) => <span className="font-medium text-slate-700 dark:text-zinc-300 break-normal">{val || '-'}</span>
+  },
+  { key: 'receiver_name', header: 'RECEIVER NAME', className: 'break-normal' },
+  {
+    key: 'receiver_full_address',
+    header: 'RECEIVER FULL ADDRESS',
+    className: 'break-normal',
+    width: "200px",
+    cell: (val) => ReceiverAddressCell(val)
+  },
+  { key: 'receiver_suburb', header: 'RECEIVER SUBURB', className: 'break-normal' },
+  { key: 'actual_parcel_tracking_number', header: 'ACTUAL PARCEL TRACKING NUMBER', className: 'break-normal' },
+  { key: 'actual_australia_post_mailing_statement_no', header: 'ACTUAL AUSTRALIA POST MAILING STATEMENT NO', className: 'break-normal' },
   { key: 'parcel_status', header: 'PARCEL STATUS', cell: (value: string) => <StatusBadge status={value} /> },
   {
-    key: 'courier', header: 'COURIER & PRODUCT', width: "220px",
+    key: 'courier',
+    header: 'COURIER & PRODUCT',
+    width: "220px",
     cell: (val: string, row: ParcelReport) => (
-      <div className="flex items-center gap-1">
-        <img src={row?.courier_logo_url} className="h-6" alt="" />
-        <span className=''>{val} {row.product_id && ` - ${row.product_id}`}</span>
-      </div>)
+      <CourierProductCell
+        courierName={val}
+        courierLogoUrl={row?.courier_logo_url}
+        productId={row?.product_id}
+        gap="gap-1"
+      />
+    )
   },
   {
     key: 'pickup_charge',
@@ -235,41 +246,44 @@ export const ADMIN_PARCEL_COLUMNS: Column<ParcelReport>[] = [
 
 export const ADMIN_INTEGRATED_PARCEL_COLUMNS: Column<ParcelReport>[] = [
   {
-    key: 'customer_name',
-    header: 'CUSTOMER NAME (SENDER NAME)',
-    sortable: true,
-    searchable: true,
-    cell: (val) => <span className="font-medium text-slate-700 dark:text-zinc-300">{val || '-'}</span>
-  },
-  { key: 'receiver_name', header: 'RECEIVER NAME', sortable: true, searchable: true },
-  {
-    key: 'receiver_full_address',
-    header: 'RECEIVER FULL ADDRESS',
-    sortable: true,
-    searchable: true,
-    cell: (val) => <span className="text-sm text-slate-600 max-w-[200px] inline-block">{val}</span>
-  },
-  { key: 'receiver_suburb', header: 'RECEIVER SUBURB', sortable: true, searchable: true },
-
-  {
     key: 'tranzit_group_order_number',
-    header: 'TRANZIT GROUP ORDER NUMBER',
-    sortable: true,
-    searchable: true,
+    header: 'ORDER NUMBER',
+    width: '160px',
     cell: (value) => (
       <LinkCell value={value} className="font-bold text-primary" path={`/admin/orders/view/${value}`} />
     )
   },
-  { key: 'actual_parcel_tracking_number', header: 'ACTUAL PARCEL TRACKING NUMBER', sortable: true, searchable: true },
-  { key: 'actual_australia_post_mailing_statement_no', header: 'ACTUAL AUSTRALIA POST MAILING STATEMENT NO', sortable: true },
-  { key: 'parcel_status', header: 'PARCEL STATUS', sortable: true },
   {
-    key: 'courier', header: 'COURIER & PRODUCT', width: "220px",
+    key: 'customer_name',
+    header: 'CUSTOMER NAME (SENDER NAME)',
+    sortable: true,
+    searchable: true,
+    cell: (val) => <span className="font-medium text-slate-700 dark:text-zinc-300 break-normal">{val || '-'}</span>
+  },
+  { key: 'receiver_name', header: 'RECEIVER NAME', className: 'break-normal' },
+  {
+    key: 'receiver_full_address',
+    header: 'RECEIVER FULL ADDRESS',
+    width: "200px",
+    cell: (val) => ReceiverAddressCell(val)
+  },
+  { key: 'receiver_suburb', header: 'RECEIVER SUBURB', className: 'break-normal' },
+
+  { key: 'actual_parcel_tracking_number', header: 'ACTUAL PARCEL TRACKING NUMBER', className: 'break-normal' },
+  { key: 'actual_australia_post_mailing_statement_no', header: 'ACTUAL AUSTRALIA POST MAILING STATEMENT NO', className: 'break-normal' },
+  { key: 'parcel_status', header: 'PARCEL STATUS', cell: (value: string) => <StatusBadge status={value} />, width: "160px" },
+  {
+    key: 'courier',
+    header: 'COURIER & PRODUCT',
+    width: "220px",
     cell: (val: string, row: ParcelReport) => (
-      <div className="flex items-center gap-1">
-        <img src={row?.courier_logo_url} className="h-6" alt="" />
-        <span>{val} {row.product_id && ` - ${row.product_id}`}</span>
-      </div>)
+      <CourierProductCell
+        courierName={val}
+        courierLogoUrl={row?.courier_logo_url}
+        productId={row?.product_id}
+        gap="gap-1"
+      />
+    )
   },
   {
     key: 'total',
@@ -283,8 +297,7 @@ export const AUSPOST_REPORT_COLUMNS: Column<any>[] = [
   {
     key: 'tranzit_group_order_number',
     header: 'ORDER NUMBER',
-    sortable: true,
-    searchable: true,
+    width: '160px',
     cell: (value, record) => {
       const orderNo = value || record.order_number || record.orderNumber || '';
       return (
@@ -297,6 +310,7 @@ export const AUSPOST_REPORT_COLUMNS: Column<any>[] = [
     header: 'CUSTOMER NAME',
     sortable: true,
     searchable: true,
+    className: 'break-normal',
     cell: (value, record) => value || record.customer_name || record.customerName || '-'
   },
   {

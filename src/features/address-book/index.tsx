@@ -16,6 +16,7 @@ import {
 } from './hooks/useAddressBook';
 import { useNavigate } from 'react-router-dom';
 import { useAppSelector } from '@/hooks/store.hooks';
+import useLocalStorage from '@/hooks/useLocalStorage';
 
 export default function AddressBookPage() {
   const navigate = useNavigate();
@@ -23,9 +24,9 @@ export default function AddressBookPage() {
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [editingAddressId, setEditingAddressId] = useState<number | null>(null);
   const [deletingId, setDeletingId] = useState<number | string | null>(null);
-  const [search, setSearch] = useState('');
-  const [pageSize, setPageSize] = useState(25);
-  const [currentPage, setCurrentPage] = useState(1);
+  const [search, setSearch] = useLocalStorage<string>('address_book_search', '');
+  const [pageSize, setPageSize] = useLocalStorage<number>('address_book_page_size', 25);
+  const [currentPage, setCurrentPage] = useLocalStorage<number>('address_book_current_page', 1);
   const { is_sub_user, team_access } = useAppSelector((state) => state.auth);
   const canReadWrite = useMemo(() => !is_sub_user || team_access?.permissions?.my_address_book === 'full', [is_sub_user, team_access]);
 
@@ -43,12 +44,12 @@ export default function AddressBookPage() {
   const handleSearch = useCallback((search: string) => {
     setSearch(search);
     setCurrentPage(1);
-  }, []);
+  }, [setSearch, setCurrentPage]);
 
   const handlePageSizeChange = useCallback((pageSize: number) => {
     setPageSize(pageSize);
     setCurrentPage(1);
-  }, []);
+  }, [setPageSize, setCurrentPage]);
 
   const handleAddAddress = useCallback(() => {
     setEditingAddressId(null);

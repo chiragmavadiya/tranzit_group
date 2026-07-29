@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react"
+import { useState, useEffect, useMemo } from "react"
 import {
   User,
   Truck,
@@ -23,6 +23,7 @@ import { STATES, WEIGHT_TIERS } from "../constants"
 //   AccordionTrigger,
 // } from "@/components/ui/accordion"
 import { useCreateCustomer, useCustomerEditDetails, useUpdateCustomer } from "../hooks/useCustomers"
+import { useXeroContacts } from "@/features/xero/hooks/useXero"
 import { showToast } from "@/components/ui/custom-toast"
 import { PlaceAutocomplete } from "@/components/common/AutoComplateAddress"
 import { Checkbox } from "@/components/ui/checkbox"
@@ -30,6 +31,7 @@ import { cleanSpaces, isPhoneValid, cn } from "@/lib/utils";
 import directFreightLogo from "@/assets/coruiers_logo/direct-freight.png"
 import auspostLogo from "@/assets/coruiers_logo/logo-auspost.png"
 import courierspleaseLogo from "@/assets/coruiers_logo/couriersplease.png"
+import type { XeroContact } from "@/features/xero/types";
 
 interface CustomerDialogProps {
   open: boolean
@@ -84,6 +86,7 @@ const INITIAL_FORM_DATA = {
   pallet_active: 0,
   topup_enable: false,
   order_prefix: "",
+  xero_contact_id: "",
   markup_charges: buildInitialCharges(),
   pickup_charges: buildInitialCharges(),
   byo_courier_invoice_enable: false,
@@ -105,8 +108,22 @@ export default function CustomerDialog({ open, onOpenChange, customerId }: Custo
   const { mutate: createCustomer, isPending: isCreating } = useCreateCustomer();
   const { mutate: updateCustomer, isPending: isUpdating } = useUpdateCustomer();
   const { data: editData, isLoading: isLoadingDetails } = useCustomerEditDetails(customerId || "");
+  // The saved id, not the form value — the list must not refetch every time a contact is picked.
+  const assignedXeroContactId = editData?.data?.xero_contact_id || undefined;
+  const { contacts: xeroContacts, isConnected: isXeroConnected, isLoading: isLoadingXeroContacts } = useXeroContacts(
+    open && !isLoadingDetails,
+    assignedXeroContactId
+  );
 
   const [sameAsShipping, setSameAsShipping] = useState(false);
+
+  const xeroContactOptions = useMemo(() => xeroContacts.map((contact: XeroContact) => {
+    const name = [contact.FirstName, contact.LastName].filter(Boolean).join(" ").trim() || contact.Name;
+    const label = name
+      ? contact.EmailAddress ? `${name} (${contact.EmailAddress})` : name
+      : contact.EmailAddress || contact.ContactID;
+    return { value: contact.ContactID, label };
+  }), [xeroContacts]);
 
   const handleChargeChange = (
     type: 'markup' | 'pickup',
@@ -244,6 +261,7 @@ export default function CustomerDialog({ open, onOpenChange, customerId }: Custo
 
       filteredData.markup_charges = mergedMarkupCharges;
       filteredData.pickup_charges = mergedPickupCharges;
+      filteredData.xero_contact_id = data.xero_contact_id ?? "";
       filteredData.country = "Australia";
       filteredData.billing_country = "Australia";
 
@@ -508,12 +526,27 @@ export default function CustomerDialog({ open, onOpenChange, customerId }: Custo
           <FormInput
             label="Order Prefix"
             placeholder="e.g. TRZ-"
-            isFullWidth
             required
             value={formData.order_prefix}
             onChange={(val) => handleChange("order_prefix", val)}
             error={submited && !formData.order_prefix?.trim()}
             errormsg="Please enter order prefix"
+          />
+          <FormSelect
+            label="Xero Contact"
+            placeholder={
+              !isXeroConnected
+                ? "Xero is not connected"
+                : isLoadingXeroContacts
+                  ? "Loading contacts..."
+                  : xeroContactOptions.length === 0
+                    ? "No Xero contacts found"
+                    : "Select Xero contact"
+            }
+            options={xeroContactOptions}
+            value={formData.xero_contact_id}
+            onValueChange={(val) => handleChange("xero_contact_id", val || "")}
+            disabled={!isXeroConnected || isLoadingXeroContacts}
           />
         </div>
 

@@ -30,7 +30,7 @@ const StatusSwitch = ({ user, isChecked, disabled }: { user: any; isChecked: boo
   };
 
   return (
-    <div className="flex items-center gap-2">
+    <div className="flex gap-2 w-[60px]">
       <Switch
         checked={isChecked}
         disabled={isPending || user.role === "Admin" || user.role === "admin" || user.role === "parent" || disabled}
@@ -103,8 +103,11 @@ export default function TeamAccessPage() {
             <div className="w-8 h-8 rounded-full bg-primary/10 text-primary flex items-center justify-center font-bold text-xs uppercase">
               {initials || '??'}
             </div>
-            <div>
+            <div className="min-w-0">
               <p className="my-0 font-medium text-gray-900 dark:text-zinc-100">{nameVal}</p>
+              <p className="md:hidden my-0 text-[11px] text-gray-500 dark:text-zinc-400 break-words">
+                {row.email}{row.created_at ? ` · ${row.created_at}` : ''}
+              </p>
             </div>
           </div>
         );
@@ -113,7 +116,7 @@ export default function TeamAccessPage() {
     {
       header: 'Email',
       key: 'email',
-
+      className: 'hidden md:table-cell',
     },
     {
       header: 'Status',
@@ -128,6 +131,7 @@ export default function TeamAccessPage() {
     {
       header: 'Created Date',
       key: 'created_at',
+      className: 'hidden md:table-cell',
     },
     ...(canReadWrite ? [{
       header: 'Actions',
@@ -161,24 +165,25 @@ export default function TeamAccessPage() {
 
 
   return (
-    <div className="flex flex-1 flex-col gap-6 h-full">
-      <div className="bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-800 rounded-xl shadow-sm overflow-hidden flex flex-col flex-1">
+    <div className="flex flex-col flex-1 gap-6 h-auto animate-in fade-in slide-in-from-bottom-2 duration-500">
+      <div className="bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-800 rounded-xl shadow-sm flex-none h-auto">
         <DataTable
           data={users}
           columns={columns}
           headerTitle="Team Members"
           headerDescription="Manage your team access and permissions."
           searchable={false}
+          pagination={false}
           exportable={false}
           searchPlaceholder="Search users by name or email..."
           customHeader={canReadWrite && (
-            <Button onClick={() => setIsAddUserOpen(true)} className="h-8 bg-primary hover:bg-primary/90 text-white gap-2">
+            <Button onClick={() => setIsAddUserOpen(true)} className="w-full sm:w-auto h-8 bg-primary hover:bg-primary/90 text-white gap-2">
               <Plus className="w-4 h-4" />
               Add User
             </Button>
           )}
           totalItems={users.length}
-          className='pb-3'
+          className='pb-3 flex-none h-auto [&_div.overflow-auto]:flex-none [&_div.overflow-auto]:h-auto [&_div.overflow-auto]:min-h-0 [&_div.overflow-auto]:overflow-y-visible [&_div.overflow-auto]:overflow-x-auto'
           loading={isLoading}
         />
       </div>

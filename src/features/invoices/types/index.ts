@@ -8,7 +8,6 @@ export interface Customer {
 export interface InvoiceDocumentData {
   id?: number;
   invoice_number: string;
-  zoho_invoice_number: string | null;
   status: string;
   customer_full_name?: string;
   customer_email?: string;
@@ -43,7 +42,6 @@ export interface InvoiceDocumentData {
 export interface Invoice {
   id: number;
   invoice_number: string;
-  zoho_invoice_number: string | null;
   status: string;
 
   // From Customer API
@@ -96,7 +94,6 @@ export interface InvoiceSummary {
 }
 export interface InvoiceFormData {
   invoice_number: string;
-  zoho_invoice_number: string;
   status: InvoiceStatus;
   customerName: string;
   customerEmail: string;

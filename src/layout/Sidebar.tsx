@@ -214,9 +214,9 @@ const Sidebar = ({
 
   return (
     <aside
-      style={bannerOpen ? { top: '36px', height: 'calc(100vh - 36px)' } : {}}
+      style={bannerOpen ? { top: '36px', height: 'calc(100dvh - 36px)' } : {}}
       className={cn(
-        "print:hidden h-screen bg-white dark:bg-zinc-950 border-r border-gray-200 dark:border-zinc-800 flex flex-col justify-between fixed top-0 left-0 transition-all duration-300 ease-in-out z-20",
+        "print:hidden h-dvh bg-white dark:bg-zinc-950 border-r border-gray-200 dark:border-zinc-800 flex flex-col justify-between fixed top-0 left-0 transition-all duration-300 ease-in-out z-20",
         isMobile
           ? "w-[240px] z-50"
           : "z-20",

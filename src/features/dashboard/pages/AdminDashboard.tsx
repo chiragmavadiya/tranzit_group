@@ -164,7 +164,7 @@ export default function AdminDashboard() {
       </div>
 
       <div className="grid grid-cols-1 xl:grid-cols-12 gap-4 items-start">
-        <div className="xl:col-span-4 h-[500px]">
+        <div className="xl:col-span-4 min-h-[400px]">
           <TransactionList
             transactions={metrics?.transactions || []}
             loading={isLoading}

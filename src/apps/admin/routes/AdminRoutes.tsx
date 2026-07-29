@@ -8,7 +8,6 @@ import PageLoading from "@/components/common/Loader";
 const Dashboard = lazy(() => import('@/features/dashboard/pages/Dashboard'));
 const Orders = lazy(() => import('@/features/orders/pages/OrdersPage'));
 const OrderDetails = lazy(() => import('@/features/orders/pages/OrderDetails'));
-const Search = lazy(() => import('@/features/search/pages/SearchPage'));
 const Setup = lazy(() => import('@/features/setup/pages/SetupPage'));
 const Invoices = lazy(() => import('@/features/invoices/pages/InvoicesPage'));
 const InvoiceDetails = lazy(() => import('@/features/invoices/pages/InvoiceDocumentView'));
@@ -21,7 +20,6 @@ const CustomerDetailPage = lazy(() => import('@/features/customers/pages/Custome
 const CancelOrderPage = lazy(() => import('@/features/cancel-order/pages/CancelOrderPage'));
 const BookPickupPage = lazy(() => import('@/features/book-pickup/pages/BookPickupPage'));
 const StaffManagementPage = lazy(() => import('@/features/staff/pages/StaffManagementPage'));
-const ZohoIntegrationPage = lazy(() => import('@/features/zoho/pages/ZohoIntegrationPage'));
 const AdminTopUpPage = lazy(() => import('@/features/wallet/pages/AdminTopUpPage'));
 const CourierSurchargePage = lazy(() => import('@/features/courier-surcharge/pages/CourierSurchargePage'));
 const CourierPostcodePage = lazy(() => import('@/features/courier-postcode/pages/CourierPostcodePage'));
@@ -32,6 +30,7 @@ const GetQuote = lazy(() => import('@/features/quote/pages/GetQuotePage'));
 const QuoteList = lazy(() => import('@/features/customer-quote/pages/QuoteListPage'));
 const ProfilePage = lazy(() => import('@/features/profile/pages/ProfilePage'));
 const GlobalConfigPage = lazy(() => import('@/features/global-config/pages/GlobalConfigPage'));
+const XeroIntegrationPage = lazy(() => import('@/features/xero/pages/XeroIntegrationPage'));
 const BlackoutDaysPage = lazy(() => import('@/features/blackout-days/pages/BlackoutDaysPage'));
 
 const HelpCenterAdminPage = lazy(() => import('@/features/help-center-admin/pages/HelpCenterAdminPage'));
@@ -82,8 +81,8 @@ export default function AdminRoutes() {
                     {/* Book Pickup */}
                     <Route path="book-pickup" element={withSuspense(<BookPickupPage />)} />
 
-                    {/* Zoho Integration, Global Settings */}
-                    <Route path="zoho-integration" element={withSuspense(<ZohoIntegrationPage />)} />
+                    {/* Xero Integration, Global Settings */}
+                    <Route path="xero-integration" element={withSuspense(<XeroIntegrationPage />)} />
                     <Route path="global-config" element={withSuspense(<GlobalConfigPage />)} />
                     <Route path="blackout-days" element={withSuspense(<BlackoutDaysPage />)} />
                     <Route path="settings" element={withSuspense(<SettingsLayout />)}>
@@ -135,7 +134,6 @@ export default function AdminRoutes() {
 
                     {/* Others */}
                     <Route path="setup" element={withSuspense(<Setup />)} />
-                    <Route path="search" element={withSuspense(<Search />)} />
 
                     {/* Default authenticated route */}
                     <Route path="/" element={<Navigate to="/admin/dashboard" replace />} />

@@ -51,7 +51,7 @@ function DialogContent({
       <DialogPrimitive.Popup
         data-slot="dialog-content"
         className={cn(
-          "fixed top-1/2 left-1/2 z-50 grid w-full max-w-[calc(100%-2rem)] -translate-x-1/2 -translate-y-1/2 gap-4 rounded-xl bg-popover p-4 text-sm text-popover-foreground ring-1 ring-foreground/10 duration-100 outline-none sm:max-w-sm data-open:animate-in data-open:fade-in-0 data-open:zoom-in-95 data-closed:animate-out data-closed:fade-out-0 data-closed:zoom-out-95",
+          "fixed top-1/2 left-1/2 z-50 grid w-[calc(100%-2rem)] max-w-[calc(100%-2rem)] sm:w-full sm:max-w-[calc(100%-2rem)] -translate-x-1/2 -translate-y-1/2 gap-4 rounded-xl bg-popover p-3 sm:p-4 text-sm text-popover-foreground ring-1 ring-foreground/10 duration-100 outline-none sm:max-w-sm data-open:animate-in data-open:fade-in-0 data-open:zoom-in-95 data-closed:animate-out data-closed:fade-out-0 data-closed:zoom-out-95",
           className
         )}
         {...props}
@@ -174,7 +174,7 @@ const CustomModel = ({ open, title, description, onOpenChange, children, onSubmi
       <DialogContent
         className={cn(
           "flex flex-col max-h-[85vh] md:max-h-[90vh] overflow-hidden gap-0",
-          contentClass || "min-w-xl"
+          contentClass || "min-w-0 sm:min-w-xl"
         )}
         tabIndex={undefined}
       >
@@ -193,24 +193,24 @@ const CustomModel = ({ open, title, description, onOpenChange, children, onSubmi
         </div>
         {
           showFooter && (
-            <DialogFooter className="gap-3 flex flex-col sm:flex-row sm:justify-between p-4 border-t border-gray-300 dark:border-zinc-800 bg-gray-50/50 dark:bg-zinc-900/50 mt-auto">
+            <DialogFooter className="gap-2 sm:gap-3 flex flex-col-reverse sm:flex-row sm:justify-between p-3 sm:p-4 border-t border-gray-300 dark:border-zinc-800 bg-gray-50/50 dark:bg-zinc-900/50 mt-auto -mx-3 sm:-mx-4 -mb-3 sm:-mb-4">
               <div className="flex items-center gap-2">
                 {customFooter}
               </div>
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-2 w-full sm:w-auto">
                 <Button
                   type="button"
                   variant="outline"
                   onClick={handleCancel}
                   disabled={isLoading}
-                  className="px-4 border-gray-200 dark:border-zinc-800 font-medium hover:bg-gray-100 dark:hover:bg-zinc-800 h-8"
+                  className="flex-1 sm:flex-none px-4 border-gray-200 dark:border-zinc-800 font-medium hover:bg-gray-100 dark:hover:bg-zinc-800 h-8"
                 >
                   {cancelText}
                 </Button>
                 <Button
                   type="submit"
                   disabled={isLoading}
-                  className="px-4 bg-primary hover:bg-primary-hover text-white font-semibold transition-all shadow-md shadow-primary/20 dark:shadow-none active:scale-[0.98] h-8"
+                  className="flex-1 sm:flex-none px-4 bg-primary hover:bg-primary-hover text-white font-semibold transition-all shadow-md shadow-primary/20 dark:shadow-none active:scale-[0.98] h-8"
                   onClick={onSubmit}
                 >
                   {isLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : null}

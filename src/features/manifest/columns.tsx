@@ -73,7 +73,7 @@ export const getManifestColumns = (
       header: 'PAYMENT STATUS', key: 'payment_status', cell: (value: string) => <StatusBadge status={value} />
     },
     {
-      header: 'ORDER SOURCE', key: 'order_type',
+      header: 'ORDER SOURCE', key: 'order_type', width: '110px',
       cell: (value: string, row: Manifest) => (
         <div className="flex items-center gap-2">
           <img src={row?.order_source_icon || Favicon} className="h-4 w-4" alt="" />

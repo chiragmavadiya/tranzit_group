@@ -1,4 +1,4 @@
-import { useState, useMemo, useEffect } from 'react';
+import { useMemo, useCallback } from 'react';
 import {
   Wallet,
   ArrowUpRight,
@@ -16,14 +16,15 @@ import { useAdminTopups, useExportAdminTopups } from '../hooks/useWallet';
 import { useDebounce } from '@/hooks/useDebounce';
 import { useCustomers } from '@/features/customers/hooks/useCustomers';
 import { formateCurrency } from '@/lib/utils';
+import useLocalStorage from '@/hooks/useLocalStorage';
 
 export default function AdminTopUpPage() {
-  const [search, setSearch] = useState('');
-  const [transactionType, setTransactionType] = useState('');
-  const [selectedCustomer, setSelectedCustomer] = useState<string>('');
-  const [pageSize, setPageSize] = useState(25);
-  const [page, setPage] = useState(1);
-  const [dateRange, setDateRange] = useState<DateFilterValue>({
+  const [search, setSearch] = useLocalStorage<string>('admin_topup_search', '');
+  const [transactionType, setTransactionType] = useLocalStorage<string>('admin_topup_transaction_type', '');
+  const [selectedCustomer, setSelectedCustomer] = useLocalStorage<string>('admin_topup_selected_customer', '');
+  const [pageSize, setPageSize] = useLocalStorage<number>('admin_topup_page_size', 25);
+  const [page, setPage] = useLocalStorage<number>('admin_topup_page', 1);
+  const [dateRange, setDateRange] = useLocalStorage<DateFilterValue>('admin_topup_date_range', {
     type: 'custom',
     from: '',
     to: '',
@@ -58,10 +59,30 @@ export default function AdminTopUpPage() {
   const transactions = topupResponse?.data || [];
   const totalItems = topupResponse?.meta?.total || 0;
 
-  // Reset page when filters change
-  useEffect(() => {
+  const handleSearchChange = useCallback((val: string) => {
     setPage(1);
-  }, [debouncedSearch, transactionType, selectedCustomer, dateRange]);
+    setSearch(val);
+  }, [setPage, setSearch]);
+
+  const handleTransactionTypeChange = useCallback((val: string) => {
+    setPage(1);
+    setTransactionType(val || 'all');
+  }, [setPage, setTransactionType]);
+
+  const handleCustomerChange = useCallback((val: string) => {
+    setPage(1);
+    setSelectedCustomer(val || 'all');
+  }, [setPage, setSelectedCustomer]);
+
+  const handleDateRangeChange = useCallback((val: DateFilterValue) => {
+    setPage(1);
+    setDateRange(val);
+  }, [setPage, setDateRange]);
+
+  const handlePageSizeChange = useCallback((val: string | number) => {
+    setPage(1);
+    setPageSize(Number(val));
+  }, [setPage, setPageSize]);
 
   const { mutate: exportAdminTopups, isPending: isExporting } = useExportAdminTopups();
 
@@ -77,6 +98,7 @@ export default function AdminTopUpPage() {
   };
 
   const handleReset = () => {
+    setPage(1);
     setSearch('');
     setTransactionType('');
     setSelectedCustomer('');
@@ -130,7 +152,7 @@ export default function AdminTopUpPage() {
             <FormSelect
               label="Transaction Type"
               value={transactionType}
-              onValueChange={(val) => setTransactionType(val || 'all')}
+              onValueChange={handleTransactionTypeChange}
               options={TRANSACTION_TYPES}
               placeholder="Select Transaction Type"
               className="w-full space-y-0"
@@ -141,7 +163,7 @@ export default function AdminTopUpPage() {
               label="Customer"
               placeholder="Select Customer"
               value={selectedCustomer}
-              onValueChange={(val) => setSelectedCustomer(val || 'all')}
+              onValueChange={handleCustomerChange}
               options={customersData?.data?.map((c: any) => ({
                 value: c.id.toString(),
                 label: `${c.first_name} ${c.last_name} (${c.email})`
@@ -152,7 +174,7 @@ export default function AdminTopUpPage() {
             <span className="text-xs font-semibold text-slate-600 dark:text-zinc-400 block mb-1">Date Range</span>
             <DateFilter
               value={dateRange}
-              onChange={setDateRange}
+              onChange={handleDateRangeChange}
               className="w-full"
             />
           </div>
@@ -176,9 +198,9 @@ export default function AdminTopUpPage() {
           data={transactions}
           searchable
           searchValue={search}
-          onSearchChange={setSearch}
+          onSearchChange={handleSearchChange}
           pageSize={pageSize}
-          onPageSizeChange={(val) => setPageSize(Number(val))}
+          onPageSizeChange={handlePageSizeChange}
           currentPage={page}
           onPageChange={setPage}
           totalItems={totalItems}

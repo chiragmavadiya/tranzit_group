@@ -185,20 +185,6 @@ export const useRemindAdminInvoice = () => {
   });
 };
 
-export const useZohoSyncAdminInvoice = () => {
-  return useMutation({
-    mutationFn: (id: string | number) => invoicesService.zohoSyncAdminInvoice(id),
-    onSuccess: (response) => {
-      if (response.status) {
-        showToast(response.message || "Synced to Zoho successfully", "success");
-      }
-    },
-    onError: (error: any) => {
-      showToast(error?.response?.data?.message || "Failed to sync to Zoho", "error");
-    },
-  });
-};
-
 export const useAdminInvoicePayment = () => {
   const queryClient = useQueryClient();
   return {

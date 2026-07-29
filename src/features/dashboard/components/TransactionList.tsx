@@ -6,8 +6,8 @@ import { cn } from "@/lib/utils";
 import {
   DropdownCustomMenu
 } from "@/components/ui/dropdown-menu";
-import { useState } from "react";
 import { CustomTooltip } from "@/components/common/CustomTooltip";
+import useLocalStorage from "@/hooks/useLocalStorage";
 interface TransactionListProps {
   // metrics: AdminMetrics | CustomerMetrics;
   className?: string;
@@ -45,7 +45,7 @@ const TransactionListSkeleton = () => (
 
 
 export function TransactionList({ transactions, className, loading }: TransactionListProps) {
-  const [activePeriod, setActivePeriod] = useState<keyof typeof periodsKey>('last28Days');
+  const [activePeriod, setActivePeriod] = useLocalStorage<keyof typeof periodsKey>('transaction_list_period', 'last28Days');
 
   const isArray = Array.isArray(transactions);
 
@@ -58,7 +58,7 @@ export function TransactionList({ transactions, className, loading }: Transactio
     : ((transactions as any)?.[countKeys[activePeriod]] || currentTransactions.length || 0);
 
   const subtitle = isArray
-    ? "Filtered activity"
+    ? "Recent activity"
     : `${periodsKey[activePeriod]} activity`;
 
   return (

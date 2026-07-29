@@ -46,7 +46,7 @@ export const ShopifyItemsCard: React.FC<ShopifyItemsCardProps> = ({ items }) => 
         <AccordionContent className="border-t border-gray-100 dark:border-zinc-800/80 flex flex-col gap-2 pb-0 pt-0">
           <div className="flex flex-col">
             {/* Header row */}
-            <div className="grid grid-cols-12 gap-4 px-4 py-2 bg-slate-50/50 dark:bg-zinc-900/50 border-b border-gray-100 dark:border-zinc-800/80 text-[11px] font-bold text-gray-500 dark:text-zinc-400 uppercase tracking-wider">
+            <div className="grid grid-cols-12 gap-4 px-4 py-2 bg-slate-50/50 dark:bg-zinc-900/50 border-b border-gray-100 dark:border-zinc-800/80 text-[11px] font-bold text-gray-500 dark:text-zinc-400 uppercase tracking-wide">
               <div className="col-span-8 md:col-span-9">Product</div>
               <div className="col-span-2 md:col-span-1 text-center">Qty</div>
               <div className="col-span-2 text-right">Price</div>

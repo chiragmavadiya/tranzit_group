@@ -14,7 +14,6 @@ const Orders = lazy(() => import('@/features/orders/pages/OrdersPage'));
 const OrderDetails = lazy(() => import('@/features/orders/pages/OrderDetails'));
 const OrderDetails2 = lazy(() => import('@/features/orders/pages/OrderDetails2'));
 // const CreateOrder = lazy(() => import('@/features/create-order/'));
-const Search = lazy(() => import('@/features/search/pages/SearchPage'));
 const GetQuote = lazy(() => import('@/features/quote/pages/GetQuotePage'));
 const MyItems = lazy(() => import('@/features/items'));
 const AddressBook = lazy(() => import('@/features/address-book'));
@@ -74,7 +73,6 @@ export default function ClientRoutes() {
           {/* <Route path="orders/create" element={<CreateOrder />} /> */}
           <Route path="quote" element={withSuspense(<GetQuote />)} />
 
-          <Route path="search" element={withSuspense(<Search />)} />
           <Route path="items" element={withSuspense(<MyItems />)} />
           <Route path="address-book" element={withSuspense(<AddressBook />)} />
           {/* <Route path="integrations" element={withSuspense(<IntegrationsLayout />)}>

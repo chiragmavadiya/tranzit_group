@@ -3,7 +3,6 @@ import { useQueryClient } from '@tanstack/react-query';
 import { useAdminInvoicePayment } from '../hooks/useInvoices';
 import { CustomModel } from '@/components/ui/dialog';
 import { FormInput, FormSelect } from '@/features/orders/components/OrderFormUI';
-
 interface AddPaymentDialogProps {
   isOpen: boolean;
   onOpenChange: (open: boolean) => void;
@@ -34,6 +33,7 @@ export function AddPaymentDialog({ isOpen, onOpenChange, invoiceId, payment }: A
     payment_date: new Date().toISOString().split('T')[0],
     internal_payment_note: ''
   });
+  const [submitted, setSubmitted] = useState(false);
 
   const { add, update } = useAdminInvoicePayment();
 
@@ -62,6 +62,10 @@ export function AddPaymentDialog({ isOpen, onOpenChange, invoiceId, payment }: A
   };
 
   const handleSubmit = async () => {
+    if (!formData.payment_amount || !formData.payment_date) {
+      setSubmitted(true);
+      return;
+    }
     if (payment) {
       update.mutate({
         invoiceId,
@@ -115,6 +119,8 @@ export function AddPaymentDialog({ isOpen, onOpenChange, invoiceId, payment }: A
               onChange={(val) => handleChange('payment_amount', val)}
               placeholder="Enter amount (e.g. 123.45)"
               required
+              error={submitted && !formData.payment_amount}
+              errormsg="Please enter amount."
             />
           </div>
           <div className="grid gap-2">
@@ -129,6 +135,8 @@ export function AddPaymentDialog({ isOpen, onOpenChange, invoiceId, payment }: A
               ]}
               onValueChange={(val) => handleChange('payment_method', val!)}
               placeholder="Select payment method"
+              searchdisable={true}
+              allowClear={false}
             />
           </div>
           <div className="grid gap-2">
@@ -139,6 +147,8 @@ export function AddPaymentDialog({ isOpen, onOpenChange, invoiceId, payment }: A
               onChange={(val) => handleChange('payment_date', val || '')}
               placeholder="Select payment date"
               required
+              error={submitted && !formData.payment_date}
+              errormsg="Please select payment date."
             />
           </div>
           <div className="grid gap-2">

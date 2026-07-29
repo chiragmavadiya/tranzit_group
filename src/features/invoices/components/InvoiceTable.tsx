@@ -61,7 +61,7 @@ export function InvoiceTable({
       key: 'id',
       header: 'Invoice #',
       sticky: 'left',
-      width: '140px',
+      // width: '140px',
       cell: (value, row) => (
         <NavLink to={`${isAdmin ? '/admin' : ''}/invoices/${value}`} className="font-bold text-primary hover:underline">
           #{row.invoice_number}
@@ -72,14 +72,14 @@ export function InvoiceTable({
       accessor: 'zoho_invoice_number',
       key: 'zoho_invoice_number',
       header: 'Zoho Invoice #',
-      width: '160px',
+      // width: '160px',
     }] : []),
     {
       accessor: 'status',
       key: 'status',
       header: 'Status',
       className: 'capitalize',
-      width: '120px',
+      // width: '120px',
       cell: (value) => (
         renderStatus(value)
       )
@@ -100,7 +100,8 @@ export function InvoiceTable({
       accessor: 'amount',
       key: 'amount',
       header: 'Total',
-      width: '110px',
+      className: 'break-normal',
+      // width: '110px',
       cell: (_, row) => (
         <div className="font-medium text-gray-700 dark:text-zinc-300">
           {formateCurrency(Number(row.total ?? row.amount ?? 0))}
@@ -111,7 +112,7 @@ export function InvoiceTable({
       accessor: 'invoice_date',
       key: 'invoice_date',
       header: 'Issued Date',
-      width: '130px',
+      // width: '130px',
       cell: (_, row) => (
         <div className="text-gray-500 dark:text-zinc-400 whitespace-nowrap">
           {row.issue_date || row?.issued_at || row.invoice_date}
@@ -122,7 +123,8 @@ export function InvoiceTable({
       accessor: 'amount_paid',
       key: 'amount_paid',
       header: 'Till Date Paid',
-      width: '130px',
+      className: 'break-normal',
+      // width: '130px',
       cell: (_, row) => {
         const val = Number(row.till_date_paid ?? row.amount_paid ?? 0);
         return (
@@ -136,7 +138,8 @@ export function InvoiceTable({
       accessor: 'balance',
       key: 'balance',
       header: 'Remaining Balance',
-      width: '160px',
+      className: 'break-normal',
+      // width: '160px',
       cell: (_, row) => {
         const val = Number(row.remaining_balance ?? row.balance ?? 0);
         return (

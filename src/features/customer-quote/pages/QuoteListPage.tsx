@@ -44,25 +44,25 @@ export default function QuoteListPage() {
             key: 'quote_reference',
             header: 'REFERENCE',
             sortable: true,
-            cell: (val: string) => <span className="font-bold text-slate-900 dark:text-zinc-100 text-[13px]">{val}</span>
+            cell: (val: string) => <span className="font-bold text-slate-900 dark:text-zinc-100">{val}</span>
         },
         {
             key: 'email',
             header: 'CUSTOMER',
             sortable: true,
-            cell: (val: string) => <span className="text-slate-500 font-medium text-[12px]">{val}</span>
+            cell: (val: string) => <span className="text-slate-500 font-medium">{val}</span>
         },
         {
             key: 'carrier',
             header: 'CARRIER',
             sortable: true,
-            cell: (val: string) => <span className="text-slate-700 dark:text-zinc-300 font-semibold text-[12px]">{val}</span>
+            cell: (val: string) => <span className="text-slate-700 dark:text-zinc-300 font-semibold">{val}</span>
         },
         {
             key: 'amount',
             header: 'AMOUNT',
             sortable: true,
-            cell: (val: number) => <span className="font-bold text-primary text-[13px] tracking-tight">${val.toFixed(2)}</span>
+            cell: (val: number) => <span className="font-bold text-primary tracking-tight">${val.toFixed(2)}</span>
         },
         {
             key: 'created_at',
@@ -80,7 +80,7 @@ export default function QuoteListPage() {
                     <Button
                         variant="ghost"
                         size="icon"
-                        className="h-8 w-8 text-slate-400 hover:text-primary hover:bg-primary/10 transition-all active:scale-90"
+                        className=" w-8 text-slate-400 hover:text-primary hover:bg-primary/10 transition-all active:scale-90"
                         onClick={() => {
                             setSelectedQuoteId(row.id);
                             setIsDetailsOpen(true);

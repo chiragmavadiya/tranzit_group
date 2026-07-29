@@ -33,18 +33,15 @@ export default function RuleList({
     {
       key: 'condition_label',
       header: 'Attribute',
-      width: '220px',
     },
     {
       key: 'action_label',
       header: 'Action',
-      width: '260px',
 
     },
     {
       key: 'actionValue',
       header: 'Value',
-      width: '180px',
       cell: (_, row) => row.carrier_name && row.product_name ? `${row.carrier_name} - ${row.product_name}` : '-'
     },
     ...(canReadWrite ? [{

@@ -35,12 +35,12 @@ import { isPhoneValid } from '@/lib/utils';
 import { useCustomers } from '@/features/customers/hooks/useCustomers';
 import { DropdownCustomMenu } from '@/components/ui/dropdown-menu';
 import { getDisplayCourierName } from '../utils/order-details.utils';
+import useLocalStorage from '@/hooks/useLocalStorage';
 
 const ImportOrdersDialog = lazy(() => import('@/features/orders/components/ImportOrdersDialog'));
 const CreateOrderDialog = lazy(() => import('@/features/orders/components/CreateOrderDialog'));
 
 export default function OrdersPage({ fromCustomer, customerId }: { fromCustomer?: boolean, customerId?: string }) {
-  console.log("Render OrdersPage")
 
   const [searchParams, setSearchParams] = useSearchParams();
   const activeTab = (searchParams.get('tab')?.toLowerCase() as TabType) || 'new';
@@ -49,46 +49,31 @@ export default function OrdersPage({ fromCustomer, customerId }: { fromCustomer?
   const isAdmin = role === 'admin';
   const isSubUser = role === 'customer' && team_access?.is_sub_user;
   const canReadWrite = !isSubUser || team_access?.permissions?.order === 'full';
-
+  // useLocalStorage('low_balance_dismissed', false);
   // State for pagination and search
   const [page, setPage] = useState(1);
-  const [pageSize, setPageSize] = useState(25);
+  const [pageSize, setPageSize] = useLocalStorage<number>('order_page_size', 100);
 
-  const [search, setSearch] = useState(() => searchParams.get('search') || '');
+  const [localSearch, setLocalSearch] = useLocalStorage<string>('orders_search', '');
+  const [customerSearch, setCustomerSearch] = useState('');
+  const search = fromCustomer ? customerSearch : localSearch;
+  const setSearch = fromCustomer ? setCustomerSearch : setLocalSearch;
   const debouncedSearch = useDebounce(search, 400);
 
-  const parseLocalDate = useCallback((dateStr?: string | null) => {
-    if (!dateStr) return undefined;
-    const parts = dateStr.includes('/') ? dateStr.split('/') : dateStr.split('-');
-    if (parts.length === 3) {
-      const day = parseInt(parts[0], 10);
-      const month = parseInt(parts[1], 10) - 1; // 0-based
-      const year = parseInt(parts[2], 10);
-      return new Date(year, month, day);
-    }
-    return undefined;
-  }, []);
-
-  const initialDateFilter = useMemo<DateFilterValue>(() => {
-    const sDate = parseLocalDate(searchParams.get('start_date'));
-    const eDate = parseLocalDate(searchParams.get('end_date'));
-    if (sDate && eDate) {
-      return {
-        type: 'custom',
-        from: format(sDate, 'dd/MM/yyyy'),
-        to: format(eDate, 'dd/MM/yyyy'),
-        label: `${format(sDate, 'dd MMM yyyy')} - ${format(eDate, 'dd MMM yyyy')}`,
-      };
-    }
-    return {
-      type: 'custom',
-      from: '',
-      to: '',
-      label: 'All Time',
-    };
-  }, [searchParams, parseLocalDate]);
-
-  const [dateRange, setDateRange] = useState<DateFilterValue>(() => initialDateFilter);
+  const [localDateRange, setLocalDateRange] = useLocalStorage<DateFilterValue>('orders_date_range', {
+    type: 'custom',
+    from: '',
+    to: '',
+    label: 'All Time',
+  });
+  const [customerDateRange, setCustomerDateRange] = useState<DateFilterValue>({
+    type: 'custom',
+    from: '',
+    to: '',
+    label: 'All Time',
+  });
+  const dateRange = fromCustomer ? customerDateRange : localDateRange;
+  const setDateRange = fromCustomer ? setCustomerDateRange : setLocalDateRange;
   const [selectedRows, setSelectedRows] = useState<string[]>([]);
   const [isDownloadingLabels, setIsDownloadingLabels] = useState(false);
   const [isCancellingOrders, setIsCancellingOrders] = useState(false);
@@ -98,55 +83,43 @@ export default function OrdersPage({ fromCustomer, customerId }: { fromCustomer?
   const [addressEditModal, setAddressEditModal] = useState<string>();
   // const [courierEditModal, setCourierEditModal] = useState<Order>();
 
-  const selectedCustomer = searchParams.get('customerId') || undefined;
+  const [selectedCustomer, setSelectedCustomerState] = useLocalStorage<string | undefined>('orders_selected_customer', undefined);
   const setSelectedCustomer = useCallback((val: string | undefined) => {
-    setSelectedRows([])
-    setSearchParams((prev) => {
-      if (val) {
-        prev.set('customerId', val);
-      } else {
-        prev.delete('customerId');
-      }
-      return prev;
-    });
-  }, [setSearchParams]);
-
-  // Synchronize searchParams back to dateRange state (e.g. on navigation or direct link clicks)
-  useEffect(() => {
-    const sDate = parseLocalDate(searchParams.get('start_date'));
-    const eDate = parseLocalDate(searchParams.get('end_date'));
-    if (sDate && eDate) {
-      const fromStr = format(sDate, 'dd/MM/yyyy');
-      const toStr = format(eDate, 'dd/MM/yyyy');
-
-      if (dateRange.from !== fromStr || dateRange.to !== toStr) {
-        setDateRange({
-          type: 'custom',
-          from: fromStr,
-          to: toStr,
-          label: `${format(sDate, 'dd MMM yyyy')} - ${format(eDate, 'dd MMM yyyy')}`,
-        });
-      }
-    } else {
-      if (dateRange.from !== '' || dateRange.to !== '') {
-        setDateRange({
-          type: 'custom',
-          from: '',
-          to: '',
-          label: 'All Time',
-        });
-      }
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [searchParams, parseLocalDate]);
-
-  // Synchronize dateRange state to URL searchParams
-  useEffect(() => {
     setSelectedRows([]);
+    setSelectedCustomerState(val);
+  }, [setSelectedCustomerState]);
+
+  // Synchronize state to URL searchParams for TopBar OrdersTabs counts API
+  useEffect(() => {
+    if (fromCustomer) return;
+    setPage(1)
     setSearchParams((prev) => {
       let hasChanged = false;
 
-      const currentStartDate = prev.get('start_date') || undefined;
+      // customerId
+      const currentCustomer = prev.get('customerId') || undefined;
+      if (currentCustomer !== selectedCustomer) {
+        if (selectedCustomer) {
+          prev.set('customerId', selectedCustomer);
+        } else {
+          prev.delete('customerId');
+        }
+        hasChanged = true;
+      }
+
+      // search
+      const currentSearch = prev.get('search') || undefined;
+      const newSearch = debouncedSearch || undefined;
+      if (currentSearch !== newSearch) {
+        if (newSearch) {
+          prev.set('search', newSearch);
+        } else {
+          prev.delete('search');
+        }
+        hasChanged = true;
+      }
+
+      // start_date & end_date
       let newStartDate: string | undefined;
       if (dateRange.from) {
         const parsedFrom = parse(dateRange.from, 'dd/MM/yyyy', new Date());
@@ -154,7 +127,7 @@ export default function OrdersPage({ fromCustomer, customerId }: { fromCustomer?
           newStartDate = format(parsedFrom, 'dd-MM-yyyy');
         }
       }
-
+      const currentStartDate = prev.get('start_date') || undefined;
       if (currentStartDate !== newStartDate) {
         if (newStartDate) {
           prev.set('start_date', newStartDate);
@@ -164,7 +137,6 @@ export default function OrdersPage({ fromCustomer, customerId }: { fromCustomer?
         hasChanged = true;
       }
 
-      const currentEndDate = prev.get('end_date') || undefined;
       let newEndDate: string | undefined;
       if (dateRange.to) {
         const parsedTo = parse(dateRange.to, 'dd/MM/yyyy', new Date());
@@ -172,7 +144,7 @@ export default function OrdersPage({ fromCustomer, customerId }: { fromCustomer?
           newEndDate = format(parsedTo, 'dd-MM-yyyy');
         }
       }
-
+      const currentEndDate = prev.get('end_date') || undefined;
       if (currentEndDate !== newEndDate) {
         if (newEndDate) {
           prev.set('end_date', newEndDate);
@@ -184,7 +156,7 @@ export default function OrdersPage({ fromCustomer, customerId }: { fromCustomer?
 
       return hasChanged ? prev : prev;
     }, { replace: true });
-  }, [dateRange, setSearchParams]);
+  }, [selectedCustomer, debouncedSearch, dateRange, setSearchParams, fromCustomer]);
 
   const downloadLabelMutation = useDownloadLabel();
   const cancelOrderMutation = useCancelOrder();
@@ -307,9 +279,9 @@ export default function OrdersPage({ fromCustomer, customerId }: { fromCustomer?
       search: debouncedSearch || undefined,
       start_date,
       end_date,
-      customer: selectedCustomer || customerId || undefined,
+      customer: fromCustomer ? customerId : (selectedCustomer || undefined),
     };
-  }, [activeTab, pageSize, page, debouncedSearch, dateRange, selectedCustomer, customerId]);
+  }, [activeTab, pageSize, page, debouncedSearch, dateRange, selectedCustomer, customerId, fromCustomer]);
 
   // Fetch orders data
   const { data: ordersData, isLoading } = useOrders(filters);
@@ -323,19 +295,22 @@ export default function OrdersPage({ fromCustomer, customerId }: { fromCustomer?
   const handleSearch = useCallback((val: string) => {
     setSearch(val);
     setPage(1);
-  }, []);
+  }, [setSearch]);
 
   const handlePageSizeChange = useCallback((size: number) => {
     setPageSize(size);
     setPage(1);
-  }, []);
+  }, [setPage, setPageSize]);
 
   const handleExport = useCallback((format: string) => {
     exportOrders.mutate({
-      ...filters,
+      // ...filters,
+      start_date: filters.start_date,
+      end_date: filters.end_date,
+      status: activeTab.toLowerCase(),
       format: format as 'pdf' | 'csv' | 'excel'
     });
-  }, [filters, exportOrders]);
+  }, [activeTab, exportOrders, filters.start_date, filters.end_date]);
 
 
 
@@ -451,7 +426,7 @@ export default function OrdersPage({ fromCustomer, customerId }: { fromCustomer?
   const handleManifestOrders = useCallback(() => {
     const auspostOrders = selectedRows.filter((orderId) => {
       const order = ordersData?.data?.find((o: any) => String(o.order_number) === String(orderId));
-      return order?.courier_code?.toLowerCase() === 'auspost';
+      return order?.courier_code?.toLowerCase() === 'auspost' || order?.courier_code?.toLowerCase() === 'startrack';
     });
     if (auspostOrders.length === 0) {
       showToast("No AusPost orders selected for manifesting", "error");
@@ -496,51 +471,54 @@ export default function OrdersPage({ fromCustomer, customerId }: { fromCustomer?
           <div className="flex flex-col gap-3 p-4 border-b border-gray-100 dark:border-zinc-800 bg-white dark:bg-zinc-950 rounded-t-lg print:hidden">
             {/* Row 1: Filters & Search */}
             <div className="flex flex-wrap items-center gap-2.5 w-full">
-              {/* Search & Date Filter Group */}
-              <div className="flex items-center gap-2 w-full sm:w-auto flex-1 sm:flex-initial">
-                <div className="flex-1 sm:w-64 md:w-72">
-                  <FormInput
-                    placeholder="Search orders..."
-                    value={search}
-                    onChange={handleSearch}
-                    icon={Search}
-                    className="w-full h-8"
-                  />
+              {/* Left Section (Filters & Search) */}
+              <div className="flex flex-wrap items-center gap-2.5 w-full sm:w-auto sm:flex-1">
+                {/* Search & Date Filter Group */}
+                <div className="flex items-center gap-2 w-full sm:w-auto flex-1 sm:flex-initial">
+                  <div className="flex-1 sm:w-64 md:w-72">
+                    <FormInput
+                      placeholder="Search orders..."
+                      value={search}
+                      onChange={handleSearch}
+                      icon={Search}
+                      className="w-full h-8"
+                    />
+                  </div>
+                  <div className="flex-1 sm:w-60 md:w-64">
+                    <DateFilter
+                      value={dateRange}
+                      onChange={setDateRange}
+                      className="w-full h-8"
+                    />
+                  </div>
                 </div>
-                <div className="flex-1 sm:w-60 md:w-64">
-                  <DateFilter
-                    value={dateRange}
-                    onChange={setDateRange}
-                    className="w-full h-8"
-                  />
-                </div>
+
+                {/* Customer Select (Admin Only) */}
+                {isAdmin && (
+                  <div className="w-full sm:w-60 md:w-64 flex-none sm:flex-initial">
+                    <FormSelect
+                      placeholder="Select Customer"
+                      value={selectedCustomer || ''}
+                      onValueChange={(val) => {
+                        const customer = customersData?.data?.find((c: any) => c.id.toString() === val);
+                        if (customer) {
+                          setSelectedCustomer(customer.id.toString());
+                        } else {
+                          setSelectedCustomer(undefined);
+                        }
+                      }}
+                      options={customersData?.data?.map((c: any) => ({
+                        value: c.id.toString(),
+                        label: `${c.first_name} ${c.last_name} (${c.email})`
+                      })) || []}
+                      selectClassName="h-8"
+                    />
+                  </div>
+                )}
               </div>
 
-              {/* Customer Select (Admin Only) */}
-              {isAdmin && (
-                <div className="w-full sm:w-60 md:w-64 flex-none sm:flex-initial">
-                  <FormSelect
-                    placeholder="Select Customer"
-                    value={selectedCustomer || ''}
-                    onValueChange={(val) => {
-                      const customer = customersData?.data?.find((c: any) => c.id.toString() === val);
-                      if (customer) {
-                        setSelectedCustomer(customer.id.toString());
-                      } else {
-                        setSelectedCustomer(undefined);
-                      }
-                    }}
-                    options={customersData?.data?.map((c: any) => ({
-                      value: c.id.toString(),
-                      label: `${c.first_name} ${c.last_name} (${c.email})`
-                    })) || []}
-                    selectClassName="h-8"
-                  />
-                </div>
-              )}
-
               {/* Actions Row (Page Size, Export, Import, Create Order) */}
-              <div className="flex flex-wrap sm:flex-nowrap items-center gap-2 w-full sm:w-auto ml-auto">
+              <div className="flex flex-wrap sm:flex-nowrap items-center gap-2 w-full sm:w-auto">
                 {/* Page Size Selector */}
                 <div className="flex items-center gap-1.5 h-8 shrink-0">
                   <span className="text-xs font-semibold text-slate-500 dark:text-zinc-400">Show:</span>
@@ -658,7 +636,19 @@ export default function OrdersPage({ fromCustomer, customerId }: { fromCustomer?
                   </span>
                 </div>
 
-                <div className="flex items-center gap-1.5 ml-auto shrink-0">
+                <div className="flex items-center gap-1.5 shrink-0">
+                  {/* {activeTab === 'new' && (
+                    <Button
+                      variant="default"
+                      size="sm"
+                      className="h-8 px-2.5 sm:px-3 gap-1.5 bg-primary hover:bg-primary-hover text-white transition-colors font-semibold shadow-sm"
+                      onClick={handleDownloadMultipleLabels}
+                      disabled={isDownloadingLabels || isCancellingOrders}
+                    >
+                      {isDownloadingLabels ? <Loader2 className="w-4 h-4 animate-spin" /> : <Printer className="w-4 h-4" />}
+                      <span className="hidden sm:inline">Print bulk Labels</span>
+                    </Button>
+                  )} */}
                   {activeTab === 'printed' && (
                     <Button
                       variant="default"

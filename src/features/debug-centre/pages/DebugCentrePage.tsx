@@ -1,4 +1,4 @@
-import { useState, useMemo, useCallback } from 'react';
+import { useMemo, useCallback } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { useDebounce } from '@/hooks/useDebounce';
 import { DebugStatsGrid } from '../components/DebugStatsGrid';
@@ -16,6 +16,7 @@ import ModuleTabs from '@/components/common/ModuleTabs';
 import { LayoutGroup } from 'framer-motion';
 import type { DebugFilters } from '../types';
 import { FormSelect } from '@/features/orders/components/OrderFormUI';
+import useLocalStorage from '@/hooks/useLocalStorage';
 
 export default function DebugCentrePage() {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -34,15 +35,15 @@ export default function DebugCentrePage() {
     ];
   }, [customersData]);
 
-  const [search, setSearch] = useState('');
-  const [customer, setCustomer] = useState('');
-  const [endpoint, setEndpoint] = useState('');
-  const [status, setStatus] = useState('');
-  const [source, setSource] = useState('');
-  const [fromDate, setFromDate] = useState('');
-  const [toDate, setToDate] = useState('');
-  const [page, setPage] = useState(1);
-  const [pageSize, setPageSize] = useState(10);
+  const [search, setSearch] = useLocalStorage<string>('debug_centre_search', '');
+  const [customer, setCustomer] = useLocalStorage<string>('debug_centre_customer', '');
+  const [endpoint, setEndpoint] = useLocalStorage<string>('debug_centre_endpoint', '');
+  const [status, setStatus] = useLocalStorage<string>('debug_centre_status', '');
+  const [source, setSource] = useLocalStorage<string>('debug_centre_source', '');
+  const [fromDate, setFromDate] = useLocalStorage<string>('debug_centre_from_date', '');
+  const [toDate, setToDate] = useLocalStorage<string>('debug_centre_to_date', '');
+  const [page, setPage] = useLocalStorage<number>('debug_centre_current_page', 1);
+  const [pageSize, setPageSize] = useLocalStorage<number>('debug_centre_page_size', 10);
 
   const debouncedSearch = useDebounce(search, 400);
 
@@ -71,7 +72,7 @@ export default function DebugCentrePage() {
     setPage(1);
   };
 
-  const handleFiltersChange = (newFilters: DebugFilters) => {
+  const handleFiltersChange = useCallback((newFilters: DebugFilters) => {
     setSearch(newFilters.search || '');
     setCustomer(newFilters.user_id || '');
     setEndpoint(newFilters.endpoint || '');
@@ -80,7 +81,7 @@ export default function DebugCentrePage() {
     setFromDate(newFilters.from_date || '');
     setToDate(newFilters.to_date || '');
     setPage(newFilters.page || 1);
-  };
+  }, [setSearch, setCustomer, setEndpoint, setStatus, setSource, setFromDate, setToDate, setPage]);
 
   const handlePageSizeChange = (size: number) => {
     setPageSize(size);
@@ -89,7 +90,7 @@ export default function DebugCentrePage() {
 
   const handleSearchChange = useCallback((search: string) => {
     handleFiltersChange({ ...filters, search, page: 1 });
-  }, [filters,]);
+  }, [filters, handleFiltersChange]);
 
   return (
     <div className="flex flex-col flex-1 gap-4 p-page-padding min-h-0 animate-in fade-in slide-in-from-bottom-2 duration-500 bg-slate-50/30 dark:bg-zinc-950/30 overflow-y-auto">
@@ -153,6 +154,7 @@ export default function DebugCentrePage() {
           {activeTab === 'traces' && (
             <TracesTab
               filters={filters}
+              searchValue={search}
               onPageChange={setPage}
               onPageSizeChange={handlePageSizeChange}
               onSearchChange={handleSearchChange}
@@ -161,6 +163,7 @@ export default function DebugCentrePage() {
           {activeTab === 'alerts' && (
             <AlertsTab
               filters={filters}
+              searchValue={search}
               onPageChange={setPage}
               onPageSizeChange={handlePageSizeChange}
               onSearchChange={handleSearchChange}
@@ -169,6 +172,7 @@ export default function DebugCentrePage() {
           {activeTab === 'failed-jobs' && (
             <FailedJobsTab
               filters={filters}
+              searchValue={search}
               onPageChange={setPage}
               onPageSizeChange={handlePageSizeChange}
               onSearchChange={handleSearchChange}
@@ -177,6 +181,7 @@ export default function DebugCentrePage() {
           {activeTab === 'external-api-failures' && (
             <ExternalApiFailuresTab
               filters={filters}
+              searchValue={search}
               onPageChange={setPage}
               onPageSizeChange={handlePageSizeChange}
               onSearchChange={handleSearchChange}
@@ -185,6 +190,7 @@ export default function DebugCentrePage() {
           {activeTab === 'slow-requests' && (
             <SlowRequestsTab
               filters={filters}
+              searchValue={search}
               onPageChange={setPage}
               onPageSizeChange={handlePageSizeChange}
               onSearchChange={handleSearchChange}
@@ -193,6 +199,7 @@ export default function DebugCentrePage() {
           {activeTab === 'slow-external-calls' && (
             <SlowExternalCallsTab
               filters={filters}
+              searchValue={search}
               onPageChange={setPage}
               onPageSizeChange={handlePageSizeChange}
               onSearchChange={handleSearchChange}
@@ -201,6 +208,7 @@ export default function DebugCentrePage() {
           {activeTab === 'customer-activity' && (
             <CustomerActivityTab
               filters={filters}
+              searchValue={search}
               onPageChange={setPage}
               onPageSizeChange={handlePageSizeChange}
               onSearchChange={handleSearchChange}

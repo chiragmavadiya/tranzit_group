@@ -65,8 +65,7 @@ export const ADMIN_TOPUP_COLUMNS: Column<any>[] = [
   {
     key: 'customer_name',
     header: 'NAME',
-    sortable: true,
-    searchable: true,
+    className: 'break-normal',
     cell: (val) => <span className="font-medium text-slate-900 dark:text-zinc-100">{val || '-'}</span>
   },
   {
@@ -76,9 +75,18 @@ export const ADMIN_TOPUP_COLUMNS: Column<any>[] = [
     cell: (value: any) => <StatusCell value={value?.toLowerCase()} statusConfig={TRANSACTION_STATUS_CONFIG} />
   },
   { key: 'amount', header: 'AMOUNT', sortable: true },
-  { key: 'reason', header: 'REASON', sortable: true },
-  { key: 'transaction_id', header: 'TRANSACTION ID', sortable: true, noPrint: true },
-  { key: 'payment_date', header: 'TRANSACTION DATE & TIME', sortable: true, noPrint: true },
+  {
+    key: 'reason', header: 'REASON',
+    className: 'break-normal', sortable: true
+  },
+  {
+    key: 'transaction_id', header: 'TRANSACTION ID',
+    className: 'break-normal'
+  },
+  {
+    key: 'payment_date', header: 'TRANSACTION DATE & TIME',
+    className: 'break-normal',
+  },
 ];
 
 export const TRANSACTION_TYPES = [

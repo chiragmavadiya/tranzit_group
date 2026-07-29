@@ -26,11 +26,12 @@ export const getCancelOrderColumns = (role: string): Column<CancelOrder>[] => [
     {
         key: 'courier',
         header: 'COURIER',
+        width: '200px',
         cell: (val: string, row) => (
             <div className='flex items-center gap-2'>
                 <img src={row?.courier_logo_url} className="h-6" alt="" />
                 <div className="flex flex-col">
-                    <span className="font-medium">{val}</span>
+                    <span className="font-medium break-normal">{val}</span>
                     <span className="text-[11px] text-slate-500 dark:text-zinc-400">{row.label_no}</span>
                 </div>
             </div>

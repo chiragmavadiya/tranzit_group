@@ -140,17 +140,13 @@ export default function CarrierConfigPage() {
           {/* Centered Logo & Header */}
           {!fetchingData && (
             <div className="flex flex-col sm:flex-row items-start gap-4">
-              <div>
-                {logoUrl && (
-                  <div className="flex justify-start sm:justify-center">
-                    <div className="bg-white p-2.5 rounded-xl border border-gray-250/60 dark:border-zinc-800 shadow-xs flex items-center justify-center shrink-0">
-                      <img src={logoUrl} alt={carrierName} className="h-16 w-16 object-contain" />
-                    </div>
-                  </div>
-                )}
-              </div>
-              <div className='flex flex-col justify-center text-left'>
-                <div className="flex flex-wrap items-center gap-2 sm:gap-3">
+              {logoUrl && (
+                <div className="bg-white p-2.5 rounded-xl border border-gray-250/60 dark:border-zinc-800 shadow-xs flex items-center justify-center shrink-0">
+                  <img src={logoUrl} alt={carrierName} className="h-16 w-16 object-contain" />
+                </div>
+              )}
+              <div className="flex-1 min-w-0 flex flex-col justify-center text-left">
+                <div className="flex flex-wrap items-center gap-x-2 sm:gap-x-3">
                   <h1 className="text-2xl font-extrabold text-slate-900 dark:text-zinc-100 tracking-tight my-0">
                     {currentSlug === 'auspost' ? 'Connect your Australia Post eParcel account' : `Connect your ${carrierName} account`}
                   </h1>

@@ -336,3 +336,6 @@ export const MODULE_PERMISSIONS: Record<string, string[]> = {
 }
 
 export const DO_NOT_REDIRECT_URLS: string[] = ['/terms-and-conditions', '/privacy-policy', '/dangerous-goods']
+
+// Show the low-balance reminder to customers when their wallet balance drops below this amount.
+export const LOW_BALANCE_THRESHOLD = 200

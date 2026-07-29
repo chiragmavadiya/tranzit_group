@@ -29,6 +29,8 @@ const platforms = [
   { id: 'amazon', name: 'Amazon', icon: Store, status: 'coming_soon' },
 ];
 
+const COMING_SOON_SLUGS = platforms.filter((p) => p.status === 'coming_soon').map((p) => p.id);
+
 export default function EcommerceIntegrationsPage() {
   const queryClient = useQueryClient();
   const [searchParams, setSearchParams] = useSearchParams()
@@ -685,6 +687,7 @@ export default function EcommerceIntegrationsPage() {
             isLoading={listLoading}
             configLoadingProvider={statusLoading ? statusVariables : undefined}
             canReadWrite={canReadWrite}
+            comingSoonSlugs={COMING_SOON_SLUGS}
           />
         </div>
       </div>

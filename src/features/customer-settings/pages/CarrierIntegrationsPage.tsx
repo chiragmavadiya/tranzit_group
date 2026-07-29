@@ -22,7 +22,7 @@ const carriers = [
   { id: 'mypostbusiness', name: 'MyPost Business', icon: Truck, status: 'available' },
   { id: 'directfreight', name: 'Direct Freight', icon: Truck, status: 'available' },
   { id: 'couriersplease', name: 'Couriers Please', icon: Truck, status: 'available' },
-  { id: 'startrack', name: 'StarTrack', icon: Truck, status: 'coming_soon' },
+  { id: 'startrack', name: 'StarTrack', icon: Truck, status: 'available' },
   { id: 'toll', name: 'Toll Priority', icon: Truck, status: 'coming_soon' },
   { id: 'dhl', name: 'DHL Express', icon: Truck, status: 'coming_soon' },
 ];

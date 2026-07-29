@@ -123,6 +123,7 @@ export type OrderDetailData = {
     shipping_activity: ShippingActivity[]
     cancel_request: CancelRequest | null
     customer_id: number
+    tracking_status: string
     transit_timeline?: {
         events: any[]
     }

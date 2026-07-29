@@ -64,7 +64,7 @@ export default function GetQuotePage() {
     const servicePrice = quoteData?.courier?.base || quoteData?.subtotal || 0;
     const gst = quoteData?.gst || quoteData?.tax || 0;
     const totalSurcharges = quoteData?.totalSurcharges || 0;
-    const marginPrice = (Number(servicePrice) * Number(margin)) / 100;
+    const marginPrice = (Number(quoteData?.courier?.base_price_margin_cal) * Number(margin)) / 100;
     const grandTotal = Number(servicePrice) + Number(gst) + Number(totalSurcharges) + Number(marginPrice) + Number(pickupCharge || 0);
     return { totalItems, totalWeight, volumetric, servicePrice, gst, totalSurcharges, grandTotal, margin: marginPrice, pickupCharge: Number(pickupCharge || 0) }
   }, [itemsData, quoteData, margin, pickupCharge])
@@ -147,6 +147,7 @@ export default function GetQuotePage() {
                 addresses={locations}
                 module="quote"
                 onQuoteChange={setQuoteData}
+                fromAdminQuot={isAdmin}
               // setCourierData={setCourierData}
               // orderDetail={orderDetail}
               />
@@ -162,7 +163,7 @@ export default function GetQuotePage() {
                 setPickupCharge={setPickupCharge}
                 onSendQuote={() => setIsSendDialogOpen(true)}
                 isValid={isValid}
-              // quoteData={quoteData}
+                quoteData={quoteData}
               />
             </div>
           </div>

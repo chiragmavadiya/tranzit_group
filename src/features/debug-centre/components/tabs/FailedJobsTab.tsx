@@ -5,12 +5,13 @@ import type { DebugFilters } from '../../types';
 
 interface FailedJobsTabProps {
   filters: DebugFilters;
+  searchValue: string;
   onPageChange: (page: number) => void;
   onPageSizeChange: (pageSize: number) => void;
   onSearchChange: (search: string) => void;
 }
 
-export const FailedJobsTab = ({ filters, onPageChange, onPageSizeChange, onSearchChange }: FailedJobsTabProps) => {
+export const FailedJobsTab = ({ filters, searchValue, onPageChange, onPageSizeChange, onSearchChange }: FailedJobsTabProps) => {
   const { data: jobsData, isLoading } = useFailedJobs(filters);
   const jobs = jobsData?.data || [];
   const totalItems = jobsData?.meta?.total || 0;
@@ -26,7 +27,7 @@ export const FailedJobsTab = ({ filters, onPageChange, onPageSizeChange, onSearc
       onPageChange={onPageChange}
       onPageSizeChange={onPageSizeChange}
       sortable
-      searchValue={filters.search}
+      searchValue={searchValue}
       onSearchChange={onSearchChange}
       headerTitle="Failed Jobs"
       exportable={false}

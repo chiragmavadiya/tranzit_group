@@ -11,7 +11,7 @@ export function ItemsHeader({ onAddItem }: ItemsHeaderProps) {
       <div className="flex items-center gap-3">
         <Button
           onClick={onAddItem}
-          className="global-btn"
+          className="global-btn w-full sm:w-auto"
         >
           <Plus className="w-4 h-4" />
           <span>Add MyItem</span>

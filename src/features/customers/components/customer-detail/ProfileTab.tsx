@@ -20,12 +20,6 @@ export const ProfileTab = ({ customerId }: ProfileTabProps) => {
 
     if (!customer) return null;
 
-    const markups = customer.charges_markups ? [
-        customer.charges_markups.aus_post,
-        customer.charges_markups.direct_freight,
-        customer.charges_markups.pallet
-    ].filter(Boolean) : [];
-
     const markupCharges = customer.markup_charges || [];
     const pickupCharges = customer.pickup_charges || [];
 
@@ -46,20 +40,14 @@ export const ProfileTab = ({ customerId }: ProfileTabProps) => {
     const val_101_250 = tier_101_250 ? tier_101_250.price_per_label : 0;
     const val_250plus = tier_250plus ? tier_250plus.price_per_label : 0;
 
-    const hasVolumeTiers = customer.byo_courier_invoice_enable ||
-        Number(val_0_25) > 0 ||
-        Number(val_26_50) > 0 ||
-        Number(val_51_100) > 0 ||
-        Number(val_101_250) > 0 ||
-        Number(val_250plus) > 0;
-
     // Filter to active couriers based on the flags, or fallback to any courier present in the charges arrays
+    // filter((courier) => customer[courier.enableKey])
     const activeCouriersWithCharges = [
-        { key: "DirectFreight", name: "Direct Freight Express" },
-        { key: "AusPost", name: "Auspost Tranzit Group" },
-        { key: "CouriersPlease", name: "Courier Please" },
-        { key: "Pallet", name: "Pallet Tranzit Group" }
-    ].map(courier => {
+        { key: "DirectFreight", name: "Direct Freight Express", enableKey: "direct_freight_active" },
+        { key: "AusPost", name: "Auspost Tranzit Group", enableKey: "auspost_active" },
+        { key: "CouriersPlease", name: "Courier Please", enableKey: "couriersplease_active" },
+        { key: "Pallet", name: "Pallet Tranzit Group", enableKey: "pallet_active" }
+    ].filter((courier) => (customer as any)[courier.enableKey]).map(courier => {
         const markup = markupCharges.find((c: any) => c.courier === courier.key) || { over_3kg: 0, over_5kg: 0, over_10kg: 0, over_15kg: 0 };
         const pickup = pickupCharges.find((c: any) => c.courier === courier.key) || { over_3kg: 0, over_5kg: 0, over_10kg: 0, over_15kg: 0 };
         return {
@@ -151,35 +139,35 @@ export const ProfileTab = ({ customerId }: ProfileTabProps) => {
                         <CardContent className="p-4">
                             {hasWeightCharges ? (
                                 <div className="space-y-4">
-                                    {hasVolumeTiers && (
-                                        <div className="p-3 rounded-xl border border-slate-200 dark:border-zinc-800 bg-slate-50/50 dark:bg-zinc-900/20">
-                                            <div className="flex items-center justify-between mb-2">
-                                                <span className="text-[11px] font-bold text-slate-400 dark:text-zinc-500 uppercase tracking-wide block">BYO Courier Volume-Based Tiered Fees (Weekly)</span>
-                                                <span className={cn(
-                                                    "text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wide",
-                                                    customer.byo_courier_invoice_enable
-                                                        ? "bg-emerald-100 text-emerald-800 dark:bg-emerald-950/50 dark:text-emerald-300"
-                                                        : "bg-amber-100 text-amber-800 dark:bg-amber-950/50 dark:text-amber-300"
-                                                )}>
-                                                    BYO Invoicing: {customer.byo_courier_invoice_enable ? "Enabled" : "Disabled"}
-                                                </span>
-                                            </div>
-                                            <div className="grid grid-cols-2 sm:grid-cols-5 gap-3">
-                                                {[
-                                                    { label: "0-25 Labels", value: val_0_25 },
-                                                    { label: "26-50 Labels", value: val_26_50 },
-                                                    { label: "51-100 Labels", value: val_51_100 },
-                                                    { label: "101-250 (Weekly)", value: val_101_250 },
-                                                    { label: "More Than 250 Labels", value: val_250plus },
-                                                ].map((tier, idx) => (
-                                                    <div key={idx} className="flex flex-col p-2 bg-white dark:bg-zinc-950 rounded-lg border border-slate-100 dark:border-zinc-900 shadow-2xs">
-                                                        <span className="text-[10px] font-semibold text-slate-500 dark:text-zinc-400 truncate">{tier.label}</span>
-                                                        <span className="text-sm font-bold text-slate-800 dark:text-white">${Number(tier.value || 0).toFixed(2)}</span>
-                                                    </div>
-                                                ))}
-                                            </div>
+                                    {/* {hasVolumeTiers && ( */}
+                                    <div className="p-3 rounded-xl border border-slate-200 dark:border-zinc-800 bg-slate-50/50 dark:bg-zinc-900/20">
+                                        <div className="flex items-center justify-between mb-2">
+                                            <span className="text-[11px] font-bold text-slate-400 dark:text-zinc-500 uppercase tracking-wide block">BYO Courier Volume-Based Tiered Fees (Weekly)</span>
+                                            <span className={cn(
+                                                "text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wide",
+                                                customer.byo_courier_invoice_enable
+                                                    ? "bg-emerald-100 text-emerald-800 dark:bg-emerald-950/50 dark:text-emerald-300"
+                                                    : "bg-amber-100 text-amber-800 dark:bg-amber-950/50 dark:text-amber-300"
+                                            )}>
+                                                BYO Invoicing: {customer.byo_courier_invoice_enable ? "Enabled" : "Disabled"}
+                                            </span>
                                         </div>
-                                    )}
+                                        <div className="grid grid-cols-2 sm:grid-cols-5 gap-3">
+                                            {[
+                                                { label: "0-25 Labels", value: val_0_25 },
+                                                { label: "26-50 Labels", value: val_26_50 },
+                                                { label: "51-100 Labels", value: val_51_100 },
+                                                { label: "101-250 (Weekly)", value: val_101_250 },
+                                                { label: "More Than 250 Labels", value: val_250plus },
+                                            ].map((tier, idx) => (
+                                                <div key={idx} className="flex flex-col p-2 bg-white dark:bg-zinc-950 rounded-lg border border-slate-100 dark:border-zinc-900 shadow-2xs">
+                                                    <span className="text-[10px] font-semibold text-slate-500 dark:text-zinc-400 truncate">{tier.label}</span>
+                                                    <span className="text-sm font-bold text-slate-800 dark:text-white">${Number(tier.value || 0).toFixed(2)}</span>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </div>
+                                    {/* )} */}
 
                                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                                         {activeCouriersWithCharges.map((courier) => (
@@ -193,7 +181,7 @@ export const ProfileTab = ({ customerId }: ProfileTabProps) => {
                                                         <tr className="text-slate-500 dark:text-zinc-400 font-semibold tracking-wide text-[10px] border-b border-slate-200/50 dark:border-zinc-800/50">
                                                             <th className="pb-1 font-bold">Weight Tier</th>
                                                             <th className="pb-1 font-bold text-right">Markup (%)</th>
-                                                            {!hasVolumeTiers && <th className="pb-1 font-bold text-right">Pickup ($)</th>}
+                                                            <th className="pb-1 font-bold text-right">Pickup ($)</th>
                                                         </tr>
                                                     </thead>
                                                     <tbody className="divide-y divide-slate-100/50 dark:divide-zinc-800/30">
@@ -204,9 +192,7 @@ export const ProfileTab = ({ customerId }: ProfileTabProps) => {
                                                                 <tr key={tier.key} className="text-slate-600 dark:text-zinc-300 text-xs">
                                                                     <td className="py-1.5 font-medium">{tier.label}</td>
                                                                     <td className="py-1.5 text-right font-semibold text-slate-900 dark:text-white">{Number(mValue).toFixed(2)}%</td>
-                                                                    {!hasVolumeTiers && (
-                                                                        <td className="py-1.5 text-right font-semibold text-slate-900 dark:text-white">${Number(pValue).toFixed(2)}</td>
-                                                                    )}
+                                                                    <td className="py-1.5 text-right font-semibold text-slate-900 dark:text-white">${Number(pValue).toFixed(2)}</td>
                                                                 </tr>
                                                             );
                                                         })}
@@ -217,22 +203,14 @@ export const ProfileTab = ({ customerId }: ProfileTabProps) => {
                                     </div>
                                 </div>
                             ) : (
-                                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                                    {markups.map((m, i) => (
-                                        <div key={i} className="p-3 rounded-xl bg-slate-50/80 dark:bg-zinc-900/50 border border-slate-100 dark:border-zinc-800 flex flex-col gap-2">
-                                            <span className="text-xs font-bold text-slate-600 dark:text-zinc-400 uppercase tracking-wide truncate">{m.title}</span>
-                                            <div className="flex flex-col gap-1 text-xs">
-                                                <div className="flex justify-between items-center text-slate-600 dark:text-zinc-400">
-                                                    <span>Markup:</span>
-                                                    <span className="font-bold text-slate-900 dark:text-white">{Number(m.markup).toFixed(2)}%</span>
-                                                </div>
-                                                <div className="flex justify-between items-center text-slate-600 dark:text-zinc-400">
-                                                    <span>Pickup:</span>
-                                                    <span className="font-bold text-slate-900 dark:text-white">${Number(m.pickup).toFixed(2)}</span>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    ))}
+                                <div className="flex flex-col items-center justify-center py-12 px-4">
+                                    <div className="flex items-center justify-center w-12 h-12 rounded-full bg-slate-100 dark:bg-zinc-800 mb-3">
+                                        <CreditCard className="w-6 h-6 text-slate-400 dark:text-zinc-500" />
+                                    </div>
+                                    <h4 className="text-sm font-semibold text-slate-900 dark:text-white mb-1">No Charges & Markups Configured</h4>
+                                    <p className="text-xs text-slate-500 dark:text-zinc-400 text-center max-w-xs">
+                                        This customer doesn't have any custom charges or markup configurations yet. Default rates will apply to their orders.
+                                    </p>
                                 </div>
                             )}
                         </CardContent>

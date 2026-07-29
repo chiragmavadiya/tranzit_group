@@ -237,12 +237,12 @@ export const InvoicePaper: React.FC<InvoicePaperProps> = ({
     }
   }, [invoice.items, invoice?.totals, invoice?.till_date_paid, invoice?.remaining_balance, isCreate, setInvoiceData, getInitialTotals]);
   return (
-    <div className="mx-auto w-full bg-white dark:bg-zinc-900 shadow-[0_0_50px_rgba(0,0,0,0.05)] dark:shadow-[0_0_50px_rgba(0,0,0,0.3)] min-h-[1100px] flex flex-col p-8 transition-all duration-300 print:shadow-none print:p-0 font-sans text-slate-900 dark:text-zinc-100">
+    <div className="mx-auto w-full bg-white dark:bg-zinc-900 shadow-[0_0_50px_rgba(0,0,0,0.05)] dark:shadow-[0_0_50px_rgba(0,0,0,0.3)] min-h-[1100px] flex flex-col p-4 sm:p-8 transition-all duration-300 print:shadow-none print:p-0 font-sans text-slate-900 dark:text-zinc-100">
 
       {/* 1. Header Layout */}
-      <div className="grid grid-cols-3 gap-8 mb-6">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-8 mb-6">
         {/* Left Column (Partition 1) */}
-        <div className="flex flex-col justify-between min-h-[160px]">
+        <div className="flex flex-col justify-between gap-3 md:gap-0 md:min-h-[160px]">
           <div>
             <img src={TranzitLogo} alt="TG" className="h-10 w-auto" />
           </div>
@@ -261,12 +261,12 @@ export const InvoicePaper: React.FC<InvoicePaperProps> = ({
         </div>
 
         {/* Center Column (Partition 2) */}
-        <div className="flex justify-center min-h-[160px]">
-          <h1 className="my-0 text-4xl font-black text-primary dark:text-white uppercase tracking-wide">TAX INVOICE</h1>
+        <div className="flex justify-center md:min-h-[160px] order-first md:order-none">
+          <h1 className="my-0 text-3xl md:text-4xl font-black text-primary dark:text-white uppercase tracking-wide">TAX INVOICE</h1>
         </div>
 
         {/* Right Column (Partition 3) */}
-        <div className="flex flex-col justify-between items-end text-right min-h-[160px]">
+        <div className="flex flex-col justify-between gap-3 md:gap-0 items-start text-left md:items-end md:text-right md:min-h-[160px]">
           <div className="text-sm text-slate-500 dark:text-zinc-400 font-medium space-y-0.5">
             <p className="font-bold text-slate-800 dark:text-white">{COMPANY_DETAILS.name || 'Tranzit Group Pty Ltd'}</p>
             <p>ABN: {COMPANY_DETAILS.abn || '12 690 967 198'}</p>
@@ -283,7 +283,7 @@ export const InvoicePaper: React.FC<InvoicePaperProps> = ({
       {/* 2. Summary Status Bar */}
       {/* 2. Summary Status Bar */}
       {isCreate ? (
-        <div className="grid grid-cols-[1fr_1fr] gap-6 mb-6 border border-slate-200 dark:border-zinc-800 rounded-xl p-4 bg-slate-50/10 shadow-sm">
+        <div className="grid grid-cols-1 sm:grid-cols-[1fr_1fr] gap-4 sm:gap-6 mb-6 border border-slate-200 dark:border-zinc-800 rounded-xl p-4 bg-slate-50/10 shadow-sm">
           {/* Customer Selection */}
           <div className="space-y-1">
             <FormSelect
@@ -334,10 +334,10 @@ export const InvoicePaper: React.FC<InvoicePaperProps> = ({
           </div>
         </div>
       ) : (
-        <div className="grid grid-cols-4 gap-4 mb-6 border border-slate-200 dark:border-zinc-800 rounded-xl p-4 bg-slate-50/10 shadow-sm items-center">
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-4 mb-6 border border-slate-200 dark:border-zinc-800 rounded-xl p-3 sm:p-4 bg-slate-50/10 shadow-sm items-center">
           {/* Invoice Date Box */}
           <div className="space-y-1">
-            <p className="text-sm text-slate-500 dark:text-zinc-400 font-medium">Invoice Date</p>
+            <p className="text-xs sm:text-sm text-slate-500 dark:text-zinc-400 font-medium">Invoice Date</p>
             {isAdmin ? (
               <Popover>
                 <PopoverTrigger className="flex items-center justify-between w-full h-8 bg-white border border-slate-200 dark:border-zinc-800 hover:bg-slate-50 dark:bg-zinc-900 dark:hover:bg-zinc-700 text-slate-700 dark:text-zinc-300 px-3 rounded-md font-bold text-sm cursor-pointer outline-none">
@@ -368,7 +368,7 @@ export const InvoicePaper: React.FC<InvoicePaperProps> = ({
 
           {/* Status Box */}
           <div className="space-y-1">
-            <p className="text-sm text-slate-500 dark:text-zinc-400 font-medium">Status</p>
+            <p className="text-xs sm:text-sm text-slate-500 dark:text-zinc-400 font-medium">Status</p>
             {isAdmin ? (
               <FormSelect
                 label=""
@@ -394,16 +394,16 @@ export const InvoicePaper: React.FC<InvoicePaperProps> = ({
 
           {/* Amount Paid Box */}
           <div className="text-center space-y-1">
-            <p className="text-sm text-slate-500 dark:text-zinc-400 font-medium">Amount Paid</p>
-            <p className="text-lg font-bold text-slate-800 dark:text-white leading-none mt-1">
+            <p className="text-xs sm:text-sm text-slate-500 dark:text-zinc-400 font-medium">Amount Paid</p>
+            <p className="my-0 text-base sm:text-lg font-bold text-slate-800 dark:text-white leading-none mt-1">
               {formateCurrency(invoice?.till_date_paid || invoice?.totals?.amount_paid || 0)}
             </p>
           </div>
 
           {/* Balance Due Box */}
           <div className="text-center space-y-1">
-            <p className="text-sm text-slate-500 dark:text-zinc-400 font-medium">Balance Due</p>
-            <p className="text-lg font-bold text-slate-800 dark:text-white leading-none mt-1">
+            <p className="text-xs sm:text-sm text-slate-500 dark:text-zinc-400 font-medium">Balance Due</p>
+            <p className="my-0 text-base sm:text-lg font-bold text-slate-800 dark:text-white leading-none mt-1">
               {formateCurrency(invoice?.remaining_balance || invoice?.totals?.amount_due || 0)}
             </p>
           </div>
@@ -724,10 +724,10 @@ export const InvoicePaper: React.FC<InvoicePaperProps> = ({
       )}
 
       {/* 4. Bottom Layout */}
-      <div className="grid grid-cols-1 lg:grid-cols-[1.5fr_1fr] gap-8 pt-8 dark:border-zinc-800">
+      <div className="grid grid-cols-1 lg:grid-cols-[1.5fr_1fr] gap-4 sm:gap-6 lg:gap-8 pt-6 sm:pt-8 dark:border-zinc-800">
 
         {/* Left: Banking Details & Terms in one card */}
-        <div className="bg-[#F8FAFC] dark:bg-zinc-950 p-6 rounded-2xl border border-slate-200 dark:border-zinc-800 space-y-6">
+        <div className="bg-[#F8FAFC] dark:bg-zinc-950 p-4 sm:p-6 rounded-2xl border border-slate-200 dark:border-zinc-800 space-y-4 sm:space-y-6">
           {/* Banking Details */}
           <div>
             <h3 className="text-base font-bold text-slate-800 dark:text-white mb-3 mt-0">Banking Details</h3>
@@ -752,7 +752,7 @@ export const InvoicePaper: React.FC<InvoicePaperProps> = ({
 
         {/* Right: Summary Card */}
         <div>
-          <div className="bg-white dark:bg-zinc-950 border border-slate-200 dark:border-zinc-800 rounded-xl p-6 shadow-sm space-y-4">
+          <div className="bg-white dark:bg-zinc-950 border border-slate-200 dark:border-zinc-800 rounded-xl p-4 sm:p-6 shadow-sm space-y-3 sm:space-y-4">
             <div className="flex justify-between text-sm">
               <span className="text-slate-500 font-medium">Subtotal (ex GST)</span>
               <span className="text-slate-800 dark:text-white font-bold">{formateCurrency(subtotalExGst)}</span>

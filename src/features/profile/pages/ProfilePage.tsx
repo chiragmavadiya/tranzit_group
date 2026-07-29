@@ -71,7 +71,7 @@ export default function ProfilePage() {
   };
 
   return (
-    <div className="p-page-padding space-y-4 animate-in fade-in duration-700">
+    <div className="p-page-padding space-y-4 animate-in fade-in duration-700 overflow-auto">
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
           <h1 className="my-0 text-2xl font-bold tracking-tight text-slate-900 dark:text-zinc-100">My Profile</h1>

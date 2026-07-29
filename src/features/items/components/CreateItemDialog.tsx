@@ -88,9 +88,9 @@ export function CreateItemDialog({
       onCancel={() => onClose(false)}
       isLoading={!!isLoading}
       submitText={editingItemId ? 'Update' : 'Submit'}
-      contentClass='min-w-2xl'
+      contentClass='w-full max-w-[calc(100%-2rem)] sm:max-w-2xl'
     >
-      <form onSubmit={handleSubmit} className="flex flex-col max-h-[90vh]">
+      <form onSubmit={handleSubmit} className="flex flex-col">
         {isFetchingDetails && (
           <div className="absolute inset-0 z-50 flex items-center justify-center bg-white/60 dark:bg-zinc-900/60 backdrop-blur-[1px]">
             <div className="flex flex-col items-center gap-2">
@@ -132,7 +132,7 @@ export function CreateItemDialog({
             <p className="text-sm font-medium text-muted-foreground mb-2">
               Dimensions (cm)
             </p>
-            <div className="grid grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
               <div>
                 <FormInput
                   type="number"

@@ -16,6 +16,7 @@ import {
   useDeleteBlackoutDay,
 } from '../hooks/useBlackoutDays';
 import type { BlackoutDayPayload } from '../services/blackout-days.service';
+import useLocalStorage from '@/hooks/useLocalStorage';
 
 interface BlackoutDayItem {
   id: string;
@@ -30,9 +31,9 @@ const DEFAULT_FORM_STATE = {
 };
 
 export default function BlackoutDaysPage() {
-  const [search, setSearch] = useState('');
-  const [page, setPage] = useState(1);
-  const [pageSize, setPageSize] = useState(25);
+  const [search, setSearch] = useLocalStorage<string>('blackout_days_search', '');
+  const [page, setPage] = useLocalStorage<number>('blackout_days_current_page', 1);
+  const [pageSize, setPageSize] = useLocalStorage<number>('blackout_days_page_size', 25);
 
   const debouncedSearch = useDebounce(search, 400);
 
@@ -165,26 +166,12 @@ export default function BlackoutDaysPage() {
   const handleSearchChange = useCallback((val: string) => {
     setSearch(val);
     setPage(1);
-  }, []);
+  }, [setSearch, setPage]);
 
   const handlePageSizeChange = useCallback((size: number) => {
     setPageSize(size);
     setPage(1);
-  }, []);
-
-  const paginatedConfigs = useMemo(() => {
-    const rawData = apiData?.data;
-    if (!rawData) return [];
-
-    if (Array.isArray(rawData)) {
-      const filtered = configs.filter((item) =>
-        item.name.toLowerCase().includes(search.toLowerCase())
-      );
-      const startIndex = (page - 1) * pageSize;
-      return filtered.slice(startIndex, startIndex + pageSize);
-    }
-    return configs;
-  }, [apiData, configs, page, pageSize, search]);
+  }, [setPageSize, setPage]);
 
   const columns = useMemo<Column<BlackoutDayItem>[]>(
     () => [
@@ -250,13 +237,13 @@ export default function BlackoutDaysPage() {
   );
 
   return (
-    <div className="flex flex-col flex-1 gap-6 p-page-padding min-h-0 animate-in fade-in slide-in-from-bottom-2 duration-500 bg-slate-50/30 dark:bg-zinc-950/30 overflow-y-auto">
-      <div className="rounded-2xl shadow-sm border border-slate-100 dark:border-zinc-800 bg-white dark:bg-zinc-950 overflow-hidden flex-1 flex flex-col min-h-[500px]">
-        <div className="flex-1 p-0">
+    <div className="flex flex-col flex-1 gap-6 p-page-padding animate-in fade-in slide-in-from-bottom-2 duration-500 bg-slate-50/30 dark:bg-zinc-950/30 overflow-y-auto">
+      <div className="rounded-2xl shadow-sm border border-slate-100 dark:border-zinc-800 bg-white dark:bg-zinc-950 flex-none h-auto">
+        <div className="p-0">
           <DataTable
             headerTitle="Blackout Days"
             headerDescription="Manage public holidays and days where carrier pickup operations are suspended."
-            data={paginatedConfigs}
+            data={configs}
             columns={columns}
             loading={isLoading}
             searchable
@@ -270,7 +257,7 @@ export default function BlackoutDaysPage() {
             onPageChange={setPage}
             pageSize={pageSize}
             onPageSizeChange={handlePageSizeChange}
-            className="text-xs pb-3"
+            className="text-xs pb-3 flex-none h-auto [&_div.overflow-auto]:flex-none [&_div.overflow-auto]:h-auto [&_div.overflow-auto]:min-h-0 [&_div.overflow-auto]:overflow-y-visible [&_div.overflow-auto]:overflow-x-auto"
             exportable={false}
             customHeader={
               <Button

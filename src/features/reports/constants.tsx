@@ -234,7 +234,15 @@ export const ADMIN_PARCEL_COLUMNS: Column<ParcelReport>[] = [
     key: 'tranzit_group_markup',
     header: 'TRANZIT GROUP MARKUP',
     sortable: true,
-    cell: (val) => val ? formateCurrency(val) : '$0.00'
+    width: '100px',
+    // cell: (val, row: ParcelReport) => val ? `${formateCurrency(val)} (${row.markup_charge_percent}%)` : '$0.00'
+    cell: (val, row: ParcelReport) =>
+      val
+        ? `${formateCurrency(val)} (${(row.markup_charge_percent || 0) > 0
+          ? `${row.markup_charge_percent}%`
+          : "N/A"
+        })`
+        : "$0.00 (N/A)"
   },
   {
     key: 'total',

@@ -544,6 +544,7 @@ export const useOrderWorkflow = () => {
         freight_levy: quoteData?.courier?.freight_levy || 0,
         markup_charge: quoteData?.courier?.markup_charge || 0,
         pickup_value: quoteData?.courier?.pickup_value || 0,
+        applied_markup_percent: quoteData?.courier?.applied_markup_percent || 0,
       },
       capture: getCapture(),
       order_type: orderDetail?.order_type,
@@ -638,7 +639,7 @@ export const useOrderWorkflow = () => {
         showToast('Failed to create orders', 'error');
       },
     });
-  }, [orderType, itemsData, addressData, role, selectedCustomer, courierData, termsAccepted, ratesAccepted, dangerousGoodsAccepted, quoteData?.courier?.courierCode, quoteData?.courier?.base, quoteData?.courier?.freight_levy, quoteData?.courier?.markup_charge, quoteData?.courier?.pickup_value, quoteData?.surcharges, quoteData?.gst, activeSettings, insuranceSelected, deliveryInstructions, calculation.totalSurcharges, calculation.grandTotal, orderDetail?.order_type, manualOrderData.trackingNumber, manualOrderData.courierId, manualOrderData.amount, checkWallet, createManualOrder, navigate, printLabel, walletCheckData?.wallet_balance, orderID, updateOrder, createOrder]);
+  }, [orderType, itemsData, addressData, role, selectedCustomer, courierData, termsAccepted, ratesAccepted, dangerousGoodsAccepted, quoteData?.courier?.courierCode, quoteData?.courier?.base, quoteData?.courier?.freight_levy, quoteData?.courier?.markup_charge, quoteData?.courier?.applied_markup_percent, quoteData?.courier?.pickup_value, quoteData?.surcharges, quoteData?.gst, activeSettings, insuranceSelected, deliveryInstructions, calculation.totalSurcharges, calculation.grandTotal, orderDetail?.order_type, manualOrderData.trackingNumber, manualOrderData.courierId, manualOrderData.amount, checkWallet, createManualOrder, navigate, printLabel, walletCheckData?.wallet_balance, orderID, updateOrder, createOrder]);
 
   // Order Consignment Flow
   const handleConsign = useCallback((skipWalletCheckArg?: any, overrideReceiverPhone?: string) => {
@@ -712,6 +713,7 @@ export const useOrderWorkflow = () => {
         freight_levy: quoteData?.courier?.freight_levy || 0,
         markup_charge: quoteData?.courier?.markup_charge || 0,
         pickup_value: quoteData?.courier?.pickup_value || 0,
+        applied_markup_percent: quoteData?.courier?.applied_markup_percent || 0,
       },
       capture: role === 'admin' || !skipWalletCheckArg || (walletCheckData?.wallet_balance ?? 0) > calculation.grandTotal,
       ...(orderType === 'create-menual' ? {
@@ -765,7 +767,7 @@ export const useOrderWorkflow = () => {
       },
     });
 
-  }, [termsAccepted, ratesAccepted, dangerousGoodsAccepted, quoteData?.courier?.courierCode, quoteData?.courier?.base, quoteData?.courier?.freight_levy, quoteData?.courier?.markup_charge, quoteData?.courier?.pickup_value, quoteData?.surcharges, quoteData?.gst, itemsData, activeSettings, selectedCustomer, orderDetail?.sender_details?.customer_id, orderDetail?.order_type, addressData.sender.name, addressData.sender.company, addressData.sender.phone, addressData.sender.email, addressData.sender.address1, addressData.sender.suburb, addressData.sender.state, addressData.sender.postcode, addressData.sender.country, addressData.receiver.name, addressData.receiver.company, addressData.receiver.phone, addressData.receiver.email, addressData.receiver.address1, addressData.receiver.suburb, addressData.receiver.state, addressData.receiver.postcode, addressData.receiver.country, courierData, insuranceSelected, signatureSelected, deliveryInstructions, calculation.servicePrice, calculation.gst, calculation.grandTotal, calculation.totalSurcharges, role, walletCheckData?.wallet_balance, orderType, manualOrderData.trackingNumber, manualOrderData.courierId, manualOrderData.amount, checkWallet, orderID, consignOrder, navigate, printLabel]);
+  }, [termsAccepted, ratesAccepted, dangerousGoodsAccepted, quoteData?.courier?.courierCode, quoteData?.courier?.base, quoteData?.courier?.freight_levy, quoteData?.courier?.markup_charge, quoteData?.courier?.pickup_value, quoteData?.courier?.applied_markup_percent, quoteData?.surcharges, quoteData?.gst, itemsData, activeSettings, selectedCustomer, orderDetail?.sender_details?.customer_id, orderDetail?.order_type, addressData.sender.name, addressData.sender.company, addressData.sender.phone, addressData.sender.email, addressData.sender.address1, addressData.sender.suburb, addressData.sender.state, addressData.sender.postcode, addressData.sender.country, addressData.receiver.name, addressData.receiver.company, addressData.receiver.phone, addressData.receiver.email, addressData.receiver.address1, addressData.receiver.suburb, addressData.receiver.state, addressData.receiver.postcode, addressData.receiver.country, courierData, insuranceSelected, signatureSelected, deliveryInstructions, calculation.servicePrice, calculation.gst, calculation.grandTotal, calculation.totalSurcharges, role, walletCheckData?.wallet_balance, orderType, manualOrderData.trackingNumber, manualOrderData.courierId, manualOrderData.amount, checkWallet, orderID, consignOrder, navigate, printLabel]);
 
 
   const handleReceiverPhoneSubmit = useCallback((phone: string) => {

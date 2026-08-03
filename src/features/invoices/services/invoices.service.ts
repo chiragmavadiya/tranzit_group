@@ -38,7 +38,7 @@ export const invoicesService = {
     return response.data;
   },
 
-  getAdminInvoices: async (params?: { search?: string; page?: number; per_page?: number; customer?: string; start_date?: string; end_date?: string }): Promise<PaginatedInvoicesResponse> => {
+  getAdminInvoices: async (params?: { search?: string; page?: number; per_page?: number; customer?: string; status?: string; start_date?: string; end_date?: string }): Promise<PaginatedInvoicesResponse> => {
     const response = await api.get(API_ENDPOINTS.ADMIN_INVOICES.BASE, { params });
     return response.data;
   },
@@ -91,7 +91,7 @@ export const invoicesService = {
     return response.data;
   },
 
-  exportAdminInvoices: async (params: { format: string; customer?: string; search?: string; start_date?: string; end_date?: string }): Promise<{ blob: Blob; filename: string }> => {
+  exportAdminInvoices: async (params: { format: string; customer?: string; status?: string; search?: string; start_date?: string; end_date?: string }): Promise<{ blob: Blob; filename: string }> => {
     const response = await api.get(API_ENDPOINTS.ADMIN_INVOICES.EXPORT, {
       params,
       responseType: 'blob',

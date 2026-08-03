@@ -3,6 +3,16 @@ import { FormSelect } from '@/features/orders/components/OrderFormUI';
 import { DateFilter } from '@/components/common/DateFilter';
 import type { DateFilterValue } from '@/components/common/DateFilter/types';
 
+const INVOICE_STATUS_OPTIONS = [
+  { value: 'draft', label: 'Draft' },
+  { value: 'send', label: 'Send' },
+  { value: 'unpaid', label: 'Unpaid' },
+  { value: 'partial', label: 'Partial' },
+  { value: 'overdue', label: 'Overdue' },
+  { value: 'paid', label: 'Paid' },
+  { value: 'voided', label: 'Voided' },
+];
+
 interface InvoiceFiltersProps {
   searchTerm: string;
   onSearchChange: (value: string) => void;
@@ -11,6 +21,8 @@ interface InvoiceFiltersProps {
   isAdmin?: boolean;
   selectedCustomer?: string;
   onCustomerChange?: (value: string | null) => void;
+  selectedStatus?: string;
+  onStatusChange?: (value: string | null) => void;
   dateRange: DateFilterValue;
   onDateRangeChange: (val: DateFilterValue) => void;
 }
@@ -19,6 +31,8 @@ export function InvoiceFilters({
   isAdmin,
   selectedCustomer,
   onCustomerChange,
+  selectedStatus,
+  onStatusChange,
   dateRange,
   onDateRangeChange,
 }: InvoiceFiltersProps) {
@@ -35,6 +49,18 @@ export function InvoiceFilters({
               value: c.id.toString(),
               label: `${c.first_name} ${c.last_name} (${c.email})`
             })) || []}
+            className="w-full"
+          />
+        </div>
+      )}
+
+      {isAdmin && (
+        <div className="w-full md:w-64">
+          <FormSelect
+            placeholder="Select Status"
+            value={selectedStatus!}
+            onValueChange={(val) => onStatusChange?.(val)}
+            options={INVOICE_STATUS_OPTIONS}
             className="w-full"
           />
         </div>

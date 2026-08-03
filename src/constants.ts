@@ -209,6 +209,7 @@ export const STATUS_STYLE: Record<string, string> = {
     partial: 'bg-orange-50 text-orange-600 dark:bg-orange-900/20 dark:text-orange-400',
     unpaid: 'bg-red-50 text-red-600 dark:bg-red-900/20 dark:text-red-400',
     draft: 'bg-slate-100 text-slate-600 dark:bg-zinc-800 dark:text-zinc-400',
+    voided: 'bg-zinc-200 text-zinc-600 line-through dark:bg-zinc-700/40 dark:text-zinc-400',
     active: 'bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-400',
     inactive: 'bg-gray-100 text-gray-800 dark:bg-gray-900/20 dark:text-gray-400',
     pending: 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/20 dark:text-yellow-400',

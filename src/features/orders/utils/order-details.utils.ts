@@ -33,3 +33,12 @@ export const getDisplayCourierName = (courierName?: string) => {
         .map((word: string) => word.charAt(0).toUpperCase() + word.slice(1))
         .join(' ');
 };
+
+/**
+ * Only an unpaid order can be restored from the archive — a paid or partially paid
+ * order stays archived. Adjust this list if the API reports a different wording.
+ */
+const RESTORABLE_PAYMENT_STATUSES = ['payment pending', 'pending', 'unpaid'];
+
+export const canRestoreByPaymentStatus = (paymentStatus?: string | null) =>
+    RESTORABLE_PAYMENT_STATUSES.includes((paymentStatus || '').trim().toLowerCase());

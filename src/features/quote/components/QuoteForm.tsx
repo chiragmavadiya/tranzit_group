@@ -14,17 +14,20 @@ interface QuoteFormProps {
     receiver: QuoteLocation | null;
   };
   setLocations: React.Dispatch<React.SetStateAction<{ sender: QuoteLocation | null; receiver: QuoteLocation | null }>>;
+  /** Locks the sender field to the logged-in customer's own address. */
+  disableSender?: boolean;
 }
 
 interface LocalityAutoCompleteProps {
   label: string;
   placeholder?: string;
   value?: string;
+  disabled?: boolean;
   onChange: (value: string) => void;
   onSelect: (locality: { label: string; suburb: string; state: string; postcode: string }) => void;
 }
 
-const LocalityAutoComplete = memo(({ label, placeholder, value, onChange, onSelect }: LocalityAutoCompleteProps) => {
+const LocalityAutoComplete = memo(({ label, placeholder, value, disabled, onChange, onSelect }: LocalityAutoCompleteProps) => {
   const [query, setQuery] = useState("");
   const { data: localities } = useSearchLocalities(query, query.length >= 2);
 
@@ -45,6 +48,7 @@ const LocalityAutoComplete = memo(({ label, placeholder, value, onChange, onSele
       options={options}
       value={value}
       label={label}
+      disabled={disabled}
       onChange={(val) => {
         setQuery(val);
         onChange(val);
@@ -66,7 +70,7 @@ const LocalityAutoComplete = memo(({ label, placeholder, value, onChange, onSele
 
 LocalityAutoComplete.displayName = "LocalityAutoComplete";
 
-export const QuoteForm = memo(({ locations, setLocations }: QuoteFormProps) => {
+export const QuoteForm = memo(({ locations, setLocations, disableSender = false }: QuoteFormProps) => {
   return (
     <div className="space-y-4">
       {/* Addresses Section */}
@@ -87,6 +91,7 @@ export const QuoteForm = memo(({ locations, setLocations }: QuoteFormProps) => {
                 label="Sender Location"
                 placeholder="Start typing suburb or postcode"
                 value={locations.sender?.label}
+                disabled={disableSender}
                 onChange={(value) => {
                   setLocations(prev => ({
                     ...prev,
@@ -116,7 +121,9 @@ export const QuoteForm = memo(({ locations, setLocations }: QuoteFormProps) => {
                   }));
                 }}
               />
-              <p className="text-xs mt-1 text-slate-500 dark:text-zinc-500">Select by suburb or enter postcode to filter</p>
+              <p className="text-xs mt-1 text-slate-500 dark:text-zinc-500">
+                {disableSender ? 'Using your account address' : 'Select by suburb or enter postcode to filter'}
+              </p>
             </div>
             <div className="space-y-1.5">
               <CustomLabel

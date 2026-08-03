@@ -59,7 +59,7 @@ export function InvoiceTable({
     {
       accessor: 'id',
       key: 'id',
-      header: 'Invoice #',
+      header: 'Invoice#',
       sticky: 'left',
       // width: '140px',
       cell: (value, row) => (
@@ -69,9 +69,8 @@ export function InvoiceTable({
       )
     },
     ...(role === 'admin' ? [{
-      accessor: 'zoho_invoice_number',
-      key: 'zoho_invoice_number',
-      header: 'Zoho Invoice #',
+      key: 'xero_invoice_id',
+      header: 'Xero Invoice#',
       // width: '160px',
     }] : []),
     {

@@ -3,7 +3,6 @@ import { Button } from '@/components/ui/button';
 import { ConformationModal } from '@/components/common/ConformationModal';
 import { showToast } from '@/components/ui/custom-toast';
 import { Loader2, RefreshCw } from 'lucide-react';
-import { XeroMark } from '../components/XeroMark';
 import { XeroConnectionCard } from '../components/XeroConnectionCard';
 import { XeroConnectionDetails } from '../components/XeroConnectionDetails';
 import { useXeroConnect, useXeroDisconnect, useXeroStatus } from '../hooks/useXero';
@@ -121,7 +120,8 @@ export default function XeroIntegrationPage() {
         <div className="flex flex-col flex-1 gap-4 p-page-padding min-h-0 animate-in fade-in slide-in-from-bottom-2 duration-500 bg-slate-50/30 dark:bg-zinc-950/30 overflow-y-auto">
             <div className="flex items-start justify-between gap-4 flex-wrap">
                 <div className="flex items-center gap-3">
-                    <XeroMark className="w-10 h-10" />
+                    {/* <XeroMark className="w-10 h-10" /> */}
+                    <svg aria-label="Xero" fill="#0078c8" height="18" viewBox="0 0 692.86 187.21" width="56" xmlns="http://www.w3.org/2000/svg"><path clip-rule="evenodd" d="M487.17,0c-17.37,0-35.88,13.48-45.35,42.84v-25.19c0-9.73-7.91-17.64-17.64-17.64s-17.64,7.91-17.64,17.64v151.92c0,9.73,7.91,17.64,17.64,17.64s17.64-7.91,17.64-17.64v-71.36c0-34.32,19.38-54.68,49.14-61.35,9.51-2.13,15.42-9.31,15.42-18.74,0-10.67-7.9-18.12-19.21-18.12Z" fill-rule="evenodd"></path><path d="M599.26,0c-51.61,0-93.6,41.99-93.6,93.6s41.99,93.6,93.6,93.6,93.6-41.99,93.6-93.6S650.87,0,599.26,0ZM599.26,151.94c-32.17,0-58.33-26.17-58.33-58.33s26.17-58.33,58.33-58.33,58.33,26.17,58.33,58.33-26.17,58.33-58.33,58.33Z"></path><path d="M599.26,70.29c-12.86,0-23.31,10.46-23.31,23.31s10.46,23.31,23.31,23.31,23.31-10.46,23.31-23.31-10.46-23.31-23.31-23.31Z"></path><path d="M285.87,0c-51.63,0-93.64,41.99-93.64,93.6s40.77,93.6,97.15,93.6c27.52,0,50.24-8.37,69.46-25.58,2.08-2.08,5.61-6.58,5.61-13,0-9.73-7.24-17.14-16.84-17.14-4.95,0-7.77,1.46-10.9,3.95-14.03,11.13-29.12,16.99-46.59,16.99-29.79,0-54.14-17.53-60.8-43.95h129.37c11.93-.05,20.58-9.66,20.58-22.9,0-32.01-31.39-85.57-93.39-85.57ZM229.27,78.68c6.26-25.84,28.62-44.27,56.61-44.27s50.14,16.48,56.55,44.27h-113.16Z"></path><path d="M187.2,17.42c0-9.64-7.82-17.42-17.42-17.42-4.65,0-9.03,1.81-12.32,5.1l-63.86,63.86L29.74,5.1C26.45,1.81,22.08,0,17.42,0,7.82,0,0,7.78,0,17.42c0,4.65,1.81,9.03,5.1,12.32l63.86,63.86L5.1,157.46c-3.29,3.29-5.1,7.67-5.1,12.32,0,9.64,7.79,17.42,17.42,17.42,4.65,0,9.03-1.81,12.32-5.1l63.86-63.86,63.86,63.86c3.29,3.29,7.67,5.1,12.32,5.1,9.63,0,17.42-7.79,17.42-17.42,0-4.65-1.81-9.03-5.1-12.32l-63.86-63.86,63.86-63.86c3.29-3.29,5.1-7.67,5.1-12.32Z"></path></svg>
                     <div>
                         <h1 className="my-0 text-xl font-bold text-slate-900 dark:text-white">Xero Integration</h1>
                         <p className="mb-0 text-xs text-slate-500 dark:text-zinc-400">

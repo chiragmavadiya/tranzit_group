@@ -360,6 +360,22 @@ export const useArchiveOrder = () => {
   });
 };
 
+export const useRestoreOrder = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ordersService.restoreOrder,
+    onSuccess: (response, orderNumber) => {
+      showToast(response.message || 'Order restored successfully', 'success');
+      queryClient.invalidateQueries({ queryKey: ["orders", "counts"] });
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.ORDERS.LIST });
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.ORDERS.DETAILS(orderNumber) });
+    },
+    onError: (error: any) => {
+      showToast(error?.message || "Failed to restore order", "error");
+    }
+  });
+};
+
 export const usePrintOrder = () => {
   const queryClient = useQueryClient();
   return useMutation({

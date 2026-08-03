@@ -84,6 +84,10 @@ const INITIAL_FORM_DATA = {
   couriersplease_active: 0,
   // mypostbusiness_active: 0,
   pallet_active: 0,
+  direct_freight_min_margin: 0,
+  auspost_min_margin: 0,
+  couriersplease_min_margin: 0,
+  pallet_min_margin: 0,
   topup_enable: false,
   order_prefix: "",
   xero_contact_id: "",
@@ -824,6 +828,7 @@ export default function CustomerDialog({ open, onOpenChange, customerId }: Custo
                   id: "direct_freight",
                   name: "Direct Freight Express",
                   activeKey: "direct_freight_active" as const,
+                  minMarginKey: "direct_freight_min_margin" as const,
                   logo: directFreightLogo,
                   displayName: "Direct Freight Express",
                   courierKey: "DirectFreight"
@@ -832,6 +837,7 @@ export default function CustomerDialog({ open, onOpenChange, customerId }: Custo
                   id: "AusPost",
                   name: "Auspost Tranzit Group",
                   activeKey: "auspost_active" as const,
+                  minMarginKey: "auspost_min_margin" as const,
                   logo: auspostLogo,
                   displayName: "Auspost Tranzit Group",
                   courierKey: "AusPost"
@@ -840,6 +846,7 @@ export default function CustomerDialog({ open, onOpenChange, customerId }: Custo
                   id: "couriersplease",
                   name: "Courier Please",
                   activeKey: "couriersplease_active" as const,
+                  minMarginKey: "couriersplease_min_margin" as const,
                   logo: courierspleaseLogo,
                   displayName: "Courier Please",
                   courierKey: "CouriersPlease"
@@ -853,9 +860,10 @@ export default function CustomerDialog({ open, onOpenChange, customerId }: Custo
                 //   courierKey: "MyPostBusiness"
                 // },
                 {
-                  // id: "pallet",
+                  id: "pallet",
                   name: "Pallet Tranzit Group",
                   activeKey: "pallet_active" as const,
+                  minMarginKey: "pallet_min_margin" as const,
                   logo: Favicon,
                   displayName: "Pallet Tranzit Group",
                   courierKey: "Pallet"
@@ -887,6 +895,24 @@ export default function CustomerDialog({ open, onOpenChange, customerId }: Custo
                       </div>
 
                       <div className="flex items-center gap-3.5">
+                        {/* Min Markup Charge Input */}
+                        {isActive && (
+                          <div className="flex items-center gap-2" onClick={(e) => e.stopPropagation()}>
+                            <span className="text-xs font-semibold text-slate-600 dark:text-zinc-400 whitespace-nowrap">
+                              Min Markup Charge:
+                            </span>
+                            <div className="w-26">
+                              <FormInput
+                                type="number"
+                                step="0.01"
+                                icon={Percent}
+                                value={formData[courier.minMarginKey]?.toString() || "0"}
+                                onChange={(val) => handleChange(courier.minMarginKey, Number(val) || 0)}
+                              />
+                            </div>
+                          </div>
+                        )}
+
                         {/* Toggle Switch */}
                         <Switch
                           checked={isActive}
@@ -910,7 +936,8 @@ export default function CustomerDialog({ open, onOpenChange, customerId }: Custo
                                 return {
                                   ...prev,
                                   markup_charges: resetCharges(prev.markup_charges),
-                                  pickup_charges: resetCharges(prev.pickup_charges)
+                                  pickup_charges: resetCharges(prev.pickup_charges),
+                                  [courier.minMarginKey]: 0
                                 };
                               });
                             }

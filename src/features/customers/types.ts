@@ -72,6 +72,10 @@ export interface CustomerFormData {
     order_prefix: string;
     xero_contact_id?: string | null;
     additional_high_kg_weight_rate: number;
+    couriersplease_min_margin?: number;
+    auspost_min_margin?: number;
+    direct_freight_min_margin?: number;
+    pallet_min_margin?: number;
     markup_charges?: CourierWeightCharge[];
     pickup_charges?: CourierWeightCharge[];
     byo_courier_invoice_enable?: boolean;

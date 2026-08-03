@@ -54,6 +54,7 @@ export interface ParcelReport {
   total: number;
   create_date: string;
   product_id: string;
+  markup_charge_percent?: number;
 }
 
 export interface OrderLabelCharge {

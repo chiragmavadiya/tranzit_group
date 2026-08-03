@@ -208,6 +208,14 @@ export const ordersService = {
     },
 
     /**
+     * Restore an archived order (admin only)
+     */
+    restoreOrder: async (orderNumber: string | number): Promise<any> => {
+        const response = await api.post(API_ENDPOINTS.ORDERS.RESTORE(orderNumber));
+        return response.data;
+    },
+
+    /**
      * Print order label
      */
     printOrder: async (data: string | number | { order_number: string | number; phone?: string }): Promise<any> => {

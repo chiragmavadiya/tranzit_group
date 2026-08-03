@@ -5,6 +5,7 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 import { format, parse, isValid } from 'date-fns';
 import type { Order, TabType } from '@/features/orders/types';
 import { useOrders, useExportOrders, useImportOrders, useDownloadLabel, useCancelOrder, useArchiveOrder, usePrintOrder, useWalletCheck, useCreateAuspostManifest } from '@/features/orders/hooks/useOrders';
+import { useRestoreOrderConfirm } from '@/features/orders/hooks/useRestoreOrderConfirm';
 import WalletCheckDialog from '@/features/orders/components/WalletCheckDialog';
 import { DataTable } from '@/components/common/DataTable';
 import { getOrdersColumns } from '../column';
@@ -161,6 +162,7 @@ export default function OrdersPage({ fromCustomer, customerId }: { fromCustomer?
   const downloadLabelMutation = useDownloadLabel();
   const cancelOrderMutation = useCancelOrder();
   const archiveOrderMutation = useArchiveOrder();
+  const { requestRestore, restoreModal, restoringOrderId } = useRestoreOrderConfirm();
   const printOrderMutation = usePrintOrder();
   const createAuspostManifestMutation = useCreateAuspostManifest();
   const { data: customersData } = useCustomers({ per_page: 1000 }, isAdmin);
@@ -460,8 +462,10 @@ export default function OrdersPage({ fromCustomer, customerId }: { fromCustomer?
         ? (printOrderMutation.variables as any).order_number
         : printOrderMutation.variables)
       : (walletLoading ? orderToPrint?.orderNumber : null),
-    canReadWrite
-  ), [role, activeTab, navigate, handleCustomerEdit, handleCourierEdit, handleDownloadSingleLabel, handleCancelSingleOrderClick, downloadingLabelId, fromCustomer, handleArchiveOrder, updateToArchiveId, handlePrintClick, printOrderMutation.isPending, printOrderMutation.variables, walletLoading, orderToPrint?.orderNumber, canReadWrite]);
+    canReadWrite,
+    requestRestore,
+    restoringOrderId
+  ), [role, activeTab, navigate, handleCustomerEdit, handleCourierEdit, handleDownloadSingleLabel, handleCancelSingleOrderClick, downloadingLabelId, fromCustomer, handleArchiveOrder, updateToArchiveId, handlePrintClick, printOrderMutation.isPending, printOrderMutation.variables, walletLoading, orderToPrint?.orderNumber, canReadWrite, requestRestore, restoringOrderId]);
 
   return (
     <div className={`${fromCustomer ? "p-0" : "p-page-padding"} flex-1 flex flex-col space-y-4 animate-in fade-in slide-in-from-bottom-2 duration-300 overflow-y-auto`}>
@@ -813,6 +817,7 @@ export default function OrdersPage({ fromCustomer, customerId }: { fromCustomer?
           />
         )
       }
+      {restoreModal}
       {addressEditModal && (
         <Suspense fallback={null}>
           <CreateOrderDialog

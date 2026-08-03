@@ -256,7 +256,7 @@ export const ItemsTable: React.FC<ItemsTableProps> = React.memo(({
                                       }
                                     }}
                                     placeholder='kg'
-                                    error={!item.weight}
+                                    // error={!item.weight}
                                   />
                                 </div>
                                 <div className="flex flex-col gap-1">
@@ -269,14 +269,14 @@ export const ItemsTable: React.FC<ItemsTableProps> = React.memo(({
                                     min="1"
                                     step="0.01"
                                     placeholder='cm'
-                                    error={Number(item.length) < 1}
+                                    error={!!item.length && Number(item.length) < 1}
                                     // errormsg='Length cannot be less than 1 cm. Please enter a valid length.'
-                                    // onBlur={(e) => {
-                                    //   const val = e.target.value;
-                                    //   if (val.startsWith(".")) {
-                                    //     e.target.value = `0${val}`;
-                                    //   }
-                                    // }}
+                                    onBlur={(e) => {
+                                      const val = e.target.value;
+                                      if (val.startsWith(".")) {
+                                        e.target.value = `0${val}`;
+                                      }
+                                    }}
                                   />
                                 </div>
                                 <div className="flex flex-col gap-1">
@@ -289,13 +289,13 @@ export const ItemsTable: React.FC<ItemsTableProps> = React.memo(({
                                     min="1"
                                     placeholder='cm'
                                     step="0.01"
-                                    error={Number(item.width) < 1}
-                                    // onBlur={(e) => {
-                                    //   const val = e.target.value;
-                                    //   if (val.startsWith(".")) {
-                                    //     e.target.value = `0${val}`;
-                                    //   }
-                                    // }}
+                                    error={!!item.width &&Number(item.width) < 1}
+                                    onBlur={(e) => {
+                                      const val = e.target.value;
+                                      if (val.startsWith(".")) {
+                                        e.target.value = `0${val}`;
+                                      }
+                                    }}
                                   />
                                 </div>
                                 <div className="flex flex-col gap-1">
@@ -308,13 +308,13 @@ export const ItemsTable: React.FC<ItemsTableProps> = React.memo(({
                                     min="1"
                                     placeholder='cm'
                                     step="0.01"
-                                    error={Number(item.height) < 1}
-                                    // onBlur={(e) => {
-                                    //   const val = e.target.value;
-                                    //   if (val.startsWith(".")) {
-                                    //     e.target.value = `0${val}`;
-                                    //   }
-                                    // }}
+                                    error={!!item.height && Number(item.height) < 1}
+                                    onBlur={(e) => {
+                                      const val = e.target.value;
+                                      if (val.startsWith(".")) {
+                                        e.target.value = `0${val}`;
+                                      }
+                                    }}
                                   />
                                 </div>
                               </div>

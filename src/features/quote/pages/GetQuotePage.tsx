@@ -15,7 +15,7 @@ import { History } from 'lucide-react';
 import { useDefaultItem } from '@/features/items/hooks/useItems';
 
 export default function GetQuotePage() {
-  const { role } = useAppSelector((state) => state.auth);
+  const { role, user } = useAppSelector((state) => state.auth);
   const isAdmin = role === 'admin';
   const { data: defaultItem } = useDefaultItem(role !== 'admin')
   const [margin, setMargin] = useState<string>('0');
@@ -90,6 +90,36 @@ export default function GetQuotePage() {
     navigate('/orders/create');
   };
 
+  // A customer always ships from their own address, so the sender is pre-filled and locked.
+  // Admins quote on behalf of others, and a customer with no address on file still needs to
+  // be able to pick one — both keep the field editable.
+  const isSenderLocked = useMemo(() => {
+    const address = user?.addresses?.[0];
+    return !isAdmin && !!address?.suburb && !!address?.postcode;
+  }, [isAdmin, user]);
+
+  useEffect(() => {
+    if (isAdmin) return;
+    const address = user?.addresses?.[0];
+    if (!address?.suburb || !address?.postcode) return;
+
+    setLocations(prev => {
+      if (prev.sender) return prev; // never overwrite a location the user already picked
+      return {
+        ...prev,
+        sender: {
+          label: [address.suburb, address.state, address.postcode].filter(Boolean).join(' '),
+          address1: '',
+          street: '',
+          suburb: address.suburb,
+          state: address.state,
+          postcode: address.postcode,
+          country: 'AU'
+        }
+      };
+    });
+  }, [isAdmin, user]);
+
   useEffect(() => {
     if (defaultItem?.data) {
       setItemsData([{
@@ -131,6 +161,7 @@ export default function GetQuotePage() {
               <QuoteForm
                 locations={locations}
                 setLocations={setLocations}
+                disableSender={isSenderLocked}
               />
               <ItemsTable
                 items={itemsData}

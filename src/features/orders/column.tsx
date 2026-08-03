@@ -2,12 +2,13 @@ import { NavLink } from "react-router-dom";
 import type { Order } from "./types";
 import type { Column } from "@/components/common/types/DataTable.types";
 
-import { Eye, Loader2, MoreVertical, Pencil, Printer } from "lucide-react";
+import { ArchiveRestore, Eye, Loader2, MoreVertical, Pencil, Printer } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { DropdownCustomMenu } from "@/components/ui/dropdown-menu";
 import { CustomTooltip } from "@/components/common/CustomTooltip";
 import { StatusBadge } from "./components/StatusBadge";
 import { formateCurrency } from "@/lib/utils";
+import { canRestoreByPaymentStatus } from "./utils/order-details.utils";
 import Favicon from '@/assets/favicon.png';
 import { CustomerNameCell } from "./components/CustomerNameCell";
 
@@ -26,6 +27,8 @@ export const getOrdersColumns = (
   onPrint?: (orderNumber: string | number, amount: number, row: Order) => void,
   printingOrderId?: string | number | null,
   canReadWrite: boolean = true,
+  onRestoreOrder?: (orderNumber: string) => void,
+  restoringOrderId?: string | null,
 ): Column<Order>[] => {
   const printedAndShippedActions = (value: string) => [
     {
@@ -73,6 +76,11 @@ export const getOrdersColumns = (
     },
 
   ]
+
+  // The archived row carries a second action (Restore) for admins, so it needs more room.
+  const showRestore = orderType === 'archived' && role === 'admin' && !fromCustomer && canReadWrite;
+  const actionsWidth = orderType === "new" && !fromCustomer ? "160px" : showRestore ? "90px" : "50px";
+
   return (
     [
       {
@@ -199,7 +207,7 @@ export const getOrdersColumns = (
         sticky: 'right',
         noPrint: true,
         disableToggle: true,
-        width: orderType === "new" && !fromCustomer ? "160px" : "50px",
+        width: actionsWidth,
         cell: (value: string, row: Order) => (
           <div className="flex gap-2" onClick={(e) => e.stopPropagation()}>
             {fromCustomer || !canReadWrite ? (
@@ -219,16 +227,35 @@ export const getOrdersColumns = (
             ) : (<>
 
               {(orderType === 'archived') && (
-                <CustomTooltip title="View Order">
-                  <Button
-                    onClick={() => navigate(`${role === "admin" ? "/admin/orders/view" : "/orders/view"}/${value}`)}
-                    variant="ghost"
-                    size="sm"
-                    className="h-fit w-fit p-0"
-                  >
-                    <Eye className="h-4.5! w-4.5!" />
-                  </Button>
-                </CustomTooltip>
+                <>
+                  <CustomTooltip title="View Order">
+                    <Button
+                      onClick={() => navigate(`${role === "admin" ? "/admin/orders/view" : "/orders/view"}/${value}`)}
+                      variant="ghost"
+                      size="sm"
+                      className="h-fit w-fit p-0"
+                    >
+                      <Eye className="h-4.5! w-4.5!" />
+                    </Button>
+                  </CustomTooltip>
+                  {showRestore && canRestoreByPaymentStatus(row.payment_status) && (
+                    <CustomTooltip title="Restore Order">
+                      <Button
+                        onClick={() => onRestoreOrder?.(value)}
+                        disabled={restoringOrderId === value}
+                        variant="ghost"
+                        size="sm"
+                        className="h-fit w-fit p-0 text-emerald-600 hover:text-emerald-700 dark:text-emerald-400"
+                      >
+                        {restoringOrderId === value ? (
+                          <Loader2 className="h-4.5! w-4.5! animate-spin" />
+                        ) : (
+                          <ArchiveRestore className="h-4.5! w-4.5!" />
+                        )}
+                      </Button>
+                    </CustomTooltip>
+                  )}
+                </>
               )}
               {orderType === 'new' && (
                 <>

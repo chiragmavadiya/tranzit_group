@@ -380,6 +380,7 @@ export const InvoicePaper: React.FC<InvoicePaperProps> = ({
                   { value: 'unpaid', label: 'Unpaid' },
                   { value: 'partial', label: 'Partial' },
                   { value: 'paid', label: 'Paid' },
+                  { value: 'voided', label: 'Voided' },
                 ]}
                 className="w-full space-y-1 col-span-1"
                 selectClassName="bg-white dark:bg-zinc-900 border border-slate-200 dark:border-zinc-800 font-bold text-slate-700 dark:text-zinc-300 h-8 rounded-md"

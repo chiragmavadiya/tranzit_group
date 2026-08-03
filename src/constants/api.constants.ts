@@ -34,6 +34,7 @@ export const API_ENDPOINTS = {
         RECEIVER_ADDRESS: (id: string | number) => `/customer/orders/${id}/receiver-address`,
         IMPORT_SAMPLE: "/customer/orders/import/sample",
         ARCHIVE: (id: string | number) => `/orders/${id}/archive`,
+        RESTORE: (orderNumber: string | number) => `/admin/orders/${orderNumber}/restore`,
         PRINT_ORDER: "/orders/print-label",
         UPDATE_COURIER: (orderNumber: string) => `/orders/${orderNumber}/courier`,
         AUSPOST_MANIFEST: "/customer/orders/auspost/manifests",

@@ -201,7 +201,7 @@ const InvoiceDocumentView: React.FC = () => {
       issue_date: date
     }))
   }, [])
-
+  console.log(invoiceData, 'invoiceData')
   useEffect(() => {
     if (invoiceID !== 'create' && details?.status) {
       const data = details?.data
@@ -544,10 +544,10 @@ const InvoiceDocumentView: React.FC = () => {
                       variant="outline"
                       onClick={handleXeroSync}
                       disabled={xeroSyncMutation.isPending}
-                      className="h-8 flex items-center gap-2 border-slate-200 dark:border-zinc-800 font-bold text-purple-600 hover:text-purple-700 hover:bg-purple-50 shadow-sm"
+                      className="h-8 flex items-center gap-2 border-slate-200 dark:border-zinc-800 font-bold text-blue-600 hover:text-blue-700 hover:bg-blue-50 shadow-sm"
                     >
                       {xeroSyncMutation.isPending ? <RefreshCw className="h-4 w-4 animate-spin" /> : <RefreshCw className="h-4 w-4" />}
-                      Send to Xero
+                      Sync to Xero
                     </Button>
                     {/* <Button
                       variant="outline"
@@ -604,7 +604,7 @@ const InvoiceDocumentView: React.FC = () => {
                           className="flex items-center gap-2 px-3 py-2 text-sm text-purple-600 dark:text-purple-400 hover:bg-purple-50 dark:hover:bg-purple-950/20 rounded-md cursor-pointer font-medium disabled:opacity-50"
                         >
                           {xeroSyncMutation.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <RefreshCw className="h-4 w-4" />}
-                          Send to Xero
+                          Sync to Xero
                         </DropdownMenuItem>
 
                         {/* <DropdownMenuItem

@@ -18,6 +18,7 @@ export default function InvoicesPage() {
   const [pageSize, setPageSize] = useLocalStorage<number>('invoice_page_size', 25);
   const [page, setPage] = useLocalStorage<number>('invoice_page', 1);
   const [selectedCustomer, setSelectedCustomer] = useLocalStorage<string>('invoice_selected_customer', '');
+  const [selectedStatus, setSelectedStatus] = useLocalStorage<string>('invoice_selected_status', '');
   const [invoiceToDelete, setInvoiceToDelete] = useState<number | null>(null);
 
   const { role } = useAppSelector((state) => state.auth);
@@ -128,6 +129,7 @@ export default function InvoicesPage() {
     page: page,
     per_page: pageSize,
     customer: selectedCustomer || undefined,
+    status: selectedStatus || undefined,
     date_from: dateRange.from || undefined,
     date_to: dateRange.to || undefined,
   }, isAdmin);
@@ -179,6 +181,7 @@ export default function InvoicesPage() {
         format,
         search: debouncedSearchTerm || undefined,
         customer: selectedCustomer || undefined,
+        status: selectedStatus || undefined,
         date_from: dateRange.from || undefined,
         date_to: dateRange.to || undefined,
       });
@@ -190,7 +193,7 @@ export default function InvoicesPage() {
         date_to: dateRange.to || undefined,
       });
     }
-  }, [isAdmin, adminExportMutation, customerExportMutation, debouncedSearchTerm, selectedCustomer, dateRange]);
+  }, [isAdmin, adminExportMutation, customerExportMutation, debouncedSearchTerm, selectedCustomer, selectedStatus, dateRange]);
 
   const handleDateRangeChange = useCallback((value: DateFilterValue) => {
     setPage(1);
@@ -214,6 +217,11 @@ export default function InvoicesPage() {
     setSelectedCustomer(value || '');
   }, [setPage, setSelectedCustomer]);
 
+  const handleStatusChange = useCallback((value: string | null) => {
+    setPage(1);
+    setSelectedStatus(value || '');
+  }, [setPage, setSelectedStatus]);
+
   const handleView = useCallback((invoiceNumber: string) => {
     const path = isAdmin ? `/admin/invoices/${invoiceNumber}` : `/invoices/${invoiceNumber}`;
     navigate(path);
@@ -235,6 +243,8 @@ export default function InvoicesPage() {
           isAdmin={isAdmin}
           selectedCustomer={selectedCustomer}
           onCustomerChange={handleCustomerChange}
+          selectedStatus={selectedStatus}
+          onStatusChange={handleStatusChange}
           dateRange={dateRange}
           onDateRangeChange={handleDateRangeChange}
         />

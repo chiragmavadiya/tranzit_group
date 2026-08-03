@@ -22,10 +22,12 @@ const carriers = [
   { id: 'mypostbusiness', name: 'MyPost Business', icon: Truck, status: 'available' },
   { id: 'directfreight', name: 'Direct Freight', icon: Truck, status: 'available' },
   { id: 'couriersplease', name: 'Couriers Please', icon: Truck, status: 'available' },
-  { id: 'startrack', name: 'StarTrack', icon: Truck, status: 'available' },
+  { id: 'startrack', name: 'StarTrack', icon: Truck, status: 'coming_soon' },
   { id: 'toll', name: 'Toll Priority', icon: Truck, status: 'coming_soon' },
   { id: 'dhl', name: 'DHL Express', icon: Truck, status: 'coming_soon' },
 ];
+
+const COMING_SOON_SLUGS = carriers.filter((c) => c.status === 'coming_soon').map((c) => c.id);
 
 export default function CarrierIntegrationsPage() {
   const navigate = useNavigate();
@@ -102,6 +104,7 @@ export default function CarrierIntegrationsPage() {
             isLoading={listLoading}
             configLoadingProvider={statusLoading ? statusVariables : undefined}
             canReadWrite={canReadWrite}
+            comingSoonSlugs={COMING_SOON_SLUGS}
           />
           {/* <RenderIntegrationSection
             title="E-commerce Integrations"

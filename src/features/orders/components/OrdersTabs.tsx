@@ -26,14 +26,14 @@ const tabsMap: Record<string, string> = {
 export function OrdersTabs({ activeTab, onTabChange, className, customerId }: OrdersTabsProps) {
   const { role } = useAppSelector((state) => state.auth);
   const [searchParams] = useSearchParams();
-  const search = customerId ? undefined : (searchParams.get('search') || undefined);
-  const startDate = customerId ? undefined : (searchParams.get('start_date') || undefined);
-  const endDate = customerId ? undefined : (searchParams.get('end_date') || undefined);
+  // const search = customerId ? undefined : (searchParams.get('search') || undefined);
+  const startDate = searchParams.get('start_date') || undefined;
+  const endDate = searchParams.get('end_date') || undefined;
 
   // Fetch status counts from the counts API
   const { data: countsData } = useOrderCounts({
     customer: customerId,
-    search,
+    // search,
     start_date: startDate,
     end_date: endDate,
   }, !!role);

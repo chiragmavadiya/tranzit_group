@@ -1,6 +1,6 @@
 import React, { useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { ArrowLeft, Box, Download, Loader2, PackagePlus, Trash2, Package, Copy } from 'lucide-react'
+import { ArchiveRestore, ArrowLeft, Box, Download, Loader2, PackagePlus, Trash2, Package, Copy } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 // import { DropdownUI } from '@/features/orders/components/OrderFormUI'
@@ -15,6 +15,8 @@ import { CustomTooltip } from '@/components/common/CustomTooltip'
 import type { AddressData } from '../../types'
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog'
 import { useAddManualTrackingNumbers } from '../../hooks/useOrders'
+import { useRestoreOrderConfirm } from '../../hooks/useRestoreOrderConfirm'
+import { canRestoreByPaymentStatus } from '../../utils/order-details.utils'
 
 
 interface OrderHeaderProps {
@@ -91,6 +93,12 @@ export const OrderHeader: React.FC<OrderHeaderProps> = ({
   const [trackingError, setTrackingError] = useState(false)
 
   const addTrackingMutation = useAddManualTrackingNumbers()
+
+  const { requestRestore, restoreModal, isRestoring } = useRestoreOrderConfirm()
+  // Restoring an archived order is admin-only, and only while the order is still unpaid.
+  const canRestoreOrder = role === 'admin'
+    && orderDetail?.order_status_category === 'archived'
+    && canRestoreByPaymentStatus(orderDetail?.payment_status)
 
   const handleOpenTrackingModal = () => {
     setTrackingNumber('')
@@ -259,6 +267,17 @@ export const OrderHeader: React.FC<OrderHeaderProps> = ({
                   {requiresManualLabel ? 'LABEL NOT YET GENERATED' : 'REPRINT LABEL'}
                 </Button>
               )}
+              {canRestoreOrder && (
+                <Button
+                  variant="outline"
+                  onClick={() => requestRestore(orderDetail?.order_number || orderID)}
+                  disabled={isRestoring}
+                  className="flex items-center gap-2 border-emerald-200 dark:border-emerald-900/30 text-emerald-600 dark:text-emerald-400 font-bold h-8 px-4 text-xs hover:bg-emerald-50 dark:hover:bg-emerald-950/30 transition-colors"
+                >
+                  {isRestoring ? <Loader2 className="h-4 w-4 animate-spin" /> : <ArchiveRestore className="h-4 w-4" />}
+                  RESTORE ORDER
+                </Button>
+              )}
               {orderDetail?.order_status_category !== 'archived' && (
                 <Button
                   variant="outline"
@@ -320,18 +339,21 @@ export const OrderHeader: React.FC<OrderHeaderProps> = ({
             title="Cancel Order"
             description={
               <div className="space-y-4">
-                <p className="text-sm mb-0 font-medium text-slate-900">Are you sure you want to cancel this order?</p>
-                <p className="text-sm mb-0 font-medium text-slate-900"> This action can’t be undone once the cancellation is processed.</p>
-                <div className="my-3 bg-amber-50 dark:bg-amber-900/20 p-3 rounded-lg border border-amber-100 dark:border-amber-900/30">
-                  <p className="mb-0 text-amber-800 dark:text-amber-400 font-semibold text-xs">Important: A $3 cancellation service fee applies to {orderDetail?.courier_details?.courier || 'Direct Freight'} bookings.</p>
-                </div>
-                <div className="space-y-2">
-                  <p className="font-semibold text-slate-900 text-sm mb-0">If the cancellation is successful:</p>
-                  <ul className="list-disc list-inside space-y-1 text-sm">
-                    <li>You will receive a confirmation notification from us</li>
-                    <li>$3 will be deducted from your refund amount</li>
-                  </ul>
-                </div>
+                {(orderDetail?.courier_details?.courier_code === "direct_freight_express_tranzit_group" || orderDetail?.courier_details?.courier_code === "auspost_tranzit_group") && (
+                  <>
+                    <p className="text-sm mb-0 font-medium text-slate-900">Are you sure you want to cancel this order?</p>
+                    <p className="text-sm mb-0 font-medium text-slate-900"> This action can’t be undone once the cancellation is processed.</p>
+                    <div className="my-3 bg-amber-50 dark:bg-amber-900/20 p-3 rounded-lg border border-amber-100 dark:border-amber-900/30">
+                      <p className="mb-0 text-amber-800 dark:text-amber-400 font-semibold text-xs">Important: A {orderDetail?.courier_details?.courier_code === "direct_freight_express_tranzit_group" ? "$5" : "$3"} cancellation service fee applies to {orderDetail?.courier_details?.courier || 'Direct Freight'} bookings.</p>
+                    </div>
+                    <div className="space-y-2">
+                      <p className="font-semibold text-slate-900 text-sm mb-0">If the cancellation is successful:</p>
+                      <ul className="list-disc list-inside space-y-1 text-sm">
+                        <li>You will receive a confirmation notification from us</li>
+                        <li>{orderDetail?.courier_details?.courier_code === "direct_freight_express_tranzit_group" ? "$5" : "$3"} will be deducted from your refund amount</li>
+                      </ul>
+                    </div>
+                  </>)}
                 <p className="mb-0 font-medium text-sm text-slate-900">Do you want to proceed with cancelling this order?</p>
               </div>
             }
@@ -356,6 +378,7 @@ export const OrderHeader: React.FC<OrderHeaderProps> = ({
             loading={isCancelling}
             className="max-w-[440px] sm:max-w-[500px]"
           />
+          {restoreModal}
 
         </div>
       </div>

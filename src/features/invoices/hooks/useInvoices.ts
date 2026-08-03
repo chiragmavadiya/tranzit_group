@@ -78,7 +78,7 @@ export const useCreateCustomerInvoice = () => {
   });
 };
 
-export const useAdminInvoices = (params?: { search?: string; page?: number; per_page?: number; customer?: string; date_from?: string; date_to?: string }, enabled: boolean = true) => {
+export const useAdminInvoices = (params?: { search?: string; page?: number; per_page?: number; customer?: string; status?: string; date_from?: string; date_to?: string }, enabled: boolean = true) => {
   return useQuery({
     queryKey: ['admin', 'invoices', 'list', params],
     queryFn: () => invoicesService.getAdminInvoices(params),
@@ -227,7 +227,7 @@ export const useAdminInvoicePayment = () => {
 
 export const useExportAdminInvoices = () => {
   return useMutation({
-    mutationFn: (params: { format: string; customer?: string; search?: string; date_from?: string; date_to?: string }) => invoicesService.exportAdminInvoices(params),
+    mutationFn: (params: { format: string; customer?: string; status?: string; search?: string; date_from?: string; date_to?: string }) => invoicesService.exportAdminInvoices(params),
     onSuccess: ({ blob, filename }) => {
       const url = window.URL.createObjectURL(blob);
       const link = document.createElement("a");

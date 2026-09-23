@@ -1,28 +1,41 @@
+import { useSearchParams } from 'react-router-dom';
 import { cn } from '@/lib/utils';
 import { CUSTOMER_TABS } from './constants';
 
-interface CustomerTabsProps {
-    activeTab: string;
-    onTabChange: (tab: string) => void;
-}
+export const CustomerTabs = () => {
+    const [searchParams, setSearchParams] = useSearchParams();
+    const tabParam = searchParams.get('customerTab');
+    const activeTab = CUSTOMER_TABS.find(t => t.toLowerCase() === tabParam?.toLowerCase()) || 'Profile';
 
-export const CustomerTabs = ({ activeTab, onTabChange }: CustomerTabsProps) => {
+    const onTabChange = (tab: string) => {
+        setSearchParams({ customerTab: tab });
+        // setSearchParams((prev) => {
+        //     prev.set('customerTab', tab);
+        //     return prev;
+        // });
+    };
+
     return (
-        <div className="flex items-center gap-2 p-1 bg-white/50 dark:bg-zinc-900/50 backdrop-blur-sm rounded-2xl w-fit border border-white dark:border-zinc-800 shadow-sm sticky top-0 z-10">
-            {CUSTOMER_TABS.map((tab) => (
-                <button
-                    key={tab}
-                    onClick={() => onTabChange(tab)}
-                    className={cn(
-                        "px-5 py-2 text-[11px] font-black uppercase tracking-widest rounded-xl transition-all duration-300",
-                        activeTab === tab
-                            ? "bg-blue-100 text-blue-600 shadow-lg dark:bg-zinc-100 dark:text-zinc-950"
-                            : "text-slate-400 hover:text-slate-600 dark:text-zinc-500 dark:hover:text-zinc-300"
-                    )}
-                >
-                    {tab}
-                </button>
-            ))}
+        <div className="border-b border-slate-200 dark:border-zinc-800 w-full">
+            <div className="flex items-center gap-3 overflow-x-auto scrollbar-hide">
+                {CUSTOMER_TABS.map((tab) => (
+                    <button
+                        key={tab}
+                        onClick={() => onTabChange(tab)}
+                        className={cn(
+                            "pb-2 px-2 pt-1 text-sm cursor-pointer font-medium relative transition-all duration-200 whitespace-nowrap tracking-normal",
+                            activeTab === tab
+                                ? "text-slate-900 dark:text-white font-bold"
+                                : "text-slate-500 hover:text-slate-700 dark:text-zinc-400 dark:hover:text-zinc-200"
+                        )}
+                    >
+                        {tab}
+                        {activeTab === tab && (
+                            <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-slate-900 dark:bg-white" />
+                        )}
+                    </button>
+                ))}
+            </div>
         </div>
     );
 };

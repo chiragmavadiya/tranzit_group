@@ -8,16 +8,16 @@ import { useState } from 'react';
 
 export const CreditApplicationTab = () => {
     const [formData, setFormData] = useState({
-        registeredName: 'Shikhar',
-        acn: '78454541545455',
-        abn: '12345678945',
-        tradingAs: 'SHIKHAR DIGISITE',
-        businessType: 'Sole Trader'
+        registeredName: '',
+        acn: '',
+        abn: '',
+        tradingAs: '',
+        businessType: ''
     });
 
     return (
-        <Card className="bg-white dark:bg-zinc-900 shadow-md border-none ring-0 shadow-md rounded-xl overflow-hidden animate-in fade-in slide-in-from-left-4 duration-500">
-            <CardHeader className="pb-4 border-b border-slate-50 dark:border-zinc-800/50">
+        <Card className="bg-white dark:bg-zinc-900 ring-0 overflow-hidden animate-in fade-in slide-in-from-left-4 duration-500">
+            <CardHeader className="p-4 border-b border-slate-50 dark:border-zinc-800/50">
                 <div className="flex items-center justify-between">
                     <SectionHeader title="Company Details" icon={Building2} />
                     <div className="flex items-center gap-3">
@@ -29,7 +29,7 @@ export const CreditApplicationTab = () => {
                             Reject
                         </Button>
                         <Button
-                            className="h-8 rounded-lg bg-blue-600 hover:bg-blue-700 text-white gap-2 shadow-md shadow-blue-600/10"
+                            className="h-8 rounded-lg bg-primary hover:bg-primary-hover text-white gap-2 shadow-md shadow-primary/20"
                         >
                             <Check className="h-3.5 w-3.5" />
                             Approve
@@ -37,7 +37,7 @@ export const CreditApplicationTab = () => {
                     </div>
                 </div>
             </CardHeader>
-            <CardContent className="">
+            <CardContent className="py-4 px-6 pt-0">
                 <div className="grid grid-cols-12 gap-x-8 gap-y-5">
                     <FormInput
                         label="Registered Name (in full)"
@@ -68,7 +68,7 @@ export const CreditApplicationTab = () => {
                         isHalf
                     />
                     <div className="col-span-12 space-y-2">
-                        <div className="text-[11px] font-extrabold text-slate-700 dark:text-zinc-400 uppercase tracking-wider ml-0.5">
+                        <div className="text-[11px] font-extrabold text-slate-700 dark:text-zinc-400 uppercase tracking-wide ml-0.5">
                             Business Type <span className="text-destructive">*</span>
                         </div>
                         <div className="flex items-center gap-6">
@@ -84,7 +84,7 @@ export const CreditApplicationTab = () => {
                                     )}>
                                         {formData.businessType === type && <div className="h-1.5 w-1.5 rounded-full bg-white dark:bg-zinc-950" />}
                                     </div>
-                                    <span className="text-[11px] font-black uppercase tracking-widest text-slate-600 dark:text-zinc-400 group-hover:text-slate-900 dark:group-hover:text-white transition-colors">{type}</span>
+                                    <span className="text-[11px] font-black uppercase tracking-wide text-slate-600 dark:text-zinc-400 group-hover:text-slate-900 dark:group-hover:text-white transition-colors">{type}</span>
                                 </div>
                             ))}
                         </div>

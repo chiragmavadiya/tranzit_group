@@ -6,14 +6,14 @@ import { useDebounce } from '@/hooks/useDebounce';
 import { downloadFile } from '@/lib/utils';
 import { QuoteDetailsDialog } from '../components/QuoteDetailsDialog';
 import { Eye, Plus } from 'lucide-react';
-import { format } from 'date-fns';
 import { useNavigate } from 'react-router-dom';
 import { showToast } from '@/components/ui/custom-toast';
+import useLocalStorage from '@/hooks/useLocalStorage';
 
 export default function QuoteListPage() {
     const navigate = useNavigate();
     const [search, setSearch] = useState('');
-    const [page, setPage] = useState(1);
+    const [page, setPage] = useLocalStorage<number>('quote_list_page', 1);
     const [pageSize, setPageSize] = useState(25);
     const [selectedQuoteId, setSelectedQuoteId] = useState<number | null>(null);
     const [isDetailsOpen, setIsDetailsOpen] = useState(false);
@@ -45,31 +45,30 @@ export default function QuoteListPage() {
             key: 'quote_reference',
             header: 'REFERENCE',
             sortable: true,
-            cell: (val: string) => <span className="font-bold text-slate-900 dark:text-zinc-100 text-[13px]">{val}</span>
+            cell: (val: string) => <span className="font-bold text-slate-900 dark:text-zinc-100">{val}</span>
         },
         {
             key: 'email',
             header: 'CUSTOMER',
             sortable: true,
-            cell: (val: string) => <span className="text-slate-500 font-medium text-[12px]">{val}</span>
+            cell: (val: string) => <span className="text-slate-500 font-medium">{val}</span>
         },
         {
             key: 'carrier',
             header: 'CARRIER',
             sortable: true,
-            cell: (val: string) => <span className="text-slate-700 dark:text-zinc-300 font-semibold text-[12px]">{val}</span>
+            cell: (val: string) => <span className="text-slate-700 dark:text-zinc-300 font-semibold">{val}</span>
         },
         {
             key: 'amount',
             header: 'AMOUNT',
             sortable: true,
-            cell: (val: number) => <span className="font-bold text-slate-900 dark:text-zinc-100 text-[13px] tracking-tight">${val.toFixed(2)}</span>
+            cell: (val: number) => <span className="font-bold text-primary tracking-tight">${val.toFixed(2)}</span>
         },
         {
             key: 'created_at',
             header: 'DATE',
             sortable: true,
-            cell: (val: string) => <span className="text-slate-500 text-[11px]">{format(new Date(val), 'dd MMM yyyy HH:mm')}</span>
         },
         {
             key: 'actions',
@@ -82,7 +81,7 @@ export default function QuoteListPage() {
                     <Button
                         variant="ghost"
                         size="icon"
-                        className="h-8 w-8 text-slate-400 hover:text-blue-500 hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-all active:scale-90"
+                        className=" w-8 text-slate-400 hover:text-primary hover:bg-primary/10 transition-all active:scale-90"
                         onClick={() => {
                             setSelectedQuoteId(row.id);
                             setIsDetailsOpen(true);
@@ -116,11 +115,11 @@ export default function QuoteListPage() {
                     onExport={handleExport}
                     customHeader={
                         <Button
-                            onClick={() => navigate('/admin/quotes/create')}
-                            className="gap-2 bg-[#0060FE] hover:bg-[#0052db] text-white shadow-lg shadow-blue-100 dark:shadow-none transition-all active:scale-[0.98] font-semibold border-none px-4 h-8"
+                            onClick={() => navigate('/admin/quotes')}
+                            className="gap-2 bg-primary hover:bg-primary-hover text-white shadow-lg shadow-blue-100 dark:shadow-none transition-all active:scale-[0.98] font-semibold border-none px-4 h-8"
                         >
                             <Plus className="w-4 h-4" />
-                            <span className="text-xs uppercase tracking-wider font-bold">New Quote</span>
+                            <span className="text-xs uppercase tracking-wide font-bold">New Quote</span>
                         </Button>
                     }
                 />

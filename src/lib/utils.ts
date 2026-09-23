@@ -2,6 +2,7 @@ import { clsx, type ClassValue } from "clsx"
 import { useEffect, useRef } from "react";
 import { twMerge } from "tailwind-merge"
 import { parse, format } from "date-fns";
+import { useAppSelector } from "@/hooks/store.hooks";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
@@ -14,6 +15,18 @@ export function getNestedValue(obj: any, path: string): any {
 
 export const generateUniqueId = () => {
   return Date.now().toString().slice(-10);
+};
+
+export const getFileName = (response: any) => {
+  const contentDisposition = response.headers['content-disposition'];
+
+  const filename = contentDisposition
+    ? contentDisposition
+      .split('filename=')[1]
+      .replace(/['"]/g, '')
+    : `customer-orders-${new Date().getTime()}.pdf`;
+
+  return filename;
 };
 
 export const downloadFile = (blob: Blob, filename: string) => {
@@ -52,3 +65,24 @@ export const convertDateFormat = (
     "dd-MM-yyyy"
   );
 };
+
+export const useRole = (): string => {
+  const role = useAppSelector((state) => state.auth.role);
+  return role || 'customer';
+};
+
+export const formateCurrency = (value: number) => {
+  return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(Number(value || 0));
+}
+
+export const removeEmptyFields = <T extends Record<string, any>>(obj: T): Partial<T> => {
+  return Object.fromEntries(
+    Object.entries(obj).filter(
+      ([, value]) =>
+        value !== '' &&
+        value !== null &&
+        value !== undefined
+    )
+  ) as Partial<T>;
+};
+export const isEmailValid = (email: string) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);

@@ -1,4 +1,4 @@
-import { useState, useCallback, useMemo } from 'react';
+import { useState, useCallback, useMemo, useEffect } from 'react';
 import { AddressBookHeader } from './components/AddressBookHeader';
 import { CreateAddressDialog } from './components/CreateAddressDialog';
 import type { Address, AddressFormData } from './types';
@@ -14,15 +14,21 @@ import {
   useDeleteAddress,
   useExportAddressBook
 } from './hooks/useAddressBook';
+import { useNavigate } from 'react-router-dom';
+import { useAppSelector } from '@/hooks/store.hooks';
+import useLocalStorage from '@/hooks/useLocalStorage';
 
 export default function AddressBookPage() {
+  const navigate = useNavigate();
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [editingAddressId, setEditingAddressId] = useState<number | null>(null);
   const [deletingId, setDeletingId] = useState<number | string | null>(null);
-  const [search, setSearch] = useState('');
-  const [pageSize, setPageSize] = useState(25);
-  const [currentPage, setCurrentPage] = useState(1);
+  const [search, setSearch] = useLocalStorage<string>('address_book_search', '');
+  const [pageSize, setPageSize] = useLocalStorage<number>('address_book_page_size', 25);
+  const [currentPage, setCurrentPage] = useLocalStorage<number>('address_book_current_page', 1);
+  const { is_sub_user, team_access } = useAppSelector((state) => state.auth);
+  const canReadWrite = useMemo(() => !is_sub_user || team_access?.permissions?.my_address_book === 'full', [is_sub_user, team_access]);
 
   // API Hooks
   const { data, isLoading } = useAddressBookList({
@@ -38,12 +44,12 @@ export default function AddressBookPage() {
   const handleSearch = useCallback((search: string) => {
     setSearch(search);
     setCurrentPage(1);
-  }, []);
+  }, [setSearch, setCurrentPage]);
 
   const handlePageSizeChange = useCallback((pageSize: number) => {
     setPageSize(pageSize);
     setCurrentPage(1);
-  }, []);
+  }, [setPageSize, setCurrentPage]);
 
   const handleAddAddress = useCallback(() => {
     setEditingAddressId(null);
@@ -97,6 +103,17 @@ export default function AddressBookPage() {
     exportMutation.mutate({ format, search });
   }, [exportMutation, search]);
 
+  const createOrder = useCallback((addr: Address) => {
+    sessionStorage.setItem('address', JSON.stringify({ ...addr, country: 'AU' }));
+    navigate('/orders/create');
+  }, [navigate]);
+
+  useEffect(() => {
+    sessionStorage.removeItem('address');
+  }, []);
+
+
+
   const columns = useMemo<Column<Address>[]>(() => [
     {
       key: "code",
@@ -111,6 +128,13 @@ export default function AddressBookPage() {
       header: "CONTACT PERSON",
       sortable: true,
       searchable: true,
+      cell: (value: string, row: Address) => {
+        return (
+          <div className={`hover:text-primary ${canReadWrite ? 'cursor-pointer' : ''}`} onClick={() => canReadWrite && handleEditAddress(row)}>
+            <span className="text-sm font-semibold uppercase text-gray-900 dark:text-white">{value}</span>
+          </div>
+        );
+      }
     },
     {
       key: "business_name",
@@ -122,9 +146,12 @@ export default function AddressBookPage() {
     {
       key: "email",
       accessor: "email",
-      header: "EMAIL ID",
-      sortable: true,
-      searchable: true,
+      header: "EMAIL",
+      cell: (value: string) => {
+        return (
+          <span className="">{value}</span>
+        );
+      }
     },
     {
       key: "phone",
@@ -138,13 +165,16 @@ export default function AddressBookPage() {
       header: "ADDRESS",
       sortable: true,
     },
-    {
+    ...(canReadWrite ? [{
       key: "actions",
       header: "ACTIONS",
       className: "w-20 px-0 pr-3 print:hidden",
-      cell: (_, row) => (
+      cell: (_: any, row: any) => (
         <div className="flex items-center gap-4">
-          <Button variant="ghost" size="sm" className="p-0 hover:text-blue-600 bg-transparent dark:hover:bg-transparent" onClick={() => handleEditAddress(row)}>
+          <Button size="sm" variant='outline' className="" onClick={() => createOrder(row)}>
+            Create Order
+          </Button>
+          <Button variant="ghost" size="sm" className="p-0 hover:text-primary bg-transparent dark:hover:bg-transparent" onClick={() => handleEditAddress(row)}>
             <Pencil className='h-4 w-4' />
           </Button>
           <Button variant="ghost" size="sm" className="p-0 hover:text-red-600 bg-transparent dark:hover:bg-transparent" onClick={() => handleConfirmDelete(row.id)}>
@@ -152,12 +182,12 @@ export default function AddressBookPage() {
           </Button>
         </div>
       )
-    }
-  ], [handleEditAddress, handleConfirmDelete]);
+    }] : [])
+  ], [handleEditAddress, handleConfirmDelete, createOrder, canReadWrite]);
 
   return (
-    <div className="flex flex-col flex-1 gap-2 p-page-padding min-h-0 animate-in fade-in slide-in-from-bottom-2 duration-500">
-      <div className='rounded-lg shadow-sm flex-1 flex flex-col min-h-0 border border-gray-100 dark:border-zinc-800 bg-white dark:bg-zinc-950 '>
+    <div className="flex flex-col flex-1 gap-2 p-page-padding animate-in fade-in slide-in-from-bottom-2 duration-500 overflow-y-auto">
+      <div className='rounded-lg shadow-sm border border-gray-100 dark:border-zinc-800 bg-white dark:bg-zinc-950 flex-none h-auto'>
         <DataTable
           columns={columns}
           data={data?.data || []}
@@ -167,17 +197,17 @@ export default function AddressBookPage() {
           searchValue={search}
           pageSize={pageSize}
           onPageSizeChange={handlePageSizeChange}
-          pageSizeInFooter
-          customHeader={<AddressBookHeader onAddAddress={handleAddAddress} />}
+          customHeader={canReadWrite && <AddressBookHeader onAddAddress={handleAddAddress} />}
           headerTitle='My Address Book'
           headerDescription="Manage your saved addresses, contact persons, and business details."
           headerClass="h-20"
-          className='pb-3'
+          className='pb-3 flex-none h-auto [&_div.overflow-auto]:flex-none [&_div.overflow-auto]:h-auto [&_div.overflow-auto]:min-h-0 [&_div.overflow-auto]:overflow-y-visible [&_div.overflow-auto]:overflow-x-auto'
           totalItems={data?.meta?.total || 0}
           currentPage={currentPage}
           onPageChange={setCurrentPage}
           onExport={onExport}
           isExporting={exportMutation.isPending}
+          exportable={canReadWrite}
         />
 
         {isDialogOpen && (

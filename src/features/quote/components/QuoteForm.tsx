@@ -3,7 +3,10 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { MapPin } from "lucide-react";
 import type { QuoteLocation } from "../types";
-import { PlaceAutocomplete } from "@/components/common/AutoComplateAddress";
+import { memo, useState, useMemo } from "react";
+import AutoComplete from "@/components/common/AutoComplate2";
+import { useSearchLocalities } from "../hooks/useQuote";
+import { CustomLabel } from "@/features/orders/components/OrderFormUI";
 
 interface QuoteFormProps {
   locations: {
@@ -11,43 +14,91 @@ interface QuoteFormProps {
     receiver: QuoteLocation | null;
   };
   setLocations: React.Dispatch<React.SetStateAction<{ sender: QuoteLocation | null; receiver: QuoteLocation | null }>>;
+  /** Locks the sender field to the logged-in customer's own address. */
+  disableSender?: boolean;
 }
 
-export function QuoteForm({ locations, setLocations }: QuoteFormProps) {
+interface LocalityAutoCompleteProps {
+  label: string;
+  placeholder?: string;
+  value?: string;
+  disabled?: boolean;
+  onChange: (value: string) => void;
+  onSelect: (locality: { label: string; suburb: string; state: string; postcode: string }) => void;
+}
+
+const LocalityAutoComplete = memo(({ label, placeholder, value, disabled, onChange, onSelect }: LocalityAutoCompleteProps) => {
+  const [query, setQuery] = useState("");
+  const { data: localities } = useSearchLocalities(query, query.length >= 2);
+
+  const options = useMemo(() => {
+    if (!localities) return [];
+    return localities.map((item) => ({
+      value: item.value,
+      label: item.label,
+      suburb: item.suburb,
+      state: item.state,
+      postcode: item.postcode,
+    }));
+  }, [localities]);
+
+  return (
+    <AutoComplete
+      placeholder={placeholder}
+      options={options}
+      value={value}
+      label={label}
+      disabled={disabled}
+      onChange={(val) => {
+        setQuery(val);
+        onChange(val);
+      }}
+      onSelect={(val) => {
+        const opt = options.find((o) => o.value === val);
+        if (opt) {
+          onSelect({
+            label: opt.label,
+            suburb: opt.suburb,
+            state: opt.state,
+            postcode: opt.postcode,
+          });
+        }
+      }}
+    />
+  );
+});
+
+LocalityAutoComplete.displayName = "LocalityAutoComplete";
+
+export const QuoteForm = memo(({ locations, setLocations, disableSender = false }: QuoteFormProps) => {
   return (
     <div className="space-y-4">
       {/* Addresses Section */}
-      <Card className="">
-        <CardHeader className="pb-0">
-          <CardTitle className="inline-flex items-center gap-2 text-[15px] font-semibold text-slate-800 dark:text-zinc-100">
-            <MapPin className="w-4 h-4 text-blue-500" />
+      <Card className="border-gray-200">
+        <CardHeader className="p-4 border-b border-gray-100 dark:border-zinc-800 " >
+          <CardTitle className=" inline-flex items-center gap-2 text-base font-semibold text-slate-800 dark:text-zinc-100">
+            <MapPin className="w-4 h-4 text-primary" />
             Addresses
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="space-y-0.5">
-              <PlaceAutocomplete
-                onPlaceSelect={(opt) => {
-                  setLocations(prev => ({
-                    ...prev,
-                    sender: {
-                      label: opt.formatted_address,
-                      suburb: opt.suburb || '',
-                      state: opt.state || '',
-                      postcode: opt.post_code || '',
-                      country: opt.country || ''
-                    }
-                  }));
-                }}
-                errormsg='Please enter an address'
-                label='Sender Location'
+            <div className="space-y-1.5">
+              <CustomLabel
+                label="Sender Suburb / Postcode"
+              />
+              <LocalityAutoComplete
+                label="Sender Location"
+                placeholder="Start typing suburb or postcode"
                 value={locations.sender?.label}
+                disabled={disableSender}
                 onChange={(value) => {
                   setLocations(prev => ({
                     ...prev,
                     sender: prev.sender ? { ...prev.sender, label: value } : {
                       label: value,
+                      address1: '',
+                      street: '',
                       suburb: '',
                       state: '',
                       postcode: '',
@@ -55,32 +106,40 @@ export function QuoteForm({ locations, setLocations }: QuoteFormProps) {
                     }
                   }));
                 }}
-                className='rounded-none'
-              />
-              <p className="text-[11px] text-slate-400 dark:text-zinc-500 mt-1">Select by suburb or enter postcode to filter</p>
-            </div>
-            <div className="space-y-0.5">
-              <PlaceAutocomplete
-                onPlaceSelect={(opt) => {
+                onSelect={(opt) => {
                   setLocations(prev => ({
                     ...prev,
-                    receiver: {
-                      label: opt.formatted_address,
-                      suburb: opt.suburb || '',
-                      state: opt.state || '',
-                      postcode: opt.post_code || '',
-                      country: opt.country || ''
+                    sender: {
+                      label: opt.label,
+                      address1: '',
+                      street: '',
+                      suburb: opt.suburb,
+                      state: opt.state,
+                      postcode: opt.postcode,
+                      country: 'AU'
                     }
                   }));
                 }}
-                errormsg='Please enter an address'
+              />
+              <p className="text-xs mt-1 text-slate-500 dark:text-zinc-500">
+                {disableSender ? 'Using your account address' : 'Select by suburb or enter postcode to filter'}
+              </p>
+            </div>
+            <div className="space-y-1.5">
+              <CustomLabel
+                label="Receiver Suburb / Postcode"
+              />
+              <LocalityAutoComplete
                 label="Receiver Location"
+                placeholder="Start typing suburb or postcode"
                 value={locations.receiver?.label}
                 onChange={(value) => {
                   setLocations(prev => ({
                     ...prev,
                     receiver: prev.receiver ? { ...prev.receiver, label: value } : {
                       label: value,
+                      address1: '',
+                      street: '',
                       suburb: '',
                       state: '',
                       postcode: '',
@@ -88,12 +147,28 @@ export function QuoteForm({ locations, setLocations }: QuoteFormProps) {
                     }
                   }));
                 }}
+                onSelect={(opt) => {
+                  setLocations(prev => ({
+                    ...prev,
+                    receiver: {
+                      label: opt.label,
+                      address1: '',
+                      street: '',
+                      suburb: opt.suburb,
+                      state: opt.state,
+                      postcode: opt.postcode,
+                      country: 'AU'
+                    }
+                  }));
+                }}
               />
-              <p className="text-[11px] text-slate-400 dark:text-zinc-500 mt-1">Select a suggestion from the dropdown to lock the locality.</p>
+              <p className="text-xs mt-1 text-slate-500 dark:text-zinc-500">Select by suburb or enter postcode to filter</p>
             </div>
           </div>
         </CardContent>
       </Card>
     </div>
   );
-}
+});
+
+QuoteForm.displayName = "QuoteForm";

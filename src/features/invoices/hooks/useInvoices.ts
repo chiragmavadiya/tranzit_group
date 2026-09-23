@@ -3,7 +3,7 @@ import { invoicesService } from '../services/invoices.service';
 import { QUERY_KEYS } from '@/constants/api.constants';
 import { showToast } from '@/components/ui/custom-toast';
 
-export const useCustomerInvoices = (params?: { search?: string; page?: number; per_page?: number; }, enabled: boolean = true) => {
+export const useCustomerInvoices = (params?: { search?: string; page?: number; per_page?: number; date_from?: string; date_to?: string }, enabled: boolean = true) => {
   return useQuery({
     queryKey: [...QUERY_KEYS.INVOICES.LIST, params],
     queryFn: () => invoicesService.getCustomerInvoices(params),
@@ -22,7 +22,7 @@ export const useCustomerInvoiceDetails = (id: number, enabled: boolean = true) =
 
 export const useExportCustomerInvoices = () => {
   return useMutation({
-    mutationFn: (params: { format: string; search?: string }) =>
+    mutationFn: (params: { format: string; search?: string; date_from?: string; date_to?: string }) =>
       invoicesService.exportCustomerInvoices(params),
     onSuccess: ({ blob, filename }) => {
       const url = window.URL.createObjectURL(blob);
@@ -36,6 +36,25 @@ export const useExportCustomerInvoices = () => {
     },
     onError: (error: any) => {
       showToast(error?.response?.data?.message || "Failed to export invoices", "error");
+    },
+  });
+};
+
+export const useDownloadCustomerInvoice = () => {
+  return useMutation({
+    mutationFn: (id: string | number) => invoicesService.downloadCustomerInvoice(id),
+    onSuccess: ({ blob, filename }) => {
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.setAttribute("download", filename);
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      window.URL.revokeObjectURL(url);
+    },
+    onError: (error: any) => {
+      showToast(error?.response?.data?.message || "Failed to download invoice", "error");
     },
   });
 };
@@ -59,7 +78,7 @@ export const useCreateCustomerInvoice = () => {
   });
 };
 
-export const useAdminInvoices = (params?: { search?: string; page?: number; per_page?: number; customer?: string }, enabled: boolean = true) => {
+export const useAdminInvoices = (params?: { search?: string; page?: number; per_page?: number; customer?: string; status?: string; date_from?: string; date_to?: string }, enabled: boolean = true) => {
   return useQuery({
     queryKey: ['admin', 'invoices', 'list', params],
     queryFn: () => invoicesService.getAdminInvoices(params),
@@ -71,7 +90,7 @@ export const useAdminInvoices = (params?: { search?: string; page?: number; per_
 
 export const useAdminInvoiceDetails = (id: string | number, enabled: boolean = true) => {
   return useQuery({
-    queryKey: ['admin', 'invoices', 'details', id],
+    queryKey: ['admin', 'invoices', 'details', Number(id)],
     queryFn: () => invoicesService.getAdminInvoiceDetails(id),
     enabled: !!id && enabled,
   });
@@ -85,11 +104,24 @@ export const useUpdateAdminInvoice = () => {
       if (response.status) {
         showToast(response.message || "Invoice updated successfully", "success");
         // queryClient.invalidateQueries({ queryKey: ['admin', 'invoices'] });
-        queryClient.invalidateQueries({ queryKey: ['admin', 'invoices', 'details', variables.id] });
+        queryClient.invalidateQueries({ queryKey: ['admin', 'invoices', 'details', Number(variables.id)] });
       }
     },
     onError: (error: any) => {
-      showToast(error?.response?.data?.message || "Failed to update invoice", "error");
+      if (error?.response?.data?.errors) {
+        const beErrors = error.response.data.errors;
+        const formattedErrors: Record<string, string> = {};
+        Object.keys(beErrors).forEach(key => {
+          showToast(beErrors[key][0], "error");
+          formattedErrors[key] = beErrors[key][0];
+        });
+        // setErrors(formattedErrors);
+        // if (formattedErrors.email || formattedErrors.order_prefix) {
+        //   setCurrentStep(0);
+        // }
+      } else {
+        showToast(error?.response?.data?.message || "Failed to update invoice", "error");
+      }
     },
   });
 };
@@ -104,6 +136,9 @@ export const useDeleteAdminInvoice = () => {
         queryClient.invalidateQueries({ queryKey: ['admin', 'invoices'] });
       }
     },
+    onError: (error: any) => {
+      showToast(error?.response?.data?.message || "Failed to delete invoice", "error");
+    },
   });
 };
 
@@ -114,7 +149,7 @@ export const useSendAdminInvoice = () => {
     onSuccess: (response, id) => {
       if (response.status) {
         showToast(response.message || "Invoice sent successfully", "success");
-        queryClient.invalidateQueries({ queryKey: ['admin', 'invoices', 'details', id] });
+        queryClient.invalidateQueries({ queryKey: ['admin', 'invoices', 'details', Number(id)] });
       }
     },
   });
@@ -150,20 +185,6 @@ export const useRemindAdminInvoice = () => {
   });
 };
 
-export const useZohoSyncAdminInvoice = () => {
-  return useMutation({
-    mutationFn: (id: string | number) => invoicesService.zohoSyncAdminInvoice(id),
-    onSuccess: (response) => {
-      if (response.status) {
-        showToast(response.message || "Synced to Zoho successfully", "success");
-      }
-    },
-    onError: (error: any) => {
-      showToast(error?.response?.data?.message || "Failed to sync to Zoho", "error");
-    },
-  });
-};
-
 export const useAdminInvoicePayment = () => {
   const queryClient = useQueryClient();
   return {
@@ -172,8 +193,11 @@ export const useAdminInvoicePayment = () => {
       onSuccess: (response, variables) => {
         if (response.status) {
           showToast("Payment added successfully", "success");
-          queryClient.invalidateQueries({ queryKey: ['admin', 'invoices', 'details', variables.id] });
+          queryClient.invalidateQueries({ queryKey: ['admin', 'invoices', 'details', Number(variables.id)] });
         }
+      },
+      onError: (error: any) => {
+        showToast(error?.response?.data?.message || "Failed to add payment", "error");
       },
     }),
     update: useMutation({
@@ -181,8 +205,11 @@ export const useAdminInvoicePayment = () => {
       onSuccess: (response, variables) => {
         if (response.status) {
           showToast("Payment updated successfully", "success");
-          queryClient.invalidateQueries({ queryKey: ['admin', 'invoices', 'details', variables.invoiceId] });
+          queryClient.invalidateQueries({ queryKey: ['admin', 'invoices', 'details', Number(variables.invoiceId)] });
         }
+      },
+      onError: (error: any) => {
+        showToast(error?.response?.data?.message || "Failed to update payment", "error");
       },
     }),
     delete: useMutation({
@@ -190,16 +217,17 @@ export const useAdminInvoicePayment = () => {
       onSuccess: (response, variables) => {
         if (response.status) {
           showToast("Payment deleted successfully", "success");
-          queryClient.invalidateQueries({ queryKey: ['admin', 'invoices', 'details', variables.invoiceId] });
+          queryClient.invalidateQueries({ queryKey: ['admin', 'invoices', 'details', Number(variables.invoiceId)] });
         }
       },
+
     }),
   };
 };
 
 export const useExportAdminInvoices = () => {
   return useMutation({
-    mutationFn: (params: { format: string; customer?: string; search?: string }) => invoicesService.exportAdminInvoices(params),
+    mutationFn: (params: { format: string; customer?: string; status?: string; search?: string; date_from?: string; date_to?: string }) => invoicesService.exportAdminInvoices(params),
     onSuccess: ({ blob, filename }) => {
       const url = window.URL.createObjectURL(blob);
       const link = document.createElement("a");

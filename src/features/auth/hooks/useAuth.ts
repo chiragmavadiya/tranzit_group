@@ -2,7 +2,9 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useCallback } from "react";
 import { authService } from "@/features/auth/services/auth.service";
 import { QUERY_KEYS } from "@/constants/api.constants";
-import type { ForgotPasswordRequest, LoginRequest, RegisterRequest, OnboardingRequest, ResetPasswordRequest } from "@/features/auth/auth.types";
+import type { ForgotPasswordRequest, LoginRequest, RegisterRequest, OnboardingRequest, ResetPasswordRequest, EmailVerifyRequest } from "@/features/auth/auth.types";
+import { useAppSelector } from "@/hooks/store.hooks";
+import { trackLogout } from "@/analytics";
 
 /**
  * Hook for customer login
@@ -15,7 +17,7 @@ export const useLogin = (role: string) => {
         onSuccess: (data) => {
             // Save token to localStorage
             if (data?.token) {
-                localStorage.setItem("auth_token", JSON.stringify(data.token));
+                localStorage.setItem(data.next_step === 'verify_email' ? "user_auth_token" : "auth_token", data.token);
             }
             // redirect to order page
             // window.location.href = "/orders";
@@ -40,8 +42,8 @@ export const useRegister = () => {
         mutationFn: useCallback((data: RegisterRequest) => authService.register(data), []),
         onSuccess: (data) => {
             // Save token to localStorage
-            if (data?.data?.accessToken) {
-                localStorage.setItem("auth_token", data.data.accessToken);
+            if (data?.token) {
+                localStorage.setItem("user_auth_token", data.token);
             }
             // Invalidate verification status
             queryClient.invalidateQueries({ queryKey: QUERY_KEYS.AUTH.VERIFICATION_STATUS });
@@ -59,6 +61,16 @@ export const useOnboarding = () => {
         mutationFn: useCallback((data: OnboardingRequest) => authService.submitOnboarding(data), []),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: QUERY_KEYS.AUTH.VERIFICATION_STATUS });
+
+            // Instantly update the user details cache to next_step: 'dashboard' to avoid routing race conditions
+            queryClient.setQueryData(QUERY_KEYS.AUTH.USER_DETAILS, (oldData: any) => {
+                if (!oldData) return oldData;
+                return {
+                    ...oldData,
+                    next_step: 'dashboard'
+                };
+            });
+
             queryClient.invalidateQueries({ queryKey: QUERY_KEYS.AUTH.USER_DETAILS });
         },
     });
@@ -74,11 +86,20 @@ export const useVerifyEmail = () => {
 };
 
 /**
+ * Hook to verify email with signature (GET request)
+ */
+export const useEmailVerify = () => {
+    return useMutation({
+        mutationFn: useCallback((data: EmailVerifyRequest) => authService.emailVerify(data), []),
+    });
+};
+
+/**
  * Hook to resend verification email
  */
 export const useResendVerification = () => {
     return useMutation({
-        mutationFn: useCallback(() => authService.resendVerification(), []),
+        mutationFn: useCallback((token: string) => authService.resendVerification(token), []),
     });
 };
 
@@ -95,11 +116,19 @@ export const useVerificationStatus = () => {
 // logout api 
 export const useLogout = () => {
     const queryClient = useQueryClient();
+    const { user } = useAppSelector((state) => state.auth);
+
     return useMutation({
         mutationFn: useCallback(() => authService.logout(), []),
-        onSuccess: () => {
+        // onSettled, not onSuccess: a failed or unreachable logout endpoint must never
+        // leave the token, role and cached data behind on the device.
+        onSettled: () => {
+            // Track logout event in Google Analytics
+            trackLogout(user?.id, user?.email);
+
             // Clear all sensitive data and query cache on logout
             localStorage.clear();
+            sessionStorage.clear();
             queryClient.clear();
         },
     });
@@ -126,6 +155,7 @@ export const useGetUserDetails = (enabled: boolean) => {
         queryFn: () => authService.getUserDetails(),
         enabled: !!(enabled && token),
         staleTime: Infinity,
+        refetchOnMount: false,
     });
 };
 
@@ -135,5 +165,33 @@ export const useGetUserDetails = (enabled: boolean) => {
 export const useResetPassword = () => {
     return useMutation({
         mutationFn: useCallback((data: ResetPasswordRequest) => authService.resetPassword(data), []),
+    });
+};
+
+/**
+ * Hook to accept the latest Terms and Conditions
+ */
+export const useAcceptTerms = () => {
+    const queryClient = useQueryClient();
+
+    return useMutation({
+        mutationFn: useCallback(() => authService.acceptTerms(), []),
+        onSuccess: () => {
+            // Flip the cached ME flag so the blocking modal closes without an extra round trip
+            queryClient.setQueryData(QUERY_KEYS.AUTH.USER_DETAILS, (oldData: any) => {
+                if (!oldData) return oldData;
+                return {
+                    ...oldData,
+                    must_accept_terms: false
+                };
+            });
+        },
+    });
+};
+
+// select plan api
+export const useSelectPlan = () => {
+    return useMutation({
+        mutationFn: useCallback((data: any) => authService.selectPlan(data), []),
     });
 };

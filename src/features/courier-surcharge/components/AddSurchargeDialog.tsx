@@ -46,7 +46,7 @@ export function AddSurchargeDialog({
     const data = surchargeDetails || initialData;
     if (data) {
       return {
-        global_courier_id: (data as any).global_courier_id?.toString() || '',
+        global_courier_id: (data as any).courier_id?.toString() || '',
         code: data.code,
         name: data.name,
         description: data.description,
@@ -90,8 +90,8 @@ export function AddSurchargeDialog({
       {isFetching && (
         <div className="absolute inset-0 z-50 flex items-center justify-center bg-white/60 dark:bg-zinc-900/60 backdrop-blur-[1px]">
           <div className="flex flex-col items-center gap-2">
-            <Loader2 className="h-8 w-8 text-blue-600 animate-spin" />
-            <p className="text-xs font-bold text-slate-500 uppercase tracking-widest">Loading surcharge details...</p>
+            <Loader2 className="h-8 w-8 text-primary animate-spin" />
+            <p className="text-xs font-bold text-slate-500 uppercase tracking-wide">Loading surcharge details...</p>
           </div>
         </div>
       )}
@@ -123,12 +123,7 @@ const SurchargeForm = forwardRef<HTMLFormElement, SurchargeFormProps>(
       e.preventDefault();
       setSubmited(true);
 
-      if (!formData.global_courier_id && !initialValues.global_courier_id) {
-        // In edit mode we might not have global_courier_id in the form but it's required by API?
-        // Actually the Postman says global_courier_id is required in both POST and PUT.
-      }
-
-      if (!formData.code || !formData.name || !formData.amount_ex_gst) {
+      if (!formData.global_courier_id || !formData.code || !formData.name || !formData.amount_ex_gst) {
         return;
       }
 
@@ -147,7 +142,7 @@ const SurchargeForm = forwardRef<HTMLFormElement, SurchargeFormProps>(
           required
           className="col-span-1"
           error={submited && !formData.global_courier_id}
-          errormsg="Courier Name is required"
+          errormsg="Please Select a Courier"
         />
 
         <FormInput
@@ -158,7 +153,7 @@ const SurchargeForm = forwardRef<HTMLFormElement, SurchargeFormProps>(
           required
           className="col-span-1"
           error={submited && !formData.code}
-          errormsg="Code is required"
+          errormsg="Please enter Code"
         />
 
         <FormInput
@@ -169,7 +164,7 @@ const SurchargeForm = forwardRef<HTMLFormElement, SurchargeFormProps>(
           required
           className="col-span-2"
           error={submited && !formData.name}
-          errormsg="Name is required"
+          errormsg="Please enter Name"
         />
 
         <FormTextarea
@@ -181,7 +176,7 @@ const SurchargeForm = forwardRef<HTMLFormElement, SurchargeFormProps>(
           rows={3}
           required
           error={submited && !formData.description}
-          errormsg="Description is required"
+          errormsg="Please enter Description"
         />
 
         <FormSelect
@@ -202,7 +197,7 @@ const SurchargeForm = forwardRef<HTMLFormElement, SurchargeFormProps>(
           required
           className="col-span-1"
           error={submited && !formData.amount_ex_gst}
-          errormsg="Amount is required"
+          errormsg="Please enter Amount"
         />
 
         <div className="col-span-12 grid grid-cols-12 gap-4 items-center mt-2 bg-slate-50/50 dark:bg-zinc-900/50 p-5 rounded-2xl border border-slate-100 dark:border-zinc-800">
@@ -219,32 +214,32 @@ const SurchargeForm = forwardRef<HTMLFormElement, SurchargeFormProps>(
 
           <div className="col-span-6 space-y-4 pl-4 border-l border-slate-200 dark:border-zinc-800">
             <div className="flex items-center justify-between gap-3">
-              <Label htmlFor="default_selected" className="text-[10px] font-extrabold text-slate-500 dark:text-zinc-400 uppercase tracking-wider cursor-pointer">Default Selected</Label>
+              <Label htmlFor="default_selected" className="text-[10px] font-extrabold text-slate-500 dark:text-zinc-400 uppercase tracking-wide cursor-pointer">Default Selected</Label>
               <Switch
                 id="default_selected"
                 checked={formData.default_selected}
                 onCheckedChange={(checked) => handleChange('default_selected', checked)}
-                className="data-[state=checked]:bg-blue-600 scale-90"
+                className="data-[state=checked]:bg-primary scale-90"
               />
             </div>
 
             <div className="flex items-center justify-between gap-3">
-              <Label htmlFor="is_auto_apply" className="text-[10px] font-extrabold text-slate-500 dark:text-zinc-400 uppercase tracking-wider cursor-pointer">Auto Apply</Label>
+              <Label htmlFor="is_auto_apply" className="text-[10px] font-extrabold text-slate-500 dark:text-zinc-400 uppercase tracking-wide cursor-pointer">Auto Apply</Label>
               <Switch
                 id="is_auto_apply"
                 checked={formData.is_auto_apply}
                 onCheckedChange={(checked) => handleChange('is_auto_apply', checked)}
-                className="data-[state=checked]:bg-blue-600 scale-90"
+                className="data-[state=checked]:bg-primary scale-90"
               />
             </div>
 
             <div className="flex items-center justify-between gap-3">
-              <Label htmlFor="is_customer_selectable" className="text-[10px] font-extrabold text-slate-500 dark:text-zinc-400 uppercase tracking-wider cursor-pointer">Customer Selectable</Label>
+              <Label htmlFor="is_customer_selectable" className="text-[10px] font-extrabold text-slate-500 dark:text-zinc-400 uppercase tracking-wide cursor-pointer">Customer Selectable</Label>
               <Switch
                 id="is_customer_selectable"
                 checked={formData.is_customer_selectable}
                 onCheckedChange={(checked) => handleChange('is_customer_selectable', checked)}
-                className="data-[state=checked]:bg-blue-600 scale-90"
+                className="data-[state=checked]:bg-primary scale-90"
               />
             </div>
           </div>

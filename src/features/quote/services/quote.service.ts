@@ -6,7 +6,8 @@ import type {
     QuoteFilters,
     GetQuoteServicesPayload,
     CreateQuotePayload,
-    ServiceRate
+    ServiceRate,
+    LocalitySearchResponse
 } from "../types";
 
 export interface QuoteListResponse {
@@ -41,9 +42,10 @@ export const quoteService = {
         const response = await api.get<QuoteDetailsResponse>(API_ENDPOINTS.ADMIN_QUOTES.DETAILS(id));
         return response.data;
     },
-    getServices: async (data: GetQuoteServicesPayload, role: string): Promise<QuoteServicesResponse> => {
-        const url = role === 'customer' ? API_ENDPOINTS.CUSTOMER_QUOTES.SERVICES : API_ENDPOINTS.ADMIN_QUOTES.SERVICES;
-        const response = await api.post<QuoteServicesResponse>(url, data);
+    getServices: async (data: GetQuoteServicesPayload, fromAdminQuot: boolean, signal?: AbortSignal): Promise<QuoteServicesResponse> => {
+        const url = fromAdminQuot ? API_ENDPOINTS.ADMIN_QUOTES.SERVICES : API_ENDPOINTS.CUSTOMER_QUOTES.SERVICES;
+        // const url = role === 'customer' ? API_ENDPOINTS.CUSTOMER_QUOTES.SERVICES : API_ENDPOINTS.ADMIN_QUOTES.SERVICES;
+        const response = await api.post<QuoteServicesResponse>(url, data, { signal });
         return response.data;
     },
     create: async (data: CreateQuotePayload): Promise<{ status: boolean; message: string; data: any }> => {
@@ -54,6 +56,12 @@ export const quoteService = {
         const response = await api.get(API_ENDPOINTS.ADMIN_QUOTES.EXPORT, {
             params,
             responseType: 'blob',
+        });
+        return response.data;
+    },
+    searchLocalities: async (q: string): Promise<LocalitySearchResponse> => {
+        const response = await api.get<LocalitySearchResponse>(API_ENDPOINTS.CUSTOMER_QUOTES.LOCALITIES_SEARCH, {
+            params: { q }
         });
         return response.data;
     }

@@ -1,28 +1,108 @@
-export interface User {
+export interface Role {
     id: number;
     name: string;
-    email: string;
-    first_name: string;
-    last_name: string;
-    gender: string;
-    image: string;
-    accessToken: string;
-    refreshToken: string;
-    roles: Roles[];
-    business_name?: string;
-    mobile?: string;
-    personal_email?: string;
-    personal_mobile?: string;
+    guard_name: string;
+    created_at: string;
+    updated_at: string;
+    pivot?: {
+        model_type: string;
+        model_id: number;
+        role_id: number;
+    };
 }
 
-export interface Roles {
+export type Roles = Role;
+
+export interface UserAddress {
     id: number;
-    name: string;
+    addressable_type: string;
+    addressable_id: number;
+    address_type: string;
+    parent_customer_id: number | null;
+    label: string | null;
+    company_name: string | null;
+    address: string;
+    address_info: string;
+    suburb: string;
+    postcode: string;
+    latitude: string | null;
+    longitude: string | null;
+    unit_number: string;
+    street_number: string;
+    street_name: string;
+    street: string;
+    street_type: string;
+    state: string;
+    city?: string;
+    created_by: number | null;
+    updated_by: number | null;
+    created_at: string;
+    updated_at: string;
+    deleted_at: string | null;
+    country?: string;
 }
+
+export interface User {
+    gst_number: string;
+    id: number;
+    first_name: string;
+    last_name: string;
+    email: string;
+    email_verified_at: string | null;
+    office_number: string | null;
+    personal_email: string | null;
+    personal_mobile: string | null;
+    last_login_at: string | null;
+    last_login_ip: string | null;
+    stripe_customer_id: string | null;
+    status: string;
+    is_onboarded: boolean;
+    created_by: number | null;
+    updated_by: number | null;
+    created_at: string;
+    updated_at: string;
+    deleted_at: string | null;
+    roles: Role[];
+    addresses: UserAddress[];
+    // Compatibility & frontend-specific fields
+    name?: string;
+    gender?: string;
+    image?: string;
+    accessToken?: string;
+    refreshToken?: string;
+    business_name?: string;
+    company_name?: string;
+    mobile?: string;
+    default_courier?: any;
+    default_item?: any;
+    role?: string;
+}
+
 
 export interface LoginRequest {
     email: string;
     password: string;
+}
+
+export interface TeamAccess {
+    is_sub_user: boolean;
+    parent_customer_id: number | null;
+    account_owner_id: number | null;
+    must_change_password: boolean;
+    order_creation_email_received: boolean;
+    permissions: Record<string, string>;
+}
+
+export interface BlackoutDay {
+    id: number;
+    name: string;
+    date: string;
+}
+
+export interface ShopifyStoreMissingParcelDefaults {
+    id: number;
+    shop_domain?: string;
+    shop_name?: string;
 }
 
 export interface LoginResponse {
@@ -31,7 +111,32 @@ export interface LoginResponse {
     message: string;
     token: string;
     next_step: string;
+    account_activation?: boolean | null;
+    must_accept_terms?: boolean;
+    shopify_package_defaults?: {
+        has_stores: boolean;
+        all_configured: boolean;
+        missing_count: number;
+        stores_missing_defaults: ShopifyStoreMissingParcelDefaults[];
+    };
+    default_courier?: any;
+    default_item?: any;
+    announcements?: {
+        id: number;
+        text: string;
+        text_color: string;
+        background_color: string;
+        expire_date: string;
+    }[];
+    team_access?: TeamAccess;
+    address_detail?: {
+        default: UserAddress;
+        billing: UserAddress;
+    };
+    courier?: any;
+    blackout_days?: BlackoutDay[];
 }
+
 
 export interface RegisterRequest {
     first_name: string;
@@ -45,6 +150,7 @@ export interface RegisterRequest {
 export interface RegisterResponse {
     status: boolean;
     data: User
+    token: string;
 }
 
 export interface ForgotPasswordRequest {
@@ -113,3 +219,33 @@ export interface GenericResponse {
     status: boolean;
     message: string;
 }
+
+export interface OnboardResponse {
+    status: boolean;
+    data: {
+        user_id: number;
+    };
+    message: string;
+}
+
+export interface EmailVerifyRequest {
+    customerId: string | number;
+    token: string;
+    expires: string;
+    signature: string;
+}
+
+export interface EmailVerifyResponse {
+    status: boolean;
+    message: string;
+    user: {
+        id: number;
+        first_name: string;
+        last_name: string;
+        email: string;
+    };
+    onboarding_complete: number;
+    token: string;
+}
+
+

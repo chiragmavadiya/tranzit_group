@@ -1,10 +1,11 @@
-import { useState, useMemo } from "react";
+import { useMemo } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 import { DataTable, type Column } from "@/components/common";
 import { useAdminInvoices, useExportAdminInvoices } from "@/features/invoices/hooks/useInvoices";
 import { useOrders, useExportOrders } from "@/features/orders/hooks/useOrders";
 import { useDebounce } from "@/hooks/useDebounce";
+import useLocalStorage from "@/hooks/useLocalStorage";
 
 interface DashboardTableProps<T> {
   title: string;
@@ -13,6 +14,10 @@ interface DashboardTableProps<T> {
   columns: Column<T>[];
   className?: string;
   pageSize?: number;
+  filterValue?: {
+    from?: string;
+    to?: string;
+  }
 }
 
 export function DashboardTable<T extends { id: number }>({
@@ -21,11 +26,12 @@ export function DashboardTable<T extends { id: number }>({
   role,
   className,
   columns,
-  pageSize: initialPageSize = 25
+  pageSize: initialPageSize = 25,
+  filterValue
 }: DashboardTableProps<T>) {
-  const [search, setSearch] = useState<string>("");
-  const [page, setPage] = useState<number>(1);
-  const [pageSize, setPageSize] = useState<number>(initialPageSize);
+  const [search, setSearch] = useLocalStorage<string>('dashboard_search',"");
+  const [page, setPage] = useLocalStorage<number>('dashboard_page',1);
+  const [pageSize, setPageSize] = useLocalStorage<number>('dashboard_pageSize',initialPageSize);
 
   const debouncedSearch = useDebounce(search, 500);
 
@@ -34,9 +40,11 @@ export function DashboardTable<T extends { id: number }>({
     search: debouncedSearch,
     page: page,
     per_page: pageSize,
+    date_from: filterValue?.from,
+    date_to: filterValue?.to,
     // Dashboard usually shows pending/recent activity
-    ...(role === 'admin' ? { status: 'pending' } : {})
-  }), [debouncedSearch, page, pageSize, role]);
+    ...(role === 'admin' ? { status: 'draft,unpaid' } : {})
+  }), [debouncedSearch, page, pageSize, role, filterValue]);
 
   // Data fetching hooks
   const adminQuery = useAdminInvoices(params, role === 'admin');
@@ -48,7 +56,7 @@ export function DashboardTable<T extends { id: number }>({
 
   // Select the active query based on role
   const activeQuery = role === 'admin' ? adminQuery : customerQuery;
-  
+
   // Extract data and total count safely
   const tableData = (activeQuery.data?.data || []) as unknown as T[];
   const totalItems = (activeQuery.data as any)?.meta?.total || tableData.length;
@@ -82,7 +90,7 @@ export function DashboardTable<T extends { id: number }>({
   const isExporting = adminExport.isPending || customerExport.isPending;
 
   return (
-    <Card className={cn("border gap-0 ring-0 shadow-md border-gray-200 dark:border-zinc-800 rounded-xl overflow-hidden group transition-colors duration-300 p-0", className)}>
+    <Card className={cn("border gap-0 ring-0 border-gray-200 dark:border-zinc-800 overflow-hidden group transition-colors duration-300 p-0", className)}>
       <CardContent className="p-0 bg-white dark:bg-zinc-950 flex-1 flex flex-col min-h-0">
         <div className="overflow-x-auto flex-1 h-[450px]">
           <DataTable

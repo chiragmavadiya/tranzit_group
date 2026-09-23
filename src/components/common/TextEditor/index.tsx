@@ -34,7 +34,7 @@ const TextEditor = ({ value, onChange }: { value: string, onChange: (value: stri
     Link.configure({
       openOnClick: false,
       HTMLAttributes: {
-        class: 'text-blue-600 underline cursor-pointer',
+        class: 'text-primary underline cursor-pointer',
       },
     }),
     Image.configure({

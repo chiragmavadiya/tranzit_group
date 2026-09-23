@@ -11,6 +11,7 @@ export interface CancelOrder {
     processed_at: string | null;
     processed_by: string;
     status: string;
+    courier_logo_url: string;
 }
 
 export interface CancelOrderSummary {
@@ -23,6 +24,7 @@ export interface CancelOrderFilters {
     search?: string;
     per_page?: number;
     page?: number;
+    customer?: string;
 }
 
 export interface CancelOrderResponse {
@@ -37,3 +39,15 @@ export interface CancelOrderResponse {
         last_page: number;
     };
 }
+
+export interface CancelOrderCounts {
+    canceled_order: number;
+    cancel_request: number;
+}
+
+export interface CancelOrderCountsResponse {
+    status: boolean;
+    message: string;
+    data: CancelOrderCounts;
+}
+

@@ -8,10 +8,11 @@ interface CustomToastProps {
   message: string;
   type?: ToastType;
   t: string | number; // Sonner's toast ID
+  description?: string;
 }
 
 // eslint-disable-next-line react-refresh/only-export-components
-const CustomToast = ({ message, type = "default", t }: CustomToastProps) => {
+const CustomToast = ({ message, type = "default", t, description }: CustomToastProps) => {
   const styles = {
     success: {
       bg: "bg-[#F0FDF4] dark:bg-emerald-950/20",
@@ -38,11 +39,11 @@ const CustomToast = ({ message, type = "default", t }: CustomToastProps) => {
       defaultTitle: "Something went wrong!",
     },
     default: {
-      bg: "bg-[#EFF6FF] dark:bg-blue-950/20",
-      border: "border-[#3B82F6]",
-      icon: <Lightbulb className="w-5 h-5 text-[#3B82F6]" />,
-      iconBg: "bg-[#3B82F6]",
-      titleColor: "text-[#1E40AF] dark:text-blue-400",
+      bg: "bg-primary/5 dark:bg-primary/10",
+      border: "border-primary",
+      icon: <Lightbulb className="w-5 h-5 text-primary" />,
+      iconBg: "bg-primary",
+      titleColor: "text-primary",
       defaultTitle: "Did you know?",
     },
   };
@@ -70,6 +71,9 @@ const CustomToast = ({ message, type = "default", t }: CustomToastProps) => {
         <p className="text-[14px]  line-clamp-4 font-medium text-slate-700 leading-tight dark:text-slate-400  mb-0">
           {message}
         </p>
+        {description && <p className="text-[13px]  line-clamp-4 font-medium text-slate-700 leading-tight dark:text-slate-400  mb-0">
+          {description}
+        </p>}
       </div>
 
       {/* Close Button */}
@@ -83,22 +87,33 @@ const CustomToast = ({ message, type = "default", t }: CustomToastProps) => {
   );
 };
 
+let isGloballySuspended = false;
+
+export const suspendToast = () => {
+  isGloballySuspended = true;
+  setTimeout(() => {
+    isGloballySuspended = false;
+  }, 0);
+};
+
 /**
  * Custom Toast Utility
  * @param message The message to display
  * @param type success | warning | error | default
  * @param title Optional title
  */
-export const showToast = (message: string, type: ToastType = "default") => {
+export const showToast = (message: string, type: ToastType = "default", description?: string, duration: number = 4000) => {
+  if (isGloballySuspended) return;
   toast.dismiss();
   toast.custom((t) => (
     <CustomToast
       message={message}
+      description={description}
       type={type}
       t={t}
     />
   ), {
-    duration: 4000,
+    duration: duration,
     position: 'top-center'
   });
 };

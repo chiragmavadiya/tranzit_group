@@ -2,6 +2,7 @@
 export type ReportType = 'shipment' | 'transaction' | 'invoice' | 'parcel';
 
 export interface ShipmentReport {
+  courier_logo_url?: string;
   parcel_id: number;
   order_number: string;
   parcel_type: string;
@@ -15,6 +16,7 @@ export interface ShipmentReport {
   receiver_suburb: string;
   status: string;
   created_at: string;
+  product_id: string;
 }
 
 export interface TransactionReport {
@@ -36,13 +38,21 @@ export interface InvoiceReport {
   created_at: string;
 }
 
+export type ParcelReportSource = 'tranzit' | 'integrated';
+
 export interface ParcelReport {
+  courier_type?: ParcelReportSource;
+  is_byo?: boolean;
+  consignment_date?: string;
+  customer_name?: string;
+  receiver_suburb?: string;
   sender_name?: string;
   receiver_name: string;
   receiver_full_address: string;
   tranzit_group_order_number: string;
   actual_parcel_tracking_number: string;
   actual_australia_post_mailing_statement_no?: string;
+  courier_logo_url?: string;
   parcel_status: string | null;
   courier: string;
   pickup_charge?: number;
@@ -50,6 +60,26 @@ export interface ParcelReport {
   tranzit_group_markup?: number;
   total: number;
   create_date: string;
+  product_id: string;
+  markup_charge_percent?: number;
+}
+
+export interface OrderLabelCharge {
+  customer_name: string;
+  receiver_name: string;
+  receiver_full_address: string;
+  receiver_suburb: string;
+  tranzit_group_order_number: string;
+  actual_parcel_tracking_number: string;
+  courier_and_product: string;
+  is_byo: boolean;
+  label_count: number;
+  rate_per_label: number;
+  total_charge: number;
+  billing_period_start: string;
+  billing_period_end: string;
+  consignment_date: string;
+  courier_logo_url?: string;
 }
 
 export interface ReportTab {
@@ -66,6 +96,9 @@ export interface ReportFilters {
   page?: number;
   customer_id?: string;
   invoice_type?: string;
+  user_id?: string;
+  courier_type?: ParcelReportSource | 'all';
+  customer?: string;
 }
 
 export interface PaginatedResponse<T> {
@@ -75,11 +108,15 @@ export interface PaginatedResponse<T> {
   summary?: {
     total_customers?: number;
     total_orders: number;
+    tranzit_orders?: number;
+    integrated_orders?: number;
     total_amount: number;
     total_markup: number;
     total_pickup: number;
     total_surcharge: number;
-
+    total_amount_paid?: number;
+    total_label_count?: number;
+    total_charge?: number;
   }
   meta: {
     current_page: number;
@@ -99,3 +136,16 @@ export interface UploadInvoiceResponse {
     missing_list: string[];
   };
 }
+
+export interface ReportCountsResponse {
+  status: boolean;
+  message?: string;
+  data: {
+    shipment?: number;
+    transaction?: number;
+    invoice?: number;
+    parcel?: number;
+    [key: string]: number | boolean | string | undefined;
+  };
+}
+

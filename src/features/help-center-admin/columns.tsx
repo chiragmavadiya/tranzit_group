@@ -2,17 +2,17 @@ import type { Column } from '@/components/common/types/DataTable.types';
 import type { HelpArticle } from './types';
 import { Button } from '@/components/ui/button';
 import { Pencil, Trash2 } from 'lucide-react';
-import { format } from 'date-fns';
+// import { format } from 'date-fns';
 import { Badge } from '@/components/ui/badge';
 
 export const ARTICLE_COLUMNS = (
-  onEdit: (row: HelpArticle) => void,
+  onEdit: (id: number) => void,
   onDelete: (row: HelpArticle) => void
 ): Column<HelpArticle>[] => [
     {
       key: 'id',
       header: '#',
-      cell: (_, __, index) => <span className="text-slate-400 font-medium">{index + 1}</span>,
+      cell: (val) => <span className="text-slate-400 font-medium">{val as string}</span>,
     },
     {
       key: 'title',
@@ -37,11 +37,11 @@ export const ARTICLE_COLUMNS = (
       sortable: true,
       cell: (val) => {
         let variant: "default" | "secondary" | "destructive" | "outline" = "secondary";
-        if (val === 'Published') variant = "default";
+        if (val === 'Published') variant = "outline";
         if (val === 'Archived') variant = "destructive";
 
         return (
-          <Badge variant={variant} className="font-bold text-[10px] uppercase tracking-wider h-5 px-2">
+          <Badge variant={variant} className="tracking-wide h-5 px-2">
             {val as string}
           </Badge>
         );
@@ -53,7 +53,7 @@ export const ARTICLE_COLUMNS = (
       sortable: true,
       cell: (val) => (
         <span className="text-slate-500 dark:text-zinc-500 font-medium">
-          {val ? format(new Date(val as string), "dd MMM yyyy, hh:mm a") : 'N/A'}
+          {val || 'N/A'}
         </span>
       ),
     },
@@ -67,7 +67,7 @@ export const ARTICLE_COLUMNS = (
             variant="ghost"
             size="icon"
             className="h-8 w-8 text-slate-400 hover:text-blue-500 hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-all active:scale-90"
-            onClick={() => onEdit(row)}
+            onClick={() => onEdit(Number(row.id))}
           >
             <Pencil className="w-3.5 h-3.5" />
           </Button>

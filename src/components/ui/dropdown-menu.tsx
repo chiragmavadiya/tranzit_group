@@ -39,7 +39,7 @@ function DropdownMenuContent({
       >
         <MenuPrimitive.Popup
           data-slot="dropdown-menu-content"
-          className={cn("z-50 max-h-(--available-height) w-(--anchor-width) min-w-32 origin-(--transform-origin) overflow-x-hidden overflow-y-auto rounded-lg bg-popover p-1 text-popover-foreground shadow-md ring-1 ring-foreground/10 duration-100 outline-none data-[side=bottom]:slide-in-from-top-2 data-[side=inline-end]:slide-in-from-left-2 data-[side=inline-start]:slide-in-from-right-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2 data-open:animate-in data-open:fade-in-0 data-open:zoom-in-95 data-closed:animate-out data-closed:overflow-hidden data-closed:fade-out-0 data-closed:zoom-out-95", className)}
+          className={cn("z-50 max-h-(--available-height) w-(--anchor-width) min-w-32 origin-(--transform-origin) overflow-x-hidden overflow-y-auto rounded-sm bg-popover p-1 text-popover-foreground ring-1 ring-foreground/10 duration-100 outline-none data-[side=bottom]:slide-in-from-top-2 data-[side=inline-end]:slide-in-from-left-2 data-[side=inline-start]:slide-in-from-right-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2 data-open:animate-in data-open:fade-in-0 data-open:zoom-in-95 data-closed:animate-out data-closed:overflow-hidden data-closed:fade-out-0 data-closed:zoom-out-95", className)}
           {...props}
         />
       </MenuPrimitive.Positioner>
@@ -86,7 +86,7 @@ function DropdownMenuItem({
       data-inset={inset}
       data-variant={variant}
       className={cn(
-        "group/dropdown-menu-item relative flex cursor-default items-center gap-1.5 rounded-md px-1.5 py-1 text-sm outline-hidden select-none focus:bg-accent focus:text-accent-foreground not-data-[variant=destructive]:focus:**:text-accent-foreground data-inset:pl-7 data-[variant=destructive]:text-destructive data-[variant=destructive]:focus:bg-destructive/10 data-[variant=destructive]:focus:text-destructive dark:data-[variant=destructive]:focus:bg-destructive/20 data-disabled:pointer-events-none data-disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4 data-[variant=destructive]:*:[svg]:text-destructive",
+        "group/dropdown-menu-item relative flex cursor-default items-center gap-1.5 rounded-sm px-1.5 py-1 text-xs outline-hidden select-none focus:bg-accent focus:text-accent-foreground not-data-[variant=destructive]:focus:**:text-accent-foreground data-inset:pl-7 data-[variant=destructive]:text-destructive data-[variant=destructive]:focus:bg-destructive/10 data-[variant=destructive]:focus:text-destructive dark:data-[variant=destructive]:focus:bg-destructive/20 data-disabled:pointer-events-none data-disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4 data-[variant=destructive]:*:[svg]:text-destructive",
         className
       )}
       {...props}
@@ -239,7 +239,7 @@ function DropdownMenuShortcut({
     <span
       data-slot="dropdown-menu-shortcut"
       className={cn(
-        "ml-auto text-xs tracking-widest text-muted-foreground group-focus/dropdown-menu-item:text-accent-foreground",
+        "ml-auto text-xs tracking-wide text-muted-foreground group-focus/dropdown-menu-item:text-accent-foreground",
         className
       )}
       {...props}
@@ -247,15 +247,15 @@ function DropdownMenuShortcut({
   )
 }
 
-const DropdownCustomMenu = ({ menus, children }: { menus: { label: string, onClick: () => void, className?: string, icon?: React.ComponentType<{ className?: string }>, variant?: "default" | "destructive" }[], children: React.ReactNode }) => {
+const DropdownCustomMenu = ({ menus, children, contentClassName }: { menus: { label: string, onClick: () => void, className?: string, icon?: React.ComponentType<{ className?: string }>, variant?: "default" | "destructive" }[], children: React.ReactNode, contentClassName?: string }) => {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger>
         {children}
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="end" className="w-fit p-2 print:hidden">
+      <DropdownMenuContent align="end" className={cn("p-2 print:hidden", contentClassName)}>
         {menus.map((menu) => (
-          <DropdownMenuItem key={menu.label} variant={menu.variant || "default"} onClick={menu.onClick} className={cn("cursor-pointer py-2 px-3 text-[13px]", menu.className)}>
+          <DropdownMenuItem key={menu.label} variant={menu.variant || "default"} onClick={menu.onClick} className={cn("cursor-pointer py-2 px-2 text-[13px]", menu.className)}>
             {menu.icon && <menu.icon className="w-4 h-4 mr-2" />}
             {menu.label}
           </DropdownMenuItem>
@@ -266,10 +266,28 @@ const DropdownCustomMenu = ({ menus, children }: { menus: { label: string, onCli
 }
 
 
-function DropdownCustomContent({ content, children, contentClassName }: { content: React.ReactNode, children: React.ReactNode, contentClassName?: string }) {
+function DropdownCustomContent({ 
+  content, 
+  children, 
+  contentClassName, 
+  triggerClassName,
+  open,
+  onOpenChange
+}: { 
+  content: React.ReactNode, 
+  children: React.ReactNode, 
+  contentClassName?: string, 
+  triggerClassName?: string,
+  open?: boolean,
+  onOpenChange?: (open: boolean) => void
+}) {
+  const dropdownProps: { open?: boolean; onOpenChange?: (open: boolean) => void } = {};
+  if (open !== undefined) dropdownProps.open = open;
+  if (onOpenChange !== undefined) dropdownProps.onOpenChange = onOpenChange;
+
   return (
-    <DropdownMenu>
-      <DropdownMenuTrigger className="hover:bg-gray-100 dark:hover:bg-zinc-800 rounded transition-colors outline-none">
+    <DropdownMenu {...dropdownProps}>
+      <DropdownMenuTrigger className={cn("hover:bg-gray-100 dark:hover:bg-zinc-800 rounded transition-colors outline-none cursor-pointer", triggerClassName)}>
         {children}
       </DropdownMenuTrigger>
       <DropdownMenuPortal>

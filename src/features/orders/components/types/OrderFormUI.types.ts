@@ -11,7 +11,7 @@ export interface HeaderIconProps {
 export interface FormInputProps extends Omit<InputHTMLAttributes<HTMLInputElement>, 'onChange' | 'value'> {
   label?: ReactNode;
   value: string | number | undefined;
-  onChange: (val: string, name?: string) => void;
+  onChange?: (val: string, name?: string) => void;
   placeholder?: string;
   type?: string;
   isHalf?: boolean;
@@ -25,6 +25,7 @@ export interface FormInputProps extends Omit<InputHTMLAttributes<HTMLInputElemen
   error?: boolean;
   errormsg?: string;
   inputClassName?: string;
+  info?: string;
 }
 
 export interface FormTextareaProps extends Omit<FormInputProps, 'type'> {
@@ -33,8 +34,8 @@ export interface FormTextareaProps extends Omit<FormInputProps, 'type'> {
 
 export interface FormSelectProps extends Omit<FormInputProps, 'value' | 'onChange'> {
   label?: string;
-  value: string;
-  onValueChange: (val: string | null) => void;
+  value: string | string[];
+  onValueChange: (val: any) => void;
   options: readonly { label: string; value: string | number }[];
   placeholder?: string;
   className?: string;
@@ -45,6 +46,11 @@ export interface FormSelectProps extends Omit<FormInputProps, 'value' | 'onChang
   error?: boolean;
   errormsg?: string;
   name?: string;
+  selectClassName?: string;
+  allowClear?: boolean;
+  searchdisable?: boolean;
+  multiple?: boolean;
+  optionClassName?: string;
 }
 
 export interface SummaryCardProps {
@@ -77,4 +83,6 @@ export interface FormCheckboxProps {
   description?: string;
   price?: number;
   className?: string;
+  disabled?: boolean;
+  info?: ReactNode;
 }

@@ -1,5 +1,7 @@
 import { api } from "@/services/api";
-import type { AdminTopupParams, AdminTopupResponse, WalletTransactionsParams, WalletTransactionsResponse, WalletExportParams } from "../types";
+import { API_ENDPOINTS } from "@/constants/api.constants";
+import type { AdminTopupParams, AdminTopupResponse, WalletTransactionsParams, WalletTransactionsResponse, WalletExportParams, WalletSummaryResponse } from "../types";
+import { getFileName } from "@/lib/utils";
 
 export const walletService = {
   getAdminTopups: async (params?: AdminTopupParams): Promise<AdminTopupResponse> => {
@@ -12,23 +14,39 @@ export const walletService = {
     return response.data;
   },
 
+  getWalletSummary: async (): Promise<WalletSummaryResponse> => {
+    const response = await api.get(API_ENDPOINTS.WALLET.SUMMARY);
+    return response.data;
+  },
+
+  downloadTransactionReceipt: async (transactionId: string | number): Promise<{ blob: Blob; filename: string }> => {
+    const response = await api.get(API_ENDPOINTS.WALLET.RECEIPT(transactionId), {
+      responseType: 'blob',
+    });
+    const filename = `Receipt_${transactionId}.pdf`;
+    return { blob: response.data, filename };
+  },
+
   exportTransactions: async (params: WalletExportParams): Promise<{ blob: Blob; filename: string }> => {
     const response = await api.get("/wallet/transactions/export", {
       params,
       responseType: 'blob'
     });
 
-    // Extract filename from Content-Disposition header
-    const disposition = response.headers['content-disposition'];
-    let filename = `wallet-transactions_${new Date().getTime()}.${params.format}`;
+    const format = params.format === "pdf" ? "pdf" : params.format === "csv" ? "csv" : "xls";
+    const filename = getFileName(response) || `wallet-transactions_${new Date().getTime()}.${format}`;
 
-    if (disposition && disposition.indexOf('filename=') !== -1) {
-      const filenameRegex = /filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/;
-      const matches = filenameRegex.exec(disposition);
-      if (matches != null && matches[1]) {
-        filename = matches[1].replace(/['"]/g, '');
-      }
-    }
+    return { blob: response.data, filename };
+  },
+
+  exportAdminTopups: async (params: AdminTopupParams & { format: string }): Promise<{ blob: Blob; filename: string }> => {
+    const response = await api.get("/admin/top-ups/export", {
+      params,
+      responseType: 'blob'
+    });
+
+    const fileformat = params.format === "pdf" ? "pdf" : params.format === "csv" ? "csv" : "xls";
+    const filename = getFileName(response) || `admin-topups_${new Date().getTime()}.${fileformat}`;
 
     return { blob: response.data, filename };
   },

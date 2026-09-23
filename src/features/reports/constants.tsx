@@ -1,25 +1,135 @@
-import type { ReportTab, ShipmentReport, TransactionReport, InvoiceReport, ParcelReport } from './types';
+import type { ReportTab, ShipmentReport, TransactionReport, InvoiceReport, ParcelReport, OrderLabelCharge } from './types';
 import type { Column } from '@/components/common/types/DataTable.types';
 import { LinkCell } from '@/components/common/DataTableCells';
+import { StatusBadge } from '../orders/components/StatusBadge';
+import { NavLink } from 'react-router-dom';
+import { formateCurrency } from '@/lib/utils';
+import { CustomTooltip } from '@/components/common/CustomTooltip';
+import { CourierProductCell } from './components/CourierProductCell';
+
+// eslint-disable-next-line react-refresh/only-export-components
+const ReceiverAddressCell = (val?: string, className = 'text-sm') => (
+  val ? (
+    <CustomTooltip title={val} placement="top">
+      <span className={`${className} text-slate-600 max-w-[200px] line-clamp-3 break-words`}>{val}</span>
+    </CustomTooltip>
+  ) : '-'
+);
+
+export const ORDER_LABEL_CHARGES_COLUMNS: Column<OrderLabelCharge>[] = [
+  {
+    key: 'tranzit_group_order_number',
+    header: 'ORDER NUMBER',
+    width: '120px',
+    disableToggle: true,
+    className: 'text-[13px]',
+    cell: (value) => (
+      <LinkCell value={value} className="font-bold text-primary" path={`/admin/orders/view/${value}`} />
+    )
+  },
+  { key: 'consignment_date', header: 'CONSIGNMENT DATE', className: 'text-[13px]' },
+  { key: 'receiver_name', header: 'RECEIVER NAME', className: 'text-[13px]' },
+  {
+    key: 'receiver_full_address',
+    header: 'RECEIVER FULL ADDRESS',
+    className: 'text-[13px]',
+    width: '200px',
+    cell: (val) => ReceiverAddressCell(val, 'text-[13px]')
+  },
+  {
+    key: 'receiver_suburb',
+    header: 'RECEIVER SUBURB',
+    className: 'text-[13px]',
+    cell: (val) => <span className="text-sm text-slate-600 max-w-[200px] inline-block">{val}</span>
+  },
+  { key: 'actual_parcel_tracking_number', className: 'text-[13px] break-normal', header: 'TRACKING NUMBER' },
+  {
+    key: 'courier_and_product',
+    header: 'COURIER & PRODUCT',
+    className: 'text-[13px]',
+    width: '220px',
+    cell: (value, row) => (
+      <CourierProductCell
+        courierName={value}
+        courierLogoUrl={row?.courier_logo_url}
+        gap="gap-2"
+      />
+    )
+  },
+  {
+    key: 'is_byo',
+    header: 'BYO',
+    className: 'text-[13px]',
+    cell: (val) => val ? (
+      <span className="whitespace-nowrap inline-flex items-center px-2 py-0.5 rounded text-[13px] font-medium bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300">Yes</span>
+    ) : (
+      <span className="whitespace-nowrap inline-flex items-center px-2 py-0.5 rounded text-[13px] font-medium bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-300">No</span>
+    )
+  },
+  // { key: 'label_count', header: 'LABEL COUNT', sortable: true },
+  {
+    key: 'rate_per_label',
+    header: 'RATE PER LABEL',
+    className: 'text-[13px]',
+    cell: (val) => val !== undefined && val !== null ? formateCurrency(val) : '-'
+  },
+  // {
+  //   key: 'total_charge',
+  //   header: 'TOTAL CHARGE',
+  //   sortable: true,
+  //   cell: (val) => val !== undefined && val !== null ? formateCurrency(val) : '-'
+  // },
+  {
+    key: 'billing_period_start',
+    header: 'BILLING PERIOD',
+    className: 'text-[13px] break-normal',
+    cell: (_, row) => row.billing_period_start && row.billing_period_end ? `${row.billing_period_start} - ${row.billing_period_end}` : '-'
+  }
+];
 
 export const REPORT_TABS: ReportTab[] = [
   { id: 'shipment', label: 'Shipment', count: 9 },
   { id: 'transaction', label: 'Transaction', count: 4 },
   { id: 'invoice', label: 'Invoice', count: 1 },
-  { id: 'parcel', label: 'Parcel', count: 3 },
+  // { id: 'parcel', label: 'Parcel', count: 3 },
 ];
 
 export const SHIPMENT_COLUMNS: Column<ShipmentReport>[] = [
-  { key: 'order_number', header: 'ORDER #', sortable: true, searchable: true },
-  { key: 'parcel_type', header: 'PARCEL TYPE', sortable: true },
+  {
+    key: 'order_number', header: 'ORDER #',
+    width: '120px',
+    disableToggle: true,
+    cell: (value: string) => (
+      <NavLink to={`/orders/view/${value}`} className="font-bold text-primary underline">
+        {value}
+      </NavLink>
+    )
+  },
+  { key: 'parcel_type', header: 'TYPE', width: '90px', sortable: true, cell: (value: string) => value === "box" ? "Parcel" : value },
   { key: 'description', header: 'DESCRIPTION' },
   { key: 'quantity', header: 'QTY', sortable: true },
   { key: 'weight', header: 'WEIGHT (KG)', sortable: true },
   { key: 'dimensions', header: 'DIMENSIONS (L X W X H)' },
   { key: 'tracking_number', header: 'TRACKING #', sortable: true, searchable: true },
-  { key: 'courier', header: 'COURIER', sortable: true, searchable: true },
-  { key: 'receiver_name', header: 'RECEIVER', sortable: true, searchable: true },
-  { key: 'status', header: 'STATUS', sortable: true },
+  {
+    key: 'courier',
+    header: 'COURIER',
+    sortable: true,
+    searchable: true,
+    width: '220px',
+    cell: (value: string, row: ShipmentReport) => (
+      <CourierProductCell
+        courierName={value}
+        courierLogoUrl={row?.courier_logo_url}
+        productId={row?.product_id}
+        gap="gap-2"
+      />
+    )
+  },
+  { key: 'receiver_name', header: 'RECEIVER', sortable: true, searchable: true, width: '160px' },
+  { key: 'status', header: 'STATUS', sortable: true, cell: (value: string) => <StatusBadge status={value} /> },
+  { key: 'tracking_status', header: 'TRANSIT STATUS', sortable: true, cell: (value: string) => <StatusBadge status={value} /> },
+  { key: 'created_at', header: 'CREATE ON', width: '200px' },
 ];
 
 export const TRANSACTION_COLUMNS: Column<TransactionReport>[] = [
@@ -37,153 +147,354 @@ export const INVOICE_COLUMNS: Column<InvoiceReport>[] = [
   { key: 'status', header: 'STATUS', sortable: true },
 ];
 
-export const MOCK_PARCEL_REPORTS: ParcelReport[] = [
-  {
-    receiver_name: 'chirag work',
-    receiver_full_address: '150 Pacific Highway, North Sydney NSW, Australia',
-    tranzit_group_order_number: '#SHP000115',
-    actual_parcel_tracking_number: 'ASDASDASD',
-    parcel_status: '-',
-    courier: 'Directfreight',
-    total: 20.59,
-    create_date: '16 Apr 2026',
-  },
-  {
-    receiver_name: 'Ashis',
-    receiver_full_address: '150 Mary Street, Brisbane City QLD, Australia',
-    tranzit_group_order_number: '#SHP000114',
-    actual_parcel_tracking_number: 'MANUAL_CREATE_ORDER',
-    parcel_status: '-',
-    courier: 'Pallet',
-    total: 1300.00,
-    create_date: '16 Apr 2026',
-  },
-  {
-    receiver_name: 'Chirag Dayabhai Mavadiya',
-    receiver_full_address: '150 Collins Street, Melbourne VIC, Australia',
-    tranzit_group_order_number: '#SHP000113',
-    actual_parcel_tracking_number: '111JD8606266',
-    parcel_status: '-',
-    courier: 'Auspost',
-    total: 36.53,
-    create_date: '16 Apr 2026',
-  },
-  {
-    receiver_name: 'Chirag Dayabhai Mavadiya',
-    receiver_full_address: '150 Collins Street, Melbourne VIC, Australia',
-    tranzit_group_order_number: '#SHP000113',
-    actual_parcel_tracking_number: '111JD8606266',
-    parcel_status: '-',
-    courier: 'Auspost',
-    total: 36.53,
-    create_date: '16 Apr 2026',
-  },
-  {
-    receiver_name: 'Chirag Dayabhai Mavadiya',
-    receiver_full_address: '150 Collins Street, Melbourne VIC, Australia',
-    tranzit_group_order_number: '#SHP000113',
-    actual_parcel_tracking_number: '111JD8606266',
-    parcel_status: '-',
-    courier: 'Auspost',
-    total: 36.53,
-    create_date: '16 Apr 2026',
-  },
-  {
-    receiver_name: 'Chirag Dayabhai Mavadiya',
-    receiver_full_address: '150 Collins Street, Melbourne VIC, Australia',
-    tranzit_group_order_number: '#SHP000113',
-    actual_parcel_tracking_number: '111JD8606266',
-    parcel_status: '-',
-    courier: 'Auspost',
-    total: 36.53,
-    create_date: '16 Apr 2026',
-  },
-  {
-    receiver_name: 'Chirag Dayabhai Mavadiya',
-    receiver_full_address: '150 Collins Street, Melbourne VIC, Australia',
-    tranzit_group_order_number: '#SHP000113',
-    actual_parcel_tracking_number: '111JD8606266',
-    parcel_status: '-',
-    courier: 'Auspost',
-    total: 36.53,
-    create_date: '16 Apr 2026',
-  },
-  {
-    receiver_name: 'Chirag Dayabhai Mavadiya',
-    receiver_full_address: '150 Collins Street, Melbourne VIC, Australia',
-    tranzit_group_order_number: '#SHP000113',
-    actual_parcel_tracking_number: '111JD8606266',
-    parcel_status: '-',
-    courier: 'Auspost',
-    total: 36.53,
-    create_date: '16 Apr 2026',
-  }
-];
-
 export const PARCEL_COLUMNS: Column<ParcelReport>[] = [
-  { key: 'receiver_name', header: 'RECEIVER NAME', sortable: true, searchable: true },
-  { key: 'receiver_full_address', header: 'RECEIVER FULL ADDRESS', sortable: true, searchable: true },
   {
     key: 'tranzit_group_order_number',
     header: 'TRANZIT GROUP ORDER NUMBER',
     sortable: true,
+    disableToggle: true,
     searchable: true,
     cell: (value, record) => (
-      <LinkCell value={value} className="font-bold" path={`/orders/${record.tranzit_group_order_number}`} />
+      <LinkCell value={value} className="font-bold" path={`/orders/view/${record.tranzit_group_order_number}`} />
     )
   },
-  { key: 'actual_parcel_tracking_number', header: 'ACTUAL PARCEL TRACKING NUMBER', sortable: true, searchable: true },
-  { key: 'parcel_status', header: 'PARCEL STATUS', sortable: true },
-  { key: 'courier', header: 'COURIER', sortable: true },
-  { key: 'total', header: 'TOTAL', sortable: true },
-  { key: 'create_date', header: 'CREATE DATE', sortable: true },
+  { key: 'receiver_name', header: 'RECEIVER NAME', sortable: true, searchable: true },
+  { key: 'receiver_full_address', header: 'RECEIVER FULL ADDRESS', sortable: true, searchable: true, width: '200px', cell: (val) => ReceiverAddressCell(val) },
+  {
+    key: 'actual_parcel_tracking_number', header: 'ACTUAL PARCEL TRACKING NUMBER', className: 'break-normal'
+  },
+  { key: 'parcel_status', header: 'PARCEL STATUS', cell: (value: string) => <StatusBadge status={value} /> },
+  {
+    key: 'courier',
+    header: 'COURIER & PRODUCT',
+    width: '220px',
+    cell: (value: string, row: ParcelReport) => (
+      <CourierProductCell
+        courierName={value}
+        courierLogoUrl={row?.courier_logo_url}
+        productId={row?.product_id}
+        gap="gap-2"
+      />
+    )
+  },
+  { key: 'total', header: 'TOTAL', sortable: true, cell: (val) => val ? formateCurrency(val) : '-' },
+  { key: 'create_date', header: 'CREATE ON', sortable: true },
 ];
 
 export const ADMIN_PARCEL_COLUMNS: Column<ParcelReport>[] = [
   {
-    key: 'customer_name',
-    header: 'CUSTOMER NAME (SENDER NAME)',
-    sortable: true,
-    searchable: true,
-    cell: (val) => <span className="font-medium text-slate-700 dark:text-zinc-300">{val || '-'}</span>
-  },
-  { key: 'receiver_name', header: 'RECEIVER NAME', sortable: true, searchable: true },
-  {
-    key: 'receiver_full_address',
-    header: 'RECEIVER FULL ADDRESS',
-    sortable: true,
-    searchable: true,
-    cell: (val) => <span className="text-xs text-slate-500 max-w-[200px] inline-block">{val}</span>
+    key: 'consignment_date',
+    header: 'CONSIGNMENT DATE',
   },
   {
     key: 'tranzit_group_order_number',
-    header: 'TRANZIT GROUP ORDER NUMBER',
-    sortable: true,
-    searchable: true,
+    header: 'ORDER NUMBER',
+    width: '160px',
+    disableToggle: true,
     cell: (value) => (
-      <LinkCell value={value} className="font-bold text-blue-600" path={`/admin/orders/all/${value?.replace('#', '')}`} />
+      <LinkCell value={value} className="font-bold text-primary" path={`/admin/orders/view/${value}`} />
     )
   },
-  { key: 'actual_parcel_tracking_number', header: 'ACTUAL PARCEL TRACKING NUMBER', sortable: true, searchable: true },
-  { key: 'actual_australia_post_mailing_statement_no', header: 'ACTUAL AUSTRALIA POST MAILING STATEMENT NO', sortable: true },
-  { key: 'parcel_status', header: 'PARCEL STATUS', sortable: true },
-  { key: 'courier', header: 'COURIER', sortable: true },
+  {
+    key: 'customer_name',
+    header: 'CUSTOMER NAME (SENDER NAME)',
+    className: 'break-normal',
+    cell: (val) => <span className="font-medium text-slate-700 dark:text-zinc-300 break-normal">{val || '-'}</span>
+  },
+  { key: 'receiver_name', header: 'RECEIVER NAME', className: 'break-normal' },
+  {
+    key: 'receiver_full_address',
+    header: 'RECEIVER FULL ADDRESS',
+    className: 'break-normal',
+    width: "200px",
+    cell: (val) => ReceiverAddressCell(val)
+  },
+  { key: 'receiver_suburb', header: 'RECEIVER SUBURB', className: 'break-normal' },
+  { key: 'actual_parcel_tracking_number', header: 'ACTUAL PARCEL TRACKING NUMBER', className: 'break-normal' },
+  { key: 'actual_australia_post_mailing_statement_no', header: 'ACTUAL AUSTRALIA POST MAILING STATEMENT NO', className: 'break-normal' },
+  { key: 'parcel_status', header: 'PARCEL STATUS', cell: (value: string) => <StatusBadge status={value} /> },
+  {
+    key: 'courier',
+    header: 'COURIER & PRODUCT',
+    width: "220px",
+    cell: (val: string, row: ParcelReport) => (
+      <CourierProductCell
+        courierName={val}
+        courierLogoUrl={row?.courier_logo_url}
+        productId={row?.product_id}
+        gap="gap-1"
+      />
+    )
+  },
   {
     key: 'pickup_charge',
     header: 'PICKUP CHARGE',
     sortable: true,
-    cell: (val) => val ? `$${Number(val).toFixed(2)}` : '-'
+    cell: (val) => val ? formateCurrency(val) : '$0.00'
   },
   {
     key: 'extra_surcharge',
     header: 'EXTRA SURCHARGE',
     sortable: true,
-    cell: (val) => val ? `$${Number(val).toFixed(2)}` : '$0.00'
+    cell: (val) => val ? formateCurrency(val) : '$0.00'
   },
   {
     key: 'tranzit_group_markup',
     header: 'TRANZIT GROUP MARKUP',
     sortable: true,
-    cell: (val) => val ? `$${Number(val).toFixed(2)}` : '$0.00'
+    width: '120px',
+    // cell: (val, row: ParcelReport) => val ? `${formateCurrency(val)} (${row.markup_charge_percent}%)` : '$0.00'
+    cell: (val, row: ParcelReport) =>
+      val
+        ? `${formateCurrency(val)} (${(row.markup_charge_percent || 0) > 0
+          ? `${row.markup_charge_percent}%`
+          : "N/A"
+        })`
+        : "$0.00 (N/A)"
+  },
+  {
+    key: 'total',
+    header: 'TOTAL',
+    sortable: true,
+    cell: (val) => val ? formateCurrency(val) : '$0.00'
+  },
+];
+
+export const ADMIN_INTEGRATED_PARCEL_COLUMNS: Column<ParcelReport>[] = [
+  {
+    key: 'tranzit_group_order_number',
+    header: 'ORDER NUMBER',
+    width: '160px',
+    disableToggle: true,
+    cell: (value) => (
+      <LinkCell value={value} className="font-bold text-primary" path={`/admin/orders/view/${value}`} />
+    )
+  },
+  {
+    key: 'customer_name',
+    header: 'CUSTOMER NAME (SENDER NAME)',
+    sortable: true,
+    searchable: true,
+    cell: (val) => <span className="font-medium text-slate-700 dark:text-zinc-300 break-normal">{val || '-'}</span>
+  },
+  { key: 'receiver_name', header: 'RECEIVER NAME', className: 'break-normal' },
+  {
+    key: 'receiver_full_address',
+    header: 'RECEIVER FULL ADDRESS',
+    width: "200px",
+    cell: (val) => ReceiverAddressCell(val)
+  },
+  { key: 'receiver_suburb', header: 'RECEIVER SUBURB', className: 'break-normal' },
+
+  { key: 'actual_parcel_tracking_number', header: 'ACTUAL PARCEL TRACKING NUMBER', className: 'break-normal' },
+  { key: 'actual_australia_post_mailing_statement_no', header: 'ACTUAL AUSTRALIA POST MAILING STATEMENT NO', className: 'break-normal' },
+  { key: 'parcel_status', header: 'PARCEL STATUS', cell: (value: string) => <StatusBadge status={value} />, width: "160px" },
+  {
+    key: 'courier',
+    header: 'COURIER & PRODUCT',
+    width: "220px",
+    cell: (val: string, row: ParcelReport) => (
+      <CourierProductCell
+        courierName={val}
+        courierLogoUrl={row?.courier_logo_url}
+        productId={row?.product_id}
+        gap="gap-1"
+      />
+    )
+  },
+  {
+    key: 'total',
+    header: 'TOTAL',
+    sortable: true,
+    cell: (val) => val ? formateCurrency(val) : '-'
+  },
+];
+
+export const PARCEL_REPORT_SOURCE_OPTIONS = [
+  { value: 'all', label: 'All Reports' },
+  { value: 'tranzit', label: 'All Tranzit Group Courier Parcel' },
+  { value: 'integrated', label: 'Custom Integrated Courier Parcel' },
+];
+
+export const ALL_PARCEL_COLUMNS: Column<ParcelReport>[] = [
+  {
+    key: 'consignment_date',
+    header: 'CONSIGNMENT DATE',
+    cell: (val, row: ParcelReport) => val || row.create_date || '-'
+  },
+  {
+    key: 'tranzit_group_order_number',
+    header: 'ORDER NUMBER',
+    width: '160px',
+    disableToggle: true,
+    cell: (value) => (
+      <LinkCell value={value} className="font-bold text-primary" path={`/admin/orders/view/${value}`} />
+    )
+  },
+  // {
+  //   key: 'courier_type',
+  //   header: 'SOURCE',
+  //   width: '150px',
+  //   cell: (val: string) => (
+  //     <span className={`inline-flex items-center rounded-md px-2 py-0.5 text-[11px] font-bold uppercase tracking-wide ${val === 'integrated'
+  //       ? 'bg-violet-50 text-violet-600 dark:bg-violet-500/10 dark:text-violet-400'
+  //       : 'bg-sky-50 text-sky-600 dark:bg-sky-500/10 dark:text-sky-400'
+  //       }`}>
+  //       {SOURCE_LABELS[val] || '-'}
+  //     </span>
+  //   )
+  // },
+  {
+    key: 'customer_name',
+    header: 'CUSTOMER NAME (SENDER NAME)',
+    className: 'break-normal',
+    cell: (val) => <span className="font-medium text-slate-700 dark:text-zinc-300 break-normal">{val || '-'}</span>
+  },
+  { key: 'receiver_name', header: 'RECEIVER NAME', className: 'break-normal' },
+  {
+    key: 'receiver_full_address',
+    header: 'RECEIVER FULL ADDRESS',
+    className: 'break-normal',
+    width: '200px',
+    cell: (val) => ReceiverAddressCell(val)
+  },
+  { key: 'receiver_suburb', header: 'RECEIVER SUBURB', className: 'break-normal' },
+  { key: 'actual_parcel_tracking_number', header: 'ACTUAL PARCEL TRACKING NUMBER', className: 'break-normal' },
+  { key: 'actual_australia_post_mailing_statement_no', header: 'ACTUAL AUSTRALIA POST MAILING STATEMENT NO', className: 'break-normal' },
+  { key: 'parcel_status', header: 'PARCEL STATUS', width: '160px', cell: (value: string) => <StatusBadge status={value} /> },
+  {
+    key: 'courier',
+    header: 'COURIER & PRODUCT',
+    width: '220px',
+    cell: (val: string, row: ParcelReport) => (
+      <CourierProductCell
+        courierName={val}
+        courierLogoUrl={row?.courier_logo_url}
+        productId={row?.product_id}
+        gap="gap-1"
+      />
+    )
+  },
+  {
+    key: 'courier_type',
+    header: 'BYO',
+    cell: (val) => val !== 'tranzit' ? (
+      <span className="whitespace-nowrap inline-flex items-center px-2 py-0.5 rounded text-[13px] font-medium bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300">Yes</span>
+    ) : (
+      <span className="whitespace-nowrap inline-flex items-center px-2 py-0.5 rounded text-[13px] font-medium bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-300">No</span>
+    )
+  },
+  {
+    key: 'pickup_charge',
+    header: 'PICKUP CHARGE',
+    sortable: true,
+    cell: (val, row: ParcelReport) => row.courier_type === 'integrated' ? '-' : formateCurrency(val || 0)
+  },
+  {
+    key: 'extra_surcharge',
+    header: 'EXTRA SURCHARGE',
+    sortable: true,
+    cell: (val, row: ParcelReport) => row.courier_type === 'integrated' ? '-' : formateCurrency(val || 0)
+  },
+  {
+    key: 'tranzit_group_markup',
+    header: 'TRANZIT GROUP MARKUP',
+    sortable: true,
+    width: '120px',
+    cell: (val, row: ParcelReport) => {
+      if (row.courier_type === 'integrated') return '-';
+      const percent = (row.markup_charge_percent || 0) > 0 ? `${row.markup_charge_percent}%` : 'N/A';
+      return `${formateCurrency(val || 0)} (${percent})`;
+    }
+  },
+  {
+    key: 'total',
+    header: 'TOTAL',
+    sortable: true,
+    cell: (val) => val ? formateCurrency(val) : '$0.00'
+  },
+];
+
+export const AUSPOST_REPORT_COLUMNS: Column<any>[] = [
+  {
+    key: 'tranzit_group_order_number',
+    header: 'ORDER NUMBER',
+    disableToggle: true,
+    width: '160px',
+    cell: (value, record) => {
+      const orderNo = value || record.order_number || record.orderNumber || '';
+      return (
+        <LinkCell value={orderNo} className="font-bold text-primary" path={`/admin/orders/view/${orderNo}`} />
+      );
+    }
+  },
+  {
+    key: 'customer_name',
+    header: 'CUSTOMER NAME',
+    sortable: true,
+    searchable: true,
+    className: 'break-normal',
+    cell: (value, record) => value || record.customer_name || record.customerName || '-'
+  },
+  {
+    key: 'ap_mailing_statement_number',
+    header: 'AP MAILING STATEMENT NUMBER',
+    sortable: true,
+    searchable: true,
+    cell: (value, record) => value || record.ap_mailing_statement_number || record.actual_australia_post_mailing_statement_no || record.apMailingStatementNumber || '-'
+  },
+  {
+    key: 'australia_post_estimated_billing',
+    header: 'SHIPPING COST(AUSPOST)',
+    sortable: true,
+    cell: (value, record) => {
+      const val = value !== undefined && value !== null ? value : (record.auspost_estimated_billing || record.auspostEstimatedBilling || 0);
+      return formateCurrency(Number(val));
+    }
+  },
+  {
+    key: 'total_fuel_levy',
+    header: 'TOTAL FUEL LEVY',
+    sortable: true,
+    cell: (value, record) => {
+      const val = value !== undefined && value !== null ? value : (record.total_fuel_levy || record.totalFuelLevy || 0);
+      return formateCurrency(Number(val));
+    }
+  },
+  {
+    key: 'total_gst',
+    header: 'TOTAL GST',
+    sortable: true,
+    cell: (value, record) => {
+      const val = value !== undefined && value !== null ? value : (record.total_gst || record.totalGst || record.totalGST || 0);
+      return formateCurrency(Number(val));
+    }
+  },
+  {
+    key: 'total_shipping_cost',
+    header: 'AUSTRALIA POST ESTIMATED BILLING',
+    sortable: true,
+    cell: (value, record) => {
+      const val = value !== undefined && value !== null ? value : (record.total_shipping_cost || record.totalShippingCost || 0);
+      return formateCurrency(Number(val));
+    }
+  },
+  {
+    key: 'total_paid_amount',
+    header: 'TOTAL PAID AMOUNT',
+    sortable: true,
+    cell: (value, record) => {
+      const val = value !== undefined && value !== null ? value : (record.total_paid_amount || record.totalPaidAmount || 0);
+      return formateCurrency(Number(val));
+    }
+  },
+  {
+    key: 'total_markup',
+    header: 'TOTAL MARKUP',
+    sortable: true,
+    cell: (value, record) => {
+      const val = value !== undefined && value !== null ? value : (record.total_markup || record.totalMarkup || 0);
+      return formateCurrency(Number(val));
+    }
   },
 ];

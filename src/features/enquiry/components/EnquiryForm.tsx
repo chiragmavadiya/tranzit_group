@@ -246,7 +246,7 @@ export function EnquiryForm() {
           error={isSubmited && formData.message === ''}
           errormsg='Please enter your message'
         />
-        <p className="text-[11px] text-gray-400 dark:text-zinc-500">
+        <p className="text-[12px] text-gray-400 dark:text-zinc-500">
           A member of support staff will respond as soon as possible.
         </p>
       </div>
@@ -260,7 +260,7 @@ export function EnquiryForm() {
         <Button
           type="submit"
           disabled={isPending}
-          className="w-full h-11 text-sm font-semibold rounded-lg bg-[#0060FE] hover:bg-blue-700 text-white shadow-lg shadow-blue-500/10 transition-all flex items-center justify-center gap-2"
+          className="w-full h-11 text-sm font-semibold rounded-lg bg-primary hover:bg-primary-hover text-white shadow-lg shadow-primary/10 transition-all flex items-center justify-center gap-2"
         >
           {isPending ? (
             <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />

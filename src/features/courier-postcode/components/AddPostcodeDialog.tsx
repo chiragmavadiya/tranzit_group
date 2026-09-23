@@ -23,6 +23,7 @@ export function AddPostcodeDialog({
   const initialValues = useMemo(() => ({
     global_courier_id: '',
     single_post_code: '',
+    suburb: '',
     price: ''
   }), []);
 
@@ -31,6 +32,7 @@ export function AddPostcodeDialog({
       return {
         global_courier_id: initialData.global_courier_id?.toString(),
         single_post_code: initialData.single_post_code,
+        suburb: initialData.suburb ?? '',
         price: initialData.price?.toString()
       };
     }
@@ -60,6 +62,7 @@ export function AddPostcodeDialog({
           onSubmit({
             global_courier_id: Number(data.global_courier_id),
             single_post_code: Number(data.single_post_code),
+            suburb: String(data.suburb).trim(),
             price: Number(data.price)
           });
         }}
@@ -77,16 +80,26 @@ const PostcodeForm = forwardRef<HTMLFormElement, PostcodeFormProps>(
   ({ initialValues, onSubmit }, ref) => {
     const [formData, setFormData] = useState(initialValues);
     const [submited, setSubmited] = useState(false);
-
     const handleChange = useCallback((field: string, value: any) => {
       setFormData((prev: any) => ({ ...prev, [field]: value }));
     }, []);
+
+    const postcodeErrorMsg = useMemo(() => {
+      if (!formData.single_post_code) {
+        return "Please enter Post Code";
+      }
+      const pcStr = String(formData.single_post_code).trim();
+      if (!/^\d{4}$/.test(pcStr)) {
+        return "Post Code must be exactly 4 digits";
+      }
+      return "";
+    }, [formData.single_post_code]);
 
     const handleSubmit = (e: React.FormEvent) => {
       e.preventDefault();
       setSubmited(true);
 
-      if (!formData.global_courier_id || !formData.single_post_code || !formData.price) {
+      if (!formData.global_courier_id || postcodeErrorMsg || !String(formData.suburb).trim() || !formData.price) {
         return;
       }
 
@@ -100,27 +113,39 @@ const PostcodeForm = forwardRef<HTMLFormElement, PostcodeFormProps>(
           onValueChange={(val) => handleChange('global_courier_id', val || '')}
           required
           error={submited && !formData.global_courier_id}
-          errormsg="Courier is required"
+          errormsg="Select a Courier"
         />
 
         <FormInput
           label="Post Code"
+          type="number"
           value={formData.single_post_code}
           onChange={(val) => handleChange('single_post_code', val)}
           placeholder="Enter PostCode"
           required
-          error={submited && !formData.single_post_code}
-          errormsg="Post Code is required"
+          error={submited && !!postcodeErrorMsg}
+          errormsg={postcodeErrorMsg}
+        />
+
+        <FormInput
+          label="Suburb"
+          value={formData.suburb}
+          onChange={(val) => handleChange('suburb', val)}
+          placeholder="Enter Suburb"
+          required
+          error={submited && !String(formData.suburb).trim()}
+          errormsg="Please enter Suburb"
         />
 
         <FormInput
           label="Price"
+          type="number"
           value={formData.price}
           onChange={(val) => handleChange('price', val)}
           placeholder="Enter Price"
           required
           error={submited && !formData.price}
-          errormsg="Price is required"
+          errormsg="Please enter Price"
         />
       </form>
     );

@@ -1,4 +1,5 @@
-import { QueryClient } from "@tanstack/react-query";
+import { MutationCache, QueryClient } from "@tanstack/react-query";
+// import * as Sentry from "@sentry/react";
 
 export const queryClient = new QueryClient({
     defaultOptions: {
@@ -12,4 +13,19 @@ export const queryClient = new QueryClient({
             retry: 0,
         },
     },
+    mutationCache: new MutationCache({
+        onError: (error: any) => {
+            // If Axios already handled it globally, don't show a second toast notification
+            // Sentry.captureException(error);
+
+            if (error.isHandledGlobally) return;
+
+            //   showToast(error.response?.data?.message || "An error occurred", "error");
+        }
+    }),
+    // queryCache: new QueryCache({
+    //     onError: (error) => {
+    //         // Sentry.captureException(error);
+    //     },
+    // }),
 });

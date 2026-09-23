@@ -9,9 +9,9 @@ import { Link, useNavigate } from "react-router-dom";
 import brandlogo from '@/assets/Tranzit_Logo.svg'
 import { useRegister } from "@/features/auth/hooks/useAuth";
 import type { RegisterRequest } from "../auth.types";
-import { useState, useMemo } from "react";
-import { AuthLayout } from "../components/AuthLayout";
+import { useState, useMemo, useEffect } from "react";
 import { showToast } from "@/components/ui/custom-toast";
+import { PRIVACY_POLICY_URL, TERMS_CONDITIONS_URL } from "@/constants";
 
 export default function SignUp() {
   const navigate = useNavigate();
@@ -59,7 +59,6 @@ export default function SignUp() {
 
   const isValid = useMemo(() => Object.keys(errors).length === 0, [errors]);
 
-  console.log(errors)
   const updateValue = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value, type, checked } = e.target;
     setData((prev) => ({
@@ -77,7 +76,7 @@ export default function SignUp() {
     }
 
     if (!data?.terms) {
-      showToast("Please accept the Privacy Policy and Terms to continue", "error")
+      showToast("Please accept the Terms & Conditions and Privacy Policy before creating your account", "error")
       return;
     }
 
@@ -101,37 +100,37 @@ export default function SignUp() {
     });
   };
 
+  useEffect(() => {
+    document.title = `Register | Tranzit`;
+  }, [])
 
 
   return (
-    <AuthLayout>
-      {/* Logo representation */}
-      <div className="flex flex-col items-center text-center space-y-2">
+    <div className="w-full">
+      <div className="flex flex-col items-center text-center space-y-2 mb-8">
         <div className="flex items-center space-x-2 pb-2">
-          <div className="flex italic text-3xl font-extrabold tracking-tight drop-shadow-sm">
-            <img src={brandlogo} alt="Logo" className="h-25" />
-          </div>
+          <img src={brandlogo} alt="Logo" className="h-16 w-auto" />
         </div>
 
-        <h2 className="text-3xl font-bold tracking-tight text-slate-900 dark:text-white">
-          Sign up to Tranzit Group.
+        <h2 className="text-2xl font-black tracking-tight text-slate-900 dark:text-white">
+          Create an account
         </h2>
-        <p className="text-sm text-slate-600 dark:text-slate-400 pt-1">
-          Get started with your 30-day trial. No credit card required.
+        <p className="text-sm font-medium text-slate-500 dark:text-slate-400">
+          Get started with your 30-day trial today
         </p>
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-3">
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
           <div className="space-y-1">
-            <Label htmlFor="firstName" className="text-slate-700 dark:text-slate-300 font-semibold text-xs uppercase tracking-wider">
+            <Label htmlFor="firstName" className="text-slate-700 dark:text-slate-300 font-semibold text-xs uppercase tracking-wide">
               First name <span className="text-red-500">*</span>
             </Label>
             <Input
               id="firstName"
               name="firstName"
               placeholder="First name"
-              className="bg-white dark:bg-zinc-900 border-slate-200 dark:border-slate-800 transition-all focus-visible:ring-0 focus-visible:ring-offset-0 focus-visible:border-blue-500 h-10 shadow-sm"
+              className="bg-white dark:bg-zinc-900 border-slate-200 dark:border-slate-800 focus:border-primary transition-all h-11 shadow-xs"
               value={data.firstName}
               onChange={updateValue}
               error={submitted && (!data.firstName || !!errors.firstName)}
@@ -139,14 +138,14 @@ export default function SignUp() {
             />
           </div>
           <div className="space-y-1">
-            <Label htmlFor="lastName" className="text-slate-700 dark:text-slate-300 font-semibold text-xs uppercase tracking-wider">
+            <Label htmlFor="lastName" className="text-slate-700 dark:text-slate-300 font-semibold text-xs uppercase tracking-wide">
               Last name <span className="text-red-500">*</span>
             </Label>
             <Input
               id="lastName"
               name="lastName"
               placeholder="Last name"
-              className="bg-white dark:bg-zinc-900 border-slate-200 dark:border-slate-800 transition-all focus-visible:ring-0 focus-visible:ring-offset-0 focus-visible:border-blue-500 h-10 shadow-sm"
+              className="bg-white dark:bg-zinc-900 border-slate-200 dark:border-slate-800 focus:border-primary transition-all h-11 shadow-xs"
               value={data.lastName}
               onChange={updateValue}
               error={submitted && (!data.lastName || !!errors.lastName)}
@@ -156,7 +155,7 @@ export default function SignUp() {
         </div>
 
         <div className="space-y-1">
-          <Label htmlFor="email" className="text-slate-700 dark:text-slate-300 font-semibold text-xs uppercase tracking-wider">
+          <Label htmlFor="email" className="text-slate-700 dark:text-slate-300 font-semibold text-xs uppercase tracking-wide">
             Email address <span className="text-red-500">*</span>
           </Label>
           <Input
@@ -167,7 +166,7 @@ export default function SignUp() {
             autoCapitalize="none"
             autoComplete="email"
             autoCorrect="off"
-            className="bg-white dark:bg-zinc-900 border-slate-200 dark:border-slate-800 transition-all focus-visible:ring-0 focus-visible:ring-offset-0 focus-visible:border-blue-500 h-10 shadow-sm"
+            className="bg-white dark:bg-zinc-900 border-slate-200 dark:border-slate-800 focus:border-primary transition-all h-11 shadow-xs"
             value={data.email}
             onChange={updateValue}
             error={submitted && (!data.email || !!errors.email)}
@@ -176,7 +175,7 @@ export default function SignUp() {
         </div>
 
         {/* <div className="space-y-1">
-          <Label htmlFor="phone" className="text-slate-700 dark:text-slate-300 font-semibold text-xs uppercase tracking-wider">
+          <Label htmlFor="phone" className="text-slate-700 dark:text-slate-300 font-semibold text-xs uppercase tracking-wide">
             Phone number <span className="text-red-500">*</span>
           </Label>
           <div className="relative flex items-center">
@@ -188,7 +187,7 @@ export default function SignUp() {
               name="phone"
               type="tel"
               placeholder="Enter your phone number"
-              className="bg-white dark:bg-zinc-900 border-slate-200 dark:border-slate-800 transition-all focus-visible:ring-0 focus-visible:ring-offset-0 focus-visible:border-blue-500 h-10 shadow-sm pl-10"
+              className="bg-white dark:bg-zinc-900 border-slate-200 dark:border-slate-800 transition-all focus-visible:ring-0 focus-visible:ring-offset-0  h-10 shadow-sm pl-10"
               value={data.phone}
               onChange={updateValue}
               error={submitted && (!data.phone || !!errors.phone)}
@@ -198,7 +197,7 @@ export default function SignUp() {
         </div> */}
 
         <div className="space-y-1">
-          <Label htmlFor="password" className="text-slate-700 dark:text-slate-300 font-semibold text-xs uppercase tracking-wider">
+          <Label htmlFor="password" className="text-slate-700 dark:text-slate-300 font-semibold text-xs uppercase tracking-wide">
             Password <span className="text-red-500">*</span>
           </Label>
           <PasswordInput
@@ -206,7 +205,7 @@ export default function SignUp() {
             name="password"
             placeholder="Enter your password"
             autoComplete="new-password"
-            className="bg-white dark:bg-zinc-900 border-slate-200 dark:border-slate-800 transition-all focus-visible:ring-0 focus-visible:ring-offset-0 focus-visible:border-blue-500 h-10 shadow-sm"
+            className="bg-white dark:bg-zinc-900 border-slate-200 dark:border-slate-800 focus:border-primary transition-all h-11 shadow-xs"
             value={data.password}
             onChange={updateValue}
             error={submitted && (!data.password || !!errors.password)}
@@ -215,7 +214,7 @@ export default function SignUp() {
         </div>
 
         <div className="space-y-1">
-          <Label htmlFor="confirmPassword" className="text-slate-700 dark:text-slate-300 font-semibold text-xs uppercase tracking-wider">
+          <Label htmlFor="confirmPassword" className="text-slate-700 dark:text-slate-300 font-semibold text-xs uppercase tracking-wide">
             Confirm your password <span className="text-red-500">*</span>
           </Label>
           <PasswordInput
@@ -223,7 +222,7 @@ export default function SignUp() {
             name="confirmPassword"
             placeholder="Re-enter your password"
             autoComplete="new-password"
-            className="bg-white dark:bg-zinc-900 border-slate-200 dark:border-slate-800 transition-all focus-visible:ring-0 focus-visible:ring-offset-0 focus-visible:border-blue-500 h-10 shadow-sm"
+            className="bg-white dark:bg-zinc-900 border-slate-200 dark:border-slate-800 focus:border-primary transition-all h-11 shadow-xs"
             value={data.confirmPassword}
             onChange={updateValue}
             error={submitted && (!data.confirmPassword || !!errors.confirmPassword)}
@@ -239,29 +238,29 @@ export default function SignUp() {
               value="true"
               checked={data.terms === 'true'}
               onCheckedChange={(checked) => setData(prev => ({ ...prev, terms: checked ? 'true' : '' }))}
-              className="mt-1 border-slate-300 text-blue-600 focus-visible:ring-blue-500 data-[state=checked]:bg-blue-600 data-[state=checked]:border-blue-600"
+              className="mt-1 border-slate-300 text-primary data-[state=checked]:bg-primary data-[state=checked]:border-primary"
             />
             <Label
               htmlFor="terms"
               className="text-sm font-medium leading-relaxed peer-disabled:cursor-not-allowed peer-disabled:opacity-70 text-slate-600 dark:text-slate-400"
             >
-              I agree to the <a href="#" className="font-semibold text-blue-600 hover:text-blue-500 hover:underline transition-colors">Privacy Policy</a> and <a href="#" className="font-semibold text-blue-600 hover:text-blue-500 hover:underline transition-colors">Terms</a>
+              I agree to the <a href={PRIVACY_POLICY_URL} target="_blank" className="font-semibold text-primary hover:underline transition-colors">Privacy Policy</a> and <a href={TERMS_CONDITIONS_URL} target="_blank" className="font-semibold text-primary hover:underline transition-colors">Terms & Conditions</a>
             </Label>
           </div>
           {/* {submitted && errors.terms && <p className="text-red-500 text-[11px] mt-1 mb-0">{errors.terms}</p>} */}
         </div>
 
-        <Button type="submit" disabled={registerMutation.isPending} className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold tracking-wide h-10 text-sm rounded-md transition-all shadow-md hover:shadow-lg">
-          {registerMutation.isPending ? "Continue..." : "Continue"}
+        <Button type="submit" disabled={registerMutation.isPending} className="w-full text-white font-bold h-11 text-[13px] rounded-md bg-primary hover:bg-primary/90 transition-all shadow-lg shadow-primary/20 active:scale-[0.98]">
+          {registerMutation.isPending ? "Creating Account..." : "Create Account"}
         </Button>
 
         <p className="text-center text-sm text-slate-600 dark:text-slate-400 pt-3">
           Already have an account?{" "}
-          <Link to="/login" className="font-bold text-blue-600 hover:text-blue-500 hover:underline transition-colors">
+          <Link to="/login" className="font-bold text-primary hover:underline transition-colors">
             Sign in instead
           </Link>
         </p>
       </form>
-    </AuthLayout>
+    </div>
   );
 }

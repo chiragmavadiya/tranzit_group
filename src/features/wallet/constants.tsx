@@ -5,48 +5,68 @@ import type { WalletTransaction } from './types';
 import { Button } from '@/components/ui/button';
 
 export const TRANSACTION_STATUS_CONFIG = {
-  credit: 'bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-400',
-  debit: 'bg-red-100 text-red-800 dark:bg-red-900/20 dark:text-red-400',
+  credit: 'bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-400 capitalize',
+  debit: 'bg-red-100 text-red-800 dark:bg-red-900/20 dark:text-red-400 capitalize',
+  refund: 'bg-blue-100 text-blue-800 dark:bg-blue-900/20 dark:text-blue-400 capitalize',
+  success: 'bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-400 capitalize',
+  failed: 'bg-red-100 text-red-800 dark:bg-red-900/20 dark:text-red-400 capitalize',
 };
 
-export const WALLET_COLUMNS: Column<WalletTransaction>[] = [
-  {
-    key: 'transaction_type',
-    header: 'TRANSACTION TYPE',
-    sortable: true,
-    cell: (value: any) => <StatusCell value={value?.toLowerCase()} statusConfig={TRANSACTION_STATUS_CONFIG} />
-  },
-  {
-    key: 'amount',
-    header: 'AMOUNT',
-    sortable: true,
-    cell: (value: any) => {
-      const amount = typeof value === 'number' ? value : parseFloat(String(value).replace(/[^0-9.-]+/g, ""));
-      return <span className="font-semibold text-slate-900 dark:text-zinc-100">${amount.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>;
-    }
-  },
-  { key: 'reason', header: 'REASON', sortable: true },
-  { key: 'transaction_id', header: 'TRANSACTION ID', sortable: true },
-  { key: 'transaction_date_time', header: 'TRANSACTION DATE & TIME', sortable: true },
-  {
-    key: 'receipt',
-    header: 'PAYMENT RECEIPT',
-    className: 'text-center',
-    cell: () => (
-      <Button variant="ghost" size="icon" className="h-8 w-8 text-blue-500 hover:text-blue-600 hover:bg-blue-50">
-        <Download className="h-4 w-4" />
-      </Button>
-    )
-  },
-];
+export const getWalletColumns = (
+  onDownload: (row: WalletTransaction) => void,
+  isDownloadingId?: string | number | null,
+  canReadWrite?: boolean
+): Column<WalletTransaction>[] => [
+    {
+      key: 'transaction_type',
+      header: 'TRANSACTION TYPE',
+      sortable: true,
+      cell: (value: any) => <StatusCell value={value?.toLowerCase()} statusConfig={TRANSACTION_STATUS_CONFIG} />
+    },
+    {
+      key: 'amount',
+      header: 'AMOUNT',
+      sortable: true,
+      cell: (value: any) => {
+        const amount = typeof value === 'number' ? value : parseFloat(String(value).replace(/[^0-9.-]+/g, ""));
+        return <span className="font-semibold text-slate-900 dark:text-zinc-100">${amount.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>;
+      }
+    },
+    { key: 'reason', header: 'REASON', sortable: true },
+    { key: 'transaction_id', header: 'TRANSACTION ID', sortable: true },
+    { key: 'transaction_date_time', header: 'TRANSACTION DATE & TIME', sortable: true },
+    ...(canReadWrite ? [{
+      key: 'receipt',
+      header: 'PAYMENT RECEIPT',
+      className: 'text-center',
+      cell: (_: any, row: WalletTransaction) => {
+        const targetId = row.id || row.transaction_id;
+        const isDownloading = isDownloadingId === targetId;
+        return (
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => onDownload(row)}
+            disabled={isDownloading}
+            className="h-8 w-8 text-primary/70 hover:text-primary hover:bg-primary/10"
+          >
+            {isDownloading ? (
+              <span className="w-4 h-4 border-2 border-primary border-t-transparent rounded-full animate-spin"></span>
+            ) : (
+              <Download className="h-4 w-4" />
+            )}
+          </Button>
+        );
+      }
+    }] : []),
+  ];
 
 export const ADMIN_TOPUP_COLUMNS: Column<any>[] = [
   {
     key: 'customer_name',
     header: 'NAME',
-    sortable: true,
-    searchable: true,
-    cell: (val) => <span className="font-medium text-slate-900 dark:text-zinc-100">{val}</span>
+    className: 'break-normal',
+    cell: (val) => <span className="font-medium text-slate-900 dark:text-zinc-100">{val || '-'}</span>
   },
   {
     key: 'type',
@@ -55,18 +75,18 @@ export const ADMIN_TOPUP_COLUMNS: Column<any>[] = [
     cell: (value: any) => <StatusCell value={value?.toLowerCase()} statusConfig={TRANSACTION_STATUS_CONFIG} />
   },
   { key: 'amount', header: 'AMOUNT', sortable: true },
-  { key: 'reason', header: 'REASON', sortable: true },
-  { key: 'transaction_id', header: 'TRANSACTION ID', sortable: true, noPrint: true },
-  { key: 'date', header: 'TRANSACTION DATE & TIME', sortable: true, noPrint: true },
-];
-
-export const ADMIN_MOCK_TRANSACTIONS = [
-  { id: '1', customer_name: 'Ashish Tukadiya', type: 'Credit', amount: '$95.26', reason: 'Wallet Topup', transaction_id: 'pi_3SuvdNBUIf6mLDll15s9iRuU', date: '29 Jan 2026, 7:21 PM' },
-  { id: '2', customer_name: 'Ashish Tukadiya', type: 'Debit', amount: '$95.26', reason: 'Consignment 01KG50BQFH4TJKTFEZB4ASCGY8', transaction_id: '-', date: '29 Jan 2026, 7:21 PM' },
-  { id: '3', customer_name: 'Chirag 10 Gondaliya 10', type: 'Credit', amount: '$14.83', reason: 'Wallet Topup', transaction_id: 'pi_3Sk29gBUIF6mLDIll0rf0RYnQ', date: '30 Dec 2025, 6:06 PM' },
-  { id: '4', customer_name: 'Chirag 10 Gondaliya 10', type: 'Debit', amount: '$14.83', reason: 'Consignment 01KDQM3F6PDC0KPWTCH3E5B456', transaction_id: '-', date: '30 Dec 2025, 6:06 PM' },
-  { id: '5', customer_name: 'Chirag 10 Gondaliya 10', type: 'Credit', amount: '$100.00', reason: 'Wallet Topup', transaction_id: 'pi_3Sk2AlBUIF6mLDI107h9dNEN', date: '30 Dec 2025, 6:07 PM' },
-
+  {
+    key: 'reason', header: 'REASON',
+    className: 'break-normal', sortable: true
+  },
+  {
+    key: 'transaction_id', header: 'TRANSACTION ID',
+    className: 'break-normal'
+  },
+  {
+    key: 'payment_date', header: 'TRANSACTION DATE & TIME',
+    className: 'break-normal',
+  },
 ];
 
 export const TRANSACTION_TYPES = [

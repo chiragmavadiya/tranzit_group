@@ -18,9 +18,9 @@ export interface StepperProps extends React.HTMLAttributes<HTMLDivElement> {
 export function Stepper({
   steps,
   currentStep,
-  activeColor = "bg-blue-600",
+  activeColor = "bg-primary",
   inactiveColor = "bg-slate-100",
-  accentColor = "border-blue-600",
+  accentColor = "border-primary",
   className,
   ...props
 }: StepperProps) {
@@ -44,11 +44,11 @@ export function Stepper({
             <div key={idx} className="relative z-10 flex flex-col items-center gap-3">
               <div
                 className={cn(
-                  "w-10 h-10 rounded-2xl flex items-center justify-center border-2 transition-all duration-500",
+                  "w-8 h-8 rounded-2xl flex items-center justify-center border-2 transition-all duration-500",
                   isCurrent
-                    ? `${activeColor} ${accentColor} text-white shadow-[0_0_15px_rgba(37,99,235,0.25)] scale-110`
+                    ? `${activeColor} ${accentColor} text-white shadow-[0_0_15px_rgba(20,47,84,0.25)] scale-110`
                     : isPassed
-                      ? `bg-white dark:bg-zinc-900 ${accentColor} text-blue-600 dark:text-blue-400`
+                      ? `bg-white dark:bg-zinc-900 ${accentColor} text-primary`
                       : "bg-white dark:bg-zinc-950 border-slate-100 dark:border-zinc-800 text-slate-300 dark:text-zinc-600"
                 )}
               >
@@ -56,7 +56,7 @@ export function Stepper({
               </div>
               <span
                 className={cn(
-                  "text-[10px] font-bold tracking-widest uppercase mb-[-4px]",
+                  "text-[12px] font-medium  mb-[-4px]",
                   isCurrent ? "text-slate-900 dark:text-zinc-100" : "text-slate-400 dark:text-zinc-500"
                 )}
               >

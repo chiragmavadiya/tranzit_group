@@ -36,3 +36,15 @@ export interface CreatePickupResponse {
     status: boolean;
     message: string;
 }
+
+export interface BookPickupCounts {
+    new: number;
+    booked: number;
+}
+
+export interface BookPickupCountsResponse {
+    status: boolean;
+    message: string;
+    data: BookPickupCounts;
+}
+

@@ -73,4 +73,36 @@ export const itemsService = {
 
     return { blob: response.data, filename };
   },
+
+  /**
+   * Set item as default
+   */
+  setDefault: async (id: number | string): Promise<GenericResponse> => {
+    const response = await api.post(`/customer/items/${id}/default`);
+    return response.data;
+  },
+
+  /**
+   * Unset item as default
+   */
+  unsetDefault: async (id: number | string): Promise<GenericResponse> => {
+    const response = await api.delete(`/customer/items/${id}/default`);
+    return response.data;
+  },
+
+  /**
+   * Get the default item
+   */
+  getDefault: async (): Promise<ItemDetailsResponse> => {
+    const response = await api.get<ItemDetailsResponse>("/customer/items/default");
+    return response.data;
+  },
+
+  /**
+   * Toggle item status
+   */
+  toggleStatus: async (id: number | string): Promise<GenericResponse> => {
+    const response = await api.patch(`/customer/items/${id}/toggle-status`);
+    return response.data;
+  },
 };

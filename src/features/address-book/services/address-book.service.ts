@@ -5,6 +5,7 @@ import type {
     AddressBookListResponse,
     AddressBookDetailsResponse,
     AddressBookFilters,
+    SearchAddressBookListResponse,
 } from "../types";
 import type { GenericResponse } from "@/features/auth/auth.types";
 
@@ -54,8 +55,8 @@ export const addressBookService = {
     /**
      * Search addresses
      */
-    search: async (query: string): Promise<AddressBookListResponse> => {
-        const response = await api.get<AddressBookListResponse>(API_ENDPOINTS.ADDRESS_BOOK.SEARCH, {
+    search: async (query: string): Promise<SearchAddressBookListResponse> => {
+        const response = await api.get<SearchAddressBookListResponse>(API_ENDPOINTS.ADDRESS_BOOK.SEARCH, {
             params: { q: query },
         });
         return response.data;

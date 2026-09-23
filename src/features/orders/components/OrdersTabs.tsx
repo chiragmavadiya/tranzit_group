@@ -1,52 +1,88 @@
 import { cn } from '@/lib/utils';
 import type { TabType } from '@/features/orders/types';
 import { TABS } from '@/features/orders/constants';
+import { useOrderCounts } from '@/features/orders/hooks/useOrders';
+import { useAppSelector } from '@/hooks/store.hooks';
+import ModuleTabs from '@/components/common/ModuleTabs';
+import { useSearchParams } from 'react-router-dom';
+import { LayoutGroup } from 'framer-motion';
+
+import { FormSelect } from '@/features/orders/components/OrderFormUI';
 
 interface OrdersTabsProps {
   activeTab: TabType;
   onTabChange: (tab: TabType) => void;
   className?: string;
+  customerId?: string;
 }
 
-// border: 1px solid #ebe6e7;
-// border - top - left - radius: 10px;
-// border - top - right - radius: 10px;
-// padding: 0 30px;
-// border - bottom - color: #fff;
+const tabsMap: Record<string, string> = {
+  new: 'Pending',
+  printed: 'Label Printed',
+  shipped: 'Dispatched',
+  archived: 'Archived',
+};
 
-export function OrdersTabs({ activeTab, onTabChange, className }: OrdersTabsProps) {
+export function OrdersTabs({ activeTab, onTabChange, className, customerId }: OrdersTabsProps) {
+  const { role } = useAppSelector((state) => state.auth);
+  const [searchParams] = useSearchParams();
+  // const search = customerId ? undefined : (searchParams.get('search') || undefined);
+  const startDate = searchParams.get('start_date') || undefined;
+  const endDate = searchParams.get('end_date') || undefined;
+
+  // Fetch status counts from the counts API
+  const { data: countsData } = useOrderCounts({
+    customer: customerId,
+    // search,
+    start_date: startDate,
+    end_date: endDate,
+  }, !!role);
+
   return (
-    <nav className={cn("flex space-x-6 h-full items-end", className)} aria-label="Tabs">
-      {TABS.map((tab) => {
-        // const count = 61;
-        const isActive = activeTab === tab.toLowerCase();
+    <>
+      <LayoutGroup id="orders-tabs">
+        <nav className={cn("hidden tablet:flex space-x-0 h-full items-end gap-6", className)} aria-label="Tabs">
+          {TABS.map((tab) => {
+            const key = tab.toLowerCase();
+            const count = countsData?.data?.[key] ?? countsData?.data?.[tab] ?? 0;
+            const isActive = activeTab === key;
 
-        return (
-          <button
-            key={tab}
-            onClick={() => onTabChange(tab.toLowerCase() as TabType)}
-            className={cn(
-              "h-10 px-6 border font-semibold text-[13px] rounded-t-md transition-all duration-200 relative flex items-center gap-2 outline-none whitespace-nowrap",
-              isActive
-                ? "border-gray-200 border-b-white text-blue-600 dark:text-blue-400 dark:border-zinc-800 dark:border-b-zinc-950"
-                : "border-transparent text-gray-500 dark:text-zinc-400 hover:text-gray-700 dark:hover:text-zinc-200 hover:border-gray-200 dark:hover:border-zinc-600"
-            )}
-          >
-            {tab}
-            {/* {count > 0 && (
-              <span className={cn(
-                "px-1.5 py-0.5 text-[10px] rounded-full font-bold transition-all duration-300",
-                isActive
-                  ? "bg-blue-100 dark:bg-blue-900/40 text-blue-600 dark:text-blue-400"
-                  : "bg-gray-100 dark:bg-zinc-800 text-gray-400 dark:text-zinc-500"
-              )}>
-                {count}
-              </span>
-            )} */}
-          </button>
-        );
-      })}
-    </nav>
+            return (
+              <ModuleTabs
+                key={tab}
+                tab={tab}
+                tabKey={tabsMap[tab]}
+                onTabChange={(tabStr) => onTabChange(tabStr.toLowerCase() as TabType)}
+                isActive={isActive}
+                count={Number(count)}
+              />
+            );
+          })}
+        </nav>
+      </LayoutGroup>
+
+      <div className="flex tablet:hidden h-full items-center px-1">
+        <FormSelect
+          value={activeTab}
+          onValueChange={(val) => {
+            if (val) onTabChange(val as TabType);
+          }}
+          options={TABS.map((tab) => {
+            const key = tab.toLowerCase();
+            const count = countsData?.data?.[key] ?? countsData?.data?.[tab] ?? 0;
+            return {
+              label: `${tabsMap[tab] || tab} (${count})`,
+              value: key,
+            };
+          })}
+          placeholder="Select status"
+          allowClear={false}
+          searchdisable={true}
+          className="w-[160px]"
+          selectClassName="h-8 [&_input]:text-[12px]! font-semibold"
+          optionClassName="text-[12px]!"
+        />
+      </div>
+    </>
   );
 }
-

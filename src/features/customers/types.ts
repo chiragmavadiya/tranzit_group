@@ -28,38 +28,83 @@ export interface CustomerListResponse {
     meta: Meta;
 }
 
+export interface CourierWeightCharge {
+    courier: string;
+    over_3kg: number;
+    over_5kg: number;
+    over_10kg: number;
+    over_15kg: number;
+    [key: string]: any;
+}
+
 export interface CustomerFormData {
     first_name: string;
     last_name: string;
     email: string;
     mobile: string;
     business_name: string;
+    sender_name: string;
+    /** Gates the customer out of the Customer Portal until an admin activates the account. */
+    account_activation?: boolean;
+    display_business_name_on_label: boolean;
     gst_number: string;
+    billing_address_info: string;
     billing_address: string;
+    billing_unit_number: string;
     billing_street_name: string;
     billing_street_number: string;
     billing_street_type: string;
     billing_suburb: string;
     billing_state: string;
     billing_postcode: string;
+    billing_country: string;
+    address_info: string;
     address: string;
-    street_name: string;
+    unit_number: string;
     street_number: string;
+    street_name: string;
     street_type: string;
     suburb: string;
     state: string;
     postcode: string;
+    country: string;
     direct_freight_active: number;
-    direct_freight_markup_charge: number;
-    direct_freight_pickup_charge: number;
     auspost_active: number;
-    auspost_markup_charge: number;
-    auspost_pickup_charge: number;
+    couriersplease_active: number;
+    aramex_active: number;
     pallet_active: number;
-    pallet_markup_charge: number;
-    pallet_pickup_charge: number;
+    fedex_active: number;
+    tnt_active: number;
+    teg_active: number;
     topup_enable: boolean;
     order_prefix: string;
+    xero_contact_id?: string | null;
+    additional_high_kg_weight_rate: number;
+    couriersplease_min_margin?: number;
+    auspost_min_margin?: number;
+    direct_freight_min_margin?: number;
+    aramex_min_margin?: number;
+    pallet_min_margin?: number;
+    fedex_min_margin?: number;
+    tnt_min_margin?: number;
+    teg_min_margin?: number;
+    /** Per-courier manual order flag. Optional so customers saved before this existed still load. */
+    manual_order_direct_freight?: boolean;
+    manual_order_auspost?: boolean;
+    manual_order_couriersplease?: boolean;
+    manual_order_aramex?: boolean;
+    manual_order_pallet?: boolean;
+    manual_order_fedex?: boolean;
+    manual_order_tnt?: boolean;
+    manual_order_teg?: boolean;
+    markup_charges?: CourierWeightCharge[];
+    pickup_charges?: CourierWeightCharge[];
+    byo_courier_invoice_enable?: boolean;
+    byo_courier_pricing_tiers?: Array<{
+        min_labels: number;
+        max_labels: number | null;
+        price_per_label: number;
+    }>;
 }
 
 export interface CustomerDetails {
@@ -76,6 +121,9 @@ export interface CustomerDetails {
     total_credit: number;
     total_debit: number;
     total_margin: number;
+    status: string;
+    account_activation?: boolean | null;
+    address_info: string;
 }
 
 export interface CustomerDetailsResponse {
@@ -96,25 +144,59 @@ export interface CustomerProfile {
     about: {
         full_name: string;
         status: string;
+        status_code: string;
         customer: string;
-        gst: number | null;
+        gst: string | number | null;
         business_name: string;
         role: string;
     };
     contacts: {
         contact: string;
         email: string;
+        office_number?: string;
     };
     pickup_address: {
         address: string;
         post_code: string;
+        address_info: string;
+        unit_number?: string;
+        street_number?: string;
+        street_name?: string;
+        street_type?: string;
+        suburb?: string;
+        state?: string;
+        postcode?: string;
+        latitude?: number | null;
+        longitude?: number | null;
     };
-    charges_markups: {
+    billing_address: {
+        address: string;
+        post_code: string;
+        address_info: string;
+        unit_number?: string;
+        street_number?: string;
+        street_name?: string;
+        street_type?: string;
+        suburb?: string;
+        state?: string;
+        postcode?: string;
+        latitude?: number | null;
+        longitude?: number | null;
+    };
+    charges_markups?: {
         aus_post: { title: string; markup: number; pickup: number; };
         direct_freight: { title: string; markup: number; pickup: number; };
         pallet: { title: string; markup: number; pickup: number; };
     };
+    markup_charges?: CourierWeightCharge[];
+    pickup_charges?: CourierWeightCharge[];
     activity_timeline: CustomerProfileActivity[];
+    byo_courier_invoice_enable?: boolean;
+    byo_courier_pricing_tiers?: Array<{
+        min_labels: number;
+        max_labels: number | null;
+        price_per_label: number;
+    }>;
 }
 
 export interface CustomerProfileResponse {
@@ -158,6 +240,7 @@ export interface CustomerTransactionsResponse {
 }
 
 export interface CustomerInvoice {
+    id: number;
     invoice_number: string;
     invoice_date: string;
     invoice_due_date: string | null;
@@ -192,4 +275,28 @@ export interface CustomerStats {
     total: number;
     active: number;
     inactive: number;
+}
+
+export interface CustomerStatsResponse {
+    status: boolean;
+    message: string;
+    data: CustomerStats;
+}
+
+export interface CustomerIntegration {
+    slug: string;
+    name: string;
+    description: string;
+    connected: boolean;
+    logo_url: string;
+    is_default: boolean;
+}
+
+export interface CustomerIntegrationResponse {
+    status: boolean;
+    message: string;
+    data: {
+        courier_integrations: CustomerIntegration[];
+        ecommerce_connections: CustomerIntegration[];
+    };
 }

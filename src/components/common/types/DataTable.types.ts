@@ -12,6 +12,10 @@ export interface Column<T> {
   sticky?: 'left' | 'right';
   hidden?: boolean;
   noPrint?: boolean;
+  resizable?: boolean;
+  minWidth?: number;
+  maxWidth?: number;
+  disableToggle?: boolean;
 }
 
 export interface SortConfig {
@@ -28,6 +32,7 @@ export interface DataTableProps<T> {
   selectable?: boolean;
   selectedRows?: string[];
   onSelectionChange?: (selectedRows: string[]) => void;
+  selectOnRowClick?: boolean;
   // Sorting
   sortable?: boolean;
   sortConfig?: SortConfig;
@@ -49,6 +54,15 @@ export interface DataTableProps<T> {
   columnSettings?: boolean;
   defaultVisibleColumns?: string[];
   onColumnVisibilityChange?: (visibleColumns: string[]) => void;
+  /**
+   * Opt in to remembering which columns the user hid, keyed by module
+   * (e.g. 'manifest' -> 'manifest_hidden_columns'). Omit to keep the
+   * toggles session-only.
+   */
+  moduleName?: string;
+  // Resizing
+  resizable?: boolean;
+  persistenceId?: string;
   // Styling
   className?: string;
   tableClassName?: string;
@@ -66,11 +80,13 @@ export interface DataTableProps<T> {
   headerPosition?: 'left' | 'right';
   headerClass?: string;
   headerTitle?: string;
-  headerDescription?: string;
+  headerDescription?: string | (() => ReactNode);
   customFooter?: ReactNode | (() => ReactNode);
   onExport?: (type: "pdf" | "excel" | "print" | "csv") => void;
   isExporting?: boolean;
   exportable?: boolean;
+  print?: boolean;
+
 }
 
 // Common cell renderer types

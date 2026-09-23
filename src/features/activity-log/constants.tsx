@@ -22,8 +22,8 @@ export const ACTIVITY_COLUMNS: Column<ActivityLog>[] = [
         header: 'ADMIN',
         cell: (_, row) => (
             <div className="flex flex-col gap-1">
-                <span className="font-bold text-slate-700 dark:text-zinc-300">{row.admin}</span>
-                <span className="text-[10px] text-slate-500">{row.email}</span>
+                <span className="font-bold text-slate-700 dark:text-zinc-300 break-normal">{row.admin}</span>
+                <span className="text-[10px] text-slate-500 break-normal">{row.email}</span>
             </div>
         ),
     },
@@ -35,7 +35,7 @@ export const ACTIVITY_COLUMNS: Column<ActivityLog>[] = [
             const action = row.action;
             const variants: Record<string, string> = {
                 created: 'bg-emerald-50 text-emerald-600 border-emerald-100 dark:bg-emerald-500/10 dark:text-emerald-400 dark:border-emerald-500/20',
-                updated: 'bg-blue-50 text-blue-600 border-blue-100 dark:bg-blue-500/10 dark:text-blue-400 dark:border-blue-500/20',
+                updated: 'bg-primary/10 text-primary border-primary/20',
                 deleted: 'bg-rose-50 text-rose-600 border-rose-100 dark:bg-rose-500/10 dark:text-rose-400 dark:border-rose-500/20',
                 status_changed: 'bg-amber-50 text-amber-600 border-amber-100 dark:bg-amber-500/10 dark:text-amber-400 dark:border-amber-500/20',
                 verified: 'bg-cyan-50 text-cyan-600 border-cyan-100 dark:bg-cyan-500/10 dark:text-cyan-400 dark:border-cyan-500/20',
@@ -54,7 +54,7 @@ export const ACTIVITY_COLUMNS: Column<ActivityLog>[] = [
         header: 'DESCRIPTION',
         cell: (_, row) => (
             <div className="flex flex-col gap-1 max-w-[300px]">
-                <span className="text-slate-600 dark:text-zinc-400 leading-relaxed">{row.description}</span>
+                <span className="text-slate-600 dark:text-zinc-400 leading-relaxed break-normal">{row.description}</span>
                 {row.changes && (
                     <div className="flex items-center gap-1.5 text-[10px]">
                         <span className="text-slate-400 line-through">{row.changes.old_status}</span>
@@ -87,8 +87,8 @@ export const ACTIVITY_COLUMNS: Column<ActivityLog>[] = [
                     <span className="text-slate-500 truncate max-w-[150px]">{row.route || 'N/A'}</span>
                 </div>
                 <div className="flex gap-1.5">
-                    <span className="font-bold text-slate-700 dark:text-zinc-300">IP:</span>
-                    <span className="text-slate-500">{row.ip_address}</span>
+                    <span className="font-bold text-slate-700 dark:text-zinc-300 break-normal">IP:</span>
+                    <span className="text-slate-500 break-normal">{row.ip_address}</span>
                 </div>
             </div>
         ),

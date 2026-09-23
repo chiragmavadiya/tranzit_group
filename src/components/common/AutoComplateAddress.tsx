@@ -2,27 +2,30 @@ import { useEffect, useRef, useState } from 'react';
 import { useMapsLibrary } from '@vis.gl/react-google-maps';
 import { FormInput } from '@/features/orders/components/OrderFormUI';
 import type { FormInputProps } from '@/features/orders/components/types/OrderFormUI.types';
+import { Search } from 'lucide-react';
 
 // Define the interface for your form data
 export interface AddressData {
     formatted_address: string;
+    address1: string;
     unit_number: string;
-    street_number: string;
-    street_name: string;
-    street_type: string;
+    street: string;
     suburb: string;
     state: string;
     post_code: string;
     latitude: number | null;
     longitude: number | null;
     country: string;
+    street_name?: string;
+    street_number?: string;
+    street_type?: string;
 }
 
 interface PlaceAutocompleteProps extends FormInputProps {
     onPlaceSelect: (data: AddressData) => void
 }
 
-export const PlaceAutocomplete = ({ onPlaceSelect, ...rest }: PlaceAutocompleteProps) => {
+export const PlaceAutocomplete = ({ onPlaceSelect, value, ...rest }: PlaceAutocompleteProps) => {
     // 1. Fix the 'never' type error by adding the Google Autocomplete type
     const [placeAutocomplete, setPlaceAutocomplete] = useState<google.maps.places.Autocomplete | null>(null);
     const inputRef = useRef<HTMLInputElement>(null);
@@ -30,9 +33,14 @@ export const PlaceAutocomplete = ({ onPlaceSelect, ...rest }: PlaceAutocompleteP
 
     useEffect(() => {
         if (!places || !inputRef.current) return;
-
         const options = {
-            fields: ['address_components', 'geometry', 'formatted_address'],
+            // fields: ['address_components', 'geometry', 'formatted_address'],
+            fields: [
+                'address_components',
+                'formatted_address',
+                'geometry',
+                'name'
+            ],
             componentRestrictions: { country: 'au' }
         };
 
@@ -42,19 +50,18 @@ export const PlaceAutocomplete = ({ onPlaceSelect, ...rest }: PlaceAutocompleteP
 
     useEffect(() => {
         if (!placeAutocomplete) return;
-
-        placeAutocomplete.addListener('place_changed', () => {
+        const listener = placeAutocomplete.addListener('place_changed', () => {
             const place = placeAutocomplete.getPlace();
-            console.log(place, "place")
             if (!place.address_components) return;
-
+            console.log(place, "Google address")
             // 2. Map Google components to the fields in image_ed5179.png
             const address: AddressData = {
                 formatted_address: place.formatted_address || '',
+                address1: '',
                 unit_number: '',
+                street: '',
                 street_number: '',
                 street_name: '',
-                street_type: '',
                 suburb: '',
                 state: '',
                 post_code: '',
@@ -63,39 +70,49 @@ export const PlaceAutocomplete = ({ onPlaceSelect, ...rest }: PlaceAutocompleteP
                 longitude: place.geometry?.location?.lng() || null,
             };
 
+            // let street_number = '';
+            // let street_type = '';
+            // let street_name = '';
             place.address_components.forEach((component: google.maps.GeocoderAddressComponent) => {
+
                 const types = component.types;
                 const value = component.short_name;
-
                 if (types.includes('subpremise')) address.unit_number = value;
+
                 if (types.includes('street_number')) address.street_number = value;
 
                 if (types.includes('route')) {
                     // Australia street logic: "George St" -> Name: George, Type: St
                     const parts = component.long_name.split(' ');
                     address.street_type = parts.length > 1 ? parts.pop() || '' : '';
-                    address.street_name = parts.join(' ');
+                    address.street_name = component.long_name;
                 }
-                if (types.includes('country')) address.country = component.short_name;
+                if (types.includes('country')) address.country = component.long_name;
                 if (types.includes('locality')) address.suburb = value;
                 if (types.includes('administrative_area_level_1')) address.state = component.short_name; // e.g. NSW
                 if (types.includes('postal_code')) address.post_code = value;
             });
-
-            console.log(address, 'address')
+            address.street = `${address.street_number} ${address.street_name}`
+            address.address1 = address.street;
             onPlaceSelect(address);
         });
+        return () => {
+            google.maps.event.removeListener(listener);
+        };
     }, [onPlaceSelect, placeAutocomplete]);
 
     return (
-        <div className="autocomplete-container w-full">
+        <div className="autocomplete-container w-full relative">
             <FormInput
                 ref={inputRef}
-                placeholder="Start typing address..."
+                placeholder="Search street address"
                 className="address-input"
+                icon={Search}
+                autoFocus={false}
+                value={value}
                 {...rest}
             />
-
+            {/* {value && <CircleX className='absolute h-4 w-4 top-1/2 text-gray-400 right-2' />} */}
         </div>
     );
 };

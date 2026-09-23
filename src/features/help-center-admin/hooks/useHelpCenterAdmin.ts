@@ -12,7 +12,7 @@ export const useHelpArticles = (filters: HelpArticleFilters) => {
   });
 };
 
-export const useHelpArticleDetails = (id: string | number | null) => {
+export const useHelpArticleDetails = (id: number | null) => {
   return useQuery({
     queryKey: QUERY_KEYS.ADMIN_HELP_CENTER.DETAILS(id || ""),
     queryFn: () => helpCenterAdminService.getDetails(id!),

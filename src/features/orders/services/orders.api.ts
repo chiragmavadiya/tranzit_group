@@ -7,9 +7,13 @@ import type {
     QuoteServicesRequest,
     QuoteServicesResponse,
     WalletCheckResponse,
-    PaymentInfoResponse
+    PaymentInfoResponse,
+    OrderCountsResponse
 } from "../types/api.types";
 import type { OrderDetailData } from "../types/order-details.types";
+import { getFileName } from "@/lib/utils";
+
+export type PackingDocument = "packing-slip" | "packing-summary";
 
 export const ordersService = {
     /**
@@ -17,11 +21,12 @@ export const ordersService = {
      */
     getOrders: async (params?: {
         status?: string;
-        start_date?: string;
-        end_date?: string;
+        start_date?: Date | string | undefined;
+        end_date?: Date | string | undefined;
         per_page?: number;
         page?: number;
         search?: string;
+        address_status?: string;
     }): Promise<OrdersResponse> => {
         const response = await api.get<OrdersResponse>(API_ENDPOINTS.ORDERS.LIST, { params });
         return response.data;
@@ -39,7 +44,17 @@ export const ordersService = {
      * Create a new order
      */
     createOrder: async (data: CreateOrderRequest): Promise<CreateOrderResponse> => {
-        const response = await api.post(API_ENDPOINTS.ORDERS.CREATE, data);
+        const response = await api.post(data.is_own_courier ? API_ENDPOINTS.ORDERS.CREATE_OWN_COURIER : API_ENDPOINTS.ORDERS.CREATE, data);
+        return response.data;
+    },
+
+    createManualOrder: async (data: any): Promise<any> => {
+        const response = await api.post(API_ENDPOINTS.ORDERS.MANUAL_STORE, data);
+        return response.data;
+    },
+
+    updateOrder: async (orderId: string | number, data: any): Promise<any> => {
+        const response = await api.put(API_ENDPOINTS.ORDERS.UPDATE(orderId), data);
         return response.data;
     },
 
@@ -62,8 +77,8 @@ export const ordersService = {
     /**
      * Check wallet balance against a total amount
      */
-    checkWalletBalance: async (total: number): Promise<WalletCheckResponse> => {
-        const response = await api.post(API_ENDPOINTS.ORDERS.WALLET_CHECK, { total });
+    checkWalletBalance: async (data: { total: number, customer_id: string | number, role: string }): Promise<WalletCheckResponse> => {
+        const response = await api.post(data.role === 'customer' ? API_ENDPOINTS.ORDERS.WALLET_CHECK : API_ENDPOINTS.ORDERS.ADMIN_WALLET_CHECK, { ...data });
         return response.data;
     },
 
@@ -86,18 +101,38 @@ export const ordersService = {
     /**
      * Cancel an order
      */
-    cancelOrder: async (orderId: string | number): Promise<any> => {
-        const response = await api.post(API_ENDPOINTS.ORDERS.CANCEL(orderId));
+    cancelOrder: async (orderId: string | number, data: any): Promise<any> => {
+        const response = await api.post(API_ENDPOINTS.ORDERS.CANCEL(orderId), data);
+        return response.data;
+    },
+
+    /**
+     * Cancel up to 100 orders in one request. `manually` is admin-only.
+     */
+    massCancelOrders: async (orderNumbers: string[], manually?: boolean): Promise<any> => {
+        const response = await api.post(API_ENDPOINTS.ORDERS.MASS_CANCEL, {
+            order_numbers: orderNumbers,
+            ...(manually != null && { manually })
+        });
+        return response.data;
+    },
+
+    /**
+     * Archive up to 100 orders in one request.
+     */
+    massArchiveOrders: async (orderNumbers: string[]): Promise<any> => {
+        const response = await api.post(API_ENDPOINTS.ORDERS.MASS_ARCHIVE, { order_numbers: orderNumbers });
         return response.data;
     },
 
     /**
      * Consign an order
      */
-    consignOrder: async (orderId: string | number, data: any): Promise<any> => {
-        const response = await api.post(API_ENDPOINTS.ORDERS.CONSIGN(orderId), data);
+    consignOrder: async (orderId: string | number, data: any, isAdmin: boolean = false): Promise<any> => {
+        const response = await api.post(API_ENDPOINTS.ORDERS.CONSIGN(orderId, isAdmin), data);
         return response.data;
     },
+
 
     /**
      * Import orders via CSV
@@ -122,8 +157,8 @@ export const ordersService = {
     exportOrders: async (params: {
         format: "pdf" | "csv" | "excel";
         status?: string;
-        start_date?: string;
-        end_date?: string;
+        start_date?: Date | string | undefined;
+        end_date?: Date | string | undefined;
         search?: string;
     }): Promise<{ blob: Blob, filename: string }> => {
         const response = await api.get(API_ENDPOINTS.ORDERS.EXPORT, {
@@ -131,7 +166,8 @@ export const ordersService = {
             responseType: "blob",
         });
 
-        const filename = `orders_${new Date().getTime()}.${params.format}`;
+        const formated = params.format === 'csv' ? 'csv' : params.format === 'excel' ? 'xlsx' : 'pdf';
+        const filename = getFileName(response) || `customer-orders-${new Date().getTime()}.${formated}`;
 
         return { blob: response.data, filename };
     },
@@ -143,6 +179,106 @@ export const ordersService = {
         const response = await api.get(API_ENDPOINTS.ORDERS.LABEL_DOWNLOAD(orderId), {
             responseType: "blob",
         });
+        return response.data;
+    },
+
+    /**
+     * Get order status counts
+     */
+    getOrderCounts: async (params?: {
+        customer?: string | number;
+        search?: string;
+        start_date?: Date | string | undefined;
+        end_date?: Date | string | undefined;
+    }): Promise<OrderCountsResponse> => {
+        const response = await api.get<OrderCountsResponse>(API_ENDPOINTS.ORDERS.COUNTS, { params });
+        return response.data;
+    },
+
+    /**
+     * Get receiver address for a specific order
+     */
+    getReceiverAddress: async (orderId: string | number): Promise<any> => {
+        const response = await api.get(API_ENDPOINTS.ORDERS.RECEIVER_ADDRESS(orderId));
+        return response.data;
+    },
+
+    /**
+     * Update receiver address for a specific order
+     */
+    updateReceiverAddress: async (orderId: string | number, data: any): Promise<any> => {
+        const response = await api.put(API_ENDPOINTS.ORDERS.RECEIVER_ADDRESS(orderId), data);
+        return response.data;
+    },
+
+    /**
+     * Download sample CSV for order import
+     */
+    downloadImportSample: async (): Promise<Blob> => {
+        const response = await api.get(API_ENDPOINTS.ORDERS.IMPORT_SAMPLE, {
+            responseType: "blob",
+        });
+        return response.data;
+    },
+
+    /**
+     * Archive an order
+     */
+    archiveOrder: async (orderId: string | number): Promise<any> => {
+        const response = await api.post(API_ENDPOINTS.ORDERS.ARCHIVE(orderId));
+        return response.data;
+    },
+
+    /**
+     * Restore an archived order (admin only)
+     */
+    restoreOrder: async (orderNumber: string | number): Promise<any> => {
+        const response = await api.post(API_ENDPOINTS.ORDERS.RESTORE(orderNumber));
+        return response.data;
+    },
+
+    /**
+     * Print order label
+     */
+    printOrder: async (data: string | number | { order_number: string | number; phone?: string }): Promise<any> => {
+        const payload = typeof data === 'object' ? data : { order_number: data };
+        const response = await api.post(API_ENDPOINTS.ORDERS.PRINT_ORDER, payload);
+        return response.data;
+    },
+
+    /**
+     * Fetch the packing slip / packing summary PDF for one or more orders
+     */
+    getPackingDocument: async ({ document, orderNumbers }: { document: PackingDocument; orderNumbers: (string | number)[] }): Promise<{ blob: Blob, filename: string }> => {
+        const endpoint = document === 'packing-slip'
+            ? API_ENDPOINTS.ORDERS.PACKING_SLIP
+            : API_ENDPOINTS.ORDERS.PACKING_SUMMARY;
+        const response = await api.post(endpoint, { order_numbers: orderNumbers }, {
+            responseType: "blob",
+        });
+
+        return { blob: response.data, filename: getFileName(response) };
+    },
+
+    /**
+     * Update order courier
+     */
+    updateCourier: async ({ orderNumber, data }: { orderNumber: string, data: any }): Promise<any> => {
+        const response = await api.put(API_ENDPOINTS.ORDERS.UPDATE_COURIER(orderNumber), data);
+        return response.data;
+    },
+
+    /**
+     * Create AusPost manifests
+     */
+    createAuspostManifest: async (orderNumbers: string[]): Promise<any> => {
+        const response = await api.post(API_ENDPOINTS.ORDERS.AUSPOST_MANIFEST, {
+            order_numbers: orderNumbers,
+        });
+        return response.data;
+    },
+    addManualTrackingNumbers: async ({ orderNumber, data }: { orderNumber: string, data: any }): Promise<any> => {
+        const response = await api.post(API_ENDPOINTS.ORDERS.ADD_MANUAL_TRACKING_NUMBERS(orderNumber), data);
         return response.data;
     },
 };

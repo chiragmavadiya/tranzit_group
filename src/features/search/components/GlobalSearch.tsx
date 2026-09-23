@@ -4,7 +4,7 @@ import { ShoppingBag, FileText, MapPin, Box, Users } from 'lucide-react';
 import { useAppSelector } from '@/hooks/store.hooks';
 import { useDebounce } from '@/hooks/useDebounce';
 import { useGlobalSearch } from '../hooks/useSearch';
-import AutoComplete from '@/components/common/AutoComplate';
+import AutoComplete from '@/components/common/AutoComplate2';
 
 interface GlobalSearchProps {
     className?: string;
@@ -12,7 +12,7 @@ interface GlobalSearchProps {
 }
 
 export const GlobalSearch: React.FC<GlobalSearchProps> = ({
-    className = "min-w-[300px] h-9",
+    className = "w-full h-8 text-[13px]",
     placeholder = "Search orders, invoices..."
 }) => {
     const navigate = useNavigate();
@@ -31,11 +31,11 @@ export const GlobalSearch: React.FC<GlobalSearchProps> = ({
 
         if (orders?.length) {
             orders.forEach((o: any) => options.push({
-                value: `order-${o.id}`,
+                value: `order-${o.order_number}`,
                 label: o.order_number,
                 type: 'Order',
                 icon: ShoppingBag,
-                order_type: o.order_type || 'new'
+                order_type: o.order_type || 'view'
             }));
         }
 
@@ -82,11 +82,14 @@ export const GlobalSearch: React.FC<GlobalSearchProps> = ({
     }, [searchResults]);
 
     const handleSearchSelect = (value: string) => {
-        const [type, id] = value.split('-');
+        const [type, ...rest] = value.split('-');
+        const id = rest.join('-');
         const option = searchOptions.find(opt => opt.value === value);
 
         const prefix = isAdmin ? '/admin' : '';
-
+        setTimeout(() => {
+            setSearchQuery("");
+        }, 0);
         if (type === 'order') {
             const orderType = option?.order_type || 'new';
             navigate(`${prefix}/orders/${orderType}/${id}`);
@@ -100,11 +103,9 @@ export const GlobalSearch: React.FC<GlobalSearchProps> = ({
             navigate(`${prefix}/customers/${option?.id || id}`);
         }
 
-        setSearchQuery("");
     };
-
     return (
-        <div className='h-8'>
+        <div className='h-8 w-full'>
             <AutoComplete
                 placeholder={placeholder}
                 className={className}
@@ -120,7 +121,7 @@ export const GlobalSearch: React.FC<GlobalSearchProps> = ({
                         </div>
                         <div className="flex flex-col flex-1">
                             <span className="text-[13px] font-medium text-slate-900 dark:text-zinc-100">{option.label}</span>
-                            <span className="text-[11px] text-slate-500 dark:text-zinc-500 uppercase tracking-wider font-bold">{option.type}</span>
+                            <span className="text-[11px] text-slate-500 dark:text-zinc-500 uppercase tracking-wide font-bold">{option.type}</span>
                         </div>
                     </div>
                 )}

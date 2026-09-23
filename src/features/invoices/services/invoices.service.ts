@@ -1,26 +1,35 @@
 import { api } from '@/services/api';
 import { API_ENDPOINTS } from '@/constants/api.constants';
 import type { PaginatedInvoicesResponse, Invoice } from '../types';
+import { getFileName } from '@/lib/utils';
 
 export const invoicesService = {
-  getCustomerInvoices: async (params?: { search?: string; page?: number; per_page?: number }): Promise<PaginatedInvoicesResponse> => {
+  getCustomerInvoices: async (params?: { search?: string; page?: number; per_page?: number; start_date?: string; end_date?: string }): Promise<PaginatedInvoicesResponse> => {
     const response = await api.get(API_ENDPOINTS.INVOICES.BASE, { params });
     return response.data;
   },
 
   getCustomerInvoiceDetails: async (id: number): Promise<{ status: boolean; message: string; data: Invoice }> => {
-    console.log(id, "getCustomerInvoiceDetails")
     const response = await api.get(`${API_ENDPOINTS.INVOICES.BASE}/${id}`);
     return response.data;
   },
 
-  exportCustomerInvoices: async (params: { format: string; search?: string }): Promise<{ blob: Blob; filename: string }> => {
+  exportCustomerInvoices: async (params: { format: string; search?: string; start_date?: string; end_date?: string }): Promise<{ blob: Blob; filename: string }> => {
     const response = await api.get(API_ENDPOINTS.INVOICES.EXPORT, {
       params,
       responseType: 'blob',
     });
 
-    const filename = `Invoices_Export_${new Date().getTime()}.${params.format}`;
+    const formated = params.format === 'csv' ? 'csv' : params.format === 'excel' ? 'xlsx' : 'pdf';
+    const filename = getFileName(response) || `invoices_export_${new Date().getTime()}.${formated}`;
+    return { blob: response.data, filename };
+  },
+
+  downloadCustomerInvoice: async (id: string | number): Promise<{ blob: Blob; filename: string }> => {
+    const response = await api.get(API_ENDPOINTS.INVOICES.DOWNLOAD(id), {
+      responseType: 'blob',
+    });
+    const filename = getFileName(response) || `Invoice_${id}.pdf`;
     return { blob: response.data, filename };
   },
 
@@ -29,7 +38,7 @@ export const invoicesService = {
     return response.data;
   },
 
-  getAdminInvoices: async (params?: { search?: string; page?: number; per_page?: number; customer?: string }): Promise<PaginatedInvoicesResponse> => {
+  getAdminInvoices: async (params?: { search?: string; page?: number; per_page?: number; customer?: string; status?: string; start_date?: string; end_date?: string }): Promise<PaginatedInvoicesResponse> => {
     const response = await api.get(API_ENDPOINTS.ADMIN_INVOICES.BASE, { params });
     return response.data;
   },
@@ -58,17 +67,12 @@ export const invoicesService = {
     const response = await api.get(API_ENDPOINTS.ADMIN_INVOICES.DOWNLOAD(id), {
       responseType: 'blob',
     });
-    const filename = `Invoice_${id}.pdf`;
+    const filename = getFileName(response) || `Invoice_${id}.pdf`;
     return { blob: response.data, filename };
   },
 
   remindAdminInvoice: async (id: string | number): Promise<{ status: boolean; message: string }> => {
     const response = await api.post(API_ENDPOINTS.ADMIN_INVOICES.REMIND(id));
-    return response.data;
-  },
-
-  zohoSyncAdminInvoice: async (id: string | number): Promise<{ status: boolean; message: string }> => {
-    const response = await api.post(API_ENDPOINTS.ADMIN_INVOICES.ZOHO_SYNC(id));
     return response.data;
   },
 
@@ -87,12 +91,13 @@ export const invoicesService = {
     return response.data;
   },
 
-  exportAdminInvoices: async (params: { format: string; customer?: string; search?: string }): Promise<{ blob: Blob; filename: string }> => {
+  exportAdminInvoices: async (params: { format: string; customer?: string; status?: string; search?: string; start_date?: string; end_date?: string }): Promise<{ blob: Blob; filename: string }> => {
     const response = await api.get(API_ENDPOINTS.ADMIN_INVOICES.EXPORT, {
       params,
       responseType: 'blob',
     });
-    const filename = `Admin_Invoices_Export_${new Date().getTime()}.${params.format}`;
+    const format = params.format === 'csv' ? 'csv' : params.format === 'excel' ? 'xlsx' : 'pdf';
+    const filename = getFileName(response) || `Admin_Invoices_Export_${new Date().getTime()}.${format}`;
     return { blob: response.data, filename };
   }
 };

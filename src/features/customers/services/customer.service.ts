@@ -10,7 +10,10 @@ import type {
     CustomerOrdersResponse,
     CustomerTransactionsResponse,
     CustomerInvoicesResponse,
+    CustomerStatsResponse,
+    CustomerIntegrationResponse,
 } from "../types";
+import { getFileName } from "@/lib/utils";
 
 export const customerService = {
     /**
@@ -18,6 +21,14 @@ export const customerService = {
      */
     getList: async (params?: Record<string, any>): Promise<CustomerListResponse> => {
         const response = await api.get<CustomerListResponse>(API_ENDPOINTS.ADMIN_CUSTOMERS.BASE, { params });
+        return response.data;
+    },
+
+    /**
+     * Get customer counts
+     */
+    getCounts: async (): Promise<CustomerStatsResponse> => {
+        const response = await api.get<CustomerStatsResponse>(API_ENDPOINTS.ADMIN_CUSTOMERS.COUNTS);
         return response.data;
     },
 
@@ -34,6 +45,14 @@ export const customerService = {
      */
     getDetails: async (id: number | string): Promise<CustomerDetailsResponse> => {
         const response = await api.get<CustomerDetailsResponse>(API_ENDPOINTS.ADMIN_CUSTOMERS.DETAILS(id));
+        return response.data;
+    },
+
+    /**
+     * Get customer me (profile for order pre-fill)
+     */
+    getMe: async (id: number | string): Promise<any> => {
+        const response = await api.get(API_ENDPOINTS.ADMIN_CUSTOMERS.ME(id));
         return response.data;
     },
 
@@ -110,10 +129,13 @@ export const customerService = {
     },
 
     /**
-     * Sync customer to Zoho
+     * Activate or deactivate the customer's access to the Customer Portal
      */
-    zohoSync: async (id: number | string, syncData?: any): Promise<GenericResponse> => {
-        const response = await api.post(API_ENDPOINTS.ADMIN_CUSTOMERS.ZOHO_SYNC(id), { syncData });
+    setAccountActivation: async (
+        id: number | string,
+        account_activation: boolean,
+    ): Promise<GenericDataResponse<{ customer_id: number; account_activation: boolean }>> => {
+        const response = await api.patch(API_ENDPOINTS.ADMIN_CUSTOMERS.ACCOUNT_ACTIVATION(id), { account_activation });
         return response.data;
     },
 
@@ -126,16 +148,8 @@ export const customerService = {
             responseType: 'blob',
         });
 
-        const disposition = response.headers['content-disposition'];
-        let filename = `customers_export_${new Date().getTime()}.${format}`;
-
-        if (disposition && disposition.indexOf('filename=') !== -1) {
-            const filenameRegex = /filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/;
-            const matches = filenameRegex.exec(disposition);
-            if (matches != null && matches[1]) {
-                filename = matches[1].replace(/['"]/g, '');
-            }
-        }
+        const _format = format === 'csv' ? 'csv' : format === 'excel' ? 'xlsx' : 'pdf';
+        const filename = getFileName(response) || `Admin_Customers_Export_${new Date().getTime()}.${_format}`;
 
         return { blob: response.data, filename };
     },
@@ -195,7 +209,49 @@ export const customerService = {
             responseType: 'blob',
         });
 
-        const filename = `invoices_${new Date().getTime()}.${format}`;
+        const formated = format === 'csv' ? 'csv' : format === 'excel' ? 'xlsx' : 'pdf';
+        const filename = getFileName(response) || `admin_customer_${id}_invoices_${new Date().getTime()}.${formated}`;
+
         return { blob: response.data, filename };
     },
+
+    /**
+     * Get customer integrations
+     */
+    getIntegrations: async (id: number | string): Promise<CustomerIntegrationResponse> => {
+        const response = await api.get<any>(API_ENDPOINTS.ADMIN_CUSTOMERS.INTEGRATIONS(id));
+        return response.data;
+    },
+
+    /**
+     * Get customer items
+     */
+    getItems: async (id: number | string, params?: Record<string, any>): Promise<any> => {
+        const response = await api.get<any>(API_ENDPOINTS.ADMIN_CUSTOMERS.ITEMS(id), { params });
+        return response.data;
+    },
+
+    /**
+     * Add transaction to customer wallet
+     */
+    addTransaction: async (id: number | string, data: any): Promise<any> => {
+        const response = await api.post(API_ENDPOINTS.ADMIN_CUSTOMERS.WALLET_TOP_UP, null, {
+            params: {
+                customer_id: id,
+                amount: data.amount,
+                description: data.description,
+                transaction_type: data.transaction_type
+            }
+        });
+        return response.data;
+    },
+
+    /**
+     * Change customer password
+     */
+    changePassword: async (id: number | string, data: any): Promise<GenericResponse> => {
+        const response = await api.post<GenericResponse>(API_ENDPOINTS.ADMIN_CUSTOMERS.CHANGE_PASSWORD(id), data);
+        return response.data;
+    },
 };
+

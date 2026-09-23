@@ -19,9 +19,10 @@ export const useQuoteDetails = (id: number | string | undefined) => {
     });
 };
 
-export const useGetQuoteServices = (role: string = 'customer') => {
+export const useGetQuoteServices = (fromAdminQuot: boolean = false) => {
     return useMutation({
-        mutationFn: (data: GetQuoteServicesPayload) => quoteService.getServices(data, role),
+        mutationFn: ({ payload, signal }: { payload: GetQuoteServicesPayload; signal?: AbortSignal }) =>
+            quoteService.getServices(payload, fromAdminQuot, signal),
     });
 };
 
@@ -38,5 +39,13 @@ export const useCreateQuote = () => {
 export const useExportQuotes = () => {
     return useMutation({
         mutationFn: (params: { format: string; search?: string }) => quoteService.export(params),
+    });
+};
+
+export const useSearchLocalities = (q: string, enabled: boolean = true) => {
+    return useQuery({
+        queryKey: QUERY_KEYS.LOCALITIES.SEARCH(q),
+        queryFn: () => quoteService.searchLocalities(q),
+        enabled: enabled && !!q,
     });
 };

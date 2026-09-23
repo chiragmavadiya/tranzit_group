@@ -5,8 +5,8 @@ import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import { Loader2, XIcon } from "lucide-react"
 
-function Dialog({ ...props }: DialogPrimitive.Root.Props) {
-  return <DialogPrimitive.Root data-slot="dialog" {...props} />
+function Dialog({ modal = false, ...props }: DialogPrimitive.Root.Props) {
+  return <DialogPrimitive.Root data-slot="dialog" {...props} modal={modal} />
 }
 
 function DialogTrigger({ ...props }: DialogPrimitive.Trigger.Props) {
@@ -51,10 +51,11 @@ function DialogContent({
       <DialogPrimitive.Popup
         data-slot="dialog-content"
         className={cn(
-          "fixed top-1/2 left-1/2 z-50 grid w-full max-w-[calc(100%-2rem)] -translate-x-1/2 -translate-y-1/2 gap-4 rounded-xl bg-popover p-4 text-sm text-popover-foreground ring-1 ring-foreground/10 duration-100 outline-none sm:max-w-sm data-open:animate-in data-open:fade-in-0 data-open:zoom-in-95 data-closed:animate-out data-closed:fade-out-0 data-closed:zoom-out-95",
+          "fixed top-1/2 left-1/2 z-50 grid w-[calc(100%-2rem)] max-w-[calc(100%-2rem)] sm:w-full sm:max-w-[calc(100%-2rem)] -translate-x-1/2 -translate-y-1/2 gap-4 rounded-sm bg-popover p-3 sm:p-4 text-xs text-popover-foreground ring-1 ring-foreground/10 duration-100 outline-none sm:max-w-sm data-open:animate-in data-open:fade-in-0 data-open:zoom-in-95 data-closed:animate-out data-closed:fade-out-0 data-closed:zoom-out-95",
           className
         )}
         {...props}
+      // initialFocus={false}
       >
         {children}
         {showCloseButton && (
@@ -158,9 +159,13 @@ interface CustomModelProps {
   contentClass?: string;
   showFooter?: boolean;
   customFooter?: React.ReactNode;
+  disablePointerDismissal?: boolean;
+  showCloseButton?: boolean;
+  /** Spinner on the cancel button, for when that slot runs its own action. */
+  cancelLoading?: boolean;
 }
 
-const CustomModel = ({ open, title, description, onOpenChange, children, onSubmit, onCancel, cancelText = 'Cancel', submitText = 'Submit', isLoading = false, contentClass = "", showFooter = true, customFooter }: CustomModelProps) => {
+const CustomModel = ({ open, title, description, onOpenChange, children, onSubmit, onCancel, cancelText = 'Cancel', submitText = 'Submit', isLoading = false, contentClass = "", showFooter = true, customFooter, disablePointerDismissal = false, showCloseButton = true, cancelLoading = false }: CustomModelProps) => {
   const handleCancel = () => {
     if (onCancel) {
       onCancel()
@@ -168,44 +173,49 @@ const CustomModel = ({ open, title, description, onOpenChange, children, onSubmi
     onOpenChange(false)
   }
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
+    <Dialog open={open} onOpenChange={onOpenChange} modal={false} disablePointerDismissal={disablePointerDismissal}>
       <DialogContent
-        className={contentClass || "min-w-xl"}
+        className={cn(
+          "flex flex-col max-h-[85vh] md:max-h-[90vh] overflow-hidden gap-0",
+          contentClass || "min-w-0 sm:min-w-xl"
+        )}
         tabIndex={undefined}
+        showCloseButton={showCloseButton}
       >
-        <DialogHeader className="border-b border-gray-100 dark:border-zinc-800">
-          <DialogTitle className="my-0 mb-3 text-xl font-bold text-slate-900 dark:text-zinc-100 italic!">
+        <DialogHeader className="border-b pb-3 border-gray-200 dark:border-zinc-800 gap-0 mb-3">
+          <DialogTitle className="my-0 mb-0 text-2xl font-bold text-slate-900 dark:text-zinc-100">
             {title}
           </DialogTitle>
           {description && (
-            <DialogDescription>
+            <DialogDescription className="mb-2">
               {description}
             </DialogDescription>
           )}
         </DialogHeader>
-        <div className="-mx-4 no-scrollbar max-h-[65vh] overflow-y-auto px-4" autoFocus={false}>
+        <div className={cn("-mx-4 no-scrollbar flex-1 overflow-y-auto px-4", showFooter && "mb-3")} autoFocus={false}>
           {children}
         </div>
         {
           showFooter && (
-            <DialogFooter className="gap-3 flex sm:justify-between p-4 border-t border-gray-100 dark:border-zinc-800 bg-gray-50/50 dark:bg-zinc-900/50">
-              <div>
+            <DialogFooter className="gap-2 sm:gap-3 flex flex-col-reverse sm:flex-row sm:justify-between p-3 sm:p-4 border-t border-gray-300 dark:border-zinc-800 bg-gray-50/50 dark:bg-zinc-900/50 mt-auto -mx-3 sm:-mx-4 -mb-3 sm:-mb-4">
+              <div className="flex items-center gap-2">
                 {customFooter}
               </div>
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-2 w-full sm:w-auto">
                 <Button
                   type="button"
                   variant="outline"
                   onClick={handleCancel}
-                  disabled={isLoading}
-                  className="px-4 border-gray-200 dark:border-zinc-800 font-medium hover:bg-gray-100 dark:hover:bg-zinc-800 h-8"
+                  disabled={isLoading || cancelLoading}
+                  className="flex-1 sm:flex-none px-4 border-gray-200 dark:border-zinc-800 font-medium hover:bg-gray-100 dark:hover:bg-zinc-800 h-8"
                 >
+                  {cancelLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : null}
                   {cancelText}
                 </Button>
                 <Button
                   type="submit"
-                  disabled={isLoading}
-                  className="px-4 bg-[#0060FE] hover:bg-[#0052db] text-white font-semibold transition-all shadow-md shadow-blue-100 dark:shadow-none active:scale-[0.98] h-8"
+                  disabled={isLoading || cancelLoading}
+                  className="flex-1 sm:flex-none px-4 bg-primary hover:bg-primary-hover text-white font-semibold transition-all shadow-md shadow-primary/20 dark:shadow-none active:scale-[0.98] h-8"
                   onClick={onSubmit}
                 >
                   {isLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : null}

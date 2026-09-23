@@ -1,26 +1,186 @@
-"use client";
-
-import { useState } from 'react';
-import { NavLink, useLocation } from 'react-router-dom';
-import { Menu, ArrowLeft, ChevronDown } from 'lucide-react';
+import React, { useState, useEffect, useMemo } from 'react';
+import { NavLink, useLocation, useNavigate } from 'react-router-dom';
+import { Menu, ArrowLeft, ChevronDown, X } from 'lucide-react';
 import type { SidebarItem } from './types/Sidebar.types';
 import { adminSidebarItems, clientSidebarItems } from '../router/Navigation';
 import tranzit_logo from '@/assets/Tranzit_Logo.svg';
+import tranzit_logo_dark from '@/assets/Tranzit_Logo_dark.svg';
 import { CustomTooltip } from '@/components/common/CustomTooltip';
 import { useAppSelector } from '@/hooks/store.hooks';
+import { useTheme } from '@/app/providers/theme-provider';
+import { cn } from '@/lib/utils';
+import { getFirstAllowedSettingsPath } from '@/utils/permission';
 
 interface SidebarProps {
   isCollapsed: boolean;
   setIsCollapsed: (val: boolean) => void;
+  isMobile?: boolean;
+  isMobileSidebarOpen?: boolean;
+  setIsMobileSidebarOpen?: (val: boolean) => void;
+  bannerOpen?: boolean;
 }
 
-export default function Sidebar({ isCollapsed, setIsCollapsed }: SidebarProps) {
+const Sidebar = ({
+  isCollapsed,
+  setIsCollapsed,
+  isMobile = false,
+  isMobileSidebarOpen = false,
+  setIsMobileSidebarOpen = () => { },
+  bannerOpen = false,
+}: SidebarProps) => {
   const [activeSubmenu, setActiveSubmenu] = useState<string | null>(null);
   const [expandedItems, setExpandedItems] = useState<string[]>([]);
-  const { role } = useAppSelector((state) => state.auth);
+  const { role, team_access } = useAppSelector((state) => state.auth);
   const location = useLocation();
+  const navigate = useNavigate();
 
-  const sidebarItems = role === 'admin' ? adminSidebarItems : clientSidebarItems;
+  const sidebarItems = useMemo(() => {
+    let items = role === 'admin' ? adminSidebarItems : clientSidebarItems;
+
+    if (role === 'customer' && team_access?.is_sub_user) {
+      const permissions = team_access.permissions || {};
+
+      items = clientSidebarItems
+        .filter((item) => {
+          if (item.key) {
+            if (item.path === '/orders/create') {
+              return permissions[item.key] === 'full';
+            }
+            return permissions[item.key] !== 'no_access';
+          }
+          return true;
+        })
+        .map((item) => {
+          if (item.subItems) {
+            const filteredSubItems = item.subItems.filter((sub) => {
+              if (sub.key) {
+                return permissions[sub.key] !== 'no_access';
+              }
+              return true;
+            });
+            return { ...item, subItems: filteredSubItems };
+          }
+
+          if (item.subGroups) {
+            const filteredSubGroups = item.subGroups
+              .map((group) => {
+                const filteredItems = group.items.filter((subItem) => {
+                  if (subItem.key) {
+                    return permissions[subItem.key] !== 'no_access';
+                  }
+                  return true;
+                });
+                return { ...group, items: filteredItems };
+              })
+              .filter((group) => group.items.length > 0);
+            return { ...item, subGroups: filteredSubGroups };
+          }
+
+          return item;
+        })
+        .filter((item) => {
+          if (item.hasDropdown) {
+            if (item.subItems && item.subItems.length === 0) return false;
+            if (item.subGroups && item.subGroups.length === 0) return false;
+          }
+          return true;
+        });
+    }
+
+    return items.map((item) => {
+      if (item.name === 'Settings') {
+        const firstAllowedSettings = getFirstAllowedSettingsPath(team_access, role);
+        return {
+          ...item,
+          path: firstAllowedSettings || '/settings/account',
+        };
+      }
+      return item;
+    });
+  }, [role, team_access]);
+
+  const { theme } = useTheme();
+
+  const isItemActive = (item: SidebarItem, isActive: boolean) => {
+    if (item.isExternal) return false;
+
+    // Fix double active highlight for base orders menu vs create order
+    if (item.name === 'Orders' || item.name === 'Order Management') {
+      if (role === 'admin' && (location.pathname === '/admin/orders' || location.pathname.startsWith('/admin/orders/'))) {
+        return true;
+      }
+      if (role !== 'admin' && location.pathname.includes('/orders/create')) {
+        return false;
+      }
+    }
+
+    // If the item has a dropdown, ignore the default NavLink isActive (which triggers for '#' paths).
+    // Instead, only highlight it if one of its sub-items is active.
+    if (item.hasDropdown) {
+      if (item.subItems) {
+        return item.subItems.some(sub =>
+          location.pathname === sub.path ||
+          location.pathname.startsWith(sub.path + '/')
+        );
+      }
+
+      if (item.subGroups) {
+        return item.subGroups.some(group =>
+          group.items.some(subItem =>
+            location.pathname === subItem.path ||
+            location.pathname.startsWith(subItem.path + '/')
+          )
+        );
+      }
+
+      return false;
+    }
+
+    return isActive;
+  };
+
+  useEffect(() => {
+    const matchingItem = sidebarItems.find(item => {
+      if (item.subGroups) {
+        if (location.pathname === item.path || location.pathname.startsWith(item.path + '/')) {
+          return true;
+        }
+        return item.subGroups.some(group =>
+          group.items.some(subItem =>
+            location.pathname === subItem.path ||
+            location.pathname.startsWith(subItem.path + '/')
+          )
+        );
+      }
+      return false;
+    });
+
+    if (matchingItem) {
+      setActiveSubmenu(matchingItem.name);
+    } else {
+      setActiveSubmenu(null);
+    }
+
+    // Auto-expand dropdowns when a sub-item is active
+    const expanded: string[] = [];
+    sidebarItems.forEach(item => {
+      if (item.subItems) {
+        const hasActiveSub = item.subItems.some(sub =>
+          location.pathname === sub.path ||
+          location.pathname.startsWith(sub.path + '/')
+        );
+        if (hasActiveSub) {
+          expanded.push(item.name);
+        }
+      }
+    });
+    if (expanded.length > 0) {
+      setExpandedItems(prev => {
+        const combined = [...prev, ...expanded];
+        return Array.from(new Set(combined));
+      });
+    }
+  }, [location.pathname, sidebarItems]);
 
   const toggleExpand = (name: string) => {
     setExpandedItems(prev =>
@@ -38,51 +198,94 @@ export default function Sidebar({ isCollapsed, setIsCollapsed }: SidebarProps) {
     }
   };
 
+  const handleBackToMainMenu = () => {
+    setActiveSubmenu(null);
+    navigate(`${role === 'admin' ? '/admin' : ''}/orders`);
+  };
+
+  const handleBackFromSubmenu = () => {
+    setActiveSubmenu(null);
+    navigate(`${role === 'admin' ? '/admin' : ''}/orders`);
+  };
+
   const currentSubmenuData = sidebarItems.find(i => i.name === activeSubmenu);
 
   return (
-    <aside className={`print:hidden h-screen bg-white dark:bg-zinc-950 border-r border-gray-200 dark:border-zinc-800 flex flex-col justify-between fixed top-0 left-0 z-20 transition-[width] duration-500 ease-in-out ${isCollapsed ? 'w-[64px]' : 'w-[240px]'}`}>
+    <aside
+      style={bannerOpen ? { top: '36px', height: 'calc(100dvh - 36px)' } : {}}
+      className={cn(
+        "print:hidden h-dvh bg-white dark:bg-zinc-950 border-r border-gray-200 dark:border-zinc-800 flex flex-col justify-between fixed top-0 left-0 transition-all duration-300 ease-in-out z-20",
+        isMobile
+          ? "w-[240px] z-50"
+          : "z-20",
+        isMobile
+          ? (isMobileSidebarOpen ? "translate-x-0" : "-translate-x-full")
+          : "translate-x-0",
+        !isMobile && (isCollapsed ? "w-[64px]" : "w-[240px]")
+      )}
+    >
       <div className="flex-1 overflow-y-auto overflow-x-hidden w-full no-scrollbar">
         {/* Main Menu Header */}
         {!activeSubmenu && (
-          <div className={`flex items-center justify-between h-16 ${isCollapsed ? 'px-4' : 'px-4'} sticky top-0 z-20 bg-white dark:bg-zinc-950`}>
-            <button onClick={() => setIsCollapsed(!isCollapsed)} className="p-2 hover:bg-gray-100 dark:hover:bg-zinc-900 rounded-md text-blue-500 transition-colors">
-              <Menu className="w-[22px] h-[22px]" strokeWidth={2.5} />
+          <div className={`flex items-center h-16 px-4 sticky top-0 z-20 bg-white dark:bg-zinc-950`}>
+            <button
+              onClick={() => isMobile ? setIsMobileSidebarOpen(false) : setIsCollapsed(!isCollapsed)}
+              className="p-2 hover:bg-gray-100 dark:hover:bg-zinc-900 rounded-md text-primary transition-colors"
+            >
+              {isMobile ? <X className="w-[22px] h-[22px]" /> : <Menu className="w-[22px] h-[22px]" strokeWidth={2.5} />}
             </button>
-            <div className="flex items-center">
+            <div className={`flex items-center transition-all duration-300 ease-in-out ${isMobile ? 'w-auto opacity-100' : (isCollapsed ? 'w-0 opacity-0 pointer-events-none overflow-hidden' : 'w-auto opacity-100')
+              }`}>
               {/* brand logo */}
-              <img src={tranzit_logo} alt="Tranzit" className="h-10 dark:invert" />
+              <div className="relative h-12 w-28 cursor-pointer shrink-0" onClick={handleBackToMainMenu}>
+                <img
+                  src={tranzit_logo}
+                  alt="Tranzit"
+                  className={cn(
+                    "absolute inset-0 h-full w-full object-contain transition-all duration-500 ease-in-out",
+                    theme === "dark" ? "opacity-0 scale-95 pointer-events-none" : "opacity-100 scale-100"
+                  )}
+                />
+                <img
+                  src={tranzit_logo_dark}
+                  alt="Tranzit"
+                  className={cn(
+                    "absolute inset-0 h-full w-full object-contain transition-all duration-500 ease-in-out",
+                    theme === "dark" ? "opacity-100 scale-100" : "opacity-0 scale-95 pointer-events-none"
+                  )}
+                />
+              </div>
             </div>
           </div>
         )}
 
         {/* Submenu Header (e.g. Settings) */}
-        {activeSubmenu && !isCollapsed && (
+        {activeSubmenu && (!isCollapsed || isMobile) && (
           <div className="flex flex-col pt-2 animate-in slide-in-from-left-4 duration-300">
             <button
-              onClick={() => setActiveSubmenu(null)}
-              className="flex items-center gap-2 px-4 py-2 text-[13px] text-gray-500 dark:text-zinc-400 hover:text-gray-900 dark:hover:text-zinc-100 transition-colors"
+              onClick={handleBackFromSubmenu}
+              className="flex items-center cursor-pointer gap-2 px-4 py-2 text-[13px] text-gray-500 dark:text-zinc-400 hover:text-gray-900 dark:hover:text-zinc-100 transition-colors"
             >
               <ArrowLeft className="w-4 h-4" />
               <span>Back to main menu</span>
             </button>
-            <div className="flex items-center justify-between px-6 py-4 mt-2">
+            <div className="flex items-center justify-between px-6 py-2 mt-2">
               <div className="flex items-center gap-3">
-                {currentSubmenuData?.icon && <currentSubmenuData.icon className="w-6 h-6 text-blue-500" />}
-                <h2 className="text-xl font-bold tracking-tight text-slate-900 dark:text-zinc-100">{activeSubmenu}</h2>
+                {currentSubmenuData?.icon && <currentSubmenuData.icon className="w-6 h-6 text-primary" />}
+                <h2 className="my-0 text-xl font-bold tracking-tight text-slate-900 dark:text-zinc-100">{activeSubmenu}</h2>
               </div>
-              <ChevronDown className="w-5 h-5 text-blue-500 rotate-180" />
+              {/* <ChevronDown className="w-5 h-5 text-primary rotate-180" /> */}
             </div>
           </div>
         )}
 
         <nav className="px-2 mt-1 space-y-0.5 pb-2">
-          {activeSubmenu && !isCollapsed ? (
+          {activeSubmenu && (!isCollapsed || isMobile) ? (
             // Render Submenu Groups (Settings)
             <div className="space-y-6 pt-4 animate-in fade-in duration-500">
               {currentSubmenuData?.subGroups?.map((group) => (
                 <div key={group.title} className="space-y-2">
-                  <h3 className="px-4 text-[11px] font-bold tracking-widest text-gray-400 uppercase">
+                  <h3 className="px-4 text-[11px] font-bold tracking-wide text-gray-400 uppercase">
                     {group.title}
                   </h3>
                   <div className="space-y-0.5">
@@ -91,11 +294,18 @@ export default function Sidebar({ isCollapsed, setIsCollapsed }: SidebarProps) {
                         key={subItem.name}
                         to={subItem.path}
                         className={({ isActive }) =>
-                          `flex items-center px-4 py-2 text-[13.5px] font-medium transition-colors ${isActive ? 'text-blue-600 dark:text-blue-400' : 'text-gray-600 dark:text-zinc-400 hover:text-gray-900 dark:hover:text-zinc-100 hover:bg-gray-50 dark:hover:bg-zinc-900'
+                          `flex items-center gap-3 px-4 py-2 text-[13.5px] border-l-4 font-medium transition-colors rounded-r-md ${isActive ? 'text-primary bg-primary/10 border-primary dark:border-primary' : 'text-gray-600 dark:text-zinc-400 hover:text-gray-900 dark:hover:text-zinc-100 hover:bg-gray-50 dark:hover:bg-zinc-900 border-transparent'
                           }`
                         }
                       >
-                        {subItem.name}
+                        {({ isActive }) => (
+                          <>
+                            {subItem.icon && (
+                              <subItem.icon className={`w-[18px] h-[18px] shrink-0 transition-colors ${isActive ? 'text-primary' : 'text-gray-400 dark:text-zinc-500'}`} strokeWidth={2} />
+                            )}
+                            <span>{subItem.name}</span>
+                          </>
+                        )}
                       </NavLink>
                     ))}
                   </div>
@@ -107,7 +317,7 @@ export default function Sidebar({ isCollapsed, setIsCollapsed }: SidebarProps) {
             sidebarItems.map((item) => (
               <div key={item.name}>
                 <NavLink
-                  to={item.isExternal ? '#' : item.path}
+                  to={item.isExternal || item.hasDropdown && item.subItems ? '#' : item.path}
                   onClick={(e) => {
                     if (item.isExternal) {
                       e.preventDefault();
@@ -115,38 +325,33 @@ export default function Sidebar({ isCollapsed, setIsCollapsed }: SidebarProps) {
                       return;
                     }
                     if (item.hasDropdown) {
-                      // e.preventDefault();
+                      if (!item.subGroups) {
+                        e.preventDefault();
+                      }
                       handleItemClick(item);
+                      return;
                     }
+                    const itemsToRemove = ['quote_courier', 'quote_items', 'quote_sender', 'quote_receiver'];
+                    itemsToRemove.forEach(key => sessionStorage.removeItem(key));
                   }}
                   className={({ isActive }) => {
-                    // Fix double active highlight for base orders menu vs create order
-                    let finalActive = isActive;
-                    if (item.isExternal) finalActive = false;
-                    if ((item.name === 'Orders' || item.name === 'Order Management') && location.pathname.includes('/orders/create')) {
-                      finalActive = false;
-                    }
-
-                    return `flex items-center justify-between overflow-hidden py-[10px] px-3 border-l-4 rounded-r-md text-[13.5px] font-medium transition-colors ${finalActive && !item.hasDropdown ? 'text-blue-600 dark:text-blue-400 bg-blue-100 dark:bg-blue-900/10 border-blue-600 dark:border-blue-400' : 'text-gray-600 dark:text-zinc-400 hover:text-gray-900 dark:hover:text-zinc-100 hover:bg-gray-100 dark:hover:bg-zinc-900 border-transparent'
+                    const active = isItemActive(item, isActive);
+                    return `flex items-center justify-between overflow-hidden py-[10px] px-3 border-l-4 rounded-r-md text-[14px] font-medium transition-colors ${active ? 'text-primary bg-primary/10 border-primary dark:border-primary font-semibold' : 'text-gray-600 dark:text-zinc-400 hover:text-gray-900 dark:hover:text-zinc-100 hover:bg-gray-100 dark:hover:bg-zinc-900 border-transparent'
                       }`
                   }}
                 >
                   {({ isActive }) => {
-                    let finalActive = isActive;
-                    if (item.isExternal) finalActive = false;
-                    if ((item.name === 'Orders' || item.name === 'Order Management') && location.pathname.includes('/orders/create')) {
-                      finalActive = false;
-                    }
+                    const active = isItemActive(item, isActive);
 
                     return (
                       <>
                         <div className={`flex items-center gap-${!isCollapsed ? 3 : 3} w-full min-w-0 transition-all duration-300`}>
                           <CustomTooltip title={item.name} placement="bottom" className="flex-1">
-                            <item.icon className={`w-[18px] h-[18px] shrink-0 transition-colors ${finalActive && !item.hasDropdown ? 'text-blue-500' : 'text-gray-400 dark:text-zinc-500'}`} strokeWidth={2} />
+                            <item.icon className={`w-[18px] h-[18px] shrink-0 transition-colors ${active ? 'text-primary' : 'text-gray-400 dark:text-zinc-500'}`} strokeWidth={2} />
                           </CustomTooltip>
                           <div className={`flex items-center min-w-0 flex-1 transition-opacity duration-3000 ${isCollapsed ? 'opacity-100' : 'opacity-100'}`}>
                             <CustomTooltip title={item.name} placement="bottom" onlyOnOverflow={true} className="flex-1">
-                              <span>{item.name}</span>
+                              <span className={active ? 'font-semibold' : ''}>{item.name}</span>
                             </CustomTooltip>
                             {item.name === 'Getting Setup' && (
                               <span className="ml-[6px] px-[5px] py-[2px] rounded text-[10px] bg-[#111827] dark:bg-zinc-800 text-white font-semibold leading-none shadow-sm shrink-0">Menu</span>
@@ -154,21 +359,21 @@ export default function Sidebar({ isCollapsed, setIsCollapsed }: SidebarProps) {
                           </div>
                         </div>
                         {item.hasDropdown && (
-                          <ChevronDown className={`w-4 h-4 shrink-0 ml-2 transition-all duration-300 text-gray-400 dark:text-zinc-500 ${isCollapsed ? 'opacity-0' : 'opacity-100'} ${expandedItems.includes(item.name) ? 'rotate-180' : ''}`} />
+                          <ChevronDown className={`w-4 h-4 shrink-0 ml-2 transition-all duration-300 ${active ? 'text-primary' : 'text-gray-400 dark:text-zinc-500'} ${(isCollapsed && !isMobile) ? 'opacity-0' : 'opacity-100'} ${expandedItems.includes(item.name) ? 'rotate-360' : 'rotate-270'}`} />
                         )}
                       </>
                     );
                   }}
                 </NavLink>
                 {/* Sub-items for Analytics (and others) */}
-                {!isCollapsed && expandedItems.includes(item.name) && item.subItems && (
+                {(!isCollapsed || isMobile) && expandedItems.includes(item.name) && item.subItems && (
                   <div className="ml-9 mt-1 space-y-1 animate-in slide-in-from-top-2 duration-200">
                     {item.subItems.map((sub) => (
                       <NavLink
                         key={sub.name}
                         to={sub.path}
                         className={({ isActive }) =>
-                          `block px-2 py-2 text-[13.5px] font-medium rounded-md transition-colors ${isActive ? 'text-blue-600 dark:text-blue-400 font-bold' : 'text-gray-500 dark:text-zinc-400 hover:text-gray-900 dark:hover:text-zinc-100'
+                          `block px-2 py-2 text-[13.5px] leading-snug rounded-md transition-colors ${isActive ? 'text-primary font-semibold tracking-wide' : 'font-medium text-gray-500 dark:text-zinc-400 hover:text-gray-900 dark:hover:text-zinc-100'
                           }`
                         }
                       >
@@ -185,7 +390,7 @@ export default function Sidebar({ isCollapsed, setIsCollapsed }: SidebarProps) {
       {/* <div className={`border-t border-gray-200 dark:border-zinc-800 text-sm text-gray-600 dark:text-zinc-400 bg-white dark:bg-zinc-950 transition-[height,padding,opacity] duration-300 overflow-hidden ${isCollapsed ? 'h-0 opacity-0 p-0' : 'p-4 flex items-center justify-between h-[60px] opacity-100'}`}>
         <span className="font-medium text-[13px] whitespace-nowrap">Classic</span>
         <div className="flex items-center gap-2 whitespace-nowrap">
-          <div className="w-[34px] h-[18px] bg-[#0060FE] dark:bg-blue-600 rounded-full relative flex items-center shadow-inner cursor-pointer px-[2px]">
+          <div className="w-[34px] h-[18px] bg-primary rounded-full relative flex items-center shadow-inner cursor-pointer px-[2px]">
             <div className="w-[14px] h-[14px] bg-white dark:bg-zinc-100 rounded-full ml-auto shadow-sm transform transition-transform"></div>
           </div>
           <span className="text-gray-800 dark:text-zinc-200 font-medium text-[13px]">UI 2.0</span>
@@ -194,3 +399,6 @@ export default function Sidebar({ isCollapsed, setIsCollapsed }: SidebarProps) {
     </aside>
   );
 }
+
+
+export default React.memo(Sidebar);

@@ -17,7 +17,7 @@ export function RichTextEditorComponent({ value, onChange, label, required }: Ri
   return (
     <div className="space-y-1.5 flex flex-col h-full">
       {label && (
-        <label className="text-[11px] font-extrabold text-slate-700 dark:text-zinc-400 uppercase tracking-wider ml-0.5 flex items-center">
+        <label className="text-[11px] font-extrabold text-slate-700 dark:text-zinc-400 uppercase tracking-wide ml-0.5 flex items-center">
           {label}
           {required && <span className="text-red-500 ml-1 font-bold">*</span>}
         </label>

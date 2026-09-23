@@ -7,8 +7,10 @@ import type {
     InvoiceReport,
     ParcelReport,
     PaginatedResponse,
-    UploadInvoiceResponse
+    UploadInvoiceResponse,
+    ReportCountsResponse
 } from "../types";
+import { getFileName } from "@/lib/utils";
 
 export const reportsService = {
     getShipmentReport: async (filters: ReportFilters): Promise<PaginatedResponse<ShipmentReport>> => {
@@ -22,7 +24,9 @@ export const reportsService = {
             responseType: 'blob',
         });
 
-        const filename = `Shipment_Report_${new Date().getTime()}.${filters.format}`;
+        const formated = filters.format === 'csv' ? 'csv' : filters.format === 'excel' ? 'xlsx' : 'pdf';
+        const filename = getFileName(response) || `Shipment_Report_${new Date().getTime()}.${formated}`;
+
         return { blob: response.data, filename };
     },
 
@@ -36,8 +40,9 @@ export const reportsService = {
             params: filters,
             responseType: 'blob',
         });
+        const formated = filters.format === 'csv' ? 'csv' : filters.format === 'excel' ? 'xlsx' : 'pdf';
+        const filename = getFileName(response) || `Transaction_Report_${new Date().getTime()}.${formated}`;
 
-        const filename = `Transaction_Report_${new Date().getTime()}.${filters.format}`;
         return { blob: response.data, filename };
     },
 
@@ -51,6 +56,27 @@ export const reportsService = {
         const response = await api.get(endpoint, { params: filters });
         return response.data;
     },
+    getIntegratedParcelReport: async (filters: ReportFilters): Promise<PaginatedResponse<ParcelReport>> => {
+        const endpoint = API_ENDPOINTS.ADMIN_REPORTS.INTEGRATED_PARCELS;
+        const response = await api.get(endpoint, { params: filters });
+        return response.data;
+    },
+
+    getAllParcelReport: async (filters: ReportFilters): Promise<PaginatedResponse<ParcelReport>> => {
+        const response = await api.get(API_ENDPOINTS.ADMIN_REPORTS.ALL_PARCELS, { params: filters });
+        return response.data;
+    },
+
+    exportAllParcelReport: async (filters: ReportFilters & { format: string }): Promise<{ blob: Blob; filename: string }> => {
+        const response = await api.get(API_ENDPOINTS.ADMIN_REPORTS.ALL_PARCELS_EXPORT, {
+            params: filters,
+            responseType: 'blob',
+        });
+
+        const formated = filters.format === 'csv' ? 'csv' : filters.format === 'excel' ? 'xlsx' : 'pdf';
+        const filename = getFileName(response) || `All_Parcel_Report_${new Date().getTime()}.${formated}`;
+        return { blob: response.data, filename };
+    },
 
     exportParcelReport: async (filters: ReportFilters & { format: string }, isAdmin: boolean = false): Promise<{ blob: Blob; filename: string }> => {
         const endpoint = isAdmin ? API_ENDPOINTS.ADMIN_REPORTS.PARCELS_EXPORT : API_ENDPOINTS.REPORTS.PARCELS_EXPORT;
@@ -59,7 +85,19 @@ export const reportsService = {
             responseType: 'blob',
         });
 
-        const filename = `Parcel_Report_${new Date().getTime()}.${filters.format}`;
+        const formated = filters.format === 'csv' ? 'csv' : filters.format === 'excel' ? 'xlsx' : 'pdf';
+        const filename = getFileName(response) || `Parcel_Report_${new Date().getTime()}.${formated}`;
+        return { blob: response.data, filename };
+    },
+    exportIntegratedParcelReport: async (filters: ReportFilters & { format: string }): Promise<{ blob: Blob; filename: string }> => {
+        const endpoint = API_ENDPOINTS.ADMIN_REPORTS.INTEGRATED_PARCELS_EXPORT;
+        const response = await api.get(endpoint, {
+            params: filters,
+            responseType: 'blob',
+        });
+
+        const formated = filters.format === 'csv' ? 'csv' : filters.format === 'excel' ? 'xlsx' : 'pdf';
+        const filename = getFileName(response) || `Integrated_Parcel_Report_${new Date().getTime()}.${formated}`;
         return { blob: response.data, filename };
     },
 
@@ -83,5 +121,44 @@ export const reportsService = {
             },
         });
         return response.data;
+    },
+
+    getReportCounts: async (filters?: ReportFilters): Promise<ReportCountsResponse> => {
+        const response = await api.get<ReportCountsResponse>(API_ENDPOINTS.REPORTS.COUNTS, { params: filters });
+        return response.data;
+    },
+
+    getAuspostReport: async (filters: ReportFilters): Promise<PaginatedResponse<any>> => {
+        const endpoint = API_ENDPOINTS.ADMIN_REPORTS.AUSPOST;
+        const response = await api.get(endpoint, { params: filters });
+        return response.data;
+    },
+
+    exportAuspostReport: async (filters: ReportFilters & { format: string }): Promise<{ blob: Blob; filename: string }> => {
+        const endpoint = API_ENDPOINTS.ADMIN_REPORTS.AUSPOST_EXPORT;
+        const response = await api.get(endpoint, {
+            params: filters,
+            responseType: 'blob',
+        });
+        const formatted = filters.format === 'csv' ? 'csv' : filters.format === 'excel' ? 'xlsx' : 'pdf';
+        const filename = getFileName(response) || `AusPost_Report_${new Date().getTime()}.${formatted}`;
+        return { blob: response.data, filename };
+    },
+
+    getOrderLabelChargesReport: async (filters: ReportFilters): Promise<PaginatedResponse<any>> => {
+        const endpoint = API_ENDPOINTS.ADMIN_REPORTS.ORDER_LABEL_CHARGES;
+        const response = await api.get(endpoint, { params: filters });
+        return response.data;
+    },
+
+    exportOrderLabelChargesReport: async (filters: ReportFilters & { format: string }): Promise<{ blob: Blob; filename: string }> => {
+        const endpoint = API_ENDPOINTS.ADMIN_REPORTS.ORDER_LABEL_CHARGES_EXPORT;
+        const response = await api.get(endpoint, {
+            params: filters,
+            responseType: 'blob',
+        });
+        const formatted = filters.format === 'csv' ? 'csv' : filters.format === 'excel' ? 'xlsx' : 'pdf';
+        const filename = getFileName(response) || `Order_Label_Charges_Report_${new Date().getTime()}.${formatted}`;
+        return { blob: response.data, filename };
     },
 };

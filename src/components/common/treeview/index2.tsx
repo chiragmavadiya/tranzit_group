@@ -677,9 +677,9 @@ const TreeItem = memo(function TreeItem({
                             }}
                         >
                             {shouldExpand ? (
-                                <FolderOpen className="h-4 w-4 fill-blue-500/20 text-blue-500" />
+                                <FolderOpen className="h-4 w-4 fill-primary/20 text-primary" />
                             ) : (
-                                <Folder className="h-4 w-4 fill-blue-500/20 text-blue-500" />
+                                <Folder className="h-4 w-4 fill-primary/20 text-primary" />
                             )}
                         </button>
                     ) : (

@@ -14,16 +14,16 @@ import {
   useExportCourierPostcodes
 } from '../hooks/useCourierPostcode';
 import { useDebounce } from '@/hooks/useDebounce';
-import { downloadFile } from '@/lib/utils';
 import { showToast } from '@/components/ui/custom-toast';
+import useLocalStorage from '@/hooks/useLocalStorage';
 
 export default function CourierPostcodePage() {
-  const [search, setSearch] = useState('');
+  const [search, setSearch] = useLocalStorage('courier-postcode-search', '');
   const [isAddOpen, setIsAddOpen] = useState(false);
   const [editingRow, setEditingRow] = useState<CourierPostcode | null>(null);
   const [deletingRow, setDeletingRow] = useState<CourierPostcode | null>(null);
-  const [page, setPage] = useState(1);
-  const [pageSize, setPageSize] = useState(25);
+  const [page, setPage] = useLocalStorage('courier-postcode-page', 1);
+  const [pageSize, setPageSize] = useLocalStorage('courier-postcode-page-size', 25);
 
   const debouncedSearch = useDebounce(search, 500);
 
@@ -78,15 +78,7 @@ export default function CourierPostcodePage() {
   };
 
   const handleExport = (format: string) => {
-    exportPostcodes({ format, search: debouncedSearch }, {
-      onSuccess: (blob) => {
-        downloadFile(blob, `courier-postcodes-${new Date().getTime()}.${format === 'excel' ? 'xlsx' : format}`);
-        showToast('Exported successfully', "success");
-      },
-      onError: (err: any) => {
-        showToast(err?.response?.data?.message || 'Failed to export', "error");
-      }
-    });
+    exportPostcodes({ format, search: debouncedSearch });
   };
 
   const columns = useMemo(() => POSTCODE_COLUMNS(
@@ -98,17 +90,18 @@ export default function CourierPostcodePage() {
   ), []);
 
   return (
-    <div className="flex flex-col flex-1 gap-4 p-page-padding min-h-0 animate-in fade-in slide-in-from-bottom-2 duration-500 bg-slate-50/30 dark:bg-zinc-950/30 overflow-y-auto">
-      <div className='rounded-2xl min-h-[500px] shadow-[0_8px_30px_rgba(0,0,0,0.04)] flex-1 flex flex-col border border-slate-100 dark:border-zinc-800 bg-white dark:bg-zinc-950 overflow-hidden'>
+    <div className="flex flex-col flex-1 gap-4 p-page-padding animate-in fade-in slide-in-from-bottom-2 duration-500 bg-slate-50/30 dark:bg-zinc-950/30 overflow-y-auto">
+      <div className='rounded-2xl shadow-[0_8px_30px_rgba(0,0,0,0.04)] flex-none h-auto border border-slate-100 dark:border-zinc-800 bg-white dark:bg-zinc-950'>
         <DataTable
           columns={columns as any}
           data={postcodeData?.data || []}
+          headerTitle='Courier Based PostCode'
           searchable
           searchValue={search}
           onSearchChange={(val) => { setSearch(val); setPage(1); }}
           pageSize={pageSize}
           onPageSizeChange={(val) => { setPageSize(Number(val)); setPage(1); }}
-          className="pb-3 text-xs"
+          className="pb-3 text-xs flex-none h-auto [&_div.overflow-auto]:flex-none [&_div.overflow-auto]:h-auto [&_div.overflow-auto]:min-h-0 [&_div.overflow-auto]:overflow-y-visible [&_div.overflow-auto]:overflow-x-auto"
           totalItems={postcodeData?.meta?.total || 0}
           currentPage={page}
           onPageChange={setPage}
@@ -122,10 +115,10 @@ export default function CourierPostcodePage() {
                 setEditingRow(null);
                 setIsAddOpen(true);
               }}
-              className="gap-2 bg-[#0060FE] hover:bg-[#0052db] text-white shadow-lg shadow-blue-100 dark:shadow-none transition-all active:scale-[0.98] font-semibold border-none px-4 h-8"
+              className="gap-2 text-white shadow-lg shadow-blue-100 dark:shadow-none transition-all active:scale-[0.98] font-semibold border-none px-4 h-8"
             >
               <Plus className="w-4 h-4" />
-              <span className="text-xs uppercase tracking-wider font-bold">Add Postcode</span>
+              <span className="text-xs uppercase tracking-wide font-bold">Add Postcode</span>
             </Button>
           }
         />

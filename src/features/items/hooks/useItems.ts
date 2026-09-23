@@ -3,6 +3,7 @@ import { itemsService } from "../services/items.service";
 import { QUERY_KEYS } from "@/constants/api.constants";
 import type { ItemsFilters, ItemFormData } from "../types";
 import { showToast } from "@/components/ui/custom-toast";
+import { downloadFile } from "@/lib/utils";
 
 /**
  * Hook to fetch items list
@@ -101,16 +102,89 @@ export const useExportItems = () => {
     mutationFn: ({ format, search }: { format: string; search?: string }) =>
       itemsService.export(format, search),
     onSuccess: ({ blob, filename }) => {
-      const url = window.URL.createObjectURL(blob);
-      const link = document.createElement('a');
-      link.href = url;
-      link.setAttribute('download', filename);
-      document.body.appendChild(link);
-      link.click();
-      link.remove();
+      downloadFile(blob, filename)
     },
     onError: (error: any) => {
       showToast(error.message || "Failed to export items", "error");
+    },
+  });
+};
+
+/**
+ * Hook to set an item as default
+ */
+export const useSetDefaultItem = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (id: number | string) => itemsService.setDefault(id),
+    onSuccess: (response) => {
+      if (response.status) {
+        showToast(response.message || "Default item updated successfully", "success");
+        queryClient.invalidateQueries({ queryKey: QUERY_KEYS.ITEMS.LIST });
+        queryClient.invalidateQueries({ queryKey: QUERY_KEYS.AUTH.USER_DETAILS });
+      } else {
+        showToast(response.message || "Failed to set default item", "error");
+      }
+    },
+    onError: (error: any) => {
+      showToast(error.message || "An error occurred", "error");
+    },
+  });
+};
+
+/**
+ * Hook to unset default item
+ */
+export const useUnsetDefaultItem = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (id: number | string) => itemsService.unsetDefault(id),
+    onSuccess: (response) => {
+      if (response.status) {
+        showToast(response.message || "Default item unset successfully", "success");
+        queryClient.invalidateQueries({ queryKey: QUERY_KEYS.ITEMS.LIST });
+        queryClient.invalidateQueries({ queryKey: QUERY_KEYS.AUTH.USER_DETAILS });
+      } else {
+        showToast(response.message || "Failed to unset default item", "error");
+      }
+    },
+    onError: (error: any) => {
+      showToast(error.message || "An error occurred", "error");
+    },
+  });
+};
+
+/**
+ * Hook to fetch the default item details
+ */
+export const useDefaultItem = (enabled: boolean = true) => {
+  return useQuery({
+    queryKey: QUERY_KEYS.ITEMS.DEFAULT,
+    queryFn: () => itemsService.getDefault(),
+    enabled: !!enabled,
+  });
+};
+
+/**
+ * Hook to toggle item status
+ */
+export const useToggleItemStatus = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (id: number | string) => itemsService.toggleStatus(id),
+    onSuccess: (response) => {
+      if (response.status) {
+        showToast(response.message || "Item status updated successfully", "success");
+        queryClient.invalidateQueries({ queryKey: QUERY_KEYS.ITEMS.LIST });
+      } else {
+        showToast(response.message || "Failed to update item status", "error");
+      }
+    },
+    onError: (error: any) => {
+      showToast(error.message || "An error occurred", "error");
     },
   });
 };

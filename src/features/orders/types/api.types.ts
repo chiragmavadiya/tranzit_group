@@ -4,7 +4,8 @@ export interface CreateOrderRequest {
         company?: string;
         phone: string;
         email: string;
-        address1: string;
+        address1?: string | undefined;
+        address?: string | undefined;
         suburb: string;
         state: string;
         postcode: string;
@@ -17,7 +18,8 @@ export interface CreateOrderRequest {
         company?: string;
         phone: string;
         email: string;
-        address1: string;
+        address1?: string | undefined;
+        address?: string | undefined;
         suburb: string;
         state: string;
         postcode: string;
@@ -25,7 +27,7 @@ export interface CreateOrderRequest {
         street_name?: string;
         street_number?: string;
     };
-    parcels: Array<{
+    parcels?: Array<{
         type: string;
         quantity: number;
         weight: number;
@@ -33,7 +35,7 @@ export interface CreateOrderRequest {
         width: number;
         height: number;
     }>;
-    service: {
+    service?: {
         courier: number;
         product_id: string;
         product_type: string;
@@ -41,11 +43,10 @@ export interface CreateOrderRequest {
         cover_limited_liability: number;
         signature_required: number;
     };
-    surcharges: any[];
+    surcharges?: any[];
     delivery_instructions?: string;
-    pickup_date: string;
-    terms_and_conditions: boolean;
-    totals: {
+    terms_and_conditions?: boolean;
+    totals?: {
         subtotal: number;
         gst: number;
         total: number;
@@ -53,6 +54,7 @@ export interface CreateOrderRequest {
     };
     capture: boolean;
     save_address?: number;
+    is_own_courier?: boolean;
 }
 
 export interface CreateOrderResponse {
@@ -60,6 +62,14 @@ export interface CreateOrderResponse {
     order_number: string;
     redirect: string;
     tracking_number?: string;
+    success?: boolean;
+    message?: string
+    status?: boolean
+    data?: {
+        order_number: string;
+        order_status_category: string;
+        need_add_tracking: boolean
+    }
 }
 
 export interface QuoteServicesRequest {
@@ -120,6 +130,7 @@ export interface WalletCheckResponse {
     wallet_balance: number;
     total: number;
     payment_capture: boolean;
+    skipWalletCheckArg?: string | boolean;
 }
 
 export interface PaymentInfoResponse {
@@ -140,3 +151,17 @@ export interface PaymentInfoResponse {
         }>;
     };
 }
+
+export interface OrderCountsResponse {
+    status: boolean;
+    message?: string;
+    data: {
+        all?: number;
+        pending?: number;
+        ready?: number;
+        consigned?: number;
+        cancelled?: number;
+        [key: string]: number | boolean | string | undefined;
+    };
+}
+

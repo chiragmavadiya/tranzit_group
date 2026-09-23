@@ -1,18 +1,31 @@
-import { FileText, Eye, Download, Wallet, DollarSign } from 'lucide-react';
+import { FileText, Eye, Download, Wallet, DollarSign, Loader2 } from 'lucide-react';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { DataTable } from '@/components/common/DataTable';
 import { StatCard } from '@/components/common/StatCard';
 import { useCustomerInvoices, useExportCustomerInvoices } from '../../hooks/useCustomers';
-import { downloadFile } from '@/lib/utils';
+import { downloadFile, formateCurrency } from '@/lib/utils';
 import { showToast } from '@/components/ui/custom-toast';
+import { NavLink, useNavigate } from 'react-router-dom';
+import { INVOICE_STATUS_COLORS } from '@/features/invoices/constants';
+import { useAppSelector } from '@/hooks/store.hooks';
+import { useDownloadAdminInvoice, useDownloadCustomerInvoice } from '@/features/invoices/hooks/useInvoices';
+import { CustomTooltip } from '@/components/common/CustomTooltip';
 
 interface InvoiceManagementTabProps {
     customerId: string;
 }
 
 export const InvoiceManagementTab = ({ customerId }: InvoiceManagementTabProps) => {
+    const { role } = useAppSelector((state) => state.auth);
+    const isAdmin = role === 'admin';
+    const navigate = useNavigate();
+
+    const downloadAdminInvoice = useDownloadAdminInvoice();
+    const downloadCustomerInvoice = useDownloadCustomerInvoice();
+    const downloadMutation = isAdmin ? downloadAdminInvoice : downloadCustomerInvoice;
+
     const { data: response, isLoading } = useCustomerInvoices(customerId);
 
     const invoices = response?.data || [];
@@ -46,13 +59,13 @@ export const InvoiceManagementTab = ({ customerId }: InvoiceManagementTabProps) 
                     label="Invoice"
                     value={summary.total_invoices.toString()}
                     icon={FileText}
-                    iconBg="bg-blue-50 dark:bg-blue-500/10"
-                    iconColor="text-blue-500"
+                    iconBg="bg-primary/10 dark:bg-primary/20"
+                    iconColor="text-primary"
                     className="border-none shadow-md"
                 />
                 <StatCard
                     label="Paid"
-                    value={`$${summary.total_paid}`}
+                    value={formateCurrency(summary.total_paid || 0)}
                     icon={DollarSign}
                     iconBg="bg-cyan-50 dark:bg-cyan-500/10"
                     iconColor="text-cyan-500"
@@ -60,7 +73,7 @@ export const InvoiceManagementTab = ({ customerId }: InvoiceManagementTabProps) 
                 />
                 <StatCard
                     label="Unpaid"
-                    value={`$${summary.total_unpaid}`}
+                    value={formateCurrency(summary.total_unpaid)}
                     icon={Wallet}
                     iconBg="bg-amber-50 dark:bg-amber-500/10"
                     iconColor="text-amber-600"
@@ -72,16 +85,13 @@ export const InvoiceManagementTab = ({ customerId }: InvoiceManagementTabProps) 
             <Card className="bg-white dark:bg-zinc-900 border-none shadow-md overflow-hidden">
                 <DataTable
                     columns={[
-                        { key: 'invoice_number', header: '#', cell: (val) => <span className="font-bold text-slate-400">#{val}</span> },
+                        { key: 'invoice_number', header: 'Invoice No.', cell: (val, row) => <NavLink to={`/admin/invoices/${row.id}`} className="font-bold hover:underline">#{val}</NavLink> },
                         {
                             key: 'status',
                             header: 'STATUS',
-                            cell: (val) => (
-                                <Badge variant="secondary" className={cn(
-                                    "border-none font-bold uppercase text-[10px] tracking-widest px-3 py-1",
-                                    val === 'Paid' ? "bg-emerald-50 text-emerald-600 dark:bg-emerald-500/10 dark:text-emerald-400" : "bg-rose-50 text-rose-600 dark:bg-rose-500/10 dark:text-rose-400"
-                                )}>
-                                    {val}
+                            cell: (status) => (
+                                <Badge className={cn("px-3 py-0.5 rounded-md font-medium border-none shadow-none", INVOICE_STATUS_COLORS[status as keyof typeof INVOICE_STATUS_COLORS])}>
+                                    {status}
                                 </Badge>
                             )
                         },
@@ -92,16 +102,33 @@ export const InvoiceManagementTab = ({ customerId }: InvoiceManagementTabProps) 
                         {
                             key: 'actions',
                             header: 'ACTION',
-                            cell: () => (
-                                <div className="flex items-center gap-2">
-                                    <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
-                                        <Eye className="h-4 w-4 text-slate-400" />
-                                    </Button>
-                                    <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
-                                        <Download className="h-4 w-4 text-slate-400" />
-                                    </Button>
-                                </div>
-                            )
+                            cell: (_, row) => {
+                                const isDownloading = downloadMutation.isPending && Number(downloadMutation.variables) === row.id;
+                                return (
+                                    <div className="flex items-center gap-2">
+                                        <CustomTooltip title="View Invoice">
+                                            <Button variant="ghost" size="sm" className="h-8 w-8 p-0" onClick={() => navigate(`/admin/invoices/${row.id}`)} >
+                                                <Eye className="h-4! w-4! " />
+                                            </Button>
+                                        </CustomTooltip>
+                                        <CustomTooltip title="Download Invoice">
+                                            <Button
+                                                variant="ghost"
+                                                size="sm"
+                                                className="h-8 w-8 p-0"
+                                                onClick={() => downloadMutation.mutate(row.id)}
+                                                disabled={downloadMutation.isPending}
+                                            >
+                                                {isDownloading ? (
+                                                    <Loader2 className="h-4 w-4 animate-spin text-primary" />
+                                                ) : (
+                                                    <Download className="h-4! w-4! " />
+                                                )}
+                                            </Button>
+                                        </CustomTooltip>
+                                    </div>
+                                );
+                            }
                         },
                     ]}
                     data={invoices}
@@ -112,6 +139,7 @@ export const InvoiceManagementTab = ({ customerId }: InvoiceManagementTabProps) 
                     exportable
                     isExporting={isExporting}
                     onExport={handleExport}
+                    className='pb-3'
                 />
             </Card>
         </div>

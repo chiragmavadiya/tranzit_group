@@ -1,42 +1,67 @@
 import { useState, useMemo, useRef, forwardRef, useCallback } from 'react';
+import { Loader2 } from 'lucide-react';
 import { CustomModel } from '@/components/ui/dialog';
 import { FormInput, FormSelect } from '@/features/orders/components/OrderFormUI';
 import PermissionTreeView from '@/components/common/treeview';
+import { useStaffFormOptions } from '../hooks/useStaff';
+
+const normalizeRole = (role?: string): string => {
+  if (!role) return 'Staff';
+  const lower = role.toLowerCase();
+  if (lower === 'it manager') return 'It Manager';
+  if (lower === 'operation manager') return 'Operation Manager';
+  if (lower === 'staff') return 'Staff';
+  if (lower === 'super admin') return 'Super Admin';
+  return role;
+};
 
 interface AddSubUserDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onSubmit: (data: any) => void;
   initialData?: any;
+  isLoading?: boolean;
+  createLoading: boolean;
 }
 
-export function AddSubUserDialog({ open, onOpenChange, onSubmit, initialData }: AddSubUserDialogProps) {
+export function AddSubUserDialog({ open, onOpenChange, onSubmit, initialData, isLoading = false, createLoading }: AddSubUserDialogProps) {
   const initialValues = useMemo(() => ({
-    firstName: '',
-    lastName: '',
-    loginEmail: '',
+    first_name: '',
+    last_name: '',
+    email: '',
     mobile: '',
-    personalEmail: '',
-    personalMobile: '',
+    personal_email: '',
+    personal_mobile: '',
     role: 'Staff',
     password: '',
-    status: 'Active',
+    confirm_password: '',
+    status: '1',
     permissions: []
   }), []);
 
   const formDataToLoad = useMemo(() => {
     if (initialData) {
       return {
-        ...initialData,
-        role: initialData.role || 'Staff',
-        status: initialData.status || 'Active',
+        id: initialData.id,
+        first_name: initialData.first_name || '',
+        last_name: initialData.last_name || '',
+        email: initialData.email || '',
+        mobile: initialData.mobile || initialData.office_number || '',
+        personal_email: initialData.personal_email || '',
+        personal_mobile: initialData.personal_mobile || '',
+        role: normalizeRole(initialData.role),
+        password: '',
+        confirm_password: '',
+        status: (initialData.status_code !== undefined ? initialData.status_code : initialData.status || '1').toString(),
         permissions: initialData.permissions || []
       };
     }
     return initialValues;
   }, [initialData, initialValues]);
 
-  const formKey = initialData ? `edit-${initialData.id}` : 'new';
+  const formKey = initialData
+    ? `edit-${initialData.id}-${initialData.permissions ? 'loaded' : 'loading'}`
+    : 'new';
   const formRef = useRef<HTMLFormElement>(null);
 
   return (
@@ -48,13 +73,20 @@ export function AddSubUserDialog({ open, onOpenChange, onSubmit, initialData }: 
       onCancel={() => onOpenChange(false)}
       submitText={initialData ? "Update" : "Submit"}
       contentClass="sm:max-w-[700px]"
+      isLoading={createLoading}
     >
-      <SubUserForm
-        key={formKey}
-        ref={formRef}
-        initialValues={formDataToLoad}
-        onSubmit={onSubmit}
-      />
+      {isLoading ? (
+        <div className="flex items-center justify-center py-20">
+          <Loader2 className="h-8 w-8 animate-spin text-slate-400" />
+        </div>
+      ) : (
+        <SubUserForm
+          key={formKey}
+          ref={formRef}
+          initialValues={formDataToLoad}
+          onSubmit={onSubmit}
+        />
+      )}
     </CustomModel>
   );
 }
@@ -69,6 +101,21 @@ const SubUserForm = forwardRef<HTMLFormElement, SubUserFormProps>(
     const [formData, setFormData] = useState(initialValues);
     const [submited, setSubmited] = useState(false);
 
+    const { data: formOptionsData } = useStaffFormOptions();
+
+    const roleOptions = useMemo(() => {
+      // const apiRoles = formOptionsData?.data?.roles;
+      // if (Array.isArray(apiRoles)) {
+      //   return apiRoles.map((r: string) => ({ label: r, value: r }));
+      // }
+      return [
+        { label: 'It Manager', value: 'It Manager' },
+        { label: 'Operation Manager', value: 'Operation Manager' },
+        { label: 'Staff', value: 'Staff' },
+        { label: 'Super Admin', value: 'Super Admin' },
+      ];
+    }, []);
+
     const handleInputChange = useCallback((field: string, value: any) => {
       setFormData((prev: any) => ({ ...prev, [field]: value }));
     }, []);
@@ -77,12 +124,48 @@ const SubUserForm = forwardRef<HTMLFormElement, SubUserFormProps>(
       e.preventDefault();
       setSubmited(true);
 
-      const requiredFields = ['firstName', 'lastName', 'loginEmail', 'mobile', 'password'];
-      const hasErrors = requiredFields.some(field => !formData[field]);
+      const requiredFields = ['first_name', 'last_name', 'email'];
+      if (!formData.id) {
+        requiredFields.push('password', 'confirm_password');
+      } else if (formData.password) {
+        requiredFields.push('confirm_password');
+      }
+
+      let hasErrors = requiredFields.some(field => !formData[field]);
+      if (formData.password && formData.password !== formData.confirm_password) {
+        hasErrors = true;
+      }
 
       if (hasErrors) return;
 
-      onSubmit(formData);
+      // Filter out top-level module names from the permissions payload sent to the backend
+      const modules = formOptionsData?.data?.modules || [];
+      const moduleNames = new Set(modules.map((m: any) => m.name));
+      const cleanPermissions = (formData.permissions || []).filter(
+        (perm: string) => !moduleNames.has(perm)
+      );
+
+      const payload: any = {
+        first_name: formData.first_name,
+        last_name: formData.last_name,
+        email: formData.email,
+        personal_email: formData.personal_email || '',
+        personal_mobile: formData.personal_mobile || '',
+        mobile: formData.mobile || '',
+        role: formData.role,
+        status: formData.status,
+        permissions: cleanPermissions
+      };
+
+      if (formData.id) {
+        payload.id = formData.id;
+      }
+
+      if (formData.password) {
+        payload.password = formData.password;
+      }
+
+      onSubmit(payload);
     };
 
     return (
@@ -92,10 +175,10 @@ const SubUserForm = forwardRef<HTMLFormElement, SubUserFormProps>(
             label="First Name"
             placeholder="First Name"
             required
-            value={formData.firstName}
-            onChange={(val) => handleInputChange('firstName', val)}
-            error={submited && !formData.firstName}
-            errormsg="First Name is required"
+            value={formData.first_name}
+            onChange={(val) => handleInputChange('first_name', val)}
+            error={submited && !formData.first_name}
+            errormsg="Please enter First Name"
           />
         </div>
         <div className="col-span-12 md:col-span-6">
@@ -103,10 +186,10 @@ const SubUserForm = forwardRef<HTMLFormElement, SubUserFormProps>(
             label="Last Name"
             placeholder="Last Name"
             required
-            value={formData.lastName}
-            onChange={(val) => handleInputChange('lastName', val)}
-            error={submited && !formData.lastName}
-            errormsg="Last Name is required"
+            value={formData.last_name}
+            onChange={(val) => handleInputChange('last_name', val)}
+            error={submited && !formData.last_name}
+            errormsg="Please enter Last Name"
           />
         </div>
         <div className="col-span-12 md:col-span-6">
@@ -114,37 +197,34 @@ const SubUserForm = forwardRef<HTMLFormElement, SubUserFormProps>(
             label="Login Email Address"
             placeholder="john.doe@example.com"
             required
-            value={formData.loginEmail}
-            onChange={(val) => handleInputChange('loginEmail', val)}
-            error={submited && !formData.loginEmail}
-            errormsg="Email is required"
+            value={formData.email}
+            onChange={(val) => handleInputChange('email', val)}
+            error={submited && !formData.email}
+            errormsg="Please enter Email Address"
           />
         </div>
         <div className="col-span-12 md:col-span-6">
           <FormInput
             label="Mobile Number"
             placeholder="Mobile Number"
-            required
             value={formData.mobile}
             onChange={(val) => handleInputChange('mobile', val)}
-            error={submited && !formData.mobile}
-            errormsg="Mobile is required"
           />
         </div>
         <div className="col-span-12 md:col-span-6">
           <FormInput
             label="Personal Email"
             placeholder="personal@example.com"
-            value={formData.personalEmail}
-            onChange={(val) => handleInputChange('personalEmail', val)}
+            value={formData.personal_email}
+            onChange={(val) => handleInputChange('personal_email', val)}
           />
         </div>
         <div className="col-span-12 md:col-span-6">
           <FormInput
             label="Personal Mobile"
             placeholder="Personal Mobile"
-            value={formData.personalMobile}
-            onChange={(val) => handleInputChange('personalMobile', val)}
+            value={formData.personal_mobile}
+            onChange={(val) => handleInputChange('personal_mobile', val)}
           />
         </div>
         <div className="col-span-12 md:col-span-6">
@@ -152,46 +232,64 @@ const SubUserForm = forwardRef<HTMLFormElement, SubUserFormProps>(
             label="Role"
             value={formData.role}
             onValueChange={(val) => handleInputChange('role', val || 'Staff')}
-            options={[
-              { label: 'Admin', value: 'Admin' },
-              { label: 'Staff', value: 'Staff' },
-              { label: 'Manager', value: 'Manager' },
-            ]}
+            options={roleOptions}
+            allowClear={false}
           />
         </div>
-        <div className="col-span-12 md:col-span-6">
-          <FormInput
-            label="Password"
-            placeholder="Password"
-            type="password"
-            required
-            value={formData.password}
-            onChange={(val) => handleInputChange('password', val)}
-            error={submited && !formData.password}
-            errormsg="Password is required"
-          />
-        </div>
+
         <div className="col-span-12 md:col-span-6">
           <FormSelect
             label="Status"
             value={formData.status}
-            onValueChange={(val) => handleInputChange('status', val || 'Active')}
+            onValueChange={(val) => handleInputChange('status', val || '1')}
             options={[
-              { label: 'Active', value: 'Active' },
-              { label: 'Inactive', value: 'Inactive' },
+              { label: 'Active', value: '1' },
+              { label: 'Inactive', value: '0' },
             ]}
+            allowClear={false}
+
           />
         </div>
+        {!formData.id && (
+          <>
+            <div className="col-span-12 md:col-span-6">
+              <FormInput
+                label="Password"
+                placeholder={formData.id ? "Leave empty to keep current" : "Password"}
+                type="password"
+                required={!formData.id}
+                value={formData.password}
+                onChange={(val) => handleInputChange('password', val)}
+                error={submited && !formData.id && !formData.password}
+                errormsg="Please enter Password"
+              />
+            </div>
+            <div className="col-span-12 md:col-span-6">
+              <FormInput
+                label="Confirm Password"
+                placeholder="Confirm Password"
+                type="password"
+                required={!formData.id || !!formData.password}
+                value={formData.confirm_password}
+                onChange={(val) => handleInputChange('confirm_password', val)}
+                error={submited && (!formData.id || !!formData.password) && (!formData.confirm_password || formData.confirm_password !== formData.password)}
+                errormsg={!formData.confirm_password ? "Please enter Confirm Password" : "Password does not match"}
+              />
+            </div>
+          </>
+        )}
 
-        <div className="col-span-12 my-4 border-t" />
+        <div className="col-span-12 my-0 border-t" />
         <div className="col-span-12">
           <PermissionTreeView
             title="Role Management"
             initialSelected={formData.permissions}
             onChange={(ids) => handleInputChange('permissions', ids)}
+            permissionsData={formOptionsData?.data?.modules || []}
           />
         </div>
       </form>
     );
   }
 );
+

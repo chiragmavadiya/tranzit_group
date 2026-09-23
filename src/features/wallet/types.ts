@@ -1,6 +1,7 @@
 export type TransactionType = 'Credit' | 'Debit';
 
 export interface WalletTransaction {
+  id?: number | string;
   transaction_type: string;
   amount: number | string;
   reason: string;
@@ -14,6 +15,8 @@ export interface WalletTransactionsParams {
   transaction_type?: string | number;
   page?: number;
   per_page?: number;
+  start_date?: string;
+  end_date?: string;
 }
 
 export interface WalletTransactionsResponse {
@@ -40,12 +43,19 @@ export interface AdminTopupParams {
   page?: number;
   status?: string;
   search?: string;
+  start_date?: string;
+  end_date?: string;
 }
 
 export interface AdminTopupResponse {
   status: boolean;
   message: string;
   data: any[];
+  summary: {
+    balance: number;
+    total_credit: number;
+    total_debit: number;
+  };
   meta: {
     current_page: number;
     per_page: number;
@@ -55,7 +65,20 @@ export interface AdminTopupResponse {
 }
 
 export interface WalletExportParams {
-  format: 'pdf';
+  format: 'pdf' | 'csv' | 'excel';
   search?: string;
   transaction_type?: string | number;
+  start_date?: string;
+  end_date?: string;
 }
+
+export interface WalletSummaryResponse {
+  status: boolean;
+  message: string;
+  data: {
+    wallet_balance: number;
+    total_credit: number;
+    total_debit: number;
+  };
+}
+

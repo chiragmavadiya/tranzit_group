@@ -2,6 +2,8 @@ import { useQuery, useMutation, useQueryClient, keepPreviousData } from "@tansta
 import { courierPostcodeService } from "../services/courier-postcode.service";
 import { QUERY_KEYS } from "@/constants/api.constants";
 import type { CourierPostcodeFilters, CourierPostcodeFormData } from "../types";
+import { downloadFile } from "@/lib/utils";
+import { showToast } from "@/components/ui/custom-toast";
 
 export const useCourierPostcodes = (params: CourierPostcodeFilters) => {
     return useQuery({
@@ -32,7 +34,7 @@ export const useCreateCourierPostcode = () => {
 export const useUpdateCourierPostcode = () => {
     const queryClient = useQueryClient();
     return useMutation({
-        mutationFn: ({ id, data }: { id: number | string; data: CourierPostcodeFormData }) => 
+        mutationFn: ({ id, data }: { id: number | string; data: CourierPostcodeFormData }) =>
             courierPostcodeService.update(id, data),
         onSuccess: (_, variables) => {
             queryClient.invalidateQueries({ queryKey: QUERY_KEYS.ADMIN_COURIER_POSTCODES.LIST });
@@ -54,5 +56,11 @@ export const useDeleteCourierPostcode = () => {
 export const useExportCourierPostcodes = () => {
     return useMutation({
         mutationFn: (params: { format: string; search?: string }) => courierPostcodeService.export(params),
+        onSuccess: ({ blob, filename }) => {
+            downloadFile(blob, filename)
+        },
+        onError: (error: any) => {
+            showToast(error.message || "Failed to export courier postcodes", "error");
+        },
     });
 };

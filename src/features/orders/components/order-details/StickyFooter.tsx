@@ -2,59 +2,83 @@ import React from 'react'
 import { Button } from '@/components/ui/button'
 import {
   Save,
-  Download,
   Printer,
-  ChevronUp,
   Loader2
 } from 'lucide-react'
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu'
 
-export const StickyFooter: React.FC<{ orderType: string | undefined, onSave?: () => void, saveLoading: boolean }> = ({ orderType, onSave, saveLoading }) => {
+interface StickyFooterProps {
+  orderType: string | undefined
+  onSave?: (skipWalletCheck: string | boolean) => void
+  saveLoading: boolean
+  isSavingDraft?: boolean
+  isCreatingConsignment?: boolean
+  onConsign?: () => void
+  isConsigning: boolean
+  isServicePending?: boolean
+}
+
+export const StickyFooter: React.FC<StickyFooterProps> = ({ orderType, onSave, saveLoading, isSavingDraft, isCreatingConsignment, onConsign, isConsigning, isServicePending }) => {
+  if (!['new', 'create', 'create-menual', 'consign', 'return'].includes(orderType || '')) return null;
   return (
-    <div className="sticky bottom-0 -left-5 right-20 bg-white dark:bg-zinc-950 border-t border-gray-200 dark:border-zinc-800 p-3 flex justify-center items-center gap-3 z-50 shadow-[0_-4px_10px_rgba(0,0,0,0.05)] dark:shadow-[0_-4px_10px_rgba(0,0,0,0.2)] transition-colors duration-300">
-      {orderType === 'new' && (
+    <div className="sticky bottom-0 left-0 right-0 w-full bg-white/95 dark:bg-zinc-950/95 backdrop-blur-md border-t border-gray-200 dark:border-zinc-800 p-2.5 flex flex-col sm:flex-row justify-center items-stretch sm:items-center gap-2 z-50 shadow-[0_-4px_12px_rgba(0,0,0,0.05)] dark:shadow-[0_-4px_12px_rgba(0,0,0,0.25)] transition-colors duration-300">
+      {(orderType === 'create' || orderType === 'return') && (
         <>
-          <Button variant="outline" className="flex items-center gap-2 border-gray-200 dark:border-zinc-800 text-[#0060FE] font-bold h-8 px-6 uppercase text-xs hover:bg-gray-50 dark:hover:bg-zinc-900 transition-colors">
-            <Save className="h-4 w-4" />
-            SAVE
+          <Button
+            onClick={() => onSave?.('saveAsDraft')}
+            variant="default"
+            disabled={isSavingDraft || isServicePending}
+            className="flex items-center gap-2 h-8 px-4 uppercase text-[11px] font-bold tracking-wide w-full sm:w-auto"
+          >
+            {isSavingDraft ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Save className="h-3.5 w-3.5" />}
+            Save Draft
           </Button>
 
-          <Button variant="outline" className="flex items-center gap-2 border-gray-200 dark:border-zinc-800 text-[#0060FE] font-bold h-8 px-6 uppercase text-xs hover:bg-gray-50 dark:hover:bg-zinc-900 transition-colors">
-            <Download className="h-4 w-4" />
-            DOWNLOAD
+          <Button
+            variant="default"
+            disabled={isCreatingConsignment || isServicePending}
+            onClick={() => onSave?.(false)}
+            className="flex items-center gap-2 h-8 px-4 uppercase text-[11px] font-bold tracking-wide w-full sm:w-auto"
+          >
+            {isCreatingConsignment ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Printer className="h-3.5 w-3.5" />}
+            Create Consignment & Download Label
           </Button>
-          <div className="flex bg-[#0060FE] rounded-md overflow-hidden">
-            <Button className="bg-[#0060FE] text-white hover:bg-blue-700 flex items-center gap-2 border-r border-blue-500/50 rounded-none h-8 px-6 font-bold uppercase text-xs">
-              <Printer className="h-4 w-4" />
-              PRINT AND OPEN NEXT
-            </Button>
-            <DropdownMenu>
-              <DropdownMenuTrigger className="bg-[#0060FE] text-white hover:bg-blue-700 rounded-none w-8 flex items-center justify-center h-8 border-l border-white/20 cursor-pointer outline-none">
-                <ChevronUp className="h-4 w-4" />
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-48 mb-2 dark:bg-zinc-900 dark:border-zinc-800">
-                <DropdownMenuItem>Print Only</DropdownMenuItem>
-                <DropdownMenuItem>Save and Close</DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-          </div>
         </>
       )}
-      {orderType === 'create' && (
-        <Button
-          onClick={onSave}
-          variant="default"
-          disabled={saveLoading}
-          className={`flex items-center gap-2 h-8 px-6 uppercase text-xs font-bold transition-all bg-[#0060FE] hover:bg-blue-700 text-white shadow-sm`}
-        >
-          {saveLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
-          Save
-        </Button>
+      {(orderType === 'create-menual') && (
+        <>
+          <Button
+            onClick={() => onSave?.('saveAsDraft')}
+            variant="default"
+            disabled={isCreatingConsignment || isServicePending}
+            className="flex items-center gap-2 h-8 px-4 uppercase text-[11px] font-bold tracking-wide w-full sm:w-auto"
+          >
+            {isCreatingConsignment ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Save className="h-3.5 w-3.5" />}
+            Create Manual Order
+          </Button>
+        </>
+      )}
+
+      {orderType === 'consign' && (
+        <>
+          <Button
+            onClick={() => onSave?.('saveAsDraft')}
+            variant="default"
+            disabled={isSavingDraft || isServicePending}
+            className="flex items-center gap-2 h-8 px-4 uppercase text-[11px] font-bold tracking-wide w-full sm:w-auto"
+          >
+            {isSavingDraft ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Save className="h-3.5 w-3.5" />}
+            Save Draft
+          </Button>
+          <Button
+            onClick={onConsign}
+            variant="default"
+            disabled={saveLoading || isConsigning || isServicePending}
+            className="flex items-center gap-2 h-8 px-4 uppercase text-[11px] font-bold tracking-wide w-full sm:w-auto bg-primary hover:bg-primary-hover text-white shadow-sm"
+          >
+            {saveLoading || isConsigning ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Save className="h-3.5 w-3.5" />}
+            Create Consignment & Download Label
+          </Button>
+        </>
       )}
     </div>
   )

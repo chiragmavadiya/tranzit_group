@@ -2,10 +2,13 @@ import type { ItemData } from "../orders/types";
 
 export interface QuoteLocation {
   label: string;
+  address1?: string;
+  street?: string;
   suburb: string;
   state: string;
   postcode: string;
   country: string;
+  address_info?: string;
 }
 
 // export interface QuoteItem {
@@ -27,6 +30,7 @@ export interface QuoteCalculations {
   gst: number;
   totalSurcharges: number;
   margin?: number;
+  pickupCharge?: number;
   insurance?: boolean;
   insuranceCost?: number;
   grandTotal: number;
@@ -118,4 +122,14 @@ export interface QuoteFilters {
   page: number;
   per_page: number;
 }
+
+export interface Locality {
+  postcode: string;
+  state: string;
+  label: string
+  value: string
+  suburb: string;
+}
+
+export type LocalitySearchResponse = Locality[];
 

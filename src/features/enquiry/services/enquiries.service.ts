@@ -10,4 +10,9 @@ export const enquiriesService = {
     });
     return response.data;
   },
+
+  getEnquiries: async (params?: Record<string, any>): Promise<any> => {
+    const response = await api.get(API_ENDPOINTS.ENQUIRIES.BASE, { params });
+    return response.data;
+  },
 };

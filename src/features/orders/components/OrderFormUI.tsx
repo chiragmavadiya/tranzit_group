@@ -1,11 +1,10 @@
-import React, { useMemo, useCallback, type ReactNode, memo } from "react";
-import { RefreshCw, CheckCircle2 } from "lucide-react";
+import React, { useMemo, useCallback, type ReactNode, memo, useState } from "react";
+import { RefreshCw, CheckCircle2, Info } from "lucide-react";
 import * as LucideIcons from "lucide-react";
 import { cn } from "@/lib/utils"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
-import SelectComponent from "@/components/ui/select"
 import { Checkbox } from "@/components/ui/checkbox"
 import {
   DropdownMenu,
@@ -22,6 +21,8 @@ import type {
   FormRadioProps,
   FormCheckboxProps
 } from "./types/OrderFormUI.types";
+import { SelectSearch } from "@/components/ui/combobox";
+import { CustomTooltip } from "@/components/common/CustomTooltip";
 
 export const Required = () => {
   return (
@@ -29,10 +30,10 @@ export const Required = () => {
   )
 }
 
-export const CustomLabel = ({ label, isHorizontal = false, required = false, className }: { label: ReactNode, isHorizontal?: boolean, required?: boolean, className?: string }) => {
+export const CustomLabel = ({ label, isHorizontal = false, required = false, className, htmlFor }: { label: ReactNode, isHorizontal?: boolean, required?: boolean, className?: string, htmlFor?: string }) => {
   if (!label) return null;
-  return (<Label className={cn(
-    "text-[11px] font-extrabold text-slate-700 dark:text-zinc-400 uppercase tracking-wider gap-0 mb-0.5",
+  return (<Label htmlFor={htmlFor} className={cn(
+    "text-[14px] font-medium text-slate-700 dark:text-zinc-400 tracking-wide gap-0 mb-0.5",
     isHorizontal ? "h-fit leading-none" : "ml-0.5",
     className
   )}>
@@ -57,45 +58,62 @@ export const FormInput = memo(React.forwardRef<HTMLInputElement, FormInputProps>
   error,
   errormsg,
   inputClassName,
+  info,
+  id,
   // rightElement
 }, ref) => {
   const [showPassword, setShowPassword] = React.useState(false);
   const isHorizontal = useMemo(() => layout === 'horizontal', [layout]);
+  const generatedId = React.useId();
+  const inputId = id ?? generatedId;
+  const errorId = `${inputId}-error`;
   const handleChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     onChange?.(e.target.value, e.target.name || '');
   }, [onChange]);
 
   return (
     <div className={cn(
-      isHorizontal ? "grid grid-cols-[120px_1fr] items-center gap-4" : "space-y-0",
+      isHorizontal ? "grid grid-cols-1 md:grid-cols-[160px_1fr] items-start md:items-center gap-1 md:gap-4" : "space-y-0",
       isFullWidth ? "col-span-12" : isHalf ? "col-span-12 md:col-span-6" : isCompact ? "col-span-6 md:col-span-3" : "col-span-12 md:col-span-6",
       className
     )}>
       {label && (
-        <CustomLabel
-          label={label}
-          isHorizontal={isHorizontal}
-          required={required}
-        />
+        <div className="flex items-center gap-1">
+          <CustomLabel
+            label={label}
+            isHorizontal={isHorizontal}
+            required={required}
+            htmlFor={inputId}
+          />
+          {info && (
+            <CustomTooltip title={info}>
+              <Info className="w-3.5 h-3.5 text-slate-400 dark:text-zinc-600 cursor-pointer" />
+            </CustomTooltip>
+          )}
+        </div>
       )}
-      <div className="relative group">
+      <div className="relative group/input">
         {Icon && (
-          <div className={cn("absolute left-3", error ? 'top-2' : 'top-1/2 -translate-y-1/2', "text-gray-400 group-focus-within:text-blue-600 transition-colors")}>
+          <div className={cn("absolute left-3", error ? 'top-2' : 'top-1/2 -translate-y-1/2', "text-gray-400 group-focus-within/input:text-primary transition-colors")}>
             <Icon className="w-4 h-4" />
           </div>
         )}
         <Input
           ref={ref}
+          id={inputId}
+          aria-invalid={error || undefined}
+          aria-describedby={error && errormsg ? errorId : undefined}
           type={showPassword ? 'text' : type}
           placeholder={placeholder}
           value={value}
           onChange={handleChange}
-          autoComplete="off"
+          autoFocus={false}
+          autoComplete="nope"
           className={cn(
-            "h-8 rounded-md border-slate-200 dark:border-zinc-800 bg-white dark:bg-zinc-950 font-medium focus-visible:ring-0 focus-visible:ring-blue-600 focus-visible:border-blue-600 transition-all placeholder:text-muted-foreground placeholder:font-normal dark:placeholder:text-zinc-700 text-sm",
+            "h-8 rounded-sm border-slate-200 dark:border-zinc-800 bg-white dark:bg-zinc-950 font-normal focus-visible:ring-0 focus-visible:ring-primary dark:focus-visible:ring-primary focus-visible:border-primary dark:focus-visible:border-primary transition-all placeholder:text-muted-foreground placeholder:font-normal dark:placeholder:text-zinc-700 text-sm",
             Icon ? "pl-9" : "px-3",
             type === 'password' ? "pr-10" : "",
-            error ? "border-red-500 focus-visible:border-red-500" : "",
+            error ? "border-red-500 dark:border-red-500 focus-visible:border-red-500 dark:focus-visible:border-red-500" : "",
             inputClassName,
           )}
           disabled={disabled}
@@ -104,7 +122,7 @@ export const FormInput = memo(React.forwardRef<HTMLInputElement, FormInputProps>
           <button
             type="button"
             onClick={() => setShowPassword(!showPassword)}
-            className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 transition-colors cursor-pointer"
+            className="absolute right-2.5 top-4 -translate-y-1/2 text-slate-400 hover:text-slate-600 transition-colors cursor-pointer"
             tabIndex={-1}
           >
             {showPassword ? (
@@ -114,7 +132,7 @@ export const FormInput = memo(React.forwardRef<HTMLInputElement, FormInputProps>
             )}
           </button>
         )}
-        {error ? <div className="text-red-500 text-[11px] w-full">{errormsg}</div> : null}
+        {error ? <div id={errorId} role="alert" className="text-red-500 text-[11px] w-full">{errormsg}</div> : null}
       </div>
     </div>
   );
@@ -134,21 +152,26 @@ export function FormTextarea({
   layout = 'vertical',
   required = false,
   error,
-  errormsg
+  errormsg,
+  disabled = false,
+  id,
 }: FormTextareaProps) {
   const isHorizontal = useMemo(() => layout === 'horizontal', [layout]);
+  const generatedId = React.useId();
+  const textareaId = id ?? generatedId;
+  const errorId = `${textareaId}-error`;
 
   const handleChange = useCallback((e: React.ChangeEvent<HTMLTextAreaElement>) => {
-    onChange(e.target.value, e.target.name || '');
+    onChange?.(e.target.value, e.target.name || '');
   }, [onChange]);
 
   return (
     <div className={cn(
-      isHorizontal ? "grid grid-cols-[120px_1fr] items-start gap-4" : "space-y-2",
+      isHorizontal ? "grid grid-cols-1 md:grid-cols-[160px_1fr] items-start gap-1 md:gap-4" : "space-y-2",
       isFullWidth ? "col-span-12" : "col-span-12 md:col-span-6"
     )}>
       {/* <Label className={cn(
-        "text-[11px] font-extrabold text-slate-700 dark:text-zinc-400 uppercase tracking-wider leading-none ",
+        "text-[11px] font-extrabold text-slate-700 dark:text-zinc-400 uppercase tracking-wide leading-none ",
         isHorizontal ? "h-fit leading-none" : "ml-0.5"
       )}>
         {label}
@@ -158,25 +181,30 @@ export function FormTextarea({
         label={label}
         isHorizontal={isHorizontal}
         required={required}
+        htmlFor={textareaId}
       />
       <Textarea
+        id={textareaId}
+        aria-invalid={error || undefined}
+        aria-describedby={error && errormsg ? errorId : undefined}
         placeholder={placeholder}
         value={value}
         onChange={handleChange}
         rows={rows}
+        disabled={disabled}
         className={cn(
-          "rounded-md shadow-none border-slate-200 dark:border-zinc-800 bg-white dark:bg-zinc-950 font-medium focus-visible:ring-0 focus-visible:ring-blue-600 focus-visible:border-blue-600 transition-all placeholder:text-muted-foreground placeholder:font-normal dark:placeholder:text-zinc-700 text-sm resize-none px-3 py-2",
-          error ? "border-red-500 focus-visible:border-red-500" : ""
+          "rounded-sm shadow-none border-slate-200 dark:border-zinc-800 bg-white dark:bg-zinc-950 font-medium focus-visible:ring-0 focus-visible:ring-primary dark:focus-visible:ring-primary focus-visible:border-primary dark:focus-visible:border-primary transition-all placeholder:text-muted-foreground placeholder:font-normal dark:placeholder:text-zinc-700 text-sm resize-none px-3 py-2",
+          error ? "border-red-500 dark:border-red-500 focus-visible:border-red-500 dark:focus-visible:border-red-500" : ""
         )}
       />
-      {error ? <div className="text-red-500 text-[11px] w-full">{errormsg}</div> : null}
+      {error ? <div id={errorId} role="alert" className="text-red-500 text-[11px] w-full">{errormsg}</div> : null}
     </div>
   );
 }
 
 export function ValidAddressBadge() {
   return (
-    <div className="flex items-center gap-2 px-3 py-1 bg-white dark:bg-zinc-900 border border-emerald-600 rounded-md text-[10px] font-bold text-emerald-600 uppercase tracking-wider w-fit shadow-sm">
+    <div className="flex items-center gap-2 px-3 py-1 bg-white dark:bg-zinc-900 border border-emerald-600 rounded-sm text-[10px] font-bold text-emerald-600 uppercase tracking-wide w-fit shadow-sm">
       <CheckCircle2 className="w-3 h-3" />
       Valid Address
       <RefreshCw className="w-3 h-3 ml-1 cursor-pointer hover:rotate-180 transition-transform duration-500" />
@@ -184,6 +212,24 @@ export function ValidAddressBadge() {
   );
 }
 
+
+const areOptionsEqual = (
+  prevOptions?: readonly { label: string; value: string | number }[],
+  nextOptions?: readonly { label: string; value: string | number }[]
+) => {
+  if (prevOptions === nextOptions) return true;
+  if (!prevOptions || !nextOptions) return false;
+  if (prevOptions.length !== nextOptions.length) return false;
+  for (let i = 0; i < prevOptions.length; i++) {
+    if (
+      prevOptions[i].value !== nextOptions[i].value ||
+      prevOptions[i].label !== nextOptions[i].label
+    ) {
+      return false;
+    }
+  }
+  return true;
+};
 
 export const FormSelect = memo(({
   label,
@@ -199,19 +245,34 @@ export const FormSelect = memo(({
   error,
   errormsg,
   name,
-  disabled
+  disabled,
+  selectClassName,
+  allowClear = true,
+  searchdisable = false,
+  multiple = false,
+  optionClassName,
+  id
 }: FormSelectProps) => {
   const isHorizontal = useMemo(() => layout === 'horizontal', [layout]);
-  const memoizedData = useMemo(() => [...options], [options]);
+  const generatedId = React.useId();
+  const selectId = id ?? generatedId;
+  const errorId = `${selectId}-error`;
+
+  const [memoizedData, setMemoizedData] = useState(options);
+  const [prevOptions, setPrevOptions] = useState(options);
+  if (!areOptionsEqual(prevOptions, options)) {
+    setPrevOptions(options);
+    setMemoizedData(options);
+  }
 
   return (
     <div className={cn(
-      isHorizontal ? "grid grid-cols-[120px_1fr] items-center gap-4" : "space-y-1",
+      isHorizontal ? "grid grid-cols-1 md:grid-cols-[160px_1fr] items-start md:items-center gap-1 md:gap-4" : "space-y-1",
       isHalf ? "col-span-12 md:col-span-6" : isCompact ? "col-span-6 md:col-span-3" : "col-span-12 md:col-span-6",
       className
     )}>
       {/* <Label className={cn(
-        "text-[11px] font-extrabold text-slate-700 dark:text-zinc-400 uppercase tracking-wider gap-0 mb-1",
+        "text-[11px] font-extrabold text-slate-700 dark:text-zinc-400 uppercase tracking-wide gap-0 mb-1",
         !isHorizontal && "ml-0.5"
       )}>
         {label}
@@ -221,21 +282,48 @@ export const FormSelect = memo(({
         label={label}
         isHorizontal={isHorizontal}
         required={required}
+        htmlFor={selectId}
       />
       <div>
-        <SelectComponent
-          className={cn("w-full h-8 text-[13px] data-[size=default]:h-8 border-slate-200 rounded-md dark:border-zinc-800 font-medium bg-white dark:bg-zinc-950 text-slate-900 dark:text-zinc-100 focus:ring-blue-600 transition-all text-sm px-3 ", error ? "border-red-500 focus:border-red-500" : "")}
-          data={memoizedData}
+        <SelectSearch
+          inputId={selectId}
+          invalid={error}
+          errorId={error && errormsg ? errorId : undefined}
+          className={cn("w-full h-8 text-[13px] data-[size=default]:h-8 border-slate-200 rounded-sm dark:border-zinc-800 font-medium bg-white dark:bg-zinc-950 text-slate-900 dark:text-zinc-100 focus:ring-primary dark:focus:ring-primary focus:border-primary dark:focus:border-primary transition-all text-sm px-3 ", error ? "border-red-500 dark:border-red-500 focus:border-red-500 dark:focus:border-red-500" : "", selectClassName)}
+          options={memoizedData}
           // defaultValue="default"
           onValueChange={onValueChange}
           value={value}
           placeholder={placeholder}
           name={name}
           disabled={disabled}
+          allowClear={allowClear}
+          searchdisable={(memoizedData.length < 6 || searchdisable)}
+          multiple={multiple}
+          optionClassName={optionClassName}
         />
-        {error ? <div className="text-red-500 text-[11px] w-full">{errormsg}</div> : null}
+        {/* <SelectSearch options={memoizedData} /> */}
+        {error ? <div id={errorId} role="alert" className="text-red-500 text-[11px] w-full">{errormsg}</div> : null}
       </div>
     </div>
+  );
+}, (prevProps, nextProps) => {
+  return (
+    prevProps.value === nextProps.value &&
+    prevProps.label === nextProps.label &&
+    prevProps.error === nextProps.error &&
+    prevProps.errormsg === nextProps.errormsg &&
+    prevProps.disabled === nextProps.disabled &&
+    prevProps.required === nextProps.required &&
+    prevProps.placeholder === nextProps.placeholder &&
+    prevProps.className === nextProps.className &&
+    prevProps.selectClassName === nextProps.selectClassName &&
+    prevProps.allowClear === nextProps.allowClear &&
+    prevProps.searchdisable === nextProps.searchdisable &&
+    prevProps.multiple === nextProps.multiple &&
+    prevProps.optionClassName === nextProps.optionClassName &&
+    prevProps.id === nextProps.id &&
+    areOptionsEqual(prevProps.options, nextProps.options)
   );
 });
 
@@ -245,9 +333,9 @@ FormSelect.displayName = 'FormSelect';
 export function SummaryCard({ title, name, address, phone, isRight = false }: SummaryCardProps) {
   return (
     <div className={cn("space-y-2", isRight && "pl-8")}>
-      <span className="text-[10px] font-bold text-blue-600 dark:text-blue-400 uppercase tracking-widest block mb-2">{title}</span>
+      <span className="text-[10px] font-bold text-primary uppercase tracking-wide block mb-2">{title}</span>
       <p className="text-lg font-bold text-slate-900 dark:text-zinc-100 leading-none">{name || '—'}</p>
-      <p className="border-l-2 border-slate-100 dark:border-zinc-800 pl-4 py-1 text-sm text-slate-500 dark:text-zinc-400 italic mt-3 leading-relaxed">{address || 'No address provided'}</p>
+      <p className="border-l-2 border-slate-100 dark:border-zinc-800 pl-4 py-1 text-sm text-slate-500 dark:text-zinc-400 mt-3 leading-relaxed">{address || 'No address provided'}</p>
       <p className="text-sm font-bold text-slate-400 dark:text-zinc-500 mt-3 tabular-nums">{phone || 'No phone provided'}</p>
     </div>
   );
@@ -257,7 +345,7 @@ export function DropdownUI({ icon = 'ChevronDown', label, onClick, options }: Dr
   const IconComponent = useMemo(() => LucideIcons[icon] as React.ComponentType<React.SVGProps<SVGSVGElement>>, [icon]);
   return (
     <DropdownMenu>
-      <DropdownMenuTrigger className="flex items-center gap-2 border border-gray-200 dark:border-zinc-800 text-gray-700 dark:text-zinc-300 h-10 px-4 rounded-md hover:bg-gray-50 dark:hover:bg-zinc-900 transition-colors cursor-pointer outline-none text-sm font-medium">
+      <DropdownMenuTrigger className="flex items-center gap-2 border border-gray-200 dark:border-zinc-800 text-gray-700 dark:text-zinc-300 h-10 px-4 rounded-sm hover:bg-gray-50 dark:hover:bg-zinc-900 transition-colors cursor-pointer outline-none text-sm font-medium">
         {label}
         <IconComponent className="h-4 w-4" />
       </DropdownMenuTrigger>
@@ -276,7 +364,7 @@ export function FormRadio({
   onChange,
   label,
   className,
-  activeColor = "bg-[#0060FE]"
+  activeColor = "bg-primary"
 }: FormRadioProps) {
   return (
     <label className={cn("flex items-center gap-2.5 cursor-pointer group", className)}>
@@ -285,7 +373,7 @@ export function FormRadio({
           type="radio"
           className={cn(
             "peer appearance-none w-4 h-4 rounded-full border-2 border-gray-300 dark:border-zinc-700 transition-all",
-            checked && (activeColor === "bg-[#0060FE]" ? "border-[#0060FE]" : `border-${activeColor.replace('bg-[', '').replace(']', '')}`)
+            checked && (activeColor === "bg-primary" ? "border-primary" : `border-${activeColor.replace('bg-[', '').replace(']', '')}`)
           )}
           checked={checked}
           onChange={onChange}
@@ -306,20 +394,33 @@ export function FormCheckbox({
   label,
   description,
   price,
-  className
+  className,
+  disabled = false,
+  info
 }: FormCheckboxProps) {
   return (
-    <div className={cn("flex items-start gap-4 p-4 transition-all", className)}>
+    <Label className={cn(
+      "flex gap-4 p-4 transition-all",
+      // Multi-line rows align the checkbox to the first line; single-line rows centre.
+      description ? "items-start" : "items-center",
+      disabled ? "cursor-not-allowed opacity-60" : "cursor-pointer",
+      className
+    )}>
       <Checkbox
         checked={checked}
         onCheckedChange={onCheckedChange}
-        className="mt-1"
+        disabled={disabled}
       />
       <div className="flex-1 space-y-1">
-        <div className="flex items-center justify-between">
-          <Label className="text-[14px] font-bold text-slate-800 dark:text-zinc-100 leading-none">
+        <div className="flex items-center justify-between gap-2">
+          <div className="flex items-center gap-1.5 text-[14px] font-bold text-slate-800 dark:text-zinc-100 leading-none">
             {label}
-          </Label>
+            {info && (
+              <CustomTooltip title={info}>
+                <Info className="w-3.5 h-3.5 text-slate-400 dark:text-zinc-600" />
+              </CustomTooltip>
+            )}
+          </div>
           {price !== undefined && (
             <span className="text-[14px] font-bold text-slate-800 dark:text-zinc-100">
               ${price.toFixed(2)}
@@ -327,11 +428,11 @@ export function FormCheckbox({
           )}
         </div>
         {description && (
-          <p className="text-[12px] text-slate-500 dark:text-zinc-400 font-medium">
+          <p className="my-0 text-[12px] text-slate-500 dark:text-zinc-400 font-medium">
             {description}
           </p>
         )}
       </div>
-    </div>
+    </Label>
   );
 }

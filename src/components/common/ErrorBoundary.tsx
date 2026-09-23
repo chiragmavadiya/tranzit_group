@@ -1,5 +1,6 @@
 import { Component, type ErrorInfo, type ReactNode } from "react";
 import { AlertTriangle, Home, RefreshCw } from "lucide-react";
+import * as Sentry from "@sentry/react";
 
 interface Props {
   children?: ReactNode;
@@ -22,7 +23,14 @@ export default class ErrorBoundary extends Component<Props, State> {
   }
 
   public componentDidCatch(error: Error, errorInfo: ErrorInfo) {
-    console.error("Uncaught error:", error, errorInfo);
+    // console.* is stripped from production builds, so Sentry is the only report that survives.
+    Sentry.captureException(error, {
+      contexts: { react: { componentStack: errorInfo.componentStack } },
+      tags: { boundary: 'app-root' },
+    });
+    if (import.meta.env.DEV) {
+      console.error("Uncaught error:", error, errorInfo);
+    }
   }
 
   public render() {
@@ -61,7 +69,7 @@ export default class ErrorBoundary extends Component<Props, State> {
               </button>
               <button 
                 onClick={() => window.location.href = '/'}
-                className="flex-1 flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 text-white font-medium py-2.5 rounded-lg transition-colors cursor-pointer"
+                className="flex-1 flex items-center justify-center gap-2 bg-primary hover:bg-primary-hover text-white font-medium py-2.5 rounded-lg transition-colors cursor-pointer"
                >
                  <Home className="w-4 h-4" />
                  Home

@@ -6,8 +6,8 @@ export const dashboardService = {
   /**
    * Get dashboard metrics
    */
-  getMetrics: async (): Promise<DashboardMetricsResponse> => {
-    const response = await api.get<DashboardMetricsResponse>(API_ENDPOINTS.DASHBOARD.METRICS);
+  getMetrics: async (params?: Record<string, any>): Promise<DashboardMetricsResponse> => {
+    const response = await api.get<DashboardMetricsResponse>(API_ENDPOINTS.DASHBOARD.METRICS, { params });
     return response.data;
   },
 };

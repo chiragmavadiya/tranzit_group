@@ -4,6 +4,7 @@ import { cn } from '@/lib/utils';
 import { Skeleton } from '@/components/ui/skeleton';
 import type { SettingCategory } from '../types';
 import { Settings2, Mail, Truck, Layout, ShieldCheck, Globe } from "lucide-react";
+import { CustomTooltip } from '@/components/common/CustomTooltip';
 
 interface SettingsSidebarProps {
   categories: SettingCategory[];
@@ -32,25 +33,22 @@ const SettingsSidebar: React.FC<SettingsSidebarProps> = ({ categories, isLoading
           cn(
             'flex items-center gap-3 px-5 py-2 rounded-lg text-sm transition-all duration-200 group relative',
             isActive
-              ? 'bg-blue-50 text-blue-700 font-medium dark:text-blue-400 '
-              : 'text-slate-500 hover:bg-slate-50 hover:text-slate-900 dark:text-zinc-400 dark:hover:bg-zinc-900 dark:hover:text-zinc-100'
+              ? 'bg-primary/10 text-primary font-medium'
+              : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900 dark:text-zinc-400 dark:hover:bg-zinc-900 dark:hover:text-zinc-100'
           )
         }
       >
         <div className={cn(
-          "p-1.5 rounded-lg transition-colors",
+          "p-1.5 rounded-lg transition-all duration-200",
           "bg-white dark:bg-zinc-900 border border-slate-100 dark:border-zinc-800 shadow-sm",
-          "group-hover:border-[#0060FE]/30 group-hover:bg-[#0060FE]/5"
+          "group-hover:border-primary/30 group-hover:bg-primary/5 group-hover:text-primary",
+          "group-[.active]:border-primary/50 group-[.active]:bg-primary/10 group-[.active]:text-primary"
         )}>
           <Icon className="w-4 h-4 shrink-0" />
         </div>
-        <span className="truncate">{category.name}</span>
-
-        {/* <NavLink to={`/admin/settings/${category.slug}`}>
-          {({ isActive }) => isActive && (
-            <div className="absolute left-0 w-1 h-6 bg-[#0060FE] rounded-r-full" />
-          )}
-        </NavLink> */}
+        <CustomTooltip title={category.name} onlyOnOverflow>
+          <span className="truncate">{category.name}</span>
+        </CustomTooltip>
       </NavLink>
     );
   };
@@ -72,7 +70,7 @@ const SettingsSidebar: React.FC<SettingsSidebarProps> = ({ categories, isLoading
     <aside className="w-72 border-r border-slate-200 dark:border-zinc-800 bg-white dark:bg-zinc-950 flex flex-col h-full overflow-y-auto custom-scrollbar">
       <div className="p-4 space-y-6">
         <div className="px-4 mb-2">
-          <h3 className="my-0 text-[11px] font-black text-slate-600 dark:text-zinc-500 uppercase tracking-wider">
+          <h3 className="my-0 text-[11px] font-black text-slate-600 dark:text-zinc-500 uppercase tracking-wide">
             Configuration
           </h3>
         </div>

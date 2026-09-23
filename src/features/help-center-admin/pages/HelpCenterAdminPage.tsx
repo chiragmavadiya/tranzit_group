@@ -6,15 +6,16 @@ import { Button } from '@/components/ui/button';
 import { ARTICLE_COLUMNS } from '../columns';
 import { AddArticleDialog } from '../components/AddArticleDialog';
 import { useHelpArticles, useHelpArticleMutations } from '../hooks/useHelpCenterAdmin';
-import type { HelpArticle } from '../types';
 import { useDebounce } from '@/hooks/useDebounce';
+import type { HelpArticle } from '../types';
+import useLocalStorage from '@/hooks/useLocalStorage';
 
 export default function HelpCenterAdminPage() {
   const [search, setSearch] = useState('');
-  const [page, setPage] = useState(1);
+  const [page, setPage] = useLocalStorage<number>('helpcenter_page', 1);
   const [pageSize, setPageSize] = useState(25);
   const [isAddOpen, setIsAddOpen] = useState(false);
-  const [editingRow, setEditingRow] = useState<HelpArticle | null>(null);
+  const [editingRow, setEditingRow] = useState<number | null>(null);
   const [deletingRow, setDeletingRow] = useState<HelpArticle | null>(null);
 
   const debouncedSearch = useDebounce(search, 500);
@@ -41,8 +42,8 @@ export default function HelpCenterAdminPage() {
   };
 
   const columns = useMemo(() => ARTICLE_COLUMNS(
-    (row) => {
-      setEditingRow(row);
+    (id) => {
+      setEditingRow(id);
       setIsAddOpen(true);
     },
     (row) => {

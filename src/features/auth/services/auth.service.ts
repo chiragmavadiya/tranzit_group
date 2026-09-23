@@ -9,7 +9,10 @@ import type {
     LoginResponse,
     ForgotPasswordRequest,
     OnboardingRequest,
-    ResetPasswordRequest
+    ResetPasswordRequest,
+    EmailVerifyRequest,
+    EmailVerifyResponse,
+    OnboardResponse
 } from "@/features/auth/auth.types";
 // role can be admin or customer 
 
@@ -42,8 +45,8 @@ export const authService = {
     /**
      * Resend verification email
      */
-    resendVerification: async (): Promise<GenericResponse> => {
-        const response = await api.post<GenericResponse>(API_ENDPOINTS.AUTH.RESEND_VERIFICATION);
+    resendVerification: async (token: string): Promise<GenericResponse> => {
+        const response = await api.post<GenericResponse>(API_ENDPOINTS.AUTH.RESEND_VERIFICATION, { token });
         return response.data;
     },
 
@@ -64,10 +67,27 @@ export const authService = {
     },
 
     /**
+     * Verify email with customer ID, token, expires, and signature
+     */
+    emailVerify: async (params: EmailVerifyRequest): Promise<EmailVerifyResponse> => {
+        const { customerId, token, expires, signature } = params;
+        const response = await api.get<EmailVerifyResponse>(
+            API_ENDPOINTS.AUTH.EMAIL_VERIFY(customerId, token),
+            {
+                params: {
+                    expires,
+                    signature,
+                },
+            }
+        );
+        return response.data;
+    },
+
+    /**
      * Submit onboarding data
      */
-    submitOnboarding: async (data: OnboardingRequest): Promise<GenericResponse> => {
-        const response = await api.put<GenericResponse>(API_ENDPOINTS.AUTH.ONBOARDING, data);
+    submitOnboarding: async (data: OnboardingRequest): Promise<OnboardResponse> => {
+        const response = await api.put<OnboardResponse>(API_ENDPOINTS.AUTH.ONBOARDING, data);
         return response.data;
     },
 
@@ -90,6 +110,22 @@ export const authService = {
      */
     resetPassword: async (data: ResetPasswordRequest): Promise<GenericResponse> => {
         const response = await api.post<GenericResponse>(API_ENDPOINTS.AUTH.RESET_PASSWORD, data);
+        return response.data;
+    },
+
+    /**
+     * Accept the latest Terms and Conditions
+     */
+    acceptTerms: async (): Promise<GenericResponse> => {
+        const response = await api.post<GenericResponse>(API_ENDPOINTS.AUTH.ACCEPT_TERMS, { accepted: true });
+        return response.data;
+    },
+
+    /**
+     * Select plan
+     */
+    selectPlan: async (data: any): Promise<OnboardResponse> => {
+        const response = await api.post<OnboardResponse>(API_ENDPOINTS.PLAN.SELECT, data);
         return response.data;
     },
 };

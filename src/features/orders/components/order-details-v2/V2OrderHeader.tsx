@@ -99,42 +99,71 @@ export const OrderHeader = ({ data }: { data: OrderDetailData }) => {
                             </div>
 
                             <div className="flex flex-wrap gap-4">
-                                <div className="group min-w-[240px] rounded-2xl border border-blue-100 bg-blue-50/50 p-4 transition-all hover:bg-blue-50">
+                                <div className="group min-w-[240px] rounded-2xl border border-primary/20 bg-primary/5 p-4 transition-all hover:bg-primary/10">
                                     <div className="flex items-center justify-between">
-                                        <p className="text-[11px] font-bold uppercase tracking-wider text-blue-600/70">
+                                        <p className="text-[11px] font-bold uppercase tracking-wide text-primary/70">
                                             Tracking Number
                                         </p>
                                         <div className="flex items-center gap-1">
                                             <Button
                                                 variant="ghost"
                                                 size="icon"
-                                                className="h-6 w-6 rounded-md hover:bg-blue-100"
+                                                className="h-6 w-6 rounded-md hover:bg-primary/20"
                                                 onClick={() => copyToClipboard(data.courier_details.tracking_number, 'tracking')}
                                             >
-                                                {copiedTracking ? <Check className="h-3 w-3 text-emerald-500" /> : <Copy className="h-3 w-3 text-blue-400" />}
+                                                {copiedTracking ? <Check className="h-3 w-3 text-emerald-500" /> : <Copy className="h-3 w-3 text-primary/80" />}
                                             </Button>
-                                            <Button variant="ghost" size="icon" className="h-6 w-6 rounded-md hover:bg-blue-100">
-                                                <ExternalLink className="h-3 w-3 text-blue-400" />
-                                            </Button>
+                                            {data.courier_details?.tracking_url && (
+                                                <Button
+                                                    variant="ghost"
+                                                    size="icon"
+                                                    className="h-6 w-6 rounded-md hover:bg-primary/20"
+                                                    onClick={() => window.open(data.courier_details.tracking_url!, '_blank')}
+                                                >
+                                                    <ExternalLink className="h-3 w-3 text-primary/80" />
+                                                </Button>
+                                            )}
                                         </div>
                                     </div>
-                                    <p className="mt-1 font-mono text-base font-bold text-blue-900">
+                                    <p className="mt-1 font-mono text-base font-bold text-primary">
                                         {data.courier_details.tracking_number}
                                     </p>
                                 </div>
-                                <div className="min-w-[240px] rounded-2xl border border-slate-200 bg-slate-50 p-4 transition-all hover:bg-slate-100/80">
-                                    <p className="text-[11px] font-bold uppercase tracking-wider text-slate-500">
-                                        Customer Reference
-                                    </p>
-                                    <p className="mt-1 text-base font-bold text-slate-900">
-                                        {data.courier_details.customer_reference}
-                                    </p>
-                                </div>
+                                {(data.courier_details?.customer_reference || data.customer_reference) && (
+                                    <div className="min-w-[240px] rounded-2xl border border-slate-200 bg-slate-50 p-4 transition-all hover:bg-slate-100/80">
+                                        <p className="text-[11px] font-bold uppercase tracking-wide text-slate-500">
+                                            Customer Reference
+                                        </p>
+                                        <p className="mt-1 text-base font-bold text-slate-900">
+                                            {data.courier_details.customer_reference || data.customer_reference}
+                                        </p>
+                                    </div>
+                                )}
+                                {(data.courier_details?.external_reference || data.external_reference) && (
+                                    <div className="min-w-[240px] rounded-2xl border border-slate-200 bg-slate-50 p-4 transition-all hover:bg-slate-100/80">
+                                        <p className="text-[11px] font-bold uppercase tracking-wide text-slate-500">
+                                            External Reference
+                                        </p>
+                                        <p className="mt-1 text-base font-bold text-slate-900">
+                                            {data.courier_details.external_reference || data.external_reference}
+                                        </p>
+                                    </div>
+                                )}
+                                {(data.courier_details?.external_order_id || data.external_order_id) && (
+                                    <div className="min-w-[240px] rounded-2xl border border-slate-200 bg-slate-50 p-4 transition-all hover:bg-slate-100/80">
+                                        <p className="text-[11px] font-bold uppercase tracking-wide text-slate-500">
+                                            External Order ID
+                                        </p>
+                                        <p className="mt-1 text-base font-bold text-slate-900">
+                                            {data.courier_details.external_order_id || data.external_order_id}
+                                        </p>
+                                    </div>
+                                )}
                             </div>
                         </div>
 
                         <div className="flex flex-wrap items-center gap-3 xl:justify-end">
-                            <Button className="h-11 rounded-xl bg-[#0060FE] hover:bg-blue-700 px-6 text-white shadow-lg shadow-blue-500/20 transition-all hover:translate-y-[-2px] active:translate-y-[0px]">
+                            <Button className="h-11 rounded-xl bg-primary hover:bg-primary-hover px-6 text-white shadow-lg shadow-primary/20 transition-all hover:translate-y-[-2px] active:translate-y-[0px]">
                                 <Rocket className="mr-2 h-4 w-4" />
                                 Generate Consignment
                             </Button>
@@ -145,7 +174,7 @@ export const OrderHeader = ({ data }: { data: OrderDetailData }) => {
                                 disabled={downloadLabel.isPending}
                             >
                                 {downloadLabel.isPending ? (
-                                    <Loader2 className="mr-2 h-4 w-4 animate-spin text-blue-600" />
+                                    <Loader2 className="mr-2 h-4 w-4 animate-spin text-primary" />
                                 ) : (
                                     <FileDown className="mr-2 h-4 w-4 text-slate-500" />
                                 )}

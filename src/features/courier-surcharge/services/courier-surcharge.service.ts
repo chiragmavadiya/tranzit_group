@@ -5,6 +5,7 @@ import type {
     CourierSurchargeFormData,
     CourierSurchargeFilters
 } from "../types";
+import { getFileName } from "@/lib/utils";
 
 export interface GlobalCourier {
     id: number;
@@ -60,11 +61,15 @@ export const courierSurchargeService = {
         const response = await api.get<GlobalCourierResponse>(API_ENDPOINTS.ADMIN_COURIER_SURCHARGES.GLOBAL_COURIERS);
         return response.data;
     },
-    export: async (params: { format: string; search?: string }): Promise<Blob> => {
+    export: async (params: { format: string; search?: string }): Promise<{ blob: Blob; filename: string }> => {
         const response = await api.get(API_ENDPOINTS.ADMIN_COURIER_SURCHARGES.EXPORT, {
             params,
             responseType: 'blob',
         });
-        return response.data;
+        const format = params.format === "pdf" ? "pdf" : params.format === "csv" ? "csv" : "xls";
+        const filename = getFileName(response) || `courier-surcharges_${new Date().getTime()}.${format}`;
+
+
+        return { blob: response.data, filename };
     }
 };

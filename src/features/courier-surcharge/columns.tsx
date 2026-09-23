@@ -2,7 +2,7 @@ import { CustomTooltip } from '@/components/common/CustomTooltip';
 import type { CourierSurcharge } from './types';
 import { Button } from '@/components/ui/button';
 import { Pencil, Trash2, CheckCircle2, XCircle } from 'lucide-react';
-import { cn } from '@/lib/utils';
+import { cn, formateCurrency } from '@/lib/utils';
 import type { Column } from '@/components/common/types/DataTable.types';
 
 export const SURCHARGE_COLUMNS = (onEdit: (row: any) => void, onDelete: (row: any) => void): Column<CourierSurcharge>[] => [
@@ -10,38 +10,48 @@ export const SURCHARGE_COLUMNS = (onEdit: (row: any) => void, onDelete: (row: an
     key: 'courier_name',
     header: 'COURIER NAME',
     sortable: true,
-    cell: (val) => <span className="font-bold text-slate-900 dark:text-zinc-100 text-[13px]">{val}</span>
+    disableToggle: true,
+    width: '150px',
+    // cell: (val) => <span className="font-bold text-slate-900 dark:text-zinc-100 text-[13px]">{val}</span>
+    cell: (value: string, row: CourierSurcharge) => (
+      <div className="flex items-center gap-1 break-normal">
+        <img src={row?.courier_logo_url} className="h-6" alt="" />
+        <span>{value}</span>
+      </div>
+    )
   },
   {
     key: 'code',
     header: 'CODE',
-    sortable: true,
-    cell: (val) => <span className="text-slate-500 font-medium text-[12px]">{val}</span>
+    disableToggle: true,
+    width: "100px",
+    // cell: (val) => <span className="text-slate-500 font-medium text-[12px]">{val}</span>
   },
   {
     key: 'name',
     header: 'NAME',
-    sortable: true,
-    cell: (val) => <span className="text-slate-700 font-semibold text-[13px]">{val}</span>
+    width: "120px",
+    className: "break-normal"
+    // cell: (val) => <span className="text-slate-700 font-semibold text-[13px]">{val}</span>
   },
   {
     key: 'description',
     header: 'DESCRIPTION',
-    className: 'max-w-[250px] truncate',
-    cell: (val) => <span className="text-slate-400 dark:text-zinc-500 text-[11px] font-medium leading-relaxed line-clamp-1">{val}</span>
+    className: 'max-w-[250px] truncate break-normal',
+    cell: (val) => <span className="leading-relaxed line-clamp-3">{val}</span>
   },
   {
     key: 'amount',
     header: 'AMOUNT',
     sortable: true,
-    cell: (val) => <span className="font-bold text-slate-900 dark:text-zinc-100 text-[13px] tracking-tight">${Number(val).toFixed(2)}</span>
+    cell: (val) => <span className="font-bold text-slate-900 dark:text-zinc-100 text-[13px] tracking-tight">{formateCurrency(val)}</span>
   },
   {
     key: 'customer_selectable',
     header: 'CUSTOMER SELECTABLE',
     cell: (val) => (
       <div className={cn(
-        "inline-flex items-center gap-1.5 px-2 py-0.5 rounded text-[10px] font-black uppercase tracking-wider transition-all",
+        "inline-flex items-center break-normal gap-1.5 px-2 py-0.5 rounded text-[10px] font-black uppercase tracking-wide transition-all",
         val
           ? "bg-emerald-50 text-emerald-600 dark:bg-emerald-500/10 dark:text-emerald-400 border border-emerald-100 dark:border-emerald-500/20"
           : "bg-rose-50 text-rose-600 dark:bg-rose-500/10 dark:text-rose-400 border border-rose-100 dark:border-rose-500/20"
@@ -56,7 +66,7 @@ export const SURCHARGE_COLUMNS = (onEdit: (row: any) => void, onDelete: (row: an
     header: 'AUTO APPLY',
     cell: (val) => (
       <div className={cn(
-        "inline-flex items-center gap-1.5 px-2 py-0.5 rounded text-[10px] font-black uppercase tracking-wider transition-all",
+        "inline-flex items-center break-normal gap-1.5 px-2 py-0.5 rounded text-[10px] font-black uppercase tracking-wide transition-all",
         val
           ? "bg-emerald-50 text-emerald-600 dark:bg-emerald-500/10 dark:text-emerald-400 border border-emerald-100 dark:border-emerald-500/20"
           : "bg-rose-50 text-rose-600 dark:bg-rose-500/10 dark:text-rose-400 border border-rose-100 dark:border-rose-500/20"

@@ -1,8 +1,11 @@
-import { Routes, Route, Navigate } from "react-router-dom";
+import { Routes, Route, Navigate, useParams } from "react-router-dom";
 import ProtectedRoute from "@/router/ProtectedRoute";
 import { lazy, Suspense } from "react";
 import Layout from "@/layout";
-import { Loader2 } from "lucide-react";
+import { useAppSelector } from "@/hooks/store.hooks";
+import { getFirstAllowedSettingsPath } from "@/utils/permission";
+import EnquiryListPage from "@/features/enquiry/pages/EnquiryList";
+import PageLoading from "@/components/common/Loader";
 
 // Lazy load page components
 const Dashboard = lazy(() => import('@/features/dashboard/pages/Dashboard'));
@@ -10,7 +13,6 @@ const Orders = lazy(() => import('@/features/orders/pages/OrdersPage'));
 const OrderDetails = lazy(() => import('@/features/orders/pages/OrderDetails'));
 const OrderDetails2 = lazy(() => import('@/features/orders/pages/OrderDetails2'));
 // const CreateOrder = lazy(() => import('@/features/create-order/'));
-const Search = lazy(() => import('@/features/search/pages/SearchPage'));
 const GetQuote = lazy(() => import('@/features/quote/pages/GetQuotePage'));
 const MyItems = lazy(() => import('@/features/items'));
 const AddressBook = lazy(() => import('@/features/address-book'));
@@ -19,22 +21,40 @@ const InvoiceDetails = lazy(() => import('@/features/invoices/pages/InvoiceDocum
 const Reports = lazy(() => import('@/features/reports'));
 const ParcelReport = lazy(() => import('@/features/reports/pages/ParcelReportPage'));
 const Enquiry = lazy(() => import('@/features/enquiry'));
-// const HelpCenter = lazy(() => import('@/features/help-center/pages/HelpCenterPage'));
-const HelpCenterArticle = lazy(() => import('@/features/help-center/pages/HelpCenterArticlePage'));
+// const HelpCenterArticle = lazy(() => import('@/features/help-center/pages/HelpCenterArticlePage'));
 const Transactions = lazy(() => import('@/features/wallet/pages/TransactionsPage'));
 const TopUp = lazy(() => import('@/features/wallet/pages/TopUpPage'));
-const IntegrationsLayout = lazy(() => import('@/features/integrations/components/IntegrationsLayout'));
-const IntegrationDetails = lazy(() => import('@/features/integrations/pages/IntegrationDetailsPage'));
-const HelpCenterLayout = lazy(() => import('@/features/help-center/components/HelpCenterLayout'));
+// const HelpCenterLayout = lazy(() => import('@/features/help-center/components/HelpCenterLayout'));
+const CustomerSettingsLayout = lazy(() => import('@/features/customer-settings/components/CustomerSettingsLayout'));
+const AccountSettingsPage = lazy(() => import('@/features/customer-settings/pages/AccountSettingsPage'));
+const TeamAccessPage = lazy(() => import('@/features/customer-settings/pages/TeamAccessPage'));
+const EcommerceIntegrationsPage = lazy(() => import('@/features/customer-settings/pages/EcommerceIntegrationsPage'));
+const EcommerceAccountPage = lazy(() => import('@/features/customer-settings/pages/EcommerceAccountPage'));
+const CarrierIntegrationsPage = lazy(() => import('@/features/customer-settings/pages/CarrierIntegrationsPage'));
+const CarrierConfigPage = lazy(() => import('@/features/customer-settings/pages/CarrierConfigPage'));
+const RulesPage = lazy(() => import('@/features/rules/pages/RulesPage'));
+const PackingDocumentsPage = lazy(() => import('@/features/packing-documents/pages/PackingDocumentsPage'));
+const ManifestPage = lazy(() => import('@/features/manifest/pages/ManifestPage'));
+
+function SettingsIndexRedirect() {
+  const { role, team_access } = useAppSelector((state) => state.auth);
+  const path = getFirstAllowedSettingsPath(team_access, role) || "/settings/account";
+  return <Navigate to={path} replace />;
+}
 
 const withSuspense = (Component: React.ReactNode) => (
   <Suspense
     fallback={<div className="flex items-center justify-center h-full w-full">
-      <Loader2 className="animate-spin text-blue-400 h-10 w-10" />
+      <PageLoading />
     </div>}>
     {Component}
   </Suspense>
 );
+
+function OrderDetailsWrapper() {
+  const { orderType, orderID } = useParams<{ orderType: string; orderID: string }>();
+  return <OrderDetails key={`${orderType}-${orderID || ''}`} />;
+}
 
 export default function ClientRoutes() {
   return (
@@ -44,20 +64,16 @@ export default function ClientRoutes() {
           <Route path="dashboard" element={withSuspense(<Dashboard />)} />
           <Route path="orders">
             <Route index element={withSuspense(<Orders />)} />
-            <Route path=":orderType" element={withSuspense(<OrderDetails />)} />
+            <Route path=":orderType" element={withSuspense(<OrderDetailsWrapper />)} />
             <Route path=":orderID" element={withSuspense(<OrderDetails2 />)} />
-            <Route path=":orderType/:orderID" element={withSuspense(<OrderDetails />)} />
+            <Route path=":orderType/:orderID" element={withSuspense(<OrderDetailsWrapper />)} />
           </Route>
 
           {/* <Route path="orders/create" element={<CreateOrder />} /> */}
           <Route path="quote" element={withSuspense(<GetQuote />)} />
 
-          <Route path="search" element={withSuspense(<Search />)} />
           <Route path="items" element={withSuspense(<MyItems />)} />
           <Route path="address-book" element={withSuspense(<AddressBook />)} />
-          <Route path="integrations" element={withSuspense(<IntegrationsLayout />)}>
-            <Route path=":providerId" element={withSuspense(<IntegrationDetails />)} />
-          </Route>
           <Route path="wallet">
             <Route path="transactions" element={withSuspense(<Transactions />)} />
             <Route path="top-up" element={withSuspense(<TopUp />)} />
@@ -69,11 +85,28 @@ export default function ClientRoutes() {
           </Route>
           <Route path="reports" element={withSuspense(<Reports />)} />
           <Route path="parcel-report" element={withSuspense(<ParcelReport />)} />
-          <Route path="enquiry" element={withSuspense(<Enquiry />)} />
-          <Route path="help-center" element={withSuspense(<HelpCenterLayout />)}>
-            {/* <Route index element={<HelpCenter />} /> */}
-            <Route path=":slug" element={withSuspense(<HelpCenterArticle />)} />
+          {/* <Route path="enquiry" element={withSuspense(<Enquiry />)} /> */}
+          <Route path="enquiry">
+            <Route path="history" element={withSuspense(<EnquiryListPage />)} />
+            <Route index element={withSuspense(<Enquiry />)} />
           </Route>
+          <Route path="manifest" element={withSuspense(<ManifestPage />)} />
+          {/* <Route path="help-center" element={withSuspense(<HelpCenterLayout />)}>
+            <Route path=":slug" element={withSuspense(<HelpCenterArticle />)} />
+          </Route> */}
+          <Route path="settings" element={withSuspense(<CustomerSettingsLayout />)}>
+            <Route index element={<SettingsIndexRedirect />} />
+            <Route path="account" element={withSuspense(<AccountSettingsPage />)} />
+            <Route path="team" element={withSuspense(<TeamAccessPage />)} />
+            <Route path="ecommerce" element={withSuspense(<EcommerceIntegrationsPage />)} />
+            <Route path="ecommerce/:provider/:accountId" element={withSuspense(<EcommerceAccountPage />)} />
+            <Route path="carriers" element={withSuspense(<CarrierIntegrationsPage />)} />
+            <Route path="carriers/:slug" element={withSuspense(<CarrierConfigPage />)} />
+            <Route path="rules" element={withSuspense(<RulesPage />)} />
+            <Route path="packing-slips-summary" element={withSuspense(<PackingDocumentsPage />)} />
+          </Route>
+
+
           {/* Default authenticated route */}
           <Route path="/" element={<Navigate to="/orders" replace />} />
 

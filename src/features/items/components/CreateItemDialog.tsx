@@ -44,7 +44,7 @@ export function CreateItemDialog({
     const w = Number(formData.item_width)
     const h = Number(formData.item_height)
     if (!l || !w || !h) return ""
-    return (l * w * h / 1000000).toFixed(3) // cm³ → m³
+    return ((l * w * h * 250) / 1000000).toFixed(3) // cm³ → m³
   }, [formData.item_length, formData.item_width, formData.item_height])
 
   const handleSubmit = useCallback((e?: React.FormEvent) => {
@@ -88,13 +88,14 @@ export function CreateItemDialog({
       onCancel={() => onClose(false)}
       isLoading={!!isLoading}
       submitText={editingItemId ? 'Update' : 'Submit'}
+      contentClass='w-full max-w-[calc(100%-2rem)] sm:max-w-2xl'
     >
-      <form onSubmit={handleSubmit} className="flex flex-col max-h-[90vh]">
+      <form onSubmit={handleSubmit} className="flex flex-col">
         {isFetchingDetails && (
           <div className="absolute inset-0 z-50 flex items-center justify-center bg-white/60 dark:bg-zinc-900/60 backdrop-blur-[1px]">
             <div className="flex flex-col items-center gap-2">
-              <Loader2 className="h-8 w-8 text-blue-600 animate-spin" />
-              <p className="text-xs font-bold text-slate-500 uppercase tracking-widest">Fetching Details...</p>
+              <Loader2 className="h-8 w-8 text-primary animate-spin" />
+              <p className="text-xs font-bold text-slate-500 uppercase tracking-wide">Fetching Details...</p>
             </div>
           </div>
         )}
@@ -131,7 +132,7 @@ export function CreateItemDialog({
             <p className="text-sm font-medium text-muted-foreground mb-2">
               Dimensions (cm)
             </p>
-            <div className="grid grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
               <div>
                 <FormInput
                   type="number"
@@ -196,10 +197,11 @@ export function CreateItemDialog({
                 <FormInput
                   type="number"
                   step="0.0001"
-                  label="Item Cubic (Volume m³)"
-                  value={calculatedVolume}
+                  label="Item Cubic (m³)"
+                  value={formData.item_cubic || calculatedVolume}
                   readOnly
                   disabled
+                  min={0}
                   onChange={(val) => handleChange('item_cubic', Number(val))}
                   placeholder="0.0000"
                 // required
@@ -222,7 +224,7 @@ export function CreateItemDialog({
               id="isDefault"
               checked={!!formData.is_default}
               onCheckedChange={(checked) => handleChange('is_default', checked)}
-              className="data-[state=checked]:bg-blue-600"
+              className="data-[state=checked]:bg-primary"
             />
           </div>
 

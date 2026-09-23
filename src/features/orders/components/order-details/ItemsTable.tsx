@@ -1,7 +1,7 @@
 import React, { useMemo } from 'react'
-import { Box, Plus, Trash2, Package, Scale, Ruler } from 'lucide-react'
+import { Box, Plus, Trash2, Package, Scale, Ruler, Weight } from 'lucide-react'
 import { Button } from '@/components/ui/button'
-import SelectComponent from '@/components/ui/select'
+// import SelectComponent from '@/components/ui/select'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import type { ItemData } from '@/features/orders/types'
@@ -12,6 +12,8 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from '@/components/ui/accordion'
+import { useAppSelector } from '@/hooks/store.hooks'
+import { FormSelect } from '../OrderFormUI'
 
 interface ItemsTableProps {
   items: ItemData[]
@@ -23,9 +25,10 @@ interface ItemsTableProps {
   removeItem?: (index: number | undefined) => void
   onFullUpdateItem?: (index: number, data: ItemData) => void
   orderType?: string
+  customerId?: number
 }
 
-export const ItemsTable: React.FC<ItemsTableProps> = ({
+export const ItemsTable: React.FC<ItemsTableProps> = React.memo(({
   items,
   onUpdateItem,
   children,
@@ -34,20 +37,40 @@ export const ItemsTable: React.FC<ItemsTableProps> = ({
   removeItem,
   onFullUpdateItem,
   isEmpty = false,
-  orderType = "create"
+  orderType = "create",
+  customerId,
 }) => {
   // const { orderType } = useParams<{ orderType?: string }>()
-  const isReadOnly = orderType !== 'create'
+  const isEditable = orderType === 'create' || orderType === 'create-menual' || orderType === 'consign' || orderType === 'return'
+  const { role } = useAppSelector((state) => state.auth);
 
-  const { data: itemsResponse } = useItems({ per_page: 100 }, !isReadOnly)
+  const { data: itemsResponse } = useItems({ per_page: 100, customer: customerId }, isEditable && (role !== 'admin' || !!customerId))
   const predefinedItems = useMemo(() => itemsResponse?.data || [], [itemsResponse])
 
   const predefinedItemsOptions = useMemo(() => {
-    return predefinedItems.map(item => ({
-      label: item.item_name,
-      value: item.id.toString(),
-    }))
+    return predefinedItems.map(item => {
+      const weight = item.item_weight !== undefined && item.item_weight !== null ? item.item_weight : 0;
+      const length = item.item_length || 0;
+      const width = item.item_width || 0;
+      const height = item.item_height || 0;
+      return {
+        label: `${item.item_name} (${weight} kg | ${length}x${width}x${height} cm)`,
+        value: item.id.toString(),
+      };
+    })
   }, [predefinedItems])
+
+  const totalQuantity = useMemo(() => {
+    return items?.reduce((sum, item) => sum + (Number(item.quantity) || 0), 0) || 0;
+  }, [items]);
+
+  const totalWeight = useMemo(() => {
+    return items?.reduce((sum, item) => sum + ((Number(item.weight) || 0) * (Number(item.quantity) || 0)), 0) || 0;
+  }, [items]);
+
+  const totalVolumetricWeight = useMemo(() => {
+    return items?.reduce((sum, item) => sum + (((Number(item.length) || 0) * (Number(item.width) || 0) * (Number(item.height) || 0) * 250) / 1000000), 0) || 0;
+  }, [items]);
 
   const handlePredefinedItemSelect = (index: number, itemIdStr: string) => {
     if (!onFullUpdateItem) return;
@@ -59,25 +82,32 @@ export const ItemsTable: React.FC<ItemsTableProps> = ({
         ...currentData,
         item_id: selectedItem.id,
         item_name: selectedItem.item_name,
-        weight: 50,
-        length: 50,
-        width: 50,
-        height: 50,
+        weight: Number(selectedItem.item_weight || 1),
+        length: Number(selectedItem.item_length || 1),
+        width: Number(selectedItem.item_width || 1),
+        height: Number(selectedItem.item_height || 1),
       })
     }
   }
   return (
-    <Accordion multiple defaultValue={['notes', 'services', 'summary', 'pickup_date']} className="flex flex-col gap-3">
+    <Accordion multiple defaultValue={['items_table']} className="flex flex-col gap-3">
 
-      {/* ORDER QUOTATION SUMMARY */}
-      <AccordionItem value="summary" className="border border-gray-200 dark:border-zinc-800 rounded-xl bg-white dark:bg-zinc-950 shadow-sm px-5 border-b overflow-hidden transition-colors duration-300 [&>h3]:my-0">
-        <AccordionTrigger className="hover:no-underline py-3 px-0 [&>svg]:text-[#0060FE] dark:[&>svg]:text-blue-500 items-center">
+      {/* ORDER ITEMS */}
+      <AccordionItem value="items_table" className="border border-gray-200 dark:border-zinc-800 rounded-md bg-white dark:bg-zinc-950 shadow-xs border-b overflow-hidden transition-colors duration-300 [&>h3]:my-0">
+        <AccordionTrigger className="hover:no-underline py-[10px] px-4 [&>svg]:text-primary items-center bg-slate-50 dark:bg-zinc-900 rounded-none cursor-pointer">
           <div className="flex items-center w-full justify-between ">
             <div className="flex items-center gap-2 text-gray-600 dark:text-zinc-300">
-              <Box className="w-5 h-5" />
-              <h3 className="my-0 text-base font-semibold text-gray-800 dark:text-zinc-100">Items {items.length > 0 && ` (${items.length})`}</h3>
+              <Box className="w-5 h-5 text-primary" />
+              <h3 className="my-0 text-sm font-bold text-slate-800 dark:text-zinc-400 ">Parcel Details {items.length > 0 && ` (${items.length})`}
+
+                {items.length > 0 && (
+                  <span className="inline-flex group-aria-expanded/accordion-trigger:hidden normal-case font-medium text-xs  dark:text-zinc-500 ml-2 pt-0.5 leading-relaxed">
+                    • {totalQuantity} {totalQuantity === 1 ? 'Parcel' : 'Parcels'} • Total Weight: {totalWeight.toFixed(2)} kg • Total Volumetric Weight: {totalVolumetricWeight.toFixed(2)} kg
+                  </span>
+                )}
+              </h3>
             </div>
-            {!isReadOnly && (
+            {isEditable && (
               <Button
                 variant="outline"
                 size="sm"
@@ -95,12 +125,12 @@ export const ItemsTable: React.FC<ItemsTableProps> = ({
                 className="hidden group-aria-expanded/accordion-trigger:flex h-8 mr-3 gap-1.5 text-[12px] border-slate-200 pt-px dark:border-zinc-800 hover:bg-slate-50 dark:hover:bg-zinc-900 font-medium"
               >
                 <Plus className="w-3.5 h-3.5" />
-                Add item
+                Add Parcel
               </Button>
             )}
           </div>
         </AccordionTrigger>
-        <AccordionContent className="border-t border-gray-100 dark:border-zinc-800 flex flex-col gap-2 pb-4 pt-4">
+        <AccordionContent className="border-t px-4  border-gray-100 dark:border-zinc-800 flex flex-col gap-2 pb-4 pt-4">
 
           <div className="w-full flex flex-col gap-4">
             <div className="flex flex-col gap-4">
@@ -112,19 +142,19 @@ export const ItemsTable: React.FC<ItemsTableProps> = ({
                 <div className="flex flex-col gap-4">
                   {items?.map((item, idx) => (
                     <React.Fragment key={idx}>
-                      {isReadOnly ? (
-                        <div className="flex flex-wrap items-center gap-y-4 gap-x-8 p-4 rounded-xl bg-gray-50/50 dark:bg-zinc-900/30 border border-gray-100 dark:border-zinc-800/50 hover:bg-gray-50 dark:hover:bg-zinc-900/50 transition-all duration-200">
+                      {!isEditable ? (
+                        <div className="flex flex-wrap items-center gap-y-4 gap-x-8 p-3 rounded-md bg-gray-50/50 dark:bg-zinc-900/30 border border-gray-100 dark:border-zinc-800/50 hover:bg-gray-50 dark:hover:bg-zinc-900/50 transition-all duration-200">
                           {/* Item Type */}
                           <div className="flex items-center gap-3 min-w-[140px]">
-                            <div className="p-2 rounded-lg bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400">
+                            <div className="p-2 rounded-lg bg-primary/10 text-primary">
                               <Package className="w-4 h-4" />
                             </div>
                             <div>
-                              <div className="text-[10px] font-bold text-gray-400 uppercase tracking-wider">Type</div>
-                              <div className="text-xs font-bold text-gray-900 dark:text-zinc-100">
+                              <div className="text-xs font-bold text-gray-400 uppercase">Packing Type</div>
+                              <div className="text-sm font-bold capitalize text-gray-900 dark:text-zinc-100">
                                 {item.type === 'my_item' ? (
                                   predefinedItems.find(i => i.id.toString() === item.item_id?.toString())?.item_name || 'My Item'
-                                ) : 'Standard Parcel'}
+                                ) : (item.type || 'Box')}
                               </div>
                             </div>
                           </div>
@@ -135,8 +165,8 @@ export const ItemsTable: React.FC<ItemsTableProps> = ({
                               <Box className="w-4 h-4" />
                             </div>
                             <div>
-                              <div className="text-[10px] font-bold text-gray-400 uppercase tracking-wider">Qty</div>
-                              <div className="text-xs font-bold text-gray-900 dark:text-zinc-100">{item.quantity} Units</div>
+                              <div className="text-xs font-bold text-gray-400 uppercase">Quantity</div>
+                              <div className="text-sm font-bold text-gray-900 dark:text-zinc-100">{item.quantity} Units</div>
                             </div>
                           </div>
 
@@ -146,8 +176,8 @@ export const ItemsTable: React.FC<ItemsTableProps> = ({
                               <Scale className="w-4 h-4" />
                             </div>
                             <div>
-                              <div className="text-[10px] font-bold text-gray-400 uppercase tracking-wider">Weight</div>
-                              <div className="text-xs font-bold text-gray-900 dark:text-zinc-100">{item.weight} kg</div>
+                              <div className="text-xs font-bold text-gray-400 uppercase">Weight</div>
+                              <div className="text-sm font-bold text-gray-900 dark:text-zinc-100">{item.weight} kg</div>
                             </div>
                           </div>
 
@@ -157,119 +187,190 @@ export const ItemsTable: React.FC<ItemsTableProps> = ({
                               <Ruler className="w-4 h-4" />
                             </div>
                             <div>
-                              <div className="text-[10px] font-bold text-gray-400 uppercase tracking-wider">Dimensions (L×W×H)</div>
-                              <div className="text-xs font-bold text-gray-900 dark:text-zinc-100">
+                              <div className="text-xs font-bold text-gray-400 uppercase">Dimensions (L×W×H)</div>
+                              <div className="text-sm font-bold text-gray-900 dark:text-zinc-100">
                                 {item.length} × {item.width} × {item.height} cm
                               </div>
                             </div>
                           </div>
                         </div>
                       ) : (
-                        <div className={`flex items-end gap-3 pb-4 ${idx !== items.length - 1 ? 'border-b border-gray-100 dark:border-zinc-800' : ''}`}>
-                          {/* Type Selection */}
-                          <div className="flex flex-col gap-1 w-[180px] shrink-0">
-                            <Label className="text-[11px] font-bold text-gray-500 dark:text-zinc-400">Type</Label>
-                            <SelectComponent
-                              value={item.type || 'box'}
-                              onValueChange={(val) => onUpdateItem?.(idx, 'type', val!)}
-                              data={[
-                                { label: 'Parcel', value: 'box' },
-                                { label: 'My Items', value: 'my_item' }
-                              ]}
-                              placeholder="Select Type"
-                              className="h-8 text-sm font-medium"
-                            />
-                          </div>
-
-                          {/* Quantity */}
-                          <div className="flex flex-col gap-1 w-[80px] shrink-0">
-                            <Label className="text-[11px] font-bold text-gray-500 dark:text-zinc-400">Quantity</Label>
-                            <Input
-                              type="number"
-                              value={item.quantity || ''}
-                              onChange={(e) => onUpdateItem?.(idx, 'quantity', Number(e.target.value) || 0)}
-                              className="h-8 text-sm font-medium"
-                              min="1"
-                              placeholder='Quantity'
-                            />
-                          </div>
-
-                          {/* Conditional Fields based on Type */}
-                          {item.type === 'my_item' ? (
-                            <div className="flex flex-col gap-1 flex-1">
-                              <Label className="text-[11px] font-bold text-gray-500 dark:text-zinc-400">Select Item</Label>
-                              <SelectComponent
-                                value={item.item_id?.toString() || ''}
-                                onValueChange={(val) => handlePredefinedItemSelect(idx, val!)}
-                                data={predefinedItemsOptions}
-                                placeholder="Select a predefined item"
+                        <div className={`flex flex-col gap-3 sm:flex-row sm:items-end pb-4 ${idx !== items.length - 1 ? 'border-b border-gray-100 dark:border-zinc-800' : ''}`}>
+                          {/* Packing Type and Quantity */}
+                          <div className="flex gap-2 w-full sm:w-auto shrink-0">
+                            {/* Type Selection */}
+                            <div className="flex flex-col gap-1 flex-1 sm:w-35 sm:flex-initial">
+                              <Label className="text-[12px] font-medium text-gray-600 dark:text-zinc-400">Packing Type</Label>
+                              <FormSelect
+                                options={[
+                                  { label: 'Parcel', value: 'box' },
+                                  { label: 'Pallet', value: 'pallet' },
+                                  { label: 'Satchel', value: 'satchel' },
+                                  { label: 'My Items', value: 'my_item' }
+                                ]}
+                                value={item.type || 'box'}
+                                onValueChange={(val) => onUpdateItem?.(idx, 'type', val!)}
+                                allowClear={false}
                                 className="h-8 text-sm font-medium"
+                                placeholder="Select Type"
+                                searchdisable
                               />
                             </div>
-                          ) : (
-                            <>
-                              <div className="flex flex-col gap-1 flex-1">
-                                <Label className="text-[11px] font-bold text-gray-500 dark:text-zinc-400">Weight (kg)</Label>
-                                <Input
-                                  type="number"
-                                  value={item.weight || ''}
-                                  onChange={(e) => onUpdateItem?.(idx, 'weight', Number(e.target.value) || 0)}
-                                  className="h-8 text-sm font-medium"
-                                  min="0"
-                                  step="0.01"
-                                  placeholder='kg'
-                                />
-                              </div>
-                              <div className="flex flex-col gap-1 flex-1">
-                                <Label className="text-[11px] font-bold text-gray-500 dark:text-zinc-400">Length (cm)</Label>
-                                <Input
-                                  type="number"
-                                  value={item.length || ''}
-                                  onChange={(e) => onUpdateItem?.(idx, 'length', Number(e.target.value) || 0)}
-                                  className="h-8 text-sm font-medium"
-                                  min="0"
-                                  placeholder='cm'
-                                />
-                              </div>
-                              <div className="flex flex-col gap-1 flex-1">
-                                <Label className="text-[11px] font-bold text-gray-500 dark:text-zinc-400">Width (cm)</Label>
-                                <Input
-                                  type="number"
-                                  value={item.width || ''}
-                                  onChange={(e) => onUpdateItem?.(idx, 'width', Number(e.target.value) || 0)}
-                                  className="h-8 text-sm font-medium"
-                                  min="0"
-                                  placeholder='cm'
-                                />
-                              </div>
-                              <div className="flex flex-col gap-1 flex-1">
-                                <Label className="text-[11px] font-bold text-gray-500 dark:text-zinc-400">Height (cm)</Label>
-                                <Input
-                                  type="number"
-                                  value={item.height || ''}
-                                  onChange={(e) => onUpdateItem?.(idx, 'height', Number(e.target.value) || 0)}
-                                  className="h-8 text-sm font-medium"
-                                  min="0"
-                                  placeholder='cm'
-                                />
-                              </div>
-                            </>
-                          )}
 
-                          {/* Delete Button */}
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            className="h-8 w-10 shrink-0 bg-red-50 hover:bg-red-100 text-red-500 dark:bg-red-950/30 dark:hover:bg-red-900/50 rounded-md"
-                            onClick={() => removeItem?.(idx)}
-                          >
-                            <Trash2 className="h-4 w-4" />
-                          </Button>
+                            {/* Quantity */}
+                            <div className="flex flex-col gap-1 w-[80px]">
+                              <Label className="text-[12px] font-medium text-gray-600 dark:text-zinc-400">Quantity</Label>
+                              <Input
+                                type="number"
+                                value={item.quantity || ''}
+                                onChange={(e) => onUpdateItem?.(idx, 'quantity', Number(e.target.value) || 0)}
+                                className="h-8 text-sm font-medium"
+                                min="1"
+                                placeholder='Quantity'
+                              />
+                            </div>
+                          </div>
+
+                          {/* Dimensions & Item select */}
+                          <div className="flex items-end gap-2 w-full sm:flex-1">
+                            {item.type === 'my_item' ? (
+                              <div className="flex flex-col gap-1 flex-1">
+                                <Label className="text-[12px] font-medium text-gray-600 dark:text-zinc-400">Select Item</Label>
+                                <FormSelect
+                                  options={predefinedItemsOptions}
+                                  value={item.item_id?.toString() || ''}
+                                  onValueChange={(val) => handlePredefinedItemSelect(idx, val!)}
+                                  allowClear={false}
+                                  className="h-8 text-sm font-medium"
+                                  placeholder="Select a predefined item"
+                                />
+                              </div>
+                            ) : (
+                              <div className="grid grid-cols-4 gap-2 flex-1 sm:flex sm:gap-3">
+                                <div className="flex flex-col gap-1">
+                                  <Label className="text-[12px] font-medium text-gray-600 dark:text-zinc-400 whitespace-nowrap overflow-hidden text-ellipsis">Weight</Label>
+                                  <Input
+                                    type="number"
+                                    value={item.weight || ''}
+                                    onChange={(e) => onUpdateItem?.(idx, 'weight', Number(e.target.value) || 0)}
+                                    className="h-8 text-sm font-medium px-2"
+                                    min="0"
+                                    step="0.01"
+                                    onBlur={(e) => {
+                                      const val = e.target.value;
+                                      if (val.startsWith(".")) {
+                                        e.target.value = `0${val}`;
+                                      }
+                                    }}
+                                    placeholder='kg'
+                                  // error={!item.weight}
+                                  />
+                                </div>
+                                <div className="flex flex-col gap-1">
+                                  <Label className="text-[12px] font-medium text-gray-600 dark:text-zinc-400 whitespace-nowrap overflow-hidden text-ellipsis">Length</Label>
+                                  <Input
+                                    type="number"
+                                    value={item.length || ''}
+                                    onChange={(e) => onUpdateItem?.(idx, 'length', Number(e.target.value) || 0)}
+                                    className="h-8 text-sm font-medium px-2"
+                                    min="0.1"
+                                    step="0.1"
+                                    placeholder='cm'
+                                    error={!!item.length && Number(item.length) < 0.1}
+                                    // errormsg='Length cannot be less than 1 cm. Please enter a valid length.'
+                                    onBlur={(e) => {
+                                      const val = e.target.value;
+                                      if (val.startsWith(".")) {
+                                        e.target.value = `0${val}`;
+                                      }
+                                    }}
+                                  />
+                                </div>
+                                <div className="flex flex-col gap-1">
+                                  <Label className="text-[12px] font-medium text-gray-600 dark:text-zinc-400 whitespace-nowrap overflow-hidden text-ellipsis">Width</Label>
+                                  <Input
+                                    type="number"
+                                    value={item.width || ''}
+                                    onChange={(e) => onUpdateItem?.(idx, 'width', Number(e.target.value) || 0)}
+                                    className="h-8 text-sm font-medium px-2"
+                                    min="0.1"
+                                    placeholder='cm'
+                                    step="0.01"
+                                    error={!!item.width && Number(item.width) < 0.1}
+                                    onBlur={(e) => {
+                                      const val = e.target.value;
+                                      if (val.startsWith(".")) {
+                                        e.target.value = `0${val}`;
+                                      }
+                                    }}
+                                  />
+                                </div>
+                                <div className="flex flex-col gap-1">
+                                  <Label className="text-[12px] font-medium text-gray-600 dark:text-zinc-400 whitespace-nowrap overflow-hidden text-ellipsis">Height</Label>
+                                  <Input
+                                    type="number"
+                                    value={item.height || ''}
+                                    onChange={(e) => onUpdateItem?.(idx, 'height', Number(e.target.value) || 0)}
+                                    className="h-8 text-sm font-medium px-2"
+                                    min="0.1"
+                                    placeholder='cm'
+                                    step="0.01"
+                                    error={!!item.height && Number(item.height) < 0.1}
+                                    onBlur={(e) => {
+                                      const val = e.target.value;
+                                      if (val.startsWith(".")) {
+                                        e.target.value = `0${val}`;
+                                      }
+                                    }}
+                                  />
+                                </div>
+                              </div>
+                            )}
+
+                            {/* Delete Button */}
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              className="h-8 w-10 shrink-0 bg-red-50 hover:bg-red-100 text-red-500 dark:bg-red-950/30 dark:hover:bg-red-900/50 rounded-md"
+                              onClick={() => removeItem?.(idx)}
+                              disabled={items?.length === 1}
+                            >
+                              <Trash2 className="h-4 w-4" />
+                            </Button>
+                          </div>
                         </div>
                       )}
                     </React.Fragment>
                   ))}
                   {children}
+
+                  {/* Summary Row */}
+                  {items && items.length > 0 && (
+                    <div className="pt-4 border-t border-gray-100 dark:border-zinc-800/80 flex flex-wrap items-center justify-baseline gap-x-4 gap-y-2 text-[13px] font-medium">
+                      <div className="flex items-center gap-1 whitespace-nowrap text-gray-500 dark:text-zinc-400">
+                        <Box className="w-3.5 h-3.5 shrink-0 text-emerald-500 dark:text-emerald-400" />
+                        <span className='leading-none'>Total Quantity:</span>
+                        <span className="leading-none font-semibold text-gray-950 dark:text-zinc-100">
+                          {totalQuantity} {totalQuantity === 1 ? 'Unit' : 'Units'}
+                        </span>
+                      </div>
+                      <div className="hidden sm:block h-3 w-px bg-gray-200 dark:bg-zinc-800" />
+                      <div className="flex items-center gap-1 whitespace-nowrap text-gray-500 dark:text-zinc-400">
+                        <Scale className="w-3.5 h-3.5 shrink-0 text-orange-500 dark:text-orange-400" />
+                        <span className='leading-none'>Total Weight:</span>
+                        <span className="leading-none font-semibold text-gray-950 dark:text-zinc-100">
+                          {totalWeight.toFixed(2)} kg
+                        </span>
+                      </div>
+                      <div className="flex items-center gap-1 whitespace-nowrap text-gray-500 dark:text-zinc-400">
+                        <Weight className="w-3.5 h-3.5 shrink-0 text-orange-500 dark:text-orange-400" />
+                        <span className='leading-none'>Total Volumetric Weight:</span>
+                        <span className="leading-none font-semibold text-gray-950 dark:text-zinc-100">
+                          {totalVolumetricWeight.toFixed(2)} kg
+                        </span>
+                      </div>
+                    </div>
+                  )}
                 </div>
               )}
             </div>
@@ -280,4 +381,4 @@ export const ItemsTable: React.FC<ItemsTableProps> = ({
       </AccordionItem>
     </Accordion>
   )
-}
+});

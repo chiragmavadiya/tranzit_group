@@ -1,4 +1,4 @@
-export type InvoiceStatus = 'Paid' | 'Partial' | 'Draft' | 'Pending' | 'Unpaid' | 'Send' | 'Overdue';
+export type InvoiceStatus = 'paid' | 'partial' | 'draft' | 'pending' | 'unpaid' | 'send' | 'overdue' | 'voided';
 
 export interface Customer {
   name: string;
@@ -6,35 +6,44 @@ export interface Customer {
 }
 
 export interface InvoiceDocumentData {
-  invoice: {
-    id?: number;
-    invoice_number: string;
-    invoice_date: string;
-    issued_at: string;
-    due_date: string | null;
-    status: string;
-    amount_paid: number;
-    balance_due: number;
-    send_email: string;
-    zoho_invoice_number: string | null;
-  };
-  customer: any;
-  items: any[];
-  summary: {
+  id?: number;
+  invoice_number: string;
+  status: string;
+  customer_full_name?: string;
+  customer_email?: string;
+  customer_business_name?: string;
+  customer?: any;
+  total: number;
+  issue_date: string;
+  due_date?: string | null;
+  send_email?: string;
+  till_date_paid: number;
+  remaining_balance: number;
+  totals: {
     subtotal_ex_gst: number;
     gst: number;
     total_inc_gst: number;
     amount_paid: number;
-    credit_amount: number;
     amount_due: number;
+    credit_amount: number;
   };
-  payments: any[];
+  address: {
+    address: string;
+    suburb: string;
+    state: string;
+    postcode: string;
+  };
+  items: any[];
+  /** invoice_items_id of saved items removed since load, sent on save so the API can delete them. */
+  deleted_item_ids?: (string | number)[];
+  orders: any[];
+  payment_transactions: any[];
 }
+
 
 export interface Invoice {
   id: number;
   invoice_number: string;
-  zoho_invoice_number: string | null;
   status: string;
 
   // From Customer API
@@ -69,19 +78,24 @@ export interface Invoice {
   customer_business_name: string,
   items: InvoiceItem
   address: any
+  actions: string[];
+  issued_at?: string;
 }
 
 export interface InvoiceSummary {
+  total_invoices: number;
+  pending_invoices: number;
+  partial_invoices: number;
+  paid_invoices: number;
+  amount_pending: number;
+  amount_paid: number;
   total_invoice: number;
   invoice_pending: number;
   invoice_partial: number;
   invoice_paid: number;
-  amount_pending: number;
-  amount_paid: number;
 }
 export interface InvoiceFormData {
   invoice_number: string;
-  zoho_invoice_number: string;
   status: InvoiceStatus;
   customerName: string;
   customerEmail: string;

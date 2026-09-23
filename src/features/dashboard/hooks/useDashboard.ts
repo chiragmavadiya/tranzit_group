@@ -1,13 +1,14 @@
-import { useQuery } from "@tanstack/react-query";
+import { keepPreviousData, useQuery } from "@tanstack/react-query";
 import { dashboardService } from "../services/dashboard.service";
 import { QUERY_KEYS } from "@/constants/api.constants";
 
 /**
  * Hook to fetch dashboard metrics
  */
-export const useDashboardMetrics = () => {
+export const useDashboardMetrics = (params?: Record<string, any>) => {
   return useQuery({
-    queryKey: QUERY_KEYS.DASHBOARD.METRICS,
-    queryFn: () => dashboardService.getMetrics(),
+    queryKey: params ? [...QUERY_KEYS.DASHBOARD.METRICS, params] : QUERY_KEYS.DASHBOARD.METRICS,
+    queryFn: () => dashboardService.getMetrics(params),
+    placeholderData: keepPreviousData,
   });
 };

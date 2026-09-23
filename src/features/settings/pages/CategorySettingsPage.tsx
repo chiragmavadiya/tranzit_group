@@ -14,7 +14,6 @@ export default function CategorySettingsPage() {
     response?.data?.find(c => c.slug === categoryId), [response, categoryId]);
 
   if (!currentCategory && response) {
-    console.log("redirect because of not ...m")
     return <Navigate to="/settings" replace />
   }
 
@@ -23,7 +22,7 @@ export default function CategorySettingsPage() {
   if (isLoading) {
     return (
       <div className="flex h-full items-center justify-center">
-        <Loader2 className="animate-spin text-blue-400 h-10 w-10" />
+        <Loader2 className="animate-spin text-primary h-10 w-10" />
       </div>
     );
   }

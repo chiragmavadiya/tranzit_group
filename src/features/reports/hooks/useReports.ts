@@ -3,12 +3,14 @@ import { reportsService } from "../services/reports.service";
 import { QUERY_KEYS } from "@/constants/api.constants";
 import type { ReportFilters } from "../types";
 import { showToast } from "@/components/ui/custom-toast";
+import { downloadFile } from "@/lib/utils";
 
-export const useShipmentReport = (filters: ReportFilters) => {
+export const useShipmentReport = (filters: ReportFilters, enabled: boolean = true) => {
   return useQuery({
     queryKey: [...QUERY_KEYS.REPORTS.SHIPMENT, filters],
     queryFn: () => reportsService.getShipmentReport(filters),
     placeholderData: keepPreviousData,
+    enabled,
   });
 };
 
@@ -32,11 +34,12 @@ export const useExportShipmentReport = () => {
   });
 };
 
-export const useTransactionReport = (filters: ReportFilters) => {
+export const useTransactionReport = (filters: ReportFilters, enabled: boolean = true) => {
   return useQuery({
     queryKey: [...QUERY_KEYS.REPORTS.TRANSACTION, filters],
     queryFn: () => reportsService.getTransactionReport(filters),
     placeholderData: keepPreviousData,
+    enabled,
   });
 };
 
@@ -60,21 +63,53 @@ export const useExportTransactionReport = () => {
   });
 };
 
-export const useInvoiceReport = (filters: ReportFilters) => {
+export const useInvoiceReport = (filters: ReportFilters, enabled: boolean = true) => {
   return useQuery({
     queryKey: [...QUERY_KEYS.REPORTS.INVOICE, filters],
     queryFn: () => reportsService.getInvoiceReport(filters),
     placeholderData: keepPreviousData,
+    enabled,
   });
 };
 
 // Assuming export for invoice is not available based on prompt endpoints, skipping useExportInvoiceReport
 
-export const useParcelReport = (filters: ReportFilters, isAdmin: boolean = false) => {
+export const useParcelReport = (filters: ReportFilters, isAdmin: boolean = false, enabled: boolean = true) => {
   return useQuery({
     queryKey: [...QUERY_KEYS.REPORTS.PARCELS, filters, isAdmin],
     queryFn: () => reportsService.getParcelReport(filters, isAdmin),
     placeholderData: keepPreviousData,
+    enabled,
+  });
+};
+export const useIntegratedParcelReport = (filters: ReportFilters, isAdmin: boolean = false, enabled: boolean = true) => {
+  return useQuery({
+    queryKey: [...QUERY_KEYS.REPORTS.PARCELS, filters, isAdmin],
+    queryFn: () => reportsService.getIntegratedParcelReport(filters),
+    placeholderData: keepPreviousData,
+    enabled,
+  });
+};
+
+export const useAllParcelReport = (filters: ReportFilters, enabled: boolean = true) => {
+  return useQuery({
+    queryKey: [...QUERY_KEYS.REPORTS.ALL_PARCELS, filters],
+    queryFn: () => reportsService.getAllParcelReport(filters),
+    placeholderData: keepPreviousData,
+    enabled,
+  });
+};
+
+export const useExportAllParcelReport = () => {
+  return useMutation({
+    mutationFn: (filters: ReportFilters & { format: string }) =>
+      reportsService.exportAllParcelReport(filters),
+    onSuccess: ({ blob, filename }) => {
+      downloadFile(blob, filename)
+    },
+    onError: (error: any) => {
+      showToast(error?.response?.data?.message || "Failed to export parcel report", "error");
+    },
   });
 };
 
@@ -82,6 +117,25 @@ export const useExportParcelReport = (isAdmin: boolean = false) => {
   return useMutation({
     mutationFn: (filters: ReportFilters & { format: string }) =>
       reportsService.exportParcelReport(filters, isAdmin),
+    onSuccess: ({ blob, filename }) => {
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.setAttribute("download", filename);
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      window.URL.revokeObjectURL(url);
+    },
+    onError: (error: any) => {
+      showToast(error?.response?.data?.message || "Failed to export parcel report", "error");
+    },
+  });
+};
+export const useExportIntegratedParcelReport = () => {
+  return useMutation({
+    mutationFn: (filters: ReportFilters & { format: string }) =>
+      reportsService.exportIntegratedParcelReport(filters),
     onSuccess: ({ blob, filename }) => {
       const url = window.URL.createObjectURL(blob);
       const link = document.createElement("a");
@@ -129,3 +183,56 @@ export const useUploadAusPostInvoice = () => {
     },
   });
 };
+
+export const useReportCounts = (filters?: ReportFilters, enabled: boolean = true) => {
+  return useQuery({
+    queryKey: filters ? [...QUERY_KEYS.REPORTS.COUNTS, filters] : QUERY_KEYS.REPORTS.COUNTS,
+    queryFn: () => reportsService.getReportCounts(filters),
+    enabled,
+  });
+};
+
+export const useAuspostReport = (filters: ReportFilters, enabled: boolean = true) => {
+  return useQuery({
+    queryKey: [...QUERY_KEYS.REPORTS.AUSPOST_REPORT, filters],
+    queryFn: () => reportsService.getAuspostReport(filters),
+    placeholderData: keepPreviousData,
+    enabled,
+  });
+};
+
+export const useExportAuspostReport = () => {
+  return useMutation({
+    mutationFn: (filters: ReportFilters & { format: string }) =>
+      reportsService.exportAuspostReport(filters),
+    onSuccess: ({ blob, filename }) => {
+      downloadFile(blob, filename)
+    },
+    onError: (error: any) => {
+      showToast(error?.response?.data?.message || "Failed to export AusPost report", "error");
+    },
+  });
+};
+
+export const useOrderLabelChargesReport = (filters: ReportFilters, enabled: boolean = true) => {
+  return useQuery({
+    queryKey: [...QUERY_KEYS.REPORTS.ORDER_LABEL_CHARGES, filters],
+    queryFn: () => reportsService.getOrderLabelChargesReport(filters),
+    placeholderData: keepPreviousData,
+    enabled,
+  });
+};
+
+export const useExportOrderLabelChargesReport = () => {
+  return useMutation({
+    mutationFn: (filters: ReportFilters & { format: string }) =>
+      reportsService.exportOrderLabelChargesReport(filters),
+    onSuccess: ({ blob, filename }) => {
+      downloadFile(blob, filename)
+    },
+    onError: (error: any) => {
+      showToast(error?.response?.data?.message || "Failed to export Order Label Charges report", "error");
+    },
+  });
+};
+

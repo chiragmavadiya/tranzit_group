@@ -48,10 +48,16 @@ export const ItemsTable: React.FC<ItemsTableProps> = React.memo(({
   const predefinedItems = useMemo(() => itemsResponse?.data || [], [itemsResponse])
 
   const predefinedItemsOptions = useMemo(() => {
-    return predefinedItems.map(item => ({
-      label: item.item_name,
-      value: item.id.toString(),
-    }))
+    return predefinedItems.map(item => {
+      const weight = item.item_weight !== undefined && item.item_weight !== null ? item.item_weight : 0;
+      const length = item.item_length || 0;
+      const width = item.item_width || 0;
+      const height = item.item_height || 0;
+      return {
+        label: `${item.item_name} (${weight} kg | ${length}x${width}x${height} cm)`,
+        value: item.id.toString(),
+      };
+    })
   }, [predefinedItems])
 
   const totalQuantity = useMemo(() => {
@@ -193,12 +199,13 @@ export const ItemsTable: React.FC<ItemsTableProps> = React.memo(({
                           {/* Packing Type and Quantity */}
                           <div className="flex gap-2 w-full sm:w-auto shrink-0">
                             {/* Type Selection */}
-                            <div className="flex flex-col gap-1 flex-1 sm:w-[120px] sm:flex-initial">
+                            <div className="flex flex-col gap-1 flex-1 sm:w-35 sm:flex-initial">
                               <Label className="text-[12px] font-medium text-gray-600 dark:text-zinc-400">Packing Type</Label>
                               <FormSelect
                                 options={[
                                   { label: 'Parcel', value: 'box' },
                                   { label: 'Pallet', value: 'pallet' },
+                                  { label: 'Satchel', value: 'satchel' },
                                   { label: 'My Items', value: 'my_item' }
                                 ]}
                                 value={item.type || 'box'}
@@ -256,7 +263,7 @@ export const ItemsTable: React.FC<ItemsTableProps> = React.memo(({
                                       }
                                     }}
                                     placeholder='kg'
-                                    // error={!item.weight}
+                                  // error={!item.weight}
                                   />
                                 </div>
                                 <div className="flex flex-col gap-1">
@@ -266,10 +273,10 @@ export const ItemsTable: React.FC<ItemsTableProps> = React.memo(({
                                     value={item.length || ''}
                                     onChange={(e) => onUpdateItem?.(idx, 'length', Number(e.target.value) || 0)}
                                     className="h-8 text-sm font-medium px-2"
-                                    min="1"
-                                    step="0.01"
+                                    min="0.1"
+                                    step="0.1"
                                     placeholder='cm'
-                                    error={!!item.length && Number(item.length) < 1}
+                                    error={!!item.length && Number(item.length) < 0.1}
                                     // errormsg='Length cannot be less than 1 cm. Please enter a valid length.'
                                     onBlur={(e) => {
                                       const val = e.target.value;
@@ -286,10 +293,10 @@ export const ItemsTable: React.FC<ItemsTableProps> = React.memo(({
                                     value={item.width || ''}
                                     onChange={(e) => onUpdateItem?.(idx, 'width', Number(e.target.value) || 0)}
                                     className="h-8 text-sm font-medium px-2"
-                                    min="1"
+                                    min="0.1"
                                     placeholder='cm'
                                     step="0.01"
-                                    error={!!item.width &&Number(item.width) < 1}
+                                    error={!!item.width && Number(item.width) < 0.1}
                                     onBlur={(e) => {
                                       const val = e.target.value;
                                       if (val.startsWith(".")) {
@@ -305,10 +312,10 @@ export const ItemsTable: React.FC<ItemsTableProps> = React.memo(({
                                     value={item.height || ''}
                                     onChange={(e) => onUpdateItem?.(idx, 'height', Number(e.target.value) || 0)}
                                     className="h-8 text-sm font-medium px-2"
-                                    min="1"
+                                    min="0.1"
                                     placeholder='cm'
                                     step="0.01"
-                                    error={!!item.height && Number(item.height) < 1}
+                                    error={!!item.height && Number(item.height) < 0.1}
                                     onBlur={(e) => {
                                       const val = e.target.value;
                                       if (val.startsWith(".")) {

@@ -6,7 +6,8 @@ import { CustomModel } from '@/components/ui/dialog';
 import { showToast } from '@/components/ui/custom-toast';
 import { Checkbox } from '@/components/ui/checkbox';
 import { PlaceAutocomplete } from '@/components/common/AutoComplateAddress';
-import { cleanSpaces, cn, isEmailValid, isPhoneValid } from '@/lib/utils';
+import { cn, isEmailValid } from '@/lib/utils';
+import { cleanSpaces, isPhoneValid, PHONE_ERROR_MESSAGE } from '@/lib/phone';
 import { STATES } from '@/constants';
 import AutoComplete from '@/components/common/AutoComplate2';
 import { useAddressBookSearch } from '@/features/address-book/hooks/useAddressBook';
@@ -14,8 +15,10 @@ import { useDebounce } from '@/hooks/useDebounce';
 import { useOrderReceiverAddress, useUpdateOrderReceiverAddress } from '../hooks/useOrders';
 import { useAppSelector } from '@/hooks/store.hooks';
 import { useCustomers } from '@/features/customers/hooks/useCustomers';
+import { useValidateLocality } from '@/hooks/useValidateLocality';
+import { LocalityWarning } from '@/components/common/LocalityWarning';
 
-export default function CreateOrderDialog({ onOpenChange, type, open, initialData, isEdit, onSubmit, orderId, orderType, selectedCustomer, onCustomerSelect }: CreateOrderDialogProps) {
+export default function CreateOrderDialog({ onOpenChange, type, open, initialData, isEdit, onSubmit, orderId, orderType, selectedCustomer, onCustomerSelect, deliveryInstructions, onDeliveryInstructionsChange }: CreateOrderDialogProps) {
   const navigate = useNavigate();
   const { role } = useAppSelector((state) => state.auth);
   const isAdminCreate = role === 'admin' && (orderType === 'create' || orderType === 'create-menual') && type === 'receiver';
@@ -48,6 +51,7 @@ export default function CreateOrderDialog({ onOpenChange, type, open, initialDat
 
   const debouncedSearchAddress = useDebounce(searchAddress, 400);
   const { data: addressBookData } = useAddressBookSearch(debouncedSearchAddress);
+  const { error: localityError, suggestions: localitySuggestions, addressSuggestions, isPending: isLocalityPending } = useValidateLocality(formData.suburb, formData.state, formData.postcode, formData.address1);
   const { data: orderResponse } = useOrderReceiverAddress((!initialData && orderId) || '');
   // const { mutate: createOrder, isPending: saveLoading } = useCreateOrder();
   const { mutateAsync: updateOrderReceiverAddress, isPending: isUpdatePending } = useUpdateOrderReceiverAddress();
@@ -172,7 +176,17 @@ export default function CreateOrderDialog({ onOpenChange, type, open, initialDat
     }
 
     if (phone && !isPhoneValid(phone)) {
-      showToast("Please enter a valid phone number", "error");
+      showToast(PHONE_ERROR_MESSAGE, "error");
+      return;
+    }
+
+    // Keep the modal open on an invalid locality — the inline banner explains why
+    if (localityError) {
+      return;
+    }
+
+    if (isLocalityPending) {
+      showToast("Validating address, please wait", "error");
       return;
     }
 
@@ -428,9 +442,9 @@ export default function CreateOrderDialog({ onOpenChange, type, open, initialDat
               </div> */}
             <div className="space-y-4">
               <FormTextarea
-                label="Instruction"
-                value={formData.instructions}
-                onChange={val => updateField('instructions', val)}
+                label={onDeliveryInstructionsChange ? "Delivery Instruction" : "Instruction"}
+                value={onDeliveryInstructionsChange ? (deliveryInstructions || '') : formData.instructions}
+                onChange={val => onDeliveryInstructionsChange ? onDeliveryInstructionsChange(val) : updateField('instructions', val)}
                 layout="horizontal"
                 placeholder='Enter Instruction'
               />
@@ -508,6 +522,32 @@ export default function CreateOrderDialog({ onOpenChange, type, open, initialDat
             </div>
           </div>
         </div>
+
+        {localityError && (
+          <LocalityWarning
+            message={localityError}
+            suggestions={localitySuggestions}
+            addressSuggestions={addressSuggestions}
+            onSelect={(suggestion) => {
+              updateField('suburb', suggestion.suburb);
+              updateField('state', suggestion.state);
+              updateField('postcode', suggestion.postcode);
+            }}
+            onSelectAddress={(suggestion) => {
+              updateField('address_info', suggestion.formatted_address);
+              updateField('address1', `${suggestion.street_number || ''} ${suggestion.street_name || ''}`.trim());
+              updateField('street_number', suggestion.street_number || '');
+              updateField('street_name', suggestion.street_name || '');
+              if (suggestion.unit_number) {
+                updateField('unit_number', suggestion.unit_number);
+              }
+              updateField('suburb', suggestion.suburb);
+              updateField('state', suggestion.state);
+              updateField('postcode', suggestion.postcode);
+              setIsSelected(true);
+            }}
+          />
+        )}
 
         {/* Address Validation Accordion */}
         {/* <div className="col-span-12">

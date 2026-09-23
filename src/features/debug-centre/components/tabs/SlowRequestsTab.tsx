@@ -20,6 +20,7 @@ export const SlowRequestsTab = ({ filters, searchValue, onPageChange, onPageSize
     <DataTable
       columns={SLOW_REQUESTS_COLUMNS}
       data={requests}
+      moduleName="slowRequests"
       loading={isLoading}
       totalItems={totalItems}
       currentPage={filters.page || 1}

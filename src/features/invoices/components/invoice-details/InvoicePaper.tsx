@@ -147,7 +147,18 @@ export const InvoicePaper: React.FC<InvoicePaperProps> = ({
   };
 
   const handleRemoveItem = useCallback((itemId: string | number) => {
-    setInvoiceData?.((prev: any) => ({ ...prev, items: prev?.items.length > 1 ? prev?.items?.filter((i: any) => i.id !== itemId) : prev?.items }))
+    setInvoiceData?.((prev: any) => {
+      if (!(prev?.items?.length > 1)) return prev;
+      const removed = prev.items.find((i: any) => i.id === itemId);
+      return {
+        ...prev,
+        items: prev.items.filter((i: any) => i.id !== itemId),
+        // Items added in this session were never saved, so there is nothing for the API to delete.
+        deleted_item_ids: removed?.invoice_items_id
+          ? [...(prev.deleted_item_ids || []), removed.invoice_items_id]
+          : prev.deleted_item_ids
+      };
+    })
   }, [setInvoiceData])
 
   const updateStatus = useCallback((status: string) => {

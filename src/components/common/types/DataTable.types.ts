@@ -32,6 +32,7 @@ export interface DataTableProps<T> {
   selectable?: boolean;
   selectedRows?: string[];
   onSelectionChange?: (selectedRows: string[]) => void;
+  selectOnRowClick?: boolean;
   // Sorting
   sortable?: boolean;
   sortConfig?: SortConfig;
@@ -53,6 +54,12 @@ export interface DataTableProps<T> {
   columnSettings?: boolean;
   defaultVisibleColumns?: string[];
   onColumnVisibilityChange?: (visibleColumns: string[]) => void;
+  /**
+   * Opt in to remembering which columns the user hid, keyed by module
+   * (e.g. 'manifest' -> 'manifest_hidden_columns'). Omit to keep the
+   * toggles session-only.
+   */
+  moduleName?: string;
   // Resizing
   resizable?: boolean;
   persistenceId?: string;

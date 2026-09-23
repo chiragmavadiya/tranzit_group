@@ -9,11 +9,12 @@ import { useNavigate } from 'react-router-dom';
 import type { EnquiryStatus } from '@/features/enquiries/types';
 import { ENQUIRY_STATUS_CONFIG } from '@/features/enquiries/constant';
 import { EnquiryDetailsDialog } from '../components/EnquiryDetailsDialog';
+import useLocalStorage from '@/hooks/useLocalStorage';
 
 export default function EnquiryListPage() {
     const navigate = useNavigate();
     const [search, setSearch] = useState('');
-    const [page, setPage] = useState(1);
+    const [page, setPage] = useLocalStorage<number>('enquiry_list_page', 1);
     const [pageSize, setPageSize] = useState(25);
     const [selectedEnquiry, setSelectedEnquiry] = useState<any | null>(null);
 

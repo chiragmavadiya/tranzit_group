@@ -1,5 +1,5 @@
-import { useState, useEffect, memo } from 'react';
-import type { ReactNode } from 'react'
+import { useState, useMemo, memo } from 'react';
+import type { MouseEvent, ReactNode } from 'react'
 import { ArrowUp, ArrowDown, Search, Settings } from 'lucide-react';
 import {
   Table,
@@ -10,6 +10,7 @@ import {
   TableRow
 } from '@/components/ui/table';
 import { Checkbox } from '@/components/ui/checkbox';
+import { Button } from '@/components/ui/button';
 import { cn, getNestedValue } from '@/lib/utils';
 import { usePagination } from './hooks/usePagination';
 import { Pagination } from './Pagination';
@@ -19,6 +20,7 @@ import type { Column, DataTableProps, SortConfig } from './types/DataTable.types
 import DropdownCustomContent from '../ui/dropdown-menu';
 import { CustomLabel, FormInput, FormSelect } from '@/features/orders/components/OrderFormUI';
 import { ExportMenu } from './ExportMenu';
+import useLocalStorage from '@/hooks/useLocalStorage';
 
 const DataTableComponent = <T extends Record<string, any>>(props: DataTableProps<T>) => {
   const {
@@ -29,6 +31,7 @@ const DataTableComponent = <T extends Record<string, any>>(props: DataTableProps
     selectable = false,
     selectedRows = [],
     onSelectionChange,
+    selectOnRowClick = false,
     // Sorting
     sortable = false,
     sortConfig,
@@ -46,6 +49,8 @@ const DataTableComponent = <T extends Record<string, any>>(props: DataTableProps
     searchValue = '',
     onSearchChange,
     searchPlaceholder = 'Search...',
+    // Column management
+    moduleName,
     // Styling
     className,
     tableClassName,
@@ -74,27 +79,125 @@ const DataTableComponent = <T extends Record<string, any>>(props: DataTableProps
   const [internalSearch, setInternalSearch] = useState('');
   const [internalSortConfig, setInternalSortConfig] = useState<SortConfig>({ key: null, direction: null });
   const [internalSelectedRows, setInternalSelectedRows] = useState<string[]>([]);
-  const [visibleColumns, setVisibleColumns] = useState<string[]>(columns.map(c => c.key));
   const [colDropdownOpen, setColDropdownOpen] = useState(false);
+  // Persist the hidden keys rather than the visible ones, so a column added in a later
+  // release shows up by default instead of disappearing for users who already saved a
+  // preference. Without a moduleName the toggles stay session-only, as before.
+  const [hiddenColumns, setHiddenColumns] = useLocalStorage<string[]>(
+    moduleName ? `${moduleName}_hidden_columns` : '',
+    []
+  );
 
-  useEffect(() => {
-    setVisibleColumns(columns.map(c => c.key));
-  }, [columns]);
+  // Checkbox edits are staged here and only reach the table on Apply.
+  const [draftHiddenColumns, setDraftHiddenColumns] = useState<string[]>(hiddenColumns);
 
-  const handleToggleColumn = (columnKey: string) => {
-    setVisibleColumns(prev => {
-      if (prev.includes(columnKey)) {
-        if (prev.length <= 1) return prev;
-        return prev.filter(k => k !== columnKey);
-      } else {
-        return [...prev, columnKey];
-      }
-    });
+  const visible = columns.filter(c => !hiddenColumns.includes(c.key));
+  // Fall back to everything if a stale preference would hide the entire table.
+  const visibleColumns = visible.length ? visible : columns;
+  const draftVisibleColumns = columns.filter(c => !draftHiddenColumns.includes(c.key));
+
+  // Looked up once per render instead of an indexOf scan per header and per cell,
+  // which was O(columns) inside a loop over every cell of every row.
+  const columnIndexes = useMemo(() => new Map(columns.map((c, i) => [c, i])), [columns]);
+
+  const handleColDropdownOpenChange = (open: boolean) => {
+    // Re-sync on open so a draft the user walked away from doesn't linger.
+    if (open) setDraftHiddenColumns(hiddenColumns);
+    setColDropdownOpen(open);
   };
 
-  const renderedColumns = columns.length > 7
-    ? columns.filter(c => visibleColumns.includes(c.key))
-    : columns;
+  const handleToggleColumn = (columnKey: string) => {
+    const isHidden = draftHiddenColumns.includes(columnKey);
+    // Always leave at least one column on screen.
+    if (!isHidden && draftVisibleColumns.length <= 1) return;
+
+    setDraftHiddenColumns(
+      isHidden
+        ? draftHiddenColumns.filter(k => k !== columnKey)
+        : [...draftHiddenColumns, columnKey]
+    );
+  };
+
+  const handleApplyColumns = () => {
+    setHiddenColumns(draftHiddenColumns);
+    setColDropdownOpen(false);
+  };
+
+  // Reset takes effect immediately — it does not wait for Apply — and closes like Apply.
+  const handleResetColumns = () => {
+    setColDropdownOpen(false);
+    setDraftHiddenColumns([]);
+    setHiddenColumns([]);
+  };
+
+  const renderedColumns = columns.length > 7 ? visibleColumns : columns;
+  const columnSettingsMenu = (
+    <DropdownCustomContent
+      open={colDropdownOpen}
+      onOpenChange={handleColDropdownOpenChange}
+      triggerClassName="p-1 rounded-md hover:bg-gray-100 dark:hover:bg-zinc-800 text-gray-500 dark:text-zinc-400 hover:text-gray-900 dark:hover:text-zinc-100 transition-colors cursor-pointer outline-none"
+      contentClassName="border border-gray-200 dark:border-zinc-800 shadow-lg"
+      content={
+        <div
+          className="flex flex-col max-h-[340px] p-2 bg-white dark:bg-zinc-950 text-gray-800 dark:text-zinc-200"
+          onClick={(e) => e.stopPropagation()}
+        >
+          <div className="px-2 py-1.5 text-xs font-semibold text-gray-500 dark:text-zinc-400 uppercase tracking-wide">
+            Toggle Columns
+          </div>
+          <div className="h-px my-1 bg-gray-100 dark:bg-zinc-800" />
+          <div className="flex flex-col min-h-0 overflow-y-auto">
+            {columns.filter((c) => !c.disableToggle).map((col) => {
+              const isChecked = draftVisibleColumns.some(c => c.key === col.key);
+              const isDisabled = isChecked && draftVisibleColumns.length <= 1;
+              return (
+                <div
+                  key={col.key}
+                  className={cn(
+                    "flex items-center gap-2.5 px-2 py-1.5 rounded-md hover:bg-slate-50 dark:hover:bg-zinc-900 cursor-pointer text-sm font-medium transition-colors select-none",
+                    isDisabled && "opacity-50 cursor-not-allowed"
+                  )}
+                  onClick={() => {
+                    if (!isDisabled) {
+                      handleToggleColumn(col.key);
+                    }
+                  }}
+                >
+                  <Checkbox
+                    checked={isChecked}
+                    onCheckedChange={() => {
+                      if (!isDisabled) {
+                        handleToggleColumn(col.key);
+                      }
+                    }}
+                    onClick={(e) => e.stopPropagation()}
+                    disabled={isDisabled}
+                  />
+                  <span className="truncate">{col.header || col.key}</span>
+                </div>
+              );
+            })}
+          </div>
+          <div className="h-px my-1 bg-gray-100 dark:bg-zinc-800" />
+          <div className="flex items-center justify-between gap-2 px-1 pt-0.5">
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={handleResetColumns}
+              disabled={!draftHiddenColumns.length && !hiddenColumns.length}
+            >
+              Reset
+            </Button>
+            <Button size="sm" onClick={handleApplyColumns}>
+              Apply
+            </Button>
+          </div>
+        </div>
+      }
+    >
+      <Settings className="w-4 h-4" />
+    </DropdownCustomContent>
+  );
 
   // Use controlled or uncontrolled values
   const currentSearch = searchValue !== undefined ? searchValue : internalSearch;
@@ -184,6 +287,14 @@ const DataTableComponent = <T extends Record<string, any>>(props: DataTableProps
     } else {
       setInternalSelectedRows(newSelection);
     }
+  };
+
+  const handleRowClick = (event: MouseEvent<HTMLTableRowElement>, row: T, rowId: string, index: number) => {
+    onRowClick?.(row, index);
+    if (!selectable || !selectOnRowClick) return;
+    // The row's own controls act on their own — they must not also toggle the selection.
+    if ((event.target as Element).closest('a, button, input, select, textarea, [role="menuitem"]')) return;
+    handleSelectRow(rowId);
   };
 
   const renderCell = (column: Column<T>, row: T, index: number) => {
@@ -286,7 +397,7 @@ const DataTableComponent = <T extends Record<string, any>>(props: DataTableProps
               )}
 
               {renderedColumns.map((column, index) => {
-                const originalIndex = columns.indexOf(column);
+                const originalIndex = columnIndexes.get(column) ?? -1;
                 return (
                   <TableHead
                     key={`${column.key}-${originalIndex}`}
@@ -313,55 +424,7 @@ const DataTableComponent = <T extends Record<string, any>>(props: DataTableProps
                       </div>}
                       {columns.length > 7 && index === renderedColumns.length - 1 && (
                         <div onClick={(e) => e.stopPropagation()} className="ml-auto flex items-center print:hidden">
-                          <DropdownCustomContent
-                            open={colDropdownOpen}
-                            onOpenChange={setColDropdownOpen}
-                            triggerClassName="p-1 rounded-md hover:bg-gray-100 dark:hover:bg-zinc-800 text-gray-500 dark:text-zinc-400 hover:text-gray-900 dark:hover:text-zinc-100 transition-colors cursor-pointer outline-none"
-                            contentClassName="border border-gray-200 dark:border-zinc-800 shadow-lg"
-                            content={
-                              <div
-                                className="flex flex-col max-h-[300px] overflow-y-auto p-2 bg-white dark:bg-zinc-950 text-gray-800 dark:text-zinc-200"
-                                onClick={(e) => e.stopPropagation()}
-                              >
-                                <div className="px-2 py-1.5 text-xs font-semibold text-gray-500 dark:text-zinc-400 uppercase tracking-wide">
-                                  Toggle Columns
-                                </div>
-                                <div className="h-px my-1 bg-gray-100 dark:bg-zinc-800" />
-                                {columns.filter((c) => !c.disableToggle).map((col) => {
-                                  const isChecked = visibleColumns.includes(col.key);
-                                  const isDisabled = isChecked && visibleColumns.length <= 1;
-                                  return (
-                                    <div
-                                      key={col.key}
-                                      className={cn(
-                                        "flex items-center gap-2.5 px-2 py-1.5 rounded-md hover:bg-slate-50 dark:hover:bg-zinc-900 cursor-pointer text-sm font-medium transition-colors select-none",
-                                        isDisabled && "opacity-50 cursor-not-allowed"
-                                      )}
-                                      onClick={() => {
-                                        if (!isDisabled) {
-                                          handleToggleColumn(col.key);
-                                        }
-                                      }}
-                                    >
-                                      <Checkbox
-                                        checked={isChecked}
-                                        onCheckedChange={() => {
-                                          if (!isDisabled) {
-                                            handleToggleColumn(col.key);
-                                          }
-                                        }}
-                                        onClick={(e) => e.stopPropagation()}
-                                        disabled={isDisabled}
-                                      />
-                                      <span className="truncate">{col.header || col.key}</span>
-                                    </div>
-                                  );
-                                })}
-                              </div>
-                            }
-                          >
-                            <Settings className="w-4 h-4" />
-                          </DropdownCustomContent>
+                          {columnSettingsMenu}
                         </div>
                       )}
                     </div>
@@ -395,10 +458,11 @@ const DataTableComponent = <T extends Record<string, any>>(props: DataTableProps
                       isSelected
                         ? "bg-slate-100 dark:bg-zinc-900"
                         : "bg-white dark:bg-zinc-950 hover:bg-primary/5 dark:hover:bg-primary/10",
-                      onRowClick && "cursor-pointer",
+                      (onRowClick || (selectable && selectOnRowClick)) && "cursor-pointer",
                       typeof rowClassName === 'function' ? rowClassName(row, index) : rowClassName
                     )}
-                    onClick={() => onRowClick?.(row, index)}
+                    aria-selected={selectable ? isSelected : undefined}
+                    onClick={(event) => handleRowClick(event, row, rowId, index)}
                   >
                     {selectable && (
                       <TableCell className={cn(
@@ -416,12 +480,12 @@ const DataTableComponent = <T extends Record<string, any>>(props: DataTableProps
                     )}
 
                     {renderedColumns.map((column) => {
-                      const originalIndex = columns.indexOf(column);
+                      const originalIndex = columnIndexes.get(column) ?? -1;
                       return (
                         <TableCell
                           key={`${column.key}-${rowId}-${originalIndex}`}
                           className={cn(
-                            `px-3 break-normal py-[10px] min-h-12 text-[13px] xl:text-sm text-gray-800 dark:text-zinc-300 whitespace-normal transition-colors`,
+                            `px-3 break-normal py-[6px] min-h-12 text-[13px] xl:text-sm text-gray-800 dark:text-zinc-300 whitespace-normal transition-colors`,
                             column.sticky === 'left' && cn(
                               "sticky left-0 shadow-[inset_-1px_0_0_0_#ebe6e7] dark:shadow-[inset_-1px_0_0_0_#27272a]",
                               isSelected

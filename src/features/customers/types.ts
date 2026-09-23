@@ -43,6 +43,10 @@ export interface CustomerFormData {
     email: string;
     mobile: string;
     business_name: string;
+    sender_name: string;
+    /** Gates the customer out of the Customer Portal until an admin activates the account. */
+    account_activation?: boolean;
+    display_business_name_on_label: boolean;
     gst_number: string;
     billing_address_info: string;
     billing_address: string;
@@ -67,7 +71,11 @@ export interface CustomerFormData {
     direct_freight_active: number;
     auspost_active: number;
     couriersplease_active: number;
+    aramex_active: number;
     pallet_active: number;
+    fedex_active: number;
+    tnt_active: number;
+    teg_active: number;
     topup_enable: boolean;
     order_prefix: string;
     xero_contact_id?: string | null;
@@ -75,7 +83,20 @@ export interface CustomerFormData {
     couriersplease_min_margin?: number;
     auspost_min_margin?: number;
     direct_freight_min_margin?: number;
+    aramex_min_margin?: number;
     pallet_min_margin?: number;
+    fedex_min_margin?: number;
+    tnt_min_margin?: number;
+    teg_min_margin?: number;
+    /** Per-courier manual order flag. Optional so customers saved before this existed still load. */
+    manual_order_direct_freight?: boolean;
+    manual_order_auspost?: boolean;
+    manual_order_couriersplease?: boolean;
+    manual_order_aramex?: boolean;
+    manual_order_pallet?: boolean;
+    manual_order_fedex?: boolean;
+    manual_order_tnt?: boolean;
+    manual_order_teg?: boolean;
     markup_charges?: CourierWeightCharge[];
     pickup_charges?: CourierWeightCharge[];
     byo_courier_invoice_enable?: boolean;
@@ -101,6 +122,7 @@ export interface CustomerDetails {
     total_debit: number;
     total_margin: number;
     status: string;
+    account_activation?: boolean | null;
     address_info: string;
 }
 

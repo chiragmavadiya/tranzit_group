@@ -83,4 +83,6 @@ export interface FormCheckboxProps {
   description?: string;
   price?: number;
   className?: string;
+  disabled?: boolean;
+  info?: ReactNode;
 }

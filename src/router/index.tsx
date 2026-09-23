@@ -1,5 +1,5 @@
 import { lazy, Suspense, useEffect, useState } from 'react';
-import { Routes, Route, useNavigate, useLocation } from 'react-router-dom';
+import { Routes, Route, useNavigate, useLocation, useParams, Navigate } from 'react-router-dom';
 import PublicRoute from '@/router/PublicRoute';
 import brandLogo from '@/assets/Tranzit_Logo.svg';
 import brandLogoDark from '@/assets/Tranzit_Logo_dark.svg';
@@ -8,16 +8,21 @@ import AdminRoutes from '@/apps/admin/routes/AdminRoutes';
 import ClientRoutes from '@/apps/client/routes/ClientRoutes';
 import { useAppDispatch, useAppSelector } from '@/hooks/store.hooks';
 import { useGetUserDetails } from '@/features/auth/hooks/useAuth';
-import { setUser } from '@/features/auth/authSlice';
+import { setUser, normalizeRole } from '@/features/auth/authSlice';
 import SubscriptionPlanModal from '@/features/customer-settings/components/SubscriptionPlanModal';
+import AcceptTermsModal from '@/features/auth/components/AcceptTermsModal';
+import AccountUnderReviewModal from '@/features/auth/components/AccountUnderReviewModal';
+import ShopifyParcelDefaultsModal from '@/features/integrations/components/ShopifyParcelDefaultsModal';
+import { hasPendingParcelDefaults } from '@/features/integrations/utils';
 import ChangePassword from '@/features/auth/pages/ChangePassword';
 import ShopifyLinkPage from '@/features/shopifyLink';
 import ShopifyAutoLoginPage from '@/features/shopifyAutoLogin';
 import { showToast } from '@/components/ui/custom-toast';
-import { DO_NOT_REDIRECT_URLS } from '@/constants';
+import { isRedirectExemptPath } from '@/constants';
 import * as Sentry from "@sentry/react";
 import PageViewTracker from '@/analytics/PageViewTracker';
 import { setAnalyticsUser } from '@/analytics';
+import { identifyUser } from '@/lib/clarity';
 
 
 // Lazy load page components
@@ -30,6 +35,16 @@ const OnboardingPage = lazy(() => import('@/features/setup/pages/OnboardingPage'
 const TermsAndConditions = lazy(() => import('@/features/auth/pages/TermsAndConditions'));
 const PrivacyPolicy = lazy(() => import('@/features/auth/pages/PrivacyPolicy'));
 const DangerousGoods = lazy(() => import('@/features/auth/pages/DangerousGoods'));
+const PublicTrackingPage = lazy(() => import('@/features/tracking/pages/PublicTrackingPage'));
+
+/** /track/ABC123 -> /track?tracking_number=ABC123 */
+const LegacyTrackRedirect = () => {
+  const { trackingNumber } = useParams<{ trackingNumber: string }>();
+  const search = trackingNumber
+    ? `?${new URLSearchParams({ tracking_number: trackingNumber })}`
+    : '';
+  return <Navigate to={`/track${search}`} replace />;
+};
 
 
 // Simple loading fallback component
@@ -53,9 +68,7 @@ const PageLoader = () => (
 );
 
 export const AppRouter = () => {
-  console.log("Render AppRouter")
-
-  const { isAuthenticated, userID, token, next_step } = useAppSelector((state) => state.auth);
+  const { isAuthenticated, userID, token, next_step, role } = useAppSelector((state) => state.auth);
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
   const location = useLocation();
@@ -65,9 +78,39 @@ export const AppRouter = () => {
   const { data: userData, isLoading, isPending, isError, refetch } = useGetUserDetails(isAuthenticated);
   const [showSubscriptionModal, setShowSubscriptionModal] = useState(false);
 
+  // Blocking modals are shown one at a time, highest priority first:
+  // Shopify parcel details -> Terms and Conditions -> low balance (that last one lives in Layout).
+  // All of them are derived straight from the ME response, so none can flash before it resolves,
+  // and the public legal pages stay reachable since the Terms modal links out to the full document.
+  const onBlockablePage = role === 'customer' && !isRedirectExemptPath(location.pathname);
+
+  // Approval outranks every blocking modal: an unapproved customer never reaches the routes
+  // below, so no portal page is mounted and none of their queries can fire. Approval is only
+  // granted on an explicit `true` — a missing or null flag keeps the account blocked.
+  const accountUnderReview =
+    isAuthenticated &&
+    onBlockablePage &&
+    !location.pathname.includes('/on-board') &&
+    !!userData &&
+    userData.account_activation !== true;
+
+  // A connected Shopify store without default parcel details can't have its orders shipped.
+  const parcelDefaultsPending = role === 'customer' && hasPendingParcelDefaults(userData);
+  const storesMissingParcelDefaults = userData?.shopify_package_defaults?.stores_missing_defaults ?? [];
+  // The modal steps aside on a Shopify store's own settings page, which is where the details are filled in.
+  // The `?configure=` form is the older deep link, kept so an in-flight one still works.
+  const isConfiguringShopify =
+    /^\/settings\/ecommerce\/shopify\/[^/]+$/.test(location.pathname) ||
+    (location.pathname === '/settings/ecommerce' &&
+      new URLSearchParams(location.search).get('configure') === 'shopify');
+
+  const mustSetParcelDefaults = onBlockablePage && parcelDefaultsPending && !isConfiguringShopify;
+
+  // Held back while parcel details are pending, including while that drawer is open.
+  const mustAcceptTerms = onBlockablePage && !!userData?.must_accept_terms && !parcelDefaultsPending;
+
   // Sync user details to Redux when query data updates
   useEffect(() => {
-    console.log("Render AppRouter Useefect 1 start")
     if (userData?.user && !isPending) {
       const add = userData?.address_detail ? [userData.address_detail.default, userData.address_detail.billing] : []
       Sentry.setUser({
@@ -90,17 +133,26 @@ export const AppRouter = () => {
 
 
 
-      if (userData.next_step === 'purchase_plan' && userData.user.role !== 'admin') {
+      // Held back while the blocking Terms modal is up, so it can't stack on top of it
+      if (userData.next_step === 'purchase_plan' && normalizeRole(userData.user.role) !== 'admin' && !userData.must_accept_terms) {
         setShowSubscriptionModal(true);
       }
     }
-    console.log("Render AppRouter Useefect 1 END")
   }, [userData, isPending, dispatch]);
+
+  // Clarity attributes a recording to the identity asserted on that page, so it has to be
+  // re-sent on every route change — sending it once per session only tags the entry page.
+  useEffect(() => {
+    if (!userData?.user?.id) return;
+    identifyUser(
+      userData.user.id.toString(),
+      `${userData.user.first_name} ${userData.user.last_name}`,
+    );
+  }, [userData, location.pathname]);
 
   // Handle redirects based on next_step state and location.pathname
   useEffect(() => {
-    console.log("Render AppRouter Useefect 2 start")
-    if (isAuthenticated && !DO_NOT_REDIRECT_URLS.includes(location.pathname)) {
+    if (isAuthenticated && !isRedirectExemptPath(location.pathname)) {
       if ((next_step === 'onboarding' || next_step === 'verify_email') && !location.pathname.includes('/on-board')) {
         navigate('/on-board/' + userID + '/' + token);
       } else if (next_step === 'change_password') {
@@ -109,7 +161,6 @@ export const AppRouter = () => {
         navigate('/orders?tab=new');
       }
     }
-    console.log("Render AppRouter Useefect 2 end")
   }, [next_step, location.pathname, isAuthenticated, userID, token, navigate]);
 
   if (isError && !location.pathname.includes('/on-board')) {
@@ -165,6 +216,7 @@ export const AppRouter = () => {
   }
 
   if (isLoading && !location.pathname.includes('/on-board')) return <PageLoader />;
+  if (accountUnderReview) return <AccountUnderReviewModal businessName={userData?.address_detail?.default?.company_name || ''} />;
 
   return (
     <Suspense fallback={<PageLoader />}>
@@ -180,6 +232,10 @@ export const AppRouter = () => {
           <Route path="/change-password" element={<ChangePassword />} />
           <Route path="/verify-email" element={<VerifyEmail />} />
         </Route>
+        {/* Recipient-facing tracking: outside PublicRoute so a signed-in user can open it too. */}
+        <Route path="/track" element={<PublicTrackingPage />} />
+        {/* Links shared before the lookup moved to query parameters. */}
+        <Route path="/track/:trackingNumber" element={<LegacyTrackRedirect />} />
         <Route path="/terms-and-conditions" element={<TermsAndConditions />} />
         <Route path="/privacy-policy" element={<PrivacyPolicy />} />
         <Route path="/dangerous-goods" element={<DangerousGoods />} />
@@ -193,6 +249,8 @@ export const AppRouter = () => {
         open={showSubscriptionModal}
         onOpenChange={setShowSubscriptionModal}
       />
+      <AcceptTermsModal open={mustAcceptTerms} />
+      <ShopifyParcelDefaultsModal open={mustSetParcelDefaults} stores={storesMissingParcelDefaults} />
     </Suspense>
   );
 };

@@ -30,9 +30,13 @@ type CancelRequest = {
 export type ShopifyItem = {
     product_name: string
     variant_title?: string | null
+    variant_id?: number | null
+    product_id?: number | null
     sku?: string | null
     quantity: number
     price: number
+    weight: number
+    weight_unit?: string | null
 }
 
 export type OrderDetailData = {
@@ -45,6 +49,11 @@ export type OrderDetailData = {
     customer_reference?: string | null
     external_reference?: string | null
     external_order_id?: string | null
+    /** Shipping the buyer picked and paid for on the sales platform, e.g. Shopify checkout. */
+    platform_shipping_method?: string | null
+    platform_shipping_price?: number | null
+    platform_shipping_currency?: string | null
+    fulfillment_status?: string | null
     order_details: {
         subtotal: number
         tax: number
@@ -54,6 +63,7 @@ export type OrderDetailData = {
         items: OrderItem[]
         surcharge_amount: number
         shopify_items?: ShopifyItem[]
+        shopify_note?: string | null
     }
     courier_details: {
         courier: string
@@ -66,6 +76,11 @@ export type OrderDetailData = {
         external_order_id?: string | null
         tracking_url?: string | null
     }
+    /**
+     * Raw rate/booking payload echoed back by the courier. Admin-only diagnostic data, and
+     * the keys differ per courier, so it is rendered generically rather than field by field.
+     */
+    courier_response?: Record<string, unknown> | null
     sender_details: {
         name: string
         customer_id: number
@@ -116,6 +131,7 @@ export type OrderDetailData = {
         message: string
     }
     delivery_instructions: string
+    contains_dangerous_goods?: boolean
     order_status_category: string
     payment_status: string
     status: string

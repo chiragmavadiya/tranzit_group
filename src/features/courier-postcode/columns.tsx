@@ -13,11 +13,15 @@ export const POSTCODE_COLUMNS = (onEdit: (row: any) => void, onDelete: (row: any
     // cell: (val) => <span className="font-bold text-slate-900 dark:text-zinc-100 text-[13px]">{val}</span>
     cell: (value: string, row: CourierPostcode) => (
       <div className="flex items-center gap-1">
-        {/* <img src={row?.courier_logo || 'https://api.tranzit.digisite.net/assets/img/couriers/direct-freight.png'} className="h-6" alt="" /> */}
         <img src={row?.courier_logo_url} className="h-6" alt="" />
         <span>{value}</span>
       </div>
     )
+  },
+  {
+    key: 'suburb',
+    header: 'SUBURB',
+    sortable: true,
   },
   {
     key: 'single_post_code',

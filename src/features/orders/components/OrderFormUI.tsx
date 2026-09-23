@@ -30,9 +30,9 @@ export const Required = () => {
   )
 }
 
-export const CustomLabel = ({ label, isHorizontal = false, required = false, className }: { label: ReactNode, isHorizontal?: boolean, required?: boolean, className?: string }) => {
+export const CustomLabel = ({ label, isHorizontal = false, required = false, className, htmlFor }: { label: ReactNode, isHorizontal?: boolean, required?: boolean, className?: string, htmlFor?: string }) => {
   if (!label) return null;
-  return (<Label className={cn(
+  return (<Label htmlFor={htmlFor} className={cn(
     "text-[14px] font-medium text-slate-700 dark:text-zinc-400 tracking-wide gap-0 mb-0.5",
     isHorizontal ? "h-fit leading-none" : "ml-0.5",
     className
@@ -59,10 +59,14 @@ export const FormInput = memo(React.forwardRef<HTMLInputElement, FormInputProps>
   errormsg,
   inputClassName,
   info,
+  id,
   // rightElement
 }, ref) => {
   const [showPassword, setShowPassword] = React.useState(false);
   const isHorizontal = useMemo(() => layout === 'horizontal', [layout]);
+  const generatedId = React.useId();
+  const inputId = id ?? generatedId;
+  const errorId = `${inputId}-error`;
   const handleChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     onChange?.(e.target.value, e.target.name || '');
   }, [onChange]);
@@ -79,6 +83,7 @@ export const FormInput = memo(React.forwardRef<HTMLInputElement, FormInputProps>
             label={label}
             isHorizontal={isHorizontal}
             required={required}
+            htmlFor={inputId}
           />
           {info && (
             <CustomTooltip title={info}>
@@ -95,6 +100,9 @@ export const FormInput = memo(React.forwardRef<HTMLInputElement, FormInputProps>
         )}
         <Input
           ref={ref}
+          id={inputId}
+          aria-invalid={error || undefined}
+          aria-describedby={error && errormsg ? errorId : undefined}
           type={showPassword ? 'text' : type}
           placeholder={placeholder}
           value={value}
@@ -124,7 +132,7 @@ export const FormInput = memo(React.forwardRef<HTMLInputElement, FormInputProps>
             )}
           </button>
         )}
-        {error ? <div className="text-red-500 text-[11px] w-full">{errormsg}</div> : null}
+        {error ? <div id={errorId} role="alert" className="text-red-500 text-[11px] w-full">{errormsg}</div> : null}
       </div>
     </div>
   );
@@ -146,8 +154,12 @@ export function FormTextarea({
   error,
   errormsg,
   disabled = false,
+  id,
 }: FormTextareaProps) {
   const isHorizontal = useMemo(() => layout === 'horizontal', [layout]);
+  const generatedId = React.useId();
+  const textareaId = id ?? generatedId;
+  const errorId = `${textareaId}-error`;
 
   const handleChange = useCallback((e: React.ChangeEvent<HTMLTextAreaElement>) => {
     onChange?.(e.target.value, e.target.name || '');
@@ -169,8 +181,12 @@ export function FormTextarea({
         label={label}
         isHorizontal={isHorizontal}
         required={required}
+        htmlFor={textareaId}
       />
       <Textarea
+        id={textareaId}
+        aria-invalid={error || undefined}
+        aria-describedby={error && errormsg ? errorId : undefined}
         placeholder={placeholder}
         value={value}
         onChange={handleChange}
@@ -181,7 +197,7 @@ export function FormTextarea({
           error ? "border-red-500 dark:border-red-500 focus-visible:border-red-500 dark:focus-visible:border-red-500" : ""
         )}
       />
-      {error ? <div className="text-red-500 text-[11px] w-full">{errormsg}</div> : null}
+      {error ? <div id={errorId} role="alert" className="text-red-500 text-[11px] w-full">{errormsg}</div> : null}
     </div>
   );
 }
@@ -234,10 +250,14 @@ export const FormSelect = memo(({
   allowClear = true,
   searchdisable = false,
   multiple = false,
-  optionClassName
+  optionClassName,
+  id
 }: FormSelectProps) => {
   const isHorizontal = useMemo(() => layout === 'horizontal', [layout]);
-  
+  const generatedId = React.useId();
+  const selectId = id ?? generatedId;
+  const errorId = `${selectId}-error`;
+
   const [memoizedData, setMemoizedData] = useState(options);
   const [prevOptions, setPrevOptions] = useState(options);
   if (!areOptionsEqual(prevOptions, options)) {
@@ -262,9 +282,13 @@ export const FormSelect = memo(({
         label={label}
         isHorizontal={isHorizontal}
         required={required}
+        htmlFor={selectId}
       />
       <div>
         <SelectSearch
+          inputId={selectId}
+          invalid={error}
+          errorId={error && errormsg ? errorId : undefined}
           className={cn("w-full h-8 text-[13px] data-[size=default]:h-8 border-slate-200 rounded-sm dark:border-zinc-800 font-medium bg-white dark:bg-zinc-950 text-slate-900 dark:text-zinc-100 focus:ring-primary dark:focus:ring-primary focus:border-primary dark:focus:border-primary transition-all text-sm px-3 ", error ? "border-red-500 dark:border-red-500 focus:border-red-500 dark:focus:border-red-500" : "", selectClassName)}
           options={memoizedData}
           // defaultValue="default"
@@ -279,7 +303,7 @@ export const FormSelect = memo(({
           optionClassName={optionClassName}
         />
         {/* <SelectSearch options={memoizedData} /> */}
-        {error ? <div className="text-red-500 text-[11px] w-full">{errormsg}</div> : null}
+        {error ? <div id={errorId} role="alert" className="text-red-500 text-[11px] w-full">{errormsg}</div> : null}
       </div>
     </div>
   );
@@ -298,6 +322,7 @@ export const FormSelect = memo(({
     prevProps.searchdisable === nextProps.searchdisable &&
     prevProps.multiple === nextProps.multiple &&
     prevProps.optionClassName === nextProps.optionClassName &&
+    prevProps.id === nextProps.id &&
     areOptionsEqual(prevProps.options, nextProps.options)
   );
 });
@@ -369,20 +394,33 @@ export function FormCheckbox({
   label,
   description,
   price,
-  className
+  className,
+  disabled = false,
+  info
 }: FormCheckboxProps) {
   return (
-    <div className={cn("flex items-start gap-4 p-4 transition-all", className)}>
+    <Label className={cn(
+      "flex gap-4 p-4 transition-all",
+      // Multi-line rows align the checkbox to the first line; single-line rows centre.
+      description ? "items-start" : "items-center",
+      disabled ? "cursor-not-allowed opacity-60" : "cursor-pointer",
+      className
+    )}>
       <Checkbox
         checked={checked}
         onCheckedChange={onCheckedChange}
-        className="mt-1"
+        disabled={disabled}
       />
       <div className="flex-1 space-y-1">
-        <div className="flex items-center justify-between">
-          <Label className="text-[14px] font-bold text-slate-800 dark:text-zinc-100 leading-none">
+        <div className="flex items-center justify-between gap-2">
+          <div className="flex items-center gap-1.5 text-[14px] font-bold text-slate-800 dark:text-zinc-100 leading-none">
             {label}
-          </Label>
+            {info && (
+              <CustomTooltip title={info}>
+                <Info className="w-3.5 h-3.5 text-slate-400 dark:text-zinc-600" />
+              </CustomTooltip>
+            )}
+          </div>
           {price !== undefined && (
             <span className="text-[14px] font-bold text-slate-800 dark:text-zinc-100">
               ${price.toFixed(2)}
@@ -390,11 +428,11 @@ export function FormCheckbox({
           )}
         </div>
         {description && (
-          <p className="text-[12px] text-slate-500 dark:text-zinc-400 font-medium">
+          <p className="my-0 text-[12px] text-slate-500 dark:text-zinc-400 font-medium">
             {description}
           </p>
         )}
       </div>
-    </div>
+    </Label>
   );
 }

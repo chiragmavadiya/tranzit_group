@@ -31,6 +31,7 @@ export const TRACES_COLUMNS: Column<DebugTrace>[] = [
     key: 'trace_id',
     header: 'Trace ID',
     width: '120px',
+    disableToggle: true,
     cell: (val) => <LinkCell value={val} path={getTraceDetailPath(val)} />
   },
   {
@@ -84,6 +85,7 @@ export const ALERTS_COLUMNS: Column<DebugAlert>[] = [
     key: 'trace_id',
     header: 'Trace ID',
     width: '120px',
+    disableToggle: true,
     cell: (val) => <LinkCell value={val} path={getTraceDetailPath(val)} />
   },
   {
@@ -121,6 +123,7 @@ export const FAILED_JOBS_COLUMNS: Column<FailedJob>[] = [
     key: 'trace_id',
     header: 'Trace ID',
     width: '120px',
+    disableToggle: true,
     cell: (val) => <LinkCell value={val} path={getTraceDetailPath(val)} />
   },
   {
@@ -156,6 +159,7 @@ export const EXTERNAL_API_FAILURES_COLUMNS: Column<ExternalApiFailure>[] = [
     key: 'trace_id',
     header: 'Trace ID',
     width: '120px',
+    disableToggle: true,
     cell: (val) => <LinkCell value={val} path={getTraceDetailPath(val)} />
   },
   {
@@ -246,6 +250,7 @@ export const SLOW_EXTERNAL_CALLS_COLUMNS: Column<SlowExternalCall>[] = [
     key: 'trace_id',
     header: 'Trace ID',
     width: '120px',
+    disableToggle: true,
     cell: (val) => <LinkCell value={val} path={getTraceDetailPath(val)} />
   },
   {

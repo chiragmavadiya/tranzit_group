@@ -23,6 +23,7 @@ export function AddPostcodeDialog({
   const initialValues = useMemo(() => ({
     global_courier_id: '',
     single_post_code: '',
+    suburb: '',
     price: ''
   }), []);
 
@@ -31,6 +32,7 @@ export function AddPostcodeDialog({
       return {
         global_courier_id: initialData.global_courier_id?.toString(),
         single_post_code: initialData.single_post_code,
+        suburb: initialData.suburb ?? '',
         price: initialData.price?.toString()
       };
     }
@@ -60,6 +62,7 @@ export function AddPostcodeDialog({
           onSubmit({
             global_courier_id: Number(data.global_courier_id),
             single_post_code: Number(data.single_post_code),
+            suburb: String(data.suburb).trim(),
             price: Number(data.price)
           });
         }}
@@ -96,7 +99,7 @@ const PostcodeForm = forwardRef<HTMLFormElement, PostcodeFormProps>(
       e.preventDefault();
       setSubmited(true);
 
-      if (!formData.global_courier_id || postcodeErrorMsg || !formData.price) {
+      if (!formData.global_courier_id || postcodeErrorMsg || !String(formData.suburb).trim() || !formData.price) {
         return;
       }
 
@@ -125,7 +128,18 @@ const PostcodeForm = forwardRef<HTMLFormElement, PostcodeFormProps>(
         />
 
         <FormInput
+          label="Suburb"
+          value={formData.suburb}
+          onChange={(val) => handleChange('suburb', val)}
+          placeholder="Enter Suburb"
+          required
+          error={submited && !String(formData.suburb).trim()}
+          errormsg="Please enter Suburb"
+        />
+
+        <FormInput
           label="Price"
+          type="number"
           value={formData.price}
           onChange={(val) => handleChange('price', val)}
           placeholder="Enter Price"

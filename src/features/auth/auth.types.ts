@@ -99,12 +99,26 @@ export interface BlackoutDay {
     date: string;
 }
 
+export interface ShopifyStoreMissingParcelDefaults {
+    id: number;
+    shop_domain?: string;
+    shop_name?: string;
+}
+
 export interface LoginResponse {
     status: boolean;
     user: User
     message: string;
     token: string;
     next_step: string;
+    account_activation?: boolean | null;
+    must_accept_terms?: boolean;
+    shopify_package_defaults?: {
+        has_stores: boolean;
+        all_configured: boolean;
+        missing_count: number;
+        stores_missing_defaults: ShopifyStoreMissingParcelDefaults[];
+    };
     default_courier?: any;
     default_item?: any;
     announcements?: {

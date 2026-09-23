@@ -28,7 +28,7 @@ export function WelcomeBanner({ userName, description, buttons, imageSrc, classN
     <div className={cn("relative overflow-hidden rounded-2xl border p-6 shadow-xl print:hidden", bgColors, className)}>
       {/* Animated Background Elements */}
       <div className="absolute inset-0 overflow-hidden">
-        <div className="absolute top-4 left-4 w-20 h-20 bg-blue-200/30 dark:bg-blue-500/10 rounded-full animate-pulse"></div>
+        <div className="absolute top-4 left-56 w-60 h-15 bg-blue-200/60 dark:bg-blue-500/10 animate-pulse" style={{ animationDelay: '0.5s' }}></div>
         <div className="absolute top-4 right-16 w-12 h-12 bg-indigo-200/40 dark:bg-indigo-500/15 rounded-full animate-bounce" style={{ animationDelay: '0.5s' }}></div>
         <div className="absolute bottom-8 left-1/4 w-16 h-16 bg-cyan-200/30 dark:bg-cyan-500/10 rounded-full animate-pulse" style={{ animationDelay: '1s' }}></div>
         <div className="absolute bottom-4 right-8 w-8 h-8 bg-purple-200/40 dark:bg-purple-500/15 rounded-full animate-bounce" style={{ animationDelay: '1.5s' }}></div>

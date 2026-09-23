@@ -47,7 +47,6 @@ export default function TopBar({
   setIsMobileSidebarOpen?: (val: boolean) => void;
   bannerOpen?: boolean;
 }) {
-  console.log("Render Topbar")
 
   const { user, is_sub_user, team_access } = useAppSelector((state) => state.auth);
   const dispatch = useAppDispatch();
@@ -69,8 +68,7 @@ export default function TopBar({
   const handleLogout = () => {
     // on success return to /signin
     logoutMutation.mutate(undefined, {
-      onSuccess: () => {
-        localStorage.clear();
+      onSettled: () => {
         Sentry.setUser(null);
         dispatch(logout());
         navigate('/login');

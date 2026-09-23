@@ -12,6 +12,7 @@ import { Checkbox } from '@/components/ui/checkbox'
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
 import { StatusBadge } from '../StatusBadge'
+import { mergeCourierSettingsWithRuleFlags } from '@/features/rules/lib/ruleDefaults'
 
 interface CarrierCardProps {
   itemData: ItemData[];
@@ -31,13 +32,20 @@ interface CarrierCardProps {
   setActiveSettings?: React.Dispatch<React.SetStateAction<any>>;
   onLoadingChange?: (loading: boolean) => void;
   fromAdminQuot?: boolean;
+  senderLocalityError?: boolean;
+  receiverLocalityError?: boolean;
+  senderLocalityPending?: boolean;
+  receiverLocalityPending?: boolean;
 }
 
 // Saved settings round-trip through the API as numbers (1/0), so accept every truthy form.
 const settingOn = (v: any) => v === true || v === 1 || v === '1' || v === 'yes';
 
 export const CarrierCard: React.FC<CarrierCardProps> = memo((props) => {
-  const { itemData, addresses, onQuoteChange, setCourierData, orderDetail, module, orderType = 'create', initialSelectedCourierId = null, signatureSelected = false, isLoading = false, selectedCustomer, setDeliveryInstructions, activeSettings, setActiveSettings, onLoadingChange, fromAdminQuot } = props
+  const { itemData, addresses, onQuoteChange, setCourierData, orderDetail, module, orderType = 'create', initialSelectedCourierId = null,
+    signatureSelected = false, isLoading = false, selectedCustomer, setDeliveryInstructions, activeSettings,
+    setActiveSettings, onLoadingChange, fromAdminQuot, senderLocalityError, receiverLocalityError,
+    senderLocalityPending, receiverLocalityPending } = props
   const { default_courier, courier_settings } = useAppSelector((state) => state.auth);
   const [selectedServiceId, setSelectedServiceId] = useState<string>(initialSelectedCourierId || '')
   const [couriers, setCouriers] = useState<any[]>([]);
@@ -58,7 +66,8 @@ export const CarrierCard: React.FC<CarrierCardProps> = memo((props) => {
   const lastApiSigReqRef = useRef<boolean>(false);
   const prevSettingsRef = useRef({
     signature_required: activeSettings?.signature_required,
-    authority_to_leave: activeSettings?.authority_to_leave
+    authority_to_leave: activeSettings?.authority_to_leave,
+    priority: activeSettings?.priority
   });
   // const [authorityToLeave, setAuthorityToLeave] = useState<boolean>(false);
   // const [signatureRequired, setSignatureRequired] = useState<boolean>(false);
@@ -172,17 +181,14 @@ export const CarrierCard: React.FC<CarrierCardProps> = memo((props) => {
           mount.current = true;
         } else if (!selectedServiceId || !allCourierIds.includes(selectedServiceId)) {
           setSelectedServiceId((prev) => {
-            console.log(prev, allCourierIds.includes(prev),allCourierIds,  !mount.current, 'select condition ::', prev)
-            if ((prev && allCourierIds.includes(prev)) && !mount.current) return prev;
+            if ((prev && allCourierIds.includes(prev))) return prev;
             if (data.services.some((c: any) => c.rule_applied)) {
-              console.log("select condition :: rule_applied")
               const findCourier = data.services.find((courier: any) => courier.rule_applied);
               if (findCourier) {
                 return findCourier.courierCode + (findCourier.product_id || '') || '';
               }
             }
             if (default_courier && default_courier.courier_id) {
-              console.log("select condition :: default_courier")
               const findCourier = data.services.find((courier: any) => courier.carrier_id === default_courier.courier_id);
               if (findCourier) {
                 return findCourier.courierCode + (findCourier.product_id || '') || '';
@@ -193,11 +199,19 @@ export const CarrierCard: React.FC<CarrierCardProps> = memo((props) => {
           });
         }
       }
+
+      // Seeding from the saved order (or the quote handoff) has now been applied, so from
+      // here on the live selection is authoritative. Without this, an order that arrives
+      // with a courier already selected never sets the flag: the branches above are skipped,
+      // later rate refreshes keep re-seeding from the order, and the surcharge list stays
+      // frozen at the saved value even as the customer ticks more options.
+      mount.current = true;
     }
   })
 
   const fetchServices = () => {
     if (orderType !== 'create' && orderType !== 'consign' && orderType !== 'return') return;
+    if (senderLocalityError || receiverLocalityError || senderLocalityPending || receiverLocalityPending) return;
     // Check if we have valid items with dimensions > 0
     const isValidItems = itemData && itemData.length > 0 && itemData.every(item =>
       Number(item.height) > 0 && Number(item.width) > 0 && Number(item.length) > 0 && Number(item.weight) > 0 && Number(item.quantity) > 0
@@ -252,6 +266,7 @@ export const CarrierCard: React.FC<CarrierCardProps> = memo((props) => {
 
   useEffect(() => {
     if (orderType !== 'create' && orderType !== 'consign' && orderType !== 'return') return;
+    if (senderLocalityError || receiverLocalityError || senderLocalityPending || receiverLocalityPending) return;
     // Check if we have valid items with dimensions > 0
     const isValidItems = itemData && itemData.length > 0 && itemData.every(item =>
       Number(item.height) > 0 && Number(item.width) > 0 && Number(item.length) > 0 && Number(item.weight) > 0 && Number(item.quantity) > 0
@@ -273,12 +288,14 @@ export const CarrierCard: React.FC<CarrierCardProps> = memo((props) => {
     // Detect if settings changed
     const settingsChanged =
       prevSettingsRef.current.signature_required !== activeSettings?.signature_required ||
-      prevSettingsRef.current.authority_to_leave !== activeSettings?.authority_to_leave;
+      prevSettingsRef.current.authority_to_leave !== activeSettings?.authority_to_leave ||
+      prevSettingsRef.current.priority !== activeSettings?.priority;
 
     // Update ref
     prevSettingsRef.current = {
       signature_required: activeSettings?.signature_required,
-      authority_to_leave: activeSettings?.authority_to_leave
+      authority_to_leave: activeSettings?.authority_to_leave,
+      priority: activeSettings?.priority
     };
 
     const triggerApi = (onlyChangeSettings = false) => {
@@ -298,7 +315,7 @@ export const CarrierCard: React.FC<CarrierCardProps> = memo((props) => {
         customer_id: selectedCustomer,
         priority: (activeSettings?.priority ?? settingOn(orderDetail?.courier_details?.advanced_settings?.priority)) ? 1 : 0,
         atl: (activeSettings?.authority_to_leave ?? settingOn(orderDetail?.courier_details?.advanced_settings?.authority_to_leave)) ? 1 : 0,
-        ...(onlyChangeSettings && { courier_code: selectedCourier?.courierCode || "couriersplease_tranzit_group" }),
+        ...(onlyChangeSettings && { courier_code: selectedCourier?.courierCode || "" }),
       };
 
       getServices({ payload, signal: createRequestSignal() }, {
@@ -312,7 +329,7 @@ export const CarrierCard: React.FC<CarrierCardProps> = memo((props) => {
       });
     };
 
-    if (settingsChanged) {
+    if (settingsChanged && couriers.length > 0) {
       triggerApi(true);
       return;
     }
@@ -322,8 +339,7 @@ export const CarrierCard: React.FC<CarrierCardProps> = memo((props) => {
     }, 500); // 500ms debounce
     // Cleanup previous timer
     return () => clearTimeout(timer);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [itemData, addresses?.sender?.suburb, addresses?.sender?.state, addresses?.sender?.postcode, addresses?.receiver?.suburb, addresses?.receiver?.state, addresses?.receiver?.postcode, getServices, orderType, module, getAddress, activeSettings?.signature_required, activeSettings?.authority_to_leave, activeSettings?.priority, selectedCustomer])
+  }, [itemData, addresses?.sender?.suburb, addresses?.sender?.state, addresses?.sender?.postcode, addresses?.receiver?.suburb, addresses?.receiver?.state, addresses?.receiver?.postcode, getServices, orderType, module, getAddress, activeSettings?.signature_required, activeSettings?.authority_to_leave, activeSettings?.priority, selectedCustomer, senderLocalityError, receiverLocalityError, senderLocalityPending, receiverLocalityPending])
 
   useEffect(() => {
     if (couriers.length > 0 && selectedServiceId) {
@@ -334,7 +350,7 @@ export const CarrierCard: React.FC<CarrierCardProps> = memo((props) => {
         const activeSurcharges = courierSurcharges.filter(charge => selectedNames.includes(charge.name));
         const autoApplyCharges = selectedCourier?.applied_surcharges?.reduce((acc: any, curr: any) => acc + curr.amount, 0) || 0;
         const surcharges = activeSurcharges.filter((charge: any) => !charge.is_auto_apply).reduce((acc: any, curr: any) => acc + curr.amount, 0) || 0;
-        const totalSurcharges = surcharges + autoApplyCharges
+        const totalSurcharges = surcharges + autoApplyCharges; // (selectedCourier?.courier_based_charge || 0)
         const surchargesGst = (totalSurcharges || 0) * 0.1
         const totalGst = (selectedCourier?.gst || 0) + surchargesGst
         const totalPrice = selectedCourier.price + totalSurcharges + surchargesGst;
@@ -353,7 +369,8 @@ export const CarrierCard: React.FC<CarrierCardProps> = memo((props) => {
           product_id: selectedCourier.product_id,
           product_type: selectedCourier.product_type,
           shipment_summary: selectedCourier.shipment_summary,
-          is_own_courier: selectedCourier.is_own_courier
+          is_own_courier: selectedCourier.is_own_courier,
+          courier_response: selectedCourier.courier_response,
         })
 
       }
@@ -410,7 +427,14 @@ export const CarrierCard: React.FC<CarrierCardProps> = memo((props) => {
       // setDeliveryInstructions?.("Hello word")
       const setting = courier_settings?.find((c: any) => c.courierCode === selectedCourier.courierCode)
       if (setting) {
-        setDeliveryInstructions?.(setting?.advanced_settings?.delivery_instruction || '')
+        if (setting?.advanced_settings?.delivery_instruction) {
+          // Do not wipe Rule Management / order delivery instructions with courier defaults.
+          setDeliveryInstructions?.((prev: string) =>
+            (prev && String(prev).trim() !== '')
+              ? prev
+              : setting?.advanced_settings?.delivery_instruction
+          );
+        }
         const targetObj = setting.advanced_settings?.settings || setting;
         const filteredSettings: Record<string, any> = {};
 
@@ -429,12 +453,21 @@ export const CarrierCard: React.FC<CarrierCardProps> = memo((props) => {
         }
 
         setActiveSettings?.((prev: any) => {
-          const newSettings = { ...filteredSettings };
+          // Only options this courier exposes may carry over — otherwise a key from the
+          // previously selected courier (e.g. signature_required) keeps rendering a checkbox
+          // the new courier does not support.
+          const carried = Object.fromEntries(
+            Object.entries(prev || {}).filter(([key]) => key in filteredSettings)
+          );
+          const newSettings = mergeCourierSettingsWithRuleFlags(
+            filteredSettings,
+            carried,
+          ) as Record<string, any>;
           // Only suppress the dep change when this courier actually has signature_required
           // AND its effective value matches what was last sent to the API.
           // Couriers without the key (e.g. Auspost) are left untouched — no stale key injected.
           if ('signature_required' in filteredSettings) {
-            const effectiveNewSigReq = !!filteredSettings.signature_required;
+            const effectiveNewSigReq = !!newSettings.signature_required;
             if (effectiveNewSigReq === lastApiSigReqRef.current) {
               newSettings.signature_required = prev?.signature_required || false;
             }
@@ -442,10 +475,10 @@ export const CarrierCard: React.FC<CarrierCardProps> = memo((props) => {
           return newSettings;
         });
       } else {
-        setActiveSettings?.({});
+        // Keep rule-owned flags even when the courier has no advanced_settings blob.
+        setActiveSettings?.((prev: any) => mergeCourierSettingsWithRuleFlags({}, prev));
       }
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedServiceId, couriers])
 
   return (
@@ -485,7 +518,7 @@ export const CarrierCard: React.FC<CarrierCardProps> = memo((props) => {
         {orderType !== 'create' && orderType !== 'consign' && orderDetail ? (
           <div className={cn("flex flex-col gap-3 transition-all duration-300", (loading || isLoading) && "opacity-40 pointer-events-none")}>
             <div className="relative flex flex-col p-4 rounded-xl border border-primary bg-primary/5 dark:bg-primary/10 shadow-sm">
-              <div className="flex items-center justify-between gap-4">
+              <div className="flex items-center flex-wrap justify-between gap-4">
                 <div className="flex items-center gap-4">
                   <div className="w-12 h-12 rounded-lg bg-white dark:bg-zinc-800 border border-gray-100 dark:border-zinc-700 flex items-center justify-center p-1 shadow-sm">
                     {orderDetail.courier_details?.image_url ? (<img
@@ -540,7 +573,7 @@ export const CarrierCard: React.FC<CarrierCardProps> = memo((props) => {
                     )}
                   </div>
                 </div>
-                <div className="text-right">
+                <div className="text-left sm:text-right">
                   <div className="text-lg font-black text-gray-900 dark:text-zinc-100 tracking-tighter">
                     ${orderDetail.order_details?.total?.toFixed(2) || '0.00'}
                   </div>
@@ -642,8 +675,8 @@ export const CarrierCard: React.FC<CarrierCardProps> = memo((props) => {
                           </span>
                           <span className="text-xs text-gray-500 dark:text-zinc-400 font-medium mt-0.5">
                             {courier.product_id && `${courier.product_id} • `}
-                            {courier.product_type || courier.service_name || courier.service_code || 'Standard Delivery'}
-                            {courier.estimate_delivery_date && ` • ETA: ${courier.estimate_delivery_date}`}
+                            {courier.product_type || courier.service_name || courier.service_code || 'Standard Delivery'} <br />
+                            {(courier.estimate_delivery_date || courier.eta) && ` ETA: ${courier.estimate_delivery_date || courier.eta}`}
                           </span>
                         </div>
                         {serviceId === selectedServiceId && (

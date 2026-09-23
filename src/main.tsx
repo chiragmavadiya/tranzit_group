@@ -7,32 +7,28 @@ import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
 import { Provider } from 'react-redux'
 import { store } from '@/app/store'
 import { queryClient } from '@/lib/query-client'
-// import * as Sentry from "@sentry/react";
+import ErrorBoundary from '@/components/common/ErrorBoundary'
 import '@/styles/index.css'
 import "@fontsource-variable/geist/index.css";
 import App from './App.tsx'
 import { TooltipProvider } from "@/components/ui/tooltip"
 import { initializeAnalytics } from "./analytics/index.ts";
-
-// const ErrorFallback = () => (
-//   <div className="flex h-screen items-center justify-center">
-//     <div>
-//       <h1>Oops!</h1>
-//       <p>Something went wrong.</p>
-//     </div>
-//   </div>
-// );
+import { initClarity } from "./lib/clarity.ts";
 
 initializeAnalytics();
+initClarity();
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
-    {/* <Sentry.ErrorBoundary fallback={<ErrorFallback />}> */}
     <Provider store={store}>
       <QueryClientProvider client={queryClient}>
         <TooltipProvider>
           <BrowserRouter>
-            <App />
+            {/* Inside the providers so a render crash shows the fallback instead of a
+                blank page, and reports to Sentry, without tearing down the store. */}
+            <ErrorBoundary>
+              <App />
+            </ErrorBoundary>
           </BrowserRouter>
         </TooltipProvider>
         {import.meta.env.DEV && (
@@ -40,6 +36,5 @@ createRoot(document.getElementById('root')!).render(
         )}
       </QueryClientProvider>
     </Provider>
-    {/* </Sentry.ErrorBoundary> */}
   </StrictMode >,
 )

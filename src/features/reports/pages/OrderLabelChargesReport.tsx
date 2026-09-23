@@ -6,6 +6,7 @@ import { useOrderLabelChargesReport, useExportOrderLabelChargesReport } from '..
 import { FormSelect, FormInput } from '@/features/orders/components/OrderFormUI';
 import { DateFilter } from '@/components/common/DateFilter';
 import type { DateFilterValue } from '@/components/common/DateFilter/types';
+import { hydrateDateFilter } from '@/components/common/DateFilter/utils';
 import { useCustomers } from '@/features/customers/hooks/useCustomers';
 import { useAppSelector } from '@/hooks/store.hooks';
 import { ExportMenu } from '@/components/common/ExportMenu';
@@ -25,7 +26,7 @@ export default function OrderLabelChargesReport() {
     from: undefined,
     to: undefined,
     label: 'All Time',
-  });
+  }, hydrateDateFilter);
 
   const [search, setSearch] = useLocalStorage<string>('order_label_charges_search', '');
   const [pageSize, setPageSize] = useLocalStorage<number>('order_label_charges_page_size', 100);
@@ -163,6 +164,7 @@ export default function OrderLabelChargesReport() {
         <DataTable
           columns={ORDER_LABEL_CHARGES_COLUMNS as any}
           data={data?.data || []}
+          moduleName="orderLabelChargesReport"
           header={false}
           className="pb-3 text-xs flex-none h-auto"
           totalItems={data?.meta?.total || 0}

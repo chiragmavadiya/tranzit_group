@@ -91,6 +91,28 @@ export const useIntegratedParcelReport = (filters: ReportFilters, isAdmin: boole
   });
 };
 
+export const useAllParcelReport = (filters: ReportFilters, enabled: boolean = true) => {
+  return useQuery({
+    queryKey: [...QUERY_KEYS.REPORTS.ALL_PARCELS, filters],
+    queryFn: () => reportsService.getAllParcelReport(filters),
+    placeholderData: keepPreviousData,
+    enabled,
+  });
+};
+
+export const useExportAllParcelReport = () => {
+  return useMutation({
+    mutationFn: (filters: ReportFilters & { format: string }) =>
+      reportsService.exportAllParcelReport(filters),
+    onSuccess: ({ blob, filename }) => {
+      downloadFile(blob, filename)
+    },
+    onError: (error: any) => {
+      showToast(error?.response?.data?.message || "Failed to export parcel report", "error");
+    },
+  });
+};
+
 export const useExportParcelReport = (isAdmin: boolean = false) => {
   return useMutation({
     mutationFn: (filters: ReportFilters & { format: string }) =>

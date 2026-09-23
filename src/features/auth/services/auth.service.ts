@@ -114,6 +114,14 @@ export const authService = {
     },
 
     /**
+     * Accept the latest Terms and Conditions
+     */
+    acceptTerms: async (): Promise<GenericResponse> => {
+        const response = await api.post<GenericResponse>(API_ENDPOINTS.AUTH.ACCEPT_TERMS, { accepted: true });
+        return response.data;
+    },
+
+    /**
      * Select plan
      */
     selectPlan: async (data: any): Promise<OnboardResponse> => {

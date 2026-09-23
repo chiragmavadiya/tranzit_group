@@ -15,6 +15,7 @@ export const ROUTE_PERMISSIONS: Record<string, string> = {
   '/settings/account': 'settings_account_detail',
   '/settings/team': 'settings_team_access',
   '/settings/rules': 'settings_rule_management',
+  '/settings/packing-slips-summary': 'settings_packing_documents',
   '/settings/ecommerce': 'settings_integrations',
   '/settings/carriers': 'settings_integrations',
 };
@@ -90,6 +91,7 @@ export const getFirstAllowedSettingsPath = (
     { key: 'settings_account_detail', path: '/settings/account' },
     { key: 'settings_team_access', path: '/settings/team' },
     { key: 'settings_rule_management', path: '/settings/rules' },
+    { key: 'settings_packing_documents', path: '/settings/packing-slips-summary' },
     { key: 'settings_integrations', path: '/settings/ecommerce' },
   ];
 

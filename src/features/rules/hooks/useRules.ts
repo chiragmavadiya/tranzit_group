@@ -2,7 +2,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { rulesService } from "../services/rules.service";
 import { QUERY_KEYS } from "@/constants/api.constants";
 import { showToast } from "@/components/ui/custom-toast";
-import type { RuleFormType } from "../types/rules.types";
+import type { RuleFormType, RuleRunStatusResponse } from "../types/rules.types";
 
 /**
  * Hook to fetch rules list
@@ -14,17 +14,6 @@ export const useRules = (enabled: boolean = true) => {
     enabled,
   });
 };
-
-/**
- * Hook to fetch rule details
- */
-// export const useRuleDetails = (id: number | string | undefined) => {
-//   return useQuery({
-//     queryKey: QUERY_KEYS.RULES.DETAILS(id as any),
-//     queryFn: () => rulesService.getDetails(id as any),
-//     enabled: !!id,
-//   });
-// };
 
 /**
  * Hook to fetch rule options
@@ -44,9 +33,7 @@ export const useCreateRule = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async (newRuleData: any) => {
-      return rulesService.create(newRuleData);
-    },
+    mutationFn: (newRuleData: RuleFormType) => rulesService.create(newRuleData),
     onSuccess: () => {
       showToast("Rule created successfully", "success");
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.RULES.LIST });
@@ -67,10 +54,9 @@ export const useUpdateRule = () => {
     mutationFn: async ({ id, data }: { id: string | number; data: RuleFormType }) => {
       return rulesService.update(id, data);
     },
-    onSuccess: (_response, variables) => {
+    onSuccess: () => {
       showToast("Rule updated successfully", "success");
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.RULES.LIST });
-      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.RULES.DETAILS(variables.id) });
     },
     onError: (error: any) => {
       showToast(error.message || "Failed to update rule", "error");
@@ -93,5 +79,56 @@ export const useDeleteRule = () => {
     onError: (error: any) => {
       showToast(error.message || "Failed to delete rule", "error");
     }
+  });
+};
+
+/**
+ * Hook to persist a new running order (list of {id, sort_order})
+ */
+export const useReorderRules = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (rules: { id: number; sort_order: number }[]) => rulesService.reorder(rules),
+    onSuccess: (response) => {
+      queryClient.setQueryData(QUERY_KEYS.RULES.LIST, response);
+    },
+    onError: (error: any) => {
+      showToast(error.message || "Failed to reorder rules", "error");
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.RULES.LIST });
+    }
+  });
+};
+
+/**
+ * Hook to queue a manual "run rules now" job
+ */
+export const useRunRules = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: () => rulesService.run(),
+    onSuccess: () => {
+      showToast("Rule run queued", "success");
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.RULES.RUN_STATUS });
+    },
+    onError: (error: any) => {
+      showToast(error.message || "Failed to run rules", "error");
+    }
+  });
+};
+
+/**
+ * Hook polling the rule-run status while a run is queued/running
+ */
+export const useRuleRunStatus = (enabled: boolean = true) => {
+  return useQuery({
+    queryKey: QUERY_KEYS.RULES.RUN_STATUS,
+    queryFn: () => rulesService.runStatus(),
+    enabled,
+    refetchInterval: (query) => {
+      const state = (query.state.data as RuleRunStatusResponse | undefined)?.data?.state;
+      return state === 'queued' || state === 'running' ? 3000 : false;
+    },
   });
 };

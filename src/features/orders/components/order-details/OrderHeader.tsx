@@ -1,8 +1,9 @@
 import React, { useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { ArchiveRestore, ArrowLeft, Box, Download, Loader2, PackagePlus, Trash2, Package, Copy } from 'lucide-react'
+import { ArchiveRestore, ArrowLeft, Box, ChevronDown, ClipboardList, Download, FileText, Loader2, PackagePlus, Printer, Trash2, Package, Copy } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
+import { DropdownCustomMenu } from '@/components/ui/dropdown-menu'
 // import { DropdownUI } from '@/features/orders/components/OrderFormUI'
 import { ConformationModal } from '@/components/common/ConformationModal'
 import type { OrderDetailData } from '../../types/order-details.types'
@@ -14,7 +15,8 @@ import { useCustomers } from '@/features/customers/hooks/useCustomers'
 import { CustomTooltip } from '@/components/common/CustomTooltip'
 import type { AddressData } from '../../types'
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog'
-import { useAddManualTrackingNumbers } from '../../hooks/useOrders'
+import { useAddManualTrackingNumbers, useDownloadPackingDocument } from '../../hooks/useOrders'
+import type { PackingDocument } from '../../services/orders.api'
 import { useRestoreOrderConfirm } from '../../hooks/useRestoreOrderConfirm'
 import { canRestoreByPaymentStatus } from '../../utils/order-details.utils'
 
@@ -93,6 +95,13 @@ export const OrderHeader: React.FC<OrderHeaderProps> = ({
   const [trackingError, setTrackingError] = useState(false)
 
   const addTrackingMutation = useAddManualTrackingNumbers()
+
+  const { mutate: downloadPackingDocument, isPending: isDownloadingPackingDocument } = useDownloadPackingDocument()
+
+  const handlePackingDownload = (documentType: PackingDocument) => {
+    if (isDownloadingPackingDocument || !orderDetail?.order_number) return
+    downloadPackingDocument({ document: documentType, orderNumbers: [orderDetail.order_number] })
+  }
 
   const { requestRestore, restoreModal, isRestoring } = useRestoreOrderConfirm()
   // Restoring an archived order is admin-only, and only while the order is still unpaid.
@@ -189,7 +198,7 @@ export const OrderHeader: React.FC<OrderHeaderProps> = ({
         cancelText="Discard"
       />
       <div className="flex flex-wrap items-center justify-between gap-4">
-        <div className="flex items-center gap-4 lg:gap-8">
+        <div className="flex flex-wrap items-center gap-4 lg:gap-8">
           <Button
             // variant="ghost"
             size="sm"
@@ -208,7 +217,7 @@ export const OrderHeader: React.FC<OrderHeaderProps> = ({
           </div>
         </div>
 
-        <div className="flex items-center gap-2">
+        <div className="flex flex-wrap items-center gap-2">
           {/* {orderType !== 'new' && (
             <DropdownUI
               label="Print"
@@ -290,7 +299,7 @@ export const OrderHeader: React.FC<OrderHeaderProps> = ({
               )}
               {(orderDetail?.order_status_category === 'new' || orderDetail?.order_status_category === 'printed' || orderDetail?.status.toLocaleLowerCase() === 'new' || orderDetail?.status.toLowerCase() === 'printed') && (
                 <>
-                  {orderDetail?.order_status_category === 'new' || orderDetail?.status.toLocaleLowerCase() === 'new' || (orderDetail?.courier_details?.is_own_courier) ? (
+                  {orderDetail?.order_status_category === 'new' || orderDetail?.status.toLocaleLowerCase() === 'new' || (orderDetail?.courier_details?.courier_code === 'couriersplease') ? (
                     <Button
                       variant="outline"
                       onClick={() => setShowArchiveModal(true)}
@@ -318,6 +327,33 @@ export const OrderHeader: React.FC<OrderHeaderProps> = ({
                 </>
               )}
             </>
+          )}
+          {!isCreate && orderDetail?.order_number && orderDetail?.order_status_category !== 'archived' && (
+            <DropdownCustomMenu
+              contentClassName="w-56 min-w-56"
+              menus={[
+                {
+                  label: 'Print packing slip',
+                  onClick: () => handlePackingDownload('packing-slip'),
+                  icon: FileText,
+                },
+                {
+                  label: 'Print packing summary',
+                  onClick: () => handlePackingDownload('packing-summary'),
+                  icon: ClipboardList,
+                },
+              ]}
+            >
+              <Button
+                variant="outline"
+                disabled={isDownloadingPackingDocument}
+                className="flex items-center gap-2 border-gray-200 dark:border-zinc-800 text-gray-700 dark:text-zinc-300 font-bold h-8 px-4 text-xs hover:bg-gray-50 dark:hover:bg-zinc-900 transition-colors"
+              >
+                {isDownloadingPackingDocument ? <Loader2 className="h-4 w-4 animate-spin" /> : <Printer className="h-4 w-4" />}
+                More actions
+                <ChevronDown className="h-4 w-4" />
+              </Button>
+            </DropdownCustomMenu>
           )}
           {role === 'admin' && (orderType === 'create' || orderType === 'create-menual') && (
             <FormSelect

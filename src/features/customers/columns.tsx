@@ -69,6 +69,7 @@ export const getCustomerColumns = (
             header: 'NAME',
             sticky: "left",
             width: "260px",
+            disableToggle: true,
             cell: (_, customer) => {
                 const fullName = `${customer.first_name} ${customer.last_name}`;
 

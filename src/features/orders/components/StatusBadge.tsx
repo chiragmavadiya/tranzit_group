@@ -36,6 +36,30 @@ const getTrackingStatusVariant = (status: string): { bg: string; dot: string } =
             bg: 'bg-red-50 text-red-600 border-red-200 dark:bg-red-950/20 dark:text-red-400 dark:border-red-900/30',
             dot: 'bg-red-500'
         },
+        'unfulfilled': {
+            bg: 'bg-amber-50/80 text-amber-600 border-amber-200 dark:bg-amber-950/20 dark:text-amber-400 dark:border-amber-900/30',
+            dot: 'bg-amber-500'
+        },
+        'on hold': {
+            bg: 'bg-violet-50 text-violet-700 border-violet-200 dark:bg-violet-950/20 dark:text-violet-400 dark:border-violet-900/30',
+            dot: 'bg-violet-500'
+        },
+        'scheduled': {
+            bg: 'bg-indigo-50 text-indigo-700 border-indigo-200 dark:bg-indigo-950/20 dark:text-indigo-400 dark:border-indigo-900/30',
+            dot: 'bg-indigo-500'
+        },
+        'partially fulfilled': {
+            bg: 'bg-blue-50 text-blue-700 border-blue-200 dark:bg-blue-950/20 dark:text-blue-400 dark:border-blue-900/30',
+            dot: 'bg-blue-500'
+        },
+        'fulfilled': {
+            bg: 'bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-950/20 dark:text-emerald-400 dark:border-emerald-900/30',
+            dot: 'bg-emerald-500'
+        },
+        'restocked': {
+            bg: 'bg-slate-50 text-slate-600 border-slate-200/80 dark:bg-zinc-900/40 dark:text-zinc-400 dark:border-zinc-800',
+            dot: 'bg-slate-400 dark:bg-zinc-500'
+        },
         'order placed / information received': {
             bg: 'bg-blue-50 text-blue-700 border-blue-200 dark:bg-blue-950/20 dark:text-blue-400 dark:border-blue-900/30',
             dot: 'bg-blue-500'
@@ -94,6 +118,9 @@ const getTrackingStatusVariant = (status: string): { bg: string; dot: string } =
     }
 
     // Fallback to keyword matching for courier-specific statuses
+    if (lowerStatus.includes('failed')) {
+        return variants['delivery attempt failed'];
+    }
     if (lowerStatus.includes('deliver')) {
         return variants.delivered;
     }
@@ -121,6 +148,27 @@ const getTrackingStatusVariant = (status: string): { bg: string; dot: string } =
 
     // Default fallback
     return variants.draft;
+};
+
+export const SourceStatusBadge = ({ status }: { status: string }) => {
+    if (!status) return null;
+    const label = status.replace(/[_-]+/g, ' ').trim();
+    const variant = getTrackingStatusVariant(label);
+
+    return (
+        <Badge
+            variant="secondary"
+            className={cn(
+                "max-w-full px-1.5 py-0 h-[17px] text-[10px] font-semibold border flex items-center gap-1 rounded-full leading-none",
+                variant.bg
+            )}
+        >
+            <span className={cn("w-1 h-1 rounded-full shrink-0", variant.dot)} />
+            <CustomTooltip title={label} className="capitalize" onlyOnOverflow>
+                <span className="capitalize truncate">{label}</span>
+            </CustomTooltip>
+        </Badge>
+    );
 };
 
 export const StatusBadge = ({ status, compact = true }: { status: string; compact?: boolean }) => {

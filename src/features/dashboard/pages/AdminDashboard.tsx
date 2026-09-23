@@ -21,6 +21,7 @@ import { formatCurrency } from "@/features/orders/utils/order-details.utils";
 import BarChart from "@/components/common/charts/BarChart";
 import type { DateFilterValue } from "@/components/common/DateFilter/types";
 import { calculateDateRange } from "@/components/common/DateFilter/utils";
+import type { Invoice } from "@/features/invoices/types";
 
 export default function AdminDashboard() {
   const [filterValue, setFilterValue] = useState<DateFilterValue>(() => {
@@ -123,6 +124,12 @@ export default function AdminDashboard() {
   const columns = [
     { header: "#", key: "id", cell: (val: string, row: any) => val ? <LinkCell value={`#${row?.invoice_number}`} className="font-bold text-primary" path={`/admin/invoices/${val}`} /> : '-' },
     { header: "STATUS", key: "status", cell: (val: string) => <StatusCell value={val} /> },
+    { header: "CUSTOMER", key: "user", cell: (_: string, row: Invoice) => (
+            <div className="flex flex-col">
+              <span className="font-semibold text-gray-800 dark:text-zinc-200">{row.customer_full_name || row.user?.name}</span>
+              <span className="text-xs text-gray-500 dark:text-zinc-400">{row.customer_email || row.user?.email}</span>
+            </div>
+          ) },
     { header: "TOTAL", key: "amount", cell: (val: unknown) => `$${Number(val).toFixed(2)}` },
     { header: "ISSUED DATE", key: "invoice_date" },
   ];

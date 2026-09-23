@@ -20,9 +20,9 @@ const ModuleTabs = ({
         <button
             onClick={() => onTabChange(tab)}
             className={cn(
-                "pb-3 pt-2 px-1 cursor-pointer capitalize font-semibold text-[13px] sm:text-sm transition-all duration-200 relative flex items-center gap-2 outline-none whitespace-nowrap",
+                "pb-3 pt-2 px-1 cursor-pointer capitalize  text-[13px] sm:text-sm transition-all duration-200 relative flex items-center gap-2 outline-none whitespace-nowrap",
                 isActive
-                    ? "text-primary font-semibold"
+                    ? "text-primary font-bold"
                     : "text-gray-500 dark:text-zinc-400 hover:text-gray-700 dark:hover:text-zinc-200"
             )}
         >

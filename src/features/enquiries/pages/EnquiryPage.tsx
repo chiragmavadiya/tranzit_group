@@ -5,10 +5,11 @@ import { EnquiryDetailsDialog } from '../components/EnquiryDetailsDialog';
 import type { Enquiry } from '../types';
 import { useAdminInquiries } from '@/features/enquiries/hooks/useEnquiries';
 import { useDebounce } from '@/hooks/useDebounce';
+import useLocalStorage from '@/hooks/useLocalStorage';
 
 export default function EnquiryPage() {
   const [search, setSearch] = useState('');
-  const [page, setPage] = useState(1);
+  const [page, setPage] = useLocalStorage<number>('enquiry_page', 1);
   const [pageSize, setPageSize] = useState(25);
   const [selectedEnquiry, setSelectedEnquiry] = useState<Enquiry | null>(null);
 

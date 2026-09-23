@@ -120,7 +120,9 @@ export const useLogout = () => {
 
     return useMutation({
         mutationFn: useCallback(() => authService.logout(), []),
-        onSuccess: () => {
+        // onSettled, not onSuccess: a failed or unreachable logout endpoint must never
+        // leave the token, role and cached data behind on the device.
+        onSettled: () => {
             // Track logout event in Google Analytics
             trackLogout(user?.id, user?.email);
 
@@ -163,6 +165,27 @@ export const useGetUserDetails = (enabled: boolean) => {
 export const useResetPassword = () => {
     return useMutation({
         mutationFn: useCallback((data: ResetPasswordRequest) => authService.resetPassword(data), []),
+    });
+};
+
+/**
+ * Hook to accept the latest Terms and Conditions
+ */
+export const useAcceptTerms = () => {
+    const queryClient = useQueryClient();
+
+    return useMutation({
+        mutationFn: useCallback(() => authService.acceptTerms(), []),
+        onSuccess: () => {
+            // Flip the cached ME flag so the blocking modal closes without an extra round trip
+            queryClient.setQueryData(QUERY_KEYS.AUTH.USER_DETAILS, (oldData: any) => {
+                if (!oldData) return oldData;
+                return {
+                    ...oldData,
+                    must_accept_terms: false
+                };
+            });
+        },
     });
 };
 

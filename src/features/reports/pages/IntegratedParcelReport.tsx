@@ -13,6 +13,7 @@ import {
 import { FormSelect, FormInput } from '@/features/orders/components/OrderFormUI';
 import { DateFilter } from '@/components/common/DateFilter';
 import type { DateFilterValue } from '@/components/common/DateFilter/types';
+import { hydrateDateFilter } from '@/components/common/DateFilter/utils';
 import { useCustomers } from '@/features/customers/hooks/useCustomers';
 import { useAppSelector } from '@/hooks/store.hooks';
 import { formateCurrency } from '@/lib/utils';
@@ -29,7 +30,7 @@ export default function IntegratedParcelReportPage() {
     from: undefined,
     to: undefined,
     label: 'All Time',
-  });
+  }, hydrateDateFilter);
 
   const [search, setSearch] = useLocalStorage<string>('integrated_parcel_search', '');
   const [pageSize, setPageSize] = useLocalStorage<number>('integrated_parcel_page_size', 100);
@@ -201,6 +202,7 @@ export default function IntegratedParcelReportPage() {
         <DataTable
           columns={ADMIN_INTEGRATED_PARCEL_COLUMNS}
           data={data?.data || []}
+          moduleName="integratedParcelReport"
           header={false}
           className="pb-3 text-xs flex-none h-auto"
           totalItems={data?.meta?.total || 0}

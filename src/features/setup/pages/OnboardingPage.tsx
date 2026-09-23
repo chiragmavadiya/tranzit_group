@@ -10,7 +10,8 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { logout, setCredentials, setNextStep } from '@/features/auth/authSlice';
 import { useOnboarding, useLogout, useEmailVerify } from '@/features/auth/hooks/useAuth';
-import { FormInput, FormSelect } from '@/features/orders/components/OrderFormUI';
+import { CustomLabel, FormInput, FormSelect } from '@/features/orders/components/OrderFormUI';
+import { Switch } from '@/components/ui/switch';
 import { useAppDispatch, useAppSelector } from '@/hooks/store.hooks';
 import { AlertCircle, LogOut, Loader2, User, Building2, MapPin, CreditCard, ChevronDown } from 'lucide-react';
 import { useEffect, useState, useEffectEvent } from 'react';
@@ -18,8 +19,10 @@ import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import brandLogo from '@/assets/Tranzit_Logo.svg';
 import { showToast } from '@/components/ui/custom-toast';
 import { PlaceAutocomplete } from '@/components/common/AutoComplateAddress';
-import { STATES, PRIVACY_POLICY_URL, TERMS_CONDITIONS_URL } from '@/constants';
-import { cleanSpaces, isPhoneValid } from '@/lib/utils';
+import { STATES, PRIVACY_POLICY_URL, TERMS_CONDITIONS_URL, SENDER_NAME_MAX_LENGTH } from '@/constants';
+import { cleanSpaces, isPhoneValid, PHONE_ERROR_MESSAGE } from '@/lib/phone';
+import { useValidateLocality } from '@/hooks/useValidateLocality';
+import { LocalityWarning } from '@/components/common/LocalityWarning';
 
 const SectionHeader = ({ title, icon: Icon, children }: { title: string, icon: any, children?: React.ReactNode }) => (
   <div className="flex items-center justify-between pb-3 border-b border-slate-50 dark:border-zinc-800/50 mb-6">
@@ -48,11 +51,14 @@ export default function OnboardingPage() {
 
   const logoutMutation = useLogout();
   const [isSubmitted, setIsSubmitted] = useState(false);
+  const [senderNameEdited, setSenderNameEdited] = useState(false);
 
   const [formData, setFormData] = useState({
     // Account
     first_name: user?.first_name || "",
     last_name: user?.last_name || "",
+    sender_name: `${user?.first_name || ""} ${user?.last_name || ""}`.trim().slice(0, SENDER_NAME_MAX_LENGTH),
+    display_business_name_on_label: false,
     mobile: "",
     email: user?.email || "",
     // Business
@@ -89,6 +95,13 @@ export default function OnboardingPage() {
     product_updates: false,
   });
 
+  const pickupLocality = useValidateLocality(formData.suburb, formData.state, formData.postcode, formData.address);
+  const billingLocality = useValidateLocality(formData.billing_suburb, formData.billing_state, formData.billing_postcode, formData.billing_address);
+  // When "same as pickup address" is ticked the billing fields mirror the pickup ones,
+  // so only the pickup warning is worth showing
+  const billingLocalityError = formData.hasBillingAddress ? billingLocality.error : '';
+  const isLocalityPending = pickupLocality.isPending || (formData.hasBillingAddress && billingLocality.isPending);
+
   const handleChange = (field: string, value: any) => {
     if (field === 'business_name' && value && value.length > 32) {
       showToast("Business name cannot be longer than 32 characters", "error");
@@ -98,13 +111,26 @@ export default function OnboardingPage() {
       showToast("ABN / ACN cannot be longer than 11 characters", "error");
       return
     }
-    setFormData(prev => ({ ...prev, [field]: value }));
+    if (field === 'sender_name') {
+      if (value && value.length > SENDER_NAME_MAX_LENGTH) {
+        showToast(`Sender name cannot be longer than ${SENDER_NAME_MAX_LENGTH} characters`, "error");
+        return
+      }
+      setSenderNameEdited(true);
+    }
+    setFormData(prev => {
+      const next = { ...prev, [field]: value };
+      // Until the sender name is typed in by hand it just follows the customer's name.
+      if (!senderNameEdited && (field === 'first_name' || field === 'last_name')) {
+        next.sender_name = `${next.first_name} ${next.last_name}`.trim().slice(0, SENDER_NAME_MAX_LENGTH);
+      }
+      return next;
+    });
   };
 
   const handleLogout = () => {
     logoutMutation.mutate(undefined, {
-      onSuccess: () => {
-        localStorage.clear();
+      onSettled: () => {
         dispatch(logout());
         navigate('/login');
       }
@@ -144,11 +170,19 @@ export default function OnboardingPage() {
     e.preventDefault();
     setIsSubmitted(true);
     if (!isPhoneValid(formData.mobile)) {
-      showToast("Invalid mobile number", "error");
+      showToast(PHONE_ERROR_MESSAGE, "error");
       return false;
     };
     if (!validateForm()) {
       showToast("Please fill in all required fields correctly", "error");
+      return
+    }
+    if (pickupLocality.error || billingLocalityError) {
+      showToast(pickupLocality.error || billingLocalityError, "error");
+      return
+    }
+    if (isLocalityPending) {
+      showToast("Validating address, please wait", "error");
       return
     }
     if (!formData.agree_privacy || !formData.accept_terms) {
@@ -258,6 +292,7 @@ export default function OnboardingPage() {
           email: user.email,
           first_name: user.first_name,
           last_name: user.last_name,
+          sender_name: prev.sender_name || `${user.first_name || ''} ${user.last_name || ''}`.trim().slice(0, SENDER_NAME_MAX_LENGTH),
           mobile: user.personal_mobile || '',
           business_name: user?.addresses && user?.addresses[0]?.company_name,
           gst_number: user.gst_number || '',
@@ -419,8 +454,8 @@ export default function OnboardingPage() {
                       value={formData.mobile}
                       onChange={(val) => handleChange('mobile', val)}
                       required
-                      error={isSubmitted && (formData.mobile?.trim() === '' || !/^\d{10}$/.test(formData.mobile.replace(/\s/g, '')))}
-                      errormsg="Please enter a valid 10-digit mobile number"
+                      error={isSubmitted && (!formData.mobile?.trim() || !isPhoneValid(formData.mobile))}
+                      errormsg={!formData.mobile?.trim() ? "Please enter mobile number" : PHONE_ERROR_MESSAGE}
                     />
                   </div>
                 </div>
@@ -451,6 +486,33 @@ export default function OnboardingPage() {
                     error={isSubmitted && formData.gst_number?.trim() === ''}
                     errormsg="Please enter your GST number"
                   />
+                </div>
+                <div className="grid grid-cols-12 gap-5">
+                  {/* <FormInput
+                    isHalf
+                    label="Sender Name (Display on label)"
+                    info='Printed on the label as the sender when "Display business name on label" is off.'
+                    placeholder="Sender name on label"
+                    value={formData.sender_name}
+                    onChange={(val) => handleChange('sender_name', val)}
+                  /> */}
+                  <div className="col-span-12 md:col-span-6">
+                    <CustomLabel label="Display business name on label" />
+                    <div className="flex items-center gap-2 h-8">
+                      <Switch
+                        checked={formData.display_business_name_on_label}
+                        onCheckedChange={(checked) => handleChange('display_business_name_on_label', checked)}
+                      />
+                      <span className="text-sm text-slate-600 dark:text-zinc-400">
+                        {formData.display_business_name_on_label ? 'Yes' : 'No'}
+                      </span>
+                    </div>
+                    <p className="my-0 text-[11px] text-slate-400 dark:text-zinc-500">
+                      {formData.display_business_name_on_label
+                        ? 'The business name will print on the label.'
+                        : 'The sender name will print on the label.'}
+                    </p>
+                  </div>
                 </div>
                 <div className="pt-2">
                   <p className="text-xs text-slate-400 dark:text-zinc-500">
@@ -484,11 +546,11 @@ export default function OnboardingPage() {
                         handleChange('addressSelected', true);
                       }}
                       onChange={(value) => { handleChange('address_info', value); handleChange('addressSelected', false) }}
-                      error={isSubmitted && formData.address_info?.trim() === ''}
-                      errormsg='Please enter your address'
+                      // error={isSubmitted && formData.address_info?.trim() === ''}
+                      // errormsg='Please enter your address'
                       placeholder='Search your address'
                       value={formData.address_info}
-                      required
+                      // required
                     />
                   </div>
                   <div className="grid grid-cols-12  gap-5">
@@ -566,6 +628,17 @@ export default function OnboardingPage() {
                     </div>
                   </div>
 
+                  {pickupLocality.error && (
+                    <LocalityWarning
+                      message={pickupLocality.error}
+                      suggestions={pickupLocality.suggestions}
+                      onSelect={(suggestion) => {
+                        handleChange('suburb', suggestion.suburb);
+                        handleChange('state', suggestion.state);
+                        handleChange('postcode', suggestion.postcode);
+                      }}
+                    />
+                  )}
 
                 </div>
               </div>
@@ -689,6 +762,18 @@ export default function OnboardingPage() {
                     </div>
 
                   </div>
+
+                  {billingLocalityError && (
+                    <LocalityWarning
+                      message={billingLocalityError}
+                      suggestions={billingLocality.suggestions}
+                      onSelect={(suggestion) => {
+                        handleChange('billing_suburb', suggestion.suburb);
+                        handleChange('billing_state', suggestion.state);
+                        handleChange('billing_postcode', suggestion.postcode);
+                      }}
+                    />
+                  )}
                 </div>
               </div>
             </div>

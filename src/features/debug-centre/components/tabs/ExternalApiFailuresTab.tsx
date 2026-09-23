@@ -20,6 +20,7 @@ export const ExternalApiFailuresTab = ({ filters, searchValue, onPageChange, onP
     <DataTable
       columns={EXTERNAL_API_FAILURES_COLUMNS}
       data={failures}
+      moduleName="externalApiFailures"
       loading={isLoading}
       totalItems={totalItems}
       currentPage={filters.page || 1}

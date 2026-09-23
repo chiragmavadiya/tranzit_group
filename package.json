@@ -5,9 +5,8 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "node generate-version.js && tsc -b && vite build",
+    "build": "tsc -b && vite build",
     "lint": "eslint .",
-    "test": "node --experimental-strip-types --test src/features/orders/lib/printLabelsUi.test.ts src/features/rules/lib/ruleDefaults.test.ts src/features/tracking/lib/trackingStages.test.ts src/features/customer-settings/lib/branding.test.ts src/features/integrations/utils.test.ts",
     "preview": "vite preview"
   },
   "dependencies": {

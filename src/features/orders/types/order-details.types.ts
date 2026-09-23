@@ -30,6 +30,7 @@ type CancelRequest = {
 export type ShopifyItem = {
     product_name: string
     variant_title?: string | null
+<<<<<<< HEAD
     variant_id?: number | null
     product_id?: number | null
     sku?: string | null
@@ -37,6 +38,11 @@ export type ShopifyItem = {
     price: number
     weight: number
     weight_unit?: string | null
+=======
+    sku?: string | null
+    quantity: number
+    price: number
+>>>>>>> 0e6e9b67246e905519767a76639d2addfe06681c
 }
 
 export type OrderDetailData = {
@@ -49,11 +55,14 @@ export type OrderDetailData = {
     customer_reference?: string | null
     external_reference?: string | null
     external_order_id?: string | null
+<<<<<<< HEAD
     /** Shipping the buyer picked and paid for on the sales platform, e.g. Shopify checkout. */
     platform_shipping_method?: string | null
     platform_shipping_price?: number | null
     platform_shipping_currency?: string | null
     fulfillment_status?: string | null
+=======
+>>>>>>> 0e6e9b67246e905519767a76639d2addfe06681c
     order_details: {
         subtotal: number
         tax: number
@@ -63,7 +72,10 @@ export type OrderDetailData = {
         items: OrderItem[]
         surcharge_amount: number
         shopify_items?: ShopifyItem[]
+<<<<<<< HEAD
         shopify_note?: string | null
+=======
+>>>>>>> 0e6e9b67246e905519767a76639d2addfe06681c
     }
     courier_details: {
         courier: string
@@ -131,7 +143,10 @@ export type OrderDetailData = {
         message: string
     }
     delivery_instructions: string
+<<<<<<< HEAD
     contains_dangerous_goods?: boolean
+=======
+>>>>>>> 0e6e9b67246e905519767a76639d2addfe06681c
     order_status_category: string
     payment_status: string
     status: string

@@ -36,6 +36,7 @@ const getTrackingStatusVariant = (status: string): { bg: string; dot: string } =
             bg: 'bg-red-50 text-red-600 border-red-200 dark:bg-red-950/20 dark:text-red-400 dark:border-red-900/30',
             dot: 'bg-red-500'
         },
+<<<<<<< HEAD
         'unfulfilled': {
             bg: 'bg-amber-50/80 text-amber-600 border-amber-200 dark:bg-amber-950/20 dark:text-amber-400 dark:border-amber-900/30',
             dot: 'bg-amber-500'
@@ -60,6 +61,8 @@ const getTrackingStatusVariant = (status: string): { bg: string; dot: string } =
             bg: 'bg-slate-50 text-slate-600 border-slate-200/80 dark:bg-zinc-900/40 dark:text-zinc-400 dark:border-zinc-800',
             dot: 'bg-slate-400 dark:bg-zinc-500'
         },
+=======
+>>>>>>> 0e6e9b67246e905519767a76639d2addfe06681c
         'order placed / information received': {
             bg: 'bg-blue-50 text-blue-700 border-blue-200 dark:bg-blue-950/20 dark:text-blue-400 dark:border-blue-900/30',
             dot: 'bg-blue-500'
@@ -118,9 +121,12 @@ const getTrackingStatusVariant = (status: string): { bg: string; dot: string } =
     }
 
     // Fallback to keyword matching for courier-specific statuses
+<<<<<<< HEAD
     if (lowerStatus.includes('failed')) {
         return variants['delivery attempt failed'];
     }
+=======
+>>>>>>> 0e6e9b67246e905519767a76639d2addfe06681c
     if (lowerStatus.includes('deliver')) {
         return variants.delivered;
     }
@@ -150,6 +156,7 @@ const getTrackingStatusVariant = (status: string): { bg: string; dot: string } =
     return variants.draft;
 };
 
+<<<<<<< HEAD
 export const SourceStatusBadge = ({ status }: { status: string }) => {
     if (!status) return null;
     const label = status.replace(/[_-]+/g, ' ').trim();
@@ -171,6 +178,8 @@ export const SourceStatusBadge = ({ status }: { status: string }) => {
     );
 };
 
+=======
+>>>>>>> 0e6e9b67246e905519767a76639d2addfe06681c
 export const StatusBadge = ({ status, compact = true }: { status: string; compact?: boolean }) => {
     if (!status) return '-';
     const variant = getTrackingStatusVariant(status);

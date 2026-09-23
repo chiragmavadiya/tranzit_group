@@ -1,21 +1,31 @@
 import { useState } from 'react';
 import type { ShippingRule } from '../types/rules.types';
 import { Button } from '@/components/ui/button';
+<<<<<<< HEAD
 import { Badge } from '@/components/ui/badge';
 import { Switch } from '@/components/ui/switch';
 import { DataTable } from '@/components/common/DataTable';
 import type { Column } from '@/components/common/types/DataTable.types';
+=======
+import { DataTable } from '@/components/common/DataTable';
+import type { Column } from '@/components/common/types/DataTable.types';
+// import { getOperatorLabel } from '../utils/rulePreview';
+>>>>>>> 0e6e9b67246e905519767a76639d2addfe06681c
 import {
   Edit2,
   Trash2,
   Plus,
+<<<<<<< HEAD
   ChevronUp,
   ChevronDown,
+=======
+>>>>>>> 0e6e9b67246e905519767a76639d2addfe06681c
 } from 'lucide-react';
 
 interface RuleListProps {
   rules: ShippingRule[];
   onEdit: (rule: ShippingRule) => void;
+<<<<<<< HEAD
   onDelete: (id: number) => void;
   onCreateClick: () => void;
   onMove: (index: number, direction: 'up' | 'down') => void;
@@ -56,20 +66,34 @@ const actionValueSummary = (rule: ShippingRule): string => {
   }
 };
 
+=======
+  onDelete: (id: string) => void;
+  onCreateClick: () => void;
+  isFormOpen: boolean;
+  canReadWrite: boolean;
+}
+
+>>>>>>> 0e6e9b67246e905519767a76639d2addfe06681c
 export default function RuleList({
   rules,
   onEdit,
   onDelete,
   onCreateClick,
+<<<<<<< HEAD
   onMove,
   onToggleActive,
   isFormOpen,
   canReadWrite,
   isReordering = false,
+=======
+  isFormOpen,
+  canReadWrite
+>>>>>>> 0e6e9b67246e905519767a76639d2addfe06681c
 }: RuleListProps) {
   const [searchTerm, setSearchTerm] = useState('');
 
   const columns: Column<ShippingRule>[] = [
+<<<<<<< HEAD
     ...(canReadWrite ? [{
       key: 'sort_order',
       header: 'Order',
@@ -119,14 +143,24 @@ export default function RuleList({
           {rule.condition_label?.length > 80 ? `${rule.condition_label.slice(0, 80)}…` : rule.condition_label}
         </span>
       )
+=======
+    {
+      key: 'condition_label',
+      header: 'Attribute',
+>>>>>>> 0e6e9b67246e905519767a76639d2addfe06681c
     },
     {
       key: 'action_label',
       header: 'Action',
+<<<<<<< HEAD
+=======
+
+>>>>>>> 0e6e9b67246e905519767a76639d2addfe06681c
     },
     {
       key: 'actionValue',
       header: 'Value',
+<<<<<<< HEAD
       cell: (_, rule) => actionValueSummary(rule)
     },
     {
@@ -148,15 +182,25 @@ export default function RuleList({
           {rule.is_active ? 'Active' : 'Inactive'}
         </Badge>
       )
+=======
+      cell: (_, row) => row.carrier_name && row.product_name ? `${row.carrier_name} - ${row.product_name}` : '-'
+>>>>>>> 0e6e9b67246e905519767a76639d2addfe06681c
     },
     ...(canReadWrite ? [{
       key: 'id',
       header: 'Actions',
       width: '100px',
       sticky: 'right' as const,
+<<<<<<< HEAD
       cell: (_value: any, rule: ShippingRule) => {
         return (
           <div className="flex items-center justify-end gap-1 opacity-80 group-hover/row:opacity-100 transition-opacity">
+=======
+      cell: (_value: any, rule: any) => {
+        return (
+          <div className="flex items-center justify-end gap-1 opacity-80 group-hover/row:opacity-100 transition-opacity">
+            {/* Edit Button */}
+>>>>>>> 0e6e9b67246e905519767a76639d2addfe06681c
             <Button
               variant="ghost"
               size="icon"
@@ -167,6 +211,10 @@ export default function RuleList({
               <Edit2 className="w-4 h-4" />
             </Button>
 
+<<<<<<< HEAD
+=======
+            {/* Delete Button */}
+>>>>>>> 0e6e9b67246e905519767a76639d2addfe06681c
             <Button
               variant="ghost"
               size="icon"
@@ -191,7 +239,13 @@ export default function RuleList({
           data={rules}
           searchValue={searchTerm}
           onSearchChange={setSearchTerm}
+<<<<<<< HEAD
           pagination={false}
+=======
+          // header={false}
+          pagination={false}
+          // searchable={false}
+>>>>>>> 0e6e9b67246e905519767a76639d2addfe06681c
           totalItems={rules.length}
           exportable={false}
           searchable={false}
@@ -200,12 +254,20 @@ export default function RuleList({
         />
       </div>
 
+<<<<<<< HEAD
       {/* Add New button */}
+=======
+      {/* Add New Button matching screenshot inline flow */}
+>>>>>>> 0e6e9b67246e905519767a76639d2addfe06681c
       {!isFormOpen && canReadWrite && (
         <div className="pt-2">
           <Button
             variant="default"
             onClick={onCreateClick}
+<<<<<<< HEAD
+=======
+          // className="h-8 text-[12px] font-bold text-white shadow-sm bg-blue-500 hover:bg-blue-600 rounded-md px-4 flex items-center gap-1.5 cursor-pointer"
+>>>>>>> 0e6e9b67246e905519767a76639d2addfe06681c
           >
             <Plus className="w-3.5 h-3.5" />
             Add new

@@ -61,6 +61,7 @@ export const reportsService = {
         const response = await api.get(endpoint, { params: filters });
         return response.data;
     },
+<<<<<<< HEAD
 
     getAllParcelReport: async (filters: ReportFilters): Promise<PaginatedResponse<ParcelReport>> => {
         const response = await api.get(API_ENDPOINTS.ADMIN_REPORTS.ALL_PARCELS, { params: filters });
@@ -77,6 +78,8 @@ export const reportsService = {
         const filename = getFileName(response) || `All_Parcel_Report_${new Date().getTime()}.${formated}`;
         return { blob: response.data, filename };
     },
+=======
+>>>>>>> 0e6e9b67246e905519767a76639d2addfe06681c
 
     exportParcelReport: async (filters: ReportFilters & { format: string }, isAdmin: boolean = false): Promise<{ blob: Blob; filename: string }> => {
         const endpoint = isAdmin ? API_ENDPOINTS.ADMIN_REPORTS.PARCELS_EXPORT : API_ENDPOINTS.REPORTS.PARCELS_EXPORT;

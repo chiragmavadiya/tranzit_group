@@ -149,6 +149,7 @@ export const useToggleCustomerStatus = () => {
     });
 };
 
+<<<<<<< HEAD
 export const useSetAccountActivation = () => {
     const queryClient = useQueryClient();
 
@@ -166,6 +167,8 @@ export const useSetAccountActivation = () => {
     });
 };
 
+=======
+>>>>>>> 0e6e9b67246e905519767a76639d2addfe06681c
 export const useExportCustomers = () => {
     return useMutation({
         mutationFn: ({ format, params }: { format: string; params?: Record<string, any> }) => customerService.exportList(format, params),
@@ -219,6 +222,7 @@ export const useChangeCustomerPassword = () => {
     });
 };
 
+<<<<<<< HEAD
 export const useCustomerItems = (id: number | string, params?: Record<string, any>) => {
     return useQuery({
         queryKey: [...QUERY_KEYS.ADMIN_CUSTOMERS.ITEMS(id), params],
@@ -293,4 +297,6 @@ export const useCustomerItems = (id: number | string, params?: Record<string, an
     });
 };
 
+=======
+>>>>>>> 0e6e9b67246e905519767a76639d2addfe06681c
 

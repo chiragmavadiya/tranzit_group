@@ -9,7 +9,10 @@ import { InvoiceTable } from '../components/InvoiceTable';
 import { useAdminInvoices, useCustomerInvoices, useExportAdminInvoices, useExportCustomerInvoices, useDeleteAdminInvoice, useRemindAdminInvoice, useDownloadAdminInvoice, useDownloadCustomerInvoice } from '../hooks/useInvoices';
 import { ConformationModal } from '@/components/common/ConformationModal';
 import type { DateFilterValue } from '@/components/common/DateFilter/types';
+<<<<<<< HEAD
 import { hydrateDateFilter } from '@/components/common/DateFilter/utils';
+=======
+>>>>>>> 0e6e9b67246e905519767a76639d2addfe06681c
 import useLocalStorage from '@/hooks/useLocalStorage';
 
 export default function InvoicesPage() {
@@ -58,7 +61,11 @@ export default function InvoicesPage() {
     };
   }, [searchParams, parseLocalDate]);
 
+<<<<<<< HEAD
   const [dateRange, setDateRange] = useLocalStorage<DateFilterValue>('invoice_date_range', initialDateFilter, hydrateDateFilter);
+=======
+  const [dateRange, setDateRange] = useLocalStorage<DateFilterValue>('invoice_date_range', initialDateFilter);
+>>>>>>> 0e6e9b67246e905519767a76639d2addfe06681c
 
   // Synchronize date range filters from URL searchParams (e.g. Dashboard redirect)
   useEffect(() => {
@@ -77,6 +84,10 @@ export default function InvoicesPage() {
         });
       }
     }
+<<<<<<< HEAD
+=======
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+>>>>>>> 0e6e9b67246e905519767a76639d2addfe06681c
   }, [searchParams, parseLocalDate]);
 
   useEffect(() => {

@@ -2,14 +2,19 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { motion } from 'framer-motion';
 import { Edit2, Loader2, Info, Mail } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+<<<<<<< HEAD
 import { CustomLabel, FormInput, FormSelect } from '@/features/orders/components/OrderFormUI';
 import { Switch } from '@/components/ui/switch';
+=======
+import { FormInput, FormSelect } from '@/features/orders/components/OrderFormUI';
+>>>>>>> 0e6e9b67246e905519767a76639d2addfe06681c
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { CustomModel } from '@/components/ui/dialog';
 import { showToast } from '@/components/ui/custom-toast';
 import { PlaceAutocomplete } from '@/components/common/AutoComplateAddress';
 import { useAppSelector } from '@/hooks/store.hooks';
 import SubscriptionPlanModal from '../components/SubscriptionPlanModal';
+<<<<<<< HEAD
 import TrackingPageBrandingCard from '../components/TrackingPageBrandingCard';
 import { STATES, SENDER_NAME_MAX_LENGTH } from '@/constants';
 import { useGetProfile, useUpdateProfile, useChangePassword } from '@/features/profile/hooks/useProfile';
@@ -17,6 +22,11 @@ import { cn } from '@/lib/utils';
 import { cleanSpaces, isPhoneValid, PHONE_ERROR_MESSAGE } from '@/lib/phone';
 import { useValidateLocality } from '@/hooks/useValidateLocality';
 import { LocalityWarning } from '@/components/common/LocalityWarning';
+=======
+import { STATES } from '@/constants';
+import { useGetProfile, useUpdateProfile, useChangePassword } from '@/features/profile/hooks/useProfile';
+import { cleanSpaces, isPhoneValid } from '@/lib/utils';
+>>>>>>> 0e6e9b67246e905519767a76639d2addfe06681c
 // import { Checkbox } from '@/components/ui/checkbox';
 // import { Label } from '@/components/ui/label';
 // import { CreateAddressDialog } from '@/features/address-book/components/CreateAddressDialog';
@@ -47,8 +57,11 @@ export default function AccountSettingsPage() {
   // Fetch profile details
   const { data: profileResponse } = useGetProfile();
   const profile = profileResponse?.data;
+<<<<<<< HEAD
   // Non-BYO customers are not on the label tier pricing, so rate and tier progress are hidden.
   const showLabelTierInfo = profile?.weekly_label_usage?.BYO_enable;
+=======
+>>>>>>> 0e6e9b67246e905519767a76639d2addfe06681c
 
   // Mutations
   const updateProfileMutation = useUpdateProfile();
@@ -62,8 +75,11 @@ export default function AccountSettingsPage() {
     phone: '',
     companyName: '',
     abn: '',
+<<<<<<< HEAD
     senderName: '',
     displayBusinessNameOnLabel: false,
+=======
+>>>>>>> 0e6e9b67246e905519767a76639d2addfe06681c
 
     // Shipping Address
     shipping_address_info: '',
@@ -100,19 +116,25 @@ export default function AccountSettingsPage() {
     confirmPassword: '',
   });
   const [disabledAddress, setDisabledAddress] = useState(false);
+<<<<<<< HEAD
 
   const billingLocality = useValidateLocality(formData.billing_suburb, formData.billing_state, formData.billing_postcode, formData.billing_address);
   // Pickup is read-only here (changed via support), so it only warns — it never blocks the save
+=======
+>>>>>>> 0e6e9b67246e905519767a76639d2addfe06681c
   // const [isDialogOpen, setIsDialogOpen] = useState(false);
   // const [editingAddressId, setEditingAddressId] = useState<string | null>(null);
 
 
 
   const handleInputChange = (value: any, name: string) => {
+<<<<<<< HEAD
     if (name === 'senderName' && typeof value === 'string' && value.length > SENDER_NAME_MAX_LENGTH) {
       showToast(`Sender name cannot be longer than ${SENDER_NAME_MAX_LENGTH} characters`, 'error');
       return;
     }
+=======
+>>>>>>> 0e6e9b67246e905519767a76639d2addfe06681c
     setFormData(prev => ({ ...prev, [name]: value }));
   };
 
@@ -133,6 +155,7 @@ export default function AccountSettingsPage() {
     }
 
     if (phone && !isPhoneValid(phone)) {
+<<<<<<< HEAD
       showToast(PHONE_ERROR_MESSAGE, 'error');
       return;
     }
@@ -144,6 +167,9 @@ export default function AccountSettingsPage() {
 
     if (billingLocality.isPending) {
       showToast("Validating address, please wait", 'error');
+=======
+      showToast("Please enter a valid phone number", 'error');
+>>>>>>> 0e6e9b67246e905519767a76639d2addfe06681c
       return;
     }
 
@@ -154,8 +180,11 @@ export default function AccountSettingsPage() {
       personal_email: formData.email,
       business_name: formData.companyName,
       gst_number: formData.abn,
+<<<<<<< HEAD
       sender_name: formData.senderName,
       display_business_name_on_label: formData.displayBusinessNameOnLabel,
+=======
+>>>>>>> 0e6e9b67246e905519767a76639d2addfe06681c
       address_detail: {
         default: {
           address_info: formData.shipping_address_info,
@@ -248,8 +277,11 @@ export default function AccountSettingsPage() {
       phone: profile?.mobile || profile?.personal_mobile || '',
       companyName: profile?.business_name || '',
       abn: profile?.gst_number || '',
+<<<<<<< HEAD
       senderName: profile?.sender_name || '',
       displayBusinessNameOnLabel: !!profile?.display_business_name_on_label,
+=======
+>>>>>>> 0e6e9b67246e905519767a76639d2addfe06681c
 
       // Shipping Address
       shipping_address_info: shAddr?.address_info || shAddr?.address || '',
@@ -369,7 +401,11 @@ export default function AccountSettingsPage() {
                 value={formData.phone}
                 onChange={(val) => handleInputChange(val, 'phone')}
                 error={submit && (!formData.phone || !isPhoneValid(formData.phone))}
+<<<<<<< HEAD
                 errormsg={!formData.phone ? "Please enter phone number" : PHONE_ERROR_MESSAGE}
+=======
+                errormsg={!formData.phone ? "Please enter phone number" : "Please enter valid phone number"}
+>>>>>>> 0e6e9b67246e905519767a76639d2addfe06681c
               />
 
               {/* Row 3: company name , ABN */}
@@ -387,6 +423,7 @@ export default function AccountSettingsPage() {
                 value={formData.abn}
                 onChange={(val) => handleInputChange(val, 'abn')}
               />
+<<<<<<< HEAD
 
               {/* Row 4: label sender details */}
               {/* <FormInput
@@ -415,6 +452,8 @@ export default function AccountSettingsPage() {
                     : 'The sender name will print on the label.'}
                 </p>
               </div>
+=======
+>>>>>>> 0e6e9b67246e905519767a76639d2addfe06681c
             </div>
           </CardContent>
         </Card>
@@ -461,12 +500,16 @@ export default function AccountSettingsPage() {
                   {profile.weekly_label_usage.week_start} - {profile.weekly_label_usage.week_end}
                 </span>
               </CardHeader>
+<<<<<<< HEAD
               <CardContent className={cn(
                 "p-6 space-y-2 flex-1 flex flex-col",
                 // Without the rate and tier rows there is nothing to space apart, so the
                 // remaining metrics sit centred instead of leaving a gap down the middle.
                 showLabelTierInfo ? "justify-between" : "justify-center gap-2"
               )}>
+=======
+              <CardContent className="p-6 space-y-2 flex-1 flex flex-col justify-between">
+>>>>>>> 0e6e9b67246e905519767a76639d2addfe06681c
                 {/* Metrics Row */}
                 <div className="flex items-start justify-between">
                   <div>
@@ -477,6 +520,7 @@ export default function AccountSettingsPage() {
                       {profile.weekly_label_usage.total_labels_printed}
                     </h3>
                   </div>
+<<<<<<< HEAD
                   {showLabelTierInfo && (
                     <div className="text-right">
                       <p className="text-[10px] font-bold text-slate-400 dark:text-zinc-500 uppercase tracking-wide mb-1">
@@ -492,6 +536,21 @@ export default function AccountSettingsPage() {
                       </div>
                     </div>
                   )}
+=======
+                  <div className="text-right">
+                    <p className="text-[10px] font-bold text-slate-400 dark:text-zinc-500 uppercase tracking-wide mb-1">
+                      Current Rate
+                    </p>
+                    <div className="flex items-center gap-1.5 justify-end">
+                      <span className="text-[10px] font-bold text-primary-600 bg-primary/5 dark:bg-primary/10 border border-primary/20 px-2 py-0.5 rounded-full">
+                        Tier {profile.weekly_label_usage.current_tier.label}
+                      </span>
+                      <span className="text-sm font-black text-slate-800 dark:text-zinc-200">
+                        ${Number(profile.weekly_label_usage.current_tier.rate).toFixed(2)}/label
+                      </span>
+                    </div>
+                  </div>
+>>>>>>> 0e6e9b67246e905519767a76639d2addfe06681c
                 </div>
 
                 {/* Print Breakdown */}
@@ -515,7 +574,11 @@ export default function AccountSettingsPage() {
                 </div>
 
                 {/* Next Tier Progress */}
+<<<<<<< HEAD
                 {showLabelTierInfo && (profile.weekly_label_usage.next_tier ? (
+=======
+                {profile.weekly_label_usage.next_tier ? (
+>>>>>>> 0e6e9b67246e905519767a76639d2addfe06681c
                   <div className="space-y-2 pt-2 border-t border-slate-100 dark:border-zinc-800/80">
                     <div className="flex items-center justify-between text-xs">
                       <span className="font-semibold text-slate-500">Progress to Next Tier</span>
@@ -549,7 +612,11 @@ export default function AccountSettingsPage() {
                       🎉 You are on the best rate tier!
                     </p>
                   </div>
+<<<<<<< HEAD
                 ))}
+=======
+                )}
+>>>>>>> 0e6e9b67246e905519767a76639d2addfe06681c
               </CardContent>
             </Card>
           </motion.div>
@@ -676,6 +743,7 @@ export default function AccountSettingsPage() {
                     />
                   </div>
                 </div>
+<<<<<<< HEAD
                 {billingLocality.error && (
                   <LocalityWarning
                     message={billingLocality.error}
@@ -687,6 +755,8 @@ export default function AccountSettingsPage() {
                     }}
                   />
                 )}
+=======
+>>>>>>> 0e6e9b67246e905519767a76639d2addfe06681c
               </div>
 
               {/* Pickup Address Column */}
@@ -792,6 +862,12 @@ export default function AccountSettingsPage() {
                   </div>
                 </div>
               </div>
+<<<<<<< HEAD
+=======
+
+
+
+>>>>>>> 0e6e9b67246e905519767a76639d2addfe06681c
             </div>
           </CardContent>
         </Card>
@@ -802,6 +878,7 @@ export default function AccountSettingsPage() {
 
       {/* Address Information Card */}
 
+<<<<<<< HEAD
       {/* Tracking Page Branding Card */}
       <motion.div
         custom={4}
@@ -812,6 +889,8 @@ export default function AccountSettingsPage() {
       >
         <TrackingPageBrandingCard canEdit={canReadWrite} />
       </motion.div>
+=======
+>>>>>>> 0e6e9b67246e905519767a76639d2addfe06681c
 
       {/* Change Password Modal */}
       <CustomModel

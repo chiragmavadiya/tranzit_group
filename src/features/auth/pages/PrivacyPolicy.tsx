@@ -6,18 +6,30 @@ import {
   Clock,
   ChevronUp,
   Search,
+<<<<<<< HEAD
   Database,
   Compass,
+=======
+  BookOpen,
+  Database,
+  Compass,
+  Shield,
+>>>>>>> 0e6e9b67246e905519767a76639d2addfe06681c
   RefreshCw,
   HelpCircle,
   Cookie,
   ExternalLink,
   Users,
+<<<<<<< HEAD
   Info,
   Lock,
   ClipboardCheck,
   ShieldAlert,
   AlertTriangle
+=======
+  FileCheck,
+  Info
+>>>>>>> 0e6e9b67246e905519767a76639d2addfe06681c
 } from "lucide-react";
 import brandLogo from "@/assets/Tranzit_Logo.svg";
 import brandLogoDark from "@/assets/Tranzit_Logo_dark.svg";
@@ -27,7 +39,11 @@ export default function PrivacyPolicy() {
   const { theme } = useTheme();
   const [scrollProgress, setScrollProgress] = useState(0);
   const [showScrollTop, setShowScrollTop] = useState(false);
+<<<<<<< HEAD
   const [activeSection, setActiveSection] = useState("what-is-personal-info");
+=======
+  const [activeSection, setActiveSection] = useState("introduction");
+>>>>>>> 0e6e9b67246e905519767a76639d2addfe06681c
   const [searchQuery, setSearchQuery] = useState("");
 
   const logoSrc = theme === "dark" ? brandLogoDark : brandLogo;
@@ -43,6 +59,7 @@ export default function PrivacyPolicy() {
 
       // Detect active section in viewport
       const sectionIds = [
+<<<<<<< HEAD
         "what-is-personal-info", "info-we-collect", "how-we-collect",
         "senders-recipients", "how-we-use", "who-we-disclose",
         "overseas-disclosure", "marketing", "cookies-analytics",
@@ -52,6 +69,14 @@ export default function PrivacyPolicy() {
       ];
 
       let current = "what-is-personal-info";
+=======
+        "introduction", "collection-use", "use-data", "security-data",
+        "changes-policy", "contact-us", "cookies", "third-party",
+        "children-privacy", "compliance-laws", "contact"
+      ];
+
+      let current = "introduction";
+>>>>>>> 0e6e9b67246e905519767a76639d2addfe06681c
       for (const id of sectionIds) {
         const el = document.getElementById(id);
         if (el) {
@@ -77,6 +102,7 @@ export default function PrivacyPolicy() {
   // Structured content for sections to support searching and rendering
   const sections = useMemo(() => [
     {
+<<<<<<< HEAD
       id: "what-is-personal-info",
       num: "01",
       title: "1. What Is Personal Information",
@@ -137,11 +163,60 @@ export default function PrivacyPolicy() {
                 <p className="text-sm text-slate-600 dark:text-zinc-300 leading-relaxed">{item.desc}</p>
               </div>
             ))}
+=======
+      id: "introduction",
+      num: "01",
+      title: "1. Introduction",
+      icon: <BookOpen className="w-5 h-5 text-primary" />,
+      searchText: "Tranzit Group we us our or Company operates the portal. This page informs you of our policies regarding the collection, use, and disclosure of personal data when you use our portal and the choices you have associated with that data.",
+      content: (
+        <p className="text-slate-600 dark:text-zinc-300 leading-relaxed text-[15px]">
+          Tranzit Group ("we", "us", "our" or "Company") operates the portal. This page informs you of our policies regarding the collection, use, and disclosure of personal data when you use our portal and the choices you have associated with that data.
+        </p>
+      )
+    },
+    {
+      id: "collection-use",
+      num: "02",
+      title: "2. Information Collection and Use",
+      icon: <Database className="w-5 h-5 text-primary" />,
+      searchText: "We collect several different types of information for various purposes to provide and improve our Service to you. Types of Data Collected Personal Data: While using our portal, we may ask you to provide us with certain personally identifiable information that can be used to contact or identify you. This may include, but is not limited to: Email address First name and last name Phone number Address, State, Province, ZIP/Postal code, City Cookies and Usage Data Usage Data: We may also collect information on how the portal is accessed and used. This may include information such as your computer's Internet Protocol address, browser type, browser version, the pages you visit, the time and date of your visit, the time spent on those pages, and other diagnostic data.",
+      content: (
+        <div className="space-y-4">
+          <p className="text-slate-600 dark:text-zinc-300 leading-relaxed text-[15px]">
+            We collect several different types of information for various purposes to provide and improve our Service to you.
+          </p>
+
+          <div className="space-y-3 pt-2">
+            <h4 className="text-sm font-bold text-slate-800 dark:text-zinc-200">2.1 Types of Data Collected</h4>
+
+            <div className="bg-slate-50 dark:bg-zinc-950 p-4 rounded-xl border border-slate-100 dark:border-zinc-800/40">
+              <span className="text-xs font-bold text-primary uppercase tracking-wide block mb-2">Personal Data</span>
+              <p className="text-sm text-slate-600 dark:text-zinc-400 mb-3">
+                While using our portal, we may ask you to provide us with certain personally identifiable information that can be used to contact or identify you ("Personal Data"). This may include, but is not limited to:
+              </p>
+              <ul className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs font-semibold pl-1 text-slate-500 dark:text-zinc-400">
+                <li className="flex items-center gap-2"><span className="w-1.5 h-1.5 rounded-full bg-primary" /> Email address</li>
+                <li className="flex items-center gap-2"><span className="w-1.5 h-1.5 rounded-full bg-primary" /> First name and last name</li>
+                <li className="flex items-center gap-2"><span className="w-1.5 h-1.5 rounded-full bg-primary" /> Phone number</li>
+                <li className="flex items-center gap-2"><span className="w-1.5 h-1.5 rounded-full bg-primary" /> Address, State, ZIP, City</li>
+                <li className="flex items-center gap-2 sm:col-span-2"><span className="w-1.5 h-1.5 rounded-full bg-primary" /> Cookies and Usage Data</li>
+              </ul>
+            </div>
+
+            <div className="bg-slate-50 dark:bg-zinc-950 p-4 rounded-xl border border-slate-100 dark:border-zinc-800/40">
+              <span className="text-xs font-bold text-primary uppercase tracking-wide block mb-2">Usage Data</span>
+              <p className="text-sm text-slate-600 dark:text-zinc-400">
+                We may also collect information on how the portal is accessed and used ("Usage Data"). This may include information such as your computer's Internet Protocol address (e.g. IP address), browser type, browser version, the pages you visit, the time and date of your visit, the time spent on those pages, and other diagnostic data.
+              </p>
+            </div>
+>>>>>>> 0e6e9b67246e905519767a76639d2addfe06681c
           </div>
         </div>
       )
     },
     {
+<<<<<<< HEAD
       id: "how-we-collect",
       num: "03",
       title: "3. How We Collect Personal Information",
@@ -215,12 +290,37 @@ export default function PrivacyPolicy() {
               "comply with our legal and regulatory obligations;",
               "improve and develop the Platform and Services; and",
               "with your consent or as permitted by law, send marketing communications about our Services."
+=======
+      id: "use-data",
+      num: "03",
+      title: "3. Use of Data",
+      icon: <Compass className="w-5 h-5 text-primary" />,
+      searchText: "Tranzit Group uses the collected data for various purposes: To provide and maintain our portal To notify you about changes to our portal To allow you to participate in interactive features of our portal when you choose to do so To provide customer care and support To gather analysis or valuable information so that we can improve our portal To monitor the usage of our portal To detect, prevent and address technical issues",
+      content: (
+        <div className="space-y-4">
+          <p className="text-slate-600 dark:text-zinc-300 leading-relaxed text-[15px]">
+            Tranzit Group uses the collected data for various purposes:
+          </p>
+          <ul className="grid grid-cols-1 md:grid-cols-2 gap-3 pl-1 text-[14px]">
+            {[
+              "To provide and maintain our portal",
+              "To notify you about changes to our portal",
+              "To support interactive features when chosen",
+              "To provide customer care and support",
+              "To analyze information to improve the portal",
+              "To monitor the usage of our portal",
+              "To detect, prevent, and address technical issues"
+>>>>>>> 0e6e9b67246e905519767a76639d2addfe06681c
             ].map((item, index) => (
               <li key={index} className="flex items-start gap-2.5 text-slate-500 dark:text-zinc-400">
                 <span className="flex-shrink-0 w-5 h-5 rounded-full bg-primary/10 text-primary flex items-center justify-center text-[10px] font-bold mt-0.5">
                   {index + 1}
                 </span>
+<<<<<<< HEAD
                 <span className="text-slate-655 dark:text-zinc-300 leading-normal">{item}</span>
+=======
+                <span>{item}</span>
+>>>>>>> 0e6e9b67246e905519767a76639d2addfe06681c
               </li>
             ))}
           </ul>
@@ -228,6 +328,7 @@ export default function PrivacyPolicy() {
       )
     },
     {
+<<<<<<< HEAD
       id: "who-we-disclose",
       num: "06",
       title: "6. Who We Disclose Personal Information To",
@@ -408,10 +509,22 @@ export default function PrivacyPolicy() {
             We will acknowledge your complaint, investigate it, and respond within a reasonable period (generally within 30 days). If you are not satisfied with our response, you may lodge a complaint with the Office of the Australian Information Commissioner (OAIC) at <a href="https://www.oaic.gov.au" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline font-bold transition-all">www.oaic.gov.au</a> or by calling <span className="font-bold text-slate-800 dark:text-zinc-200">1300 363 992</span>.
           </p>
         </div>
+=======
+      id: "security-data",
+      num: "04",
+      title: "4. Security of Data",
+      icon: <Shield className="w-5 h-5 text-primary" />,
+      searchText: "The security of your data is important to us, but remember that no method of transmission over the Internet or method of electronic storage is 100% secure. While we strive to use commercially acceptable means to protect your Personal Data, we cannot guarantee its absolute security.",
+      content: (
+        <p className="text-slate-600 dark:text-zinc-300 leading-relaxed text-[15px]">
+          The security of your data is important to us, but remember that no method of transmission over the Internet or method of electronic storage is 100% secure. While we strive to use commercially acceptable means to protect your Personal Data, we cannot guarantee its absolute security.
+        </p>
+>>>>>>> 0e6e9b67246e905519767a76639d2addfe06681c
       )
     },
     {
       id: "changes-policy",
+<<<<<<< HEAD
       num: "16",
       title: "16. Changes to This Privacy Policy",
       icon: <RefreshCw className="w-5 h-5 text-primary" />,
@@ -422,10 +535,21 @@ export default function PrivacyPolicy() {
             We may update this Privacy Policy from time to time to reflect changes to our Services, business operations or legal requirements. The current version will be published on our website, and the &quot;Last Updated&quot; date above indicates when it was most recently revised. Where a change materially affects how we handle personal information, we will take reasonable steps to bring it to your attention.
           </p>
         </div>
+=======
+      num: "05",
+      title: "5. Changes to This Privacy Policy",
+      icon: <RefreshCw className="w-5 h-5 text-primary" />,
+      searchText: "We may update our Privacy Policy from time to time. We will notify you of any changes by posting the new Privacy Policy on this page and updating the Last Updated date at the top of this Privacy Policy.",
+      content: (
+        <p className="text-slate-600 dark:text-zinc-300 leading-relaxed text-[15px]">
+          We may update our Privacy Policy from time to time. We will notify you of any changes by posting the new Privacy Policy on this page and updating the "Last Updated" date at the top of this Privacy Policy.
+        </p>
+>>>>>>> 0e6e9b67246e905519767a76639d2addfe06681c
       )
     },
     {
       id: "contact-us",
+<<<<<<< HEAD
       num: "17",
       title: "17. Contact Us",
       icon: <HelpCircle className="w-5 h-5 text-primary" />,
@@ -436,6 +560,77 @@ export default function PrivacyPolicy() {
             Questions, requests or complaints about privacy can be directed to:
           </p>
 
+=======
+      num: "06",
+      title: "6. Contact Us",
+      icon: <HelpCircle className="w-5 h-5 text-primary" />,
+      searchText: "If you have any questions about this Privacy Policy, please contact us at the address provided below.",
+      content: (
+        <p className="text-slate-600 dark:text-zinc-300 leading-relaxed text-[15px]">
+          If you have any questions about this Privacy Policy, please contact us at the address provided below.
+        </p>
+      )
+    },
+    {
+      id: "cookies",
+      num: "07",
+      title: "7. Cookies",
+      icon: <Cookie className="w-5 h-5 text-primary" />,
+      searchText: "Our portal uses cookies to enhance user experience. A cookie is a file containing an identifier a string of letters and numbers that is sent by a web server to a web browser and is stored by the browser. The identifier is then sent back to the server each time the browser requests a page from the server. Cookies may be either persistent cookies or session cookies. You can instruct your browser to refuse all cookies or to indicate when a cookie is being sent. However, if you do not accept cookies, you may not be able to use some portions of our portal.",
+      content: (
+        <p className="text-slate-600 dark:text-zinc-300 leading-relaxed text-[15px]">
+          Our portal uses cookies to enhance user experience. A cookie is a file containing an identifier (a string of letters and numbers) that is sent by a web server to a web browser and is stored by the browser. The identifier is then sent back to the server each time the browser requests a page from the server. Cookies may be either "persistent" cookies or "session" cookies.
+          <br /><br />
+          You can instruct your browser to refuse all cookies or to indicate when a cookie is being sent. However, if you do not accept cookies, you may not be able to use some portions of our portal.
+        </p>
+      )
+    },
+    {
+      id: "third-party",
+      num: "08",
+      title: "8. Third-Party Links",
+      icon: <ExternalLink className="w-5 h-5 text-primary" />,
+      searchText: "Our portal may contain links to other sites. If you click on a third-party link, you will be directed to that site. Note that these external sites are not operated by us. Therefore, we strongly advise you to review the Privacy Policy of these websites. We have no control over and assume no responsibility for the content, privacy policies, or practices of any third-party sites or services.",
+      content: (
+        <p className="text-slate-600 dark:text-zinc-300 leading-relaxed text-[15px]">
+          Our portal may contain links to other sites. If you click on a third-party link, you will be directed to that site. Note that these external sites are not operated by us. Therefore, we strongly advise you to review the Privacy Policy of these websites. We have no control over and assume no responsibility for the content, privacy policies, or practices of any third-party sites or services.
+        </p>
+      )
+    },
+    {
+      id: "children-privacy",
+      num: "09",
+      title: "9. Children's Privacy",
+      icon: <Users className="w-5 h-5 text-primary" />,
+      searchText: "Our portal does not address anyone under the age of 18 Children. We do not knowingly collect personally identifiable information from anyone under the age of 18. If you are a parent or guardian and you are aware that your child has provided us with Personal Data, please contact us immediately.",
+      content: (
+        <p className="text-slate-600 dark:text-zinc-300 leading-relaxed text-[15px]">
+          Our portal does not address anyone under the age of 18 ("Children"). We do not knowingly collect personally identifiable information from anyone under the age of 18. If you are a parent or guardian and you are aware that your child has provided us with Personal Data, please contact us immediately.
+        </p>
+      )
+    },
+    {
+      id: "compliance-laws",
+      num: "10",
+      title: "10. Compliance with Laws",
+      icon: <FileCheck className="w-5 h-5 text-primary" />,
+      searchText: "Tranzit Group complies with all applicable privacy laws and regulations, including the Privacy Act 1988 Cth and the Australian Privacy Principles.",
+      content: (
+        <p className="text-slate-600 dark:text-zinc-300 leading-relaxed text-[15px]">
+          Tranzit Group complies with all applicable privacy laws and regulations, including the Privacy Act 1988 (Cth) and the Australian Privacy Principles.
+        </p>
+      )
+    },
+    {
+      id: "contact",
+      num: "11",
+      title: "11. Contact Information",
+      icon: <HelpCircle className="w-5 h-5 text-primary" />,
+      searchText: "Tranzit Group ABN: 12 690 967 198 Address: 12B Bass Ct Keysborough, VIC 3173 Australia Email: info@tranzitgroup.com.au",
+      content: (
+        <div className="space-y-6">
+          {/* Styled Contact Grid Card */}
+>>>>>>> 0e6e9b67246e905519767a76639d2addfe06681c
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             <div className="bg-slate-50 dark:bg-zinc-950 p-6 rounded-2xl border border-slate-100 dark:border-zinc-800/40 flex flex-col items-center text-center hover:shadow-md hover:border-primary/20 transition-all duration-300">
               <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center text-primary mb-4 shadow-sm">
@@ -445,7 +640,11 @@ export default function PrivacyPolicy() {
                 Business Details
               </span>
               <span className="font-bold text-slate-800 dark:text-zinc-200">Tranzit Group</span>
+<<<<<<< HEAD
               <span className="text-sm text-slate-500 dark:text-zinc-400 mt-1 font-medium font-mono">ABN: 12 690 967 198</span>
+=======
+              <span className="text-sm text-slate-500 dark:text-zinc-400 mt-1 font-medium">ABN: 12 690 967 198</span>
+>>>>>>> 0e6e9b67246e905519767a76639d2addfe06681c
             </div>
 
             <div className="bg-slate-50 dark:bg-zinc-950 p-6 rounded-2xl border border-slate-100 dark:border-zinc-800/40 flex flex-col items-center text-center hover:shadow-md hover:border-primary/20 transition-all duration-300">
@@ -453,6 +652,7 @@ export default function PrivacyPolicy() {
                 <MapPin className="w-6 h-6" />
               </div>
               <span className="text-[11px] font-bold uppercase tracking-wide text-slate-400 dark:text-zinc-500 mb-1">
+<<<<<<< HEAD
                 Website
               </span>
               <a
@@ -464,6 +664,14 @@ export default function PrivacyPolicy() {
                 tranzitgroup.com.au
               </a>
               <span className="text-sm text-slate-500 dark:text-zinc-400 mt-1 font-medium">Official Portal</span>
+=======
+                Address
+              </span>
+              <span className="font-bold text-slate-800 dark:text-zinc-200 leading-snug">
+                12B Bass Ct, Keysborough
+              </span>
+              <span className="text-sm text-slate-500 dark:text-zinc-400 font-medium">VIC 3173, Australia</span>
+>>>>>>> 0e6e9b67246e905519767a76639d2addfe06681c
             </div>
 
             <div className="bg-slate-50 dark:bg-zinc-950 p-6 rounded-2xl border border-slate-100 dark:border-zinc-800/40 flex flex-col items-center text-center hover:shadow-md hover:border-primary/20 transition-all duration-300">
@@ -471,7 +679,11 @@ export default function PrivacyPolicy() {
                 <Mail className="w-6 h-6" />
               </div>
               <span className="text-[11px] font-bold uppercase tracking-wide text-slate-400 dark:text-zinc-500 mb-1">
+<<<<<<< HEAD
                 Privacy Email
+=======
+                Support Email
+>>>>>>> 0e6e9b67246e905519767a76639d2addfe06681c
               </span>
               <a
                 href="mailto:info@tranzitgroup.com.au"
@@ -479,7 +691,11 @@ export default function PrivacyPolicy() {
               >
                 info@tranzitgroup.com.au
               </a>
+<<<<<<< HEAD
               <span className="text-sm text-slate-500 dark:text-zinc-400 mt-1 font-medium">Response within 24-48h</span>
+=======
+              <span className="text-sm text-slate-500 dark:text-zinc-400 mt-1 font-medium">Response within 24h</span>
+>>>>>>> 0e6e9b67246e905519767a76639d2addfe06681c
             </div>
           </div>
         </div>
@@ -498,6 +714,23 @@ export default function PrivacyPolicy() {
     );
   }, [searchQuery, sections]);
 
+<<<<<<< HEAD
+=======
+  const indexSections = useMemo(() => [
+    { id: "introduction", title: "1. Introduction", num: "01" },
+    { id: "collection-use", title: "2. Collection and Use", num: "02" },
+    { id: "use-data", title: "3. Use of Data", num: "03" },
+    { id: "security-data", title: "4. Security", num: "04" },
+    { id: "changes-policy", title: "5. Changes", num: "05" },
+    { id: "contact-us", title: "6. Contact Us", num: "06" },
+    { id: "cookies", title: "7. Cookies", num: "07" },
+    { id: "third-party", title: "8. Third-Party Links", num: "08" },
+    { id: "children-privacy", title: "9. Children", num: "09" },
+    { id: "compliance-laws", title: "10. Compliance", num: "10" },
+    { id: "contact", title: "11. Contact Information", num: "11" }
+  ], []);
+
+>>>>>>> 0e6e9b67246e905519767a76639d2addfe06681c
   return (
     <div className="min-h-screen bg-slate-55 dark:bg-zinc-950 text-slate-800 dark:text-zinc-200 selection:bg-primary/20 transition-colors duration-300 relative overflow-x-clip">
 
@@ -519,22 +752,38 @@ export default function PrivacyPolicy() {
           </div>
           <div className="flex items-center gap-2.5 text-xs font-semibold text-slate-400 bg-slate-100/50 dark:bg-zinc-800/30 px-3.5 py-2 rounded-xl">
             <Clock className="w-3.5 h-3.5 text-primary" />
+<<<<<<< HEAD
             <span>Updated: 17 August 2026</span>
+=======
+            <span>Updated: June 2026</span>
+>>>>>>> 0e6e9b67246e905519767a76639d2addfe06681c
           </div>
         </div>
       </header>
 
       {/* Main Content Area */}
+<<<<<<< HEAD
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+=======
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16">
+>>>>>>> 0e6e9b67246e905519767a76639d2addfe06681c
         <div className="lg:grid lg:grid-cols-12 lg:gap-10">
 
           {/* Left Column: Sidebar Table of Contents */}
           <aside className="hidden lg:block lg:col-span-3 sticky top-28 self-start bg-white/50 dark:bg-zinc-900/35 p-6 rounded-2xl border border-slate-200/45 dark:border-zinc-800/45 backdrop-blur-sm shadow-xs">
+<<<<<<< HEAD
             <nav className="space-y-1.5 pl-1 py-1 max-h-[calc(100vh-220px)] overflow-y-auto pr-2 scrollbar-thin scrollbar-thumb-slate-200 dark:scrollbar-thumb-zinc-850 scrollbar-track-transparent">
               <span className="block text-xs font-bold uppercase tracking-wide text-slate-400 dark:text-zinc-500 mb-4 pl-1">
                 Document Index
               </span>
               {sections.map((section) => {
+=======
+            <nav className="space-y-1.5 pl-1 py-1">
+              <span className="block text-xs font-bold uppercase tracking-wide text-slate-400 dark:text-zinc-500 mb-4 pl-1">
+                Document Index
+              </span>
+              {indexSections.map((section) => {
+>>>>>>> 0e6e9b67246e905519767a76639d2addfe06681c
                 const isSectionVisible = filteredSections.some((s) => s.id === section.id);
                 return (
                   <a
@@ -560,13 +809,20 @@ export default function PrivacyPolicy() {
             <div className="bg-white dark:bg-zinc-900 border border-slate-200/60 dark:border-zinc-800/60 rounded-3xl p-6 sm:p-10 shadow-xs relative overflow-hidden transition-colors duration-300">
               <div className="absolute top-0 right-0 w-32 h-32 bg-primary/5 rounded-bl-full pointer-events-none" />
 
+<<<<<<< HEAD
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6 mb-4">
                 <div>
                   <h1 className="mt-0 mb-1 text-3xl sm:text-4xl font-black text-slate-900 dark:text-white leading-tight">
+=======
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6 mb-6">
+                <div>
+                  <h1 className="text-3xl mt-0 mb-1 sm:text-4xl font-black text-slate-900 dark:text-white leading-tight">
+>>>>>>> 0e6e9b67246e905519767a76639d2addfe06681c
                     Privacy Policy
                   </h1>
                 </div>
               </div>
+<<<<<<< HEAD
               <p className="text-sm text-slate-655 dark:text-zinc-350 leading-relaxed max-w-2xl">
                 Tranzit Group ABN 12 690 967 198 (&quot;Tranzit Group&quot;, &quot;we&quot;, &quot;us&quot; or &quot;our&quot;) provides a technology and freight-management platform that enables customers to compare freight services, obtain quotations, book shipments, generate shipping labels, track consignments and manage related shipping functionality (the &quot;Platform&quot; and &quot;Services&quot;).
               </p>
@@ -575,6 +831,10 @@ export default function PrivacyPolicy() {
               </p>
               <p className="text-sm text-slate-655 dark:text-zinc-350 leading-relaxed max-w-2xl mt-3 font-semibold">
                 By using our website, Platform or Services, or by providing personal information to us, you consent to the collection, use and disclosure of personal information as described in this Privacy Policy. This Privacy Policy should be read together with our Terms and Conditions.
+=======
+              <p className="text-sm text-slate-500 dark:text-zinc-400 leading-relaxed max-w-2xl">
+                Your privacy is of utmost importance to us. This Privacy Policy details the types of personal data we collect, how we use it, and your rights regarding your personal information.
+>>>>>>> 0e6e9b67246e905519767a76639d2addfe06681c
               </p>
 
               {/* Modern Interactive Search Bar */}
@@ -641,7 +901,11 @@ export default function PrivacyPolicy() {
                   </div>
                   <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-1">No Matching Sections Found</h3>
                   <p className="text-sm text-slate-500 dark:text-zinc-400 max-w-sm mx-auto">
+<<<<<<< HEAD
                     We couldn't find any terms matching &quot;{searchQuery}&quot;. Please try another search term or browse the categories.
+=======
+                    We couldn't find any terms matching "{searchQuery}". Please try another search term or browse the categories.
+>>>>>>> 0e6e9b67246e905519767a76639d2addfe06681c
                   </p>
                 </div>
               )}

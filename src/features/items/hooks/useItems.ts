@@ -122,7 +122,10 @@ export const useSetDefaultItem = () => {
       if (response.status) {
         showToast(response.message || "Default item updated successfully", "success");
         queryClient.invalidateQueries({ queryKey: QUERY_KEYS.ITEMS.LIST });
+<<<<<<< HEAD
         queryClient.invalidateQueries({ queryKey: QUERY_KEYS.AUTH.USER_DETAILS });
+=======
+>>>>>>> 0e6e9b67246e905519767a76639d2addfe06681c
       } else {
         showToast(response.message || "Failed to set default item", "error");
       }
@@ -145,7 +148,10 @@ export const useUnsetDefaultItem = () => {
       if (response.status) {
         showToast(response.message || "Default item unset successfully", "success");
         queryClient.invalidateQueries({ queryKey: QUERY_KEYS.ITEMS.LIST });
+<<<<<<< HEAD
         queryClient.invalidateQueries({ queryKey: QUERY_KEYS.AUTH.USER_DETAILS });
+=======
+>>>>>>> 0e6e9b67246e905519767a76639d2addfe06681c
       } else {
         showToast(response.message || "Failed to unset default item", "error");
       }

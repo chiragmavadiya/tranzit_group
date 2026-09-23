@@ -2,7 +2,11 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { rulesService } from "../services/rules.service";
 import { QUERY_KEYS } from "@/constants/api.constants";
 import { showToast } from "@/components/ui/custom-toast";
+<<<<<<< HEAD
 import type { RuleFormType, RuleRunStatusResponse } from "../types/rules.types";
+=======
+import type { RuleFormType } from "../types/rules.types";
+>>>>>>> 0e6e9b67246e905519767a76639d2addfe06681c
 
 /**
  * Hook to fetch rules list
@@ -16,6 +20,20 @@ export const useRules = (enabled: boolean = true) => {
 };
 
 /**
+<<<<<<< HEAD
+=======
+ * Hook to fetch rule details
+ */
+// export const useRuleDetails = (id: number | string | undefined) => {
+//   return useQuery({
+//     queryKey: QUERY_KEYS.RULES.DETAILS(id as any),
+//     queryFn: () => rulesService.getDetails(id as any),
+//     enabled: !!id,
+//   });
+// };
+
+/**
+>>>>>>> 0e6e9b67246e905519767a76639d2addfe06681c
  * Hook to fetch rule options
  */
 export const useRuleOptions = (enabled: boolean = true) => {
@@ -33,7 +51,13 @@ export const useCreateRule = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
+<<<<<<< HEAD
     mutationFn: (newRuleData: RuleFormType) => rulesService.create(newRuleData),
+=======
+    mutationFn: async (newRuleData: any) => {
+      return rulesService.create(newRuleData);
+    },
+>>>>>>> 0e6e9b67246e905519767a76639d2addfe06681c
     onSuccess: () => {
       showToast("Rule created successfully", "success");
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.RULES.LIST });
@@ -54,9 +78,16 @@ export const useUpdateRule = () => {
     mutationFn: async ({ id, data }: { id: string | number; data: RuleFormType }) => {
       return rulesService.update(id, data);
     },
+<<<<<<< HEAD
     onSuccess: () => {
       showToast("Rule updated successfully", "success");
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.RULES.LIST });
+=======
+    onSuccess: (_response, variables) => {
+      showToast("Rule updated successfully", "success");
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.RULES.LIST });
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.RULES.DETAILS(variables.id) });
+>>>>>>> 0e6e9b67246e905519767a76639d2addfe06681c
     },
     onError: (error: any) => {
       showToast(error.message || "Failed to update rule", "error");
@@ -81,6 +112,7 @@ export const useDeleteRule = () => {
     }
   });
 };
+<<<<<<< HEAD
 
 /**
  * Hook to persist a new running order (list of {id, sort_order})
@@ -132,3 +164,5 @@ export const useRuleRunStatus = (enabled: boolean = true) => {
     },
   });
 };
+=======
+>>>>>>> 0e6e9b67246e905519767a76639d2addfe06681c

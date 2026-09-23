@@ -19,7 +19,10 @@ export const getManifestColumns = (
       key: 'order_number',
       className: 'text-primary font-bold',
       width: '120px',
+<<<<<<< HEAD
       disableToggle: true,
+=======
+>>>>>>> 0e6e9b67246e905519767a76639d2addfe06681c
       sticky: 'left',
       cell: (value: string) => {
         if (!canOrderView) {
@@ -51,7 +54,11 @@ export const getManifestColumns = (
       header: 'SUBURB', key: 'suburb',
     },
     {
+<<<<<<< HEAD
       header: 'CARRIER', key: 'courier',
+=======
+      header: 'CARRIER & PRODUCT', key: 'courier',
+>>>>>>> 0e6e9b67246e905519767a76639d2addfe06681c
       width: '220px',
       cell: (value: string, row: Manifest) => (
         <div className="flex items-center gap-2">

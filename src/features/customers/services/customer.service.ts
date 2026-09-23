@@ -129,6 +129,7 @@ export const customerService = {
     },
 
     /**
+<<<<<<< HEAD
      * Activate or deactivate the customer's access to the Customer Portal
      */
     setAccountActivation: async (
@@ -140,6 +141,8 @@ export const customerService = {
     },
 
     /**
+=======
+>>>>>>> 0e6e9b67246e905519767a76639d2addfe06681c
      * Export list of customers
      */
     exportList: async (format: string, params?: Record<string, any>): Promise<{ blob: Blob; filename: string }> => {
@@ -224,6 +227,7 @@ export const customerService = {
     },
 
     /**
+<<<<<<< HEAD
      * Get customer items
      */
     getItems: async (id: number | string, params?: Record<string, any>): Promise<any> => {
@@ -232,6 +236,8 @@ export const customerService = {
     },
 
     /**
+=======
+>>>>>>> 0e6e9b67246e905519767a76639d2addfe06681c
      * Add transaction to customer wallet
      */
     addTransaction: async (id: number | string, data: any): Promise<any> => {

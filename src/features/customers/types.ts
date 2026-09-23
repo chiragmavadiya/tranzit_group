@@ -71,11 +71,15 @@ export interface CustomerFormData {
     direct_freight_active: number;
     auspost_active: number;
     couriersplease_active: number;
+<<<<<<< HEAD
     aramex_active: number;
     pallet_active: number;
     fedex_active: number;
     tnt_active: number;
     teg_active: number;
+=======
+    pallet_active: number;
+>>>>>>> 0e6e9b67246e905519767a76639d2addfe06681c
     topup_enable: boolean;
     order_prefix: string;
     xero_contact_id?: string | null;
@@ -83,6 +87,7 @@ export interface CustomerFormData {
     couriersplease_min_margin?: number;
     auspost_min_margin?: number;
     direct_freight_min_margin?: number;
+<<<<<<< HEAD
     aramex_min_margin?: number;
     pallet_min_margin?: number;
     fedex_min_margin?: number;
@@ -97,6 +102,9 @@ export interface CustomerFormData {
     manual_order_fedex?: boolean;
     manual_order_tnt?: boolean;
     manual_order_teg?: boolean;
+=======
+    pallet_min_margin?: number;
+>>>>>>> 0e6e9b67246e905519767a76639d2addfe06681c
     markup_charges?: CourierWeightCharge[];
     pickup_charges?: CourierWeightCharge[];
     byo_courier_invoice_enable?: boolean;
@@ -122,7 +130,10 @@ export interface CustomerDetails {
     total_debit: number;
     total_margin: number;
     status: string;
+<<<<<<< HEAD
     account_activation?: boolean | null;
+=======
+>>>>>>> 0e6e9b67246e905519767a76639d2addfe06681c
     address_info: string;
 }
 

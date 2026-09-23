@@ -20,7 +20,10 @@ export const SlowExternalCallsTab = ({ filters, searchValue, onPageChange, onPag
     <DataTable
       columns={SLOW_EXTERNAL_CALLS_COLUMNS}
       data={calls}
+<<<<<<< HEAD
       moduleName="slowExternalCalls"
+=======
+>>>>>>> 0e6e9b67246e905519767a76639d2addfe06681c
       loading={isLoading}
       totalItems={totalItems}
       currentPage={filters.page || 1}

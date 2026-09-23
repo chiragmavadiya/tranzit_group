@@ -6,7 +6,10 @@ import { StatCard } from '@/components/common/StatCard';
 import { FormSelect } from '@/features/orders/components/OrderFormUI';
 import { DateFilter } from '@/components/common/DateFilter';
 import type { DateFilterValue } from '@/components/common/DateFilter/types';
+<<<<<<< HEAD
 import { hydrateDateFilter } from '@/components/common/DateFilter/utils';
+=======
+>>>>>>> 0e6e9b67246e905519767a76639d2addfe06681c
 
 import { getWalletColumns, TRANSACTION_TYPES } from '../constants';
 import { useWalletTransactions, useWalletExport, useDownloadReceipt } from '../hooks/useWalletTransactions';
@@ -29,7 +32,11 @@ export default function TransactionsPage() {
     from: '',
     to: '',
     label: 'All Time',
+<<<<<<< HEAD
   }, hydrateDateFilter);
+=======
+  });
+>>>>>>> 0e6e9b67246e905519767a76639d2addfe06681c
 
   const formattedStartDate = useMemo(() => {
     if (!dateRange.from) return undefined;

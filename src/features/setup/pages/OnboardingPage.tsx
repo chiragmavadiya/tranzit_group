@@ -10,8 +10,12 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { logout, setCredentials, setNextStep } from '@/features/auth/authSlice';
 import { useOnboarding, useLogout, useEmailVerify } from '@/features/auth/hooks/useAuth';
+<<<<<<< HEAD
 import { CustomLabel, FormInput, FormSelect } from '@/features/orders/components/OrderFormUI';
 import { Switch } from '@/components/ui/switch';
+=======
+import { FormInput, FormSelect } from '@/features/orders/components/OrderFormUI';
+>>>>>>> 0e6e9b67246e905519767a76639d2addfe06681c
 import { useAppDispatch, useAppSelector } from '@/hooks/store.hooks';
 import { AlertCircle, LogOut, Loader2, User, Building2, MapPin, CreditCard, ChevronDown } from 'lucide-react';
 import { useEffect, useState, useEffectEvent } from 'react';
@@ -19,10 +23,15 @@ import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import brandLogo from '@/assets/Tranzit_Logo.svg';
 import { showToast } from '@/components/ui/custom-toast';
 import { PlaceAutocomplete } from '@/components/common/AutoComplateAddress';
+<<<<<<< HEAD
 import { STATES, PRIVACY_POLICY_URL, TERMS_CONDITIONS_URL, SENDER_NAME_MAX_LENGTH } from '@/constants';
 import { cleanSpaces, isPhoneValid, PHONE_ERROR_MESSAGE } from '@/lib/phone';
 import { useValidateLocality } from '@/hooks/useValidateLocality';
 import { LocalityWarning } from '@/components/common/LocalityWarning';
+=======
+import { STATES, PRIVACY_POLICY_URL, TERMS_CONDITIONS_URL } from '@/constants';
+import { cleanSpaces, isPhoneValid } from '@/lib/utils';
+>>>>>>> 0e6e9b67246e905519767a76639d2addfe06681c
 
 const SectionHeader = ({ title, icon: Icon, children }: { title: string, icon: any, children?: React.ReactNode }) => (
   <div className="flex items-center justify-between pb-3 border-b border-slate-50 dark:border-zinc-800/50 mb-6">
@@ -111,6 +120,7 @@ export default function OnboardingPage() {
       showToast("ABN / ACN cannot be longer than 11 characters", "error");
       return
     }
+<<<<<<< HEAD
     if (field === 'sender_name') {
       if (value && value.length > SENDER_NAME_MAX_LENGTH) {
         showToast(`Sender name cannot be longer than ${SENDER_NAME_MAX_LENGTH} characters`, "error");
@@ -126,6 +136,9 @@ export default function OnboardingPage() {
       }
       return next;
     });
+=======
+    setFormData(prev => ({ ...prev, [field]: value }));
+>>>>>>> 0e6e9b67246e905519767a76639d2addfe06681c
   };
 
   const handleLogout = () => {
@@ -170,7 +183,11 @@ export default function OnboardingPage() {
     e.preventDefault();
     setIsSubmitted(true);
     if (!isPhoneValid(formData.mobile)) {
+<<<<<<< HEAD
       showToast(PHONE_ERROR_MESSAGE, "error");
+=======
+      showToast("Invalid mobile number", "error");
+>>>>>>> 0e6e9b67246e905519767a76639d2addfe06681c
       return false;
     };
     if (!validateForm()) {
@@ -292,7 +309,10 @@ export default function OnboardingPage() {
           email: user.email,
           first_name: user.first_name,
           last_name: user.last_name,
+<<<<<<< HEAD
           sender_name: prev.sender_name || `${user.first_name || ''} ${user.last_name || ''}`.trim().slice(0, SENDER_NAME_MAX_LENGTH),
+=======
+>>>>>>> 0e6e9b67246e905519767a76639d2addfe06681c
           mobile: user.personal_mobile || '',
           business_name: user?.addresses && user?.addresses[0]?.company_name,
           gst_number: user.gst_number || '',
@@ -546,11 +566,19 @@ export default function OnboardingPage() {
                         handleChange('addressSelected', true);
                       }}
                       onChange={(value) => { handleChange('address_info', value); handleChange('addressSelected', false) }}
+<<<<<<< HEAD
                       // error={isSubmitted && formData.address_info?.trim() === ''}
                       // errormsg='Please enter your address'
                       placeholder='Search your address'
                       value={formData.address_info}
                       // required
+=======
+                      error={isSubmitted && formData.address_info?.trim() === ''}
+                      errormsg='Please enter your address'
+                      placeholder='Search your address'
+                      value={formData.address_info}
+                      required
+>>>>>>> 0e6e9b67246e905519767a76639d2addfe06681c
                     />
                   </div>
                   <div className="grid grid-cols-12  gap-5">
@@ -655,6 +683,115 @@ export default function OnboardingPage() {
                     <Label htmlFor="billing_same" className="text-[12px] font-bold text-slate-600 dark:text-zinc-400 cursor-pointer tracking-wide">
                       Same as pickup address
                     </Label>
+<<<<<<< HEAD
+=======
+                  </div>
+                </SectionHeader>
+
+                <div className="space-y-4">
+                  <div>
+                    <PlaceAutocomplete
+                      label="Address Information"
+                      onPlaceSelect={(opt) => {
+                        handleChange('billing_address_info', opt.formatted_address);
+                        handleChange('billing_address', opt.address1);
+                        handleChange('billing_unit_number', opt.unit_number);
+                        handleChange('billing_street_name', opt.street_name);
+                        handleChange('billing_street_number', opt.street_number);
+                        handleChange('billing_street_type', opt.street_type);
+                        handleChange('billing_suburb', opt.suburb);
+                        handleChange('billing_state', opt.state);
+                        handleChange('billing_country', opt.country);
+                        handleChange('billing_postcode', opt.post_code);
+                        handleChange('billingAddressSelected', true);
+                      }}
+                      onChange={(value) => { handleChange('billing_address_info', value); handleChange('billingAddressSelected', false) }}
+                      error={isSubmitted && formData.hasBillingAddress && formData.billing_address_info?.trim() === ''}
+                      errormsg='Please enter your billing address'
+                      value={formData.billing_address_info}
+                      placeholder='Search your address'
+                      required
+                      disabled={!formData.hasBillingAddress}
+                    />
+                  </div>
+
+                  <div className="grid grid-cols-12 gap-5">
+                    <FormInput
+                      isHalf
+                      label="Billing Unit Number"
+                      placeholder="Enter your unit number"
+                      value={formData.billing_unit_number}
+                      onChange={(val) => handleChange('billing_unit_number', val)}
+                      disabled={!formData.hasBillingAddress}
+                    />
+                    <FormInput
+                      isHalf
+                      label="Billing Street"
+                      placeholder="Street address"
+                      value={formData.billing_address}
+                      onChange={(val) => { handleChange('billing_address', val); handleChange('billing_street_name', val) }}
+                      required
+                      error={isSubmitted && formData.hasBillingAddress && formData.billing_address?.trim() === ''}
+                      errormsg="Please enter your street"
+                      disabled={!formData.hasBillingAddress || formData.billingAddressSelected}
+                    />
+                  </div>
+
+                  <div className="grid grid-cols-12 gap-5">
+                    <div className="col-span-12 md:col-span-3">
+                      <FormInput
+                        isFullWidth
+                        label="Suburb"
+                        placeholder="Sydney"
+                        value={formData.billing_suburb}
+                        onChange={(val) => handleChange('billing_suburb', val)}
+                        required
+                        error={isSubmitted && formData.hasBillingAddress && formData.billing_suburb?.trim() === ''}
+                        errormsg="Please enter your suburb"
+                        disabled={!formData.hasBillingAddress || formData.billingAddressSelected}
+                      />
+                    </div>
+                    <div className="col-span-12 md:col-span-3">
+                      <FormSelect
+                        label="State"
+                        placeholder='Select State'
+                        options={STATES}
+                        value={formData.billing_state}
+                        onValueChange={(val) => handleChange('billing_state', val)}
+                        required
+                        error={isSubmitted && formData.hasBillingAddress && formData.billing_state?.trim() === ''}
+                        errormsg="Please select your state"
+                        disabled={!formData.hasBillingAddress || formData.billingAddressSelected}
+                      />
+                    </div>
+                    <div className="col-span-12 md:col-span-3">
+                      <FormInput
+                        isFullWidth
+                        label="Postcode"
+                        placeholder="2000"
+                        value={formData.billing_postcode}
+                        onChange={(val) => handleChange('billing_postcode', val)}
+                        required
+                        error={isSubmitted && formData.hasBillingAddress && formData.billing_postcode?.trim() === ''}
+                        errormsg="Please enter your postcode"
+                        disabled={!formData.hasBillingAddress || formData.billingAddressSelected}
+                      />
+                    </div>
+                    <div className="col-span-12 md:col-span-3">
+                      <FormInput
+                        isFullWidth
+                        label="Country"
+                        placeholder="Australia"
+                        value={formData.billing_country || "Australia"}
+                        // onChange={(val) => handleChange('billing_country', val)}
+                        required
+                        error={isSubmitted && formData.hasBillingAddress && formData.billing_country?.trim() === ''}
+                        errormsg="Please enter your country"
+                        disabled
+                      />
+                    </div>
+
+>>>>>>> 0e6e9b67246e905519767a76639d2addfe06681c
                   </div>
                 </SectionHeader>
 

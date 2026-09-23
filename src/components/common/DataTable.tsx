@@ -1,5 +1,10 @@
+<<<<<<< HEAD
 import { useState, useMemo, memo } from 'react';
 import type { MouseEvent, ReactNode } from 'react'
+=======
+import { useState, useEffect, memo } from 'react';
+import type { ReactNode } from 'react'
+>>>>>>> 0e6e9b67246e905519767a76639d2addfe06681c
 import { ArrowUp, ArrowDown, Search, Settings } from 'lucide-react';
 import {
   Table,
@@ -10,7 +15,10 @@ import {
   TableRow
 } from '@/components/ui/table';
 import { Checkbox } from '@/components/ui/checkbox';
+<<<<<<< HEAD
 import { Button } from '@/components/ui/button';
+=======
+>>>>>>> 0e6e9b67246e905519767a76639d2addfe06681c
 import { cn, getNestedValue } from '@/lib/utils';
 import { usePagination } from './hooks/usePagination';
 import { Pagination } from './Pagination';
@@ -20,7 +28,10 @@ import type { Column, DataTableProps, SortConfig } from './types/DataTable.types
 import DropdownCustomContent from '../ui/dropdown-menu';
 import { CustomLabel, FormInput, FormSelect } from '@/features/orders/components/OrderFormUI';
 import { ExportMenu } from './ExportMenu';
+<<<<<<< HEAD
 import useLocalStorage from '@/hooks/useLocalStorage';
+=======
+>>>>>>> 0e6e9b67246e905519767a76639d2addfe06681c
 
 const DataTableComponent = <T extends Record<string, any>>(props: DataTableProps<T>) => {
   const {
@@ -79,6 +90,7 @@ const DataTableComponent = <T extends Record<string, any>>(props: DataTableProps
   const [internalSearch, setInternalSearch] = useState('');
   const [internalSortConfig, setInternalSortConfig] = useState<SortConfig>({ key: null, direction: null });
   const [internalSelectedRows, setInternalSelectedRows] = useState<string[]>([]);
+<<<<<<< HEAD
   const [colDropdownOpen, setColDropdownOpen] = useState(false);
   // Persist the hidden keys rather than the visible ones, so a column added in a later
   // release shows up by default instead of disappearing for users who already saved a
@@ -198,6 +210,29 @@ const DataTableComponent = <T extends Record<string, any>>(props: DataTableProps
       <Settings className="w-4 h-4" />
     </DropdownCustomContent>
   );
+=======
+  const [visibleColumns, setVisibleColumns] = useState<string[]>(columns.map(c => c.key));
+  const [colDropdownOpen, setColDropdownOpen] = useState(false);
+
+  useEffect(() => {
+    setVisibleColumns(columns.map(c => c.key));
+  }, [columns]);
+
+  const handleToggleColumn = (columnKey: string) => {
+    setVisibleColumns(prev => {
+      if (prev.includes(columnKey)) {
+        if (prev.length <= 1) return prev;
+        return prev.filter(k => k !== columnKey);
+      } else {
+        return [...prev, columnKey];
+      }
+    });
+  };
+
+  const renderedColumns = columns.length > 7
+    ? columns.filter(c => visibleColumns.includes(c.key))
+    : columns;
+>>>>>>> 0e6e9b67246e905519767a76639d2addfe06681c
 
   // Use controlled or uncontrolled values
   const currentSearch = searchValue !== undefined ? searchValue : internalSearch;
@@ -397,7 +432,11 @@ const DataTableComponent = <T extends Record<string, any>>(props: DataTableProps
               )}
 
               {renderedColumns.map((column, index) => {
+<<<<<<< HEAD
                 const originalIndex = columnIndexes.get(column) ?? -1;
+=======
+                const originalIndex = columns.indexOf(column);
+>>>>>>> 0e6e9b67246e905519767a76639d2addfe06681c
                 return (
                   <TableHead
                     key={`${column.key}-${originalIndex}`}
@@ -424,7 +463,59 @@ const DataTableComponent = <T extends Record<string, any>>(props: DataTableProps
                       </div>}
                       {columns.length > 7 && index === renderedColumns.length - 1 && (
                         <div onClick={(e) => e.stopPropagation()} className="ml-auto flex items-center print:hidden">
+<<<<<<< HEAD
                           {columnSettingsMenu}
+=======
+                          <DropdownCustomContent
+                            open={colDropdownOpen}
+                            onOpenChange={setColDropdownOpen}
+                            triggerClassName="p-1 rounded-md hover:bg-gray-100 dark:hover:bg-zinc-800 text-gray-500 dark:text-zinc-400 hover:text-gray-900 dark:hover:text-zinc-100 transition-colors cursor-pointer outline-none"
+                            contentClassName="border border-gray-200 dark:border-zinc-800 shadow-lg"
+                            content={
+                              <div
+                                className="flex flex-col max-h-[300px] overflow-y-auto p-2 bg-white dark:bg-zinc-950 text-gray-800 dark:text-zinc-200"
+                                onClick={(e) => e.stopPropagation()}
+                              >
+                                <div className="px-2 py-1.5 text-xs font-semibold text-gray-500 dark:text-zinc-400 uppercase tracking-wide">
+                                  Toggle Columns
+                                </div>
+                                <div className="h-px my-1 bg-gray-100 dark:bg-zinc-800" />
+                                {columns.filter((c) => !c.disableToggle).map((col) => {
+                                  const isChecked = visibleColumns.includes(col.key);
+                                  const isDisabled = isChecked && visibleColumns.length <= 1;
+                                  return (
+                                    <div
+                                      key={col.key}
+                                      className={cn(
+                                        "flex items-center gap-2.5 px-2 py-1.5 rounded-md hover:bg-slate-50 dark:hover:bg-zinc-900 cursor-pointer text-sm font-medium transition-colors select-none",
+                                        isDisabled && "opacity-50 cursor-not-allowed"
+                                      )}
+                                      onClick={() => {
+                                        if (!isDisabled) {
+                                          handleToggleColumn(col.key);
+                                        }
+                                      }}
+                                    >
+                                      <Checkbox
+                                        checked={isChecked}
+                                        onCheckedChange={() => {
+                                          if (!isDisabled) {
+                                            handleToggleColumn(col.key);
+                                          }
+                                        }}
+                                        onClick={(e) => e.stopPropagation()}
+                                        disabled={isDisabled}
+                                      />
+                                      <span className="truncate">{col.header || col.key}</span>
+                                    </div>
+                                  );
+                                })}
+                              </div>
+                            }
+                          >
+                            <Settings className="w-4 h-4" />
+                          </DropdownCustomContent>
+>>>>>>> 0e6e9b67246e905519767a76639d2addfe06681c
                         </div>
                       )}
                     </div>
@@ -458,7 +549,11 @@ const DataTableComponent = <T extends Record<string, any>>(props: DataTableProps
                       isSelected
                         ? "bg-slate-100 dark:bg-zinc-900"
                         : "bg-white dark:bg-zinc-950 hover:bg-primary/5 dark:hover:bg-primary/10",
+<<<<<<< HEAD
                       (onRowClick || (selectable && selectOnRowClick)) && "cursor-pointer",
+=======
+                      onRowClick && "cursor-pointer",
+>>>>>>> 0e6e9b67246e905519767a76639d2addfe06681c
                       typeof rowClassName === 'function' ? rowClassName(row, index) : rowClassName
                     )}
                     aria-selected={selectable ? isSelected : undefined}
@@ -480,12 +575,20 @@ const DataTableComponent = <T extends Record<string, any>>(props: DataTableProps
                     )}
 
                     {renderedColumns.map((column) => {
+<<<<<<< HEAD
                       const originalIndex = columnIndexes.get(column) ?? -1;
+=======
+                      const originalIndex = columns.indexOf(column);
+>>>>>>> 0e6e9b67246e905519767a76639d2addfe06681c
                       return (
                         <TableCell
                           key={`${column.key}-${rowId}-${originalIndex}`}
                           className={cn(
+<<<<<<< HEAD
                             `px-3 break-normal py-[6px] min-h-12 text-[13px] xl:text-sm text-gray-800 dark:text-zinc-300 whitespace-normal transition-colors`,
+=======
+                            `px-3 break-normal py-[10px] min-h-12 text-[13px] xl:text-sm text-gray-800 dark:text-zinc-300 whitespace-normal transition-colors`,
+>>>>>>> 0e6e9b67246e905519767a76639d2addfe06681c
                             column.sticky === 'left' && cn(
                               "sticky left-0 shadow-[inset_-1px_0_0_0_#ebe6e7] dark:shadow-[inset_-1px_0_0_0_#27272a]",
                               isSelected

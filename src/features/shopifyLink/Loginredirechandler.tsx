@@ -9,6 +9,7 @@ type Props = {
 };
 
 /**
+<<<<<<< HEAD
  * A leading "/" alone is not enough: "//evil.com" and "/\evil.com" are protocol-relative
  * URLs that send the freshly signed-in user straight off the site.
  */
@@ -16,6 +17,8 @@ const isSameOriginPath = (value: string) =>
   value.startsWith('/') && !value.startsWith('//') && !value.startsWith('/\\');
 
 /**
+=======
+>>>>>>> 0e6e9b67246e905519767a76639d2addfe06681c
 * Add to your existing Login page (or call this hook inside it).
 * - Shows ?error= from Shopify OAuth failures
 * - After login, sends user to ?redirect= (e.g. /shopify/link?token=...)
@@ -48,7 +51,11 @@ export function useLoginRedirectHandler(onToast?: ToastFn) {
 
   function redirectAfterLogin(): boolean {
     const redirect = searchParams.get('redirect');
+<<<<<<< HEAD
     if (redirect && isSameOriginPath(redirect)) {
+=======
+    if (redirect && redirect.startsWith('/')) {
+>>>>>>> 0e6e9b67246e905519767a76639d2addfe06681c
       // Use full navigation so /shopify/link remounts and runs link API
       window.location.href = redirect;
       return true;

@@ -1,5 +1,6 @@
 import type { CustomerIntegration } from "../customers/types";
 
+<<<<<<< HEAD
 /** Shopify: one rate provider (carrier service) registered on the store. `id` is Shopify's own id. */
 export interface ShopifyShippingMethod {
     id: string;
@@ -7,6 +8,8 @@ export interface ShopifyShippingMethod {
     active: boolean;
 }
 
+=======
+>>>>>>> 0e6e9b67246e905519767a76639d2addfe06681c
 export interface IntegrationData {
     courier?: string;
     connected: boolean;
@@ -50,6 +53,7 @@ export interface IntegrationsResponse {
 }
 
 
+<<<<<<< HEAD
 
 
 
@@ -124,6 +128,12 @@ export interface ShoplineParcelDefaultsPayload {
     default_package_height: number;
     default_package_weight: number;
 }
+=======
+
+
+
+
+>>>>>>> 0e6e9b67246e905519767a76639d2addfe06681c
 
 export interface WooCommerceConnectData {
     store_url: string;

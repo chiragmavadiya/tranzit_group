@@ -35,16 +35,22 @@ export const API_ENDPOINTS = {
         RECEIVER_ADDRESS: (id: string | number) => `/customer/orders/${id}/receiver-address`,
         IMPORT_SAMPLE: "/customer/orders/import/sample",
         ARCHIVE: (id: string | number) => `/orders/${id}/archive`,
+<<<<<<< HEAD
         MASS_CANCEL: "/orders/mass-cancel",
         MASS_ARCHIVE: "/orders/mass-archive",
         RESTORE: (orderNumber: string | number) => `/admin/orders/${orderNumber}/restore`,
         PRINT_ORDER: "/orders/print-label",
         PACKING_SLIP: "/orders/packing-slip",
         PACKING_SUMMARY: "/orders/packing-summary",
+=======
+        RESTORE: (orderNumber: string | number) => `/admin/orders/${orderNumber}/restore`,
+        PRINT_ORDER: "/orders/print-label",
+>>>>>>> 0e6e9b67246e905519767a76639d2addfe06681c
         UPDATE_COURIER: (orderNumber: string) => `/orders/${orderNumber}/courier`,
         AUSPOST_MANIFEST: "/customer/orders/auspost/manifests",
         MANUAL_STORE: "/admin/orders/manual-store",
         ADD_MANUAL_TRACKING_NUMBERS: (orderNumber: string) => `/admin/orders/${orderNumber}/tracking`,
+<<<<<<< HEAD
         PRINT_LABELS_CHECK: "/orders/print-labels/check",
         PRINT_LABELS: "/orders/print-labels",
         PRINT_LABELS_STATUS: (printId: string) => `/orders/print-labels/${printId}`,
@@ -63,6 +69,8 @@ export const API_ENDPOINTS = {
     // Authenticated customer branding for the public tracking page.
     TRACKING_PAGE: {
         SETTINGS: "/tracking-page/settings",
+=======
+>>>>>>> 0e6e9b67246e905519767a76639d2addfe06681c
     },
     DASHBOARD: {
         METRICS: "/dashboard/metrics",
@@ -122,13 +130,19 @@ export const API_ENDPOINTS = {
         INVOICE: (id: string | number) => `/admin/customers/${id}/invoice`,
         VERIFY: (id: string | number) => `/admin/customers/${id}/verify`,
         TOGGLE_STATUS: (id: string | number) => `/admin/customers/${id}/toggle-status`,
+<<<<<<< HEAD
         ACCOUNT_ACTIVATION: (id: string | number) => `/admin/customers/${id}/toggle-account-activation`,
+=======
+>>>>>>> 0e6e9b67246e905519767a76639d2addfe06681c
         EXPORT: "/admin/customers/export",
         ORDERS_EXPORT: (id: string | number) => `/admin/customers/${id}/orders/export`,
         TRANSACTION_EXPORT: (id: string | number) => `/admin/customers/${id}/transaction/export`,
         INVOICE_EXPORT: (id: string | number) => `/admin/customers/${id}/invoice/export`,
         INTEGRATIONS: (id: string | number) => `/admin/customers/${id}/integrations`,
+<<<<<<< HEAD
         ITEMS: (id: string | number) => `/admin/customers/${id}/items`,
+=======
+>>>>>>> 0e6e9b67246e905519767a76639d2addfe06681c
         WALLET_TOP_UP: "/admin/wallet/top-up",
         CHANGE_PASSWORD: (id: string | number) => `/admin/customers/${id}/change-password`,
         ME: (id: string | number) => `/admin/customers/${id}/me`,
@@ -163,9 +177,12 @@ export const API_ENDPOINTS = {
     CUSTOMER_QUOTES: {
         SERVICES: "/get-quote/services",
         LOCALITIES_SEARCH: "/localities/search",
+<<<<<<< HEAD
     },
     LOCALITIES: {
         VALIDATE: "/localities/validate",
+=======
+>>>>>>> 0e6e9b67246e905519767a76639d2addfe06681c
     },
     ADMIN_COURIER_SURCHARGES: {
         BASE: "/admin/courier-surcharges",
@@ -183,8 +200,11 @@ export const API_ENDPOINTS = {
         PARCELS_EXPORT: "/admin/reports/customer-parcels/export",
         INTEGRATED_PARCELS: "/admin/reports/integrated-courier-parcels",
         INTEGRATED_PARCELS_EXPORT: "/admin/reports/integrated-courier-parcels/export",
+<<<<<<< HEAD
         ALL_PARCELS: "/admin/reports/all-parcels",
         ALL_PARCELS_EXPORT: "/admin/reports/all-parcels/export",
+=======
+>>>>>>> 0e6e9b67246e905519767a76639d2addfe06681c
         AUSPOST_ORDER_SUMMARY: "/admin/reports/auspost-order-summary",
         AUSPOST_ORDER_SUMMARY_EXPORT: "/admin/reports/auspost-order-summary/export",
         UNDELIVERED_PARCELS: "/admin/reports/undelivered-parcels",
@@ -238,6 +258,7 @@ export const API_ENDPOINTS = {
         DISCONNECT: (provider: string) => `/integrations/${provider}/disconnect`,
         SYNC: (provider: string) => `/integrations/${provider}/sync`,
         AUTO_FULFILLMENT: "/integrations/shopify/auto-fulfillment",
+<<<<<<< HEAD
         SHOPIFY_LIVE_RATES: "/integrations/shopify/live-rates",
         SHOPIFY_LIVE_RATES_SETTINGS: "/integrations/shopify/live-rates/settings",
         SHOPIFY_PARCEL_DEFAULTS: "/integrations/shopify/package-defaults",
@@ -245,10 +266,13 @@ export const API_ENDPOINTS = {
         SHOPIFY_SHIPPING_METHODS: "/customer/integrations/shopify/shipping-methods",
         SHOPIFY_SHIPPING_METHOD: (id: string) => `/customer/integrations/shopify/shipping-methods/${id}`,
         SHOPLINE_PARCEL_DEFAULTS: "/integrations/shopline/package-defaults",
+=======
+>>>>>>> 0e6e9b67246e905519767a76639d2addfe06681c
         SAVE_WOOCOMMERCE: "/integrations/woocommerce/save",
         PRODUCTS_STATUS: (provider: string) => `/integrations/${provider}/products/status`,
         ADVANCED_SETTINGS: (provider: string) => `/integrations/${provider}/advanced-settings`,
         PRODUCTS: (provider: string) => `/integrations/${provider}/products`,
+<<<<<<< HEAD
         MANUAL_PRODUCT_DETAILS: (provider: string, productCode: string) => `/integrations/${provider}/products/${productCode}`,
         PATCH_PRODUCT_STATUS: (provider: string, productCode: string) => `/integrations/${provider}/products/${productCode}/status`,
         DEFAULT: (provider: string) => `/integrations/${provider}/default`,
@@ -259,6 +283,15 @@ export const API_ENDPOINTS = {
         SHOPLINE_AUTO_FULFILLMENT: "/integrations/shopline/auto-fulfillment",
         ETSY_AUTO_SYNC: "/integrations/etsy/auto-sync",
         ETSY_AUTO_FULFILLMENT: "/integrations/etsy/auto-fulfillment",
+=======
+        MANUAL_PRODUCTS: (provider: string) => `/integrations/${provider}/products/manual`,
+        MANUAL_PRODUCT_DETAILS: (provider: string, productCode: string) => `/integrations/${provider}/products/${productCode}`,
+        PATCH_PRODUCT_STATUS: (provider: string, productCode: string) => `/integrations/${provider}/products/${productCode}/status`,
+        DELIVERY_PREFERENCES: "/integrations/tranzit-group/delivery-preferences",
+        DEFAULT: (provider: string) => `/integrations/${provider}/default`,
+        EBAY_AUTO_SYNC: "/integrations/ebay/auto-sync",
+        EBAY_AUTO_FULFILLMENT: "/integrations/ebay/auto-fulfillment",
+>>>>>>> 0e6e9b67246e905519767a76639d2addfe06681c
     },
     PLAN: {
         SELECT: "/customer/plans/select"
@@ -276,6 +309,7 @@ export const API_ENDPOINTS = {
     RULES: {
         BASE: "/customer/rule-management",
         OPTIONS: "/customer/rule-management/options",
+<<<<<<< HEAD
         REORDER: "/customer/rule-management/reorder",
         RUN: "/customer/rule-management/run",
         RUN_STATUS: "/customer/rule-management/run-status",
@@ -288,6 +322,10 @@ export const API_ENDPOINTS = {
         SUMMARY: "/customer/packing-slip-settings/summary",
         SUMMARY_SAMPLE: "/customer/packing-slip-settings/summary/sample",
     },
+=======
+        DETAILS: (id: string | number) => `/customer/rule-management/${id}`,
+    },
+>>>>>>> 0e6e9b67246e905519767a76639d2addfe06681c
     ADMIN_DEBUG_CENTRE: {
         BASE: "/admin/debug-centre",
         STATS: "/admin/debug-centre/counts",
@@ -313,9 +351,12 @@ export const QUERY_KEYS = {
         PAYMENT_INFO: (id: string | number) => ["orders", "payment", id],
         COUNTS: (customer?: string | number) => ["orders", "counts", customer || "all"],
         RECEIVER_ADDRESS: (id: string | number) => ["orders", "receiver-address", id],
+<<<<<<< HEAD
         PRINT_LABELS_STATUS: (printId: string) => ["orders", "print-labels", printId],
         BULK_PRINT_LIST: ["orders", "bulk-print", "list"],
         BULK_PRINT_DETAILS: (batchId: string) => ["orders", "bulk-print", "details", batchId],
+=======
+>>>>>>> 0e6e9b67246e905519767a76639d2addfe06681c
     },
     PUBLIC_TRACKING: (method: string, value: string) => ["public-tracking", method, value],
     TRACKING_PAGE_SETTINGS: ["tracking-page", "settings"],
@@ -365,7 +406,10 @@ export const QUERY_KEYS = {
         TRANSACTION: (id: string | number) => ["admin", "customers", "transaction", id],
         INVOICE: (id: string | number) => ["admin", "customers", "invoice", id],
         INTEGRATIONS: (id: string | number) => ["admin", "customers", "integrations", id],
+<<<<<<< HEAD
         ITEMS: (id: string | number) => ["admin", "customers", "items", id],
+=======
+>>>>>>> 0e6e9b67246e905519767a76639d2addfe06681c
         ME: (id: string | number) => ["admin", "customers", "me", id],
     },
     ADMIN_STAFF: {
@@ -416,13 +460,22 @@ export const QUERY_KEYS = {
     },
     LOCALITIES: {
         SEARCH: (q: string) => ["localities", "search", q],
+<<<<<<< HEAD
         VALIDATE: (suburb: string, state: string, postcode: string, address: string) => ["localities", "validate", suburb, state, postcode, address],
+=======
+>>>>>>> 0e6e9b67246e905519767a76639d2addfe06681c
     },
     INTEGRATIONS: {
         LIST: ["integrations"],
         STATUS: (provider: string) => ["integration-status", provider],
+<<<<<<< HEAD
         SHOPIFY_LIVE_RATES_SETTINGS: (storeId: string | number) => ["shopify-live-rates-settings", storeId],
         MANUAL_PRODUCTS: (provider: string) => ["manual-products", provider],
+=======
+        MANUAL_PRODUCTS: (provider: string) => ["manual-products", provider],
+        PRODUCTS: (provider: string) => ["products", provider],
+        DELIVERY_PREFERENCES: ["delivery-preferences"],
+>>>>>>> 0e6e9b67246e905519767a76639d2addfe06681c
     },
     MANIFEST: {
         LIST: ["manifests", "list"],
@@ -440,12 +493,15 @@ export const QUERY_KEYS = {
         LIST: ["rules", "list"],
         DETAILS: (id: string | number) => ["rules", "details", id],
         OPTIONS: ["rules", "options"],
+<<<<<<< HEAD
         RUN_STATUS: ["rules", "run-status"],
     },
     PACKING_DOCUMENTS: {
         SLIP_SETTINGS: ["settings", "packing-slip"],
         SUMMARY_SETTINGS: ["settings", "packing-summary"],
         SORTING: ["settings", "packing-sorting"],
+=======
+>>>>>>> 0e6e9b67246e905519767a76639d2addfe06681c
     },
     XERO: {
         STATUS: ["admin", "xero", "status"],

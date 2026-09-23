@@ -120,9 +120,13 @@ export const useLogout = () => {
 
     return useMutation({
         mutationFn: useCallback(() => authService.logout(), []),
+<<<<<<< HEAD
         // onSettled, not onSuccess: a failed or unreachable logout endpoint must never
         // leave the token, role and cached data behind on the device.
         onSettled: () => {
+=======
+        onSuccess: () => {
+>>>>>>> 0e6e9b67246e905519767a76639d2addfe06681c
             // Track logout event in Google Analytics
             trackLogout(user?.id, user?.email);
 
@@ -168,6 +172,7 @@ export const useResetPassword = () => {
     });
 };
 
+<<<<<<< HEAD
 /**
  * Hook to accept the latest Terms and Conditions
  */
@@ -189,6 +194,8 @@ export const useAcceptTerms = () => {
     });
 };
 
+=======
+>>>>>>> 0e6e9b67246e905519767a76639d2addfe06681c
 // select plan api
 export const useSelectPlan = () => {
     return useMutation({

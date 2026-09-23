@@ -46,11 +46,15 @@ export const ProfileTab = ({ customerId }: ProfileTabProps) => {
         { key: "DirectFreight", name: "Direct Freight Express", enableKey: "direct_freight_active" },
         { key: "AusPost", name: "Auspost Tranzit Group", enableKey: "auspost_active" },
         { key: "CouriersPlease", name: "Courier Please", enableKey: "couriersplease_active" },
+<<<<<<< HEAD
         { key: "Aramex", name: "Aramex Tranzit Group", enableKey: "aramex_active" },
         { key: "Pallet", name: "Pallet Tranzit Group", enableKey: "pallet_active" },
         { key: "Fedex", name: "Fedex Tranzit Group", enableKey: "fedex_active" },
         { key: "TNT", name: "TNT Tranzit Group", enableKey: "tnt_active" },
         { key: "TEG", name: "TEG Tranzit Group", enableKey: "teg_active" }
+=======
+        { key: "Pallet", name: "Pallet Tranzit Group", enableKey: "pallet_active" }
+>>>>>>> 0e6e9b67246e905519767a76639d2addfe06681c
     ].filter((courier) => (customer as any)[courier.enableKey]).map(courier => {
         const markup = markupCharges.find((c: any) => c.courier === courier.key) || { over_3kg: 0, over_5kg: 0, over_10kg: 0, over_15kg: 0 };
         const pickup = pickupCharges.find((c: any) => c.courier === courier.key) || { over_3kg: 0, over_5kg: 0, over_10kg: 0, over_15kg: 0 };

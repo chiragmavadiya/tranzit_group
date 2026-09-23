@@ -30,7 +30,10 @@ export default function LowBalanceModal({ open, onOpenChange, balance }: LowBala
       title="Service Reminder: Low Available Credit Balance"
       contentClass="min-w-0 sm:min-w-[500px] sm:max-w-[650px]"
       showFooter={false}
+<<<<<<< HEAD
       disablePointerDismissal={true}
+=======
+>>>>>>> 0e6e9b67246e905519767a76639d2addfe06681c
     >
       <div className="flex flex-col gap-4 text-left p-1">
         {/* Greeting */}

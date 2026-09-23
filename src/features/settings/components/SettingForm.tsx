@@ -35,6 +35,8 @@ const SettingForm = ({ category }: { category: any }) => {
         return key.split('_').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
     };
 
+    console.log(payload, 'payload')
+
     useEffect(() => {
         if (detailResponse?.data) {
             const initialPayload: Record<string, any> = {};

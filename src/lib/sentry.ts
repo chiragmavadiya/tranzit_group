@@ -1,4 +1,5 @@
 import * as Sentry from "@sentry/react";
+<<<<<<< HEAD
 import axios from "axios";
 
 Sentry.init({
@@ -9,6 +10,12 @@ Sentry.init({
         if (e && typeof e === 'object' && 'code' in e && e.code === 'ERR_NETWORK' && !navigator.onLine) return null;
         return event;
     },
+=======
+
+Sentry.init({
+    dsn: import.meta.env.VITE_SENTRY_DSN,
+
+>>>>>>> 0e6e9b67246e905519767a76639d2addfe06681c
     integrations: [
         Sentry.browserTracingIntegration(),
     ],

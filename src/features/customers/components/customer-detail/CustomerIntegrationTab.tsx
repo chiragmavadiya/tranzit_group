@@ -1,9 +1,14 @@
 import { useCustomerIntegrations } from '../../hooks/useCustomers';
+<<<<<<< HEAD
 import { Truck, ShoppingCart, Check } from "lucide-react";
 import { useMemo } from 'react';
 import { DataTable } from '@/components/common/DataTable';
 import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
+=======
+import { Truck, ShoppingCart } from "lucide-react";
+import RenderIntegrationSection from '@/features/integrations/components/RenderIntegrationSection';
+>>>>>>> 0e6e9b67246e905519767a76639d2addfe06681c
 
 interface CustomerIntegrationTabProps {
     customerId: string;
@@ -14,6 +19,7 @@ export const CustomerIntegrationTab = ({ customerId }: CustomerIntegrationTabPro
 
     const data = response?.data;
 
+<<<<<<< HEAD
     const courierData = useMemo(() => {
         return data?.courier_integrations.filter((item: any) => item.connected) || [];
     }, [data]);
@@ -181,6 +187,28 @@ export const CustomerIntegrationTab = ({ customerId }: CustomerIntegrationTabPro
                     </div>
                 )}
             </div>
+=======
+    return (
+        <div className="space-y-8 animate-in fade-in duration-500 bg-white dark:bg-zinc-950 p-4 rounded-md">
+            {/* {renderIntegrationSection('courier_integrations', 'Courier Integrations', Truck)} */}
+            {/* {renderIntegrationSection('ecommerce_connections', 'E-commerce Integrations', ShoppingCart)} */}
+            <RenderIntegrationSection
+                data={data?.courier_integrations.filter((item: any) => item.connected)}
+                // disconnectMutation={disconnectMutation}
+                fromCustomer={true}
+                title="Courier Integrations"
+                Icon={Truck}
+                isLoading={isLoading}
+            />
+            <RenderIntegrationSection
+                data={data?.ecommerce_connections.filter((item: any) => item.connected)}
+                // disconnectMutation={disconnectMutation}
+                fromCustomer={true}
+                title="E-commerce Integrations"
+                Icon={ShoppingCart}
+                isLoading={isLoading}
+            />
+>>>>>>> 0e6e9b67246e905519767a76639d2addfe06681c
         </div>
     );
 };

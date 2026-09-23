@@ -5,8 +5,13 @@ import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import { Loader2, XIcon } from "lucide-react"
 
+<<<<<<< HEAD
 function Dialog({ modal = false, ...props }: DialogPrimitive.Root.Props) {
   return <DialogPrimitive.Root data-slot="dialog" {...props} modal={modal} />
+=======
+function Dialog({ ...props }: DialogPrimitive.Root.Props) {
+  return <DialogPrimitive.Root data-slot="dialog" {...props} modal={false} />
+>>>>>>> 0e6e9b67246e905519767a76639d2addfe06681c
 }
 
 function DialogTrigger({ ...props }: DialogPrimitive.Trigger.Props) {
@@ -51,7 +56,11 @@ function DialogContent({
       <DialogPrimitive.Popup
         data-slot="dialog-content"
         className={cn(
+<<<<<<< HEAD
           "fixed top-1/2 left-1/2 z-50 grid w-[calc(100%-2rem)] max-w-[calc(100%-2rem)] sm:w-full sm:max-w-[calc(100%-2rem)] -translate-x-1/2 -translate-y-1/2 gap-4 rounded-sm bg-popover p-3 sm:p-4 text-xs text-popover-foreground ring-1 ring-foreground/10 duration-100 outline-none sm:max-w-sm data-open:animate-in data-open:fade-in-0 data-open:zoom-in-95 data-closed:animate-out data-closed:fade-out-0 data-closed:zoom-out-95",
+=======
+          "fixed top-1/2 left-1/2 z-50 grid w-[calc(100%-2rem)] max-w-[calc(100%-2rem)] sm:w-full sm:max-w-[calc(100%-2rem)] -translate-x-1/2 -translate-y-1/2 gap-4 rounded-xl bg-popover p-3 sm:p-4 text-sm text-popover-foreground ring-1 ring-foreground/10 duration-100 outline-none sm:max-w-sm data-open:animate-in data-open:fade-in-0 data-open:zoom-in-95 data-closed:animate-out data-closed:fade-out-0 data-closed:zoom-out-95",
+>>>>>>> 0e6e9b67246e905519767a76639d2addfe06681c
           className
         )}
         {...props}
@@ -160,12 +169,18 @@ interface CustomModelProps {
   showFooter?: boolean;
   customFooter?: React.ReactNode;
   disablePointerDismissal?: boolean;
+<<<<<<< HEAD
   showCloseButton?: boolean;
   /** Spinner on the cancel button, for when that slot runs its own action. */
   cancelLoading?: boolean;
 }
 
 const CustomModel = ({ open, title, description, onOpenChange, children, onSubmit, onCancel, cancelText = 'Cancel', submitText = 'Submit', isLoading = false, contentClass = "", showFooter = true, customFooter, disablePointerDismissal = false, showCloseButton = true, cancelLoading = false }: CustomModelProps) => {
+=======
+}
+
+const CustomModel = ({ open, title, description, onOpenChange, children, onSubmit, onCancel, cancelText = 'Cancel', submitText = 'Submit', isLoading = false, contentClass = "", showFooter = true, customFooter, disablePointerDismissal = false }: CustomModelProps) => {
+>>>>>>> 0e6e9b67246e905519767a76639d2addfe06681c
   const handleCancel = () => {
     if (onCancel) {
       onCancel()
@@ -192,7 +207,11 @@ const CustomModel = ({ open, title, description, onOpenChange, children, onSubmi
             </DialogDescription>
           )}
         </DialogHeader>
+<<<<<<< HEAD
         <div className={cn("-mx-4 no-scrollbar flex-1 overflow-y-auto px-4", showFooter && "mb-3")} autoFocus={false}>
+=======
+        <div className="-mx-4 no-scrollbar flex-1 overflow-y-auto px-4 mb-3" autoFocus={false}>
+>>>>>>> 0e6e9b67246e905519767a76639d2addfe06681c
           {children}
         </div>
         {
@@ -206,7 +225,11 @@ const CustomModel = ({ open, title, description, onOpenChange, children, onSubmi
                   type="button"
                   variant="outline"
                   onClick={handleCancel}
+<<<<<<< HEAD
                   disabled={isLoading || cancelLoading}
+=======
+                  disabled={isLoading}
+>>>>>>> 0e6e9b67246e905519767a76639d2addfe06681c
                   className="flex-1 sm:flex-none px-4 border-gray-200 dark:border-zinc-800 font-medium hover:bg-gray-100 dark:hover:bg-zinc-800 h-8"
                 >
                   {cancelLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : null}
@@ -214,7 +237,11 @@ const CustomModel = ({ open, title, description, onOpenChange, children, onSubmi
                 </Button>
                 <Button
                   type="submit"
+<<<<<<< HEAD
                   disabled={isLoading || cancelLoading}
+=======
+                  disabled={isLoading}
+>>>>>>> 0e6e9b67246e905519767a76639d2addfe06681c
                   className="flex-1 sm:flex-none px-4 bg-primary hover:bg-primary-hover text-white font-semibold transition-all shadow-md shadow-primary/20 dark:shadow-none active:scale-[0.98] h-8"
                   onClick={onSubmit}
                 >

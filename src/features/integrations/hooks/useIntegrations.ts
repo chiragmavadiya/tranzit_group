@@ -2,10 +2,13 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { integrationService } from "../services/integrationService";
 import { showToast } from "@/components/ui/custom-toast";
 import { QUERY_KEYS } from "@/constants/api.constants";
+<<<<<<< HEAD
 import type { ShopifyLiveRatesSettingsPayload, ShopifyParcelDefaultsPayload, ShoplineParcelDefaultsPayload } from "../types";
 
 // `id` targets one store/account when a provider has several connected.
 export type IntegrationTarget = { provider: string; id?: string | number };
+=======
+>>>>>>> 0e6e9b67246e905519767a76639d2addfe06681c
 
 export const useIntegrationsList = () => {
     return useQuery({
@@ -22,6 +25,7 @@ export const useIntegrationStatus = (provider: string, enabled = true) => {
     });
 };
 
+<<<<<<< HEAD
 export const useRefreshShopifyShippingMethods = () => {
     const queryClient = useQueryClient();
     return useMutation({
@@ -68,6 +72,11 @@ export const useDeleteShopifyShippingMethod = () => {
         onError: (error: any) => {
             showToast(error.message || "Failed to remove shipping method", "error");
         }
+=======
+export const useIntegrationStatusMutation = () => {
+    return useMutation({
+        mutationFn: (provider: string) => integrationService.getStatus(provider)
+>>>>>>> 0e6e9b67246e905519767a76639d2addfe06681c
     });
 };
 
@@ -94,8 +103,13 @@ export const useConnectIntegration = () => {
 export const useDisconnectIntegration = () => {
     const queryClient = useQueryClient();
     return useMutation({
+<<<<<<< HEAD
         mutationFn: ({ provider, id }: IntegrationTarget) => integrationService.disconnect(provider, id),
         onSuccess: (_, { provider }) => {
+=======
+        mutationFn: (provider: string) => integrationService.disconnect(provider),
+        onSuccess: (_, provider) => {
+>>>>>>> 0e6e9b67246e905519767a76639d2addfe06681c
             queryClient.invalidateQueries({ queryKey: QUERY_KEYS.INTEGRATIONS.LIST });
             queryClient.invalidateQueries({ queryKey: QUERY_KEYS.INTEGRATIONS.STATUS(provider) });
             showToast("Disconnected successfully", "success");
@@ -136,6 +150,7 @@ export const useToggleProductStatus = () => {
     });
 };
 
+<<<<<<< HEAD
 export const useUpdateShopifyParcelDefaults = () => {
     const queryClient = useQueryClient();
     return useMutation({
@@ -168,6 +183,8 @@ export const useUpdateShoplineParcelDefaults = () => {
     });
 };
 
+=======
+>>>>>>> 0e6e9b67246e905519767a76639d2addfe06681c
 export const useUpdateAdvancedSettings = () => {
     const queryClient = useQueryClient();
     return useMutation({
@@ -200,6 +217,17 @@ export const useAddManualProduct = () => {
     });
 };
 
+<<<<<<< HEAD
+=======
+export const useGetManualProducts = (provider: string, enabled = true) => {
+    return useQuery({
+        queryKey: QUERY_KEYS.INTEGRATIONS.MANUAL_PRODUCTS(provider),
+        queryFn: () => integrationService.getManualProducts(provider),
+        enabled: !!provider && enabled
+    });
+};
+
+>>>>>>> 0e6e9b67246e905519767a76639d2addfe06681c
 export const useUpdateManualProduct = () => {
     const queryClient = useQueryClient();
     return useMutation({
@@ -247,6 +275,39 @@ export const usePatchProductStatus = () => {
     });
 };
 
+<<<<<<< HEAD
+=======
+export const useGetProducts = (provider: string, enabled = true) => {
+    return useQuery({
+        queryKey: QUERY_KEYS.INTEGRATIONS.PRODUCTS(provider),
+        queryFn: () => integrationService.getProducts(provider),
+        enabled: !!provider && enabled
+    });
+};
+
+export const useGetDeliveryPreferences = (enabled = true) => {
+    return useQuery({
+        queryKey: QUERY_KEYS.INTEGRATIONS.DELIVERY_PREFERENCES,
+        queryFn: integrationService.getDeliveryPreferences,
+        enabled
+    });
+};
+
+export const useSetDeliveryPreferences = () => {
+    const queryClient = useQueryClient();
+    return useMutation({
+        mutationFn: (data: any) => integrationService.setDeliveryPreferences(data),
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: QUERY_KEYS.INTEGRATIONS.DELIVERY_PREFERENCES });
+            showToast("Delivery preferences updated", "success");
+        },
+        onError: (error: any) => {
+            showToast(error.message || "Failed to update delivery preferences", "error");
+        }
+    });
+};
+
+>>>>>>> 0e6e9b67246e905519767a76639d2addfe06681c
 export const useSetDefaultIntegration = () => {
     const queryClient = useQueryClient();
     return useMutation({
@@ -280,11 +341,17 @@ export const useRemoveDefaultIntegration = () => {
 export const useToggleEbayAutoSync = () => {
     const queryClient = useQueryClient();
     return useMutation({
+<<<<<<< HEAD
         mutationFn: ({ enabled, accountId }: { enabled: boolean; accountId?: string | number }) =>
             integrationService.toggleEbayAutoSync(enabled, accountId),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: QUERY_KEYS.INTEGRATIONS.STATUS("ebay") });
             queryClient.invalidateQueries({ queryKey: QUERY_KEYS.INTEGRATIONS.LIST });
+=======
+        mutationFn: (enabled: boolean) => integrationService.toggleEbayAutoSync(enabled),
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: QUERY_KEYS.INTEGRATIONS.STATUS("ebay") });
+>>>>>>> 0e6e9b67246e905519767a76639d2addfe06681c
             showToast("eBay Auto-sync status updated", "success");
         },
         onError: (error: any) => {
@@ -296,11 +363,17 @@ export const useToggleEbayAutoSync = () => {
 export const useToggleEbayAutoFulfillment = () => {
     const queryClient = useQueryClient();
     return useMutation({
+<<<<<<< HEAD
         mutationFn: ({ enabled, accountId }: { enabled: boolean; accountId?: string | number }) =>
             integrationService.toggleEbayAutoFulfillment(enabled, accountId),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: QUERY_KEYS.INTEGRATIONS.STATUS("ebay") });
             queryClient.invalidateQueries({ queryKey: QUERY_KEYS.INTEGRATIONS.LIST });
+=======
+        mutationFn: (enabled: boolean) => integrationService.toggleEbayAutoFulfillment(enabled),
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: QUERY_KEYS.INTEGRATIONS.STATUS("ebay") });
+>>>>>>> 0e6e9b67246e905519767a76639d2addfe06681c
             showToast("eBay Auto-fulfillment status updated", "success");
         },
         onError: (error: any) => {
@@ -309,6 +382,7 @@ export const useToggleEbayAutoFulfillment = () => {
     });
 };
 
+<<<<<<< HEAD
 export const useToggleSquarespaceAutoFulfillment = () => {
     const queryClient = useQueryClient();
     return useMutation({
@@ -333,6 +407,14 @@ export const useToggleShopifyAutoFulfillment = () => {
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: QUERY_KEYS.INTEGRATIONS.STATUS("shopify") });
             queryClient.invalidateQueries({ queryKey: QUERY_KEYS.INTEGRATIONS.LIST });
+=======
+export const useToggleShopifyAutoFulfillment = () => {
+    const queryClient = useQueryClient();
+    return useMutation({
+        mutationFn: (enabled: boolean) => integrationService.toggleAutoFulfillment(enabled),
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: QUERY_KEYS.INTEGRATIONS.STATUS("shopify") });
+>>>>>>> 0e6e9b67246e905519767a76639d2addfe06681c
             showToast("Shopify Auto-fulfillment status updated", "success");
         },
         onError: (error: any) => {
@@ -340,6 +422,7 @@ export const useToggleShopifyAutoFulfillment = () => {
         }
     });
 };
+<<<<<<< HEAD
 
 export const useToggleShopifyLiveRates = () => {
     const queryClient = useQueryClient();
@@ -443,3 +526,5 @@ export const useToggleEtsyAutoFulfillment = () => {
     });
 };
 
+=======
+>>>>>>> 0e6e9b67246e905519767a76639d2addfe06681c

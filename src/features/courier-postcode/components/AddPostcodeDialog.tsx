@@ -99,7 +99,11 @@ const PostcodeForm = forwardRef<HTMLFormElement, PostcodeFormProps>(
       e.preventDefault();
       setSubmited(true);
 
+<<<<<<< HEAD
       if (!formData.global_courier_id || postcodeErrorMsg || !String(formData.suburb).trim() || !formData.price) {
+=======
+      if (!formData.global_courier_id || postcodeErrorMsg || !formData.price) {
+>>>>>>> 0e6e9b67246e905519767a76639d2addfe06681c
         return;
       }
 
@@ -125,6 +129,7 @@ const PostcodeForm = forwardRef<HTMLFormElement, PostcodeFormProps>(
           required
           error={submited && !!postcodeErrorMsg}
           errormsg={postcodeErrorMsg}
+<<<<<<< HEAD
         />
 
         <FormInput
@@ -135,6 +140,8 @@ const PostcodeForm = forwardRef<HTMLFormElement, PostcodeFormProps>(
           required
           error={submited && !String(formData.suburb).trim()}
           errormsg="Please enter Suburb"
+=======
+>>>>>>> 0e6e9b67246e905519767a76639d2addfe06681c
         />
 
         <FormInput

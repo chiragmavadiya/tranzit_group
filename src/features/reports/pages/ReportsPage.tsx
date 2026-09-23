@@ -3,7 +3,10 @@ import { useSearchParams } from 'react-router-dom';
 import { format, parse, isValid } from 'date-fns';
 import { ReportsHeader } from '../components/ReportsHeader';
 import type { DateFilterValue } from '@/components/common/DateFilter/types';
+<<<<<<< HEAD
 import { hydrateDateFilter } from '@/components/common/DateFilter/utils';
+=======
+>>>>>>> 0e6e9b67246e905519767a76639d2addfe06681c
 import {
   SHIPMENT_COLUMNS,
   TRANSACTION_COLUMNS,
@@ -36,7 +39,11 @@ export default function ReportsPage() {
     from: undefined,
     to: undefined,
     label: 'All Time',
+<<<<<<< HEAD
   }, hydrateDateFilter);
+=======
+  });
+>>>>>>> 0e6e9b67246e905519767a76639d2addfe06681c
 
   const [pageSize, setPageSize] = useLocalStorage<number>('reports_page_size', 100);
   const [page, setPage] = useLocalStorage<number>('reports_page', 1);
@@ -258,7 +265,10 @@ export default function ReportsPage() {
             key={activeTab}
             headerTitle={`${activeTab} Reports`}
             headerClass='capitalize'
+<<<<<<< HEAD
             moduleName='allReport'
+=======
+>>>>>>> 0e6e9b67246e905519767a76639d2addfe06681c
             headerDescription={() => <>Reports generated for <span className="font-semibold text-gray-900 dark:text-zinc-200">{dateRange.label || 'All Time'}</span></>}
             columns={columns as any}
             data={data as any}

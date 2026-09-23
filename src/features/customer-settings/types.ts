@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 /** GET /customer/tracking-page/settings — every field is null until first saved. */
 export interface TrackingPageSettings {
   logo: string | null;
@@ -22,6 +23,8 @@ export interface TrackingPageSettingsUpdate {
   header_color?: string | null;
 }
 
+=======
+>>>>>>> 0e6e9b67246e905519767a76639d2addfe06681c
 export interface TeamUser {
   id: number | string;
   first_name: string;

@@ -53,7 +53,10 @@ export const PlaceAutocomplete = ({ onPlaceSelect, value, ...rest }: PlaceAutoco
         const listener = placeAutocomplete.addListener('place_changed', () => {
             const place = placeAutocomplete.getPlace();
             if (!place.address_components) return;
+<<<<<<< HEAD
             console.log(place, "Google address")
+=======
+>>>>>>> 0e6e9b67246e905519767a76639d2addfe06681c
             // 2. Map Google components to the fields in image_ed5179.png
             const address: AddressData = {
                 formatted_address: place.formatted_address || '',

@@ -1,5 +1,6 @@
 import { useCallback, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+<<<<<<< HEAD
 import { Truck, Link2Off, Settings2, Check, Loader2, ArrowLeft } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -11,17 +12,32 @@ import TNTLogo from '@/assets/coruiers_logo/TNT.webp';
 import AlliedExpress from '@/assets/coruiers_logo/allied_express.png';
 import TeamGloablexpress from '@/assets/coruiers_logo/team_gloabl_express.png';
 
+=======
+import { Truck } from 'lucide-react';
+import { Drawer } from '@/components/ui/drawer';
+import { motion, AnimatePresence } from 'framer-motion';
+>>>>>>> 0e6e9b67246e905519767a76639d2addfe06681c
 import { useQueryClient } from '@tanstack/react-query';
 import {
   useConnectIntegration,
   useDisconnectIntegration,
   useIntegrationsList,
+<<<<<<< HEAD
   useSetDefaultIntegration,
   useRemoveDefaultIntegration
 } from '@/features/integrations/hooks/useIntegrations';
 import CarrierConfigForm from '../components/CarrierConfigForm';
 import { useAppSelector } from '@/hooks/store.hooks';
 import { cn } from '@/lib/utils';
+=======
+  useIntegrationStatusMutation,
+  useSetDefaultIntegration,
+  useRemoveDefaultIntegration
+} from '@/features/integrations/hooks/useIntegrations';
+import RenderIntegrationSection from '@/features/integrations/components/RenderIntegrationSection';
+import CarrierConfigForm from '../components/CarrierConfigForm';
+import { useAppSelector } from '@/hooks/store.hooks';
+>>>>>>> 0e6e9b67246e905519767a76639d2addfe06681c
 
 const carriers = [
   { id: 'auspost', name: 'Australia Post', icon: Truck, status: 'available' },
@@ -29,6 +45,7 @@ const carriers = [
   { id: 'mypostbusiness', name: 'MyPost Business', icon: Truck, status: 'available' },
   { id: 'directfreight', name: 'Direct Freight', icon: Truck, status: 'available' },
   { id: 'couriersplease', name: 'Couriers Please', icon: Truck, status: 'available' },
+<<<<<<< HEAD
   { id: 'startrack', name: 'StarTrack', icon: Truck, status: 'available' },
   { id: 'fedex', name: 'FedEx', icon: Truck, status: 'coming_soon' },
   { id: 'tnt', name: 'TNT', icon: Truck, status: 'coming_soon', logo: TNTLogo },
@@ -42,11 +59,24 @@ export default function CarrierIntegrationsPage() {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
 
+=======
+  { id: 'startrack', name: 'StarTrack', icon: Truck, status: 'coming_soon' },
+  { id: 'toll', name: 'Toll Priority', icon: Truck, status: 'coming_soon' },
+  { id: 'dhl', name: 'DHL Express', icon: Truck, status: 'coming_soon' },
+];
+
+const COMING_SOON_SLUGS = carriers.filter((c) => c.status === 'coming_soon').map((c) => c.id);
+
+export default function CarrierIntegrationsPage() {
+  const navigate = useNavigate();
+  const queryClient = useQueryClient();
+>>>>>>> 0e6e9b67246e905519767a76639d2addfe06681c
   const [isAddOpen, setIsAddOpen] = useState(false);
   const [selectedCarrier, setSelectedCarrier] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [formData, setFormData] = useState<any>({});
 
+<<<<<<< HEAD
   // Confirmation modal states
   const [isConfirmDisconnectOpen, setIsConfirmDisconnectOpen] = useState(false);
   const [carrierToDisconnect, setCarrierToDisconnect] = useState<any>(null);
@@ -54,10 +84,18 @@ export default function CarrierIntegrationsPage() {
   // Fetch status of the individual courier integrations
   const { data: listResponse, isLoading: listLoading } = useIntegrationsList();
   const { is_sub_user, team_access } = useAppSelector((state) => state.auth);
+=======
+  // Fetch status of the individual courier integrations
+  const { data: listResponse, isLoading: listLoading } = useIntegrationsList();
+  // Fetch status of the individual courier integrations
+  const { isPending: statusLoading, variables: statusVariables } = useIntegrationStatusMutation();
+  const { is_sub_user, team_access } = useAppSelector((state) => state.auth)
+>>>>>>> 0e6e9b67246e905519767a76639d2addfe06681c
   const canReadWrite = useMemo(() => !is_sub_user || team_access?.permissions?.settings_integrations === 'full', [is_sub_user, team_access]);
 
   const connectMutation = useConnectIntegration();
   const disconnectMutation = useDisconnectIntegration();
+<<<<<<< HEAD
   const { mutate: setDefault, isPending: isSettingDefault, variables: setDefaultVars } = useSetDefaultIntegration();
   const { mutate: removeDefault, isPending: isRemovingDefault, variables: removeDefaultVars } = useRemoveDefaultIntegration();
 
@@ -213,13 +251,30 @@ export default function CarrierIntegrationsPage() {
     }
   };
 
+=======
+  const setDefaultMutation = useSetDefaultIntegration();
+  const removeDefaultMutation = useRemoveDefaultIntegration();
+
+  const handleEdit = (providerId: string) => {
+    navigate(`/settings/carriers/${providerId}`);
+  };
+
+  const onConnect = useCallback((providerId: string) => {
+    navigate(`/settings/carriers/${providerId}`);
+  }, [navigate]);
+
+>>>>>>> 0e6e9b67246e905519767a76639d2addfe06681c
   const handleConnect = (data: any) => {
     setIsLoading(true);
     const platform = selectedCarrier!;
     connectMutation.mutate({ provider: platform, data }, {
       onSuccess: () => {
         setIsLoading(false);
+<<<<<<< HEAD
         queryClient.invalidateQueries({ queryKey: ["integrations-list"] });
+=======
+        queryClient.invalidateQueries({ queryKey: ["integration-status", platform] });
+>>>>>>> 0e6e9b67246e905519767a76639d2addfe06681c
         resetFlow();
       },
       onError: () => {
@@ -237,6 +292,7 @@ export default function CarrierIntegrationsPage() {
   };
 
   return (
+<<<<<<< HEAD
     <div className="flex flex-col gap-6 min-h-[calc(100vh-120px)] bg-white p-page-padding dark:bg-zinc-900 border border-gray-200 dark:border-zinc-800 rounded-xl shadow-sm">
       <div className="flex flex-col flex-1">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-3 border-b border-slate-100 dark:border-zinc-800">
@@ -298,6 +354,42 @@ export default function CarrierIntegrationsPage() {
               )}
             </div>
           )}
+=======
+    <div className="flex flex-col gap-6 min-h-[calc(100vh-120px)] bg-white p-page-padding dark:bg-zinc-900 border border-gray-200 dark:border-zinc-800 rounded-sm shadow-sm">
+      <div className=" flex flex-col flex-1">
+        <div className="flex flex-col gap-1 mb-3">
+          <h1 className="text-2xl flex items-center gap-2 font-bold text-slate-900 dark:text-zinc-100 my-0">
+            <Truck className="w-6 h-6 text-primary" />
+            Courier Integrations
+          </h1>
+          <p className="text-sm text-slate-500 dark:text-zinc-400 mb-2">Connect your shipping couriers to streamline your workflow.</p>
+        </div>
+
+        <div className="flex flex-col gap-10">
+          <RenderIntegrationSection
+            // title="Courier Integrations"
+            // Icon={Truck}
+            data={listResponse?.data?.courier_integrations}
+            disconnectMutation={disconnectMutation}
+            setDefaultMutation={setDefaultMutation}
+            removeDefaultMutation={removeDefaultMutation}
+            onConnect={onConnect}
+            onConfigure={handleEdit}
+            isLoading={listLoading}
+            configLoadingProvider={statusLoading ? statusVariables : undefined}
+            canReadWrite={canReadWrite}
+            comingSoonSlugs={COMING_SOON_SLUGS}
+          />
+          {/* <RenderIntegrationSection
+            title="E-commerce Integrations"
+            Icon={ShoppingCart}
+            data={listResponse?.data?.ecommerce_connections}
+            disconnectMutation={disconnectMutation}
+            onConnect={onConnect}
+            isLoading={listLoading}
+            configLoadingProvider={statusLoading ? statusVariables : undefined}
+          /> */}
+>>>>>>> 0e6e9b67246e905519767a76639d2addfe06681c
         </div>
       </div>
 
@@ -307,6 +399,7 @@ export default function CarrierIntegrationsPage() {
         title={
           selectedCarrier ? (
             <div className="flex items-center gap-3">
+<<<<<<< HEAD
               <Button
                 variant="ghost"
                 size="sm"
@@ -315,6 +408,8 @@ export default function CarrierIntegrationsPage() {
               >
                 <ArrowLeft className="w-4 h-4" />
               </Button>
+=======
+>>>>>>> 0e6e9b67246e905519767a76639d2addfe06681c
               {(() => {
                 const carrierIntegration = listResponse?.data?.courier_integrations?.find(
                   (c) => c.slug === selectedCarrier
@@ -326,7 +421,11 @@ export default function CarrierIntegrationsPage() {
                 ) : null;
               })()}
               <span className="text-lg font-bold text-gray-900 dark:text-zinc-100">
+<<<<<<< HEAD
                 {selectedCarrier === 'auspost' ? 'Connect Australia Post eParcel' : `Connect ${carriers.find(c => c.id === selectedCarrier)?.name}`}
+=======
+                {selectedCarrier === 'auspost' ? 'Connect your Australia Post eParcel account' : `Connect your ${carriers.find(c => c.id === selectedCarrier)?.name} account`}
+>>>>>>> 0e6e9b67246e905519767a76639d2addfe06681c
               </span>
             </div>
           ) : (
@@ -339,6 +438,7 @@ export default function CarrierIntegrationsPage() {
         <div className="pb-4">
           <div className="mt-8 px-4 h-full overflow-y-auto no-scrollbar">
             <AnimatePresence mode="wait">
+<<<<<<< HEAD
               {!selectedCarrier ? (
                 <motion.div
                   key="list"
@@ -423,6 +523,14 @@ export default function CarrierIntegrationsPage() {
                   initial={{ opacity: 0, x: 10 }}
                   animate={{ opacity: 1, x: 0 }}
                   exit={{ opacity: 0, x: -10 }}
+=======
+              {selectedCarrier && (
+                <motion.div
+                  key="step1"
+                  initial={{ opacity: 0, x: -10 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  exit={{ opacity: 0, x: 10 }}
+>>>>>>> 0e6e9b67246e905519767a76639d2addfe06681c
                   className="space-y-6 max-w-2xl mx-auto"
                 >
                   <CarrierConfigForm
@@ -438,6 +546,7 @@ export default function CarrierIntegrationsPage() {
           </div>
         </div>
       </Drawer>
+<<<<<<< HEAD
 
       <ConformationModal
         open={isConfirmDisconnectOpen}
@@ -455,6 +564,8 @@ export default function CarrierIntegrationsPage() {
         className="w-full"
         loading={disconnectMutation.isPending}
       />
+=======
+>>>>>>> 0e6e9b67246e905519767a76639d2addfe06681c
     </div>
   );
 }

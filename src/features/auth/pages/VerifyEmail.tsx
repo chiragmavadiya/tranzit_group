@@ -47,7 +47,12 @@ export default function VerifyEmail() {
   const handleLogout = () => {
     // on success return to /signin
     logoutMutation.mutate(undefined, {
+<<<<<<< HEAD
       onSettled: () => {
+=======
+      onSuccess: () => {
+        localStorage.clear();
+>>>>>>> 0e6e9b67246e905519767a76639d2addfe06681c
         dispatch(logout());
         navigate('/login');
       }

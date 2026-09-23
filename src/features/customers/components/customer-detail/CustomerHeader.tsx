@@ -1,9 +1,17 @@
 import { useState } from 'react';
+<<<<<<< HEAD
 import { MapPin, Calendar, Wallet, UserCheck, UserMinus, ShieldCheck, Lock, LockOpen, ChevronLeft, Loader2, Pencil, Check } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import type { CustomerDetails } from '../../types';
 import { useVerifyCustomer, useToggleCustomerStatus, useSetAccountActivation } from '../../hooks/useCustomers';
+=======
+import { CheckCircle2, MapPin, Calendar, Wallet, UserMinus, ShieldCheck, ChevronLeft, Loader2, Pencil, Check } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import type { CustomerDetails } from '../../types';
+import { useVerifyCustomer,  useToggleCustomerStatus } from '../../hooks/useCustomers';
+>>>>>>> 0e6e9b67246e905519767a76639d2addfe06681c
 import { useNavigate } from 'react-router-dom';
 import { showToast } from '@/components/ui/custom-toast';
 import { cn, formateCurrency } from '@/lib/utils';
@@ -27,12 +35,19 @@ const getFormattedDate = (dateStr: string) => {
 export const CustomerHeader = ({ customer, onEdit }: CustomerHeaderProps) => {
     const navigate = useNavigate();
     const fullName = `${customer.first_name} ${customer.last_name}`;
+<<<<<<< HEAD
     // Customer status and account activation are separate controls, one confirm modal at a time.
     const [confirmAction, setConfirmAction] = useState<'status' | 'activation' | null>(null);
 
     const { mutate: verify, isPending: isVerifying } = useVerifyCustomer();
     const { mutate: toggleStatus, isPending: isTogglingStatus } = useToggleCustomerStatus();
     const { mutate: setAccountActivation, isPending: isToggling } = useSetAccountActivation();
+=======
+    const [isConfirmOpen, setIsConfirmOpen] = useState(false);
+
+    const { mutate: verify, isPending: isVerifying } = useVerifyCustomer();
+    const { mutate: toggleStatus, isPending: isToggling } = useToggleCustomerStatus();
+>>>>>>> 0e6e9b67246e905519767a76639d2addfe06681c
 
     const handleVerify = () => {
         verify(customer.id, {
@@ -41,6 +56,7 @@ export const CustomerHeader = ({ customer, onEdit }: CustomerHeaderProps) => {
         });
     };
 
+<<<<<<< HEAD
     const isAccountActivated = !!customer.account_activation;
 
     const handleConfirmActivation = () => {
@@ -54,10 +70,27 @@ export const CustomerHeader = ({ customer, onEdit }: CustomerHeaderProps) => {
             },
             // The modal stays open so the admin can retry without losing their place.
             onError: (err: any) => showToast(err?.response?.data?.message || 'Failed to update account activation', "error"),
+=======
+    const handleToggleStatus = () => {
+        setIsConfirmOpen(true);
+    };
+
+    const handleConfirmToggle = () => {
+        toggleStatus(customer.id, {
+            onSuccess: (res) => {
+                showToast(res.message || 'Status updated successfully', 'success');
+                setIsConfirmOpen(false);
+            },
+            onError: (err: any) => {
+                showToast(err?.response?.data?.message || 'Failed to update status', "error");
+                setIsConfirmOpen(false);
+            },
+>>>>>>> 0e6e9b67246e905519767a76639d2addfe06681c
         });
     };
 
     const isActive = customer.status === 'active';
+<<<<<<< HEAD
 
     const handleConfirmStatus = () => {
         toggleStatus(customer.id, {
@@ -68,6 +101,8 @@ export const CustomerHeader = ({ customer, onEdit }: CustomerHeaderProps) => {
             onError: (err: any) => showToast(err?.response?.data?.message || 'Failed to update status', "error"),
         });
     };
+=======
+>>>>>>> 0e6e9b67246e905519767a76639d2addfe06681c
 
     return (
         <div className="flex flex-col gap-2">
@@ -118,6 +153,7 @@ export const CustomerHeader = ({ customer, onEdit }: CustomerHeaderProps) => {
                             >
                                 {isActive ? "Active Customer" : "Inactive Customer"}
                             </Badge>
+<<<<<<< HEAD
                             <Badge
                                 variant="secondary"
                                 className={cn(
@@ -129,6 +165,8 @@ export const CustomerHeader = ({ customer, onEdit }: CustomerHeaderProps) => {
                             >
                                 {isAccountActivated ? "Portal Access On" : "Portal Access Off"}
                             </Badge>
+=======
+>>>>>>> 0e6e9b67246e905519767a76639d2addfe06681c
                             <div className="flex items-center gap-1.5 px-2.5 h-6 rounded-md bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200/50 dark:border-emerald-900/40 text-emerald-700 dark:text-emerald-400 text-xs font-bold shadow-2xs shrink-0 select-none">
                                 <Wallet className="w-3 h-3 text-emerald-600 dark:text-emerald-400" />
                                 <span>Balance: {formateCurrency(Number(customer.wallet_balance))}</span>
@@ -172,6 +210,7 @@ export const CustomerHeader = ({ customer, onEdit }: CustomerHeaderProps) => {
                         Edit
                     </Button>
                     <Button
+<<<<<<< HEAD
                         variant="outline"
                         className={cn(
                             "h-8 rounded-lg gap-1.5 text-xs font-semibold px-3 shadow-2xs transition-colors border-slate-200 text-slate-700 dark:border-zinc-800 dark:text-zinc-300",
@@ -202,20 +241,40 @@ export const CustomerHeader = ({ customer, onEdit }: CustomerHeaderProps) => {
                                 : "bg-emerald-600 hover:bg-emerald-700 text-white"
                         )}
                         onClick={() => setConfirmAction('activation')}
+=======
+                        variant="destructive"
+                        className={cn(
+                            "h-8 rounded-lg gap-1.5 text-xs font-semibold shadow-sm transition-colors border-transparent px-3.5",
+                            isActive
+                                ? "bg-red-600 hover:bg-red-700 text-white"
+                                : "bg-emerald-600 hover:bg-emerald-700 text-white"
+                        )}
+                        onClick={handleToggleStatus}
+>>>>>>> 0e6e9b67246e905519767a76639d2addfe06681c
                         disabled={isToggling}
                     >
                         {isToggling ? (
                             <Loader2 className="h-3.5 w-3.5 animate-spin" />
+<<<<<<< HEAD
                         ) : isAccountActivated ? (
                             <Lock className="h-3.5 w-3.5" />
                         ) : (
                             <LockOpen className="h-3.5 w-3.5" />
                         )}
                         {isAccountActivated ? 'Deactivate Portal Access' : 'Activate Portal Access'}
+=======
+                        ) : isActive ? (
+                            <UserMinus className="h-3.5 w-3.5" />
+                        ) : (
+                            <CheckCircle2 className="h-3.5 w-3.5" />
+                        )}
+                        {isActive ? 'Deactivate' : 'Activate'}
+>>>>>>> 0e6e9b67246e905519767a76639d2addfe06681c
                     </Button>
                 </div>
             </div>
             <ConformationModal
+<<<<<<< HEAD
                 open={confirmAction === 'status'}
                 onOpenChange={(open) => !open && setConfirmAction(null)}
                 title={isActive ? "Mark customer as inactive?" : "Mark customer as active?"}
@@ -239,6 +298,16 @@ export const CustomerHeader = ({ customer, onEdit }: CustomerHeaderProps) => {
                 cancelText="Cancel"
                 confirmVariant={isAccountActivated ? "destructive" : "default"}
                 onConfirm={handleConfirmActivation}
+=======
+                open={isConfirmOpen}
+                onOpenChange={setIsConfirmOpen}
+                title="Change Status"
+                description="Are you sure you want to Change the status for this customer?"
+                confirmText="Confirm"
+                cancelText="Cancel"
+                confirmVariant={isActive ? "destructive" : "default"}
+                onConfirm={handleConfirmToggle}
+>>>>>>> 0e6e9b67246e905519767a76639d2addfe06681c
                 loading={isToggling}
             />
         </div>

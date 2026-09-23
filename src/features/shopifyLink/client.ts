@@ -2,12 +2,16 @@
 * Adapt getAuthToken / setAuthToken to match your app (context, Redux, etc.).
 */
 
+<<<<<<< HEAD
 // Same base as the shared axios client (src/services/api.ts). VITE_API_BASE_URL already
 // ends in /api, so paths are appended to it directly.
 const API_BASE =
     import.meta.env.VITE_API_BASE_URL ||
     import.meta.env.VITE_API_URL ||
     'http://127.0.0.1:8000/api';
+=======
+const API_BASE = import.meta.env.VITE_API_URL ?? 'https://api.tranzit.digisite.net';
+>>>>>>> 0e6e9b67246e905519767a76639d2addfe06681c
 
 export function getAuthToken(): string | null {
     return localStorage.getItem('auth_token');
@@ -58,7 +62,11 @@ export async function apiRequest<T>(path: string, options: RequestOptions = {}):
         headers.Authorization = `Bearer ${token}`;
     }
 
+<<<<<<< HEAD
     const response = await fetch(`${API_BASE}${path}`, {
+=======
+    const response = await fetch(`${API_BASE}/api${path}`, {
+>>>>>>> 0e6e9b67246e905519767a76639d2addfe06681c
         method,
         headers,
         body: body !== undefined ? JSON.stringify(body) : undefined,

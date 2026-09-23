@@ -2,6 +2,7 @@ import { useState } from 'react';
 
 const useLocalStorage = <T>(
     key: string,
+<<<<<<< HEAD
     initialValue: T,
     // Lets callers re-derive a stored value that goes stale over time (e.g. relative date filters).
     hydrate?: (storedValue: T, initialValue: T) => T
@@ -14,6 +15,14 @@ const useLocalStorage = <T>(
             if (item === null || item === 'undefined' || item === '{}') return initialValue;
             const storedValue = JSON.parse(item) as T;
             return hydrate ? hydrate(storedValue, initialValue) : storedValue;
+=======
+    initialValue: T
+): [T, React.Dispatch<React.SetStateAction<T>>] => {
+    const getStoredValue = (): T => {
+        try {
+            const item = localStorage.getItem(key);
+            return item !== null && item !== 'undefined' && item !== '{}' ? JSON.parse(item) : initialValue;
+>>>>>>> 0e6e9b67246e905519767a76639d2addfe06681c
         } catch (error) {
             console.error("error", error);
             return initialValue;
@@ -34,12 +43,19 @@ const useLocalStorage = <T>(
 
             setStoredValue(valueToStore);
 
+<<<<<<< HEAD
             if (key) {
                 localStorage.setItem(
                     key,
                     JSON.stringify(valueToStore)
                 );
             }
+=======
+            localStorage.setItem(
+                key,
+                JSON.stringify(valueToStore)
+            );
+>>>>>>> 0e6e9b67246e905519767a76639d2addfe06681c
         } catch (error) {
             console.error(error);
         }

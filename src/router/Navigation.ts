@@ -51,7 +51,10 @@ export const adminSidebarItems: SidebarItem[] = [
     hasDropdown: true,
     permissions: [...(MODULE_PERMISSIONS['Customer Parcel Report'] || []), ...(MODULE_PERMISSIONS.report || [])],
     subItems: [
+<<<<<<< HEAD
       { name: 'All Reports', path: '/admin/all-reports', permissions: MODULE_PERMISSIONS.report },
+=======
+>>>>>>> 0e6e9b67246e905519767a76639d2addfe06681c
       { name: 'Auspost Report', path: '/admin/auspost-report', permissions: MODULE_PERMISSIONS.report },
       { name: 'All Tranzit Group Courier Parcel Report', path: '/admin/customer-parcel-report', permissions: MODULE_PERMISSIONS['Customer Parcel Report'] },
       { name: 'Custom Integrated Courier Parcel Report', path: '/admin/integrated-parcel-report', permissions: MODULE_PERMISSIONS.report },
@@ -161,7 +164,10 @@ export const clientSidebarItems: SidebarItem[] = [
           { name: 'Account Details', key: 'settings_account_detail', path: '/settings/account', icon: User },
           { name: 'Team Access', key: 'settings_team_access', path: '/settings/team', icon: Users },
           { name: 'Rule Management', key: 'settings_rule_management', path: '/settings/rules', icon: Route },
+<<<<<<< HEAD
           { name: 'Packing Slips & Summary', key: 'settings_packing_documents', path: '/settings/packing-slips-summary', icon: Printer },
+=======
+>>>>>>> 0e6e9b67246e905519767a76639d2addfe06681c
         ]
       },
       {

@@ -99,18 +99,22 @@ export interface BlackoutDay {
     date: string;
 }
 
+<<<<<<< HEAD
 export interface ShopifyStoreMissingParcelDefaults {
     id: number;
     shop_domain?: string;
     shop_name?: string;
 }
 
+=======
+>>>>>>> 0e6e9b67246e905519767a76639d2addfe06681c
 export interface LoginResponse {
     status: boolean;
     user: User
     message: string;
     token: string;
     next_step: string;
+<<<<<<< HEAD
     account_activation?: boolean | null;
     must_accept_terms?: boolean;
     shopify_package_defaults?: {
@@ -119,6 +123,8 @@ export interface LoginResponse {
         missing_count: number;
         stores_missing_defaults: ShopifyStoreMissingParcelDefaults[];
     };
+=======
+>>>>>>> 0e6e9b67246e905519767a76639d2addfe06681c
     default_courier?: any;
     default_item?: any;
     announcements?: {

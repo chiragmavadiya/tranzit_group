@@ -31,7 +31,10 @@ interface SidePanelProps {
   liabilityMessage: string | undefined;
   payment_status?: string;
   shipping_activity?: any[];
+<<<<<<< HEAD
   courierResponse?: Record<string, unknown> | null;
+=======
+>>>>>>> 0e6e9b67246e905519767a76639d2addfe06681c
 }
 
 export const SidePanel: React.FC<SidePanelProps> = memo(({
@@ -45,7 +48,10 @@ export const SidePanel: React.FC<SidePanelProps> = memo(({
   liabilityMessage,
   payment_status,
   shipping_activity = [],
+<<<<<<< HEAD
   courierResponse,
+=======
+>>>>>>> 0e6e9b67246e905519767a76639d2addfe06681c
   // signatureSelected,
 }) => {
   const isCreate = useMemo(() => orderType === 'create' || orderType === 'create-menual' || orderType === 'consign' || orderType === 'return', [orderType]);
@@ -71,6 +77,7 @@ export const SidePanel: React.FC<SidePanelProps> = memo(({
         }
       });
     }
+<<<<<<< HEAD
     // if(quoteData?.courier?.courier_based_charge > 0){ 
     //   seen.add("Post code Surcharge");
     //   list.push({ name: "Post code Surcharge", amount: quoteData.courier.courier_based_charge });
@@ -84,6 +91,12 @@ export const SidePanel: React.FC<SidePanelProps> = memo(({
 
   const hasCourierResponse = !!courierResponse && Object.keys(courierResponse).length > 0;
 
+=======
+
+    return list;
+  }, [quoteData]);
+
+>>>>>>> 0e6e9b67246e905519767a76639d2addfe06681c
   const timelineData = useMemo(() => {
     if (!Array.isArray(shipping_activity) || shipping_activity.length === 0) {
       return { stages: [], activeId: null };
@@ -107,7 +120,11 @@ export const SidePanel: React.FC<SidePanelProps> = memo(({
 
   return (
     <div className="flex flex-col gap-4">
+<<<<<<< HEAD
       <Accordion multiple defaultValue={['notes', 'services', 'summary', "support", "liability", "timeline", "courier_response"]} className="flex flex-col gap-3">
+=======
+      <Accordion multiple defaultValue={['notes', 'services', 'summary', "support", "liability", "timeline"]} className="flex flex-col gap-3">
+>>>>>>> 0e6e9b67246e905519767a76639d2addfe06681c
 
         {/* TRANSIT TIMELINE */}
         {!isCreate && (
@@ -151,11 +168,19 @@ export const SidePanel: React.FC<SidePanelProps> = memo(({
                         <div className={cn(
                           "relative w-5 h-5 rounded-full border-2 flex items-center justify-center bg-white dark:bg-zinc-950 transition-all duration-300 z-10 ",
                           !stage.completed
+<<<<<<< HEAD
                             ? "border-primary"
                             : "border-gray-200"
                         )}>
                           {!stage.completed && (
                             <div className="w-2 h-2 rounded-full bg-primary" />
+=======
+                            ? "border-primary dark:border-[#1b7a58]"
+                            : "border-gray-200 dark:border-zinc-800"
+                        )}>
+                          {!stage.completed && (
+                            <div className="w-2 h-2 rounded-full bg-[#0f4431] dark:bg-[#1b7a58]" />
+>>>>>>> 0e6e9b67246e905519767a76639d2addfe06681c
                           )}
                         </div>
 
@@ -233,6 +258,7 @@ export const SidePanel: React.FC<SidePanelProps> = memo(({
 
               <div className="border-t border-gray-100 dark:border-zinc-800 my-1"></div>
 
+<<<<<<< HEAD
               {awaitingCourierQuote ? (
                 <div className="flex items-start gap-2 rounded-lg border border-amber-200 bg-amber-50/60 px-3 py-2.5 dark:border-amber-900/30 dark:bg-amber-950/20">
                   <Info className="h-3.5 w-3.5 shrink-0 mt-0.5 text-amber-600 dark:text-amber-400" />
@@ -316,6 +342,56 @@ export const SidePanel: React.FC<SidePanelProps> = memo(({
                   </div>
                 </>
               )}
+=======
+              <div className="flex justify-between items-center text-sm">
+                <span className="text-gray-500 dark:text-zinc-400 font-medium">Shipping Services</span>
+                <span className="font-bold text-gray-900 dark:text-zinc-100">${calculation?.servicePrice?.toFixed(2)}</span>
+              </div>
+              <div className="flex justify-between items-center text-sm">
+                <div className="flex items-center gap-1.5">
+                  <span className="text-gray-500 dark:text-zinc-400 font-medium">Extra surcharges</span>
+                  {surchargesList.length > 0 && (
+                    // <TooltipProvider delay={100}>
+                    <Tooltip>
+                      <TooltipTrigger className="h-[14px]">
+                        <span className="inline-flex items-center justify-center text-gray-400 hover:text-primary dark:text-zinc-500 dark:hover:text-primary cursor-pointer transition-colors duration-200">
+                          <Info className="h-3.5 w-3.5" />
+                        </span>
+                      </TooltipTrigger>
+                      <TooltipContent side="top" align="center" className="flex flex-col gap-1.5 p-2.5 min-w-[180px] bg-gray-900 dark:bg-zinc-800 text-gray-100 border border-gray-800 dark:border-zinc-700">
+                        <div className="text-[10px] font-bold text-gray-400 dark:text-zinc-400 uppercase tracking-wide pb-1 border-b border-gray-800 dark:border-zinc-700 w-full">
+                          Surcharge Breakdown
+                        </div>
+                        <div className="flex flex-col gap-1 w-full max-h-32 overflow-y-auto no-scrollbar">
+                          {surchargesList.map((charge: any, idx: number) => (
+                            <div key={idx} className="flex justify-between items-center gap-3 text-[12px]">
+                              <span className="text-white font-medium dark:text-zinc-300">- {charge.name}</span>
+                            </div>
+                          ))}
+                        </div>
+                      </TooltipContent>
+                    </Tooltip>
+                    // </TooltipProvider>
+                  )}
+                </div>
+                <span className="font-bold text-gray-900 dark:text-zinc-100">${calculation?.totalSurcharges?.toFixed(2)}</span>
+              </div>
+              {calculation?.insurance && (
+                <div className="flex justify-between items-center text-sm text-primary animate-in fade-in slide-in-from-top-1">
+                  <span className="font-medium">Shipment Protection</span>
+                  <span className="font-bold">+$6.00</span>
+                </div>
+              )}
+              <div className="flex justify-between items-center text-sm">
+                <span className="text-gray-500 dark:text-zinc-400 font-medium">GST</span>
+                <span className="font-bold text-gray-900 dark:text-zinc-100">${calculation?.gst?.toFixed(2)}</span>
+              </div>
+
+              <div className="border-t border-gray-100 dark:border-zinc-800 my-1 pt-2 flex justify-between items-center">
+                <span className="text-base text-gray-900 dark:text-zinc-100 font-bold">Total {orderType === 'consign' || orderType === 'create' ? 'Payable' : ''}</span>
+                <span className="text-base font-bold text-primary">${calculation?.grandTotal?.toFixed(2)}</span>
+              </div>
+>>>>>>> 0e6e9b67246e905519767a76639d2addfe06681c
 
             </AccordionContent>
           </AccordionItem>
@@ -422,6 +498,7 @@ export const SidePanel: React.FC<SidePanelProps> = memo(({
           </AccordionContent>
         </AccordionItem>
 
+<<<<<<< HEAD
         {/* COURIER RESPONSE — admin only; the prop is undefined for customers */}
         {hasCourierResponse && (
           <AccordionItem value="courier_response" className="border border-slate-200 dark:border-zinc-800 rounded-xl bg-slate-50/60 dark:bg-zinc-900/40 shadow-xs px-5 border-b overflow-hidden transition-colors duration-300 [&>h3]:my-0">
@@ -438,6 +515,8 @@ export const SidePanel: React.FC<SidePanelProps> = memo(({
           </AccordionItem>
         )}
 
+=======
+>>>>>>> 0e6e9b67246e905519767a76639d2addfe06681c
         {/* LIABILITY COVER */}
         {!isCreate && (
           <AccordionItem value="liability" className={cn(

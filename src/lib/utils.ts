@@ -3,6 +3,10 @@ import { useEffect, useRef } from "react";
 import { twMerge } from "tailwind-merge"
 import { parse, format } from "date-fns";
 import { useAppSelector } from "@/hooks/store.hooks";
+<<<<<<< HEAD
+=======
+import { PHONE_REGEX_WITH_SPACE } from "@/constants";
+>>>>>>> 0e6e9b67246e905519767a76639d2addfe06681c
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
@@ -85,4 +89,10 @@ export const removeEmptyFields = <T extends Record<string, any>>(obj: T): Partia
     )
   ) as Partial<T>;
 };
+<<<<<<< HEAD
 export const isEmailValid = (email: string) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+=======
+export const cleanSpaces = (value: string) => value?.replace(/[^\d+]/g, '');
+export const isEmailValid = (email: string) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+export const isPhoneValid = (phone: string) => PHONE_REGEX_WITH_SPACE.test(cleanSpaces(phone));
+>>>>>>> 0e6e9b67246e905519767a76639d2addfe06681c

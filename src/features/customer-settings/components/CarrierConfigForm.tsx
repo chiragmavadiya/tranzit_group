@@ -21,6 +21,7 @@ const CARRIER_NAMES: Record<string, string> = {
   mypostbusiness: "MyPost Business",
   directfreight: "Direct Freight",
   couriersplease: "CouriersPlease",
+<<<<<<< HEAD
   startrack: "StarTrack",
   fedex: "FedEx",
   tge: "Team Global Express"
@@ -31,6 +32,11 @@ const TGE_BUSINESS_UNITS = [
   { label: 'Priority Australia', value: 'PriorityAustralia' }
 ];
 
+=======
+  startrack: "StarTrack"
+};
+
+>>>>>>> 0e6e9b67246e905519767a76639d2addfe06681c
 const GUIDE_TIPS: Record<string, {
   portalName: string;
   portalUrl: string;
@@ -90,7 +96,11 @@ const GUIDE_TIPS: Record<string, {
 
           <li>
             Enter an account label, then select{" "}
+<<<<<<< HEAD
             <strong>Save & Test connection</strong> or{" "}
+=======
+            <strong>Connect Account</strong> or{" "}
+>>>>>>> 0e6e9b67246e905519767a76639d2addfe06681c
             <strong>Save Changes</strong>.
           </li>
         </ol>
@@ -187,8 +197,13 @@ const GUIDE_TIPS: Record<string, {
           </li>
 
           <li>
+<<<<<<< HEAD
             Then select{" "}
             <strong>Save & Test connection</strong> or{" "}
+=======
+            Enter an account label, then select{" "}
+            <strong>Connect Account</strong> or{" "}
+>>>>>>> 0e6e9b67246e905519767a76639d2addfe06681c
             <strong>Save Changes</strong>.
           </li>
         </ol>
@@ -297,7 +312,11 @@ const GUIDE_TIPS: Record<string, {
           </li>
 
           <li>
+<<<<<<< HEAD
             Enter an account label, then select <strong>Save & Test connection</strong>{" "}
+=======
+            Enter an account label, then select <strong>Connect Account</strong>{" "}
+>>>>>>> 0e6e9b67246e905519767a76639d2addfe06681c
             or <strong>Save Changes</strong>.
           </li>
         </ol>
@@ -386,7 +405,11 @@ const GUIDE_TIPS: Record<string, {
 
           <li>
             Enter an account label, then select{" "}
+<<<<<<< HEAD
             <strong>Save & Test connection</strong> or{" "}
+=======
+            <strong>Connect Account</strong> or{" "}
+>>>>>>> 0e6e9b67246e905519767a76639d2addfe06681c
             <strong>Save Changes</strong>.
           </li>
         </ol>
@@ -471,8 +494,13 @@ const GUIDE_TIPS: Record<string, {
           </li>
 
           <li>
+<<<<<<< HEAD
             Then select{" "}
             <strong>Save & Test connection</strong> or{" "}
+=======
+            Enter an account label, then select{" "}
+            <strong>Connect Account</strong> or{" "}
+>>>>>>> 0e6e9b67246e905519767a76639d2addfe06681c
             <strong>Save Changes</strong>.
           </li>
         </ol>
@@ -521,7 +549,11 @@ const GUIDE_TIPS: Record<string, {
   },
   startrack: {
     portalName: "Australia Post Developer Centre",
+<<<<<<< HEAD
     portalUrl: "https://developers.auspost.com.au/apis",
+=======
+    portalUrl: "https://developers.auspost.com.au/",
+>>>>>>> 0e6e9b67246e905519767a76639d2addfe06681c
     supportUrl: "https://auspost.com.au/help-and-support",
     credentialsList: "API Key, Password and StarTrack Account Number",
 
@@ -529,9 +561,15 @@ const GUIDE_TIPS: Record<string, {
       <div className="space-y-4 text-left font-normal">
         <ol className="list-decimal space-y-3 pl-4 text-[13px] leading-relaxed text-slate-600 dark:text-zinc-400">
           <li>
+<<<<<<< HEAD
             Register for a Developer Centre account on the{" "}
             <a
               href="https://developers.auspost.com.au/apis"
+=======
+            Sign in to the{" "}
+            <a
+              href="https://developers.auspost.com.au/"
+>>>>>>> 0e6e9b67246e905519767a76639d2addfe06681c
               target="_blank"
               rel="noopener noreferrer"
               className="font-semibold text-primary hover:underline"
@@ -542,6 +580,7 @@ const GUIDE_TIPS: Record<string, {
           </li>
 
           <li>
+<<<<<<< HEAD
             From the API list, register for the{" "}
             <strong>Shipping and Tracking API</strong> key using your{" "}
             <strong>StarTrack Account Number</strong>.
@@ -562,6 +601,21 @@ const GUIDE_TIPS: Record<string, {
           <li>
             Once the form is complete, Australia Post will email your production{" "}
             <strong>API Key</strong> and <strong>Password</strong>.
+=======
+            Register for the <strong>Shipping &amp; Tracking API</strong> using
+            your <strong>StarTrack Account Number</strong>.
+          </li>
+
+          <li>
+            If you already have a Shipping &amp; Tracking API key, you can add
+            your StarTrack account to your existing API credentials instead of
+            creating a new integration.
+          </li>
+
+          <li>
+            Once your registration has been approved, Australia Post will provide
+            your <strong>API Key</strong> and <strong>Password</strong>.
+>>>>>>> 0e6e9b67246e905519767a76639d2addfe06681c
           </li>
 
           <li>
@@ -573,11 +627,16 @@ const GUIDE_TIPS: Record<string, {
 
           <li>
             Enter an account label, then select{" "}
+<<<<<<< HEAD
             <strong>Save & Test connection</strong> or{" "}
+=======
+            <strong>Connect Account</strong> or{" "}
+>>>>>>> 0e6e9b67246e905519767a76639d2addfe06681c
             <strong>Save Changes</strong>.
           </li>
         </ol>
 
+<<<<<<< HEAD
         <div className="mt-4 space-y-2 rounded-lg border border-primary/20 bg-primary/5 p-3 dark:border-primary/30 dark:bg-primary/10">
           <p className="text-[13px] font-bold text-slate-800 dark:text-zinc-200">
             Platform Partner details
@@ -607,16 +666,24 @@ const GUIDE_TIPS: Record<string, {
           </p>
         </div>
 
+=======
+>>>>>>> 0e6e9b67246e905519767a76639d2addfe06681c
         <div className="mt-4 space-y-2 rounded-lg border border-amber-200 bg-amber-50 p-3 dark:border-amber-900/50 dark:bg-amber-950/20">
           <p className="text-[13px] font-bold text-amber-900 dark:text-amber-200">
             Important
           </p>
 
           <p className="text-[12px] leading-relaxed text-amber-800 dark:text-amber-300">
+<<<<<<< HEAD
             Shipping and Tracking API access is available only for eligible
             Australia Post or StarTrack contract customers. If you already have a
             Shipping and Tracking API key, you can add your StarTrack account to
             your existing credentials instead of creating a new integration.
+=======
+            Shipping &amp; Tracking API access is available only for eligible
+            Australia Post or StarTrack contract customers. API credentials are
+            issued after your registration has been reviewed and approved.
+>>>>>>> 0e6e9b67246e905519767a76639d2addfe06681c
           </p>
         </div>
 
@@ -638,11 +705,16 @@ const GUIDE_TIPS: Record<string, {
 
         <div className="mt-4 border-t border-slate-100 pt-4 dark:border-zinc-800/80">
           <a
+<<<<<<< HEAD
             href="https://developers.auspost.com.au/apis"
+=======
+            href="https://developers.auspost.com.au/apis/st-registration"
+>>>>>>> 0e6e9b67246e905519767a76639d2addfe06681c
             target="_blank"
             rel="noopener noreferrer"
             className="text-[13px] font-semibold text-primary hover:underline"
           >
+<<<<<<< HEAD
             Register for the Shipping and Tracking API
           </a>
         </div>
@@ -860,6 +932,9 @@ const GUIDE_TIPS: Record<string, {
             className="text-[13px] font-semibold text-primary hover:underline"
           >
             Contact Team Global Express
+=======
+            Register for the Shipping &amp; Tracking API
+>>>>>>> 0e6e9b67246e905519767a76639d2addfe06681c
           </a>
         </div>
       </div>
@@ -895,9 +970,13 @@ function CarrierConfigTip({ selectedCarrier }: CarrierConfigTipProps) {
             {selectedCarrier === 'aramex' && "You will need an active Aramex Australia account and API credentials generated from your Aramex account portal."}
             {selectedCarrier === 'directfreight' && "To connect your Direct Freight account, ensure that API access has been enabled by Direct Freight."}
             {selectedCarrier === 'startrack' && "You will need an active StarTrack account and approved Shipping and Tracking API credentials."}
+<<<<<<< HEAD
             {selectedCarrier === 'fedex' && "You will need an active FedEx account with API access enabled, along with the username, password and sender code issued by FedEx for that account."}
             {selectedCarrier === 'tge' && "You will need an active Team Global Express account with API access enabled, along with the API credentials, connote and SSCC ranges and Print API credentials issued by Team Global Express for that account."}
             {selectedCarrier !== 'auspost' && selectedCarrier !== 'mypostbusiness' && selectedCarrier !== 'aramex' && selectedCarrier !== 'directfreight' && selectedCarrier !== 'startrack' && selectedCarrier !== 'fedex' && selectedCarrier !== 'tge' && `Make sure you have an active ${displayName} account with API access enabled.`}
+=======
+            {selectedCarrier !== 'auspost' && selectedCarrier !== 'mypostbusiness' && selectedCarrier !== 'aramex' && selectedCarrier !== 'directfreight' && selectedCarrier !== 'startrack' && `Make sure you have an active ${displayName} account with API access enabled.`}
+>>>>>>> 0e6e9b67246e905519767a76639d2addfe06681c
           </span>
         </div>
       </div>
@@ -1171,6 +1250,7 @@ export default function CarrierConfigForm({
     }
   };
 
+<<<<<<< HEAD
   const tgeBusinessUnits: string[] = Array.isArray(formData.business_units) ? formData.business_units : [];
 
   const validateForm = () => {
@@ -1184,15 +1264,23 @@ export default function CarrierConfigForm({
     if (tgeBusinessUnits.includes('IPEC')) tgeFields.push('ipec_slid', 'ipec_range_start', 'ipec_range_end');
     if (tgeBusinessUnits.includes('PriorityAustralia')) tgeFields.push('priority_slid', 'priority_range_start', 'priority_range_end');
 
+=======
+  const validateForm = () => {
+    const newErrors: Record<string, string> = {};
+>>>>>>> 0e6e9b67246e905519767a76639d2addfe06681c
     const requiredFields: Record<string, string[]> = {
       auspost: ['api_key', 'api_password', 'account_number',],
       aramex: ['client_id', 'client_secret'],
       mypostbusiness: ['merchant_token'],
       directfreight: ['token', 'account', 'site_id', 'base_url', 'consignment_token'],
       couriersplease: ['username', 'password'],
+<<<<<<< HEAD
       startrack: ['api_key', 'api_password', 'account_number'],
       fedex: ['username', 'password', 'account_number', 'sender_code'],
       tge: tgeFields
+=======
+      startrack: ['api_key', 'api_password', 'account_number']
+>>>>>>> 0e6e9b67246e905519767a76639d2addfe06681c
     };
 
     const fieldLabelMap: Record<string, string> = {
@@ -1206,6 +1294,7 @@ export default function CarrierConfigForm({
       account: 'Account number',
       site_id: 'Site ID',
       consignment_token: 'Consignment Token',
+<<<<<<< HEAD
       username: selectedCarrier === 'fedex' ? 'Username' : 'Account number',
       password: selectedCarrier === 'fedex' ? 'Password' : 'API Secret',
       sender_code: 'Sender code',
@@ -1222,14 +1311,24 @@ export default function CarrierConfigForm({
       sscc_range_end: 'SSCC range end',
       print_identity: 'Print identity',
       print_token: 'Print token'
+=======
+      username: 'Account number',
+      password: 'API Secret'
+>>>>>>> 0e6e9b67246e905519767a76639d2addfe06681c
     };
 
     const fieldsToValidate = requiredFields[selectedCarrier] || [];
     fieldsToValidate.forEach(field => {
+<<<<<<< HEAD
       const value = formData[field];
       if (!value || (typeof value === 'string' && !value.trim()) || (Array.isArray(value) && value.length === 0)) {
         const label = fieldLabelMap[field] || field.split('_').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
         newErrors[field] = `Please ${field === 'business_units' ? 'select' : 'enter'} ${label}`;
+=======
+      if (!formData[field] || (typeof formData[field] === 'string' && !formData[field].trim())) {
+        const label = fieldLabelMap[field] || field.split('_').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
+        newErrors[field] = `Please enter ${label}`;
+>>>>>>> 0e6e9b67246e905519767a76639d2addfe06681c
       }
     });
 
@@ -1243,6 +1342,7 @@ export default function CarrierConfigForm({
     if (!validateForm()) {
       return;
     }
+<<<<<<< HEAD
     if (selectedCarrier === 'fedex') {
       // FedEx /connect only accepts the credential fields, not the rest of the status payload.
       const { username, password, account_number, sender_code, account_label } = formData;
@@ -1278,6 +1378,8 @@ export default function CarrierConfigForm({
       onSubmit(payload);
       return;
     }
+=======
+>>>>>>> 0e6e9b67246e905519767a76639d2addfe06681c
     onSubmit(formData);
   };
 
@@ -1395,6 +1497,7 @@ export default function CarrierConfigForm({
             </div>
           </>
         );
+<<<<<<< HEAD
       case 'fedex':
         return (
           <>
@@ -1516,6 +1619,8 @@ export default function CarrierConfigForm({
             </div>
           </>
         );
+=======
+>>>>>>> 0e6e9b67246e905519767a76639d2addfe06681c
       default:
         return null;
     }
@@ -1584,8 +1689,13 @@ export default function CarrierConfigForm({
             <div className="col-span-12 border-b border-slate-100 dark:border-zinc-800/80 my-2" />
           </>
         )}
+<<<<<<< HEAD
         {/* Advanced Settings Column (left) — only once the account is connected */}
         {isConnected && formData.advanced_settings?.settings && formData.advanced_settings.settings.length > 0 && (
+=======
+        {/* Advanced Settings Column (left) */}
+        {formData.advanced_settings?.settings && formData.advanced_settings.settings.length > 0 && (
+>>>>>>> 0e6e9b67246e905519767a76639d2addfe06681c
           <div className="col-span-12 lg:col-span-4 bg-white dark:bg-zinc-900 border border-slate-200/80 dark:border-zinc-800 rounded-xl shadow-xs p-4 md:p-6 space-y-4 text-left transition-all duration-300 hover:shadow-sm">
             <div>
               <h4 className="text-base font-bold text-slate-900 dark:text-zinc-50 uppercase tracking-wide my-0">Advanced Settings</h4>
@@ -1594,7 +1704,11 @@ export default function CarrierConfigForm({
 
             <div className="space-y-4 w-full">
               {formData.advanced_settings.settings.map((setting: any) => {
+<<<<<<< HEAD
                 if (setting.type === 'checkbox' || setting.type === 'toggle') {
+=======
+                if (setting.type === 'checkbox') {
+>>>>>>> 0e6e9b67246e905519767a76639d2addfe06681c
                   return (
                     <div
                       key={setting.key}
@@ -1615,6 +1729,7 @@ export default function CarrierConfigForm({
                       </label>
                     </div>
                   );
+<<<<<<< HEAD
                 } else if (setting.type === 'dropdown' || setting.type === 'select') {
                   // AusPost sends plain strings, FedEx sends { value, label } pairs, TGE sends
                   // the options on the setting itself as well as the labelled list.
@@ -1624,6 +1739,13 @@ export default function CarrierConfigForm({
                   const options = rawOptions.map((opt: any) =>
                     typeof opt === 'string' ? { label: opt, value: opt } : { label: opt.label, value: opt.value }
                   );
+=======
+                } else if (setting.type === 'dropdown') {
+                  const options = (formData.advanced_settings.print_format_options || []).map((opt: string) => ({
+                    label: opt,
+                    value: opt
+                  }));
+>>>>>>> 0e6e9b67246e905519767a76639d2addfe06681c
                   return (
                     <div key={setting.key} className="space-y-1">
                       <FormSelect
@@ -1655,6 +1777,7 @@ export default function CarrierConfigForm({
                     </div>
                   );
                 }
+<<<<<<< HEAD
                 return (
                   <div key={setting.key} className="space-y-1">
                     <FormInput
@@ -1667,6 +1790,9 @@ export default function CarrierConfigForm({
                     />
                   </div>
                 );
+=======
+                return null;
+>>>>>>> 0e6e9b67246e905519767a76639d2addfe06681c
               })}
             </div>
 
@@ -1686,8 +1812,13 @@ export default function CarrierConfigForm({
           </div>
         )}
 
+<<<<<<< HEAD
         {/* Supported Products Column (right) — only once the account is connected */}
         {isConnected && formData.products && (() => {
+=======
+        {/* Supported Products Column (right) */}
+        {formData.products && (() => {
+>>>>>>> 0e6e9b67246e905519767a76639d2addfe06681c
           const filteredProducts = formData.products.filter((product: any) => {
             const term = productSearchTerm.toLowerCase();
             return (
@@ -1722,8 +1853,12 @@ export default function CarrierConfigForm({
                       className="mb-0"
                     />
                   </div>
+<<<<<<< HEAD
                   {/* StarTrack has no endpoint for adding services. */}
                   {isConnected && canReadWrite && selectedCarrier !== 'startrack' && (
+=======
+                  {isConnected && canReadWrite && (
+>>>>>>> 0e6e9b67246e905519767a76639d2addfe06681c
                     <Button
                       type="button"
                       variant="outline"

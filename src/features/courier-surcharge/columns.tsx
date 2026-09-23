@@ -10,12 +10,19 @@ export const SURCHARGE_COLUMNS = (onEdit: (row: any) => void, onDelete: (row: an
     key: 'courier_name',
     header: 'COURIER NAME',
     sortable: true,
+<<<<<<< HEAD
     disableToggle: true,
+=======
+>>>>>>> 0e6e9b67246e905519767a76639d2addfe06681c
     width: '150px',
     // cell: (val) => <span className="font-bold text-slate-900 dark:text-zinc-100 text-[13px]">{val}</span>
     cell: (value: string, row: CourierSurcharge) => (
       <div className="flex items-center gap-1 break-normal">
+<<<<<<< HEAD
         <img src={row?.courier_logo_url} className="h-6" alt="" />
+=======
+        <img src={row?.courier_logo_url || 'https://api.tranzit.digisite.net/assets/img/couriers/logo-auspost.png'} className="h-6" alt="" />
+>>>>>>> 0e6e9b67246e905519767a76639d2addfe06681c
         <span>{value}</span>
       </div>
     )
@@ -23,7 +30,10 @@ export const SURCHARGE_COLUMNS = (onEdit: (row: any) => void, onDelete: (row: an
   {
     key: 'code',
     header: 'CODE',
+<<<<<<< HEAD
     disableToggle: true,
+=======
+>>>>>>> 0e6e9b67246e905519767a76639d2addfe06681c
     width: "100px",
     // cell: (val) => <span className="text-slate-500 font-medium text-[12px]">{val}</span>
   },

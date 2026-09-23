@@ -609,6 +609,10 @@ const PermissionTreeView = ({
                 setTreeData(initializeTree(permissionsData, initialSelected));
             }
         }
+<<<<<<< HEAD
+=======
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+>>>>>>> 0e6e9b67246e905519767a76639d2addfe06681c
     }, [initialSelected, permissionsData]);
 
     const filterTree = (nodes: TreeNode[], query: string): TreeNode[] => {

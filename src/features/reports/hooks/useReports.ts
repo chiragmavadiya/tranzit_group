@@ -88,6 +88,7 @@ export const useIntegratedParcelReport = (filters: ReportFilters, isAdmin: boole
     queryFn: () => reportsService.getIntegratedParcelReport(filters),
     placeholderData: keepPreviousData,
     enabled,
+<<<<<<< HEAD
   });
 };
 
@@ -110,6 +111,8 @@ export const useExportAllParcelReport = () => {
     onError: (error: any) => {
       showToast(error?.response?.data?.message || "Failed to export parcel report", "error");
     },
+=======
+>>>>>>> 0e6e9b67246e905519767a76639d2addfe06681c
   });
 };
 

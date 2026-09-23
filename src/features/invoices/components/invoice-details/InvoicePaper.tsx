@@ -147,6 +147,7 @@ export const InvoicePaper: React.FC<InvoicePaperProps> = ({
   };
 
   const handleRemoveItem = useCallback((itemId: string | number) => {
+<<<<<<< HEAD
     setInvoiceData?.((prev: any) => {
       if (!(prev?.items?.length > 1)) return prev;
       const removed = prev.items.find((i: any) => i.id === itemId);
@@ -159,6 +160,9 @@ export const InvoicePaper: React.FC<InvoicePaperProps> = ({
           : prev.deleted_item_ids
       };
     })
+=======
+    setInvoiceData?.((prev: any) => ({ ...prev, items: prev?.items.length > 1 ? prev?.items?.filter((i: any) => i.id !== itemId) : prev?.items }))
+>>>>>>> 0e6e9b67246e905519767a76639d2addfe06681c
   }, [setInvoiceData])
 
   const updateStatus = useCallback((status: string) => {

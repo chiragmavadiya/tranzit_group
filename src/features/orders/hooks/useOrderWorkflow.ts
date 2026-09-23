@@ -17,6 +17,7 @@ import {
 } from './useOrders';
 import type { AddressData, OrderDetailData, WalletCheckResponse } from '../types';
 import { useDefaultItem } from '@/features/items/hooks/useItems';
+<<<<<<< HEAD
 import { removeEmptyFields } from '@/lib/utils';
 import { cleanSpaces } from '@/lib/phone';
 import { useCustomerMe } from '@/features/customers/hooks/useCustomers';
@@ -24,6 +25,11 @@ import { useGetUserDetails } from '@/features/auth/hooks/useAuth';
 import { setCourierSettings } from '@/features/auth/authSlice';
 import { useRules, useRuleOptions } from '@/features/rules/hooks/useRules';
 import { ruleFlagDefaultsFromActiveRules } from '@/features/rules/lib/ruleDefaults';
+=======
+import { cleanSpaces, removeEmptyFields } from '@/lib/utils';
+import { useCustomerMe } from '@/features/customers/hooks/useCustomers';
+import { setCourierSettings } from '@/features/auth/authSlice';
+>>>>>>> 0e6e9b67246e905519767a76639d2addfe06681c
 
 // address1 = street
 const initialAddressData = {
@@ -45,6 +51,7 @@ const initialAddressData = {
   saveToAddressBook: false,
 }
 
+<<<<<<< HEAD
 // Customers can be flagged per courier so support creates the label instead of the system.
 // The flags come from /me as flat keys. Pallet is pending its courierCode.
 const MANUAL_ORDER_FLAGS: Record<string, string> = {
@@ -53,6 +60,8 @@ const MANUAL_ORDER_FLAGS: Record<string, string> = {
   couriersplease_tranzit_group: 'manual_order_couriersplease',
 };
 
+=======
+>>>>>>> 0e6e9b67246e905519767a76639d2addfe06681c
 export const useOrderWorkflow = () => {
   const { orderType, orderID } = useParams<{ orderType: string; orderID: string }>();
   const [searchParams] = useSearchParams();
@@ -75,10 +84,13 @@ export const useOrderWorkflow = () => {
   const orderDetail = orderResponse?.data;
   const isEditable = orderType === 'create' || orderType === 'consign' || orderType === 'create-menual' || orderType === 'return';
   const isCreate = orderType === 'create' || orderType === 'create-menual' || orderType === 'return';
+<<<<<<< HEAD
   const { data: rulesResponse } = useRules(role === 'customer' && isEditable);
   const { data: ruleOptionsResponse } = useRuleOptions(role === 'customer' && isEditable);
   const packageRuleAppliedRef = useRef(false);
   const appliedRuleOutcomeRef = useRef<string | null>(null);
+=======
+>>>>>>> 0e6e9b67246e905519767a76639d2addfe06681c
 
   const { data: defaultItem } = useDefaultItem(isCreate && (role !== 'admin') && !localStorage.getItem('order_to_clone'))
   // State Management
@@ -133,15 +145,21 @@ export const useOrderWorkflow = () => {
   const [signatureSelected, setSignatureSelected] = useState<boolean>(false);
   const [orderDialogMode, setOrderDialogMode] = useState<'sender' | 'receiver' | null>(initialDialogMode);
   const [deliveryInstructions, setDeliveryInstructions] = useState<string>('');
+<<<<<<< HEAD
   // const [labelNotes, setLabelNotes] = useState<string>('');
+=======
+>>>>>>> 0e6e9b67246e905519767a76639d2addfe06681c
   const [isEdit, setIsEdit] = useState<boolean>(false);
   const [termsAccepted, setTermsAccepted] = useState(true);
   const [ratesAccepted, setRatesAccepted] = useState(true);
   const [dangerousGoodsAccepted, setDangerousGoodsAccepted] = useState(false);
   const [selectedCustomer, setSelectedCustomer] = useState<number>();
   const { data: customerMeData } = useCustomerMe(role === 'admin' ? selectedCustomer : undefined);
+<<<<<<< HEAD
   // Already fetched by the router; read from cache for the signed-in customer's /me flags.
   const { data: signedInMe } = useGetUserDetails(false);
+=======
+>>>>>>> 0e6e9b67246e905519767a76639d2addfe06681c
   const [showReceiverPhoneModal, setShowReceiverPhoneModal] = useState(false);
   const [receiverPhone, setReceiverPhone] = useState('');
 
@@ -167,6 +185,7 @@ export const useOrderWorkflow = () => {
     skipItemCountCheckRef.current = false;
   }, [itemsData]);
 
+<<<<<<< HEAD
   // Only the condition fields the create form can answer. order_value, order_source,
   // receiver_is_po_box and item_sku / item_description have no equivalent here, so
   // rules using them stay backend-only (import / Run rules now).
@@ -196,6 +215,8 @@ export const useOrderWorkflow = () => {
     [rulesResponse?.data, ruleOptionsResponse?.data?.my_items, ruleContext]
   );
 
+=======
+>>>>>>> 0e6e9b67246e905519767a76639d2addfe06681c
   const setDefaultItemData = useEffectEvent((data: any) => {
     if ((itemsData.length === 1) || itemsData.length === 0) {
       setItemsData([
@@ -218,6 +239,7 @@ export const useOrderWorkflow = () => {
   })
   useEffect(() => {
     if (defaultItem && !isValidItems() && (orderType === 'create' || orderType === 'create-menual' || orderType === 'return') && !localStorage.getItem('quote_to_clone') && !localStorage.getItem('quote_items')) {
+<<<<<<< HEAD
       // Package rules win over the account default item.
       if (ruleDefaults.package) {
         return;
@@ -225,6 +247,11 @@ export const useOrderWorkflow = () => {
       setDefaultItemData(defaultItem.data)
     }
   }, [defaultItem, setItemsData, orderType, ruleDefaults.package]);
+=======
+      setDefaultItemData(defaultItem.data)
+    }
+  }, [defaultItem, setItemsData, orderType]);
+>>>>>>> 0e6e9b67246e905519767a76639d2addfe06681c
 
 
 
@@ -243,7 +270,11 @@ export const useOrderWorkflow = () => {
         name: `${customerMeData.user.first_name || ''} ${customerMeData.user.last_name || ''}`.trim(),
         email: customerMeData.user.email || '',
         phone: customerMeData.user.office_number || customerMeData.user.personal_mobile || '',
+<<<<<<< HEAD
         company: addr.company_name || '',
+=======
+        company: customerMeData.user.company_name || '',
+>>>>>>> 0e6e9b67246e905519767a76639d2addfe06681c
         address_info: addr?.address_info || `${addr?.address}, ${addr?.suburb} ${addr?.state} ${addr?.postcode}` || '',
         address1: addr?.address || '',
         unit_number: addr?.unit_number || '',
@@ -257,7 +288,11 @@ export const useOrderWorkflow = () => {
     }));
 
     const anc = !isValidItems();
+<<<<<<< HEAD
     if (customerMeData.default_item && anc && !ruleDefaults.package) {
+=======
+    if (customerMeData.default_item && anc) {
+>>>>>>> 0e6e9b67246e905519767a76639d2addfe06681c
       setItemsData([{
         weight: Number(customerMeData.default_item?.item_weight) || 0,
         length: Number(customerMeData.default_item?.item_length) || 0,
@@ -267,7 +302,11 @@ export const useOrderWorkflow = () => {
         quantity: 1,
       }])
     }
+<<<<<<< HEAD
   }, [customerMeData, dispatch, orderType, setItemsData, ruleDefaults.package]);
+=======
+  }, [customerMeData, dispatch, orderType, setItemsData]);
+>>>>>>> 0e6e9b67246e905519767a76639d2addfe06681c
 
   const isValidConsignOrder = useCallback((orderStatus: string | undefined) => {
     if (orderStatus !== 'new' && orderType === 'consign') {
@@ -285,7 +324,11 @@ export const useOrderWorkflow = () => {
           ...prev[key],
           email: user.email || '',
           phone: user.office_number || user.personal_mobile || '',
+<<<<<<< HEAD
           company: user.addresses?.[0].company_name || '',
+=======
+          company: user.company_name || '',
+>>>>>>> 0e6e9b67246e905519767a76639d2addfe06681c
           address_info: user.addresses?.[0]?.address_info || user.addresses?.[0]?.address || '',
           address1: user.addresses?.[0]?.address || '',
           suburb: user.addresses?.[0]?.suburb || '',
@@ -349,13 +392,17 @@ export const useOrderWorkflow = () => {
       description: item.description || '',
     })) || []);
     setDeliveryInstructions(data.delivery_instructions || '');
+<<<<<<< HEAD
     // setLabelNotes(data.label_notes || '');
+=======
+>>>>>>> 0e6e9b67246e905519767a76639d2addfe06681c
     setInsuranceSelected(data.limited_liability_cover?.covered || false);
     setSignatureSelected(data.signature_required === 'yes');
     setCourierData(data.courier_details);
     setQuoteData(data.order_details);
     isValidConsignOrder(data.order_status_category);
     setSelectedCustomer(data.customer_id)
+<<<<<<< HEAD
     if (data.contains_dangerous_goods === false || sessionStorage.getItem(`order_${data?.order_number}_confirmed`) === 'true') {
       setDangerousGoodsAccepted(true)
     } else if (ruleDefaults.dangerousGoodsAccepted === true) {
@@ -461,6 +508,14 @@ export const useOrderWorkflow = () => {
       // }
     }
   }, [isCreate, isEditable, orderType, role, ruleDefaults, setItemsData]);
+=======
+    if (sessionStorage.getItem(`order_${data?.order_number}_confirmed`) === 'true') {
+      setDangerousGoodsAccepted(true)
+    }
+  }, [isValidConsignOrder, setItemsData, setDangerousGoodsAccepted])
+
+  // Sync existing order details (Edit/Consign Mode)
+>>>>>>> 0e6e9b67246e905519767a76639d2addfe06681c
   useEffect(() => {
     if (orderDetail && (orderType !== 'create' || localStorage.getItem('order_to_clone')) && orderType !== 'create-menual') {
       setOrdesDetailData(orderDetail)
@@ -523,6 +578,7 @@ export const useOrderWorkflow = () => {
     return noTrackingNumber;
   }, [orderDetail?.need_add_tracking]);
 
+<<<<<<< HEAD
   // True only when the customer is flagged for manual orders on the courier chosen for this
   // order. Redux keeps just the `user` sub-object of /me, so the cached payload is read too.
   const requiresSupportLabel = useMemo(() => {
@@ -550,6 +606,8 @@ export const useOrderWorkflow = () => {
     return true;
   }, [itemsData]);
 
+=======
+>>>>>>> 0e6e9b67246e905519767a76639d2addfe06681c
   // Order Submission/Saving Flow
   const handleOnSave = useCallback((skipWalletCheckArg?: any, overrideReceiverPhone?: string) => {
     if (skipWalletCheckArg === 'skipItemCountCheck') {
@@ -647,6 +705,13 @@ export const useOrderWorkflow = () => {
       return;
     }
 
+<<<<<<< HEAD
+=======
+    const isValidItems = itemsData && itemsData.length > 0 && itemsData.every((item) =>
+      item.type !== 'box' ||
+      Number(item.height) > 0 && Number(item.width) > 0 && Number(item.length) > 0 && Number(item.weight) > 0 && Number(item.quantity) > 0
+    );
+>>>>>>> 0e6e9b67246e905519767a76639d2addfe06681c
     const hasSenderAddress = Boolean(addressData?.sender?.address1);
     const hasReceiverAddress = Boolean(addressData?.receiver?.address1);
 
@@ -655,9 +720,13 @@ export const useOrderWorkflow = () => {
       return;
     }
 
+<<<<<<< HEAD
     if (!hasValidParcelDetails()) return;
 
     if (skipWalletCheckArg !== 'saveAsDraft' && (!hasSenderAddress || !hasReceiverAddress)) {
+=======
+    if (skipWalletCheckArg !== 'saveAsDraft' && (!isValidItems || !hasSenderAddress || !hasReceiverAddress)) {
+>>>>>>> 0e6e9b67246e905519767a76639d2addfe06681c
       showToast('Please fill out item dimensions and complete both addresses.', 'error');
       return;
     }
@@ -675,6 +744,7 @@ export const useOrderWorkflow = () => {
       showToast("Please confirm that this consignment does not contain dangerous goods", 'error');
       return;
     }
+<<<<<<< HEAD
     // Support creates the label when the customer is flagged for manual orders on this courier,
     // or when Direct Freight limits are exceeded (any item weight above 28kg, or 6+ items).
     const needsSupportLabel = requiresSupportLabel
@@ -682,6 +752,10 @@ export const useOrderWorkflow = () => {
         && (itemsData.length >= 6 || itemsData?.some((item) => Number(item.quantity) >= 6) || itemsData?.some((item) => Number(item.weight) >= 28)));
 
     if (needsSupportLabel && skipWalletCheckArg !== true && skipWalletCheckArg !== 'skipItemCountCheck' && skipWalletCheckArg !== 'saveAsDraft' && !skipItemCountCheckRef.current) {
+=======
+    // if any item have weight above 28kg then will show itemCount model
+    if (quoteData?.courier?.courierCode === 'direct_freight_express_tranzit_group' && (itemsData.length >= 6 || itemsData?.some((item) => Number(item.quantity) >= 6) || itemsData?.some((item) => Number(item.weight) >= 28)) && skipWalletCheckArg !== true && skipWalletCheckArg !== 'skipItemCountCheck' && skipWalletCheckArg !== 'saveAsDraft' && !skipItemCountCheckRef.current) {
+>>>>>>> 0e6e9b67246e905519767a76639d2addfe06681c
       setShowItemCountModal(true);
       return;
     }
@@ -714,6 +788,7 @@ export const useOrderWorkflow = () => {
         cover_limited_liability: insuranceSelected ? 1 : 0,
         ...formattedActiveSettings,
         signature_required: activeSettings?.signature_required ? 1 : 0,
+<<<<<<< HEAD
         // Order flag: 1 = contains DG. Checkbox checked = does NOT contain → 0.
         contains_dangerous_goods: dangerousGoodsAccepted ? 0 : 1,
       },
@@ -722,6 +797,12 @@ export const useOrderWorkflow = () => {
       // label_notes: labelNotes,
       terms_and_conditions: termsAccepted,
       contains_dangerous_goods: dangerousGoodsAccepted,
+=======
+      },
+      surcharges: quoteData?.surcharges || [],
+      delivery_instructions: deliveryInstructions,
+      terms_and_conditions: termsAccepted,
+>>>>>>> 0e6e9b67246e905519767a76639d2addfe06681c
       totals: {
         subtotal: quoteData?.courier?.base || 0,
         gst: quoteData?.gst || 0,
@@ -731,7 +812,10 @@ export const useOrderWorkflow = () => {
         markup_charge: quoteData?.courier?.markup_charge || 0,
         pickup_value: quoteData?.courier?.pickup_value || 0,
         applied_markup_percent: quoteData?.courier?.applied_markup_percent || 0,
+<<<<<<< HEAD
         courier_based_charge: quoteData?.courier?.courier_based_charge || 0,
+=======
+>>>>>>> 0e6e9b67246e905519767a76639d2addfe06681c
       },
       capture: getCapture(),
       order_type: orderDetail?.order_type,
@@ -826,7 +910,11 @@ export const useOrderWorkflow = () => {
         showToast('Failed to create orders', 'error');
       },
     });
+<<<<<<< HEAD
   }, [orderType, itemsData, hasValidParcelDetails, addressData, role, selectedCustomer, courierData, termsAccepted, ratesAccepted, dangerousGoodsAccepted, requiresSupportLabel, quoteData?.courier?.courierCode, quoteData?.courier?.base, quoteData?.courier?.freight_levy, quoteData?.courier?.markup_charge, quoteData?.courier?.pickup_value, quoteData?.courier?.applied_markup_percent, quoteData?.courier?.courier_based_charge, quoteData?.surcharges, quoteData?.gst, activeSettings, insuranceSelected, deliveryInstructions, calculation.totalSurcharges, calculation.grandTotal, orderDetail?.order_type, manualOrderData.trackingNumber, manualOrderData.courierId, manualOrderData.amount, checkWallet, createManualOrder, navigate, printLabel, walletCheckData?.wallet_balance, orderID, updateOrder, createOrder]);
+=======
+  }, [orderType, itemsData, addressData, role, selectedCustomer, courierData, termsAccepted, ratesAccepted, dangerousGoodsAccepted, quoteData?.courier?.courierCode, quoteData?.courier?.base, quoteData?.courier?.freight_levy, quoteData?.courier?.markup_charge, quoteData?.courier?.applied_markup_percent, quoteData?.courier?.pickup_value, quoteData?.surcharges, quoteData?.gst, activeSettings, insuranceSelected, deliveryInstructions, calculation.totalSurcharges, calculation.grandTotal, orderDetail?.order_type, manualOrderData.trackingNumber, manualOrderData.courierId, manualOrderData.amount, checkWallet, createManualOrder, navigate, printLabel, walletCheckData?.wallet_balance, orderID, updateOrder, createOrder]);
+>>>>>>> 0e6e9b67246e905519767a76639d2addfe06681c
 
   // Order Consignment Flow
   const handleConsign = useCallback((skipWalletCheckArg?: any, overrideReceiverPhone?: string) => {
@@ -838,6 +926,7 @@ export const useOrderWorkflow = () => {
       return;
     }
 
+<<<<<<< HEAD
     if (!hasValidParcelDetails()) return;
 
     const needsSupportLabel = requiresSupportLabel
@@ -845,6 +934,9 @@ export const useOrderWorkflow = () => {
         && (itemsData.length >= 4 || itemsData?.some((item) => Number(item.quantity) >= 4) || itemsData?.some((item) => Number(item.weight) >= 28)));
 
     if (needsSupportLabel && skipWalletCheckArg !== true && skipWalletCheckArg !== 'skipItemCountCheck' && !skipItemCountCheckRef.current) {
+=======
+    if (quoteData?.courier?.courierCode === 'direct_freight_express_tranzit_group' && (itemsData.length >= 4 || itemsData?.some((item) => Number(item.quantity) >= 4) || itemsData?.some((item) => Number(item.weight) >= 28)) && skipWalletCheckArg !== true && skipWalletCheckArg !== 'skipItemCountCheck' && !skipItemCountCheckRef.current) {
+>>>>>>> 0e6e9b67246e905519767a76639d2addfe06681c
       setShowItemCountModal(true);
       return;
     }
@@ -893,6 +985,7 @@ export const useOrderWorkflow = () => {
         cover_limited_liability: insuranceSelected ? 1 : 0,
         ...formattedActiveSettings,
         signature_required: signatureSelected ? 1 : 0,
+<<<<<<< HEAD
         // Order flag: 1 = contains DG. Checkbox checked = does NOT contain → 0.
         contains_dangerous_goods: dangerousGoodsAccepted ? 0 : 1,
       },
@@ -901,6 +994,12 @@ export const useOrderWorkflow = () => {
       // label_notes: labelNotes,
       terms_and_conditions: termsAccepted,
       contains_dangerous_goods: dangerousGoodsAccepted,
+=======
+      },
+      surcharges: quoteData?.surcharges || [],
+      delivery_instructions: deliveryInstructions,
+      terms_and_conditions: termsAccepted,
+>>>>>>> 0e6e9b67246e905519767a76639d2addfe06681c
       order_type: orderDetail?.order_type,
       totals: {
         subtotal: quoteData?.courier?.base || calculation.servicePrice,
@@ -911,7 +1010,10 @@ export const useOrderWorkflow = () => {
         markup_charge: quoteData?.courier?.markup_charge || 0,
         pickup_value: quoteData?.courier?.pickup_value || 0,
         applied_markup_percent: quoteData?.courier?.applied_markup_percent || 0,
+<<<<<<< HEAD
         courier_based_charge: quoteData?.courier?.courier_based_charge || 0,
+=======
+>>>>>>> 0e6e9b67246e905519767a76639d2addfe06681c
       },
       capture: role === 'admin' || !skipWalletCheckArg || (walletCheckData?.wallet_balance ?? 0) > calculation.grandTotal,
       ...(orderType === 'create-menual' ? {
@@ -965,7 +1067,11 @@ export const useOrderWorkflow = () => {
       },
     });
 
+<<<<<<< HEAD
   }, [termsAccepted, ratesAccepted, dangerousGoodsAccepted, hasValidParcelDetails, requiresSupportLabel, quoteData?.courier?.courierCode, quoteData?.courier?.base, quoteData?.courier?.freight_levy, quoteData?.courier?.markup_charge, quoteData?.courier?.pickup_value, quoteData?.courier?.applied_markup_percent, quoteData?.courier?.courier_based_charge, quoteData?.surcharges, quoteData?.gst, itemsData, activeSettings, selectedCustomer, orderDetail?.sender_details?.customer_id, orderDetail?.order_type, addressData.sender.name, addressData.sender.company, addressData.sender.phone, addressData.sender.email, addressData.sender.address1, addressData.sender.suburb, addressData.sender.state, addressData.sender.postcode, addressData.sender.country, addressData.receiver.name, addressData.receiver.company, addressData.receiver.phone, addressData.receiver.email, addressData.receiver.address1, addressData.receiver.suburb, addressData.receiver.state, addressData.receiver.postcode, addressData.receiver.country, courierData, insuranceSelected, signatureSelected, deliveryInstructions, calculation.servicePrice, calculation.gst, calculation.grandTotal, calculation.totalSurcharges, role, walletCheckData?.wallet_balance, orderType, manualOrderData.trackingNumber, manualOrderData.courierId, manualOrderData.amount, checkWallet, orderID, consignOrder, navigate, printLabel]);
+=======
+  }, [termsAccepted, ratesAccepted, dangerousGoodsAccepted, quoteData?.courier?.courierCode, quoteData?.courier?.base, quoteData?.courier?.freight_levy, quoteData?.courier?.markup_charge, quoteData?.courier?.pickup_value, quoteData?.courier?.applied_markup_percent, quoteData?.surcharges, quoteData?.gst, itemsData, activeSettings, selectedCustomer, orderDetail?.sender_details?.customer_id, orderDetail?.order_type, addressData.sender.name, addressData.sender.company, addressData.sender.phone, addressData.sender.email, addressData.sender.address1, addressData.sender.suburb, addressData.sender.state, addressData.sender.postcode, addressData.sender.country, addressData.receiver.name, addressData.receiver.company, addressData.receiver.phone, addressData.receiver.email, addressData.receiver.address1, addressData.receiver.suburb, addressData.receiver.state, addressData.receiver.postcode, addressData.receiver.country, courierData, insuranceSelected, signatureSelected, deliveryInstructions, calculation.servicePrice, calculation.gst, calculation.grandTotal, calculation.totalSurcharges, role, walletCheckData?.wallet_balance, orderType, manualOrderData.trackingNumber, manualOrderData.courierId, manualOrderData.amount, checkWallet, orderID, consignOrder, navigate, printLabel]);
+>>>>>>> 0e6e9b67246e905519767a76639d2addfe06681c
 
 
   const handleReceiverPhoneSubmit = useCallback((phone: string) => {

@@ -1,6 +1,7 @@
 import { createSlice, type PayloadAction } from "@reduxjs/toolkit";
 import type { AuthState } from "@/types/store.types";
 import type { User, TeamAccess, BlackoutDay } from "@/features/auth/auth.types";
+<<<<<<< HEAD
 import { ADMIN_ROLES } from "@/constants";
 
 /**
@@ -15,6 +16,8 @@ export const normalizeRole = (role?: string | null) => {
         ? 'admin'
         : value.toLowerCase();
 };
+=======
+>>>>>>> 0e6e9b67246e905519767a76639d2addfe06681c
 
 const initialState: AuthState = {
     user: null,
@@ -42,8 +45,12 @@ const authSlice = createSlice({
             state,
             action: PayloadAction<{ userID: number; token: string, role: string, next_step: string, user?: User, team_access?: TeamAccess, courier_settings?: any, blackout_days?: BlackoutDay[] }>
         ) => {
+<<<<<<< HEAD
             const { userID, token, role: rawRole, next_step, user, team_access, courier_settings, blackout_days } = action.payload;
             const role = normalizeRole(rawRole);
+=======
+            const { userID, token, role, next_step, user, team_access, courier_settings, blackout_days } = action.payload;
+>>>>>>> 0e6e9b67246e905519767a76639d2addfe06681c
             state.userID = userID;
             state.role = role;
             state.token = token;
@@ -72,7 +79,11 @@ const authSlice = createSlice({
             state.user = user;
             state.userID = user.id;
             state.isAuthenticated = true;
+<<<<<<< HEAD
             const role = normalizeRole(user.role);
+=======
+            const role = user.role;
+>>>>>>> 0e6e9b67246e905519767a76639d2addfe06681c
             state.default_courier = default_courier;
             state.default_item = default_item;
             if (courier_settings !== undefined) {
@@ -84,8 +95,13 @@ const authSlice = createSlice({
                 localStorage.setItem("blackout_days", JSON.stringify(blackout_days));
             }
             if (role) {
+<<<<<<< HEAD
                 state.role = role;
                 localStorage.setItem("user_role", role);
+=======
+                state.role = role.toLowerCase();
+                localStorage.setItem("user_role", role.toLowerCase());
+>>>>>>> 0e6e9b67246e905519767a76639d2addfe06681c
             }
             if (next_step !== undefined) state.next_step = next_step;
             if (team_access !== undefined) {

@@ -7,9 +7,13 @@ import { AUSTRALIAN_STATES } from '../constants';
 import { useAddressBookDetails } from '../hooks/useAddressBook';
 import { PlaceAutocomplete } from '@/components/common/AutoComplateAddress';
 import { showToast } from '@/components/ui/custom-toast';
+<<<<<<< HEAD
 import { cleanSpaces, isPhoneValid, PHONE_ERROR_MESSAGE } from '@/lib/phone';
 import { useValidateLocality } from '@/hooks/useValidateLocality';
 import { LocalityWarning } from '@/components/common/LocalityWarning';
+=======
+import { cleanSpaces, isPhoneValid } from '@/lib/utils';
+>>>>>>> 0e6e9b67246e905519767a76639d2addfe06681c
 // import { GlobalCourierSelect } from '@/features/courier-surcharge/components/GlobalCourierSelect';
 
 interface CreateAddressDialogProps {
@@ -94,6 +98,7 @@ export function CreateAddressDialog({
     }
 
     if (formData.phone && !isPhoneValid(formData.phone)) {
+<<<<<<< HEAD
       showToast(PHONE_ERROR_MESSAGE, 'error');
       return;
     }
@@ -105,6 +110,9 @@ export function CreateAddressDialog({
 
     if (isLocalityPending) {
       showToast("Validating address, please wait", 'error');
+=======
+      showToast("Please enter a valid phone number", 'error');
+>>>>>>> 0e6e9b67246e905519767a76639d2addfe06681c
       return;
     }
 
@@ -136,6 +144,198 @@ export function CreateAddressDialog({
             <div className="flex flex-col items-center gap-2">
               <Loader2 className="h-8 w-8 text-primary animate-spin" />
               <p className="text-xs font-bold text-slate-500 uppercase tracking-wide">Fetching Details...</p>
+<<<<<<< HEAD
+=======
+            </div>
+          </div>
+        )}
+        <div className="space-y-4">
+          <div className="flex dark:border-zinc-800 rounded-xs overflow-hidden bg-white dark:bg-zinc-950 mb-6">
+            <div className="flex-1 relative flex items-center">
+              <PlaceAutocomplete
+                placeholder='Search street address'
+                onPlaceSelect={(opt) => {
+                  handleChange('address_info', opt.formatted_address);
+                  handleChange('unit_number', opt.unit_number);
+                  handleChange('address', opt.street);
+                  handleChange('street_number', opt.street_number);
+                  handleChange('street_name', opt.street_name);
+                  handleChange('street_type', opt.street_type);
+                  handleChange('suburb', opt.suburb);
+                  handleChange('state', opt.state);
+                  handleChange('postcode', opt.post_code);
+                  setIsSelected(true)
+                }}
+                onChange={(value) => { handleChange('address_info', value); setIsSelected(false) }}
+                // error={submited && formData.address_information?.trim() === ''}
+                // errormsg='Please enter an address'
+                value={formData.address_info}
+                autoFocus={false}
+              />
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-4">
+            {/* Left Column */}
+            <div className="space-y-4">
+              <FormInput
+                layout="horizontal"
+                label="Receiver name"
+                value={formData.contact_person}
+                onChange={(val) => handleChange('contact_person', val)}
+                placeholder="Receiver name"
+                required
+                error={submited && formData.contact_person.length < 1}
+                errormsg="Please enter receiver name"
+                isFullWidth
+              />
+              <FormInput
+                layout="horizontal"
+                label="Email"
+                value={formData.email}
+                onChange={(val) => handleChange('email', val)}
+                placeholder="example@mail.com"
+                required
+                error={submited && formData.email.length < 1}
+                errormsg="Please enter an email"
+                isFullWidth
+              />
+              <FormInput
+                layout="horizontal"
+                label="Phone"
+                value={formData.phone || ''}
+                onChange={(val) => handleChange('phone', val)}
+                placeholder="Phone number"
+                isFullWidth
+                required
+                error={submited && formData.phone.length < 1}
+                errormsg="Please enter a phone number"
+              />
+              <FormTextarea
+                layout="horizontal"
+                label="Special Instructions"
+                value={formData.special_instructions || ''}
+                onChange={(val) => handleChange('special_instructions', val)}
+                placeholder="instructions..."
+                rows={3}
+                isFullWidth
+              />
+              {/* <FormSelect
+                layout="horizontal"
+                label="Preferred Courier"
+                value={formData.default_carrier || ''}
+                onValueChange={(val) => handleChange('default_carrier', val)}
+                options={MOCK_COURIERS}
+                placeholder="Select type"
+                required
+                error={submited && formData.default_carrier.length < 1}
+                errormsg="Please select the carrier"
+                isFullWidth
+              /> */}
+              {/* <GlobalCourierSelect
+                  layout='horizontal'
+                  value={formData.default_carrier}
+                  onValueChange={(val) => handleChange('default_carrier', val || '')}
+                  required
+                  error={submited && !formData.default_carrier}
+                  errormsg="Please select a Default Courier"
+                /> */}
+              <FormInput
+                layout="horizontal"
+                label="Customer Reference"
+                value={formData.customer_reference}
+                onChange={(val) => handleChange('customer_reference', val)}
+                placeholder="Customer Reference"
+              // required
+              // error={submited && formData.code.length < 1}
+              // errormsg="Please enter a customer reference"
+              // isFullWidth
+              />
+            </div>
+
+            {/* Right Column */}
+            <div className="space-y-4">
+              <FormInput
+                layout="horizontal"
+                label="Company Name"
+                value={formData.business_name || ''}
+                onChange={(val) => handleChange('business_name', val)}
+                placeholder="Company name"
+                isFullWidth
+              />
+              <FormInput
+                layout="horizontal"
+                label="Unit Number"
+                value={formData.unit_number || ''}
+                onChange={(val) => handleChange('unit_number', val)}
+                placeholder="e.g. 1234"
+                isFullWidth
+                disabled={isSelected}
+              />
+              <FormInput
+                layout="horizontal"
+                label="Street"
+                value={formData.address || ''}
+                onChange={(val) => { handleChange('address', val); handleChange('street_name', val); }}
+                placeholder="e.g. George"
+                required
+                error={submited && formData.address.length < 1}
+                errormsg="Please enter the street"
+                isFullWidth
+                disabled={isSelected}
+              />
+              <FormInput
+                layout="horizontal"
+                label="Suburb"
+                value={formData.suburb || ''}
+                onChange={(val) => handleChange('suburb', val)}
+                placeholder="e.g. Sydney"
+                required
+                error={submited && formData.suburb.length < 1}
+                errormsg="Please enter the suburb"
+                isFullWidth
+                disabled={isSelected}
+              />
+              <FormSelect
+                layout="horizontal"
+                label="State"
+                value={formData.state || ''}
+                onValueChange={(val) => handleChange('state', val)}
+                options={AUSTRALIAN_STATES}
+                placeholder="Select state"
+                required
+                error={submited && formData.state.length < 1}
+                errormsg="Please select the state"
+                disabled={isSelected}
+                allowClear={false}
+              // isFullWidth
+              />
+              <FormInput
+                layout="horizontal"
+                label="Post Code"
+                value={formData.postcode || ''}
+                onChange={(val) => handleChange('postcode', val)}
+                placeholder="e.g. 2000"
+                required
+                error={submited && formData.postcode.length < 1}
+                errormsg="Please enter the post code"
+                isFullWidth
+                disabled={isSelected}
+              />
+              <FormInput
+                layout="horizontal"
+                label="Country"
+                value={formData.country || 'Australia'}
+                // onChange={(val) => handleChange('country', val)}
+                disabled
+                placeholder="e.g. Australia"
+                // required
+                // error={submited && formData.country.length < 1}
+                // errormsg="Please enter the country"
+                isFullWidth
+              />
+
+>>>>>>> 0e6e9b67246e905519767a76639d2addfe06681c
             </div>
           </div>
         )}

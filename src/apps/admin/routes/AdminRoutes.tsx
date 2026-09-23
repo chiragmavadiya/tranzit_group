@@ -14,7 +14,10 @@ const InvoiceDetails = lazy(() => import('@/features/invoices/pages/InvoiceDocum
 const ParcelReport = lazy(() => import('@/features/reports/pages/ParcelReportPage'));
 const AuspostReportPage = lazy(() => import('@/features/reports/pages/AusPostReport'));
 const IntegratedParcelReport = lazy(() => import('@/features/reports/pages/IntegratedParcelReport'));
+<<<<<<< HEAD
 const AllParcelReport = lazy(() => import('@/features/reports/pages/AllParcelReportPage'));
+=======
+>>>>>>> 0e6e9b67246e905519767a76639d2addfe06681c
 const OrderLabelChargesReport = lazy(() => import('@/features/reports/pages/OrderLabelChargesReport'));
 const CustomerManagement = lazy(() => import('@/features/customers/pages/CustomerPage'));
 const CustomerDetailPage = lazy(() => import('@/features/customers/pages/CustomerDetailPage'));
@@ -52,6 +55,8 @@ const withSuspense = (Component: React.ReactNode) => (
 
 
 export default function AdminRoutes() {
+    console.log("Render AdminRoutes")
+
     return (
         <Routes>
             <Route element={<ProtectedRoute role="admin" />}>
@@ -99,7 +104,10 @@ export default function AdminRoutes() {
                     <Route path="enquiry" element={withSuspense(<EnquiryPage />)} />
 
                     {/* Reports */}
+<<<<<<< HEAD
                     <Route path="all-reports" element={withSuspense(<AllParcelReport />)} />
+=======
+>>>>>>> 0e6e9b67246e905519767a76639d2addfe06681c
                     <Route path="auspost-report" element={withSuspense(<AuspostReportPage />)} />
                     <Route path="customer-parcel-report" element={withSuspense(<ParcelReport />)} />
                     <Route path="integrated-parcel-report" element={withSuspense(<IntegratedParcelReport />)} />

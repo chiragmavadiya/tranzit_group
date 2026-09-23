@@ -10,7 +10,11 @@ import brandlogo from '@/assets/Tranzit_Logo.svg';
 import { useLogin } from "@/features/auth/hooks/useAuth";
 import type { LoginRequest } from "@/features/auth/auth.types";
 import { useAppDispatch } from "@/hooks/store.hooks";
+<<<<<<< HEAD
 import { setCredentials, normalizeRole } from "@/features/auth/authSlice";
+=======
+import { setCredentials } from "@/features/auth/authSlice";
+>>>>>>> 0e6e9b67246e905519767a76639d2addfe06681c
 import { useEffect, useState } from "react";
 import { Spinner } from "@/components/ui/spinner";
 import { showToast } from "@/components/ui/custom-toast";
@@ -44,7 +48,11 @@ export default function SignIn({ role = "customer" }: { role?: string }) {
     loginMutation.mutate(data, {
       onSuccess: (response) => {
         if (response?.status && response.user) {
+<<<<<<< HEAD
           const role = normalizeRole(response.user.role || response.user.roles[0]?.name);
+=======
+          const role = response.user.role || response.user.roles[0]?.name;
+>>>>>>> 0e6e9b67246e905519767a76639d2addfe06681c
           dispatch(setCredentials({
             userID: response.user.id,
             token: response.token,

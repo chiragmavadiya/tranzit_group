@@ -826,7 +826,11 @@ export default function DangerousGoods() {
       </header>
 
       {/* Main Content Area */}
+<<<<<<< HEAD
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+=======
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16">
+>>>>>>> 0e6e9b67246e905519767a76639d2addfe06681c
         <div className="lg:grid lg:grid-cols-12 lg:gap-10">
 
           {/* Left Column: Sidebar Table of Contents */}

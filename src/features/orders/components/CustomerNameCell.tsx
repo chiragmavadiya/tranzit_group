@@ -2,7 +2,10 @@ import { useState } from 'react';
 import { ChevronDown, MapPin, Phone, Mail, Pencil } from "lucide-react";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import type { Order } from "../types";
+<<<<<<< HEAD
 // import { AddressStatusIcon } from "./address-validation/AddressStatusIcon";
+=======
+>>>>>>> 0e6e9b67246e905519767a76639d2addfe06681c
 
 interface CustomerNameCellProps {
   value: string;
@@ -24,6 +27,7 @@ export const CustomerNameCell = ({
   isAdmin,
 }: CustomerNameCellProps) => {
   const [open, setOpen] = useState(false);
+<<<<<<< HEAD
   // const icon = (
   //   <AddressStatusIcon status={row.address_status} message={row.address_message} />
   // );
@@ -35,6 +39,11 @@ export const CustomerNameCell = ({
         {value}
       </span>
     );
+=======
+
+  if (fromCustomer) {
+    return <span className="whitespace-normal break-words uppercase font-semibold leading-tight">{value}</span>;
+>>>>>>> 0e6e9b67246e905519767a76639d2addfe06681c
   }
 
   const [street, ...rest] = row.customer_full_address?.split(",") || [];
@@ -48,7 +57,10 @@ export const CustomerNameCell = ({
     return (
       <div
         onMouseLeave={() => setOpen(false)}
+<<<<<<< HEAD
         onClick={(e) => e.stopPropagation()}
+=======
+>>>>>>> 0e6e9b67246e905519767a76639d2addfe06681c
         className="w-full"
       >
         <Popover open={open} onOpenChange={setOpen}>
@@ -57,10 +69,14 @@ export const CustomerNameCell = ({
               onClick={() => setOpen(prev => !prev)}
               className="w-[calc(100%+12px)] px-1.5 transition-all duration-250 py-1 border border-transparent -mx-1.5 group-hover/row:border-gray-200 dark:group-hover/row:border-zinc-800 group-hover/row:bg-white dark:group-hover/row:bg-zinc-900 rounded-sm flex items-center justify-between hover:text-primary outline-none cursor-pointer text-slate-800 dark:text-zinc-200 min-w-0"
             >
+<<<<<<< HEAD
               <span className="whitespace-normal break-words uppercase font-medium flex-1 text-left pr-1 leading-tight inline-flex items-center gap-1.5 min-w-0">
                 {/* {icon} */}
                 {value}
               </span>
+=======
+              <span className="whitespace-normal break-words uppercase font-medium flex-1 text-left pr-1 leading-tight">{value}</span>
+>>>>>>> 0e6e9b67246e905519767a76639d2addfe06681c
               <ChevronDown className="w-3.5 h-3.5 opacity-0 group-hover/row:opacity-100 transition-opacity duration-250 text-slate-400 dark:text-zinc-500 shrink-0 ml-1" />
             </button>
           </PopoverTrigger>
@@ -98,6 +114,7 @@ export const CustomerNameCell = ({
   }
 
   return (
+<<<<<<< HEAD
     <div
       onClick={(e) => e.stopPropagation()}
       className="w-[calc(100%+12px)] flex justify-between items-center uppercase font-medium py-1 px-1.5 -mx-1.5 transition-all duration-250 border border-transparent group-hover/row:border-gray-200 dark:group-hover/row:border-zinc-800 group-hover/row:bg-white dark:group-hover/row:bg-zinc-900 rounded-sm text-slate-800 dark:text-zinc-200 min-w-0"
@@ -106,6 +123,10 @@ export const CustomerNameCell = ({
         {/* {icon} */}
         {value}
       </span>
+=======
+    <div className="w-[calc(100%+12px)] flex justify-between items-center uppercase font-medium py-1 px-1.5 -mx-1.5 transition-all duration-250 border border-transparent group-hover/row:border-gray-200 dark:group-hover/row:border-zinc-800 group-hover/row:bg-white dark:group-hover/row:bg-zinc-900 rounded-sm text-slate-800 dark:text-zinc-200 min-w-0">
+      <span className="whitespace-normal break-words flex-1 text-left pr-1 leading-tight">{value}</span>
+>>>>>>> 0e6e9b67246e905519767a76639d2addfe06681c
       <Pencil onClick={() => customerEditClick(row.order_number)} className="h-3 w-3 shrink-0 cursor-pointer text-primary opacity-0 group-hover/row:opacity-100" />
     </div>
   );

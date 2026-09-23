@@ -97,8 +97,11 @@ export interface ReportFilters {
   customer_id?: string;
   invoice_type?: string;
   user_id?: string;
+<<<<<<< HEAD
   courier_type?: ParcelReportSource | 'all';
   customer?: string;
+=======
+>>>>>>> 0e6e9b67246e905519767a76639d2addfe06681c
 }
 
 export interface PaginatedResponse<T> {

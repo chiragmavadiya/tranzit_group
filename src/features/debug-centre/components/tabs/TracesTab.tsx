@@ -22,7 +22,10 @@ export const TracesTab = ({ filters, searchValue, onPageChange, onPageSizeChange
     <DataTable
       columns={TRACES_COLUMNS}
       data={traces}
+<<<<<<< HEAD
       moduleName="trace"
+=======
+>>>>>>> 0e6e9b67246e905519767a76639d2addfe06681c
       loading={isLoading}
       totalItems={totalItems}
       currentPage={filters.page || 1}

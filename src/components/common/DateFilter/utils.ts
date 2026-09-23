@@ -13,7 +13,11 @@ import {
   subYears,
   format,
 } from "date-fns";
+<<<<<<< HEAD
 import type { DateFilterType, DateFilterValue } from "./types";
+=======
+import type { DateFilterType } from "./types";
+>>>>>>> 0e6e9b67246e905519767a76639d2addfe06681c
 
 export const QUICK_FILTER_OPTIONS: { type: DateFilterType; label: string }[] = [
   { type: "today", label: "Today" },
@@ -106,6 +110,7 @@ export const getQuickFilterLabel = (type: DateFilterType): string => {
   const option = QUICK_FILTER_OPTIONS.find((opt) => opt.type === type);
   return option ? option.label : "Today";
 };
+<<<<<<< HEAD
 
 /**
  * Rebuilds a persisted date filter for the current day.
@@ -134,3 +139,5 @@ export const hydrateDateFilter = (
     label: range.label,
   };
 };
+=======
+>>>>>>> 0e6e9b67246e905519767a76639d2addfe06681c

@@ -54,12 +54,15 @@ export interface DataTableProps<T> {
   columnSettings?: boolean;
   defaultVisibleColumns?: string[];
   onColumnVisibilityChange?: (visibleColumns: string[]) => void;
+<<<<<<< HEAD
   /**
    * Opt in to remembering which columns the user hid, keyed by module
    * (e.g. 'manifest' -> 'manifest_hidden_columns'). Omit to keep the
    * toggles session-only.
    */
   moduleName?: string;
+=======
+>>>>>>> 0e6e9b67246e905519767a76639d2addfe06681c
   // Resizing
   resizable?: boolean;
   persistenceId?: string;

@@ -94,7 +94,11 @@ export function BookPickupDialog({ open, onOpenChange, defaultAddress = '' }: Bo
 
     const handleSubmit = () => {
         setSubmitted(true);
+<<<<<<< HEAD
         if (!form.pickup_address.trim() || !form.pickup_parcel || Number(form.pickup_parcel) < 1 || !form.pickup_date || !form.rough_ready_time) {
+=======
+        if (!form.pickup_address.trim() || !form.pickup_parcel || !form.pickup_date || !form.rough_ready_time) {
+>>>>>>> 0e6e9b67246e905519767a76639d2addfe06681c
             showToast('Please fill in all required fields', 'error');
             return;
         }
@@ -174,8 +178,13 @@ export function BookPickupDialog({ open, onOpenChange, defaultAddress = '' }: Bo
                             value={form.pickup_parcel}
                             onChange={(value) => setForm((prev) => ({ ...prev, pickup_parcel: value }))}
                             placeholder="Enter Parcels Pickup"
+<<<<<<< HEAD
                             error={submitted && (!form.pickup_parcel || Number(form.pickup_parcel) < 1)}
                             errormsg={Number(form.pickup_parcel) < 1 ? 'Please enter valid number of parcels' : 'Please enter Parcels for Pickup'}
+=======
+                            error={submitted && !form.pickup_parcel}
+                            errormsg='Please enter Parcels for Pickup'
+>>>>>>> 0e6e9b67246e905519767a76639d2addfe06681c
                         />
                     </div>
 

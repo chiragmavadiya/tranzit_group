@@ -63,7 +63,11 @@ export default function CarrierConfigPage() {
   };
 
   const handleDisconnect = () => {
+<<<<<<< HEAD
     disconnectMutation.mutate({ provider: currentSlug });
+=======
+    disconnectMutation.mutate(currentSlug);
+>>>>>>> 0e6e9b67246e905519767a76639d2addfe06681c
   };
 
   return (

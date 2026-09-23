@@ -3,10 +3,13 @@ import { API_ENDPOINTS } from "@/constants/api.constants";
 import type {
     IntegrationResponse,
     IntegrationsResponse,
+<<<<<<< HEAD
     ShopifyLiveRatesSettingsPayload,
     ShopifyLiveRatesSettingsResponse,
     ShopifyParcelDefaultsPayload,
     ShoplineParcelDefaultsPayload,
+=======
+>>>>>>> 0e6e9b67246e905519767a76639d2addfe06681c
     WooCommerceConnectData
 } from "../types";
 
@@ -26,8 +29,12 @@ export const integrationService = {
     },
 
     connect: async (provider: string, data: any) => {
+<<<<<<< HEAD
         // OAuth providers have nothing to post: the GET returns the authorization URL.
         if (provider === 'ebay' || provider === 'squarespace' || provider === 'etsy') {
+=======
+        if (provider === 'ebay') {
+>>>>>>> 0e6e9b67246e905519767a76639d2addfe06681c
             const response = await api.get(API_ENDPOINTS.INTEGRATIONS.CONNECT(provider));
             return response.data;
         }
@@ -42,15 +49,22 @@ export const integrationService = {
 
     disconnect: async (provider: string, id?: string | number) => {
         // Some use DELETE, some use POST /disconnect
+<<<<<<< HEAD
         const postProviders = ['shopify', 'woocommerce', 'ebay', 'squarespace', 'shopline', 'etsy'];
         if (postProviders.includes(provider)) {
             const response = await api.post(API_ENDPOINTS.INTEGRATIONS.DISCONNECT(provider), accountParam(provider, id));
+=======
+        const postProviders = ['shopify', 'woocommerce', 'ebay'];
+        if (postProviders.includes(provider)) {
+            const response = await api.post(API_ENDPOINTS.INTEGRATIONS.DISCONNECT(provider));
+>>>>>>> 0e6e9b67246e905519767a76639d2addfe06681c
             return response.data;
         }
         const response = await api.delete(API_ENDPOINTS.INTEGRATIONS.DISCONNECT(provider));
         return response.data;
     },
 
+<<<<<<< HEAD
     sync: async (provider: string, id?: string | number) => {
         const response = await api.post(API_ENDPOINTS.INTEGRATIONS.SYNC(provider), accountParam(provider, id));
         return response.data;
@@ -106,19 +120,45 @@ export const integrationService = {
             method: "POST",
             url: API_ENDPOINTS.INTEGRATIONS.EBAY_AUTO_SYNC,
             data: { enabled, ...accountParam('ebay', accountId) }
+=======
+    sync: async (provider: string) => {
+        const response = await api.post(API_ENDPOINTS.INTEGRATIONS.SYNC(provider));
+        return response.data;
+    },
+
+    toggleAutoFulfillment: async (enabled: boolean) => {
+        const response = await api.post(API_ENDPOINTS.INTEGRATIONS.AUTO_FULFILLMENT, { enabled });
+        return response.data;
+    },
+
+    toggleEbayAutoSync: async (enabled: boolean) => {
+        const response = await api.request({
+            method: "POST",
+            url: API_ENDPOINTS.INTEGRATIONS.EBAY_AUTO_SYNC,
+            data: { enabled }
+>>>>>>> 0e6e9b67246e905519767a76639d2addfe06681c
         });
         return response.data;
     },
 
+<<<<<<< HEAD
     toggleEbayAutoFulfillment: async (enabled: boolean, accountId?: string | number) => {
         const response = await api.request({
             method: "POST",
             url: API_ENDPOINTS.INTEGRATIONS.EBAY_AUTO_FULFILLMENT,
             data: { enabled, ...accountParam('ebay', accountId) }
+=======
+    toggleEbayAutoFulfillment: async (enabled: boolean) => {
+        const response = await api.request({
+            method: "POST",
+            url: API_ENDPOINTS.INTEGRATIONS.EBAY_AUTO_FULFILLMENT,
+            data: { enabled }
+>>>>>>> 0e6e9b67246e905519767a76639d2addfe06681c
         });
         return response.data;
     },
 
+<<<<<<< HEAD
     toggleSquarespaceAutoFulfillment: async (enabled: boolean, accountId?: string | number) => {
         const response = await api.post(API_ENDPOINTS.INTEGRATIONS.SQUARESPACE_AUTO_FULFILLMENT, { enabled, ...accountParam('squarespace', accountId) });
         return response.data;
@@ -144,6 +184,8 @@ export const integrationService = {
         return response.data;
     },
 
+=======
+>>>>>>> 0e6e9b67246e905519767a76639d2addfe06681c
     toggleProductStatus: async (provider: string, productCode: string, enabled: boolean) => {
         const response = await api.post(API_ENDPOINTS.INTEGRATIONS.PRODUCTS_STATUS(provider), { product_code: productCode, enabled });
         return response.data;
@@ -159,6 +201,14 @@ export const integrationService = {
         return response.data;
     },
 
+<<<<<<< HEAD
+=======
+    getManualProducts: async (provider: string) => {
+        const response = await api.get(API_ENDPOINTS.INTEGRATIONS.MANUAL_PRODUCTS(provider));
+        return response.data;
+    },
+
+>>>>>>> 0e6e9b67246e905519767a76639d2addfe06681c
     updateManualProduct: async (provider: string, productCode: string, data: { product_code?: string; product_name?: string; enabled?: boolean }) => {
         const response = await api.put(API_ENDPOINTS.INTEGRATIONS.MANUAL_PRODUCT_DETAILS(provider, productCode), data);
         return response.data;
@@ -174,6 +224,24 @@ export const integrationService = {
         return response.data;
     },
 
+<<<<<<< HEAD
+=======
+    getProducts: async (provider: string) => {
+        const response = await api.get(API_ENDPOINTS.INTEGRATIONS.PRODUCTS(provider));
+        return response.data;
+    },
+
+    getDeliveryPreferences: async () => {
+        const response = await api.get(API_ENDPOINTS.INTEGRATIONS.DELIVERY_PREFERENCES);
+        return response.data;
+    },
+
+    setDeliveryPreferences: async (data: any) => {
+        const response = await api.put(API_ENDPOINTS.INTEGRATIONS.DELIVERY_PREFERENCES, data);
+        return response.data;
+    },
+
+>>>>>>> 0e6e9b67246e905519767a76639d2addfe06681c
     setDefault: async (provider: string) => {
         const response = await api.post(API_ENDPOINTS.INTEGRATIONS.DEFAULT(provider));
         return response.data;

@@ -298,9 +298,12 @@ export const SelectSearch = ({
   searchdisable,
   multiple,
   optionClassName,
+<<<<<<< HEAD
   inputId,
   errorId,
   invalid,
+=======
+>>>>>>> 0e6e9b67246e905519767a76639d2addfe06681c
 }: {
   options: readonly options[]
   value?: any
@@ -314,9 +317,12 @@ export const SelectSearch = ({
   searchdisable?: boolean
   multiple?: boolean
   optionClassName?: string
+<<<<<<< HEAD
   inputId?: string
   errorId?: string
   invalid?: boolean
+=======
+>>>>>>> 0e6e9b67246e905519767a76639d2addfe06681c
 }) => {
   const inputRef = React.useRef<HTMLInputElement>(null)
   const containerRef = React.useRef<HTMLDivElement>(null)
@@ -357,6 +363,12 @@ export const SelectSearch = ({
         onValueChange?.(opt.map((item) => String(item.value)))
       } else if (opt && !Array.isArray(opt)) {
         onValueChange?.(String(opt.value))
+<<<<<<< HEAD
+=======
+        setTimeout(() => {
+          inputRef.current?.blur()
+        }, 0)
+>>>>>>> 0e6e9b67246e905519767a76639d2addfe06681c
       } else {
         onValueChange?.(null)
       }
@@ -392,9 +404,12 @@ export const SelectSearch = ({
           ))}
           <ComboboxChipsInput
             ref={inputRef}
+<<<<<<< HEAD
             id={inputId}
             aria-invalid={invalid || undefined}
             aria-describedby={errorId}
+=======
+>>>>>>> 0e6e9b67246e905519767a76639d2addfe06681c
             placeholder={Array.isArray(currentOption) && currentOption.length > 0 ? "" : placeholder}
             className="text-xs outline-none h-7 min-w-[60px] flex-1 text-slate-800 dark:text-zinc-200 bg-transparent"
             disabled={disabled}
@@ -438,9 +453,12 @@ export const SelectSearch = ({
     <Combobox {...comboboxProps}>
       <ComboboxInput
         ref={inputRef}
+<<<<<<< HEAD
         id={inputId}
         aria-invalid={invalid || undefined}
         aria-describedby={errorId}
+=======
+>>>>>>> 0e6e9b67246e905519767a76639d2addfe06681c
         placeholder={placeholder}
         className={cn(
           "w-full cursor-pointer text-xs h-10 rounded-sm border-gray-200 dark:border-zinc-800 dark:bg-zinc-900 transition-colors placeholder:text-slate-300 dark:placeholder:text-zinc-700 ring-0! px-0.5!",

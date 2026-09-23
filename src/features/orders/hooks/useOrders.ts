@@ -3,8 +3,11 @@ import { ordersService } from "@/features/orders/services/orders.api";
 import { QUERY_KEYS } from "@/constants/api.constants";
 import { showToast, suspendToast } from "@/components/ui/custom-toast";
 import { useDownloadManifestPDF } from "@/features/manifest/hooks/useManifest";
+<<<<<<< HEAD
 import { downloadFile } from "@/lib/utils";
 import * as Sentry from "@sentry/react";
+=======
+>>>>>>> 0e6e9b67246e905519767a76639d2addfe06681c
 
 /**
  * Hook to fetch customer orders with filters
@@ -248,6 +251,7 @@ export const useDownloadLabel = (printAfterDownload: boolean = false) => {
       }
 
       const url = window.URL.createObjectURL(blob);
+<<<<<<< HEAD
       const iframe = document.createElement('iframe');
 
       iframe.style.position = 'fixed';
@@ -276,6 +280,39 @@ export const useDownloadLabel = (printAfterDownload: boolean = false) => {
       };
 
       document.body.appendChild(iframe);
+=======
+
+      // const printWindow = window.open(url);
+      if (printAfterDownload) {
+
+        const iframe = document.createElement('iframe');
+
+        iframe.style.position = 'fixed';
+        iframe.style.right = '0';
+        iframe.style.bottom = '0';
+        iframe.style.width = '0';
+        iframe.style.height = '0';
+        iframe.style.border = '0';
+
+        iframe.src = url;
+
+        document.body.appendChild(iframe);
+
+        iframe.onload = () => {
+          iframe.contentWindow?.focus();
+          iframe.contentWindow?.print();
+        }
+      } else {
+        const link = document.createElement('a');
+        link.href = url;
+        link.setAttribute('download', `label-${orderId}.pdf`);
+        document.body.appendChild(link);
+        link.click();
+        link.remove();
+      }
+
+
+>>>>>>> 0e6e9b67246e905519767a76639d2addfe06681c
     },
     onError: async (error: any) => {
       let errorMessage = "Failed to download label";
@@ -296,6 +333,7 @@ export const useDownloadLabel = (printAfterDownload: boolean = false) => {
 };
 
 /**
+<<<<<<< HEAD
  * Hook to download the packing slip / packing summary PDF rendered by the API.
  */
 export const useDownloadPackingDocument = () => {
@@ -323,6 +361,8 @@ export const useDownloadPackingDocument = () => {
 };
 
 /**
+=======
+>>>>>>> 0e6e9b67246e905519767a76639d2addfe06681c
  * Hook to fetch order status counts
  */
 export const useOrderCounts = (

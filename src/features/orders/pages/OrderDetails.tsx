@@ -4,7 +4,10 @@ import { Loader2, AlertTriangle, XCircle, FileQuestion } from 'lucide-react';
 import { OrderHeader } from '@/features/orders/components/order-details/OrderHeader';
 import { AddressCard } from '@/features/orders/components/order-details/AddressCard';
 import { CarrierCard } from '@/features/orders/components/order-details/CarrierCard';
+<<<<<<< HEAD
 import { PlatformShippingCard } from '@/features/orders/components/order-details/PlatformShippingCard';
+=======
+>>>>>>> 0e6e9b67246e905519767a76639d2addfe06681c
 import { HistoryCard } from '@/features/orders/components/order-details/HistoryCard';
 import { SidePanel } from '@/features/orders/components/order-details/SidePanel';
 import { StickyFooter } from '@/features/orders/components/order-details/StickyFooter';
@@ -21,8 +24,12 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { showToast } from '@/components/ui/custom-toast';
 import { CustomModel } from '@/components/ui/dialog';
 import { FormInput } from '@/features/orders/components/OrderFormUI';
+<<<<<<< HEAD
 import { isPhoneValid, PHONE_ERROR_MESSAGE } from '@/lib/phone';
 import { useValidateLocality } from '@/hooks/useValidateLocality';
+=======
+import { isPhoneValid } from '@/lib/utils';
+>>>>>>> 0e6e9b67246e905519767a76639d2addfe06681c
 import { getDisplayCourierName } from '../utils/order-details.utils';
 
 const OrderDetailsSkeleton: React.FC = () => {
@@ -249,12 +256,18 @@ const OrderDetailsPage: React.FC = () => {
   } = useOrderWorkflow();
 
   const [showCarrierConfirm, setShowCarrierConfirm] = useState(false);
+<<<<<<< HEAD
   const [showOnHoldConfirm, setShowOnHoldConfirm] = useState(false);
   const [receiverPhoneInput, setReceiverPhoneInput] = useState('');
   const [isQuoteLoading, setIsQuoteLoading] = useState(false);
 
   const { error: senderLocalityError, isPending: senderLocalityPending } = useValidateLocality(addressData.sender.suburb, addressData.sender.state, addressData.sender.postcode, addressData.sender.address1);
   const { error: receiverLocalityError, isPending: receiverLocalityPending } = useValidateLocality(addressData.receiver.suburb, addressData.receiver.state, addressData.receiver.postcode, addressData.receiver.address1);
+=======
+  const [receiverPhoneInput, setReceiverPhoneInput] = useState('');
+  const [isQuoteLoading, setIsQuoteLoading] = useState(false);
+
+>>>>>>> 0e6e9b67246e905519767a76639d2addfe06681c
   React.useEffect(() => {
     if (showReceiverPhoneModal) {
       setReceiverPhoneInput(addressData.receiver.phone || '');
@@ -265,6 +278,7 @@ const OrderDetailsPage: React.FC = () => {
     quoteData?.courier?.carrier || orderDetail?.courier_details?.courier || courierData?.courier
   );
 
+<<<<<<< HEAD
   const isOnHold = String(orderDetail?.fulfillment_status || '').replace(/[_-]+/g, ' ').trim().toLowerCase() === 'on hold';
 
   const proceedConsign = () => {
@@ -300,6 +314,32 @@ const OrderDetailsPage: React.FC = () => {
       return;
     }
 
+=======
+  const handleConsignClick = () => {
+    if (!termsAccepted || !ratesAccepted || !dangerousGoodsAccepted) {
+      showToast('You must accept all Terms & Conditions, Dangerous Goods, and Futile Pickup declarations.', 'error');
+      return;
+    }
+
+    if (!courierData?.courier) {
+      showToast('Please select a courier.', 'error');
+      return;
+    }
+
+    if (courierData?.is_own_courier) {
+      setShowCarrierConfirm(true);
+    } else {
+      handleConsign();
+    }
+  };
+
+  const handleSaveClick = (skipWalletCheckArg: string | boolean) => {
+    if (skipWalletCheckArg === 'saveAsDraft') {
+      handleOnSave('saveAsDraft');
+      return;
+    }
+
+>>>>>>> 0e6e9b67246e905519767a76639d2addfe06681c
     const isValidItems = itemsData && itemsData.length > 0 && itemsData.every((item) =>
       item.type !== 'box' ||
       (Number(item.height) > 0 && Number(item.width) > 0 && Number(item.length) > 0 && Number(item.weight) > 0 && Number(item.quantity) > 0)
@@ -438,7 +478,11 @@ const OrderDetailsPage: React.FC = () => {
 
             )}
 
+<<<<<<< HEAD
             {orderDetail?.cancel_request && orderDetail.status !== 'Cancelled' && orderType !== 'create' && (
+=======
+            {orderDetail?.cancel_request && orderDetail.status !== 'Cancelled' && (
+>>>>>>> 0e6e9b67246e905519767a76639d2addfe06681c
               <div className="mb-4 py-2 px-4 bg-amber-50 dark:bg-amber-900/10 border border-amber-200 dark:border-amber-900/30 rounded-xl flex flex-col md:flex-row items-start md:items-center justify-between gap-4 animate-in slide-in-from-top-2 duration-500 shadow-sm">
                 <div className="flex items-center gap-4">
                   <div className="h-8 w-8 rounded-full bg-amber-100 dark:bg-amber-900/40 flex items-center justify-center text-amber-600 dark:text-amber-400 shrink-0">
@@ -493,23 +537,37 @@ const OrderDetailsPage: React.FC = () => {
                     title="Sender"
                     name={addressData.sender.name}
                     // address={addressData.sender.address_info || addressData.sender.address || ''}
+<<<<<<< HEAD
                     address={`${addressData.sender?.unit_number && addressData.sender?.unit_number + '/'}${addressData.sender?.address1}, ${addressData?.sender?.suburb} ${addressData?.sender?.state} ${addressData?.sender?.postcode} Australia`}
+=======
+                    address={`${addressData.sender?.unit_number && addressData.sender?.unit_number + '-'}${addressData.sender?.address1}, ${addressData?.sender?.suburb} ${addressData?.sender?.state} ${addressData?.sender?.postcode} Australia`}
+>>>>>>> 0e6e9b67246e905519767a76639d2addfe06681c
                     email={addressData.sender.email}
                     editable={isEditable && (role === 'admin' || orderType === 'return')}
                     onEditClick={() => onEditClick('sender')}
                     phone={addressData.sender.phone}
+<<<<<<< HEAD
                     validationError={senderLocalityError}
+=======
+>>>>>>> 0e6e9b67246e905519767a76639d2addfe06681c
                   />
                   <AddressCard
                     title="Receiver"
                     name={addressData.receiver.name}
+<<<<<<< HEAD
                     address={`${addressData.receiver?.unit_number && addressData.receiver?.unit_number + '/'}${addressData.receiver?.address1}, ${addressData?.receiver?.suburb} ${addressData?.receiver?.state} ${addressData?.receiver?.postcode} Australia`}
+=======
+                    address={`${addressData.receiver?.unit_number && addressData.receiver?.unit_number + '-'}${addressData.receiver?.address1}, ${addressData?.receiver?.suburb} ${addressData?.receiver?.state} ${addressData?.receiver?.postcode} Australia`}
+>>>>>>> 0e6e9b67246e905519767a76639d2addfe06681c
                     email={addressData.receiver.email}
                     instruction={addressData.receiver.instructions || ''}
                     editable={isEditable && orderType !== 'return'}
                     onEditClick={() => onEditClick('receiver')}
                     phone={addressData.receiver.phone}
+<<<<<<< HEAD
                     validationError={receiverLocalityError}
+=======
+>>>>>>> 0e6e9b67246e905519767a76639d2addfe06681c
                   />
 
                   <ItemsTable
@@ -521,6 +579,7 @@ const OrderDetailsPage: React.FC = () => {
                     orderType={orderType}
                     customerId={selectedCustomer}
                   />
+<<<<<<< HEAD
                   {orderDetail?.order_details?.shopify_items?.length ? (
                     <ShopifyItemsCard
                       items={orderDetail.order_details.shopify_items}
@@ -536,6 +595,10 @@ const OrderDetailsPage: React.FC = () => {
                       price={orderDetail?.platform_shipping_price}
                       currency={orderDetail?.platform_shipping_currency}
                     />
+=======
+                  {orderDetail?.order_details?.shopify_items && orderDetail.order_details.shopify_items.length > 0 && (
+                    <ShopifyItemsCard items={orderDetail.order_details.shopify_items} />
+>>>>>>> 0e6e9b67246e905519767a76639d2addfe06681c
                   )}
                   {orderType !== 'create-menual' && (
                     <CarrierCard
@@ -554,10 +617,13 @@ const OrderDetailsPage: React.FC = () => {
                       activeSettings={activeSettings}
                       setActiveSettings={setActiveSettings}
                       onLoadingChange={setIsQuoteLoading}
+<<<<<<< HEAD
                       senderLocalityError={Boolean(senderLocalityError)}
                       receiverLocalityError={Boolean(receiverLocalityError)}
                       senderLocalityPending={senderLocalityPending}
                       receiverLocalityPending={receiverLocalityPending}
+=======
+>>>>>>> 0e6e9b67246e905519767a76639d2addfe06681c
                     />
                   )}
                   {!isCreate && (
@@ -580,7 +646,10 @@ const OrderDetailsPage: React.FC = () => {
                       liability={orderDetail?.limited_liability_cover?.covered || false}
                       payment_status={orderDetail?.payment_status}
                       shipping_activity={orderDetail?.transit_timeline?.events?.reverse()}
+<<<<<<< HEAD
                       courierResponse={role === 'admin' ? orderDetail?.courier_response : undefined}
+=======
+>>>>>>> 0e6e9b67246e905519767a76639d2addfe06681c
                     />
                   </div>
                 )}
@@ -608,7 +677,11 @@ const OrderDetailsPage: React.FC = () => {
             isCreatingConsignment={isCreatingConsignment}
             onConsign={handleConsignClick}
             isConsigning={isConsigning}
+<<<<<<< HEAD
             isServicePending={isQuoteLoading || senderLocalityPending || receiverLocalityPending}
+=======
+            isServicePending={isQuoteLoading}
+>>>>>>> 0e6e9b67246e905519767a76639d2addfe06681c
           />
         </>
       )}
@@ -627,8 +700,11 @@ const OrderDetailsPage: React.FC = () => {
           default_item={default_item}
           selectedCustomer={selectedCustomer}
           onCustomerSelect={setSelectedCustomer}
+<<<<<<< HEAD
           deliveryInstructions={deliveryInstructions}
           onDeliveryInstructionsChange={(val) => handleOptionalFieldsChange('delivery_instructions', val)}
+=======
+>>>>>>> 0e6e9b67246e905519767a76639d2addfe06681c
         />
       )}
       {walletCheckOpen && walletCheckData && (
@@ -665,6 +741,7 @@ const OrderDetailsPage: React.FC = () => {
         cancelText="Cancel"
         className="sm:max-w-[500px]"
       />
+<<<<<<< HEAD
       {showOnHoldConfirm && (
         <ConformationModal
           open={showOnHoldConfirm}
@@ -689,6 +766,8 @@ const OrderDetailsPage: React.FC = () => {
           className="sm:max-w-[500px]"
         />
       )}
+=======
+>>>>>>> 0e6e9b67246e905519767a76639d2addfe06681c
       {showCarrierConfirm && (
         <ConformationModal
           open={showCarrierConfirm}
@@ -725,7 +804,11 @@ const OrderDetailsPage: React.FC = () => {
           description="A contact number for the receiver is required to book this consignment."
           onSubmit={() => {
             if (!receiverPhoneInput.trim() || !isPhoneValid(receiverPhoneInput)) {
+<<<<<<< HEAD
               showToast(PHONE_ERROR_MESSAGE, "error");
+=======
+              showToast("Please enter a valid phone number", "error");
+>>>>>>> 0e6e9b67246e905519767a76639d2addfe06681c
               return;
             }
             handleReceiverPhoneSubmit(receiverPhoneInput);
@@ -743,7 +826,10 @@ const OrderDetailsPage: React.FC = () => {
               required
               isFullWidth
               error={!receiverPhoneInput.trim() || !isPhoneValid(receiverPhoneInput)}
+<<<<<<< HEAD
               errormsg={!receiverPhoneInput.trim() ? "Please enter a phone number" : PHONE_ERROR_MESSAGE}
+=======
+>>>>>>> 0e6e9b67246e905519767a76639d2addfe06681c
             />
           </div>
         </CustomModel>

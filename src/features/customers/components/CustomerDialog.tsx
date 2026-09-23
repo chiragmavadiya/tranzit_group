@@ -15,8 +15,12 @@ import {
 import Favicon from '@/assets/favicon.png';
 import { CustomModel } from "@/components/ui/dialog"
 import { Switch } from "@/components/ui/switch"
+<<<<<<< HEAD
 import { CustomLabel, FormInput, FormSelect } from "@/features/orders/components/OrderFormUI"
 import { SENDER_NAME_MAX_LENGTH } from "@/constants"
+=======
+import { FormInput, FormSelect } from "@/features/orders/components/OrderFormUI"
+>>>>>>> 0e6e9b67246e905519767a76639d2addfe06681c
 import { STATES, WEIGHT_TIERS } from "../constants"
 // import {
 //   Accordion,
@@ -29,6 +33,7 @@ import { useXeroContacts } from "@/features/xero/hooks/useXero"
 import { showToast } from "@/components/ui/custom-toast"
 import { PlaceAutocomplete } from "@/components/common/AutoComplateAddress"
 import { Checkbox } from "@/components/ui/checkbox"
+<<<<<<< HEAD
 import { cn } from "@/lib/utils";
 import { cleanSpaces, isPhoneValid, PHONE_ERROR_MESSAGE } from "@/lib/phone";
 import { useValidateLocality } from "@/hooks/useValidateLocality";
@@ -40,6 +45,12 @@ import aramexLogo from "@/assets/coruiers_logo/aramex.png"
 import fedexLogo from "@/assets/coruiers_logo/fedex.png"
 import tntLogo from "@/assets/coruiers_logo/TNT.webp"
 // import tegLogo from "@/assets/coruiers_logo/team_gloabl_express.png"
+=======
+import { cleanSpaces, isPhoneValid, cn } from "@/lib/utils";
+import directFreightLogo from "@/assets/coruiers_logo/direct-freight.png"
+import auspostLogo from "@/assets/coruiers_logo/logo-auspost.png"
+import courierspleaseLogo from "@/assets/coruiers_logo/couriersplease.png"
+>>>>>>> 0e6e9b67246e905519767a76639d2addfe06681c
 import type { XeroContact } from "@/features/xero/types";
 
 interface CustomerDialogProps {
@@ -51,7 +62,11 @@ interface CustomerDialogProps {
 const STATE_OPTIONS = STATES.map(s => ({ label: s, value: s }));
 
 const buildInitialCharges = () => {
+<<<<<<< HEAD
   const couriers = ["AusPost", "DirectFreight", "CouriersPlease", "Aramex", "Fedex", "TNT", "Pallet"]; //  "TEG",
+=======
+  const couriers = ["AusPost", "DirectFreight", "CouriersPlease", "Pallet"]; //MyPostBusiness
+>>>>>>> 0e6e9b67246e905519767a76639d2addfe06681c
   return couriers.map(courier => {
     const chargeObj: any = { courier };
     WEIGHT_TIERS.forEach(tier => {
@@ -94,6 +109,7 @@ const INITIAL_FORM_DATA = {
   direct_freight_active: 0,
   auspost_active: 0,
   couriersplease_active: 0,
+<<<<<<< HEAD
   aramex_active: 0,
   pallet_active: 0,
   fedex_active: 0,
@@ -115,6 +131,14 @@ const INITIAL_FORM_DATA = {
   manual_order_fedex: false,
   manual_order_tnt: false,
   manual_order_teg: false,
+=======
+  // mypostbusiness_active: 0,
+  pallet_active: 0,
+  direct_freight_min_margin: 0,
+  auspost_min_margin: 0,
+  couriersplease_min_margin: 0,
+  pallet_min_margin: 0,
+>>>>>>> 0e6e9b67246e905519767a76639d2addfe06681c
   topup_enable: false,
   order_prefix: "",
   xero_contact_id: "",
@@ -148,6 +172,7 @@ export default function CustomerDialog({ open, onOpenChange, customerId }: Custo
 
   const [sameAsShipping, setSameAsShipping] = useState(false);
 
+<<<<<<< HEAD
   const shippingLocality = useValidateLocality(formData.suburb, formData.state, formData.postcode, formData.address);
   const billingLocality = useValidateLocality(formData.billing_suburb, formData.billing_state, formData.billing_postcode, formData.billing_address);
   // With "same as shipping" ticked the billing fields mirror the shipping ones,
@@ -155,6 +180,8 @@ export default function CustomerDialog({ open, onOpenChange, customerId }: Custo
   const billingLocalityError = sameAsShipping ? '' : billingLocality.error;
   const isLocalityPending = shippingLocality.isPending || (!sameAsShipping && billingLocality.isPending);
 
+=======
+>>>>>>> 0e6e9b67246e905519767a76639d2addfe06681c
   const xeroContactOptions = useMemo(() => xeroContacts.map((contact: XeroContact) => {
     const name = [contact.FirstName, contact.LastName].filter(Boolean).join(" ").trim() || contact.Name;
     const label = name
@@ -276,8 +303,11 @@ export default function CustomerDialog({ open, onOpenChange, customerId }: Custo
       const filteredData: any = {};
       Object.keys(INITIAL_FORM_DATA).forEach((key) => {
         filteredData[key] = (data as any)[key] !== undefined ? (data as any)[key] : (INITIAL_FORM_DATA as any)[key];
+<<<<<<< HEAD
         // Manual order flags go back to the API as true/false, whatever shape they arrive in.
         if (key.startsWith("manual_order_")) filteredData[key] = !!filteredData[key];
+=======
+>>>>>>> 0e6e9b67246e905519767a76639d2addfe06681c
       });
       // Merge with INITIAL_FORM_DATA to ensure all 4 couriers are always present
       const mergedMarkupCharges = INITIAL_FORM_DATA.markup_charges.map((defItem: any) => {
@@ -292,8 +322,11 @@ export default function CustomerDialog({ open, onOpenChange, customerId }: Custo
 
       // const firstCharge = mergedPickupCharges[0] || {};
       filteredData.byo_courier_invoice_enable = data.byo_courier_invoice_enable ?? false;
+<<<<<<< HEAD
       // Arrives as a boolean or a 1/0 flag depending on the endpoint; the API wants true/false back.
       filteredData.account_activation = !!data.account_activation;
+=======
+>>>>>>> 0e6e9b67246e905519767a76639d2addfe06681c
 
       if (data.byo_courier_pricing_tiers && Array.isArray(data.byo_courier_pricing_tiers) && data.byo_courier_pricing_tiers.length > 0) {
         filteredData.byo_courier_pricing_tiers = data.byo_courier_pricing_tiers;
@@ -391,7 +424,11 @@ export default function CustomerDialog({ open, onOpenChange, customerId }: Custo
     ];
 
     if (formData.mobile && !isPhoneValid(formData.mobile)) {
+<<<<<<< HEAD
       showToast(PHONE_ERROR_MESSAGE, "error");
+=======
+      showToast("Please enter a valid phone number", "error");
+>>>>>>> 0e6e9b67246e905519767a76639d2addfe06681c
       return false;
     }
 
@@ -437,6 +474,7 @@ export default function CustomerDialog({ open, onOpenChange, customerId }: Custo
       return false;
     }
 
+<<<<<<< HEAD
     // Keep the modal open on an invalid locality — the inline banner explains why
     if (shippingLocality.error || billingLocalityError) {
       return false;
@@ -447,6 +485,8 @@ export default function CustomerDialog({ open, onOpenChange, customerId }: Custo
       return false;
     }
 
+=======
+>>>>>>> 0e6e9b67246e905519767a76639d2addfe06681c
     if (formData.byo_courier_invoice_enable) {
       const hasEmptyPrice = formData.byo_courier_pricing_tiers.some(
         (tier) => tier.price_per_label === undefined || tier.price_per_label === null || tier.price_per_label.toString().trim() === ""
@@ -466,10 +506,15 @@ export default function CustomerDialog({ open, onOpenChange, customerId }: Custo
       return;
     }
 
+<<<<<<< HEAD
     const { account_activation, ...createFields } = formData;
     const payload = {
       // Activation is only managed on an existing customer, never set at creation.
       ...(isEdit ? { ...formData, account_activation: !!account_activation } : createFields),
+=======
+    const payload = {
+      ...formData,
+>>>>>>> 0e6e9b67246e905519767a76639d2addfe06681c
       mobile: cleanSpaces(formData.mobile),
       byo_courier_invoice_enable: !!formData.byo_courier_invoice_enable,
       byo_courier_pricing_tiers: !formData.byo_courier_invoice_enable
@@ -606,6 +651,7 @@ export default function CustomerDialog({ open, onOpenChange, customerId }: Custo
             onValueChange={(val) => handleChange("xero_contact_id", val || "")}
             disabled={!isXeroConnected || isLoadingXeroContacts}
           />
+<<<<<<< HEAD
           {isEdit && (
             <div className="col-span-12 md:col-span-6">
               <CustomLabel label="Account Activation" />
@@ -660,6 +706,10 @@ export default function CustomerDialog({ open, onOpenChange, customerId }: Custo
           </div>
         </div>
 
+=======
+        </div>
+
+>>>>>>> 0e6e9b67246e905519767a76639d2addfe06681c
         <div className="space-y-8 animate-in fade-in slide-in-from-right-4 duration-300">
           {/* Shipping Address */}
           <div className="space-y-4 pt-2">
@@ -748,6 +798,123 @@ export default function CustomerDialog({ open, onOpenChange, customerId }: Custo
                 error={submited && !formData.country?.trim()}
                 errormsg="Please enter country"
               />
+<<<<<<< HEAD
+=======
+            </div>
+          </div>
+
+          {/* Billing address */}
+          <div className="">
+            <div className="flex items-center justify-between border-b border-slate-50 dark:border-zinc-900 mb-4 pb-2">
+              <div className="flex items-center gap-2">
+                <Receipt className="w-4 h-4 text-primary" />
+                <h3 className="my-0 text-sm font-bold text-slate-900 dark:text-zinc-100">Billing Address</h3>
+              </div>
+              <div className="flex items-center gap-2">
+                <Checkbox
+                  id="same_as_shipping"
+                  checked={sameAsShipping}
+                  onCheckedChange={(checked) => setSameAsShipping(!!checked)}
+                />
+                <label
+                  htmlFor="same_as_shipping"
+                  className="text-xs font-semibold text-slate-700 dark:text-zinc-400 cursor-pointer select-none"
+                >
+                  Use the above address as your billing address
+                </label>
+              </div>
+            </div>
+            <div className="grid grid-cols-12 gap-x-3 sm:gap-x-4 gap-y-4">
+              <div className="col-span-12">
+                <PlaceAutocomplete
+                  label="Address Information"
+                  onPlaceSelect={(opt) => {
+                    handleChange('billing_address_info', opt.formatted_address);
+                    handleChange('billing_address', opt.address1);
+                    handleChange('billing_unit_number', opt.unit_number);
+                    handleChange('billing_street_number', opt.street_number);
+                    handleChange('billing_street_name', opt.street_name);
+                    handleChange('billing_street_type', opt.street_type);
+                    handleChange('billing_suburb', opt.suburb);
+                    handleChange('billing_state', opt.state);
+                    handleChange('billing_country', opt.country);
+                    handleChange('billing_postcode', opt.post_code);
+                  }}
+                  onChange={(value) => handleChange('billing_address_info', value)}
+                  // error={submited && formData.billing_address_info?.trim() === ''}
+                  // errormsg='Please enter your billing address'
+                  value={formData.billing_address_info}
+                  // required
+                  disabled={sameAsShipping}
+                />
+              </div>
+
+              <FormInput
+                label="Unit Number"
+                isHalf
+                placeholder="e.g. 123"
+                value={formData.billing_unit_number}
+                onChange={(val) => handleChange("billing_unit_number", val)}
+                disabled={sameAsShipping}
+              />
+
+              <FormInput
+                label="Street"
+                isHalf
+                placeholder="e.g. 123 Main St"
+                value={formData.billing_address}
+                onChange={(val) => { handleChange("billing_address", val); handleChange("billing_street_name", val) }}
+                required
+                error={submited && !formData.billing_address?.trim()}
+                errormsg="Please enter street"
+                disabled={sameAsShipping}
+              />
+              <FormInput
+                label="Suburb"
+                isCompact
+                placeholder="Suburb"
+                value={formData.billing_suburb}
+                onChange={(val) => handleChange("billing_suburb", val)}
+                required
+                error={submited && !formData.billing_suburb?.trim()}
+                errormsg="Please enter suburb"
+                disabled={sameAsShipping}
+              />
+              <FormSelect
+                label="State"
+                isCompact
+                placeholder="Select State"
+                options={STATE_OPTIONS}
+                value={formData.billing_state}
+                onValueChange={(val) => handleChange("billing_state", val)}
+                required
+                error={submited && !formData.billing_state?.trim()}
+                errormsg="Please enter state"
+                disabled={sameAsShipping}
+              />
+              <FormInput
+                label="Postcode"
+                isCompact
+                placeholder="3000"
+                value={formData.billing_postcode}
+                onChange={(val) => handleChange("billing_postcode", val)}
+                required
+                error={submited && !formData.billing_postcode?.trim()}
+                errormsg="Please enter postcode"
+                disabled={sameAsShipping}
+              />
+              <FormInput
+                label="Country"
+                isCompact
+                placeholder="Australia"
+                value={formData.billing_country}
+                onChange={(val) => handleChange("billing_country", val)}
+                required
+                error={submited && !formData.billing_country?.trim()}
+                errormsg="Please enter country"
+                disabled={sameAsShipping}
+              />
+>>>>>>> 0e6e9b67246e905519767a76639d2addfe06681c
             </div>
             {shippingLocality.error && (
               <LocalityWarning
@@ -959,7 +1126,10 @@ export default function CustomerDialog({ open, onOpenChange, customerId }: Custo
                   name: "Direct Freight Express",
                   activeKey: "direct_freight_active" as const,
                   minMarginKey: "direct_freight_min_margin" as const,
+<<<<<<< HEAD
                   manualOrderKey: "manual_order_direct_freight" as const,
+=======
+>>>>>>> 0e6e9b67246e905519767a76639d2addfe06681c
                   logo: directFreightLogo,
                   displayName: "Direct Freight Express",
                   courierKey: "DirectFreight"
@@ -969,7 +1139,10 @@ export default function CustomerDialog({ open, onOpenChange, customerId }: Custo
                   name: "Auspost Tranzit Group",
                   activeKey: "auspost_active" as const,
                   minMarginKey: "auspost_min_margin" as const,
+<<<<<<< HEAD
                   manualOrderKey: "manual_order_auspost" as const,
+=======
+>>>>>>> 0e6e9b67246e905519767a76639d2addfe06681c
                   logo: auspostLogo,
                   displayName: "Auspost Tranzit Group",
                   courierKey: "AusPost"
@@ -979,11 +1152,15 @@ export default function CustomerDialog({ open, onOpenChange, customerId }: Custo
                   name: "Courier Please",
                   activeKey: "couriersplease_active" as const,
                   minMarginKey: "couriersplease_min_margin" as const,
+<<<<<<< HEAD
                   manualOrderKey: "manual_order_couriersplease" as const,
+=======
+>>>>>>> 0e6e9b67246e905519767a76639d2addfe06681c
                   logo: courierspleaseLogo,
                   displayName: "Courier Please",
                   courierKey: "CouriersPlease"
                 },
+<<<<<<< HEAD
                 {
                   id: "aramex",
                   name: "Aramex Tranzit Group",
@@ -1024,17 +1201,33 @@ export default function CustomerDialog({ open, onOpenChange, customerId }: Custo
                 //   logo: tegLogo,
                 //   displayName: "TEG Tranzit Group",
                 //   courierKey: "TEG"
+=======
+                // {
+                //   id: "mypostbusiness",
+                //   name: "MyPost Business",
+                //   activeKey: "mypostbusiness_active" as const,
+                //   logo: "https://api.tranzit.digisite.net/assets/img/couriers/aus_post_logo_small.png",
+                //   displayName: "MyPost Business",
+                //   courierKey: "MyPostBusiness"
+>>>>>>> 0e6e9b67246e905519767a76639d2addfe06681c
                 // },
                 {
                   id: "pallet",
                   name: "Pallet Tranzit Group",
                   activeKey: "pallet_active" as const,
                   minMarginKey: "pallet_min_margin" as const,
+<<<<<<< HEAD
                   manualOrderKey: "manual_order_pallet" as const,
                   logo: Favicon,
                   displayName: "Pallet Tranzit Group",
                   courierKey: "Pallet"
                 },
+=======
+                  logo: Favicon,
+                  displayName: "Pallet Tranzit Group",
+                  courierKey: "Pallet"
+                }
+>>>>>>> 0e6e9b67246e905519767a76639d2addfe06681c
               ];
 
               return couriersList.map((courier) => {
@@ -1052,6 +1245,7 @@ export default function CustomerDialog({ open, onOpenChange, customerId }: Custo
                   >
                     {/* Header */}
                     <div
+<<<<<<< HEAD
                       className="px-3 sm:px-4 py-2.5 flex flex-wrap items-center gap-x-3 gap-y-2.5 select-none"
                     >
                       <div className="order-1 flex flex-1 items-center gap-3 min-w-0">
@@ -1083,6 +1277,25 @@ export default function CustomerDialog({ open, onOpenChange, customerId }: Custo
                               Min Markup Charge:
                             </span>
                             <div className="w-26 shrink-0">
+=======
+                      className="px-3 sm:px-4 py-2.5 flex items-center justify-between select-none"
+                    >
+                      <div className="flex items-center gap-3">
+                        <div className="flex items-center justify-center w-14 h-8 bg-slate-50 dark:bg-zinc-900 rounded-md p-1">
+                          <img src={courier.logo} className="max-h-full max-w-full object-contain" alt={courier.name} />
+                        </div>
+                        <span className="text-sm font-bold text-slate-800 dark:text-zinc-200">{courier.displayName}</span>
+                      </div>
+
+                      <div className="flex items-center gap-3.5">
+                        {/* Min Markup Charge Input */}
+                        {isActive && (
+                          <div className="flex items-center gap-2" onClick={(e) => e.stopPropagation()}>
+                            <span className="text-xs font-semibold text-slate-600 dark:text-zinc-400 whitespace-nowrap">
+                              Min Markup Charge:
+                            </span>
+                            <div className="w-26">
+>>>>>>> 0e6e9b67246e905519767a76639d2addfe06681c
                               <FormInput
                                 type="number"
                                 step="0.01"
@@ -1092,10 +1305,15 @@ export default function CustomerDialog({ open, onOpenChange, customerId }: Custo
                               />
                             </div>
                           </div>
+<<<<<<< HEAD
                         </div>
                       )}
 
                       <div className="order-2 shrink-0 sm:order-3">
+=======
+                        )}
+
+>>>>>>> 0e6e9b67246e905519767a76639d2addfe06681c
                         {/* Toggle Switch */}
                         <Switch
                           checked={isActive}
@@ -1120,8 +1338,12 @@ export default function CustomerDialog({ open, onOpenChange, customerId }: Custo
                                   ...prev,
                                   markup_charges: resetCharges(prev.markup_charges),
                                   pickup_charges: resetCharges(prev.pickup_charges),
+<<<<<<< HEAD
                                   [courier.minMarginKey]: 0,
                                   [courier.manualOrderKey]: false
+=======
+                                  [courier.minMarginKey]: 0
+>>>>>>> 0e6e9b67246e905519767a76639d2addfe06681c
                                 };
                               });
                             }

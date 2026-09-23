@@ -34,8 +34,11 @@ export interface InvoiceDocumentData {
     postcode: string;
   };
   items: any[];
+<<<<<<< HEAD
   /** invoice_items_id of saved items removed since load, sent on save so the API can delete them. */
   deleted_item_ids?: (string | number)[];
+=======
+>>>>>>> 0e6e9b67246e905519767a76639d2addfe06681c
   orders: any[];
   payment_transactions: any[];
 }

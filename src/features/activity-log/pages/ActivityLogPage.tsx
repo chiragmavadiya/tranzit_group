@@ -8,7 +8,10 @@ import { useActivityLog } from '../hooks/useActivityLog';
 import { useDebounce } from '@/hooks/useDebounce';
 import { DateFilter } from '@/components/common/DateFilter';
 import type { DateFilterValue } from '@/components/common/DateFilter/types';
+<<<<<<< HEAD
 import { hydrateDateFilter } from '@/components/common/DateFilter/utils';
+=======
+>>>>>>> 0e6e9b67246e905519767a76639d2addfe06681c
 import useLocalStorage from '@/hooks/useLocalStorage';
 
 export default function ActivityLogPage() {
@@ -17,7 +20,11 @@ export default function ActivityLogPage() {
         from: '',
         to: '',
         label: 'All Time',
+<<<<<<< HEAD
     }, hydrateDateFilter);
+=======
+    });
+>>>>>>> 0e6e9b67246e905519767a76639d2addfe06681c
     const [role, setRole] = useLocalStorage<string>('activity_log_role', 'all');
     const [action, setAction] = useLocalStorage<string>('activity_log_action', 'all');
     const [search, setSearch] = useLocalStorage<string>('activity_log_search', '');

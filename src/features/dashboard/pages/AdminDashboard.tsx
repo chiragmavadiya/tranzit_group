@@ -21,7 +21,10 @@ import { formatCurrency } from "@/features/orders/utils/order-details.utils";
 import BarChart from "@/components/common/charts/BarChart";
 import type { DateFilterValue } from "@/components/common/DateFilter/types";
 import { calculateDateRange } from "@/components/common/DateFilter/utils";
+<<<<<<< HEAD
 import type { Invoice } from "@/features/invoices/types";
+=======
+>>>>>>> 0e6e9b67246e905519767a76639d2addfe06681c
 
 export default function AdminDashboard() {
   const [filterValue, setFilterValue] = useState<DateFilterValue>(() => {

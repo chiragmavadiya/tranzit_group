@@ -1,6 +1,10 @@
 import React, { useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+<<<<<<< HEAD
 import { ArchiveRestore, ArrowLeft, Box, ChevronDown, ClipboardList, Download, FileText, Loader2, PackagePlus, Printer, Trash2, Package, Copy } from 'lucide-react'
+=======
+import { ArchiveRestore, ArrowLeft, Box, Download, Loader2, PackagePlus, Trash2, Package, Copy } from 'lucide-react'
+>>>>>>> 0e6e9b67246e905519767a76639d2addfe06681c
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { DropdownCustomMenu } from '@/components/ui/dropdown-menu'
@@ -15,8 +19,12 @@ import { useCustomers } from '@/features/customers/hooks/useCustomers'
 import { CustomTooltip } from '@/components/common/CustomTooltip'
 import type { AddressData } from '../../types'
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog'
+<<<<<<< HEAD
 import { useAddManualTrackingNumbers, useDownloadPackingDocument } from '../../hooks/useOrders'
 import type { PackingDocument } from '../../services/orders.api'
+=======
+import { useAddManualTrackingNumbers } from '../../hooks/useOrders'
+>>>>>>> 0e6e9b67246e905519767a76639d2addfe06681c
 import { useRestoreOrderConfirm } from '../../hooks/useRestoreOrderConfirm'
 import { canRestoreByPaymentStatus } from '../../utils/order-details.utils'
 
@@ -96,6 +104,7 @@ export const OrderHeader: React.FC<OrderHeaderProps> = ({
 
   const addTrackingMutation = useAddManualTrackingNumbers()
 
+<<<<<<< HEAD
   const { mutate: downloadPackingDocument, isPending: isDownloadingPackingDocument } = useDownloadPackingDocument()
 
   const handlePackingDownload = (documentType: PackingDocument) => {
@@ -103,6 +112,8 @@ export const OrderHeader: React.FC<OrderHeaderProps> = ({
     downloadPackingDocument({ document: documentType, orderNumbers: [orderDetail.order_number] })
   }
 
+=======
+>>>>>>> 0e6e9b67246e905519767a76639d2addfe06681c
   const { requestRestore, restoreModal, isRestoring } = useRestoreOrderConfirm()
   // Restoring an archived order is admin-only, and only while the order is still unpaid.
   const canRestoreOrder = role === 'admin'
@@ -299,7 +310,11 @@ export const OrderHeader: React.FC<OrderHeaderProps> = ({
               )}
               {(orderDetail?.order_status_category === 'new' || orderDetail?.order_status_category === 'printed' || orderDetail?.status.toLocaleLowerCase() === 'new' || orderDetail?.status.toLowerCase() === 'printed') && (
                 <>
+<<<<<<< HEAD
                   {orderDetail?.order_status_category === 'new' || orderDetail?.status.toLocaleLowerCase() === 'new' || (orderDetail?.courier_details?.courier_code === 'couriersplease') ? (
+=======
+                  {orderDetail?.order_status_category === 'new' || orderDetail?.status.toLocaleLowerCase() === 'new' || (orderDetail?.courier_details?.is_own_courier) ? (
+>>>>>>> 0e6e9b67246e905519767a76639d2addfe06681c
                     <Button
                       variant="outline"
                       onClick={() => setShowArchiveModal(true)}
@@ -328,6 +343,7 @@ export const OrderHeader: React.FC<OrderHeaderProps> = ({
               )}
             </>
           )}
+<<<<<<< HEAD
           {!isCreate && orderDetail?.order_number && orderDetail?.order_status_category !== 'archived' && (
             <DropdownCustomMenu
               contentClassName="w-56 min-w-56"
@@ -355,6 +371,8 @@ export const OrderHeader: React.FC<OrderHeaderProps> = ({
               </Button>
             </DropdownCustomMenu>
           )}
+=======
+>>>>>>> 0e6e9b67246e905519767a76639d2addfe06681c
           {role === 'admin' && (orderType === 'create' || orderType === 'create-menual') && (
             <FormSelect
               label="Customer"

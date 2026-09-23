@@ -6,8 +6,12 @@ import { CustomModel } from '@/components/ui/dialog';
 import { showToast } from '@/components/ui/custom-toast';
 import { Checkbox } from '@/components/ui/checkbox';
 import { PlaceAutocomplete } from '@/components/common/AutoComplateAddress';
+<<<<<<< HEAD
 import { cn, isEmailValid } from '@/lib/utils';
 import { cleanSpaces, isPhoneValid, PHONE_ERROR_MESSAGE } from '@/lib/phone';
+=======
+import { cleanSpaces, cn, isEmailValid, isPhoneValid } from '@/lib/utils';
+>>>>>>> 0e6e9b67246e905519767a76639d2addfe06681c
 import { STATES } from '@/constants';
 import AutoComplete from '@/components/common/AutoComplate2';
 import { useAddressBookSearch } from '@/features/address-book/hooks/useAddressBook';
@@ -15,10 +19,15 @@ import { useDebounce } from '@/hooks/useDebounce';
 import { useOrderReceiverAddress, useUpdateOrderReceiverAddress } from '../hooks/useOrders';
 import { useAppSelector } from '@/hooks/store.hooks';
 import { useCustomers } from '@/features/customers/hooks/useCustomers';
+<<<<<<< HEAD
 import { useValidateLocality } from '@/hooks/useValidateLocality';
 import { LocalityWarning } from '@/components/common/LocalityWarning';
 
 export default function CreateOrderDialog({ onOpenChange, type, open, initialData, isEdit, onSubmit, orderId, orderType, selectedCustomer, onCustomerSelect, deliveryInstructions, onDeliveryInstructionsChange }: CreateOrderDialogProps) {
+=======
+
+export default function CreateOrderDialog({ onOpenChange, type, open, initialData, isEdit, onSubmit, orderId, orderType, selectedCustomer, onCustomerSelect }: CreateOrderDialogProps) {
+>>>>>>> 0e6e9b67246e905519767a76639d2addfe06681c
   const navigate = useNavigate();
   const { role } = useAppSelector((state) => state.auth);
   const isAdminCreate = role === 'admin' && (orderType === 'create' || orderType === 'create-menual') && type === 'receiver';
@@ -51,7 +60,10 @@ export default function CreateOrderDialog({ onOpenChange, type, open, initialDat
 
   const debouncedSearchAddress = useDebounce(searchAddress, 400);
   const { data: addressBookData } = useAddressBookSearch(debouncedSearchAddress);
+<<<<<<< HEAD
   const { error: localityError, suggestions: localitySuggestions, addressSuggestions, isPending: isLocalityPending } = useValidateLocality(formData.suburb, formData.state, formData.postcode, formData.address1);
+=======
+>>>>>>> 0e6e9b67246e905519767a76639d2addfe06681c
   const { data: orderResponse } = useOrderReceiverAddress((!initialData && orderId) || '');
   // const { mutate: createOrder, isPending: saveLoading } = useCreateOrder();
   const { mutateAsync: updateOrderReceiverAddress, isPending: isUpdatePending } = useUpdateOrderReceiverAddress();
@@ -176,6 +188,7 @@ export default function CreateOrderDialog({ onOpenChange, type, open, initialDat
     }
 
     if (phone && !isPhoneValid(phone)) {
+<<<<<<< HEAD
       showToast(PHONE_ERROR_MESSAGE, "error");
       return;
     }
@@ -187,6 +200,9 @@ export default function CreateOrderDialog({ onOpenChange, type, open, initialDat
 
     if (isLocalityPending) {
       showToast("Validating address, please wait", "error");
+=======
+      showToast("Please enter a valid phone number", "error");
+>>>>>>> 0e6e9b67246e905519767a76639d2addfe06681c
       return;
     }
 
@@ -442,9 +458,15 @@ export default function CreateOrderDialog({ onOpenChange, type, open, initialDat
               </div> */}
             <div className="space-y-4">
               <FormTextarea
+<<<<<<< HEAD
                 label={onDeliveryInstructionsChange ? "Delivery Instruction" : "Instruction"}
                 value={onDeliveryInstructionsChange ? (deliveryInstructions || '') : formData.instructions}
                 onChange={val => onDeliveryInstructionsChange ? onDeliveryInstructionsChange(val) : updateField('instructions', val)}
+=======
+                label="Instruction"
+                value={formData.instructions}
+                onChange={val => updateField('instructions', val)}
+>>>>>>> 0e6e9b67246e905519767a76639d2addfe06681c
                 layout="horizontal"
                 placeholder='Enter Instruction'
               />
@@ -523,6 +545,7 @@ export default function CreateOrderDialog({ onOpenChange, type, open, initialDat
           </div>
         </div>
 
+<<<<<<< HEAD
         {localityError && (
           <LocalityWarning
             message={localityError}
@@ -549,6 +572,8 @@ export default function CreateOrderDialog({ onOpenChange, type, open, initialDat
           />
         )}
 
+=======
+>>>>>>> 0e6e9b67246e905519767a76639d2addfe06681c
         {/* Address Validation Accordion */}
         {/* <div className="col-span-12">
             <Accordion className="w-full border border-slate-200 dark:border-zinc-800 rounded-md bg-white dark:bg-zinc-950/50 shadow-sm overflow-hidden">

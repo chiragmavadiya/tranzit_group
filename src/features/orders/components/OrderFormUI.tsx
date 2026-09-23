@@ -32,7 +32,11 @@ export const Required = () => {
 
 export const CustomLabel = ({ label, isHorizontal = false, required = false, className, htmlFor }: { label: ReactNode, isHorizontal?: boolean, required?: boolean, className?: string, htmlFor?: string }) => {
   if (!label) return null;
+<<<<<<< HEAD
   return (<Label htmlFor={htmlFor} className={cn(
+=======
+  return (<Label className={cn(
+>>>>>>> 0e6e9b67246e905519767a76639d2addfe06681c
     "text-[14px] font-medium text-slate-700 dark:text-zinc-400 tracking-wide gap-0 mb-0.5",
     isHorizontal ? "h-fit leading-none" : "ml-0.5",
     className
@@ -59,7 +63,10 @@ export const FormInput = memo(React.forwardRef<HTMLInputElement, FormInputProps>
   errormsg,
   inputClassName,
   info,
+<<<<<<< HEAD
   id,
+=======
+>>>>>>> 0e6e9b67246e905519767a76639d2addfe06681c
   // rightElement
 }, ref) => {
   const [showPassword, setShowPassword] = React.useState(false);
@@ -83,7 +90,10 @@ export const FormInput = memo(React.forwardRef<HTMLInputElement, FormInputProps>
             label={label}
             isHorizontal={isHorizontal}
             required={required}
+<<<<<<< HEAD
             htmlFor={inputId}
+=======
+>>>>>>> 0e6e9b67246e905519767a76639d2addfe06681c
           />
           {info && (
             <CustomTooltip title={info}>
@@ -154,7 +164,10 @@ export function FormTextarea({
   error,
   errormsg,
   disabled = false,
+<<<<<<< HEAD
   id,
+=======
+>>>>>>> 0e6e9b67246e905519767a76639d2addfe06681c
 }: FormTextareaProps) {
   const isHorizontal = useMemo(() => layout === 'horizontal', [layout]);
   const generatedId = React.useId();
@@ -250,6 +263,7 @@ export const FormSelect = memo(({
   allowClear = true,
   searchdisable = false,
   multiple = false,
+<<<<<<< HEAD
   optionClassName,
   id
 }: FormSelectProps) => {
@@ -258,6 +272,12 @@ export const FormSelect = memo(({
   const selectId = id ?? generatedId;
   const errorId = `${selectId}-error`;
 
+=======
+  optionClassName
+}: FormSelectProps) => {
+  const isHorizontal = useMemo(() => layout === 'horizontal', [layout]);
+  
+>>>>>>> 0e6e9b67246e905519767a76639d2addfe06681c
   const [memoizedData, setMemoizedData] = useState(options);
   const [prevOptions, setPrevOptions] = useState(options);
   if (!areOptionsEqual(prevOptions, options)) {
@@ -286,9 +306,12 @@ export const FormSelect = memo(({
       />
       <div>
         <SelectSearch
+<<<<<<< HEAD
           inputId={selectId}
           invalid={error}
           errorId={error && errormsg ? errorId : undefined}
+=======
+>>>>>>> 0e6e9b67246e905519767a76639d2addfe06681c
           className={cn("w-full h-8 text-[13px] data-[size=default]:h-8 border-slate-200 rounded-sm dark:border-zinc-800 font-medium bg-white dark:bg-zinc-950 text-slate-900 dark:text-zinc-100 focus:ring-primary dark:focus:ring-primary focus:border-primary dark:focus:border-primary transition-all text-sm px-3 ", error ? "border-red-500 dark:border-red-500 focus:border-red-500 dark:focus:border-red-500" : "", selectClassName)}
           options={memoizedData}
           // defaultValue="default"
@@ -303,7 +326,11 @@ export const FormSelect = memo(({
           optionClassName={optionClassName}
         />
         {/* <SelectSearch options={memoizedData} /> */}
+<<<<<<< HEAD
         {error ? <div id={errorId} role="alert" className="text-red-500 text-[11px] w-full">{errormsg}</div> : null}
+=======
+        {error ? <div className="text-red-500 text-[11px] w-full">{errormsg}</div> : null}
+>>>>>>> 0e6e9b67246e905519767a76639d2addfe06681c
       </div>
     </div>
   );
@@ -322,7 +349,10 @@ export const FormSelect = memo(({
     prevProps.searchdisable === nextProps.searchdisable &&
     prevProps.multiple === nextProps.multiple &&
     prevProps.optionClassName === nextProps.optionClassName &&
+<<<<<<< HEAD
     prevProps.id === nextProps.id &&
+=======
+>>>>>>> 0e6e9b67246e905519767a76639d2addfe06681c
     areOptionsEqual(prevProps.options, nextProps.options)
   );
 });

@@ -61,7 +61,10 @@ export function InvoiceTable({
       key: 'id',
       header: 'Invoice#',
       sticky: 'left',
+<<<<<<< HEAD
       disableToggle: true,
+=======
+>>>>>>> 0e6e9b67246e905519767a76639d2addfe06681c
       // width: '140px',
       cell: (value, row) => (
         <NavLink to={`${isAdmin ? '/admin' : ''}/invoices/${value}`} className="font-bold text-primary hover:underline">

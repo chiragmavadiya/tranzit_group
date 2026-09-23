@@ -43,6 +43,7 @@ api.interceptors.response.use(
         // Sentry.captureException(error);
         // Sentry Log
         const data = error.response?.data as any;
+<<<<<<< HEAD
         if (axios.isCancel(error)) return
         const message = data?.message || error.message || "An error occurred";
         const isNetworkNoise =
@@ -52,6 +53,20 @@ api.interceptors.response.use(
             error.request?.status === 0;           // no response reached JS
 
         if (axios.isAxiosError(error) && !isNetworkNoise && message !== 'No default item found') {
+=======
+        console.log(data, 'data.....')
+        const message = data?.message || error.message || "An error occurred";
+        if (axios.isAxiosError(error)) {
+            console.log("Set axios error", {
+                url: error.config?.url,
+                method: error.config?.method,
+                status: error.response?.status,
+                statusText: error.response?.statusText,
+                response: error.response?.data,
+                request: error.config?.data,
+                params: error.config?.params,
+            })
+>>>>>>> 0e6e9b67246e905519767a76639d2addfe06681c
             Sentry.withScope((scope) => {
                 scope.setTransactionName(
                     `${error.config?.method?.toUpperCase()} ${error?.config?.url}`
@@ -69,6 +84,10 @@ api.interceptors.response.use(
                 Sentry.captureException(error);
             });
         } else {
+<<<<<<< HEAD
+=======
+            console.log("Set normal error")
+>>>>>>> 0e6e9b67246e905519767a76639d2addfe06681c
             Sentry.captureException(error);
         }
 

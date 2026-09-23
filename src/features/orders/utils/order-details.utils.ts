@@ -28,7 +28,10 @@ export const getDisplayCourierName = (courierName?: string) => {
     if (rawName === 'aramex') return 'Aramex';
     if (rawName === 'couriersplease' || rawName === 'couriers-please') return 'Couriers Please';
     if (rawName === 'startrack' || rawName === 'star-track') return 'StarTrack';
+<<<<<<< HEAD
     if (rawName === 'fedex') return 'FedEx';
+=======
+>>>>>>> 0e6e9b67246e905519767a76639d2addfe06681c
     return rawName
         .split('-')
         .map((word: string) => word.charAt(0).toUpperCase() + word.slice(1))

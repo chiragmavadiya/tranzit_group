@@ -114,6 +114,7 @@ export const authService = {
     },
 
     /**
+<<<<<<< HEAD
      * Accept the latest Terms and Conditions
      */
     acceptTerms: async (): Promise<GenericResponse> => {
@@ -122,6 +123,8 @@ export const authService = {
     },
 
     /**
+=======
+>>>>>>> 0e6e9b67246e905519767a76639d2addfe06681c
      * Select plan
      */
     selectPlan: async (data: any): Promise<OnboardResponse> => {

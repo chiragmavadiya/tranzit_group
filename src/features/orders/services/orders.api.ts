@@ -12,8 +12,11 @@ import type {
 } from "../types/api.types";
 import type { OrderDetailData } from "../types/order-details.types";
 import { getFileName } from "@/lib/utils";
+<<<<<<< HEAD
 
 export type PackingDocument = "packing-slip" | "packing-summary";
+=======
+>>>>>>> 0e6e9b67246e905519767a76639d2addfe06681c
 
 export const ordersService = {
     /**
@@ -103,6 +106,7 @@ export const ordersService = {
      */
     cancelOrder: async (orderId: string | number, data: any): Promise<any> => {
         const response = await api.post(API_ENDPOINTS.ORDERS.CANCEL(orderId), data);
+<<<<<<< HEAD
         return response.data;
     },
 
@@ -122,6 +126,8 @@ export const ordersService = {
      */
     massArchiveOrders: async (orderNumbers: string[]): Promise<any> => {
         const response = await api.post(API_ENDPOINTS.ORDERS.MASS_ARCHIVE, { order_numbers: orderNumbers });
+=======
+>>>>>>> 0e6e9b67246e905519767a76639d2addfe06681c
         return response.data;
     },
 
@@ -247,6 +253,7 @@ export const ordersService = {
     },
 
     /**
+<<<<<<< HEAD
      * Fetch the packing slip / packing summary PDF for one or more orders
      */
     getPackingDocument: async ({ document, orderNumbers }: { document: PackingDocument; orderNumbers: (string | number)[] }): Promise<{ blob: Blob, filename: string }> => {
@@ -261,6 +268,8 @@ export const ordersService = {
     },
 
     /**
+=======
+>>>>>>> 0e6e9b67246e905519767a76639d2addfe06681c
      * Update order courier
      */
     updateCourier: async ({ orderNumber, data }: { orderNumber: string, data: any }): Promise<any> => {

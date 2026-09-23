@@ -13,11 +13,14 @@ export interface DrawerProps {
   children: React.ReactNode
   footer?: React.ReactNode
   className?: string
+<<<<<<< HEAD
   /**
    * Fires once the close transition has finished and the panel has left the DOM.
    * Use it to hand control to another overlay, so the two never stack.
    */
   onCloseComplete?: () => void
+=======
+>>>>>>> 0e6e9b67246e905519767a76639d2addfe06681c
 }
 
 export function Drawer({
@@ -27,12 +30,17 @@ export function Drawer({
   description,
   children,
   footer,
+<<<<<<< HEAD
   className,
   onCloseComplete
 }: DrawerProps) {
   const titleId = React.useId()
   const panelRef = React.useRef<HTMLDivElement>(null)
 
+=======
+  className
+}: DrawerProps) {
+>>>>>>> 0e6e9b67246e905519767a76639d2addfe06681c
   React.useEffect(() => {
     if (open) {
       document.body.style.overflow = "hidden"
@@ -44,6 +52,7 @@ export function Drawer({
     }
   }, [open])
 
+<<<<<<< HEAD
   // Escape closes the panel, and focus moves into it on open so keyboard users land
   // inside the drawer instead of staying behind the overlay.
   React.useEffect(() => {
@@ -61,6 +70,10 @@ export function Drawer({
 
   const content = (
     <AnimatePresence onExitComplete={onCloseComplete}>
+=======
+  const content = (
+    <AnimatePresence>
+>>>>>>> 0e6e9b67246e905519767a76639d2addfe06681c
       {open && (
         <>
           <motion.div
@@ -68,6 +81,7 @@ export function Drawer({
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             onClick={onClose}
+<<<<<<< HEAD
             aria-hidden="true"
             className="fixed inset-0 z-[100] bg-black/40 backdrop-blur-sm"
           />
@@ -77,6 +91,11 @@ export function Drawer({
             aria-modal="true"
             aria-labelledby={titleId}
             tabIndex={-1}
+=======
+            className="fixed inset-0 z-[100] bg-black/40 backdrop-blur-sm"
+          />
+          <motion.div
+>>>>>>> 0e6e9b67246e905519767a76639d2addfe06681c
             initial={{ x: "100%" }}
             animate={{ x: 0 }}
             exit={{ x: "100%" }}
@@ -89,7 +108,11 @@ export function Drawer({
             <div className="flex flex-col h-full">
               <div className="flex items-start justify-between px-6 py-5 border-b border-gray-100 dark:border-zinc-800">
                 <div className="flex flex-col gap-1">
+<<<<<<< HEAD
                   <h2 id={titleId} className="my-0 text-xl font-bold text-gray-900 dark:text-zinc-100">
+=======
+                  <h2 className="my-0 text-xl font-bold text-gray-900 dark:text-zinc-100">
+>>>>>>> 0e6e9b67246e905519767a76639d2addfe06681c
                     {title}
                   </h2>
                   {description && (
@@ -103,7 +126,10 @@ export function Drawer({
                   size="icon-sm"
                   className="rounded-full w-8 h-8 hover:bg-gray-100 dark:hover:bg-zinc-800"
                   onClick={onClose}
+<<<<<<< HEAD
                   aria-label="Close panel"
+=======
+>>>>>>> 0e6e9b67246e905519767a76639d2addfe06681c
                 >
                   <X className="w-4 h-4 text-gray-500" />
                 </Button>

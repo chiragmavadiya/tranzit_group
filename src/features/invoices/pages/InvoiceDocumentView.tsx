@@ -201,7 +201,7 @@ const InvoiceDocumentView: React.FC = () => {
       issue_date: date
     }))
   }, [])
-
+  console.log(invoiceData, 'invoiceData')
   useEffect(() => {
     if (invoiceID !== 'create' && details?.status) {
       const data = details?.data
@@ -320,8 +320,12 @@ const InvoiceDocumentView: React.FC = () => {
         destination: item.destination,
         to: item.to,
         receiver: item.receiver
+<<<<<<< HEAD
       })),
       deleted_item_ids: invoiceData.deleted_item_ids || []
+=======
+      }))
+>>>>>>> 0e6e9b67246e905519767a76639d2addfe06681c
     }
 
     if (invoiceID === 'create') {

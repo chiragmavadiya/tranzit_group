@@ -6,6 +6,10 @@ import { useAppSelector } from "@/hooks/store.hooks";
 import { getFirstAllowedSettingsPath } from "@/utils/permission";
 import EnquiryListPage from "@/features/enquiry/pages/EnquiryList";
 import PageLoading from "@/components/common/Loader";
+<<<<<<< HEAD
+=======
+// import IntegrationsPage from "@/features/integrations/pages/IntegrationPage";
+>>>>>>> 0e6e9b67246e905519767a76639d2addfe06681c
 
 // Lazy load page components
 const Dashboard = lazy(() => import('@/features/dashboard/pages/Dashboard'));
@@ -24,16 +28,27 @@ const Enquiry = lazy(() => import('@/features/enquiry'));
 // const HelpCenterArticle = lazy(() => import('@/features/help-center/pages/HelpCenterArticlePage'));
 const Transactions = lazy(() => import('@/features/wallet/pages/TransactionsPage'));
 const TopUp = lazy(() => import('@/features/wallet/pages/TopUpPage'));
+<<<<<<< HEAD
+=======
+// const IntegrationsLayout = lazy(() => import('@/features/integrations/components/IntegrationsLayout'));
+// const IntegrationDetails = lazy(() => import('@/features/integrations/pages/IntegrationDetailsPage'));
+>>>>>>> 0e6e9b67246e905519767a76639d2addfe06681c
 // const HelpCenterLayout = lazy(() => import('@/features/help-center/components/HelpCenterLayout'));
 const CustomerSettingsLayout = lazy(() => import('@/features/customer-settings/components/CustomerSettingsLayout'));
 const AccountSettingsPage = lazy(() => import('@/features/customer-settings/pages/AccountSettingsPage'));
 const TeamAccessPage = lazy(() => import('@/features/customer-settings/pages/TeamAccessPage'));
 const EcommerceIntegrationsPage = lazy(() => import('@/features/customer-settings/pages/EcommerceIntegrationsPage'));
+<<<<<<< HEAD
 const EcommerceAccountPage = lazy(() => import('@/features/customer-settings/pages/EcommerceAccountPage'));
 const CarrierIntegrationsPage = lazy(() => import('@/features/customer-settings/pages/CarrierIntegrationsPage'));
 const CarrierConfigPage = lazy(() => import('@/features/customer-settings/pages/CarrierConfigPage'));
 const RulesPage = lazy(() => import('@/features/rules/pages/RulesPage'));
 const PackingDocumentsPage = lazy(() => import('@/features/packing-documents/pages/PackingDocumentsPage'));
+=======
+const CarrierIntegrationsPage = lazy(() => import('@/features/customer-settings/pages/CarrierIntegrationsPage'));
+const CarrierConfigPage = lazy(() => import('@/features/customer-settings/pages/CarrierConfigPage'));
+const RulesPage = lazy(() => import('@/features/rules/pages/RulesPage'));
+>>>>>>> 0e6e9b67246e905519767a76639d2addfe06681c
 const ManifestPage = lazy(() => import('@/features/manifest/pages/ManifestPage'));
 
 function SettingsIndexRedirect() {
@@ -74,6 +89,12 @@ export default function ClientRoutes() {
 
           <Route path="items" element={withSuspense(<MyItems />)} />
           <Route path="address-book" element={withSuspense(<AddressBook />)} />
+<<<<<<< HEAD
+=======
+          {/* <Route path="integrations" element={withSuspense(<IntegrationsLayout />)}>
+            <Route path=":providerId" element={withSuspense(<IntegrationDetails />)} />
+          </Route> */}
+>>>>>>> 0e6e9b67246e905519767a76639d2addfe06681c
           <Route path="wallet">
             <Route path="transactions" element={withSuspense(<Transactions />)} />
             <Route path="top-up" element={withSuspense(<TopUp />)} />
@@ -94,16 +115,26 @@ export default function ClientRoutes() {
           {/* <Route path="help-center" element={withSuspense(<HelpCenterLayout />)}>
             <Route path=":slug" element={withSuspense(<HelpCenterArticle />)} />
           </Route> */}
+<<<<<<< HEAD
+=======
+          {/* <Route path="integrations" element={<IntegrationsPage />} /> */}
+>>>>>>> 0e6e9b67246e905519767a76639d2addfe06681c
           <Route path="settings" element={withSuspense(<CustomerSettingsLayout />)}>
             <Route index element={<SettingsIndexRedirect />} />
             <Route path="account" element={withSuspense(<AccountSettingsPage />)} />
             <Route path="team" element={withSuspense(<TeamAccessPage />)} />
             <Route path="ecommerce" element={withSuspense(<EcommerceIntegrationsPage />)} />
+<<<<<<< HEAD
             <Route path="ecommerce/:provider/:accountId" element={withSuspense(<EcommerceAccountPage />)} />
             <Route path="carriers" element={withSuspense(<CarrierIntegrationsPage />)} />
             <Route path="carriers/:slug" element={withSuspense(<CarrierConfigPage />)} />
             <Route path="rules" element={withSuspense(<RulesPage />)} />
             <Route path="packing-slips-summary" element={withSuspense(<PackingDocumentsPage />)} />
+=======
+            <Route path="carriers" element={withSuspense(<CarrierIntegrationsPage />)} />
+            <Route path="carriers/:slug" element={withSuspense(<CarrierConfigPage />)} />
+            <Route path="rules" element={withSuspense(<RulesPage />)} />
+>>>>>>> 0e6e9b67246e905519767a76639d2addfe06681c
           </Route>
 
 

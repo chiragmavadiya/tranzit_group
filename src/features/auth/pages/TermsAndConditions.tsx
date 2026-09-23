@@ -12,6 +12,7 @@ import {
   AlertTriangle,
   ClipboardCheck,
   ExternalLink,
+<<<<<<< HEAD
   Scale,
   XCircle,
   HelpCircle,
@@ -36,6 +37,14 @@ import {
   Bell,
   Gavel,
   RefreshCw
+=======
+  History,
+  Scale,
+  UserCheck,
+  XCircle,
+  HelpCircle,
+  Info
+>>>>>>> 0e6e9b67246e905519767a76639d2addfe06681c
 } from "lucide-react";
 import brandLogo from "@/assets/Tranzit_Logo.svg";
 import brandLogoDark from "@/assets/Tranzit_Logo_dark.svg";
@@ -45,7 +54,11 @@ export default function TermsAndConditions() {
   const { theme } = useTheme();
   const [scrollProgress, setScrollProgress] = useState(0);
   const [showScrollTop, setShowScrollTop] = useState(false);
+<<<<<<< HEAD
   const [activeSection, setActiveSection] = useState("definitions");
+=======
+  const [activeSection, setActiveSection] = useState("introduction");
+>>>>>>> 0e6e9b67246e905519767a76639d2addfe06681c
   const [searchQuery, setSearchQuery] = useState("");
 
   const logoSrc = theme === "dark" ? brandLogoDark : brandLogo;
@@ -61,6 +74,7 @@ export default function TermsAndConditions() {
 
       // Detect active section in viewport
       const sectionIds = [
+<<<<<<< HEAD
         "definitions",
         "tranzit-group-role",
         "account-registration",
@@ -119,6 +133,14 @@ export default function TermsAndConditions() {
       ];
 
       let current = "definitions";
+=======
+        "introduction", "use-license", "disclaimer", "limitations",
+        "accuracy", "links", "modifications", "governing-law",
+        "user-accounts", "prohibited-activities", "contact"
+      ];
+
+      let current = "introduction";
+>>>>>>> 0e6e9b67246e905519767a76639d2addfe06681c
       for (const id of sectionIds) {
         const el = document.getElementById(id);
         if (el) {
@@ -144,6 +166,7 @@ export default function TermsAndConditions() {
   // Structured content for sections to support searching and rendering
   const sections = useMemo(() => [
     {
+<<<<<<< HEAD
       id: "definitions",
       num: "01",
       title: "1. Definitions",
@@ -173,11 +196,71 @@ export default function TermsAndConditions() {
                 <span className="text-slate-600 dark:text-zinc-300">{def.desc}</span>
               </div>
             ))}
+=======
+      id: "introduction",
+      num: "01",
+      title: "1. Introduction",
+      icon: <BookOpen className="w-5 h-5 text-primary" />,
+      searchText: "Welcome to Tranzit Group's Portal. These Terms and Conditions govern your use of our website, applications, and services. By accessing and using this portal, you agree to be bound by these terms. If you do not agree with any part of these terms, you should not use our services.",
+      content: (
+        <p className="text-slate-600 dark:text-zinc-300 leading-relaxed text-[15px]">
+          Welcome to Tranzit Group's Portal. These Terms and Conditions govern your use of our website, applications, and services. By accessing and using this portal, you agree to be bound by these terms. If you do not agree with any part of these terms, you should not use our services.
+        </p>
+      )
+    },
+    {
+      id: "use-license",
+      num: "02",
+      title: "2. Use License",
+      icon: <Key className="w-5 h-5 text-primary" />,
+      searchText: "Permission is granted to temporarily download one copy of the materials information or software on Tranzit Group's portal for personal, non-commercial transitory viewing only. This is the grant of a license, not a transfer of title, and under this license you may not: Modify or copy the materials Use the materials for any commercial purpose or for any public display Attempt to decompile or reverse engineer any software contained on Tranzit Group's portal Remove any copyright or other proprietary notations from the materials Transfer the materials to another person or mirror the materials on any other server Violate any applicable laws or regulations",
+      content: (
+        <div className="space-y-4">
+          <p className="text-slate-600 dark:text-zinc-300 leading-relaxed text-[15px]">
+            Permission is granted to temporarily download one copy of the materials (information or software) on Tranzit Group's portal for personal, non-commercial transitory viewing only. This is the grant of a license, not a transfer of title, and under this license you may not:
+          </p>
+          <ul className="grid grid-cols-1 md:grid-cols-2 gap-3 pl-1 text-[14px]">
+            {[
+              "Modify or copy the materials",
+              "Use the materials for any commercial purpose or public display",
+              "Decompile or reverse engineer any portal software",
+              "Remove any copyright or proprietary notations",
+              "Transfer the materials or 'mirror' them on another server",
+              "Violate any applicable laws or regulations"
+            ].map((item, index) => (
+              <li key={index} className="flex items-start gap-2.5 text-slate-500 dark:text-zinc-400">
+                <span className="flex-shrink-0 w-5 h-5 rounded-full bg-primary/10 text-primary flex items-center justify-center text-[10px] font-bold mt-0.5">
+                  {index + 1}
+                </span>
+                <span>{item}</span>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )
+    },
+    {
+      id: "disclaimer",
+      num: "03",
+      title: "3. Disclaimer",
+      icon: <ShieldAlert className="w-5 h-5 text-primary" />,
+      searchText: "The materials on Tranzit Group's portal are provided on an 'as is' basis. Tranzit Group makes no warranties, expressed or implied, and hereby disclaims and negates all other warranties including, without limitation, implied warranties or conditions of merchantability, fitness for a particular purpose, or non-infringement of intellectual property or other violation of rights.",
+      content: (
+        <div className="space-y-4">
+          <p className="text-slate-600 dark:text-zinc-300 leading-relaxed text-[15px]">
+            The materials on Tranzit Group's portal are provided on an 'as is' basis. Tranzit Group makes no warranties, expressed or implied, and hereby disclaims and negates all other warranties including, without limitation:
+          </p>
+          <div className="bg-amber-500/5 border-l-4 border-amber-500 p-4 rounded-r-xl">
+            <p className="text-sm text-amber-700 dark:text-amber-400 font-medium">
+              Implied warranties or conditions of merchantability, fitness for a particular purpose, or non-infringement of intellectual property or other violation of rights.
+            </p>
+>>>>>>> 0e6e9b67246e905519767a76639d2addfe06681c
           </div>
         </div>
       )
     },
     {
+<<<<<<< HEAD
       id: "tranzit-group-role",
       num: "02",
       title: "2. Tranzit Group's Role",
@@ -1345,6 +1428,98 @@ export default function TermsAndConditions() {
               "to harass or threaten another person;",
               "to infringe intellectual property rights; or",
               "in a way reasonably likely to materially damage Tranzit Group's systems or services."
+=======
+      id: "limitations",
+      num: "04",
+      title: "4. Limitations",
+      icon: <AlertTriangle className="w-5 h-5 text-primary" />,
+      searchText: "In no event shall Tranzit Group or its suppliers be liable for any damages (including, without limitation, damages for loss of data or profit, or due to business interruption) arising out of the use or inability to use the materials on Tranzit Group's portal, even if Tranzit Group or an authorized representative has been notified orally or in writing of the possibility of such damage.",
+      content: (
+        <p className="text-slate-600 dark:text-zinc-300 leading-relaxed text-[15px]">
+          In no event shall Tranzit Group or its suppliers be liable for any damages (including, without limitation, damages for loss of data or profit, or due to business interruption) arising out of the use or inability to use the materials on Tranzit Group's portal, even if Tranzit Group or an authorized representative has been notified orally or in writing of the possibility of such damage.
+        </p>
+      )
+    },
+    {
+      id: "accuracy",
+      num: "05",
+      title: "5. Accuracy of Materials",
+      icon: <ClipboardCheck className="w-5 h-5 text-primary" />,
+      searchText: "The materials appearing on Tranzit Group's portal could include technical, typographical, or photographic errors. Tranzit Group does not warrant that any of the materials on its portal are accurate, complete, or current. Tranzit Group may make changes to the materials contained on its portal at any time without notice.",
+      content: (
+        <p className="text-slate-600 dark:text-zinc-300 leading-relaxed text-[15px]">
+          The materials appearing on Tranzit Group's portal could include technical, typographical, or photographic errors. Tranzit Group does not warrant that any of the materials on its portal are accurate, complete, or current. Tranzit Group may make changes to the materials contained on its portal at any time without notice.
+        </p>
+      )
+    },
+    {
+      id: "links",
+      num: "06",
+      title: "6. Links",
+      icon: <ExternalLink className="w-5 h-5 text-primary" />,
+      searchText: "Tranzit Group has not reviewed all of the sites linked to its portal and is not responsible for the contents of any such linked site. The inclusion of any link does not imply endorsement by Tranzit Group of the site. Use of any such linked website is at the user's own risk.",
+      content: (
+        <p className="text-slate-600 dark:text-zinc-300 leading-relaxed text-[15px]">
+          Tranzit Group has not reviewed all of the sites linked to its portal and is not responsible for the contents of any such linked site. The inclusion of any link does not imply endorsement by Tranzit Group of the site. Use of any such linked website is at the user's own risk.
+        </p>
+      )
+    },
+    {
+      id: "modifications",
+      num: "07",
+      title: "7. Modifications",
+      icon: <History className="w-5 h-5 text-primary" />,
+      searchText: "Tranzit Group may revise these terms of service for its portal at any time without notice. By using this portal, you are agreeing to be bound by the then current version of these terms of service.",
+      content: (
+        <p className="text-slate-600 dark:text-zinc-300 leading-relaxed text-[15px]">
+          Tranzit Group may revise these terms of service for its portal at any time without notice. By using this portal, you are agreeing to be bound by the then current version of these terms of service.
+        </p>
+      )
+    },
+    {
+      id: "governing-law",
+      num: "08",
+      title: "8. Governing Law",
+      icon: <Scale className="w-5 h-5 text-primary" />,
+      searchText: "These terms and conditions are governed by and construed in accordance with the laws of Australia, and you irrevocably submit to the exclusive jurisdiction of the courts in that location.",
+      content: (
+        <p className="text-slate-600 dark:text-zinc-300 leading-relaxed text-[15px]">
+          These terms and conditions are governed by and construed in accordance with the laws of Australia, and you irrevocably submit to the exclusive jurisdiction of the courts in that location.
+        </p>
+      )
+    },
+    {
+      id: "user-accounts",
+      num: "09",
+      title: "9. User Accounts",
+      icon: <UserCheck className="w-5 h-5 text-primary" />,
+      searchText: "If you create an account on our portal, you are responsible for maintaining the confidentiality of your account information and password. You agree to accept responsibility for all activities that occur under your account. You must notify us immediately of any unauthorized use of your account.",
+      content: (
+        <p className="text-slate-600 dark:text-zinc-300 leading-relaxed text-[15px]">
+          If you create an account on our portal, you are responsible for maintaining the confidentiality of your account information and password. You agree to accept responsibility for all activities that occur under your account. You must notify us immediately of any unauthorized use of your account.
+        </p>
+      )
+    },
+    {
+      id: "prohibited-activities",
+      num: "10",
+      title: "10. Prohibited Activities",
+      icon: <XCircle className="w-5 h-5 text-primary" />,
+      searchText: "You agree not to engage in any of the following prohibited activities: Harassing or causing distress or inconvenience to any person Obscene or abusive language or behavior Disrupting the normal flow of dialogue within our portal Attempting to gain unauthorized access to our systems Uploading viruses or malicious code Spamming or sending unsolicited communications",
+      content: (
+        <div className="space-y-4">
+          <p className="text-slate-600 dark:text-zinc-300 leading-relaxed text-[15px]">
+            You agree not to engage in any of the following prohibited activities:
+          </p>
+          <ul className="grid grid-cols-1 md:grid-cols-2 gap-3 pl-1 text-[14px]">
+            {[
+              "Harassing or causing distress/inconvenience",
+              "Obscene or abusive language or behavior",
+              "Disrupting the normal flow of dialogue",
+              "Attempting unauthorized access to systems",
+              "Uploading viruses or malicious code",
+              "Spamming or sending unsolicited communications"
+>>>>>>> 0e6e9b67246e905519767a76639d2addfe06681c
             ].map((item, index) => (
               <li key={index} className="flex items-start gap-2.5 text-red-500/80 dark:text-red-400/80">
                 <span className="flex-shrink-0 w-1.5 h-1.5 rounded-full bg-red-500 mt-2" />
@@ -1356,6 +1531,7 @@ export default function TermsAndConditions() {
       )
     },
     {
+<<<<<<< HEAD
       id: "suspension",
       num: "42",
       title: "42. Suspension",
@@ -1652,6 +1828,20 @@ export default function TermsAndConditions() {
             Questions about these Terms or the Tranzit Group Services can be directed to:
           </p>
 
+=======
+      id: "contact",
+      num: "11",
+      title: "11. Contact Information",
+      icon: <HelpCircle className="w-5 h-5 text-primary" />,
+      searchText: "If you have any questions about these Terms and Conditions, please contact us at the address provided below. Tranzit Group ABN: 12 690 967 198 Address: 12B Bass Ct Keysborough, VIC 3173 Australia Email: info@tranzitgroup.com.au",
+      content: (
+        <div className="space-y-6">
+          <p className="text-slate-600 dark:text-zinc-300 leading-relaxed text-[15px]">
+            If you have any questions about these Terms and Conditions, please contact us at the address provided below.
+          </p>
+
+          {/* Styled Contact Grid Card */}
+>>>>>>> 0e6e9b67246e905519767a76639d2addfe06681c
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-6">
             <div className="bg-slate-50 dark:bg-zinc-950 p-6 rounded-2xl border border-slate-100 dark:border-zinc-800/40 flex flex-col items-center text-center hover:shadow-md hover:border-primary/20 transition-all duration-300">
               <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center text-primary mb-4 shadow-sm">
@@ -1662,6 +1852,7 @@ export default function TermsAndConditions() {
               </span>
               <span className="font-bold text-slate-800 dark:text-zinc-200">Tranzit Group</span>
               <span className="text-sm text-slate-500 dark:text-zinc-400 mt-1 font-medium">ABN: 12 690 967 198</span>
+<<<<<<< HEAD
               <a
                 href="https://tranzitgroup.com.au"
                 target="_blank"
@@ -1671,6 +1862,8 @@ export default function TermsAndConditions() {
                 tranzitgroup.com.au
                 <ExternalLink className="w-3 h-3" />
               </a>
+=======
+>>>>>>> 0e6e9b67246e905519767a76639d2addfe06681c
             </div>
 
             <div className="bg-slate-50 dark:bg-zinc-950 p-6 rounded-2xl border border-slate-100 dark:border-zinc-800/40 flex flex-col items-center text-center hover:shadow-md hover:border-primary/20 transition-all duration-300">
@@ -1691,6 +1884,7 @@ export default function TermsAndConditions() {
                 <Mail className="w-6 h-6" />
               </div>
               <span className="text-[11px] font-bold uppercase tracking-wide text-slate-400 dark:text-zinc-500 mb-1">
+<<<<<<< HEAD
                 Contact Details
               </span>
               <a
@@ -1702,10 +1896,22 @@ export default function TermsAndConditions() {
               {/* <span className="text-sm text-slate-500 dark:text-zinc-400 mt-1 font-medium">
                 Phone: [Insert Phone Number]
               </span> */}
+=======
+                Support Email
+              </span>
+              <a
+                href="mailto:info@tranzitgroup.com.au"
+                className="font-bold text-primary hover:underline underline-offset-4 transition-colors"
+              >
+                info@tranzitgroup.com.au
+              </a>
+              <span className="text-sm text-slate-500 dark:text-zinc-400 mt-1 font-medium">Response within 24h</span>
+>>>>>>> 0e6e9b67246e905519767a76639d2addfe06681c
             </div>
           </div>
         </div>
       )
+<<<<<<< HEAD
     },
     {
       id: "acceptance",
@@ -1725,6 +1931,8 @@ export default function TermsAndConditions() {
           </div>
         </div>
       )
+=======
+>>>>>>> 0e6e9b67246e905519767a76639d2addfe06681c
     }
   ], []);
 
@@ -1760,18 +1968,30 @@ export default function TermsAndConditions() {
           </div>
           <div className="flex items-center gap-2.5 text-xs font-semibold text-slate-400 bg-slate-100/50 dark:bg-zinc-800/30 px-3.5 py-2 rounded-xl">
             <Clock className="w-3.5 h-3.5 text-primary" />
+<<<<<<< HEAD
             <span>Updated: 17 August 2026</span>
+=======
+            <span>Updated: June 2026</span>
+>>>>>>> 0e6e9b67246e905519767a76639d2addfe06681c
           </div>
         </div>
       </header>
 
       {/* Main Content Area */}
+<<<<<<< HEAD
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+=======
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16">
+>>>>>>> 0e6e9b67246e905519767a76639d2addfe06681c
         <div className="lg:grid lg:grid-cols-12 lg:gap-10">
 
           {/* Left Column: Sidebar Table of Contents */}
           <aside className="hidden lg:block lg:col-span-3 sticky top-28 self-start bg-white/50 dark:bg-zinc-900/35 p-6 rounded-2xl border border-slate-200/45 dark:border-zinc-800/45 backdrop-blur-sm shadow-xs">
+<<<<<<< HEAD
             <nav className="space-y-1.5 pl-1 py-1 max-h-[calc(100vh-220px)] overflow-y-auto pr-2 scrollbar-thin scrollbar-thumb-slate-200 dark:scrollbar-thumb-zinc-850 scrollbar-track-transparent">
+=======
+            <nav className="space-y-1.5 pl-1 py-1">
+>>>>>>> 0e6e9b67246e905519767a76639d2addfe06681c
               <span className="block text-xs font-bold uppercase tracking-wide text-slate-400 dark:text-zinc-500 mb-4 pl-1">
                 Document Index
               </span>
@@ -1809,10 +2029,14 @@ export default function TermsAndConditions() {
                 </div>
               </div>
               <p className="text-sm text-slate-500 dark:text-zinc-400 leading-relaxed max-w-2xl">
+<<<<<<< HEAD
                 These Terms and Conditions (&quot;Terms&quot;) govern access to and use of the Tranzit Group website, shipping platform, applications, integrations, APIs and related freight-management services. Tranzit Group ABN 12 690 967 198 is referred to in these Terms as &quot;Tranzit Group&quot;, &quot;we&quot;, &quot;us&quot; or &quot;our&quot;.
               </p>
               <p className="text-sm text-slate-550 dark:text-zinc-450 leading-relaxed max-w-2xl mt-3">
                 By creating an account, accessing the Platform, obtaining a quotation, booking a shipment, purchasing a shipping service or otherwise using our Services, you agree to be bound by these Terms. If you are using the Platform on behalf of a company or other organisation, you represent that you have authority to bind that organisation to these Terms.
+=======
+                Please read these terms and conditions carefully before using the Tranzit Group Portal. By accessing or using our services, you agree to comply with and be bound by these legal rules.
+>>>>>>> 0e6e9b67246e905519767a76639d2addfe06681c
               </p>
 
               {/* Modern Interactive Search Bar */}
@@ -1879,7 +2103,11 @@ export default function TermsAndConditions() {
                   </div>
                   <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-1">No Matching Sections Found</h3>
                   <p className="text-sm text-slate-500 dark:text-zinc-400 max-w-sm mx-auto">
+<<<<<<< HEAD
                     We couldn't find any terms matching &quot;{searchQuery}&quot;. Please try another search term or browse the categories.
+=======
+                    We couldn't find any terms matching "{searchQuery}". Please try another search term or browse the categories.
+>>>>>>> 0e6e9b67246e905519767a76639d2addfe06681c
                   </p>
                 </div>
               )}

@@ -5,13 +5,15 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "tsc -b && vite build",
+    "build": "node generate-version.js && tsc -b && vite build",
     "lint": "eslint .",
+    "test": "node --experimental-strip-types --test src/features/orders/lib/printLabelsUi.test.ts src/features/rules/lib/ruleDefaults.test.ts src/features/tracking/lib/trackingStages.test.ts src/features/customer-settings/lib/branding.test.ts src/features/integrations/utils.test.ts",
     "preview": "vite preview"
   },
   "dependencies": {
     "@base-ui/react": "^1.4.0",
     "@fontsource-variable/geist": "^5.2.8",
+    "@microsoft/clarity": "^1.0.2",
     "@reduxjs/toolkit": "^2.11.2",
     "@sentry/react": "^10.63.0",
     "@tanstack/react-query": "^5.97.0",

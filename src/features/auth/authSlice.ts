@@ -1,6 +1,20 @@
 import { createSlice, type PayloadAction } from "@reduxjs/toolkit";
 import type { AuthState } from "@/types/store.types";
 import type { User, TeamAccess, BlackoutDay } from "@/features/auth/auth.types";
+import { ADMIN_ROLES } from "@/constants";
+
+/**
+ * The portal only has two roles: admin and customer. The API sends finer-grained staff
+ * titles ("Super Admin", "Staff", "Operation Manager", "It Manager"); every one of them
+ * is folded into admin here so the rest of the app never has to know about them.
+ */
+export const normalizeRole = (role?: string | null) => {
+    const value = (role || '').trim();
+    if (!value) return value;
+    return ADMIN_ROLES.some((adminRole) => adminRole.toLowerCase() === value.toLowerCase())
+        ? 'admin'
+        : value.toLowerCase();
+};
 
 const initialState: AuthState = {
     user: null,
@@ -9,7 +23,7 @@ const initialState: AuthState = {
     isAuthenticated: !!localStorage.getItem("auth_token"),
     isLoading: false,
     error: null,
-    role: localStorage.getItem("user_role") as string,
+    role: normalizeRole(localStorage.getItem("user_role")),
     next_step: '',
     default_courier: null,
     is_sub_user: false,
@@ -28,7 +42,8 @@ const authSlice = createSlice({
             state,
             action: PayloadAction<{ userID: number; token: string, role: string, next_step: string, user?: User, team_access?: TeamAccess, courier_settings?: any, blackout_days?: BlackoutDay[] }>
         ) => {
-            const { userID, token, role, next_step, user, team_access, courier_settings, blackout_days } = action.payload;
+            const { userID, token, role: rawRole, next_step, user, team_access, courier_settings, blackout_days } = action.payload;
+            const role = normalizeRole(rawRole);
             state.userID = userID;
             state.role = role;
             state.token = token;
@@ -57,7 +72,7 @@ const authSlice = createSlice({
             state.user = user;
             state.userID = user.id;
             state.isAuthenticated = true;
-            const role = user.role;
+            const role = normalizeRole(user.role);
             state.default_courier = default_courier;
             state.default_item = default_item;
             if (courier_settings !== undefined) {
@@ -69,8 +84,8 @@ const authSlice = createSlice({
                 localStorage.setItem("blackout_days", JSON.stringify(blackout_days));
             }
             if (role) {
-                state.role = role.toLowerCase();
-                localStorage.setItem("user_role", role.toLowerCase());
+                state.role = role;
+                localStorage.setItem("user_role", role);
             }
             if (next_step !== undefined) state.next_step = next_step;
             if (team_access !== undefined) {

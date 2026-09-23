@@ -98,6 +98,7 @@ export const AlertsTab = ({ filters, searchValue, onPageChange, onPageSizeChange
     <DataTable
       columns={columns}
       data={alerts}
+      moduleName="alert"
       loading={isLoading}
       totalItems={totalItems}
       currentPage={filters.page || 1}

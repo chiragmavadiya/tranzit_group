@@ -13,7 +13,7 @@ import {
   subYears,
   format,
 } from "date-fns";
-import type { DateFilterType } from "./types";
+import type { DateFilterType, DateFilterValue } from "./types";
 
 export const QUICK_FILTER_OPTIONS: { type: DateFilterType; label: string }[] = [
   { type: "today", label: "Today" },
@@ -105,4 +105,32 @@ export const calculateDateRange = (
 export const getQuickFilterLabel = (type: DateFilterType): string => {
   const option = QUICK_FILTER_OPTIONS.find((opt) => opt.type === type);
   return option ? option.label : "Today";
+};
+
+/**
+ * Rebuilds a persisted date filter for the current day.
+ * Quick filters ("today", "thisWeek", ...) are relative, so their stored `from`/`to`
+ * go stale as soon as the day changes and must be recalculated from today's date.
+ * Custom ranges are absolute and are restored untouched. Unrecognised/legacy stored
+ * shapes fall back to the caller's initial value.
+ */
+export const hydrateDateFilter = (
+  stored: DateFilterValue,
+  fallback: DateFilterValue
+): DateFilterValue => {
+  const isKnownType =
+    !!stored &&
+    typeof stored === "object" &&
+    QUICK_FILTER_OPTIONS.some((opt) => opt.type === stored.type);
+
+  if (!isKnownType) return fallback;
+  if (stored.type === "custom") return stored;
+
+  const range = calculateDateRange(stored.type);
+  return {
+    type: stored.type,
+    from: format(range.from, "dd/MM/yyyy"),
+    to: format(range.to, "dd/MM/yyyy"),
+    label: range.label,
+  };
 };

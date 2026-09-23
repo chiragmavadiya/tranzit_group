@@ -3,6 +3,8 @@ import { ordersService } from "@/features/orders/services/orders.api";
 import { QUERY_KEYS } from "@/constants/api.constants";
 import { showToast, suspendToast } from "@/components/ui/custom-toast";
 import { useDownloadManifestPDF } from "@/features/manifest/hooks/useManifest";
+import { downloadFile } from "@/lib/utils";
+import * as Sentry from "@sentry/react";
 
 /**
  * Hook to fetch customer orders with filters
@@ -14,6 +16,7 @@ export const useOrders = (params?: {
   per_page?: number;
   page?: number;
   search?: string;
+  address_status?: string;
 }, enabled: boolean = true) => {
   return useQuery({
     queryKey: [...QUERY_KEYS.ORDERS.LIST, params],
@@ -95,6 +98,24 @@ export const useCancelOrder = () => {
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.ORDERS.LIST });
       queryClient.invalidateQueries({ queryKey: ["orders", "counts"] });
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.ORDERS.DETAILS(orderId) });
+    },
+  });
+};
+
+/**
+ * Hook to cancel or archive many orders in a single request.
+ * Pending orders are archived; printed/dispatched ones are cancelled with the courier.
+ */
+export const useMassOrderAction = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ action, orderNumbers, manually }: { action: 'cancel' | 'archive'; orderNumbers: string[]; manually?: boolean }) =>
+      action === 'archive'
+        ? ordersService.massArchiveOrders(orderNumbers)
+        : ordersService.massCancelOrders(orderNumbers, manually),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.ORDERS.LIST });
+      queryClient.invalidateQueries({ queryKey: ["orders", "counts"] });
     },
   });
 };
@@ -218,38 +239,43 @@ export const useDownloadLabel = (printAfterDownload: boolean = false) => {
   return useMutation({
     mutationFn: ordersService.downloadLabel,
     onSuccess: (blob, orderId) => {
-      const url = window.URL.createObjectURL(blob);
+      const filename = `label-${orderId}.pdf`;
 
-      // const printWindow = window.open(url);
-      if (printAfterDownload) {
-
-        const iframe = document.createElement('iframe');
-
-        iframe.style.position = 'fixed';
-        iframe.style.right = '0';
-        iframe.style.bottom = '0';
-        iframe.style.width = '0';
-        iframe.style.height = '0';
-        iframe.style.border = '0';
-
-        iframe.src = url;
-
-        document.body.appendChild(iframe);
-
-        iframe.onload = () => {
-          iframe.contentWindow?.focus();
-          iframe.contentWindow?.print();
-        }
-      } else {
-        const link = document.createElement('a');
-        link.href = url;
-        link.setAttribute('download', `label-${orderId}.pdf`);
-        document.body.appendChild(link);
-        link.click();
-        link.remove();
+      // An embedded host (Shopify admin) sandboxes our frame and blocks print dialogs.
+      if (!printAfterDownload || window.top !== window.self) {
+        downloadFile(blob, filename);
+        return;
       }
 
+      const url = window.URL.createObjectURL(blob);
+      const iframe = document.createElement('iframe');
 
+      iframe.style.position = 'fixed';
+      iframe.style.right = '0';
+      iframe.style.bottom = '0';
+      iframe.style.width = '0';
+      iframe.style.height = '0';
+      iframe.style.border = '0';
+
+      iframe.src = url;
+
+      iframe.onload = () => {
+        try {
+          iframe.contentWindow?.focus();
+          iframe.contentWindow?.print();
+        } catch (error) {
+          Sentry.captureException(error, { level: 'warning', tags: { feature: 'label-print' } });
+          showToast('Could not open the print dialog. Downloading the label instead.', 'warning');
+          downloadFile(blob, filename);
+        }
+        // The dialog reads the document lazily, so the blob has to outlive this handler.
+        setTimeout(() => {
+          iframe.remove();
+          window.URL.revokeObjectURL(url);
+        }, 30000);
+      };
+
+      document.body.appendChild(iframe);
     },
     onError: async (error: any) => {
       let errorMessage = "Failed to download label";
@@ -257,6 +283,33 @@ export const useDownloadLabel = (printAfterDownload: boolean = false) => {
         try {
           const text = await error.response.data.text();
           const parsed = JSON.parse(text);
+          errorMessage = parsed.message || errorMessage;
+        } catch {
+          errorMessage = error.message || errorMessage;
+        }
+      } else {
+        errorMessage = error?.message || errorMessage;
+      }
+      showToast(errorMessage, "error");
+    }
+  });
+};
+
+/**
+ * Hook to download the packing slip / packing summary PDF rendered by the API.
+ */
+export const useDownloadPackingDocument = () => {
+  return useMutation({
+    mutationFn: ordersService.getPackingDocument,
+    onSuccess: ({ blob, filename }) => {
+      downloadFile(blob, filename);
+    },
+    onError: async (error: any, variables) => {
+      const label = variables.document === 'packing-slip' ? 'packing slip' : 'packing summary';
+      let errorMessage = `Failed to download ${label}`;
+      if (error?.response?.data instanceof Blob) {
+        try {
+          const parsed = JSON.parse(await error.response.data.text());
           errorMessage = parsed.message || errorMessage;
         } catch {
           errorMessage = error.message || errorMessage;

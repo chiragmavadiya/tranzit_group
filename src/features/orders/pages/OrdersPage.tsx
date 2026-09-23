@@ -4,13 +4,15 @@ import { useState, useMemo, useCallback, useEffect, lazy, Suspense } from 'react
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { format, parse, isValid } from 'date-fns';
 import type { Order, TabType } from '@/features/orders/types';
-import { useOrders, useExportOrders, useImportOrders, useDownloadLabel, useCancelOrder, useArchiveOrder, usePrintOrder, useWalletCheck, useCreateAuspostManifest } from '@/features/orders/hooks/useOrders';
+import { useOrders, useExportOrders, useImportOrders, useDownloadLabel, useCancelOrder, useArchiveOrder, useMassOrderAction, usePrintOrder, useWalletCheck, useCreateAuspostManifest, useDownloadPackingDocument } from '@/features/orders/hooks/useOrders';
+import type { PackingDocument } from '@/features/orders/services/orders.api';
 import { useRestoreOrderConfirm } from '@/features/orders/hooks/useRestoreOrderConfirm';
 import WalletCheckDialog from '@/features/orders/components/WalletCheckDialog';
 import { DataTable } from '@/components/common/DataTable';
-import { getOrdersColumns } from '../column';
+import { getOrdersColumns, getAddressCheckerColumns } from '../column';
 import { DateFilter } from '@/components/common/DateFilter';
 import type { DateFilterValue } from '@/components/common/DateFilter/types';
+import { hydrateDateFilter } from '@/components/common/DateFilter/utils';
 // import { calculateDateRange } from '@/components/common/DateFilter/utils';
 import { Button } from '@/components/ui/button';
 import {
@@ -32,14 +34,18 @@ import { ConformationModal } from '@/components/common/ConformationModal';
 import { useDebounce } from '@/hooks/useDebounce';
 import { FormSelect, FormInput } from '../components/OrderFormUI';
 import { CustomModel } from '@/components/ui/dialog';
-import { isPhoneValid } from '@/lib/utils';
+import { isPhoneValid, PHONE_ERROR_MESSAGE } from '@/lib/phone';
 import { useCustomers } from '@/features/customers/hooks/useCustomers';
 import { DropdownCustomMenu } from '@/components/ui/dropdown-menu';
 import { getDisplayCourierName } from '../utils/order-details.utils';
 import useLocalStorage from '@/hooks/useLocalStorage';
+import { BulkPrintAction } from '../components/bulk-print/BulkPrintAction';
+import { useApplyAddressValidation } from '../hooks/useAddressValidation';
 
 const ImportOrdersDialog = lazy(() => import('@/features/orders/components/ImportOrdersDialog'));
 const CreateOrderDialog = lazy(() => import('@/features/orders/components/CreateOrderDialog'));
+
+const BULK_PRINT_ENABLED = String(import.meta.env.VITE_ENABLE_BULK_PRINT).toLowerCase() === 'true';
 
 export default function OrdersPage({ fromCustomer, customerId }: { fromCustomer?: boolean, customerId?: string }) {
 
@@ -52,7 +58,7 @@ export default function OrdersPage({ fromCustomer, customerId }: { fromCustomer?
   const canReadWrite = !isSubUser || team_access?.permissions?.order === 'full';
   // useLocalStorage('low_balance_dismissed', false);
   // State for pagination and search
-  const [page, setPage] = useState(1);
+  const [page, setPage] = useLocalStorage<number>('order_page', 1);
   const [pageSize, setPageSize] = useLocalStorage<number>('order_page_size', 100);
 
   const [localSearch, setLocalSearch] = useLocalStorage<string>('orders_search', '');
@@ -66,7 +72,7 @@ export default function OrdersPage({ fromCustomer, customerId }: { fromCustomer?
     from: '',
     to: '',
     label: 'All Time',
-  });
+  }, hydrateDateFilter);
   const [customerDateRange, setCustomerDateRange] = useState<DateFilterValue>({
     type: 'custom',
     from: '',
@@ -76,12 +82,12 @@ export default function OrdersPage({ fromCustomer, customerId }: { fromCustomer?
   const dateRange = fromCustomer ? customerDateRange : localDateRange;
   const setDateRange = fromCustomer ? setCustomerDateRange : setLocalDateRange;
   const [selectedRows, setSelectedRows] = useState<string[]>([]);
-  const [isDownloadingLabels, setIsDownloadingLabels] = useState(false);
   const [isCancellingOrders, setIsCancellingOrders] = useState(false);
   const [showCancelModal, setShowCancelModal] = useState(false);
   const [orderToCancel, setOrderToCancel] = useState<string | null>(null);
   const [orderToArchive, setOrderToArchive] = useState<string | null>(null);
   const [addressEditModal, setAddressEditModal] = useState<string>();
+  const [addressCheckerOpen, setAddressCheckerOpen] = useState(false);
   // const [courierEditModal, setCourierEditModal] = useState<Order>();
 
   const [selectedCustomer, setSelectedCustomerState] = useLocalStorage<string | undefined>('orders_selected_customer', undefined);
@@ -162,9 +168,11 @@ export default function OrdersPage({ fromCustomer, customerId }: { fromCustomer?
   const downloadLabelMutation = useDownloadLabel();
   const cancelOrderMutation = useCancelOrder();
   const archiveOrderMutation = useArchiveOrder();
+  const massOrderAction = useMassOrderAction();
   const { requestRestore, restoreModal, restoringOrderId } = useRestoreOrderConfirm();
   const printOrderMutation = usePrintOrder();
   const createAuspostManifestMutation = useCreateAuspostManifest();
+  const packingDocumentMutation = useDownloadPackingDocument();
   const { data: customersData } = useCustomers({ per_page: 1000 }, isAdmin);
 
   const [walletCheckOpen, setWalletCheckOpen] = useState(false);
@@ -282,15 +290,22 @@ export default function OrdersPage({ fromCustomer, customerId }: { fromCustomer?
       start_date,
       end_date,
       customer: fromCustomer ? customerId : (selectedCustomer || undefined),
+      address_status: addressCheckerOpen ? 'invalid' : undefined,
     };
-  }, [activeTab, pageSize, page, debouncedSearch, dateRange, selectedCustomer, customerId, fromCustomer]);
+  }, [activeTab, pageSize, page, debouncedSearch, dateRange, selectedCustomer, customerId, fromCustomer, addressCheckerOpen]);
 
-  // Fetch orders data
+  useEffect(() => {
+    if (activeTab !== 'new') {
+      setAddressCheckerOpen(false);
+    }
+  }, [activeTab]);
+
   const { data: ordersData, isLoading } = useOrders(filters);
 
   // Mutations
   const exportOrders = useExportOrders();
   const importOrders = useImportOrders();
+  const applyAddressValidation = useApplyAddressValidation();
 
   const [isImportDialogOpen, setIsImportDialogOpen] = useState(false);
 
@@ -328,75 +343,67 @@ export default function OrdersPage({ fromCustomer, customerId }: { fromCustomer?
     });
   }, [importOrders]);
 
-  const handleDownloadMultipleLabels = useCallback(async () => {
+  // One request covers every order, so a bulk download is a single API call.
+  const handleDownloadPackingDocument = useCallback((document: PackingDocument, orderNumbers: string[]) => {
+    if (!orderNumbers.length || packingDocumentMutation.isPending) return;
+    packingDocumentMutation.mutate({ document, orderNumbers });
+  }, [packingDocumentMutation]);
+
+  const handleCancelMultipleOrders = useCallback(() => {
     if (selectedRows.length === 0) return;
-    setIsDownloadingLabels(true);
-    // let successCount = 0;
-    // let failCount = 0;
-    // for (const orderId of selectedRows) {
-    //   try {
-    //     downloadLabelMutation.mutateAsync(orderId);
-    //     successCount++;
-    //   } catch {
-    //     failCount++;
-    //   }
-    // }
-    const results = await Promise.allSettled(
-      selectedRows.map((orderId) =>
-        downloadLabelMutation.mutateAsync(orderId)
-      )
-    );
-
-    const successCount = results.filter(
-      (result) => result.status === "fulfilled"
-    ).length;
-
-    const failCount = results.filter(
-      (result) => result.status === "rejected"
-    ).length;
-    if (successCount > 0) {
-      showToast(`Successfully downloaded ${successCount} label(s).`, "success");
-    }
-    if (failCount > 0) {
-      showToast(`Failed to download ${failCount} label(s).`, "error");
-    }
-    setSelectedRows([]);
-    setIsDownloadingLabels(false);
-  }, [selectedRows, downloadLabelMutation]);
-
-  const handleCancelMultipleOrders = useCallback(async () => {
-    if (selectedRows.length === 0) return;
-    setIsCancellingOrders(true);
-    let successCount = 0;
-    let failCount = 0;
-    for (const orderId of selectedRows) {
-      try {
-        const order = ordersData?.data.find((order) => order.order_number === orderId);
-        if (order?.is_own_courier || activeTab === 'new') {
-          await archiveOrderMutation.mutateAsync(orderId);
-        } else {
-          await cancelOrderMutation.mutateAsync({ orderId, data: { manually: false } });
-
-        }
-        successCount++;
-      } catch {
-        failCount++;
+    // Only label-printed orders are cancelled with the courier; pending and dispatched ones are archived.
+    const action = activeTab === 'printed' ? 'cancel' : 'archive';
+    massOrderAction.mutate({ action, orderNumbers: selectedRows }, {
+      onSuccess: (response: any) => {
+        // The API reports per-order outcomes, so a 200 can still hide individual failures.
+        const failures: { order_number: string; message?: string }[] = (response?.results || []).filter((result: any) => !result?.status);
+        const listed = failures.slice(0, 2).map((failure) => `${failure.order_number}: ${failure.message || 'Failed'}`).join(' ');
+        showToast(
+          response?.message || `Successfully ${action === 'archive' ? 'archived' : 'cancelled'} ${selectedRows.length} order(s).`,
+          failures.length ? "warning" : "success",
+          failures.length > 2 ? `${listed} +${failures.length - 2} more` : listed || undefined,
+          failures.length ? 8000 : undefined
+        );
+        // Leave the failed orders selected so they stay visible and can be retried.
+        setSelectedRows(failures.map((failure) => failure.order_number));
+        setShowCancelModal(false);
+      },
+      onError: (error: any) => {
+        showToast(error?.message || `Failed to ${action} the selected orders.`, "error");
+        setShowCancelModal(false);
       }
-    }
-    if (successCount > 0) {
-      showToast(`Successfully cancelled ${successCount} order(s).`, "success");
-    }
-    if (failCount > 0) {
-      showToast(`Failed to cancel ${failCount} order(s).`, "error");
-    }
-    setSelectedRows([]);
-    setShowCancelModal(false);
-    setIsCancellingOrders(false);
-  }, [selectedRows, ordersData, activeTab, archiveOrderMutation, cancelOrderMutation]);
+    });
+  }, [selectedRows, activeTab, massOrderAction]);
 
   const handleCustomerEdit = useCallback((id: string) => {
     setAddressEditModal(id);
   }, []);
+
+  const handleApplySelectedAddresses = useCallback(() => {
+    const selected = (ordersData?.data || []).filter((order: Order) => selectedRows.includes(order.order_number));
+    const updates = selected.flatMap((order: Order) => {
+      const suggestion = order.address_suggestions?.[0];
+      if (!suggestion) return [];
+      return [{
+        order_number: order.order_number,
+        suburb: suggestion.suburb,
+        state: suggestion.state,
+        postcode: suggestion.postcode,
+      }];
+    });
+
+    if (updates.length === 0) {
+      showToast('Select orders that have a suggested suburb/postcode, or use Update on the row to edit the street.', 'error');
+      return;
+    }
+
+    applyAddressValidation.mutate(updates, {
+      onSuccess: (response) => {
+        showToast(response.message || 'Addresses updated.', 'success');
+        setSelectedRows([]);
+      },
+    });
+  }, [ordersData?.data, selectedRows, applyAddressValidation]);
 
   const handleCourierEdit = useCallback((row: Order) => {
     navigate(`${isAdmin ? '/admin' : ''}/orders/consign/${row.order_number}`);
@@ -441,31 +448,45 @@ export default function OrdersPage({ fromCustomer, customerId }: { fromCustomer?
     });
   }, [selectedRows, ordersData?.data, createAuspostManifestMutation]);
 
+  const canPrintLabels = BULK_PRINT_ENABLED && canReadWrite && (!fromCustomer || isAdmin);
+
+  // Printed labels leave the selection. Skipped and failed orders stay ticked so the
+  // customer can fix them and retry, the same way Starshipit leaves problem orders selected.
+  const handlePrintLabelsFinished = useCallback((printedOrderNumbers: string[]) => {
+    const printed = new Set(printedOrderNumbers);
+    setSelectedRows((current) => current.filter((orderNumber) => !printed.has(orderNumber)));
+  }, []);
+
   const downloadingLabelId = downloadLabelMutation.isPending ? String(downloadLabelMutation.variables) : null;
   const updateToArchiveId = archiveOrderMutation.isPending ? String(archiveOrderMutation.variables) : null;
 
-  const columns = useMemo(() => getOrdersColumns(
-    role,
-    activeTab,
-    navigate,
-    handleCustomerEdit,
-    handleCourierEdit,
-    handleDownloadSingleLabel,
-    handleCancelSingleOrderClick,
-    downloadingLabelId,
-    fromCustomer,
-    handleArchiveOrder,
-    updateToArchiveId,
-    handlePrintClick,
-    printOrderMutation.isPending
-      ? (printOrderMutation.variables && typeof printOrderMutation.variables === 'object' && 'order_number' in printOrderMutation.variables
-        ? (printOrderMutation.variables as any).order_number
-        : printOrderMutation.variables)
-      : (walletLoading ? orderToPrint?.orderNumber : null),
-    canReadWrite,
-    requestRestore,
-    restoringOrderId
-  ), [role, activeTab, navigate, handleCustomerEdit, handleCourierEdit, handleDownloadSingleLabel, handleCancelSingleOrderClick, downloadingLabelId, fromCustomer, handleArchiveOrder, updateToArchiveId, handlePrintClick, printOrderMutation.isPending, printOrderMutation.variables, walletLoading, orderToPrint?.orderNumber, canReadWrite, requestRestore, restoringOrderId]);
+  const columns = useMemo(() => addressCheckerOpen
+    ? getAddressCheckerColumns(role, handleCustomerEdit)
+    : getOrdersColumns(
+      role,
+      activeTab,
+      navigate,
+      handleCustomerEdit,
+      handleCourierEdit,
+      handleDownloadSingleLabel,
+      handleCancelSingleOrderClick,
+      downloadingLabelId,
+      fromCustomer,
+      handleArchiveOrder,
+      updateToArchiveId,
+      handlePrintClick,
+      printOrderMutation.isPending
+        ? (printOrderMutation.variables && typeof printOrderMutation.variables === 'object' && 'order_number' in printOrderMutation.variables
+          ? (printOrderMutation.variables as any).order_number
+          : printOrderMutation.variables)
+        : (walletLoading ? orderToPrint?.orderNumber : null),
+      canReadWrite,
+      requestRestore,
+      restoringOrderId,
+      handleDownloadPackingDocument
+    ), [addressCheckerOpen, role, activeTab, navigate, handleCustomerEdit, handleCourierEdit, handleDownloadSingleLabel, handleCancelSingleOrderClick, downloadingLabelId, fromCustomer, handleArchiveOrder, updateToArchiveId, handlePrintClick, printOrderMutation.isPending, printOrderMutation.variables, walletLoading, orderToPrint?.orderNumber, canReadWrite, requestRestore, restoringOrderId, handleDownloadPackingDocument]);
+
+  const invalidCount = ordersData?.meta?.total || 0;
 
   return (
     <div className={`${fromCustomer ? "p-0" : "p-page-padding"} flex-1 flex flex-col space-y-4 animate-in fade-in slide-in-from-bottom-2 duration-300 overflow-y-auto`}>
@@ -588,6 +609,21 @@ export default function OrdersPage({ fromCustomer, customerId }: { fromCustomer?
                       </Button>
                     )}
 
+                    {activeTab === 'new' && (
+                      <Button
+                        variant="outline"
+                        className="h-8 px-2.5 sm:px-3 gap-1.5 border-gray-200 dark:border-zinc-800 hover:bg-gray-50 dark:hover:bg-zinc-800 font-medium text-slate-700 dark:text-zinc-300 transition-colors shrink-0"
+                        onClick={() => {
+                          setAddressCheckerOpen(true);
+                          setSelectedRows([]);
+                          setPage(1);
+                        }}
+                      >
+                        <Zap className="w-4 h-4 text-sky-500" />
+                        <span className="hidden sm:inline">Check addresses</span>
+                      </Button>
+                    )}
+
                     {/* Create Order */}
                     {isAdmin ? (
                       <div className="flex-1 sm:flex-initial min-w-[90px] sm:min-w-0">
@@ -640,7 +676,26 @@ export default function OrdersPage({ fromCustomer, customerId }: { fromCustomer?
                   </span>
                 </div>
 
-                <div className="flex items-center gap-1.5 shrink-0">
+                <div className="flex flex-wrap items-center justify-end gap-1.5 shrink-0">
+                  {addressCheckerOpen && selectedRows.length > 0 && (
+                    <Button
+                      variant="default"
+                      size="sm"
+                      className="h-8 px-2.5 sm:px-3 gap-1.5 bg-primary hover:bg-primary-hover text-white font-semibold"
+                      onClick={handleApplySelectedAddresses}
+                      disabled={applyAddressValidation.isPending}
+                    >
+                      {applyAddressValidation.isPending ? <Loader2 className="w-4 h-4 animate-spin" /> : null}
+                      Update ({selectedRows.length})
+                    </Button>
+                  )}
+                  {canPrintLabels && (activeTab === 'new' || activeTab === 'printed') && !addressCheckerOpen && (
+                    <BulkPrintAction
+                      selectedOrderNumbers={selectedRows}
+                      onFinished={handlePrintLabelsFinished}
+                      disabled={massOrderAction.isPending}
+                    />
+                  )}
                   {/* {activeTab === 'new' && (
                     <Button
                       variant="default"
@@ -655,19 +710,6 @@ export default function OrdersPage({ fromCustomer, customerId }: { fromCustomer?
                   )} */}
                   {activeTab === 'printed' && (
                     <Button
-                      variant="default"
-                      size="sm"
-                      className="h-8 px-2.5 sm:px-3 gap-1.5 bg-primary hover:bg-primary-hover text-white transition-colors font-semibold shadow-sm"
-                      onClick={handleDownloadMultipleLabels}
-                      disabled={isDownloadingLabels || isCancellingOrders}
-                    >
-                      {isDownloadingLabels ? <Loader2 className="w-4 h-4 animate-spin" /> : <Download className="w-4 h-4" />}
-                      <span className="hidden sm:inline">Download Labels</span>
-                    </Button>
-                  )}
-
-                  {activeTab === 'printed' && (
-                    <Button
                       variant="outline"
                       size="sm"
                       className="h-8 px-2.5 sm:px-3 gap-1.5 border-gray-200 dark:border-zinc-800 hover:bg-gray-50 dark:hover:bg-zinc-800 text-slate-700 dark:text-zinc-300 transition-colors font-semibold"
@@ -679,14 +721,41 @@ export default function OrdersPage({ fromCustomer, customerId }: { fromCustomer?
                     </Button>
                   )}
 
+                  {activeTab !== 'archived' && (
+                    <DropdownCustomMenu
+                      contentClassName="w-52"
+                      menus={[
+                        {
+                          label: 'Print packing slip',
+                          onClick: () => handleDownloadPackingDocument('packing-slip', selectedRows),
+                        },
+                        {
+                          label: 'Print packing summary',
+                          onClick: () => handleDownloadPackingDocument('packing-summary', selectedRows),
+                        },
+                      ]}
+                    >
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="h-8 px-2.5 sm:px-3 gap-1.5 border-gray-200 dark:border-zinc-800 hover:bg-gray-50 dark:hover:bg-zinc-800 text-slate-700 dark:text-zinc-300 transition-colors font-semibold"
+                        disabled={packingDocumentMutation.isPending}
+                      >
+                        {packingDocumentMutation.isPending ? <Loader2 className="w-4 h-4 animate-spin" /> : <FileText className="w-4 h-4" />}
+                        <span className="hidden sm:inline">Packing</span>
+                        <ChevronDown className="w-4 h-4" />
+                      </Button>
+                    </DropdownCustomMenu>
+                  )}
+
                   <Button
                     variant="outline"
                     size="sm"
                     className="h-8 px-2.5 sm:px-3 gap-1.5 border-red-200 dark:border-red-950/30 hover:border-red-300 hover:bg-red-50/50 dark:hover:bg-red-950/20 text-red-600 dark:text-red-400 transition-colors font-semibold"
                     onClick={() => setShowCancelModal(true)}
-                    disabled={isCancellingOrders || isDownloadingLabels}
+                    disabled={massOrderAction.isPending}
                   >
-                    {isCancellingOrders ? <Loader2 className="w-4 h-4 animate-spin" /> : <Trash2 className="w-4 h-4" />}
+                    {massOrderAction.isPending ? <Loader2 className="w-4 h-4 animate-spin" /> : <Trash2 className="w-4 h-4" />}
                     <span className="hidden sm:inline">{activeTab === 'new' ? 'Delete' : 'Cancel'}</span>
                   </Button>
 
@@ -705,10 +774,37 @@ export default function OrdersPage({ fromCustomer, customerId }: { fromCustomer?
           </div>
         )}
 
+        {addressCheckerOpen && (
+          <div className="flex items-center justify-between gap-2 px-4 py-2.5 border-b border-gray-100 dark:border-zinc-800 bg-slate-50/80 dark:bg-zinc-900/40">
+            <div className="flex items-center gap-2">
+              <span className="rounded-md bg-white dark:bg-zinc-950 border border-gray-200 dark:border-zinc-800 px-2.5 py-1 text-xs font-bold text-slate-700 dark:text-zinc-200">
+                Invalid
+              </span>
+              <span className="text-xs text-slate-500 dark:text-zinc-400">
+                {invalidCount} {invalidCount === 1 ? 'order needs' : 'orders need'} attention
+              </span>
+            </div>
+            <Button
+              variant="ghost"
+              size="sm"
+              className="h-8 px-2 text-red-600 hover:text-red-700 hover:bg-red-50 dark:text-red-400 dark:hover:bg-red-950/20 font-semibold"
+              onClick={() => {
+                setAddressCheckerOpen(false);
+                setSelectedRows([]);
+                setPage(1);
+              }}
+            >
+              <X className="w-4 h-4" />
+              Close address checker
+            </Button>
+          </div>
+        )}
+
         <DataTable
           columns={columns}
           data={ordersData?.data || []}
           rowKey="order_number"
+          moduleName='order'
           loading={isLoading}
           searchPlaceholder="Search orders..."
           onSearchChange={handleSearch}
@@ -722,9 +818,10 @@ export default function OrdersPage({ fromCustomer, customerId }: { fromCustomer?
           onPageChange={setPage}
           onExport={handleExport}
           isExporting={exportOrders.isPending}
-          selectable={!isAdmin && activeTab !== 'archived'}
+          selectable={activeTab !== 'archived' && canReadWrite}
           selectedRows={selectedRows}
           onSelectionChange={setSelectedRows}
+          selectOnRowClick
           exportable={!fromCustomer && canReadWrite}
           header={!!fromCustomer}
         />
@@ -753,7 +850,7 @@ export default function OrdersPage({ fromCustomer, customerId }: { fromCustomer?
             confirmText={`Yes, ${activeTab === 'new' ? 'Delete' : 'Cancel'}`}
             cancelText="No, Keep"
             confirmVariant="destructive"
-            loading={isCancellingOrders}
+            loading={massOrderAction.isPending}
           />
         )
       }
@@ -762,26 +859,24 @@ export default function OrdersPage({ fromCustomer, customerId }: { fromCustomer?
           <ConformationModal
             open={!!orderToCancel}
             onOpenChange={(open) => !open && setOrderToCancel(null)}
-            title={activeTab === 'printed' || activeTab === 'shipped' ? "Archive Order" : "Cancel Order"}
+            title={activeTab === 'printed' || activeTab === 'shipped' ? "Cancel Order" : "Archive Order"}
             description={activeTab === 'printed' || activeTab === 'shipped'
-              ? `Are you sure you want to archive order ${orderToCancel}? This action cannot be undone.`
-              : `Are you sure you want to cancel order ${orderToCancel}? This action cannot be undone.`}
+              ? `Are you sure you want to cancel order ${orderToCancel}? This action cannot be undone.`
+              : `Are you sure you want to archive order ${orderToCancel}? This action cannot be undone.`}
             onConfirm={async () => {
               setIsCancellingOrders(true);
               try {
                 await cancelOrderMutation.mutateAsync({ orderId: orderToCancel, data: { manually: false } });
                 showToast(
                   activeTab === 'printed' || activeTab === 'shipped'
-                    ? `Order ${orderToCancel} archived successfully.`
-                    : `Order ${orderToCancel} cancelled successfully.`,
+                    ? `Order ${orderToCancel} cancelled successfully.` : `Order ${orderToCancel} archived successfully.`,
                   "success"
                 );
               } catch (err: any) {
                 showToast(
                   err?.response?.data?.message ||
                   (activeTab === 'printed' || activeTab === 'shipped'
-                    ? `Failed to archive order ${orderToCancel}.`
-                    : `Failed to cancel order ${orderToCancel}.`),
+                    ? `Failed to cancel order ${orderToCancel}.` : `Failed to archive order ${orderToCancel}.`),
                   "error"
                 );
               } finally {
@@ -789,7 +884,7 @@ export default function OrdersPage({ fromCustomer, customerId }: { fromCustomer?
                 setOrderToCancel(null);
               }
             }}
-            confirmText={activeTab === 'printed' || activeTab === 'shipped' ? "Yes, Archive" : "Yes, Cancel"}
+            confirmText={activeTab === 'printed' || activeTab === 'shipped' ? "Yes, Cancel" : "Yes, Archive"}
             cancelText="No, Keep"
             confirmVariant="destructive"
             loading={isCancellingOrders}
@@ -913,7 +1008,7 @@ export default function OrdersPage({ fromCustomer, customerId }: { fromCustomer?
           description="A contact number for the receiver is required to book this consignment."
           onSubmit={() => {
             if (!receiverPhoneInput.trim() || !isPhoneValid(receiverPhoneInput)) {
-              showToast("Please enter a valid phone number", "error");
+              showToast(PHONE_ERROR_MESSAGE, "error");
               return;
             }
             setShowReceiverPhoneModal(false);
@@ -935,7 +1030,7 @@ export default function OrdersPage({ fromCustomer, customerId }: { fromCustomer?
               required
               isFullWidth
               error={receiverPhoneInput.trim() !== '' && !isPhoneValid(receiverPhoneInput)}
-              errormsg="Please enter a valid phone number"
+              errormsg={PHONE_ERROR_MESSAGE}
             />
           </div>
         </CustomModel>

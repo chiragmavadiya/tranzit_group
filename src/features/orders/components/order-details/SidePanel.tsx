@@ -31,6 +31,7 @@ interface SidePanelProps {
   liabilityMessage: string | undefined;
   payment_status?: string;
   shipping_activity?: any[];
+  courierResponse?: Record<string, unknown> | null;
 }
 
 export const SidePanel: React.FC<SidePanelProps> = memo(({
@@ -44,6 +45,7 @@ export const SidePanel: React.FC<SidePanelProps> = memo(({
   liabilityMessage,
   payment_status,
   shipping_activity = [],
+  courierResponse,
   // signatureSelected,
 }) => {
   const isCreate = useMemo(() => orderType === 'create' || orderType === 'create-menual' || orderType === 'consign' || orderType === 'return', [orderType]);
@@ -69,9 +71,18 @@ export const SidePanel: React.FC<SidePanelProps> = memo(({
         }
       });
     }
-
+    // if(quoteData?.courier?.courier_based_charge > 0){ 
+    //   seen.add("Post code Surcharge");
+    //   list.push({ name: "Post code Surcharge", amount: quoteData.courier.courier_based_charge });
+    // }
     return list;
   }, [quoteData]);
+
+  const postcodeSurcharge = Number(quoteData?.courier?.courier_based_charge ?? quoteData?.courier_based_charge ?? 0);
+
+  const awaitingCourierQuote = isCreate && !quoteData?.courier;
+
+  const hasCourierResponse = !!courierResponse && Object.keys(courierResponse).length > 0;
 
   const timelineData = useMemo(() => {
     if (!Array.isArray(shipping_activity) || shipping_activity.length === 0) {
@@ -96,7 +107,7 @@ export const SidePanel: React.FC<SidePanelProps> = memo(({
 
   return (
     <div className="flex flex-col gap-4">
-      <Accordion multiple defaultValue={['notes', 'services', 'summary', "support", "liability", "timeline"]} className="flex flex-col gap-3">
+      <Accordion multiple defaultValue={['notes', 'services', 'summary', "support", "liability", "timeline", "courier_response"]} className="flex flex-col gap-3">
 
         {/* TRANSIT TIMELINE */}
         {!isCreate && (
@@ -140,11 +151,11 @@ export const SidePanel: React.FC<SidePanelProps> = memo(({
                         <div className={cn(
                           "relative w-5 h-5 rounded-full border-2 flex items-center justify-center bg-white dark:bg-zinc-950 transition-all duration-300 z-10 ",
                           !stage.completed
-                            ? "border-primary dark:border-[#1b7a58]"
-                            : "border-gray-200 dark:border-zinc-800"
+                            ? "border-primary"
+                            : "border-gray-200"
                         )}>
                           {!stage.completed && (
-                            <div className="w-2 h-2 rounded-full bg-[#0f4431] dark:bg-[#1b7a58]" />
+                            <div className="w-2 h-2 rounded-full bg-primary" />
                           )}
                         </div>
 
@@ -222,54 +233,89 @@ export const SidePanel: React.FC<SidePanelProps> = memo(({
 
               <div className="border-t border-gray-100 dark:border-zinc-800 my-1"></div>
 
-              <div className="flex justify-between items-center text-sm">
-                <span className="text-gray-500 dark:text-zinc-400 font-medium">Shipping Services</span>
-                <span className="font-bold text-gray-900 dark:text-zinc-100">${calculation?.servicePrice?.toFixed(2)}</span>
-              </div>
-              <div className="flex justify-between items-center text-sm">
-                <div className="flex items-center gap-1.5">
-                  <span className="text-gray-500 dark:text-zinc-400 font-medium">Extra surcharges</span>
-                  {surchargesList.length > 0 && (
-                    // <TooltipProvider delay={100}>
-                    <Tooltip>
-                      <TooltipTrigger className="h-[14px]">
-                        <span className="inline-flex items-center justify-center text-gray-400 hover:text-primary dark:text-zinc-500 dark:hover:text-primary cursor-pointer transition-colors duration-200">
-                          <Info className="h-3.5 w-3.5" />
-                        </span>
-                      </TooltipTrigger>
-                      <TooltipContent side="top" align="center" className="flex flex-col gap-1.5 p-2.5 min-w-[180px] bg-gray-900 dark:bg-zinc-800 text-gray-100 border border-gray-800 dark:border-zinc-700">
-                        <div className="text-[10px] font-bold text-gray-400 dark:text-zinc-400 uppercase tracking-wide pb-1 border-b border-gray-800 dark:border-zinc-700 w-full">
-                          Surcharge Breakdown
-                        </div>
-                        <div className="flex flex-col gap-1 w-full max-h-32 overflow-y-auto no-scrollbar">
-                          {surchargesList.map((charge: any, idx: number) => (
-                            <div key={idx} className="flex justify-between items-center gap-3 text-[12px]">
-                              <span className="text-white font-medium dark:text-zinc-300">- {charge.name}</span>
-                            </div>
-                          ))}
-                        </div>
-                      </TooltipContent>
-                    </Tooltip>
-                    // </TooltipProvider>
-                  )}
+              {awaitingCourierQuote ? (
+                <div className="flex items-start gap-2 rounded-lg border border-amber-200 bg-amber-50/60 px-3 py-2.5 dark:border-amber-900/30 dark:bg-amber-950/20">
+                  <Info className="h-3.5 w-3.5 shrink-0 mt-0.5 text-amber-600 dark:text-amber-400" />
+                  <span className="text-xs leading-relaxed text-amber-800 dark:text-amber-400">
+                    Select a courier to see the shipping charges for this order.
+                  </span>
                 </div>
-                <span className="font-bold text-gray-900 dark:text-zinc-100">${calculation?.totalSurcharges?.toFixed(2)}</span>
-              </div>
-              {calculation?.insurance && (
-                <div className="flex justify-between items-center text-sm text-primary animate-in fade-in slide-in-from-top-1">
-                  <span className="font-medium">Shipment Protection</span>
-                  <span className="font-bold">+$6.00</span>
-                </div>
-              )}
-              <div className="flex justify-between items-center text-sm">
-                <span className="text-gray-500 dark:text-zinc-400 font-medium">GST</span>
-                <span className="font-bold text-gray-900 dark:text-zinc-100">${calculation?.gst?.toFixed(2)}</span>
-              </div>
+              ) : (
+                <>
+                  <div className="flex justify-between items-center text-sm">
+                    {/* quoteData.courier.courier_based_charge */}
 
-              <div className="border-t border-gray-100 dark:border-zinc-800 my-1 pt-2 flex justify-between items-center">
-                <span className="text-base text-gray-900 dark:text-zinc-100 font-bold">Total {orderType === 'consign' || orderType === 'create' ? 'Payable' : ''}</span>
-                <span className="text-base font-bold text-primary">${calculation?.grandTotal?.toFixed(2)}</span>
-              </div>
+                    <div className="flex items-center gap-1.5">
+                      <span className="text-gray-500 dark:text-zinc-400 font-medium">Shipping Services</span>
+                      {postcodeSurcharge > 0 && (
+                        <Tooltip>
+                          <TooltipTrigger className="h-[14px]">
+                            <span className="inline-flex items-center justify-center text-gray-400 hover:text-primary dark:text-zinc-500 dark:hover:text-primary cursor-pointer transition-colors duration-200">
+                              <Info className="h-3.5 w-3.5" />
+                            </span>
+                          </TooltipTrigger>
+                          <TooltipContent side="top" align="center" className="flex flex-col items-start gap-1.5 p-2.5 min-w-[240px] text-left bg-gray-900 dark:bg-zinc-800 text-gray-100 border border-gray-800 dark:border-zinc-700">
+                            <div className="text-[10px] font-bold text-gray-400 dark:text-zinc-400 uppercase tracking-wide pb-1 border-b border-gray-800 dark:border-zinc-700 w-full">
+                              Included in this price
+                            </div>
+                            <div className="flex justify-between items-center gap-3 text-[12px] w-full">
+                              <span className="text-white font-medium dark:text-zinc-300">Postcode Surcharge</span>
+                              <span className="text-white font-bold dark:text-zinc-100">
+                                ${postcodeSurcharge.toFixed(2)}
+                              </span>
+                            </div>
+                          </TooltipContent>
+                        </Tooltip>
+                      )}
+                    </div>
+                    <span className="font-bold text-gray-900 dark:text-zinc-100">${calculation?.servicePrice?.toFixed(2)}</span>
+                  </div>
+                  <div className="flex justify-between items-center text-sm">
+                    <div className="flex items-center gap-1.5">
+                      <span className="text-gray-500 dark:text-zinc-400 font-medium">Extra surcharges</span>
+                      {surchargesList.length > 0 && (
+                        // <TooltipProvider delay={100}>
+                        <Tooltip>
+                          <TooltipTrigger className="h-[14px]">
+                            <span className="inline-flex items-center justify-center text-gray-400 hover:text-primary dark:text-zinc-500 dark:hover:text-primary cursor-pointer transition-colors duration-200">
+                              <Info className="h-3.5 w-3.5" />
+                            </span>
+                          </TooltipTrigger>
+                          <TooltipContent side="top" align="center" className="flex flex-col gap-1.5 p-2.5 min-w-[180px] bg-gray-900 dark:bg-zinc-800 text-gray-100 border border-gray-800 dark:border-zinc-700">
+                            <div className="text-[10px] font-bold text-gray-400 dark:text-zinc-400 uppercase tracking-wide pb-1 border-b border-gray-800 dark:border-zinc-700 w-full">
+                              Surcharge Breakdown
+                            </div>
+                            <div className="flex flex-col gap-1 w-full max-h-32 overflow-y-auto no-scrollbar">
+                              {surchargesList.map((charge: any, idx: number) => (
+                                <div key={idx} className="flex justify-between items-center gap-3 text-[12px]">
+                                  <span className="text-white font-medium dark:text-zinc-300">- {charge.name}</span>
+                                </div>
+                              ))}
+                            </div>
+                          </TooltipContent>
+                        </Tooltip>
+                        // </TooltipProvider>
+                      )}
+                    </div>
+                    <span className="font-bold text-gray-900 dark:text-zinc-100">${calculation?.totalSurcharges?.toFixed(2)}</span>
+                  </div>
+                  {calculation?.insurance && (
+                    <div className="flex justify-between items-center text-sm text-primary animate-in fade-in slide-in-from-top-1">
+                      <span className="font-medium">Shipment Protection</span>
+                      <span className="font-bold">+$6.00</span>
+                    </div>
+                  )}
+                  <div className="flex justify-between items-center text-sm">
+                    <span className="text-gray-500 dark:text-zinc-400 font-medium">GST</span>
+                    <span className="font-bold text-gray-900 dark:text-zinc-100">${calculation?.gst?.toFixed(2)}</span>
+                  </div>
+
+                  <div className="border-t border-gray-100 dark:border-zinc-800 my-1 pt-2 flex justify-between items-center">
+                    <span className="text-base text-gray-900 dark:text-zinc-100 font-bold">Total {orderType === 'consign' || orderType === 'create' ? 'Payable' : ''}</span>
+                    <span className="text-base font-bold text-primary">${calculation?.grandTotal?.toFixed(2)}</span>
+                  </div>
+                </>
+              )}
 
             </AccordionContent>
           </AccordionItem>
@@ -375,6 +421,22 @@ export const SidePanel: React.FC<SidePanelProps> = memo(({
             )}
           </AccordionContent>
         </AccordionItem>
+
+        {/* COURIER RESPONSE — admin only; the prop is undefined for customers */}
+        {hasCourierResponse && (
+          <AccordionItem value="courier_response" className="border border-slate-200 dark:border-zinc-800 rounded-xl bg-slate-50/60 dark:bg-zinc-900/40 shadow-xs px-5 border-b overflow-hidden transition-colors duration-300 [&>h3]:my-0">
+            <AccordionTrigger className="hover:no-underline py-3 px-0 [&>svg]:text-slate-400 dark:[&>svg]:text-zinc-500 cursor-pointer">
+              <div className="flex flex-wrap items-center gap-2.5 w-full text-left pr-6">
+                <span className="text-base font-bold text-gray-900 dark:text-zinc-100">Courier Response</span>
+              </div>
+            </AccordionTrigger>
+            <AccordionContent className="pb-4 pt-1">
+              <pre className="max-h-80 overflow-auto rounded-lg border border-slate-200 dark:border-zinc-800 bg-white dark:bg-zinc-950 p-3 text-[11px] leading-relaxed font-mono text-gray-700 dark:text-zinc-300">
+                {JSON.stringify(courierResponse, null, 2)}
+              </pre>
+            </AccordionContent>
+          </AccordionItem>
+        )}
 
         {/* LIABILITY COVER */}
         {!isCreate && (

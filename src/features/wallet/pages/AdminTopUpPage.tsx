@@ -12,6 +12,7 @@ import { FormSelect } from '@/features/orders/components/OrderFormUI';
 import { Button } from '@/components/ui/button';
 import { DateFilter } from '@/components/common/DateFilter';
 import type { DateFilterValue } from '@/components/common/DateFilter/types';
+import { hydrateDateFilter } from '@/components/common/DateFilter/utils';
 import { useAdminTopups, useExportAdminTopups } from '../hooks/useWallet';
 import { useDebounce } from '@/hooks/useDebounce';
 import { useCustomers } from '@/features/customers/hooks/useCustomers';
@@ -29,7 +30,7 @@ export default function AdminTopUpPage() {
     from: '',
     to: '',
     label: 'All Time',
-  });
+  }, hydrateDateFilter);
 
   const debouncedSearch = useDebounce(search, 500);
 

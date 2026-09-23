@@ -61,6 +61,7 @@ export function InvoiceTable({
       key: 'id',
       header: 'Invoice#',
       sticky: 'left',
+      disableToggle: true,
       // width: '140px',
       cell: (value, row) => (
         <NavLink to={`${isAdmin ? '/admin' : ''}/invoices/${value}`} className="font-bold text-primary hover:underline">
@@ -276,6 +277,7 @@ export function InvoiceTable({
         <DataTable
           columns={columns}
           data={invoices}
+          moduleName="invoice"
           searchPlaceholder="Search invoices..."
           onSearchChange={onSearchChange}
           searchValue={search}

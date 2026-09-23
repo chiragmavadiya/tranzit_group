@@ -18,6 +18,7 @@ export interface Order {
   receiver_email?: string;
   receiver_phone?: string;
   order_source_icon?: string;
+  fulfillment_status?: string | null;
   is_own_courier: boolean;
   items: ItemData[]
   sender_address_info?: string;
@@ -26,6 +27,13 @@ export interface Order {
   canReadWrite?: boolean
   customer_id?: number | string
   can_consign: boolean
+  address_status?: 'valid' | 'invalid' | 'skipped' | 'unchecked'
+  address_message?: string
+  address_street?: string
+  address_state?: string
+  address_postcode?: string
+  address_country?: string
+  address_suggestions?: Array<{ suburb: string; state: string; postcode: string }>
 }
 
 export type TabType = 'new' | 'printed' | 'shipped' | 'archived';
@@ -95,6 +103,8 @@ export interface CreateOrderDialogProps {
   orderType?: string;
   selectedCustomer?: number;
   onCustomerSelect?: (id: number | undefined) => void;
+  deliveryInstructions?: string;
+  onDeliveryInstructionsChange?: (value: string) => void;
 }
 
 export interface WalletCheckDialogProps {

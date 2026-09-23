@@ -13,6 +13,8 @@ import type {
 import type { OrderDetailData } from "../types/order-details.types";
 import { getFileName } from "@/lib/utils";
 
+export type PackingDocument = "packing-slip" | "packing-summary";
+
 export const ordersService = {
     /**
      * Get customer orders with optional filters and pagination
@@ -24,6 +26,7 @@ export const ordersService = {
         per_page?: number;
         page?: number;
         search?: string;
+        address_status?: string;
     }): Promise<OrdersResponse> => {
         const response = await api.get<OrdersResponse>(API_ENDPOINTS.ORDERS.LIST, { params });
         return response.data;
@@ -100,6 +103,25 @@ export const ordersService = {
      */
     cancelOrder: async (orderId: string | number, data: any): Promise<any> => {
         const response = await api.post(API_ENDPOINTS.ORDERS.CANCEL(orderId), data);
+        return response.data;
+    },
+
+    /**
+     * Cancel up to 100 orders in one request. `manually` is admin-only.
+     */
+    massCancelOrders: async (orderNumbers: string[], manually?: boolean): Promise<any> => {
+        const response = await api.post(API_ENDPOINTS.ORDERS.MASS_CANCEL, {
+            order_numbers: orderNumbers,
+            ...(manually != null && { manually })
+        });
+        return response.data;
+    },
+
+    /**
+     * Archive up to 100 orders in one request.
+     */
+    massArchiveOrders: async (orderNumbers: string[]): Promise<any> => {
+        const response = await api.post(API_ENDPOINTS.ORDERS.MASS_ARCHIVE, { order_numbers: orderNumbers });
         return response.data;
     },
 
@@ -222,6 +244,20 @@ export const ordersService = {
         const payload = typeof data === 'object' ? data : { order_number: data };
         const response = await api.post(API_ENDPOINTS.ORDERS.PRINT_ORDER, payload);
         return response.data;
+    },
+
+    /**
+     * Fetch the packing slip / packing summary PDF for one or more orders
+     */
+    getPackingDocument: async ({ document, orderNumbers }: { document: PackingDocument; orderNumbers: (string | number)[] }): Promise<{ blob: Blob, filename: string }> => {
+        const endpoint = document === 'packing-slip'
+            ? API_ENDPOINTS.ORDERS.PACKING_SLIP
+            : API_ENDPOINTS.ORDERS.PACKING_SUMMARY;
+        const response = await api.post(endpoint, { order_numbers: orderNumbers }, {
+            responseType: "blob",
+        });
+
+        return { blob: response.data, filename: getFileName(response) };
     },
 
     /**

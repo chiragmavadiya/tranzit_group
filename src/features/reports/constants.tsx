@@ -21,6 +21,7 @@ export const ORDER_LABEL_CHARGES_COLUMNS: Column<OrderLabelCharge>[] = [
     key: 'tranzit_group_order_number',
     header: 'ORDER NUMBER',
     width: '120px',
+    disableToggle: true,
     className: 'text-[13px]',
     cell: (value) => (
       <LinkCell value={value} className="font-bold text-primary" path={`/admin/orders/view/${value}`} />
@@ -97,6 +98,7 @@ export const SHIPMENT_COLUMNS: Column<ShipmentReport>[] = [
   {
     key: 'order_number', header: 'ORDER #',
     width: '120px',
+    disableToggle: true,
     cell: (value: string) => (
       <NavLink to={`/orders/view/${value}`} className="font-bold text-primary underline">
         {value}
@@ -150,6 +152,7 @@ export const PARCEL_COLUMNS: Column<ParcelReport>[] = [
     key: 'tranzit_group_order_number',
     header: 'TRANZIT GROUP ORDER NUMBER',
     sortable: true,
+    disableToggle: true,
     searchable: true,
     cell: (value, record) => (
       <LinkCell value={value} className="font-bold" path={`/orders/view/${record.tranzit_group_order_number}`} />
@@ -180,9 +183,14 @@ export const PARCEL_COLUMNS: Column<ParcelReport>[] = [
 
 export const ADMIN_PARCEL_COLUMNS: Column<ParcelReport>[] = [
   {
+    key: 'consignment_date',
+    header: 'CONSIGNMENT DATE',
+  },
+  {
     key: 'tranzit_group_order_number',
     header: 'ORDER NUMBER',
     width: '160px',
+    disableToggle: true,
     cell: (value) => (
       <LinkCell value={value} className="font-bold text-primary" path={`/admin/orders/view/${value}`} />
     )
@@ -234,7 +242,7 @@ export const ADMIN_PARCEL_COLUMNS: Column<ParcelReport>[] = [
     key: 'tranzit_group_markup',
     header: 'TRANZIT GROUP MARKUP',
     sortable: true,
-    width: '100px',
+    width: '120px',
     // cell: (val, row: ParcelReport) => val ? `${formateCurrency(val)} (${row.markup_charge_percent}%)` : '$0.00'
     cell: (val, row: ParcelReport) =>
       val
@@ -257,6 +265,7 @@ export const ADMIN_INTEGRATED_PARCEL_COLUMNS: Column<ParcelReport>[] = [
     key: 'tranzit_group_order_number',
     header: 'ORDER NUMBER',
     width: '160px',
+    disableToggle: true,
     cell: (value) => (
       <LinkCell value={value} className="font-bold text-primary" path={`/admin/orders/view/${value}`} />
     )
@@ -301,10 +310,116 @@ export const ADMIN_INTEGRATED_PARCEL_COLUMNS: Column<ParcelReport>[] = [
   },
 ];
 
+export const PARCEL_REPORT_SOURCE_OPTIONS = [
+  { value: 'all', label: 'All Reports' },
+  { value: 'tranzit', label: 'All Tranzit Group Courier Parcel' },
+  { value: 'integrated', label: 'Custom Integrated Courier Parcel' },
+];
+
+export const ALL_PARCEL_COLUMNS: Column<ParcelReport>[] = [
+  {
+    key: 'consignment_date',
+    header: 'CONSIGNMENT DATE',
+    cell: (val, row: ParcelReport) => val || row.create_date || '-'
+  },
+  {
+    key: 'tranzit_group_order_number',
+    header: 'ORDER NUMBER',
+    width: '160px',
+    disableToggle: true,
+    cell: (value) => (
+      <LinkCell value={value} className="font-bold text-primary" path={`/admin/orders/view/${value}`} />
+    )
+  },
+  // {
+  //   key: 'courier_type',
+  //   header: 'SOURCE',
+  //   width: '150px',
+  //   cell: (val: string) => (
+  //     <span className={`inline-flex items-center rounded-md px-2 py-0.5 text-[11px] font-bold uppercase tracking-wide ${val === 'integrated'
+  //       ? 'bg-violet-50 text-violet-600 dark:bg-violet-500/10 dark:text-violet-400'
+  //       : 'bg-sky-50 text-sky-600 dark:bg-sky-500/10 dark:text-sky-400'
+  //       }`}>
+  //       {SOURCE_LABELS[val] || '-'}
+  //     </span>
+  //   )
+  // },
+  {
+    key: 'customer_name',
+    header: 'CUSTOMER NAME (SENDER NAME)',
+    className: 'break-normal',
+    cell: (val) => <span className="font-medium text-slate-700 dark:text-zinc-300 break-normal">{val || '-'}</span>
+  },
+  { key: 'receiver_name', header: 'RECEIVER NAME', className: 'break-normal' },
+  {
+    key: 'receiver_full_address',
+    header: 'RECEIVER FULL ADDRESS',
+    className: 'break-normal',
+    width: '200px',
+    cell: (val) => ReceiverAddressCell(val)
+  },
+  { key: 'receiver_suburb', header: 'RECEIVER SUBURB', className: 'break-normal' },
+  { key: 'actual_parcel_tracking_number', header: 'ACTUAL PARCEL TRACKING NUMBER', className: 'break-normal' },
+  { key: 'actual_australia_post_mailing_statement_no', header: 'ACTUAL AUSTRALIA POST MAILING STATEMENT NO', className: 'break-normal' },
+  { key: 'parcel_status', header: 'PARCEL STATUS', width: '160px', cell: (value: string) => <StatusBadge status={value} /> },
+  {
+    key: 'courier',
+    header: 'COURIER & PRODUCT',
+    width: '220px',
+    cell: (val: string, row: ParcelReport) => (
+      <CourierProductCell
+        courierName={val}
+        courierLogoUrl={row?.courier_logo_url}
+        productId={row?.product_id}
+        gap="gap-1"
+      />
+    )
+  },
+  {
+    key: 'courier_type',
+    header: 'BYO',
+    cell: (val) => val !== 'tranzit' ? (
+      <span className="whitespace-nowrap inline-flex items-center px-2 py-0.5 rounded text-[13px] font-medium bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300">Yes</span>
+    ) : (
+      <span className="whitespace-nowrap inline-flex items-center px-2 py-0.5 rounded text-[13px] font-medium bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-300">No</span>
+    )
+  },
+  {
+    key: 'pickup_charge',
+    header: 'PICKUP CHARGE',
+    sortable: true,
+    cell: (val, row: ParcelReport) => row.courier_type === 'integrated' ? '-' : formateCurrency(val || 0)
+  },
+  {
+    key: 'extra_surcharge',
+    header: 'EXTRA SURCHARGE',
+    sortable: true,
+    cell: (val, row: ParcelReport) => row.courier_type === 'integrated' ? '-' : formateCurrency(val || 0)
+  },
+  {
+    key: 'tranzit_group_markup',
+    header: 'TRANZIT GROUP MARKUP',
+    sortable: true,
+    width: '120px',
+    cell: (val, row: ParcelReport) => {
+      if (row.courier_type === 'integrated') return '-';
+      const percent = (row.markup_charge_percent || 0) > 0 ? `${row.markup_charge_percent}%` : 'N/A';
+      return `${formateCurrency(val || 0)} (${percent})`;
+    }
+  },
+  {
+    key: 'total',
+    header: 'TOTAL',
+    sortable: true,
+    cell: (val) => val ? formateCurrency(val) : '$0.00'
+  },
+];
+
 export const AUSPOST_REPORT_COLUMNS: Column<any>[] = [
   {
     key: 'tranzit_group_order_number',
     header: 'ORDER NUMBER',
+    disableToggle: true,
     width: '160px',
     cell: (value, record) => {
       const orderNo = value || record.order_number || record.orderNumber || '';

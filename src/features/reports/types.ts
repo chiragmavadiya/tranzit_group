@@ -38,7 +38,14 @@ export interface InvoiceReport {
   created_at: string;
 }
 
+export type ParcelReportSource = 'tranzit' | 'integrated';
+
 export interface ParcelReport {
+  courier_type?: ParcelReportSource;
+  is_byo?: boolean;
+  consignment_date?: string;
+  customer_name?: string;
+  receiver_suburb?: string;
   sender_name?: string;
   receiver_name: string;
   receiver_full_address: string;
@@ -90,6 +97,8 @@ export interface ReportFilters {
   customer_id?: string;
   invoice_type?: string;
   user_id?: string;
+  courier_type?: ParcelReportSource | 'all';
+  customer?: string;
 }
 
 export interface PaginatedResponse<T> {
@@ -99,6 +108,8 @@ export interface PaginatedResponse<T> {
   summary?: {
     total_customers?: number;
     total_orders: number;
+    tranzit_orders?: number;
+    integrated_orders?: number;
     total_amount: number;
     total_markup: number;
     total_pickup: number;

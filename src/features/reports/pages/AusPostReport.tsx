@@ -9,6 +9,7 @@ import { AUSPOST_REPORT_COLUMNS } from '../constants';
 import { useAuspostReport, useExportAuspostReport } from '../hooks/useReports';
 import { DateFilter } from '@/components/common/DateFilter';
 import type { DateFilterValue } from '@/components/common/DateFilter/types';
+import { hydrateDateFilter } from '@/components/common/DateFilter/utils';
 import { formateCurrency } from '@/lib/utils';
 import { useAppSelector } from '@/hooks/store.hooks';
 import { FormInput, FormSelect } from '@/features/orders/components/OrderFormUI';
@@ -53,7 +54,7 @@ export default function AuspostReportPage() {
     };
   }, [searchParams, parseLocalDate]);
 
-  const [dateRange, setDateRange] = useLocalStorage<DateFilterValue>('auspost_report_date_range', initialDateFilter);
+  const [dateRange, setDateRange] = useLocalStorage<DateFilterValue>('auspost_report_date_range', initialDateFilter, hydrateDateFilter);
   const [search, setSearch] = useLocalStorage<string>('auspost_report_search', '');
   const [pageSize, setPageSize] = useLocalStorage<number>('auspost_report_page_size', 100);
   const [page, setPage] = useLocalStorage<number>('auspost_report_page', 1);
@@ -80,7 +81,6 @@ export default function AuspostReportPage() {
         });
       }
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [searchParams, parseLocalDate]);
 
   // Synchronize dateRange state to URL searchParams
@@ -244,6 +244,7 @@ export default function AuspostReportPage() {
 
         <DataTable
           columns={AUSPOST_REPORT_COLUMNS as any}
+          moduleName="auspostReport"
           data={data?.data || []}
           header={false}
           className="pb-3 text-xs flex-none h-auto"

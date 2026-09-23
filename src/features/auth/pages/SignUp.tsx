@@ -244,7 +244,7 @@ export default function SignUp() {
               htmlFor="terms"
               className="text-sm font-medium leading-relaxed peer-disabled:cursor-not-allowed peer-disabled:opacity-70 text-slate-600 dark:text-slate-400"
             >
-              I agree to the <a href={PRIVACY_POLICY_URL} target="_blank" className="font-semibold text-primary hover:underline transition-colors">Privacy Policy</a> and <a href={TERMS_CONDITIONS_URL} target="_blank" className="font-semibold text-primary hover:underline transition-colors">Terms</a>
+              I agree to the <a href={PRIVACY_POLICY_URL} target="_blank" className="font-semibold text-primary hover:underline transition-colors">Privacy Policy</a> and <a href={TERMS_CONDITIONS_URL} target="_blank" className="font-semibold text-primary hover:underline transition-colors">Terms & Conditions</a>
             </Label>
           </div>
           {/* {submitted && errors.terms && <p className="text-red-500 text-[11px] mt-1 mb-0">{errors.terms}</p>} */}

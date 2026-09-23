@@ -6,6 +6,7 @@ import {
   Phone,
   Mail,
   Receipt,
+  Tag,
   Wallet,
   Loader2,
   DollarSign,
@@ -14,7 +15,8 @@ import {
 import Favicon from '@/assets/favicon.png';
 import { CustomModel } from "@/components/ui/dialog"
 import { Switch } from "@/components/ui/switch"
-import { FormInput, FormSelect } from "@/features/orders/components/OrderFormUI"
+import { CustomLabel, FormInput, FormSelect } from "@/features/orders/components/OrderFormUI"
+import { SENDER_NAME_MAX_LENGTH } from "@/constants"
 import { STATES, WEIGHT_TIERS } from "../constants"
 // import {
 //   Accordion,
@@ -27,10 +29,17 @@ import { useXeroContacts } from "@/features/xero/hooks/useXero"
 import { showToast } from "@/components/ui/custom-toast"
 import { PlaceAutocomplete } from "@/components/common/AutoComplateAddress"
 import { Checkbox } from "@/components/ui/checkbox"
-import { cleanSpaces, isPhoneValid, cn } from "@/lib/utils";
+import { cn } from "@/lib/utils";
+import { cleanSpaces, isPhoneValid, PHONE_ERROR_MESSAGE } from "@/lib/phone";
+import { useValidateLocality } from "@/hooks/useValidateLocality";
+import { LocalityWarning } from "@/components/common/LocalityWarning";
 import directFreightLogo from "@/assets/coruiers_logo/direct-freight.png"
 import auspostLogo from "@/assets/coruiers_logo/logo-auspost.png"
 import courierspleaseLogo from "@/assets/coruiers_logo/couriersplease.png"
+import aramexLogo from "@/assets/coruiers_logo/aramex.png"
+import fedexLogo from "@/assets/coruiers_logo/fedex.png"
+import tntLogo from "@/assets/coruiers_logo/TNT.webp"
+// import tegLogo from "@/assets/coruiers_logo/team_gloabl_express.png"
 import type { XeroContact } from "@/features/xero/types";
 
 interface CustomerDialogProps {
@@ -42,7 +51,7 @@ interface CustomerDialogProps {
 const STATE_OPTIONS = STATES.map(s => ({ label: s, value: s }));
 
 const buildInitialCharges = () => {
-  const couriers = ["AusPost", "DirectFreight", "CouriersPlease", "Pallet"]; //MyPostBusiness
+  const couriers = ["AusPost", "DirectFreight", "CouriersPlease", "Aramex", "Fedex", "TNT", "Pallet"]; //  "TEG",
   return couriers.map(courier => {
     const chargeObj: any = { courier };
     WEIGHT_TIERS.forEach(tier => {
@@ -58,6 +67,9 @@ const INITIAL_FORM_DATA = {
   email: "",
   mobile: "",
   business_name: "",
+  sender_name: "",
+  account_activation: false,
+  display_business_name_on_label: false,
   gst_number: "",
   billing_address_info: "",
   billing_address: "",
@@ -82,12 +94,27 @@ const INITIAL_FORM_DATA = {
   direct_freight_active: 0,
   auspost_active: 0,
   couriersplease_active: 0,
-  // mypostbusiness_active: 0,
+  aramex_active: 0,
   pallet_active: 0,
+  fedex_active: 0,
+  tnt_active: 0,
+  teg_active: 0,
   direct_freight_min_margin: 0,
   auspost_min_margin: 0,
   couriersplease_min_margin: 0,
+  aramex_min_margin: 0,
   pallet_min_margin: 0,
+  fedex_min_margin: 0,
+  tnt_min_margin: 0,
+  teg_min_margin: 0,
+  manual_order_direct_freight: false,
+  manual_order_auspost: false,
+  manual_order_couriersplease: false,
+  manual_order_aramex: false,
+  manual_order_pallet: false,
+  manual_order_fedex: false,
+  manual_order_tnt: false,
+  manual_order_teg: false,
   topup_enable: false,
   order_prefix: "",
   xero_contact_id: "",
@@ -120,6 +147,13 @@ export default function CustomerDialog({ open, onOpenChange, customerId }: Custo
   );
 
   const [sameAsShipping, setSameAsShipping] = useState(false);
+
+  const shippingLocality = useValidateLocality(formData.suburb, formData.state, formData.postcode, formData.address);
+  const billingLocality = useValidateLocality(formData.billing_suburb, formData.billing_state, formData.billing_postcode, formData.billing_address);
+  // With "same as shipping" ticked the billing fields mirror the shipping ones,
+  // so only the shipping warning is worth showing
+  const billingLocalityError = sameAsShipping ? '' : billingLocality.error;
+  const isLocalityPending = shippingLocality.isPending || (!sameAsShipping && billingLocality.isPending);
 
   const xeroContactOptions = useMemo(() => xeroContacts.map((contact: XeroContact) => {
     const name = [contact.FirstName, contact.LastName].filter(Boolean).join(" ").trim() || contact.Name;
@@ -242,6 +276,8 @@ export default function CustomerDialog({ open, onOpenChange, customerId }: Custo
       const filteredData: any = {};
       Object.keys(INITIAL_FORM_DATA).forEach((key) => {
         filteredData[key] = (data as any)[key] !== undefined ? (data as any)[key] : (INITIAL_FORM_DATA as any)[key];
+        // Manual order flags go back to the API as true/false, whatever shape they arrive in.
+        if (key.startsWith("manual_order_")) filteredData[key] = !!filteredData[key];
       });
       // Merge with INITIAL_FORM_DATA to ensure all 4 couriers are always present
       const mergedMarkupCharges = INITIAL_FORM_DATA.markup_charges.map((defItem: any) => {
@@ -256,6 +292,8 @@ export default function CustomerDialog({ open, onOpenChange, customerId }: Custo
 
       // const firstCharge = mergedPickupCharges[0] || {};
       filteredData.byo_courier_invoice_enable = data.byo_courier_invoice_enable ?? false;
+      // Arrives as a boolean or a 1/0 flag depending on the endpoint; the API wants true/false back.
+      filteredData.account_activation = !!data.account_activation;
 
       if (data.byo_courier_pricing_tiers && Array.isArray(data.byo_courier_pricing_tiers) && data.byo_courier_pricing_tiers.length > 0) {
         filteredData.byo_courier_pricing_tiers = data.byo_courier_pricing_tiers;
@@ -317,6 +355,10 @@ export default function CustomerDialog({ open, onOpenChange, customerId }: Custo
   ]);
 
   const handleChange = (field: string, value: any) => {
+    if (field === "sender_name" && value && value.length > SENDER_NAME_MAX_LENGTH) {
+      showToast(`Sender name cannot be longer than ${SENDER_NAME_MAX_LENGTH} characters`, "error");
+      return
+    }
     setFormData((prev) => ({ ...prev, [field]: value }))
   }
 
@@ -349,7 +391,7 @@ export default function CustomerDialog({ open, onOpenChange, customerId }: Custo
     ];
 
     if (formData.mobile && !isPhoneValid(formData.mobile)) {
-      showToast("Please enter a valid phone number", "error");
+      showToast(PHONE_ERROR_MESSAGE, "error");
       return false;
     }
 
@@ -395,6 +437,16 @@ export default function CustomerDialog({ open, onOpenChange, customerId }: Custo
       return false;
     }
 
+    // Keep the modal open on an invalid locality — the inline banner explains why
+    if (shippingLocality.error || billingLocalityError) {
+      return false;
+    }
+
+    if (isLocalityPending) {
+      showToast("Validating address, please wait", "error");
+      return false;
+    }
+
     if (formData.byo_courier_invoice_enable) {
       const hasEmptyPrice = formData.byo_courier_pricing_tiers.some(
         (tier) => tier.price_per_label === undefined || tier.price_per_label === null || tier.price_per_label.toString().trim() === ""
@@ -414,8 +466,10 @@ export default function CustomerDialog({ open, onOpenChange, customerId }: Custo
       return;
     }
 
+    const { account_activation, ...createFields } = formData;
     const payload = {
-      ...formData,
+      // Activation is only managed on an existing customer, never set at creation.
+      ...(isEdit ? { ...formData, account_activation: !!account_activation } : createFields),
       mobile: cleanSpaces(formData.mobile),
       byo_courier_invoice_enable: !!formData.byo_courier_invoice_enable,
       byo_courier_pricing_tiers: !formData.byo_courier_invoice_enable
@@ -507,8 +561,8 @@ export default function CustomerDialog({ open, onOpenChange, customerId }: Custo
             placeholder="0412 345 678"
             value={formData.mobile}
             onChange={(val) => handleChange("mobile", val)}
-            error={submited && !formData.mobile?.trim()}
-            errormsg="Please enter mobile number"
+            error={submited && (!formData.mobile?.trim() || !isPhoneValid(formData.mobile))}
+            errormsg={!formData.mobile?.trim() ? "Please enter mobile number" : PHONE_ERROR_MESSAGE}
           />
           <FormInput
             label="Business Name"
@@ -552,6 +606,58 @@ export default function CustomerDialog({ open, onOpenChange, customerId }: Custo
             onValueChange={(val) => handleChange("xero_contact_id", val || "")}
             disabled={!isXeroConnected || isLoadingXeroContacts}
           />
+          {isEdit && (
+            <div className="col-span-12 md:col-span-6">
+              <CustomLabel label="Account Activation" />
+              <div className="flex items-center gap-2 h-8">
+                <Switch
+                  checked={formData.account_activation}
+                  onCheckedChange={(checked) => handleChange("account_activation", checked)}
+                />
+                <span className="text-sm text-slate-600 dark:text-zinc-400">
+                  {formData.account_activation ? "Activated" : "Deactivated"}
+                </span>
+              </div>
+              <p className="my-0 text-[11px] text-slate-400 dark:text-zinc-500">
+                Allow this customer to access and use the Customer Portal.
+              </p>
+            </div>
+          )}
+        </div>
+
+        {/* Label Details */}
+        <div className="space-y-4 pt-2 animate-in fade-in slide-in-from-right-4 duration-300">
+          <div className="flex items-center gap-2 border-b border-slate-50 dark:border-zinc-900 pb-2">
+            <Tag className="w-4 h-4 text-emerald-600" />
+            <h3 className="my-0 text-sm font-bold text-slate-900 dark:text-zinc-100">Label Details</h3>
+          </div>
+          <div className="grid grid-cols-12 gap-x-3 sm:gap-x-5 gap-y-4">
+            {/* <FormInput
+              label="Sender Name (Display on label)"
+              icon={User}
+              info='Printed on the label as the sender when "Display business name on label" is off.'
+              placeholder="Sender name on label"
+              value={formData.sender_name}
+              onChange={(val) => handleChange("sender_name", val)}
+            /> */}
+            <div className="col-span-12 md:col-span-6">
+              <CustomLabel label="Display business name on label" />
+              <div className="flex items-center gap-2 h-8">
+                <Switch
+                  checked={formData.display_business_name_on_label}
+                  onCheckedChange={(checked) => handleChange("display_business_name_on_label", checked)}
+                />
+                <span className="text-sm text-slate-600 dark:text-zinc-400">
+                  {formData.display_business_name_on_label ? "Yes" : "No"}
+                </span>
+              </div>
+              <p className="my-0 text-[11px] text-slate-400 dark:text-zinc-500">
+                {formData.display_business_name_on_label
+                  ? "The business name will print on the label."
+                  : "The sender name will print on the label."}
+              </p>
+            </div>
+          </div>
         </div>
 
         <div className="space-y-8 animate-in fade-in slide-in-from-right-4 duration-300">
@@ -643,6 +749,17 @@ export default function CustomerDialog({ open, onOpenChange, customerId }: Custo
                 errormsg="Please enter country"
               />
             </div>
+            {shippingLocality.error && (
+              <LocalityWarning
+                message={shippingLocality.error}
+                suggestions={shippingLocality.suggestions}
+                onSelect={(suggestion) => {
+                  handleChange('suburb', suggestion.suburb);
+                  handleChange('state', suggestion.state);
+                  handleChange('postcode', suggestion.postcode);
+                }}
+              />
+            )}
           </div>
 
           {/* Billing address */}
@@ -757,6 +874,19 @@ export default function CustomerDialog({ open, onOpenChange, customerId }: Custo
                 disabled={sameAsShipping}
               />
             </div>
+            {billingLocalityError && (
+              <div className="mt-4">
+                <LocalityWarning
+                  message={billingLocalityError}
+                  suggestions={billingLocality.suggestions}
+                  onSelect={(suggestion) => {
+                    handleChange('billing_suburb', suggestion.suburb);
+                    handleChange('billing_state', suggestion.state);
+                    handleChange('billing_postcode', suggestion.postcode);
+                  }}
+                />
+              </div>
+            )}
           </div>
         </div>
 
@@ -829,6 +959,7 @@ export default function CustomerDialog({ open, onOpenChange, customerId }: Custo
                   name: "Direct Freight Express",
                   activeKey: "direct_freight_active" as const,
                   minMarginKey: "direct_freight_min_margin" as const,
+                  manualOrderKey: "manual_order_direct_freight" as const,
                   logo: directFreightLogo,
                   displayName: "Direct Freight Express",
                   courierKey: "DirectFreight"
@@ -838,6 +969,7 @@ export default function CustomerDialog({ open, onOpenChange, customerId }: Custo
                   name: "Auspost Tranzit Group",
                   activeKey: "auspost_active" as const,
                   minMarginKey: "auspost_min_margin" as const,
+                  manualOrderKey: "manual_order_auspost" as const,
                   logo: auspostLogo,
                   displayName: "Auspost Tranzit Group",
                   courierKey: "AusPost"
@@ -847,27 +979,62 @@ export default function CustomerDialog({ open, onOpenChange, customerId }: Custo
                   name: "Courier Please",
                   activeKey: "couriersplease_active" as const,
                   minMarginKey: "couriersplease_min_margin" as const,
+                  manualOrderKey: "manual_order_couriersplease" as const,
                   logo: courierspleaseLogo,
                   displayName: "Courier Please",
                   courierKey: "CouriersPlease"
                 },
+                {
+                  id: "aramex",
+                  name: "Aramex Tranzit Group",
+                  activeKey: "aramex_active" as const,
+                  minMarginKey: "aramex_min_margin" as const,
+                  manualOrderKey: "manual_order_aramex" as const,
+                  logo: aramexLogo,
+                  displayName: "Aramex Tranzit Group",
+                  courierKey: "Aramex"
+                },
+
+                {
+                  id: "fedex",
+                  name: "Fedex Tranzit Group",
+                  activeKey: "fedex_active" as const,
+                  minMarginKey: "fedex_min_margin" as const,
+                  manualOrderKey: "manual_order_fedex" as const,
+                  logo: fedexLogo,
+                  displayName: "Fedex Tranzit Group",
+                  courierKey: "Fedex"
+                },
+                {
+                  id: "tnt",
+                  name: "TNT Tranzit Group",
+                  activeKey: "tnt_active" as const,
+                  minMarginKey: "tnt_min_margin" as const,
+                  manualOrderKey: "manual_order_tnt" as const,
+                  logo: tntLogo,
+                  displayName: "TNT Tranzit Group",
+                  courierKey: "TNT"
+                },
                 // {
-                //   id: "mypostbusiness",
-                //   name: "MyPost Business",
-                //   activeKey: "mypostbusiness_active" as const,
-                //   logo: "https://api.tranzit.digisite.net/assets/img/couriers/aus_post_logo_small.png",
-                //   displayName: "MyPost Business",
-                //   courierKey: "MyPostBusiness"
+                //   id: "teg",
+                //   name: "TEG Tranzit Group",
+                //   activeKey: "teg_active" as const,
+                //   minMarginKey: "teg_min_margin" as const,
+                //   manualOrderKey: "manual_order_teg" as const,
+                //   logo: tegLogo,
+                //   displayName: "TEG Tranzit Group",
+                //   courierKey: "TEG"
                 // },
                 {
                   id: "pallet",
                   name: "Pallet Tranzit Group",
                   activeKey: "pallet_active" as const,
                   minMarginKey: "pallet_min_margin" as const,
+                  manualOrderKey: "manual_order_pallet" as const,
                   logo: Favicon,
                   displayName: "Pallet Tranzit Group",
                   courierKey: "Pallet"
-                }
+                },
               ];
 
               return couriersList.map((courier) => {
@@ -885,23 +1052,37 @@ export default function CustomerDialog({ open, onOpenChange, customerId }: Custo
                   >
                     {/* Header */}
                     <div
-                      className="px-3 sm:px-4 py-2.5 flex items-center justify-between select-none"
+                      className="px-3 sm:px-4 py-2.5 flex flex-wrap items-center gap-x-3 gap-y-2.5 select-none"
                     >
-                      <div className="flex items-center gap-3">
-                        <div className="flex items-center justify-center w-14 h-8 bg-slate-50 dark:bg-zinc-900 rounded-md p-1">
+                      <div className="order-1 flex flex-1 items-center gap-3 min-w-0">
+                        <div className="flex items-center justify-center w-14 h-8 bg-slate-50 dark:bg-zinc-900 rounded-md p-1 shrink-0">
                           <img src={courier.logo} className="max-h-full max-w-full object-contain" alt={courier.name} />
                         </div>
-                        <span className="text-sm font-bold text-slate-800 dark:text-zinc-200">{courier.displayName}</span>
+                        <span className="text-sm font-bold text-slate-800 dark:text-zinc-200 truncate">{courier.displayName}</span>
                       </div>
 
-                      <div className="flex items-center gap-3.5">
-                        {/* Min Markup Charge Input */}
-                        {isActive && (
-                          <div className="flex items-center gap-2" onClick={(e) => e.stopPropagation()}>
+                      {/* Settings drop to their own full-width row on mobile, stay inline from sm up */}
+                      {isActive && (
+                        <div className="order-3 flex w-full flex-col gap-2 sm:order-2 sm:w-auto sm:flex-row sm:items-center sm:gap-3.5">
+                          {/* Manual Order */}
+                          <div className="flex items-center justify-between gap-2 sm:justify-start" onClick={(e) => e.stopPropagation()}>
+                            <span className="text-xs font-semibold text-slate-600 dark:text-zinc-400 whitespace-nowrap">
+                              Manual Order
+                            </span>
+                            <Switch
+                              checked={!!formData[courier.manualOrderKey]}
+                              onCheckedChange={(checked) => handleChange(courier.manualOrderKey, checked)}
+                            />
+                          </div>
+
+                          <span className="hidden h-6 w-px bg-slate-200 dark:bg-zinc-800 sm:block" />
+
+                          {/* Min Markup Charge Input */}
+                          <div className="flex items-center justify-between gap-2 sm:justify-start" onClick={(e) => e.stopPropagation()}>
                             <span className="text-xs font-semibold text-slate-600 dark:text-zinc-400 whitespace-nowrap">
                               Min Markup Charge:
                             </span>
-                            <div className="w-26">
+                            <div className="w-26 shrink-0">
                               <FormInput
                                 type="number"
                                 step="0.01"
@@ -911,8 +1092,10 @@ export default function CustomerDialog({ open, onOpenChange, customerId }: Custo
                               />
                             </div>
                           </div>
-                        )}
+                        </div>
+                      )}
 
+                      <div className="order-2 shrink-0 sm:order-3">
                         {/* Toggle Switch */}
                         <Switch
                           checked={isActive}
@@ -937,7 +1120,8 @@ export default function CustomerDialog({ open, onOpenChange, customerId }: Custo
                                   ...prev,
                                   markup_charges: resetCharges(prev.markup_charges),
                                   pickup_charges: resetCharges(prev.pickup_charges),
-                                  [courier.minMarginKey]: 0
+                                  [courier.minMarginKey]: 0,
+                                  [courier.manualOrderKey]: false
                                 };
                               });
                             }

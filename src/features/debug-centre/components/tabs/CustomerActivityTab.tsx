@@ -29,6 +29,7 @@ export const CustomerActivityTab = ({ filters, searchValue, onPageChange, onPage
     <DataTable
       columns={CUSTOMER_ACTIVITY_COLUMNS}
       data={activity}
+      moduleName="customerActivity"
       loading={isLoading}
       totalItems={totalItems}
       currentPage={filters.page || 1}

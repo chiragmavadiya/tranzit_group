@@ -298,6 +298,9 @@ export const SelectSearch = ({
   searchdisable,
   multiple,
   optionClassName,
+  inputId,
+  errorId,
+  invalid,
 }: {
   options: readonly options[]
   value?: any
@@ -311,6 +314,9 @@ export const SelectSearch = ({
   searchdisable?: boolean
   multiple?: boolean
   optionClassName?: string
+  inputId?: string
+  errorId?: string
+  invalid?: boolean
 }) => {
   const inputRef = React.useRef<HTMLInputElement>(null)
   const containerRef = React.useRef<HTMLDivElement>(null)
@@ -351,9 +357,6 @@ export const SelectSearch = ({
         onValueChange?.(opt.map((item) => String(item.value)))
       } else if (opt && !Array.isArray(opt)) {
         onValueChange?.(String(opt.value))
-        setTimeout(() => {
-          inputRef.current?.blur()
-        }, 0)
       } else {
         onValueChange?.(null)
       }
@@ -389,6 +392,9 @@ export const SelectSearch = ({
           ))}
           <ComboboxChipsInput
             ref={inputRef}
+            id={inputId}
+            aria-invalid={invalid || undefined}
+            aria-describedby={errorId}
             placeholder={Array.isArray(currentOption) && currentOption.length > 0 ? "" : placeholder}
             className="text-xs outline-none h-7 min-w-[60px] flex-1 text-slate-800 dark:text-zinc-200 bg-transparent"
             disabled={disabled}
@@ -432,6 +438,9 @@ export const SelectSearch = ({
     <Combobox {...comboboxProps}>
       <ComboboxInput
         ref={inputRef}
+        id={inputId}
+        aria-invalid={invalid || undefined}
+        aria-describedby={errorId}
         placeholder={placeholder}
         className={cn(
           "w-full cursor-pointer text-xs h-10 rounded-sm border-gray-200 dark:border-zinc-800 dark:bg-zinc-900 transition-colors placeholder:text-slate-300 dark:placeholder:text-zinc-700 ring-0! px-0.5!",

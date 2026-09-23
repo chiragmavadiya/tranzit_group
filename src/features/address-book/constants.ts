@@ -1,4 +1,3 @@
-
 export const AUSTRALIAN_STATES = [
   { label: 'ACT', value: 'ACT' },
   { label: 'NSW', value: 'NSW' },
@@ -42,4 +41,3 @@ export const STREET_TYPES = [
   { label: 'Walk', value: 'Walk' },
   { label: 'Way', value: 'Way' },
 ];
-

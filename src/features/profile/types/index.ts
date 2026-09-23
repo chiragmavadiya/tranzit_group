@@ -37,6 +37,8 @@ export interface UpdateProfileRequest {
   personal_email?: string | null;
   personal_mobile?: string;
   business_name?: string;
+  sender_name?: string;
+  display_business_name_on_label?: boolean;
   gst_number?: string;
   address_detail?: {
     default?: AddressDetailItem;
@@ -63,6 +65,8 @@ export interface WeeklyLabelUsageTier {
 }
 
 export interface WeeklyLabelUsage {
+  /** Tier rate and progress only apply to BYO customers. Absent on older responses. */
+  BYO_enable?: boolean;
   week_start: string;
   week_end: string;
   byo_labels_printed: number;
@@ -80,6 +84,8 @@ export interface ProfileDetails {
   mobile?: string;
   personal_email?: string | null;
   business_name: string;
+  sender_name?: string;
+  display_business_name_on_label?: boolean;
   gst_number: string;
   email?: string;
   personal_mobile?: string;

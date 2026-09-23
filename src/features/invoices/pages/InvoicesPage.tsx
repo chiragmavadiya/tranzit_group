@@ -9,6 +9,7 @@ import { InvoiceTable } from '../components/InvoiceTable';
 import { useAdminInvoices, useCustomerInvoices, useExportAdminInvoices, useExportCustomerInvoices, useDeleteAdminInvoice, useRemindAdminInvoice, useDownloadAdminInvoice, useDownloadCustomerInvoice } from '../hooks/useInvoices';
 import { ConformationModal } from '@/components/common/ConformationModal';
 import type { DateFilterValue } from '@/components/common/DateFilter/types';
+import { hydrateDateFilter } from '@/components/common/DateFilter/utils';
 import useLocalStorage from '@/hooks/useLocalStorage';
 
 export default function InvoicesPage() {
@@ -57,7 +58,7 @@ export default function InvoicesPage() {
     };
   }, [searchParams, parseLocalDate]);
 
-  const [dateRange, setDateRange] = useLocalStorage<DateFilterValue>('invoice_date_range', initialDateFilter);
+  const [dateRange, setDateRange] = useLocalStorage<DateFilterValue>('invoice_date_range', initialDateFilter, hydrateDateFilter);
 
   // Synchronize date range filters from URL searchParams (e.g. Dashboard redirect)
   useEffect(() => {
@@ -76,7 +77,6 @@ export default function InvoicesPage() {
         });
       }
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [searchParams, parseLocalDate]);
 
   useEffect(() => {

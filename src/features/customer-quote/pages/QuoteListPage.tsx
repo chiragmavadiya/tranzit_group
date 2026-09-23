@@ -8,11 +8,12 @@ import { QuoteDetailsDialog } from '../components/QuoteDetailsDialog';
 import { Eye, Plus } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { showToast } from '@/components/ui/custom-toast';
+import useLocalStorage from '@/hooks/useLocalStorage';
 
 export default function QuoteListPage() {
     const navigate = useNavigate();
     const [search, setSearch] = useState('');
-    const [page, setPage] = useState(1);
+    const [page, setPage] = useLocalStorage<number>('quote_list_page', 1);
     const [pageSize, setPageSize] = useState(25);
     const [selectedQuoteId, setSelectedQuoteId] = useState<number | null>(null);
     const [isDetailsOpen, setIsDetailsOpen] = useState(false);

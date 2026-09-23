@@ -28,8 +28,6 @@ const Sidebar = ({
   setIsMobileSidebarOpen = () => { },
   bannerOpen = false,
 }: SidebarProps) => {
-  console.log("Render Sidebar")
-
   const [activeSubmenu, setActiveSubmenu] = useState<string | null>(null);
   const [expandedItems, setExpandedItems] = useState<string[]>([]);
   const { role, team_access } = useAppSelector((state) => state.auth);

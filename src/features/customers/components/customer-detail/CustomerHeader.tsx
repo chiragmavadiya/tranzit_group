@@ -1,9 +1,9 @@
 import { useState } from 'react';
-import { CheckCircle2, MapPin, Calendar, Wallet, UserMinus, ShieldCheck, ChevronLeft, Loader2, Pencil, Check } from 'lucide-react';
+import { MapPin, Calendar, Wallet, UserCheck, UserMinus, ShieldCheck, Lock, LockOpen, ChevronLeft, Loader2, Pencil, Check } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import type { CustomerDetails } from '../../types';
-import { useVerifyCustomer,  useToggleCustomerStatus } from '../../hooks/useCustomers';
+import { useVerifyCustomer, useToggleCustomerStatus, useSetAccountActivation } from '../../hooks/useCustomers';
 import { useNavigate } from 'react-router-dom';
 import { showToast } from '@/components/ui/custom-toast';
 import { cn, formateCurrency } from '@/lib/utils';
@@ -27,10 +27,12 @@ const getFormattedDate = (dateStr: string) => {
 export const CustomerHeader = ({ customer, onEdit }: CustomerHeaderProps) => {
     const navigate = useNavigate();
     const fullName = `${customer.first_name} ${customer.last_name}`;
-    const [isConfirmOpen, setIsConfirmOpen] = useState(false);
+    // Customer status and account activation are separate controls, one confirm modal at a time.
+    const [confirmAction, setConfirmAction] = useState<'status' | 'activation' | null>(null);
 
     const { mutate: verify, isPending: isVerifying } = useVerifyCustomer();
-    const { mutate: toggleStatus, isPending: isToggling } = useToggleCustomerStatus();
+    const { mutate: toggleStatus, isPending: isTogglingStatus } = useToggleCustomerStatus();
+    const { mutate: setAccountActivation, isPending: isToggling } = useSetAccountActivation();
 
     const handleVerify = () => {
         verify(customer.id, {
@@ -39,24 +41,33 @@ export const CustomerHeader = ({ customer, onEdit }: CustomerHeaderProps) => {
         });
     };
 
-    const handleToggleStatus = () => {
-        setIsConfirmOpen(true);
-    };
+    const isAccountActivated = !!customer.account_activation;
 
-    const handleConfirmToggle = () => {
-        toggleStatus(customer.id, {
+    const handleConfirmActivation = () => {
+        setAccountActivation({ id: customer.id, account_activation: !isAccountActivated }, {
             onSuccess: (res) => {
-                showToast(res.message || 'Status updated successfully', 'success');
-                setIsConfirmOpen(false);
+                showToast(
+                    res.message || `Account ${isAccountActivated ? 'deactivated' : 'activated'} successfully`,
+                    'success',
+                );
+                setConfirmAction(null);
             },
-            onError: (err: any) => {
-                showToast(err?.response?.data?.message || 'Failed to update status', "error");
-                setIsConfirmOpen(false);
-            },
+            // The modal stays open so the admin can retry without losing their place.
+            onError: (err: any) => showToast(err?.response?.data?.message || 'Failed to update account activation', "error"),
         });
     };
 
     const isActive = customer.status === 'active';
+
+    const handleConfirmStatus = () => {
+        toggleStatus(customer.id, {
+            onSuccess: (res) => {
+                showToast(res.message || 'Status updated successfully', 'success');
+                setConfirmAction(null);
+            },
+            onError: (err: any) => showToast(err?.response?.data?.message || 'Failed to update status', "error"),
+        });
+    };
 
     return (
         <div className="flex flex-col gap-2">
@@ -107,6 +118,17 @@ export const CustomerHeader = ({ customer, onEdit }: CustomerHeaderProps) => {
                             >
                                 {isActive ? "Active Customer" : "Inactive Customer"}
                             </Badge>
+                            <Badge
+                                variant="secondary"
+                                className={cn(
+                                    "font-semibold border-none px-2.5 py-0.5 rounded-full text-[11px] leading-none shrink-0",
+                                    isAccountActivated
+                                        ? "bg-emerald-100 text-emerald-800 dark:bg-emerald-950/60 dark:text-emerald-400"
+                                        : "bg-amber-100 text-amber-800 dark:bg-amber-950/60 dark:text-amber-400"
+                                )}
+                            >
+                                {isAccountActivated ? "Portal Access On" : "Portal Access Off"}
+                            </Badge>
                             <div className="flex items-center gap-1.5 px-2.5 h-6 rounded-md bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200/50 dark:border-emerald-900/40 text-emerald-700 dark:text-emerald-400 text-xs font-bold shadow-2xs shrink-0 select-none">
                                 <Wallet className="w-3 h-3 text-emerald-600 dark:text-emerald-400" />
                                 <span>Balance: {formateCurrency(Number(customer.wallet_balance))}</span>
@@ -150,36 +172,73 @@ export const CustomerHeader = ({ customer, onEdit }: CustomerHeaderProps) => {
                         Edit
                     </Button>
                     <Button
-                        variant="destructive"
+                        variant="outline"
                         className={cn(
-                            "h-8 rounded-lg gap-1.5 text-xs font-semibold shadow-sm transition-colors border-transparent px-3.5",
+                            "h-8 rounded-lg gap-1.5 text-xs font-semibold px-3 shadow-2xs transition-colors border-slate-200 text-slate-700 dark:border-zinc-800 dark:text-zinc-300",
+                            // Neutral at rest so it can't be mistaken for the portal access action,
+                            // but the hover state still signals which way the change goes.
                             isActive
-                                ? "bg-red-600 hover:bg-red-700 text-white"
-                                : "bg-emerald-600 hover:bg-emerald-700 text-white"
+                                ? "hover:border-red-300 hover:bg-red-50 hover:text-red-600 dark:hover:border-red-500/40 dark:hover:bg-red-500/10 dark:hover:text-red-400"
+                                : "hover:border-emerald-300 hover:bg-emerald-50 hover:text-emerald-600 dark:hover:border-emerald-500/40 dark:hover:bg-emerald-500/10 dark:hover:text-emerald-400"
                         )}
-                        onClick={handleToggleStatus}
-                        disabled={isToggling}
+                        onClick={() => setConfirmAction('status')}
+                        disabled={isTogglingStatus}
                     >
-                        {isToggling ? (
+                        {isTogglingStatus ? (
                             <Loader2 className="h-3.5 w-3.5 animate-spin" />
                         ) : isActive ? (
                             <UserMinus className="h-3.5 w-3.5" />
                         ) : (
-                            <CheckCircle2 className="h-3.5 w-3.5" />
+                            <UserCheck className="h-3.5 w-3.5" />
                         )}
-                        {isActive ? 'Deactivate' : 'Activate'}
+                        {isActive ? 'Mark Customer Inactive' : 'Mark Customer Active'}
+                    </Button>
+                    <Button
+                        variant="destructive"
+                        className={cn(
+                            "h-8 rounded-lg gap-1.5 text-xs font-semibold shadow-sm transition-colors border-transparent px-3.5",
+                            isAccountActivated
+                                ? "bg-red-600 hover:bg-red-700 text-white"
+                                : "bg-emerald-600 hover:bg-emerald-700 text-white"
+                        )}
+                        onClick={() => setConfirmAction('activation')}
+                        disabled={isToggling}
+                    >
+                        {isToggling ? (
+                            <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                        ) : isAccountActivated ? (
+                            <Lock className="h-3.5 w-3.5" />
+                        ) : (
+                            <LockOpen className="h-3.5 w-3.5" />
+                        )}
+                        {isAccountActivated ? 'Deactivate Portal Access' : 'Activate Portal Access'}
                     </Button>
                 </div>
             </div>
             <ConformationModal
-                open={isConfirmOpen}
-                onOpenChange={setIsConfirmOpen}
-                title="Change Status"
-                description="Are you sure you want to Change the status for this customer?"
-                confirmText="Confirm"
+                open={confirmAction === 'status'}
+                onOpenChange={(open) => !open && setConfirmAction(null)}
+                title={isActive ? "Mark customer as inactive?" : "Mark customer as active?"}
+                description={isActive
+                    ? "This customer will not be able to log in to the Customer Portal at all."
+                    : "This customer will be able to log in again. What they can use after that depends on their portal access."}
+                confirmText={isActive ? "Mark Inactive" : "Mark Active"}
                 cancelText="Cancel"
                 confirmVariant={isActive ? "destructive" : "default"}
-                onConfirm={handleConfirmToggle}
+                onConfirm={handleConfirmStatus}
+                loading={isTogglingStatus}
+            />
+            <ConformationModal
+                open={confirmAction === 'activation'}
+                onOpenChange={(open) => !open && setConfirmAction(null)}
+                title={isAccountActivated ? "Deactivate customer account?" : "Activate customer account?"}
+                description={isAccountActivated
+                    ? "This customer can still log in, but will see the account under review screen and will not be able to use any Customer Portal feature."
+                    : "This customer will be able to access and use all Customer Portal features."}
+                confirmText={isAccountActivated ? "Deactivate Account" : "Activate Account"}
+                cancelText="Cancel"
+                confirmVariant={isAccountActivated ? "destructive" : "default"}
+                onConfirm={handleConfirmActivation}
                 loading={isToggling}
             />
         </div>

@@ -8,10 +8,11 @@ import { AddArticleDialog } from '../components/AddArticleDialog';
 import { useHelpArticles, useHelpArticleMutations } from '../hooks/useHelpCenterAdmin';
 import { useDebounce } from '@/hooks/useDebounce';
 import type { HelpArticle } from '../types';
+import useLocalStorage from '@/hooks/useLocalStorage';
 
 export default function HelpCenterAdminPage() {
   const [search, setSearch] = useState('');
-  const [page, setPage] = useState(1);
+  const [page, setPage] = useLocalStorage<number>('helpcenter_page', 1);
   const [pageSize, setPageSize] = useState(25);
   const [isAddOpen, setIsAddOpen] = useState(false);
   const [editingRow, setEditingRow] = useState<number | null>(null);

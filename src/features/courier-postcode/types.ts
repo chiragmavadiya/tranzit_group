@@ -3,6 +3,7 @@ export interface CourierPostcode {
     courier_name: string;
     global_courier_id: number;
     single_post_code: number;
+    suburb: string;
     price: number;
     courier_logo_url: string
 }
@@ -10,6 +11,7 @@ export interface CourierPostcode {
 export interface CourierPostcodeFormData {
     global_courier_id: number;
     single_post_code: number;
+    suburb: string;
     price: number;
 }
 

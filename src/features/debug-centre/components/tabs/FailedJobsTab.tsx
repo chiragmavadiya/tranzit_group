@@ -20,6 +20,7 @@ export const FailedJobsTab = ({ filters, searchValue, onPageChange, onPageSizeCh
     <DataTable
       columns={FAILED_JOBS_COLUMNS}
       data={jobs}
+      moduleName="failedJobs"
       loading={isLoading}
       totalItems={totalItems}
       currentPage={filters.page || 1}

@@ -21,8 +21,15 @@ const CARRIER_NAMES: Record<string, string> = {
   mypostbusiness: "MyPost Business",
   directfreight: "Direct Freight",
   couriersplease: "CouriersPlease",
-  startrack: "StarTrack"
+  startrack: "StarTrack",
+  fedex: "FedEx",
+  tge: "Team Global Express"
 };
+
+const TGE_BUSINESS_UNITS = [
+  { label: 'IPEC', value: 'IPEC' },
+  { label: 'Priority Australia', value: 'PriorityAustralia' }
+];
 
 const GUIDE_TIPS: Record<string, {
   portalName: string;
@@ -83,7 +90,7 @@ const GUIDE_TIPS: Record<string, {
 
           <li>
             Enter an account label, then select{" "}
-            <strong>Connect Account</strong> or{" "}
+            <strong>Save & Test connection</strong> or{" "}
             <strong>Save Changes</strong>.
           </li>
         </ol>
@@ -180,8 +187,8 @@ const GUIDE_TIPS: Record<string, {
           </li>
 
           <li>
-            Enter an account label, then select{" "}
-            <strong>Connect Account</strong> or{" "}
+            Then select{" "}
+            <strong>Save & Test connection</strong> or{" "}
             <strong>Save Changes</strong>.
           </li>
         </ol>
@@ -290,7 +297,7 @@ const GUIDE_TIPS: Record<string, {
           </li>
 
           <li>
-            Enter an account label, then select <strong>Connect Account</strong>{" "}
+            Enter an account label, then select <strong>Save & Test connection</strong>{" "}
             or <strong>Save Changes</strong>.
           </li>
         </ol>
@@ -379,7 +386,7 @@ const GUIDE_TIPS: Record<string, {
 
           <li>
             Enter an account label, then select{" "}
-            <strong>Connect Account</strong> or{" "}
+            <strong>Save & Test connection</strong> or{" "}
             <strong>Save Changes</strong>.
           </li>
         </ol>
@@ -464,8 +471,8 @@ const GUIDE_TIPS: Record<string, {
           </li>
 
           <li>
-            Enter an account label, then select{" "}
-            <strong>Connect Account</strong> or{" "}
+            Then select{" "}
+            <strong>Save & Test connection</strong> or{" "}
             <strong>Save Changes</strong>.
           </li>
         </ol>
@@ -514,7 +521,7 @@ const GUIDE_TIPS: Record<string, {
   },
   startrack: {
     portalName: "Australia Post Developer Centre",
-    portalUrl: "https://developers.auspost.com.au/",
+    portalUrl: "https://developers.auspost.com.au/apis",
     supportUrl: "https://auspost.com.au/help-and-support",
     credentialsList: "API Key, Password and StarTrack Account Number",
 
@@ -522,9 +529,9 @@ const GUIDE_TIPS: Record<string, {
       <div className="space-y-4 text-left font-normal">
         <ol className="list-decimal space-y-3 pl-4 text-[13px] leading-relaxed text-slate-600 dark:text-zinc-400">
           <li>
-            Sign in to the{" "}
+            Register for a Developer Centre account on the{" "}
             <a
-              href="https://developers.auspost.com.au/"
+              href="https://developers.auspost.com.au/apis"
               target="_blank"
               rel="noopener noreferrer"
               className="font-semibold text-primary hover:underline"
@@ -535,19 +542,26 @@ const GUIDE_TIPS: Record<string, {
           </li>
 
           <li>
-            Register for the <strong>Shipping &amp; Tracking API</strong> using
-            your <strong>StarTrack Account Number</strong>.
+            From the API list, register for the{" "}
+            <strong>Shipping and Tracking API</strong> key using your{" "}
+            <strong>StarTrack Account Number</strong>.
           </li>
 
           <li>
-            If you already have a Shipping &amp; Tracking API key, you can add
-            your StarTrack account to your existing API credentials instead of
-            creating a new integration.
+            In the registration form, answer{" "}
+            <strong>Yes</strong> to{" "}
+            <em>"Are you accessing the API via a Platform Partner?"</em> and
+            complete the partner details exactly as shown below.
           </li>
 
           <li>
-            Once your registration has been approved, Australia Post will provide
-            your <strong>API Key</strong> and <strong>Password</strong>.
+            Tick the consent checkbox to confirm TranzitGroup may access your
+            account, then continue through the remaining steps.
+          </li>
+
+          <li>
+            Once the form is complete, Australia Post will email your production{" "}
+            <strong>API Key</strong> and <strong>Password</strong>.
           </li>
 
           <li>
@@ -559,10 +573,39 @@ const GUIDE_TIPS: Record<string, {
 
           <li>
             Enter an account label, then select{" "}
-            <strong>Connect Account</strong> or{" "}
+            <strong>Save & Test connection</strong> or{" "}
             <strong>Save Changes</strong>.
           </li>
         </ol>
+
+        <div className="mt-4 space-y-2 rounded-lg border border-primary/20 bg-primary/5 p-3 dark:border-primary/30 dark:bg-primary/10">
+          <p className="text-[13px] font-bold text-slate-800 dark:text-zinc-200">
+            Platform Partner details
+          </p>
+
+          <div className="space-y-1.5 text-[12px] leading-relaxed text-slate-600 dark:text-zinc-400">
+            <div className="flex flex-wrap gap-x-2">
+              <span>Are you accessing the API via a Platform Partner?</span>
+              <strong className="text-slate-800 dark:text-zinc-200">Yes</strong>
+            </div>
+
+            <div className="flex flex-wrap gap-x-2">
+              <span>Please select your eCommerce Partner</span>
+              <strong className="text-slate-800 dark:text-zinc-200">Other</strong>
+            </div>
+
+            <div className="flex flex-wrap gap-x-2">
+              <span>Please provide the name of the platform</span>
+              <strong className="text-slate-800 dark:text-zinc-200">TranzitGroup</strong>
+            </div>
+          </div>
+
+          <p className="text-[12px] italic leading-relaxed text-slate-500 dark:text-zinc-400">
+            TranzitGroup is not listed in the eCommerce Partner dropdown yet, so
+            select <strong>Other</strong> and type <strong>TranzitGroup</strong>{" "}
+            (one word, no space) in the platform name field.
+          </p>
+        </div>
 
         <div className="mt-4 space-y-2 rounded-lg border border-amber-200 bg-amber-50 p-3 dark:border-amber-900/50 dark:bg-amber-950/20">
           <p className="text-[13px] font-bold text-amber-900 dark:text-amber-200">
@@ -570,9 +613,10 @@ const GUIDE_TIPS: Record<string, {
           </p>
 
           <p className="text-[12px] leading-relaxed text-amber-800 dark:text-amber-300">
-            Shipping &amp; Tracking API access is available only for eligible
-            Australia Post or StarTrack contract customers. API credentials are
-            issued after your registration has been reviewed and approved.
+            Shipping and Tracking API access is available only for eligible
+            Australia Post or StarTrack contract customers. If you already have a
+            Shipping and Tracking API key, you can add your StarTrack account to
+            your existing credentials instead of creating a new integration.
           </p>
         </div>
 
@@ -594,12 +638,228 @@ const GUIDE_TIPS: Record<string, {
 
         <div className="mt-4 border-t border-slate-100 pt-4 dark:border-zinc-800/80">
           <a
-            href="https://developers.auspost.com.au/apis/st-registration"
+            href="https://developers.auspost.com.au/apis"
             target="_blank"
             rel="noopener noreferrer"
             className="text-[13px] font-semibold text-primary hover:underline"
           >
-            Register for the Shipping &amp; Tracking API
+            Register for the Shipping and Tracking API
+          </a>
+        </div>
+      </div>
+    )
+  },
+  fedex: {
+    portalName: "FedEx",
+    portalUrl: "https://www.fedex.com/en-au/home.html",
+    supportUrl: "https://www.fedex.com/en-au/customer-support.html",
+    credentialsList: "Username, Password, Account Number and Sender Code",
+
+    customGuide: (
+      <div className="space-y-4 text-left font-normal">
+        <ol className="list-decimal space-y-3 pl-4 text-[13px] leading-relaxed text-slate-600 dark:text-zinc-400">
+          <li>
+            Contact your FedEx Account Manager or{" "}
+            <a
+              href="https://www.fedex.com/en-au/customer-support.html"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="font-semibold text-primary hover:underline"
+            >
+              FedEx Customer Support
+            </a>{" "}
+            and request API access for your business account.
+          </li>
+
+          <li>
+            Once your API access has been approved, FedEx will issue your{" "}
+            <strong>Username</strong> and <strong>Password</strong> for the
+            account number you intend to ship against.
+          </li>
+
+          <li>
+            Ask FedEx to confirm the <strong>Sender Code</strong> assigned to
+            your account. FedEx uses it to identify the pickup location on your
+            consignments.
+          </li>
+
+          <li>
+            Return to Tranzit and enter your <strong>Username</strong>,{" "}
+            <strong>Password</strong>, <strong>Account Number</strong>, and{" "}
+            <strong>Sender Code</strong> into the corresponding fields.
+          </li>
+
+          <li>
+            Enter an account label, then select{" "}
+            <strong>Save & Test connection</strong> or{" "}
+            <strong>Save Changes</strong>.
+          </li>
+        </ol>
+
+        <div className="mt-4 space-y-2 rounded-lg border border-amber-200 bg-amber-50 p-3 dark:border-amber-900/50 dark:bg-amber-950/20">
+          <p className="text-[13px] font-bold text-amber-900 dark:text-amber-200">
+            Important
+          </p>
+
+          <p className="text-[12px] leading-relaxed text-amber-800 dark:text-amber-300">
+            Your API <strong>Username</strong> is not the user ID you use to
+            sign in to fedex.com. Make sure the credentials are issued for the
+            same <strong>Account Number</strong> entered here, otherwise the
+            connection test will fail.
+          </p>
+        </div>
+
+        <div className="mt-4 space-y-1 border-t border-slate-100 pt-4 dark:border-zinc-800/80">
+          <p className="text-[13px] font-bold text-slate-800 dark:text-zinc-200">
+            Don't have a FedEx account?
+          </p>
+
+          <p className="text-[13px] leading-normal text-slate-500 dark:text-zinc-400">
+            <a
+              href="https://www.fedex.com/en-au/new-customer/how-to-open-account.html"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="font-semibold text-primary hover:underline"
+            >
+              Open a FedEx business shipping account
+            </a>
+            , then request API access before connecting your account to Tranzit.
+          </p>
+
+          <p className="mt-1 text-[12px] italic leading-normal text-slate-400 dark:text-zinc-500">
+            API credentials are provided only after your FedEx account has been
+            approved for API integration.
+          </p>
+        </div>
+
+        <div className="mt-4 border-t border-slate-100 pt-4 dark:border-zinc-800/80">
+          <a
+            href="https://www.fedex.com/en-au/customer-support.html"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-[13px] font-semibold text-primary hover:underline"
+          >
+            Contact FedEx
+          </a>
+        </div>
+      </div>
+    )
+  },
+  tge: {
+    portalName: "MyTeamGE",
+    portalUrl: "https://www.myteamge.com/",
+    supportUrl: "https://www.teamglobalexp.com/contact-us",
+    credentialsList: "Client ID, Client Secret, source system code, message sender, account number, connote ranges, SSCC range and Print API credentials",
+
+    customGuide: (
+      <div className="space-y-4 text-left font-normal">
+        <ol className="list-decimal space-y-3 pl-4 text-[13px] leading-relaxed text-slate-600 dark:text-zinc-400">
+          <li>
+            Contact your Team Global Express Account Manager or{" "}
+            <a
+              href="https://www.teamglobalexp.com/contact-us"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="font-semibold text-primary hover:underline"
+            >
+              Team Global Express support
+            </a>{" "}
+            and request API access for your account.
+          </li>
+
+          <li>
+            Team Global Express will issue your{" "}
+            <strong>Client ID</strong> and <strong>Client Secret</strong> for
+            authentication, along with the <strong>source system code</strong>{" "}
+            and <strong>message sender</strong> values used on every request.
+          </li>
+
+          <li>
+            Confirm which <strong>business units</strong> are enabled on your
+            account &mdash; <strong>IPEC</strong>,{" "}
+            <strong>Priority Australia</strong>, or both.
+          </li>
+
+          <li>
+            For each enabled business unit, request the{" "}
+            <strong>SLID</strong> and the <strong>connote number range</strong>{" "}
+            allocated to your account. Team Global Express allocates a separate
+            range per business unit.
+          </li>
+
+          <li>
+            Request your <strong>SSCC serial range</strong>, which is used to
+            number the individual items on each consignment.
+          </li>
+
+          <li>
+            Ask for your Print API credentials &mdash; the{" "}
+            <strong>print identity</strong> and <strong>print token</strong>{" "}
+            used to generate labels and driver manifests.
+          </li>
+
+          <li>
+            Return to Tranzit, enter the credentials into the corresponding
+            fields, then select <strong>Save &amp; Test connection</strong> or{" "}
+            <strong>Save Changes</strong>.
+          </li>
+
+          <li>
+            Review the available services and enable the ones you want to quote
+            and consign with.
+          </li>
+        </ol>
+
+        <div className="mt-4 space-y-2 rounded-lg border border-amber-200 bg-amber-50 p-3 dark:border-amber-900/50 dark:bg-amber-950/20">
+          <p className="text-[13px] font-bold text-amber-900 dark:text-amber-200">
+            Important
+          </p>
+
+          <p className="text-[12px] leading-relaxed text-amber-800 dark:text-amber-300">
+            Connote and SSCC ranges are allocated to your account and must not
+            be shared with another system. If the same range is used elsewhere,
+            Team Global Express may reject your consignments as duplicates. Your{" "}
+            <strong>source system code</strong> is tied to the connote range, so
+            enter the value exactly as it was issued.
+          </p>
+        </div>
+
+        <div className="mt-4 space-y-2 rounded-lg border border-primary/20 bg-primary/5 p-3 dark:border-primary/30 dark:bg-primary/10">
+          <p className="text-[13px] font-bold text-slate-800 dark:text-zinc-200">
+            Driver manifests
+          </p>
+
+          <p className="text-[12px] leading-relaxed text-slate-600 dark:text-zinc-400">
+            Team Global Express requires a printed manifest to be handed to the
+            driver at every pickup. Print two copies and keep one signed by the
+            driver as your proof of lodgement.
+          </p>
+        </div>
+
+        <div className="mt-4 space-y-1 border-t border-slate-100 pt-4 dark:border-zinc-800/80">
+          <p className="text-[13px] font-bold text-slate-800 dark:text-zinc-200">
+            Don't have a Team Global Express account?
+          </p>
+
+          <p className="text-[13px] leading-normal text-slate-500 dark:text-zinc-400">
+            Contact Team Global Express to open a credit account before
+            requesting API access.
+          </p>
+
+          <p className="mt-1 text-[12px] italic leading-normal text-slate-400 dark:text-zinc-500">
+            API credentials, connote ranges and Print API access are issued only
+            after your account has been approved for API integration.
+          </p>
+        </div>
+
+        <div className="mt-4 border-t border-slate-100 pt-4 dark:border-zinc-800/80">
+          <a
+            href="https://www.teamglobalexp.com/contact-us"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-[13px] font-semibold text-primary hover:underline"
+          >
+            Contact Team Global Express
           </a>
         </div>
       </div>
@@ -635,7 +895,9 @@ function CarrierConfigTip({ selectedCarrier }: CarrierConfigTipProps) {
             {selectedCarrier === 'aramex' && "You will need an active Aramex Australia account and API credentials generated from your Aramex account portal."}
             {selectedCarrier === 'directfreight' && "To connect your Direct Freight account, ensure that API access has been enabled by Direct Freight."}
             {selectedCarrier === 'startrack' && "You will need an active StarTrack account and approved Shipping and Tracking API credentials."}
-            {selectedCarrier !== 'auspost' && selectedCarrier !== 'mypostbusiness' && selectedCarrier !== 'aramex' && selectedCarrier !== 'directfreight' && selectedCarrier !== 'startrack' && `Make sure you have an active ${displayName} account with API access enabled.`}
+            {selectedCarrier === 'fedex' && "You will need an active FedEx account with API access enabled, along with the username, password and sender code issued by FedEx for that account."}
+            {selectedCarrier === 'tge' && "You will need an active Team Global Express account with API access enabled, along with the API credentials, connote and SSCC ranges and Print API credentials issued by Team Global Express for that account."}
+            {selectedCarrier !== 'auspost' && selectedCarrier !== 'mypostbusiness' && selectedCarrier !== 'aramex' && selectedCarrier !== 'directfreight' && selectedCarrier !== 'startrack' && selectedCarrier !== 'fedex' && selectedCarrier !== 'tge' && `Make sure you have an active ${displayName} account with API access enabled.`}
           </span>
         </div>
       </div>
@@ -909,15 +1171,28 @@ export default function CarrierConfigForm({
     }
   };
 
+  const tgeBusinessUnits: string[] = Array.isArray(formData.business_units) ? formData.business_units : [];
+
   const validateForm = () => {
     const newErrors: Record<string, string> = {};
+
+    // TGE's required set follows the business units enabled on the account. On a re-connect
+    // the secrets may be left blank, which keeps the values already stored.
+    const tgeFields = ['client_id', 'source_system_code', 'message_sender', 'account_number', 'business_units', 'sscc_range_start', 'sscc_range_end', 'print_identity'];
+    if (!formData.has_client_secret) tgeFields.push('client_secret');
+    if (!formData.has_print_token) tgeFields.push('print_token');
+    if (tgeBusinessUnits.includes('IPEC')) tgeFields.push('ipec_slid', 'ipec_range_start', 'ipec_range_end');
+    if (tgeBusinessUnits.includes('PriorityAustralia')) tgeFields.push('priority_slid', 'priority_range_start', 'priority_range_end');
+
     const requiredFields: Record<string, string[]> = {
       auspost: ['api_key', 'api_password', 'account_number',],
       aramex: ['client_id', 'client_secret'],
       mypostbusiness: ['merchant_token'],
       directfreight: ['token', 'account', 'site_id', 'base_url', 'consignment_token'],
       couriersplease: ['username', 'password'],
-      startrack: ['api_key', 'api_password', 'account_number']
+      startrack: ['api_key', 'api_password', 'account_number'],
+      fedex: ['username', 'password', 'account_number', 'sender_code'],
+      tge: tgeFields
     };
 
     const fieldLabelMap: Record<string, string> = {
@@ -931,15 +1206,30 @@ export default function CarrierConfigForm({
       account: 'Account number',
       site_id: 'Site ID',
       consignment_token: 'Consignment Token',
-      username: 'Account number',
-      password: 'API Secret'
+      username: selectedCarrier === 'fedex' ? 'Username' : 'Account number',
+      password: selectedCarrier === 'fedex' ? 'Password' : 'API Secret',
+      sender_code: 'Sender code',
+      source_system_code: 'Source system code',
+      message_sender: 'Message sender',
+      business_units: 'at least one business unit',
+      ipec_slid: 'IPEC SLID',
+      ipec_range_start: 'IPEC connote range start',
+      ipec_range_end: 'IPEC connote range end',
+      priority_slid: 'Priority SLID',
+      priority_range_start: 'Priority connote range start',
+      priority_range_end: 'Priority connote range end',
+      sscc_range_start: 'SSCC range start',
+      sscc_range_end: 'SSCC range end',
+      print_identity: 'Print identity',
+      print_token: 'Print token'
     };
 
     const fieldsToValidate = requiredFields[selectedCarrier] || [];
     fieldsToValidate.forEach(field => {
-      if (!formData[field] || (typeof formData[field] === 'string' && !formData[field].trim())) {
+      const value = formData[field];
+      if (!value || (typeof value === 'string' && !value.trim()) || (Array.isArray(value) && value.length === 0)) {
         const label = fieldLabelMap[field] || field.split('_').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
-        newErrors[field] = `Please enter ${label}`;
+        newErrors[field] = `Please ${field === 'business_units' ? 'select' : 'enter'} ${label}`;
       }
     });
 
@@ -951,6 +1241,41 @@ export default function CarrierConfigForm({
     if (e) e.preventDefault();
     setSubmitted(true);
     if (!validateForm()) {
+      return;
+    }
+    if (selectedCarrier === 'fedex') {
+      // FedEx /connect only accepts the credential fields, not the rest of the status payload.
+      const { username, password, account_number, sender_code, account_label } = formData;
+      onSubmit({ username, password, account_number, sender_code, account_label });
+      return;
+    }
+    if (selectedCarrier === 'tge') {
+      // TGE /connect only accepts the credential fields. Blank secrets are dropped so a
+      // re-connect keeps the stored ones, and a unit's ranges are only sent when it is enabled.
+      const payload: Record<string, any> = {
+        client_id: formData.client_id,
+        source_system_code: formData.source_system_code,
+        message_sender: formData.message_sender,
+        account_number: formData.account_number,
+        business_units: tgeBusinessUnits,
+        sscc_range_start: Number(formData.sscc_range_start),
+        sscc_range_end: Number(formData.sscc_range_end),
+        print_identity: formData.print_identity
+      };
+      if (formData.client_secret) payload.client_secret = formData.client_secret;
+      if (formData.print_token) payload.print_token = formData.print_token;
+      if (formData.gs1_prefix) payload.gs1_prefix = formData.gs1_prefix;
+      if (tgeBusinessUnits.includes('IPEC')) {
+        payload.ipec_slid = formData.ipec_slid;
+        payload.ipec_range_start = Number(formData.ipec_range_start);
+        payload.ipec_range_end = Number(formData.ipec_range_end);
+      }
+      if (tgeBusinessUnits.includes('PriorityAustralia')) {
+        payload.priority_slid = formData.priority_slid;
+        payload.priority_range_start = Number(formData.priority_range_start);
+        payload.priority_range_end = Number(formData.priority_range_end);
+      }
+      onSubmit(payload);
       return;
     }
     onSubmit(formData);
@@ -1070,6 +1395,127 @@ export default function CarrierConfigForm({
             </div>
           </>
         );
+      case 'fedex':
+        return (
+          <>
+            <div className="col-span-12 space-y-1">
+              <FormInput label="Username" {...commonProps("username")} placeholder="Enter your Username" info="Enter the API username issued by FedEx for your account. This is not the user ID you use to sign in to fedex.com." />
+            </div>
+            <div className="col-span-12 space-y-1">
+              <FormInput label="Password" {...commonProps("password")} type="password" placeholder="Enter your Password" info="Enter the API password issued by FedEx alongside your API username." />
+            </div>
+            <div className="col-span-12 space-y-1">
+              <FormInput label="Account number" {...commonProps("account_number")} placeholder="Enter your Account number" info="Enter the FedEx account number that your API credentials are authorised to transact against." />
+            </div>
+            <div className="col-span-12 space-y-1">
+              <FormInput label="Sender code" {...commonProps("sender_code")} placeholder="Enter your Sender code" info="Enter the sender code assigned to your FedEx account. FedEx uses it to identify the pickup location on your consignments." />
+            </div>
+            <div className="col-span-12 space-y-1">
+              <FormInput label="Account label" {...commonProps("account_label")} required={false} placeholder="Enter your Account label" info="Enter a label for this account (optional)." />
+            </div>
+          </>
+        );
+      case 'tge':
+        return (
+          <>
+            <div className="col-span-12 space-y-1">
+              <FormInput label="Client ID" {...commonProps("client_id")} placeholder="Enter your Client ID" info="Enter the client ID issued by Team Global Express for your account." />
+            </div>
+            <div className="col-span-12 space-y-1">
+              <FormInput
+                label="Client Secret"
+                {...commonProps("client_secret")}
+                type="password"
+                required={!formData.has_client_secret}
+                placeholder={formData.has_client_secret ? "Leave blank to keep the saved secret" : "Enter your Client Secret"}
+                info="Enter the client secret issued alongside your client ID. Leave it blank when updating other details to keep the saved secret."
+              />
+            </div>
+            <div className="col-span-12 space-y-1">
+              <FormInput label="Source system code" {...commonProps("source_system_code")} placeholder="For example: VM02" info="Enter the source system code issued by Team Global Express. It is tied to your connote range, so enter it exactly as issued." />
+            </div>
+            <div className="col-span-12 space-y-1">
+              <FormInput label="Message sender" {...commonProps("message_sender")} placeholder="Enter your Message sender" info="Enter the message sender value issued by Team Global Express. This identifies your system on every request and is usually your registered domain." />
+            </div>
+            <div className="col-span-12 space-y-1">
+              <FormInput label="Account number" {...commonProps("account_number")} placeholder="For example: FC3333" info="Enter the Team Global Express account number that your freight is billed to." />
+            </div>
+
+            <div className="col-span-12 space-y-1">
+              <FormSelect
+                label="Business units"
+                options={TGE_BUSINESS_UNITS}
+                value={tgeBusinessUnits}
+                onValueChange={(val) => handleInputChange(val || [], 'business_units')}
+                placeholder="Select business units..."
+                multiple
+                required
+                isHalf={false}
+                isFullWidth
+                allowClear={false}
+                selectClassName="w-full"
+                disabled={!canReadWrite}
+                error={submitted && !!errors.business_units}
+                errormsg={errors.business_units}
+              />
+              <p className="my-0 text-[11px] leading-normal text-slate-400 dark:text-zinc-500">
+                Select the business units enabled on your account. Each one has its own connote range.
+              </p>
+            </div>
+
+            {tgeBusinessUnits.includes('IPEC') && (
+              <>
+                <div className="col-span-12 space-y-1">
+                  <FormInput label="IPEC SLID" {...commonProps("ipec_slid")} placeholder="For example: 867701" info="Enter the 6-digit SLID issued for your IPEC connote range." />
+                </div>
+                <div className="col-span-12 md:col-span-6 space-y-1">
+                  <FormInput label="IPEC range start" {...commonProps("ipec_range_start")} type="number" placeholder="For example: 1" info="Enter the first connote number in the IPEC range allocated to your account." />
+                </div>
+                <div className="col-span-12 md:col-span-6 space-y-1">
+                  <FormInput label="IPEC range end" {...commonProps("ipec_range_end")} type="number" placeholder="For example: 9999999" info="Enter the last connote number in the IPEC range allocated to your account." />
+                </div>
+              </>
+            )}
+
+            {tgeBusinessUnits.includes('PriorityAustralia') && (
+              <>
+                <div className="col-span-12 space-y-1">
+                  <FormInput label="Priority SLID" {...commonProps("priority_slid")} placeholder="For example: ABCD" info="Enter the 4-character SLID issued for your Priority Australia connote range." />
+                </div>
+                <div className="col-span-12 md:col-span-6 space-y-1">
+                  <FormInput label="Priority range start" {...commonProps("priority_range_start")} type="number" placeholder="For example: 1" info="Enter the first connote number in the Priority Australia range allocated to your account." />
+                </div>
+                <div className="col-span-12 md:col-span-6 space-y-1">
+                  <FormInput label="Priority range end" {...commonProps("priority_range_end")} type="number" placeholder="For example: 999999" info="Enter the last connote number in the Priority Australia range allocated to your account." />
+                </div>
+              </>
+            )}
+
+            <div className="col-span-12 md:col-span-6 space-y-1">
+              <FormInput label="SSCC range start" {...commonProps("sscc_range_start")} type="number" placeholder="For example: 355232001" info="Enter the first serial number in the SSCC range allocated to your account. One SSCC is used for each item on a consignment." />
+            </div>
+            <div className="col-span-12 md:col-span-6 space-y-1">
+              <FormInput label="SSCC range end" {...commonProps("sscc_range_end")} type="number" placeholder="For example: 355240000" info="Enter the last serial number in the SSCC range allocated to your account." />
+            </div>
+            <div className="col-span-12 space-y-1">
+              <FormInput label="GS1 prefix" {...commonProps("gs1_prefix")} required={false} placeholder="Defaults to 9327510" info="Enter the 7-digit GS1 company prefix used to build your SSCCs. Leave blank to use the Team Global Express prefix." />
+            </div>
+
+            <div className="col-span-12 space-y-1">
+              <FormInput label="Print identity" {...commonProps("print_identity")} placeholder="Enter your Print identity" info="Enter the Print API identity issued by Team Global Express. It is used to generate labels and driver manifests." />
+            </div>
+            <div className="col-span-12 space-y-1">
+              <FormInput
+                label="Print token"
+                {...commonProps("print_token")}
+                type="password"
+                required={!formData.has_print_token}
+                placeholder={formData.has_print_token ? "Leave blank to keep the saved token" : "Enter your Print token"}
+                info="Enter the Print API token issued alongside your print identity. Leave it blank when updating other details to keep the saved token."
+              />
+            </div>
+          </>
+        );
       default:
         return null;
     }
@@ -1138,8 +1584,8 @@ export default function CarrierConfigForm({
             <div className="col-span-12 border-b border-slate-100 dark:border-zinc-800/80 my-2" />
           </>
         )}
-        {/* Advanced Settings Column (left) */}
-        {formData.advanced_settings?.settings && formData.advanced_settings.settings.length > 0 && (
+        {/* Advanced Settings Column (left) — only once the account is connected */}
+        {isConnected && formData.advanced_settings?.settings && formData.advanced_settings.settings.length > 0 && (
           <div className="col-span-12 lg:col-span-4 bg-white dark:bg-zinc-900 border border-slate-200/80 dark:border-zinc-800 rounded-xl shadow-xs p-4 md:p-6 space-y-4 text-left transition-all duration-300 hover:shadow-sm">
             <div>
               <h4 className="text-base font-bold text-slate-900 dark:text-zinc-50 uppercase tracking-wide my-0">Advanced Settings</h4>
@@ -1148,7 +1594,7 @@ export default function CarrierConfigForm({
 
             <div className="space-y-4 w-full">
               {formData.advanced_settings.settings.map((setting: any) => {
-                if (setting.type === 'checkbox') {
+                if (setting.type === 'checkbox' || setting.type === 'toggle') {
                   return (
                     <div
                       key={setting.key}
@@ -1169,11 +1615,15 @@ export default function CarrierConfigForm({
                       </label>
                     </div>
                   );
-                } else if (setting.type === 'dropdown') {
-                  const options = (formData.advanced_settings.print_format_options || []).map((opt: string) => ({
-                    label: opt,
-                    value: opt
-                  }));
+                } else if (setting.type === 'dropdown' || setting.type === 'select') {
+                  // AusPost sends plain strings, FedEx sends { value, label } pairs, TGE sends
+                  // the options on the setting itself as well as the labelled list.
+                  const rawOptions = formData.advanced_settings.print_format_options?.length
+                    ? formData.advanced_settings.print_format_options
+                    : (setting.options || []);
+                  const options = rawOptions.map((opt: any) =>
+                    typeof opt === 'string' ? { label: opt, value: opt } : { label: opt.label, value: opt.value }
+                  );
                   return (
                     <div key={setting.key} className="space-y-1">
                       <FormSelect
@@ -1205,7 +1655,18 @@ export default function CarrierConfigForm({
                     </div>
                   );
                 }
-                return null;
+                return (
+                  <div key={setting.key} className="space-y-1">
+                    <FormInput
+                      label={setting.label}
+                      value={setting.value ?? ''}
+                      onChange={(val) => handleAdvancedSettingChange(setting.key, val)}
+                      isHalf={false}
+                      isFullWidth
+                      disabled={!isConnected || !canReadWrite}
+                    />
+                  </div>
+                );
               })}
             </div>
 
@@ -1225,8 +1686,8 @@ export default function CarrierConfigForm({
           </div>
         )}
 
-        {/* Supported Products Column (right) */}
-        {formData.products && (() => {
+        {/* Supported Products Column (right) — only once the account is connected */}
+        {isConnected && formData.products && (() => {
           const filteredProducts = formData.products.filter((product: any) => {
             const term = productSearchTerm.toLowerCase();
             return (
@@ -1261,7 +1722,8 @@ export default function CarrierConfigForm({
                       className="mb-0"
                     />
                   </div>
-                  {isConnected && canReadWrite && (
+                  {/* StarTrack has no endpoint for adding services. */}
+                  {isConnected && canReadWrite && selectedCarrier !== 'startrack' && (
                     <Button
                       type="button"
                       variant="outline"

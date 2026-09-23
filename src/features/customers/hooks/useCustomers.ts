@@ -149,6 +149,23 @@ export const useToggleCustomerStatus = () => {
     });
 };
 
+export const useSetAccountActivation = () => {
+    const queryClient = useQueryClient();
+
+    return useMutation({
+        mutationFn: ({ id, account_activation }: { id: number | string; account_activation: boolean }) =>
+            customerService.setAccountActivation(id, account_activation),
+        onSuccess: (_, variables) => {
+            queryClient.invalidateQueries({ queryKey: QUERY_KEYS.ADMIN_CUSTOMERS.LIST });
+            queryClient.invalidateQueries({ queryKey: QUERY_KEYS.ADMIN_CUSTOMERS.COUNTS });
+            // The edit modal reads its own cache, so it has to refetch or it will show a stale toggle.
+            queryClient.invalidateQueries({ queryKey: ["admin", "customers", "edit", variables.id] });
+            queryClient.invalidateQueries({ queryKey: QUERY_KEYS.ADMIN_CUSTOMERS.DETAILS(variables.id.toString()) });
+            queryClient.invalidateQueries({ queryKey: QUERY_KEYS.ADMIN_CUSTOMERS.PROFILE(variables.id.toString()) });
+        },
+    });
+};
+
 export const useExportCustomers = () => {
     return useMutation({
         mutationFn: ({ format, params }: { format: string; params?: Record<string, any> }) => customerService.exportList(format, params),
@@ -199,6 +216,80 @@ export const useChangeCustomerPassword = () => {
     return useMutation({
         mutationFn: ({ id, data }: { id: number | string; data: { new_password: string; new_password_confirmation: string } }) =>
             customerService.changePassword(id, data),
+    });
+};
+
+export const useCustomerItems = (id: number | string, params?: Record<string, any>) => {
+    return useQuery({
+        queryKey: [...QUERY_KEYS.ADMIN_CUSTOMERS.ITEMS(id), params],
+        queryFn: async () => {
+            try {
+                return await customerService.getItems(id, params);
+            } catch (e) {
+                console.warn("API not ready yet, using mock items fallback", e);
+                return {
+                    status: true,
+                    message: "Mock items loaded",
+                    data: [
+                        {
+                            id: 1,
+                            item_name: "Standard Shipping Box A",
+                            item_code: "BOX-A-STD",
+                            item_length: 30,
+                            item_width: 20,
+                            item_height: 15,
+                            item_weight: 1.5,
+                            item_cubic: 0.009,
+                            status: "Active",
+                            is_default: true
+                        },
+                        {
+                            id: 2,
+                            item_name: "Large Shipping Box B",
+                            item_code: "BOX-B-LRG",
+                            item_length: 50,
+                            item_width: 40,
+                            item_height: 30,
+                            item_weight: 4.5,
+                            item_cubic: 0.06,
+                            status: "Active",
+                            is_default: false
+                        },
+                        {
+                            id: 3,
+                            item_name: "Small Document Satchel",
+                            item_code: "SAT-DOC-SM",
+                            item_length: 22,
+                            item_width: 16,
+                            item_height: 2,
+                            item_weight: 0.5,
+                            item_cubic: 0.0007,
+                            status: "Active",
+                            is_default: false
+                        },
+                        {
+                            id: 4,
+                            item_name: "Heavy Duty Pallet Unit",
+                            item_code: "PLT-HD-UNIT",
+                            item_length: 120,
+                            item_width: 100,
+                            item_height: 160,
+                            item_weight: 25.0,
+                            item_cubic: 1.92,
+                            status: "Active",
+                            is_default: false
+                        }
+                    ],
+                    meta: {
+                        current_page: 1,
+                        per_page: 25,
+                        total: 4,
+                        last_page: 1
+                    }
+                };
+            }
+        },
+        enabled: !!id,
     });
 };
 

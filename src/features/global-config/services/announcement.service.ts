@@ -45,7 +45,6 @@ export interface AnnouncementSingleApiResponse {
 export const announcementService = {
   getAnnouncements: async (params?: { page?: number; per_page?: number; search?: string }): Promise<AnnouncementListApiResponse> => {
     const response = await api.get<AnnouncementListApiResponse>(API_ENDPOINTS.ANNOUNCEMENTS.BASE, { params });
-    console.log(response, 'announcementService.getAnnouncements response.data');
     return response.data;
   },
 

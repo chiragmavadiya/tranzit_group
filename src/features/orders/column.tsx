@@ -6,11 +6,13 @@ import { ArchiveRestore, Eye, Loader2, MoreVertical, Pencil, Printer } from "luc
 import { Button } from "@/components/ui/button";
 import { DropdownCustomMenu } from "@/components/ui/dropdown-menu";
 import { CustomTooltip } from "@/components/common/CustomTooltip";
-import { StatusBadge } from "./components/StatusBadge";
+import { SourceStatusBadge, StatusBadge } from "./components/StatusBadge";
 import { formateCurrency } from "@/lib/utils";
 import { canRestoreByPaymentStatus } from "./utils/order-details.utils";
+import { AddressStatusBadge, AddressStatusIcon, dash } from "./components/address-validation/AddressStatusIcon";
 import Favicon from '@/assets/favicon.png';
 import { CustomerNameCell } from "./components/CustomerNameCell";
+import type { PackingDocument } from "./services/orders.api";
 
 export const getOrdersColumns = (
   role: string = "customer",
@@ -29,8 +31,20 @@ export const getOrdersColumns = (
   canReadWrite: boolean = true,
   onRestoreOrder?: (orderNumber: string) => void,
   restoringOrderId?: string | null,
+  onDownloadPackingDocument?: (document: PackingDocument, orderNumbers: string[]) => void,
 ): Column<Order>[] => {
-  const printedAndShippedActions = (value: string) => [
+  const packingActions = (value: string) => [
+    {
+      label: "Print packing slip",
+      onClick: () => onDownloadPackingDocument?.("packing-slip", [value]),
+    },
+    {
+      label: "Print packing summary",
+      onClick: () => onDownloadPackingDocument?.("packing-summary", [value]),
+    },
+  ]
+
+  const printedAndShippedActions = (value: string, courier_code: string = "") => [
     {
       label: "View order",
       onClick: () => navigate(`${role === "admin" ? "/admin/orders/view" : "/orders/view"}/${value}`),
@@ -41,11 +55,10 @@ export const getOrdersColumns = (
       onClick: () => onDownloadLabel?.(value),
       // icon: Download,
     },
+    ...packingActions(value),
     {
-      label: "Archived order",
-      onClick: () => {
-        onArchiveOrder?.(value);
-      },
+      label: courier_code === 'couriersplease' || Boolean(!courier_code) ? "Archived order" : "Cancel order",
+      onClick: () => courier_code === 'couriersplease' || Boolean(!courier_code) ? onArchiveOrder?.(value) : onCancelOrder?.(value),
       // icon: Archive,
       variant: "destructive" as const,
       className: "text-red-600 dark:text-red-400 font-medium"
@@ -58,14 +71,15 @@ export const getOrdersColumns = (
       onClick: () => navigate(`${role === "admin" ? "/admin/orders/consign" : "/orders/consign"}/${value}`),
       // icon: Eye,
     },
-    {
-      label: "Cancel order",
-      onClick: () => {
-        onCancelOrder?.(value);
-      },
-      // variant: "destructive" as const,
-      className: "font-medium hover:text"
-    },
+    // {
+    //   label: "Cancel order",
+    //   onClick: () => {
+    //     onCancelOrder?.(value);
+    //   },
+    //   // variant: "destructive" as const,
+    //   className: "font-medium hover:text"
+    // },
+    ...packingActions(value),
     {
       label: "Archive order",
       onClick: () => {
@@ -87,7 +101,8 @@ export const getOrdersColumns = (
         header: 'ORDER #',
         key: 'order_number',
         sticky: 'left',
-        width: '160px',
+        disableToggle: true,
+        width: '110px',
         cell: (value: string) => (
           <NavLink to={`${role === "admin" ? "/admin" : ""}/orders/${(orderType === 'new' && !fromCustomer && canReadWrite) ? 'consign' : 'view'}/${value}`} className="font-medium text-primary underline">
             {value}
@@ -129,6 +144,14 @@ export const getOrdersColumns = (
         className: 'break-normal'
       },
       {
+        header: 'ADDRESS',
+        key: 'address_status',
+        width: '120px',
+        cell: (_value: string, row: Order) => (
+          <AddressStatusBadge status={row.address_status} message={row.address_message} />
+        )
+      },
+      {
         header: 'CARRIER & PRODUCT', key: 'courier',
         width: "180px",
         cell: (value: string, row: Order) => (
@@ -145,7 +168,7 @@ export const getOrdersColumns = (
                   {row.product_id && <span className="font-normal text-xs text-slate-500 dark:text-zinc-400"> - {row.product_id}</span>}
                 </div>
               </div>
-              <Pencil onClick={() => courierEditClick(row)} height={12} width={12} className="h-3! w-3! cursor-pointer text-primary opacity-0 group-hover/row:opacity-100 shrink-0 ml-auto" />
+              <Pencil onClick={(e) => { e.stopPropagation(); courierEditClick(row); }} height={12} width={12} className="h-3! w-3! cursor-pointer text-primary opacity-0 group-hover/row:opacity-100 shrink-0 ml-auto" />
             </div>) : (
               <div className="flex items-center gap-1">
                 {(row?.courier_logo || row?.courier_logo_url) && (
@@ -182,7 +205,7 @@ export const getOrdersColumns = (
         header: 'AMOUNT',
         key: 'amount',
         // width: '100px',
-        cell: (value: string) => <span className="font-medium"> {formateCurrency(Number(value))}</span>
+        cell: (value: string) => <span className="font-medium"> {Number(value) === 0 ? '-' : formateCurrency(Number(value))}</span>
       },
       ...(orderType !== 'shipped' && orderType !== 'new' ? [{
         header: 'PAYMENT STATUS',
@@ -191,13 +214,20 @@ export const getOrdersColumns = (
         cell: (value: string) => <StatusBadge status={value} />
       }] : []),
       {
-        header: 'ORDER SOURCE',
+        header: 'SOURCE / STATUS',
         key: 'order_type',
-        width: '110px',
+        width: '150px',
         cell: (value: string, row: Order) => (
-          <div className="flex items-center gap-2">
-            <img src={row?.order_source_icon || Favicon} className="h-5" alt="" />
-            {!row?.order_source_icon && <span className="capitalize">{value}</span>}
+          <div className="flex flex items-center gap-1.5">
+            <div className="flex items-center gap-1.5 min-w-0">
+              <CustomTooltip title={value}>
+                <img src={row?.order_source_icon || Favicon} className="h-6 max-w-[70px] object-contain shrink-0" alt="" />
+              </CustomTooltip>
+              {!row?.order_source_icon && (
+                <span className="capitalize truncate leading-tight">{value}</span>
+              )}
+            </div>
+            {row?.fulfillment_status && row?.order_source_icon && <SourceStatusBadge status={row.fulfillment_status} />}
           </div>
         )
       },
@@ -275,7 +305,7 @@ export const getOrdersColumns = (
                   )}
                   <DropdownCustomMenu
                     menus={newActions(value)}
-                    contentClassName="w-40"
+                    contentClassName="w-52"
                   >
                     <Button
                       variant="ghost"
@@ -293,8 +323,8 @@ export const getOrdersColumns = (
               )}
               {(orderType === 'printed' || orderType === 'shipped') && (
                 <DropdownCustomMenu
-                  menus={printedAndShippedActions(value)}
-                  contentClassName="w-40"
+                  menus={printedAndShippedActions(value, row.courier_code)}
+                  contentClassName="w-52"
                 >
                   <Button
                     variant="ghost"
@@ -317,3 +347,101 @@ export const getOrdersColumns = (
     ]
   )
 };
+
+export const getAddressCheckerColumns = (
+  role: string = "customer",
+  onUpdate: (orderNumber: string) => void,
+): Column<Order>[] => [
+    {
+      header: 'ORDER #',
+      key: 'order_number',
+      sticky: 'left',
+      width: '110px',
+      cell: (value: string) => (
+        <NavLink to={`${role === "admin" ? "/admin" : ""}/orders/consign/${value}`} className="font-medium text-primary underline">
+          {value}
+        </NavLink>
+      ),
+    },
+    {
+      header: 'ORDER DATE',
+      key: 'consignment_date',
+      className: 'break-normal',
+    },
+    {
+      header: 'LOOK UP CONTACT',
+      key: 'customer_name',
+      width: '180px',
+      cell: (value: string, row: Order) => (
+        <span className="inline-flex items-center gap-1.5 uppercase font-medium">
+          <AddressStatusIcon status={row.address_status} message={row.address_message} />
+          {value || '-'}
+        </span>
+      ),
+    },
+    {
+      header: 'STREET',
+      key: 'address_street',
+      cell: (value: string) => dash(value),
+    },
+    {
+      header: 'SUBURB',
+      key: 'suburb',
+      cell: (value: string) => dash(value),
+    },
+    {
+      header: 'POSTCODE',
+      key: 'address_postcode',
+      cell: (value: string) => dash(value),
+    },
+    {
+      header: 'STATE',
+      key: 'address_state',
+      cell: (value: string) => dash(value),
+    },
+    {
+      header: 'COUNTRY',
+      key: 'address_country',
+      cell: (value: string) => dash(value) === '-' ? 'Australia' : dash(value),
+    },
+    {
+      header: 'SUGGESTED ADDRESS',
+      key: 'address_suggestions',
+      width: '200px',
+      cell: (_value: string, row: Order) => {
+        const [first, ...rest] = row.address_suggestions || [];
+        if (!first) {
+          return <span className="text-slate-400 dark:text-zinc-500">No suggestion</span>;
+        }
+
+        return (
+          <div className="flex flex-col gap-0.5">
+            <span className="uppercase font-medium text-emerald-700 dark:text-emerald-400">
+              {first.suburb} {first.state} {first.postcode}
+            </span>
+            {rest.length > 0 && (
+              <span className="text-[11px] text-slate-500 dark:text-zinc-400">
+                +{rest.length} more — use Update to pick
+              </span>
+            )}
+          </div>
+        );
+      },
+    },
+    {
+      header: '',
+      key: 'address_status',
+      width: '110px',
+      cell: (_value: string, row: Order) => (
+        <Button
+          variant="outline"
+          size="sm"
+          className="h-8 px-2.5 gap-1.5 font-semibold"
+          onClick={() => onUpdate(row.order_number)}
+        >
+          <Pencil className="h-3.5 w-3.5" />
+          Update
+        </Button>
+      ),
+    },
+  ];

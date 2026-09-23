@@ -1,5 +1,5 @@
 import React, { memo } from "react";
-import { Pencil, User, Mail, Phone } from "lucide-react";
+import { Pencil, User, Mail, Phone, AlertTriangle } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 
@@ -12,6 +12,7 @@ interface AddressCardProps {
   editable?: boolean;
   onEditClick?: () => void;
   phone?: string;
+  validationError?: string;
 }
 
 export const AddressCard: React.FC<AddressCardProps> = memo(({
@@ -23,6 +24,7 @@ export const AddressCard: React.FC<AddressCardProps> = memo(({
   editable = false,
   onEditClick,
   phone,
+  validationError,
 }) => {
 
   return (
@@ -67,6 +69,14 @@ export const AddressCard: React.FC<AddressCardProps> = memo(({
             </Button>
           )}
         </div>
+        {validationError && (
+          <div className="flex py-2 items-center px-4 gap-2 bg-red-50 dark:bg-red-900/10 border-t border-red-200 dark:border-red-900/30">
+            <AlertTriangle className="h-4 w-4 shrink-0 text-red-600 dark:text-red-400" />
+            <span className="text-sm font-medium text-red-700 dark:text-red-300">
+              {validationError}
+            </span>
+          </div>
+        )}
         {instruction && (
           <div className="flex py-2 items-center px-4 gap-3 bg-gray-300 dark:bg-zinc-900 border-t border-gray-200 dark:border-zinc-800">
             <span className="text-sm font-medium text-slate-800 dark:text-zinc-400">

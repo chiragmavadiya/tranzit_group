@@ -23,7 +23,7 @@ export default function PublicRoute() {
         showToast(decodeURIComponent(success), 'success');
       }
 
-      const target = (role === 'admin' || role === 'Staff') ? '/admin/orders' : '/orders';
+      const target = role === 'admin' ? '/admin/orders' : '/orders';
       navigate(target, { replace: true });
     }
   }, [shouldRedirect, role, searchParams, navigate]);

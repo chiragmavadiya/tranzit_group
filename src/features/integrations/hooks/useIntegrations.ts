@@ -2,6 +2,10 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { integrationService } from "../services/integrationService";
 import { showToast } from "@/components/ui/custom-toast";
 import { QUERY_KEYS } from "@/constants/api.constants";
+import type { ShopifyLiveRatesSettingsPayload, ShopifyParcelDefaultsPayload, ShoplineParcelDefaultsPayload } from "../types";
+
+// `id` targets one store/account when a provider has several connected.
+export type IntegrationTarget = { provider: string; id?: string | number };
 
 export const useIntegrationsList = () => {
     return useQuery({
@@ -18,9 +22,52 @@ export const useIntegrationStatus = (provider: string, enabled = true) => {
     });
 };
 
-export const useIntegrationStatusMutation = () => {
+export const useRefreshShopifyShippingMethods = () => {
+    const queryClient = useQueryClient();
     return useMutation({
-        mutationFn: (provider: string) => integrationService.getStatus(provider)
+        mutationFn: (storeId: string | number) => integrationService.getShopifyShippingMethods(storeId),
+        onSuccess: (response: any, storeId) => {
+            // The endpoint has been seen returning the list either bare or under `shipping_methods`.
+            const methods = Array.isArray(response?.data) ? response.data : response?.data?.shipping_methods;
+            if (!Array.isArray(methods)) {
+                // Shape we don't recognise: fall back to re-reading the whole status.
+                queryClient.invalidateQueries({ queryKey: QUERY_KEYS.INTEGRATIONS.STATUS('shopify') });
+                return;
+            }
+            // Write straight into the cached status, which is where the page reads them from.
+            queryClient.setQueryData(QUERY_KEYS.INTEGRATIONS.STATUS('shopify'), (previous: any) => {
+                if (!previous?.data) return previous;
+                const applyTo = (store: any) =>
+                    (String(store?.id) === String(storeId) ? { ...store, shipping_methods: methods } : store);
+                return {
+                    ...previous,
+                    data: {
+                        ...previous.data,
+                        ...(previous.data.stores ? { stores: previous.data.stores.map(applyTo) } : {}),
+                        ...(previous.data.store ? { store: applyTo(previous.data.store) } : {})
+                    }
+                };
+            });
+            showToast(response?.message || "Shipping methods refreshed", "success");
+        },
+        onError: (error: any) => {
+            showToast(error.message || "Failed to refresh shipping methods", "error");
+        }
+    });
+};
+
+export const useDeleteShopifyShippingMethod = () => {
+    const queryClient = useQueryClient();
+    return useMutation({
+        mutationFn: (id: string) => integrationService.deleteShopifyShippingMethod(id),
+        onSuccess: (response: any) => {
+            queryClient.invalidateQueries({ queryKey: QUERY_KEYS.INTEGRATIONS.STATUS('shopify') });
+            queryClient.invalidateQueries({ queryKey: QUERY_KEYS.INTEGRATIONS.LIST });
+            showToast(response?.message || "Shipping method removed from Shopify", "success");
+        },
+        onError: (error: any) => {
+            showToast(error.message || "Failed to remove shipping method", "error");
+        }
     });
 };
 
@@ -47,8 +94,8 @@ export const useConnectIntegration = () => {
 export const useDisconnectIntegration = () => {
     const queryClient = useQueryClient();
     return useMutation({
-        mutationFn: (provider: string) => integrationService.disconnect(provider),
-        onSuccess: (_, provider) => {
+        mutationFn: ({ provider, id }: IntegrationTarget) => integrationService.disconnect(provider, id),
+        onSuccess: (_, { provider }) => {
             queryClient.invalidateQueries({ queryKey: QUERY_KEYS.INTEGRATIONS.LIST });
             queryClient.invalidateQueries({ queryKey: QUERY_KEYS.INTEGRATIONS.STATUS(provider) });
             showToast("Disconnected successfully", "success");
@@ -60,9 +107,12 @@ export const useDisconnectIntegration = () => {
 };
 
 export const useSyncIntegration = () => {
+    const queryClient = useQueryClient();
     return useMutation({
-        mutationFn: (provider: string) => integrationService.sync(provider),
-        onSuccess: () => {
+        mutationFn: ({ provider, id }: IntegrationTarget) => integrationService.sync(provider, id),
+        onSuccess: (_, variables) => {
+            queryClient.invalidateQueries({ queryKey: QUERY_KEYS.INTEGRATIONS.LIST });
+            queryClient.invalidateQueries({ queryKey: QUERY_KEYS.INTEGRATIONS.STATUS(variables.provider) });
             showToast("Synchronization started", "success");
         },
         onError: (error: any) => {
@@ -82,6 +132,38 @@ export const useToggleProductStatus = () => {
         },
         onError: (error: any) => {
             showToast(error.message || "Failed to update product status", "error");
+        }
+    });
+};
+
+export const useUpdateShopifyParcelDefaults = () => {
+    const queryClient = useQueryClient();
+    return useMutation({
+        mutationFn: (payload: ShopifyParcelDefaultsPayload) => integrationService.updateShopifyParcelDefaults(payload),
+        onSuccess: (response: any) => {
+            queryClient.invalidateQueries({ queryKey: QUERY_KEYS.INTEGRATIONS.STATUS('shopify') });
+            queryClient.invalidateQueries({ queryKey: QUERY_KEYS.INTEGRATIONS.LIST });
+            // ME carries the flag behind the blocking parcel-details modal, so it has to be re-read.
+            queryClient.invalidateQueries({ queryKey: QUERY_KEYS.AUTH.USER_DETAILS });
+            showToast(response?.message || "Default parcel details saved", "success");
+        },
+        onError: (error: any) => {
+            showToast(error.message || "Failed to save default parcel details", "error");
+        }
+    });
+};
+
+export const useUpdateShoplineParcelDefaults = () => {
+    const queryClient = useQueryClient();
+    return useMutation({
+        mutationFn: (payload: ShoplineParcelDefaultsPayload) => integrationService.updateShoplineParcelDefaults(payload),
+        onSuccess: (response: any) => {
+            queryClient.invalidateQueries({ queryKey: QUERY_KEYS.INTEGRATIONS.STATUS('shopline') });
+            queryClient.invalidateQueries({ queryKey: QUERY_KEYS.INTEGRATIONS.LIST });
+            showToast(response?.message || "Default parcel details saved", "success");
+        },
+        onError: (error: any) => {
+            showToast(error.message || "Failed to save default parcel details", "error");
         }
     });
 };
@@ -115,14 +197,6 @@ export const useAddManualProduct = () => {
         onError: (error: any) => {
             showToast(error.message || "Failed to add product", "error");
         }
-    });
-};
-
-export const useGetManualProducts = (provider: string, enabled = true) => {
-    return useQuery({
-        queryKey: QUERY_KEYS.INTEGRATIONS.MANUAL_PRODUCTS(provider),
-        queryFn: () => integrationService.getManualProducts(provider),
-        enabled: !!provider && enabled
     });
 };
 
@@ -173,36 +247,6 @@ export const usePatchProductStatus = () => {
     });
 };
 
-export const useGetProducts = (provider: string, enabled = true) => {
-    return useQuery({
-        queryKey: QUERY_KEYS.INTEGRATIONS.PRODUCTS(provider),
-        queryFn: () => integrationService.getProducts(provider),
-        enabled: !!provider && enabled
-    });
-};
-
-export const useGetDeliveryPreferences = (enabled = true) => {
-    return useQuery({
-        queryKey: QUERY_KEYS.INTEGRATIONS.DELIVERY_PREFERENCES,
-        queryFn: integrationService.getDeliveryPreferences,
-        enabled
-    });
-};
-
-export const useSetDeliveryPreferences = () => {
-    const queryClient = useQueryClient();
-    return useMutation({
-        mutationFn: (data: any) => integrationService.setDeliveryPreferences(data),
-        onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: QUERY_KEYS.INTEGRATIONS.DELIVERY_PREFERENCES });
-            showToast("Delivery preferences updated", "success");
-        },
-        onError: (error: any) => {
-            showToast(error.message || "Failed to update delivery preferences", "error");
-        }
-    });
-};
-
 export const useSetDefaultIntegration = () => {
     const queryClient = useQueryClient();
     return useMutation({
@@ -236,9 +280,11 @@ export const useRemoveDefaultIntegration = () => {
 export const useToggleEbayAutoSync = () => {
     const queryClient = useQueryClient();
     return useMutation({
-        mutationFn: (enabled: boolean) => integrationService.toggleEbayAutoSync(enabled),
+        mutationFn: ({ enabled, accountId }: { enabled: boolean; accountId?: string | number }) =>
+            integrationService.toggleEbayAutoSync(enabled, accountId),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: QUERY_KEYS.INTEGRATIONS.STATUS("ebay") });
+            queryClient.invalidateQueries({ queryKey: QUERY_KEYS.INTEGRATIONS.LIST });
             showToast("eBay Auto-sync status updated", "success");
         },
         onError: (error: any) => {
@@ -250,9 +296,11 @@ export const useToggleEbayAutoSync = () => {
 export const useToggleEbayAutoFulfillment = () => {
     const queryClient = useQueryClient();
     return useMutation({
-        mutationFn: (enabled: boolean) => integrationService.toggleEbayAutoFulfillment(enabled),
+        mutationFn: ({ enabled, accountId }: { enabled: boolean; accountId?: string | number }) =>
+            integrationService.toggleEbayAutoFulfillment(enabled, accountId),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: QUERY_KEYS.INTEGRATIONS.STATUS("ebay") });
+            queryClient.invalidateQueries({ queryKey: QUERY_KEYS.INTEGRATIONS.LIST });
             showToast("eBay Auto-fulfillment status updated", "success");
         },
         onError: (error: any) => {
@@ -261,12 +309,30 @@ export const useToggleEbayAutoFulfillment = () => {
     });
 };
 
+export const useToggleSquarespaceAutoFulfillment = () => {
+    const queryClient = useQueryClient();
+    return useMutation({
+        mutationFn: ({ enabled, accountId }: { enabled: boolean; accountId?: string | number }) =>
+            integrationService.toggleSquarespaceAutoFulfillment(enabled, accountId),
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: QUERY_KEYS.INTEGRATIONS.STATUS("squarespace") });
+            queryClient.invalidateQueries({ queryKey: QUERY_KEYS.INTEGRATIONS.LIST });
+            showToast("Squarespace Auto-fulfillment status updated", "success");
+        },
+        onError: (error: any) => {
+            showToast(error.message || "Failed to update Squarespace Auto-fulfillment status", "error");
+        }
+    });
+};
+
 export const useToggleShopifyAutoFulfillment = () => {
     const queryClient = useQueryClient();
     return useMutation({
-        mutationFn: (enabled: boolean) => integrationService.toggleAutoFulfillment(enabled),
+        mutationFn: ({ enabled, storeId }: { enabled: boolean; storeId?: string | number }) =>
+            integrationService.toggleAutoFulfillment(enabled, storeId),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: QUERY_KEYS.INTEGRATIONS.STATUS("shopify") });
+            queryClient.invalidateQueries({ queryKey: QUERY_KEYS.INTEGRATIONS.LIST });
             showToast("Shopify Auto-fulfillment status updated", "success");
         },
         onError: (error: any) => {
@@ -274,3 +340,106 @@ export const useToggleShopifyAutoFulfillment = () => {
         }
     });
 };
+
+export const useToggleShopifyLiveRates = () => {
+    const queryClient = useQueryClient();
+    return useMutation({
+        mutationFn: ({ enabled, storeId }: { enabled: boolean; storeId?: string | number }) =>
+            integrationService.toggleShopifyLiveRates(enabled, storeId),
+        onSuccess: (response) => {
+            queryClient.invalidateQueries({ queryKey: QUERY_KEYS.INTEGRATIONS.STATUS("shopify") });
+            queryClient.invalidateQueries({ queryKey: QUERY_KEYS.INTEGRATIONS.LIST });
+            showToast(response?.message || "Shopify Live Checkout Rates status updated", "success");
+        },
+        onError: (error: any) => {
+            showToast(error.message || "Failed to update Shopify Live Checkout Rates status", "error");
+        }
+    });
+};
+
+export const useShopifyLiveRatesSettings = (storeId?: string | number, enabled = true) => {
+    return useQuery({
+        queryKey: QUERY_KEYS.INTEGRATIONS.SHOPIFY_LIVE_RATES_SETTINGS(storeId!),
+        queryFn: () => integrationService.getShopifyLiveRatesSettings(storeId!),
+        enabled: storeId != null && enabled
+    });
+};
+
+export const useUpdateShopifyLiveRatesSettings = () => {
+    const queryClient = useQueryClient();
+    return useMutation({
+        mutationFn: (payload: ShopifyLiveRatesSettingsPayload) => integrationService.updateShopifyLiveRatesSettings(payload),
+        onSuccess: (response, payload) => {
+            queryClient.invalidateQueries({ queryKey: QUERY_KEYS.INTEGRATIONS.SHOPIFY_LIVE_RATES_SETTINGS(payload.store_id) });
+            showToast(response?.message || "Live Checkout Rates settings updated", "success");
+        },
+        onError: (error: any) => {
+            showToast(error.message || "Failed to update Live Checkout Rates settings", "error");
+        }
+    });
+};
+
+export const useToggleShoplineAutoSync = () => {
+    const queryClient = useQueryClient();
+    return useMutation({
+        mutationFn: ({ enabled, accountId }: { enabled: boolean; accountId?: string | number }) =>
+            integrationService.toggleShoplineAutoSync(enabled, accountId),
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: QUERY_KEYS.INTEGRATIONS.STATUS("shopline") });
+            queryClient.invalidateQueries({ queryKey: QUERY_KEYS.INTEGRATIONS.LIST });
+            showToast("Shopline Auto-sync status updated", "success");
+        },
+        onError: (error: any) => {
+            showToast(error.message || "Failed to update Shopline Auto-sync status", "error");
+        }
+    });
+};
+
+export const useToggleShoplineAutoFulfillment = () => {
+    const queryClient = useQueryClient();
+    return useMutation({
+        mutationFn: ({ enabled, accountId }: { enabled: boolean; accountId?: string | number }) =>
+            integrationService.toggleShoplineAutoFulfillment(enabled, accountId),
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: QUERY_KEYS.INTEGRATIONS.STATUS("shopline") });
+            queryClient.invalidateQueries({ queryKey: QUERY_KEYS.INTEGRATIONS.LIST });
+            showToast("Shopline Auto-fulfillment status updated", "success");
+        },
+        onError: (error: any) => {
+            showToast(error.message || "Failed to update Shopline Auto-fulfillment status", "error");
+        }
+    });
+};
+
+export const useToggleEtsyAutoSync = () => {
+    const queryClient = useQueryClient();
+    return useMutation({
+        mutationFn: ({ enabled, accountId }: { enabled: boolean; accountId?: string | number }) =>
+            integrationService.toggleEtsyAutoSync(enabled, accountId),
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: QUERY_KEYS.INTEGRATIONS.STATUS("etsy") });
+            queryClient.invalidateQueries({ queryKey: QUERY_KEYS.INTEGRATIONS.LIST });
+            showToast("Etsy Auto-sync status updated", "success");
+        },
+        onError: (error: any) => {
+            showToast(error.message || "Failed to update Etsy Auto-sync status", "error");
+        }
+    });
+};
+
+export const useToggleEtsyAutoFulfillment = () => {
+    const queryClient = useQueryClient();
+    return useMutation({
+        mutationFn: ({ enabled, accountId }: { enabled: boolean; accountId?: string | number }) =>
+            integrationService.toggleEtsyAutoFulfillment(enabled, accountId),
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: QUERY_KEYS.INTEGRATIONS.STATUS("etsy") });
+            queryClient.invalidateQueries({ queryKey: QUERY_KEYS.INTEGRATIONS.LIST });
+            showToast("Etsy Auto-fulfillment status updated", "success");
+        },
+        onError: (error: any) => {
+            showToast(error.message || "Failed to update Etsy Auto-fulfillment status", "error");
+        }
+    });
+};
+

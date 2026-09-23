@@ -71,6 +71,7 @@ export default function CourierSurchargePage() {
         <DataTable
           headerTitle="Courier Surcharge List"
           columns={columns}
+          moduleName="courierSurcharge"
           data={listResponse?.data || []}
           loading={isLoading}
           searchable

@@ -43,7 +43,7 @@ export function DashboardTable<T extends { id: number }>({
     date_from: filterValue?.from,
     date_to: filterValue?.to,
     // Dashboard usually shows pending/recent activity
-    ...(role === 'admin' ? { status: 'draft' } : {})
+    ...(role === 'admin' ? { status: 'draft,unpaid' } : {})
   }), [debouncedSearch, page, pageSize, role, filterValue]);
 
   // Data fetching hooks

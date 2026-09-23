@@ -8,17 +8,15 @@ import type { DebugFilters } from '../types';
 
 interface DebugFilterBarProps {
   filters: DebugFilters;
-  onFiltersChange: (filters: DebugFilters) => void;
+  onFilterChange: (patch: Partial<DebugFilters>) => void;
   customerOptions?: Array<{ label: string; value: string }>;
-  endpointOptions?: Array<{ label: string; value: string }>;
   activeTab: string;
 }
 
 export const DebugFilterBar = ({
   filters,
-  onFiltersChange,
+  onFilterChange,
   customerOptions = [],
-  endpointOptions = [],
   activeTab,
 }: DebugFilterBarProps) => {
   const statusOptions = activeTab === 'alerts'
@@ -34,6 +32,8 @@ export const DebugFilterBar = ({
       { label: 'Failed', value: 'failed' },
     ];
 
+  // DateFilter's type/label are presentation-only ("This Month" vs a raw range),
+  // so they live here rather than in the filters the API cares about.
   const [dateRange, setDateRange] = useState<DateFilterValue>({
     type: 'custom',
     from: filters.from_date || '',
@@ -41,49 +41,34 @@ export const DebugFilterBar = ({
     label: 'Custom',
   });
 
-  // const handleSearchChange = useCallback((search: string) => {
-  //   onFiltersChange({ ...filters, search, page: 1 });
-  // }, [filters, onFiltersChange]);
-
   const handleCustomerChange = useCallback((customer: string) => {
-    onFiltersChange({ ...filters, user_id: customer === 'all' ? undefined : customer, page: 1 });
-  }, [filters, onFiltersChange]);
-
-  const handleEndpointChange = useCallback((endpoint: string) => {
-    onFiltersChange({ ...filters, endpoint: endpoint === 'all' ? undefined : endpoint, page: 1 });
-  }, [filters, onFiltersChange]);
+    onFilterChange({ user_id: customer === 'all' ? undefined : customer, page: 1 });
+  }, [onFilterChange]);
 
   const handleStatusChange = useCallback((status: string) => {
-    onFiltersChange({ ...filters, status: status === 'all' ? undefined : status, page: 1 });
-  }, [filters, onFiltersChange]);
+    onFilterChange({ status: status === 'all' ? undefined : status, page: 1 });
+  }, [onFilterChange]);
 
   const handleDateRangeChange = useCallback((range: DateFilterValue) => {
     setDateRange(range);
-    onFiltersChange({
-      ...filters,
-      from_date: range.from,
-      to_date: range.to,
-      page: 1,
-    });
-  }, [filters, onFiltersChange]);
+    onFilterChange({ from_date: range.from, to_date: range.to, page: 1 });
+  }, [onFilterChange]);
 
   const handleReset = useCallback(() => {
     setDateRange({ type: 'custom', from: '', to: '', label: 'Custom' });
-    onFiltersChange({ search: '', page: 1, per_page: 10 });
-  }, [onFiltersChange]);
+    onFilterChange({
+      search: '',
+      user_id: undefined,
+      status: undefined,
+      from_date: undefined,
+      to_date: undefined,
+      page: 1,
+    });
+  }, [onFilterChange]);
 
   return (
     <div className="bg-white dark:bg-zinc-950 p-5 rounded-2xl border border-slate-100 dark:border-zinc-800 shadow-[0_2px_10px_-4px_rgba(0,0,0,0.05)] space-y-4 print:hidden">
       <div className="grid grid-cols-1 md:grid-cols-4 lg:grid-cols-10 gap-4">
-        {/* <div className="lg:col-span-2">
-          <FormInput
-            label="Search"
-            placeholder="Trace ID, customer..."
-            value={filters.search || ''}
-            onChange={(val) => handleSearchChange(val)}
-          />
-        </div> */}
-
         {customerOptions.length > 0 && (
           <div className="lg:col-span-3">
             <FormSelect
@@ -98,20 +83,7 @@ export const DebugFilterBar = ({
           </div>
         )}
 
-        {endpointOptions.length > 0 && (
-          <div className="lg:col-span-3">
-            <FormSelect
-              label="Endpoint"
-              value={filters.endpoint || 'all'}
-              onValueChange={handleEndpointChange}
-              options={[{ label: 'All Endpoints', value: 'all' }, ...endpointOptions]}
-              placeholder="All"
-              searchdisable={false}
-            />
-          </div>
-        )}
-
-        {activeTab !== 'failed-jobs' && activeTab !== 'external-api-failures' && statusOptions.length > 0 && (
+        {activeTab !== 'failed-jobs' && activeTab !== 'external-api-failures' && (
           <div className="lg:col-span-3">
             <FormSelect
               label="Status"
@@ -124,20 +96,6 @@ export const DebugFilterBar = ({
             />
           </div>
         )}
-
-        {/* {sourceOptions.length > 0 && (
-          <div className="lg:col-span-3">
-            <FormSelect
-              label="Source"
-              value={filters.source || 'all'}
-              onValueChange={handleSourceChange}
-              options={sourceOptions}
-              placeholder="All"
-              searchdisable={true}
-              allowClear={false}
-            />
-          </div>
-        )} */}
 
         <div className="lg:col-span-3 flex flex-col">
           <CustomLabel label="Date Range" />

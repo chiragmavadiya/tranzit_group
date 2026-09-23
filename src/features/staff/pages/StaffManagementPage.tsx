@@ -21,6 +21,7 @@ import {
 } from '../hooks/useStaff';
 import type { StaffUser } from '../types';
 import { useDebounce } from '@/hooks/useDebounce';
+import useLocalStorage from '@/hooks/useLocalStorage';
 
 const getInitials = (firstName?: string, lastName?: string) => {
   return `${firstName?.[0] || ''}${lastName?.[0] || ''}`.toUpperCase();
@@ -74,7 +75,7 @@ const StatusSwitch = ({ user }: { user: StaffUser }) => {
 export default function StaffManagementPage() {
   const [search, setSearch] = useState('');
   const [pageSize, setPageSize] = useState(25);
-  const [page, setPage] = useState(1);
+  const [page, setPage] = useLocalStorage<number>('staff_page', 1);
 
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
@@ -188,7 +189,7 @@ export default function StaffManagementPage() {
         const name = `${row.first_name} ${row.last_name}`;
         return (
           <div className="flex items-center gap-3">
-            <div className={cn("w-8 h-8 rounded-full flex items-center justify-center text-[10px] font-bold shadow-sm border border-white dark:border-zinc-800 pt-[3px]", initialsBg)}>
+            <div className={cn("w-8 h-8 rounded-full flex items-center justify-center text-[10px] font-bold shadow-sm border border-white dark:border-zinc-800", initialsBg)}>
               {initials}
             </div>
             <div className="flex flex-col">

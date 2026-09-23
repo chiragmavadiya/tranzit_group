@@ -7,7 +7,9 @@ import { AUSTRALIAN_STATES } from '../constants';
 import { useAddressBookDetails } from '../hooks/useAddressBook';
 import { PlaceAutocomplete } from '@/components/common/AutoComplateAddress';
 import { showToast } from '@/components/ui/custom-toast';
-import { cleanSpaces, isPhoneValid } from '@/lib/utils';
+import { cleanSpaces, isPhoneValid, PHONE_ERROR_MESSAGE } from '@/lib/phone';
+import { useValidateLocality } from '@/hooks/useValidateLocality';
+import { LocalityWarning } from '@/components/common/LocalityWarning';
 // import { GlobalCourierSelect } from '@/features/courier-surcharge/components/GlobalCourierSelect';
 
 interface CreateAddressDialogProps {
@@ -68,6 +70,7 @@ export function CreateAddressDialog({
   const [submited, setSubmited] = useState(false);
   const [isSelected, setIsSelected] = useState(false);
   const { data: detailsData, isLoading: isFetchingDetails } = useAddressBookDetails(editingAddressId || undefined);
+  const { error: localityError, suggestions: localitySuggestions, isPending: isLocalityPending } = useValidateLocality(formData.suburb, formData.state, formData.postcode, formData.address);
 
   // const formRef = useRef<HTMLFormElement>(null);
 
@@ -91,7 +94,17 @@ export function CreateAddressDialog({
     }
 
     if (formData.phone && !isPhoneValid(formData.phone)) {
-      showToast("Please enter a valid phone number", 'error');
+      showToast(PHONE_ERROR_MESSAGE, 'error');
+      return;
+    }
+
+    // Keep the modal open on an invalid locality — the inline banner explains why
+    if (localityError) {
+      return;
+    }
+
+    if (isLocalityPending) {
+      showToast("Validating address, please wait", 'error');
       return;
     }
 
@@ -185,8 +198,8 @@ export function CreateAddressDialog({
                 placeholder="Phone number"
                 isFullWidth
                 required
-                error={submited && formData.phone.length < 1}
-                errormsg="Please enter a phone number"
+                error={submited && (!formData.phone?.trim() || !isPhoneValid(formData.phone))}
+                errormsg={!formData.phone?.trim() ? "Please enter a phone number" : PHONE_ERROR_MESSAGE}
               />
               <FormTextarea
                 layout="horizontal"
@@ -247,7 +260,7 @@ export function CreateAddressDialog({
                 onChange={(val) => handleChange('unit_number', val)}
                 placeholder="e.g. 1234"
                 isFullWidth
-                disabled={isSelected}
+                // disabled={isSelected}
               />
               <FormInput
                 layout="horizontal"
@@ -314,6 +327,18 @@ export function CreateAddressDialog({
 
             </div>
           </div>
+
+          {localityError && (
+            <LocalityWarning
+              message={localityError}
+              suggestions={localitySuggestions}
+              onSelect={(suggestion) => {
+                handleChange('suburb', suggestion.suburb);
+                handleChange('state', suggestion.state);
+                handleChange('postcode', suggestion.postcode);
+              }}
+            />
+          )}
         </div>
       </div>
       {/* </form> */}

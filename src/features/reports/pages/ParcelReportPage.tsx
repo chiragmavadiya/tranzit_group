@@ -13,6 +13,7 @@ import {
 import { FormSelect, FormInput } from '@/features/orders/components/OrderFormUI';
 import { DateFilter } from '@/components/common/DateFilter';
 import type { DateFilterValue } from '@/components/common/DateFilter/types';
+import { hydrateDateFilter } from '@/components/common/DateFilter/utils';
 import { useCustomers } from '@/features/customers/hooks/useCustomers';
 // import { showToast } from '@/components/ui/custom-toast';
 import { useAppSelector } from '@/hooks/store.hooks';
@@ -31,7 +32,7 @@ export default function ParcelReportPage() {
     from: undefined,
     to: undefined,
     label: 'All Time',
-  });
+  }, hydrateDateFilter);
 
   const [search, setSearch] = useLocalStorage<string>('parcel_report_search', '');
   const [pageSize, setPageSize] = useLocalStorage<number>('parcel_report_page_size', 100);
@@ -225,6 +226,7 @@ export default function ParcelReportPage() {
         <DataTable
           columns={(isAdmin ? ADMIN_PARCEL_COLUMNS : PARCEL_COLUMNS) as any}
           data={data?.data || []}
+          moduleName="parcelReport"
           header={false}
           className="pb-3 text-xs flex-none h-auto"
           totalItems={data?.meta?.total || 0}

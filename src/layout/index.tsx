@@ -9,14 +9,13 @@ import { useAppSelector } from '@/hooks/store.hooks';
 import SubscriptionPlanModal from '@/features/customer-settings/components/SubscriptionPlanModal';
 import LowBalanceModal from '@/features/wallet/components/LowBalanceModal';
 import { useGetUserDetails } from '@/features/auth/hooks/useAuth';
+import { hasPendingParcelDefaults } from '@/features/integrations/utils';
 import { useWalletSummary } from '@/features/wallet/hooks/useWallet';
 import useLocalStorage from '@/hooks/useLocalStorage';
 import { LOW_BALANCE_THRESHOLD } from '@/constants';
 import { ChevronLeftIcon, ChevronRightIcon } from 'lucide-react';
 
 export default function Layout() {
-  console.log("Render Layout")
-
   const [isCollapsed, setIsCollapsed] = useState(window.innerWidth <= 1280);
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
   const [isMobile, setIsMobile] = useState(window.innerWidth < 667);
@@ -40,10 +39,12 @@ export default function Layout() {
   const [showLowBalanceModal, setShowLowBalanceModal] = useState(false);
 
   useEffect(() => {
-    if (role === 'customer' && walletData?.data && walletBalance < LOW_BALANCE_THRESHOLD && !lowBalanceDismissed) {
+    // Lowest priority of the blocking modals: held back while the Shopify parcel details or the
+    // Terms modal is up, so it can't stack on top of either
+    if (role === 'customer' && !hasPendingParcelDefaults(userData) && !userData?.must_accept_terms && walletData?.data && walletBalance < LOW_BALANCE_THRESHOLD && !lowBalanceDismissed) {
       setShowLowBalanceModal(true);
     }
-  }, [role, walletData, walletBalance, lowBalanceDismissed]);
+  }, [role, userData, walletData, walletBalance, lowBalanceDismissed]);
 
   const handleLowBalanceOpenChange = (open: boolean) => {
     setShowLowBalanceModal(open);

@@ -129,6 +129,17 @@ export const customerService = {
     },
 
     /**
+     * Activate or deactivate the customer's access to the Customer Portal
+     */
+    setAccountActivation: async (
+        id: number | string,
+        account_activation: boolean,
+    ): Promise<GenericDataResponse<{ customer_id: number; account_activation: boolean }>> => {
+        const response = await api.patch(API_ENDPOINTS.ADMIN_CUSTOMERS.ACCOUNT_ACTIVATION(id), { account_activation });
+        return response.data;
+    },
+
+    /**
      * Export list of customers
      */
     exportList: async (format: string, params?: Record<string, any>): Promise<{ blob: Blob; filename: string }> => {
@@ -209,6 +220,14 @@ export const customerService = {
      */
     getIntegrations: async (id: number | string): Promise<CustomerIntegrationResponse> => {
         const response = await api.get<any>(API_ENDPOINTS.ADMIN_CUSTOMERS.INTEGRATIONS(id));
+        return response.data;
+    },
+
+    /**
+     * Get customer items
+     */
+    getItems: async (id: number | string, params?: Record<string, any>): Promise<any> => {
+        const response = await api.get<any>(API_ENDPOINTS.ADMIN_CUSTOMERS.ITEMS(id), { params });
         return response.data;
     },
 

@@ -8,13 +8,14 @@ import { TRANSACTION_STATUS_CONFIG } from '@/features/wallet/constants';
 import { StatusCell } from '@/components/common';
 import { Button } from '@/components/ui/button';
 import { CreditDebitWalletDialog } from './CreditDebitWalletDialog';
+import useLocalStorage from '@/hooks/useLocalStorage';
 
 interface TransactionTabProps {
     customerId: string;
 }
 
 export const TransactionTab = ({ customerId }: TransactionTabProps) => {
-    const [page, setPage] = useState(1);
+    const [page, setPage] = useLocalStorage<number>('transaction_page', 1);
     const [pageSize, setPageSize] = useState(25);
     const [search, setSearch] = useState('');
     const [isTopUpOpen, setIsTopUpOpen] = useState(false);

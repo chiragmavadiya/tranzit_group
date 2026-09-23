@@ -11,12 +11,13 @@ import { useDebounce } from '@/hooks/useDebounce';
 import { FormInput, FormSelect } from '@/features/orders/components/OrderFormUI';
 import { DropdownCustomMenu } from '@/components/ui/dropdown-menu';
 import { DEFAULT_PAGE_SIZES } from '@/constants/global.constants';
+import useLocalStorage from '@/hooks/useLocalStorage';
 
 export default function BookPickupPage() {
     const [searchParams] = useSearchParams();
     const activeTab = searchParams.get('tab') || 'new';
     const [search, setSearch] = useState('');
-    const [page, setPage] = useState(1);
+    const [page, setPage] = useLocalStorage<number>('bookpickup_page', 1);
     const [pageSize, setPageSize] = useState(25);
     const [selectedRows, setSelectedRows] = useState<string[]>([]);
 

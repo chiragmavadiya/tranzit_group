@@ -13,6 +13,11 @@ export interface DrawerProps {
   children: React.ReactNode
   footer?: React.ReactNode
   className?: string
+  /**
+   * Fires once the close transition has finished and the panel has left the DOM.
+   * Use it to hand control to another overlay, so the two never stack.
+   */
+  onCloseComplete?: () => void
 }
 
 export function Drawer({
@@ -22,8 +27,12 @@ export function Drawer({
   description,
   children,
   footer,
-  className
+  className,
+  onCloseComplete
 }: DrawerProps) {
+  const titleId = React.useId()
+  const panelRef = React.useRef<HTMLDivElement>(null)
+
   React.useEffect(() => {
     if (open) {
       document.body.style.overflow = "hidden"
@@ -35,8 +44,23 @@ export function Drawer({
     }
   }, [open])
 
+  // Escape closes the panel, and focus moves into it on open so keyboard users land
+  // inside the drawer instead of staying behind the overlay.
+  React.useEffect(() => {
+    if (!open) return
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") onClose()
+    }
+    document.addEventListener("keydown", handleKeyDown)
+    const focusTimer = window.setTimeout(() => panelRef.current?.focus(), 0)
+    return () => {
+      document.removeEventListener("keydown", handleKeyDown)
+      window.clearTimeout(focusTimer)
+    }
+  }, [open, onClose])
+
   const content = (
-    <AnimatePresence>
+    <AnimatePresence onExitComplete={onCloseComplete}>
       {open && (
         <>
           <motion.div
@@ -44,9 +68,15 @@ export function Drawer({
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             onClick={onClose}
+            aria-hidden="true"
             className="fixed inset-0 z-[100] bg-black/40 backdrop-blur-sm"
           />
           <motion.div
+            ref={panelRef}
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby={titleId}
+            tabIndex={-1}
             initial={{ x: "100%" }}
             animate={{ x: 0 }}
             exit={{ x: "100%" }}
@@ -59,7 +89,7 @@ export function Drawer({
             <div className="flex flex-col h-full">
               <div className="flex items-start justify-between px-6 py-5 border-b border-gray-100 dark:border-zinc-800">
                 <div className="flex flex-col gap-1">
-                  <h2 className="my-0 text-xl font-bold text-gray-900 dark:text-zinc-100">
+                  <h2 id={titleId} className="my-0 text-xl font-bold text-gray-900 dark:text-zinc-100">
                     {title}
                   </h2>
                   {description && (
@@ -73,6 +103,7 @@ export function Drawer({
                   size="icon-sm"
                   className="rounded-full w-8 h-8 hover:bg-gray-100 dark:hover:bg-zinc-800"
                   onClick={onClose}
+                  aria-label="Close panel"
                 >
                   <X className="w-4 h-4 text-gray-500" />
                 </Button>

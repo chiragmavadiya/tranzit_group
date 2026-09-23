@@ -333,7 +333,7 @@ export default function GlobalConfigPage() {
     ],
     [handleDeleteClick, handleOpenModal, customersData, toggleStatusMutation]
   );
-  console.log(apiData, 'apiData.data')
+
   return (
     <div className="flex flex-col flex-1 gap-6 p-page-padding animate-in fade-in slide-in-from-bottom-2 duration-500 bg-slate-50/30 dark:bg-zinc-950/30 overflow-y-auto">
       <div className="rounded-2xl shadow-sm border border-slate-100 dark:border-zinc-800 bg-white dark:bg-zinc-950 flex-none h-auto">

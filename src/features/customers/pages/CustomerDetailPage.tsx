@@ -12,6 +12,7 @@ import { InvoiceManagementTab } from '../components/customer-detail/InvoiceManag
 import { useCustomerDetails } from '../hooks/useCustomers';
 import CustomerDialog from '../components/CustomerDialog';
 import { CustomerIntegrationTab } from '../components/customer-detail/CustomerIntegrationTab';
+import { CustomerItemsTab } from '../components/customer-detail/CustomerItemsTab';
 import PageLoading from '@/components/common/Loader';
 
 export default function CustomerDetailPage() {
@@ -62,6 +63,7 @@ export default function CustomerDetailPage() {
                     {activeTab === 'Credit Application' && <CreditApplicationTab />}
                     {activeTab === 'Invoice Management' && <InvoiceManagementTab customerId={id as string} />}
                     {activeTab === 'Integration' && <CustomerIntegrationTab customerId={id as string} />}
+                    {activeTab === 'Items' && <CustomerItemsTab customerId={id as string} />}
                 </div>
             </div>
 
